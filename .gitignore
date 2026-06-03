@@ -1,0 +1,53 @@
+# Local workspace / research cache
+.work/
+
+# Secrets and private config
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.csr
+*.mnemonic
+*mnemonic*
+*private*
+*secret*
+*seed*
+*wallet*
+keyring/
+keys/
+secrets/
+credentials/
+config/*.toml.local
+
+# Cosmos / CometBFT node state
+.ignite/
+data/
+priv_validator_key.json
+priv_validator_state.json
+node_key.json
+genesis.json
+addrbook.json
+
+# Build outputs
+build/
+dist/
+out/
+bin/
+*.exe
+*.test
+coverage.out
+
+# Go / tooling caches
+.cache/
+tmp/
+vendor/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
