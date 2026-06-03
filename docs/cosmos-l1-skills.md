@@ -51,3 +51,4 @@ This knowledge pack is consulted before Cosmos SDK L1 design or implementation w
 - Keep files below 500 lines by splitting keeper, msg, query, genesis, and params logic.
 - Test keeper logic first, MsgServer authorization second, and full app flows third.
 - Keep BlockSTM disabled until deterministic parallel execution has chain-specific test coverage.
+- Run the engineering governance loop before code changes and record the outcome in the final implementation summary.

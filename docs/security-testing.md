@@ -58,3 +58,5 @@ After each implementation increment:
 - Monolith risk check.
 - Missing invariant list.
 - Next refactor proposal.
+
+The detailed governance loop lives in [Engineering Governance](engineering-governance.md) and is mandatory before code changes, after tests, and before commits.

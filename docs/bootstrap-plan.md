@@ -31,6 +31,7 @@ Post-scaffold work:
 - Confirm generated app uses the expected SDK release family.
 - Split app wiring if generated files become too large.
 - Add first CI workflow after the Go module exists.
+- Apply the engineering governance checklist before and after reviewing generated code.
 
 ## Increment 3: Tokenfactory Module
 
