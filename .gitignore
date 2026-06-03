@@ -25,7 +25,10 @@ config/*.toml.local
 
 # Cosmos / CometBFT node state
 .ignite/
+.l1d/
 data/
+node_home/
+networks/local/
 priv_validator_key.json
 priv_validator_state.json
 node_key.json
@@ -40,11 +43,17 @@ bin/
 *.exe
 *.test
 coverage.out
+coverage/
 
 # Go / tooling caches
 .cache/
 tmp/
 vendor/
+
+# Logs and runtime diagnostics
+*.log
+*.prof
+*.pprof
 
 # OS / editor
 .DS_Store
