@@ -13,6 +13,7 @@ No node binary or Cosmos application code has been scaffolded yet.
 ## Engineering Rules
 
 - Follow the [engineering governance standard](docs/engineering-governance.md) before implementation, refactoring, testing, or debugging.
+- Follow the [skill orchestration standard](docs/skill-orchestration.md) before selecting tools, skills, or MCP integrations.
 - Every feature must be small enough for a focused commit.
 - Use Conventional Commit messages.
 - Keep module state deterministic and isolated.
@@ -29,6 +30,7 @@ No node binary or Cosmos application code has been scaffolded yet.
 - [Genesis and params model](docs/genesis-params.md)
 - [Security and testing strategy](docs/security-testing.md)
 - [Engineering governance](docs/engineering-governance.md)
+- [Skill orchestration](docs/skill-orchestration.md)
 - [Bootstrap implementation plan](docs/bootstrap-plan.md)
 - [COSMOS_L1_SKILLS](docs/cosmos-l1-skills.md)
 
