@@ -84,6 +84,56 @@ function Assert-BondedStatus {
   }
 }
 
+function New-DelegateTxArgs {
+  param(
+    [string]$ValidatorAddress,
+    [string]$Amount,
+    [string]$FromKey = "node0",
+    [string]$FromHome,
+    [hashtable]$Extra = @{}
+  )
+
+  $args = @(
+    "tx", "staking", "delegate", $ValidatorAddress, $Amount,
+    "--from", $FromKey,
+    "--home", $FromHome,
+    "--chain-id", $ChainId,
+    "--keyring-backend", "test",
+    "--fees", $Fees,
+    "--yes",
+    "--broadcast-mode", "sync",
+    "--node", $rpcNode,
+    "--output", "json"
+  )
+
+  foreach ($key in $Extra.Keys) {
+    $args += @($key, [string]$Extra[$key])
+  }
+  return $args
+}
+
+function Assert-DelegateTxFailsSafely {
+  param(
+    [string[]]$Arguments,
+    [string]$Name
+  )
+
+  try {
+    Send-LocalnetTx `
+      -Binary $Binary `
+      -Arguments $Arguments `
+      -RPCPort $node0Ports.RPC `
+      -TimeoutSeconds $TimeoutSeconds `
+      -ExpectFailure | Out-Null
+  } catch {
+    if ($_.Exception.Message -notmatch "did not return JSON") {
+      throw
+    }
+    Assert-LocalnetCliFailure -Binary $Binary -Arguments $Arguments | Out-Null
+  }
+  Write-Host "$Name rejected"
+}
+
 Push-Location $RepoRoot
 try {
   & .\scripts\localnet\stop.ps1 -OutputDir $OutputDir
@@ -174,6 +224,24 @@ try {
 
   $afterPower = Wait-LocalnetTotalVotingPowerGreater -PreviousPower $beforePower -RPCPort $node0Ports.RPC -TimeoutSeconds $TimeoutSeconds
   Write-Host "validator voting power increased from $beforePower to $afterPower"
+
+  Assert-DelegateTxFailsSafely `
+    -Arguments (New-DelegateTxArgs -ValidatorAddress $validatorAddress -Amount "1uatom" -FromHome $node0Home) `
+    -Name "wrong delegation denom"
+
+  Assert-DelegateTxFailsSafely `
+    -Arguments (New-DelegateTxArgs -ValidatorAddress $validatorAddress -Amount "999999999999999999norb" -FromHome $node0Home) `
+    -Name "insufficient delegation funds"
+
+  Assert-LocalnetCliFailure `
+    -Binary $Binary `
+    -Arguments (New-DelegateTxArgs -ValidatorAddress "not-a-validator-address" -Amount "1norb" -FromHome $node0Home) | Out-Null
+  Write-Host "invalid validator address rejected"
+
+  Assert-LocalnetCliFailure `
+    -Binary $Binary `
+    -Arguments (New-DelegateTxArgs -ValidatorAddress $validatorAddress -Amount "1norb" -FromHome $node0Home -FromKey "missing-delegator") | Out-Null
+  Write-Host "invalid delegator key rejected"
 
   $height = Wait-LocalnetHeight -TargetHeight ([int64]$height + 1) -RPCPort $node0Ports.RPC -TimeoutSeconds $TimeoutSeconds
   Write-Host "PoS smoke flow completed at height $height"

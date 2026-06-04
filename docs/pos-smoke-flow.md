@@ -41,6 +41,7 @@ Expected result:
 - delegation tx from `node0` is accepted
 - delegation query shows a `norb` balance
 - CometBFT total voting power increases after the delegation
+- wrong-denom, insufficient-funds, malformed-validator, and missing-delegator delegation attempts fail safely
 
 Recovery:
 
@@ -147,7 +148,7 @@ Stop the network:
 ## Audit Notes
 
 - Staking, fees, and bank balances in this flow must use `norb`.
-- Wrong-denom, insufficient-funds, and malformed-validator delegation paths are covered by app tests, not by destructive localnet actions.
+- Wrong-denom, insufficient-funds, malformed-validator, and missing-delegator delegation paths are covered by app tests and the localnet smoke without changing staking module behavior. Sequence/replay protection stays in the shared `x/auth` boundary and is not modeled by this PoS-specific smoke.
 - The e2e flow checks aggregate CometBFT voting power, so it is stable across 3-validator and 5-validator profiles and does not depend on validator ordering.
 - Localnet scripts must not print mnemonics or write helper keys outside ignored node homes.
 - Slashing smoke is read-only on localnet: query params and signing infos only.

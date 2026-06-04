@@ -64,6 +64,7 @@ func TestPoSRejectsInvalidDelegations(t *testing.T) {
 	tests := []struct {
 		name             string
 		fundedCoins      sdk.Coins
+		delegatorAddress string
 		delegationAmount sdk.Coin
 		validatorAddress string
 	}{
@@ -83,6 +84,11 @@ func TestPoSRejectsInvalidDelegations(t *testing.T) {
 			delegationAmount: sdk.NewInt64Coin(BondDenom, 5_000_000),
 			validatorAddress: "not-a-validator-address",
 		},
+		{
+			name:             "invalid delegator address",
+			delegatorAddress: "not-a-delegator-address",
+			delegationAmount: sdk.NewInt64Coin(BondDenom, 5_000_000),
+		},
 	}
 
 	for _, tc := range tests {
@@ -95,10 +101,14 @@ func TestPoSRejectsInvalidDelegations(t *testing.T) {
 				validatorAddress = tc.validatorAddress
 			}
 
-			delegator := AddTestAddrsWithCoins(t, app, ctx, 1, tc.fundedCoins)[0]
+			delegatorAddress := tc.delegatorAddress
+			if delegatorAddress == "" {
+				delegator := AddTestAddrsWithCoins(t, app, ctx, 1, tc.fundedCoins)[0]
+				delegatorAddress = delegator.String()
+			}
 			msgServer := stakingkeeper.NewMsgServerImpl(app.StakingKeeper)
 			_, err := msgServer.Delegate(ctx, stakingtypes.NewMsgDelegate(
-				delegator.String(),
+				delegatorAddress,
 				validatorAddress,
 				tc.delegationAmount,
 			))

@@ -57,6 +57,33 @@ function Invoke-LocalnetCliJsonAllowFailure {
   return $text.Substring($jsonStart) | ConvertFrom-Json
 }
 
+function Assert-LocalnetCliFailure {
+  param(
+    [string]$Binary,
+    [string[]]$Arguments,
+    [string]$ExpectedLog = ""
+  )
+
+  $previousErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    $output = & $Binary @Arguments 2>&1
+    $exitCode = $LASTEXITCODE
+  } finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
+
+  if ($exitCode -eq 0) {
+    throw "orbitalisd command succeeded but failure was expected: $Binary $($Arguments -join ' ')"
+  }
+
+  $text = $output -join "`n"
+  if ($ExpectedLog -and ($text -notmatch [regex]::Escape($ExpectedLog))) {
+    throw "orbitalisd command failed, but output did not contain '$ExpectedLog': $text"
+  }
+  return $text
+}
+
 function Get-LocalnetTxHash {
   param([object]$Tx)
 
