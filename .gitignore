@@ -1,5 +1,6 @@
 # Local workspace / research cache
 .work/
+.codex/
 
 # Secrets and private config
 .env
