@@ -69,7 +69,7 @@ Every change must record architecture, security, scalability, and test strategy 
 
 - Query methods are read-only and return gRPC status errors for nil, malformed, not found, and invalid id requests.
 - List endpoints use pagination/default limits or an explicit prototype cap with a MUST FIX note before public high-cardinality use.
-- Proto changes pass `buf lint` and follow generation policy. Public breaking changes require versioning.
+- Proto changes pass `buf lint`, generated drift verification, and [proto-workflow.md](../proto-workflow.md). Public breaking changes require versioning.
 - CLI, gRPC, and REST examples match [Query Surface](../query-surface.md); no local filesystem paths or secrets appear in API output.
 
 ## Release Artifacts

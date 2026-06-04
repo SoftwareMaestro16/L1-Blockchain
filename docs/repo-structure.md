@@ -44,6 +44,8 @@
 - `x/<module>/types/` owns generated types, constants, errors, and expected keeper interfaces.
 - `tests/` owns cross-module, adversarial, and determinism test suites.
 
+Proto source and generated Go must follow [proto-workflow.md](proto-workflow.md): edit `.proto`, run `buf lint`, verify generation into `.work\bufgen`, and update checked-in generated files only from approved buf output.
+
 ## Git Hygiene
 
 - Commit source, docs, proto, tests, and CI config.

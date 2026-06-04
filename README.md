@@ -43,10 +43,10 @@ Proto checks:
 ```powershell
 $env:PATH = "$PWD\.work\tools\bin;$env:PATH"
 buf lint
-buf generate
+.\scripts\proto\verify-generated.ps1 -Buf .\.work\tools\bin\buf.exe
 ```
 
-`buf generate` writes verification output into ignored `.work\bufgen`; checked-in generated Go code lives under `x\*\types`.
+`buf generate` writes verification output into ignored `.work\bufgen`; checked-in generated Go code lives under `x\*\types`. See [docs/proto-workflow.md](docs/proto-workflow.md) before changing proto contracts or generated files.
 
 ## Local 3-Node Network
 

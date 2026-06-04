@@ -180,8 +180,18 @@ try {
 
   if (Test-Path -LiteralPath $Buf) {
     Invoke-AuditNative -Name "buf-lint" -Executable $Buf -Arguments @("lint")
+    Invoke-AuditPowerShell `
+      -Name "proto-generated-verify" `
+      -Notes "buf generate output must match checked-in x/*/types generated files" `
+      -Script {
+        & (Join-Path $RepoRoot "scripts\proto\verify-generated.ps1") -Buf $Buf
+        if ($LASTEXITCODE -ne 0) {
+          throw "proto generated verification failed with exit code $LASTEXITCODE"
+        }
+      }
   } else {
     Add-AuditResult -Name "buf-lint" -Status "skipped" -ExitCode 0 -Log "" -Notes "buf.exe not found"
+    Add-AuditResult -Name "proto-generated-verify" -Status "skipped" -ExitCode 0 -Log "" -Notes "buf.exe not found"
   }
 
   if (Test-Path -LiteralPath $Gitleaks) {
