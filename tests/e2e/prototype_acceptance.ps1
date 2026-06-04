@@ -116,6 +116,10 @@ try {
   $node1 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node1Home -KeyName "node1"
 
   Write-AcceptanceStep "query base state"
+  $status = Invoke-LocalnetRpc -RPCPort $node0Ports.RPC -Path "/status"
+  if ($status.result.node_info.network -ne $ChainId) {
+    throw "RPC status network mismatch: $($status.result.node_info.network)"
+  }
   $latestBlock = Invoke-AcceptanceQueryCliJson -Context $ctx -Arguments @("query", "block")
   if (-not ($latestBlock.header.height -or $latestBlock.block.header.height)) {
     throw "query block did not return a block height"

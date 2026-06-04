@@ -69,6 +69,7 @@ Stop or reset:
 Prototype acceptance and targeted smoke tests:
 
 ```powershell
+.\tests\e2e\prototype_smoke.ps1
 .\tests\e2e\prototype_acceptance.ps1
 .\tests\e2e\localnet_smoke.ps1
 .\tests\e2e\native_token_smoke.ps1

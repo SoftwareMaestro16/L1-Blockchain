@@ -64,6 +64,7 @@ For `.localnet-5`, set `$HOME` and `$NODE1_HOME` under `.localnet-5`. Keep `$NOD
 One-command acceptance:
 
 ```powershell
+.\tests\e2e\prototype_smoke.ps1
 .\tests\e2e\prototype_acceptance.ps1
 .\tests\e2e\prototype_acceptance.ps1 -Profile Full -OutputDir .localnet-5 -ValidatorCount 5
 ```

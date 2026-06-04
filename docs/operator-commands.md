@@ -252,6 +252,8 @@ build\orbitalisd.exe version --long --output json
 build\orbitalisd.exe query fees params --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
 build\orbitalisd.exe query dex pool 1 --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
 .\tests\scripts\operator_commands_doc_test.ps1
+.\tests\scripts\prototype_smoke_wrapper_test.ps1
+.\tests\e2e\prototype_smoke.ps1
 .\tests\e2e\prototype_acceptance.ps1
 .\scripts\security\prototype-audit.ps1 -Profile Fast
 .\tests\e2e\localnet_smoke.ps1

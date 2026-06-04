@@ -9,6 +9,12 @@ The suite proves that a local prototype can be built from the repository, initia
 Default PR-friendly smoke profile:
 
 ```powershell
+.\tests\e2e\prototype_smoke.ps1
+```
+
+Equivalent configurable acceptance command:
+
+```powershell
 .\tests\e2e\prototype_acceptance.ps1
 ```
 
@@ -52,7 +58,7 @@ Shift ports or choose a specific node endpoint:
 3. Reset/init localnet through `scripts\localnet\init.ps1`.
 4. Validate genesis through `scripts\localnet\validate-genesis.ps1`.
 5. Start validators and wait for height, RPC, peers, REST, and gRPC health.
-6. Query block, native token metadata, fees params, and REST node info.
+6. Query RPC status, block, native token metadata, fees params, and REST node info.
 7. Send `norb` by bank tx and verify balance change.
 8. Reject a tx with `testtoken` fee.
 9. Create a tokenfactory denom, mint it, and query it through gRPC/REST.
@@ -93,7 +99,7 @@ If `-KeepLogsOnFailure` is not set, the suite resets the localnet output directo
 Recommended PR check:
 
 ```powershell
-.\tests\e2e\prototype_acceptance.ps1 -Profile Smoke
+.\tests\e2e\prototype_smoke.ps1
 ```
 
 Recommended manual/nightly check:

@@ -59,6 +59,7 @@ foreach ($required in @(
     '\.\\scripts\\localnet\\diagnostics\.ps1',
     '\.\\scripts\\localnet\\stop\.ps1',
     '\.\\scripts\\localnet\\reset\.ps1',
+    '\.\\tests\\e2e\\prototype_smoke\.ps1',
     'build\\orbitalisd\.exe version --long --output json',
     'build\\orbitalisd\.exe query block',
     'build\\orbitalisd\.exe query bank balance',
