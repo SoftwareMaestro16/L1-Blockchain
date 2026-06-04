@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"os"
 
 	dbm "github.com/cosmos/cosmos-db"
@@ -16,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtxconfig "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -24,6 +26,8 @@ import (
 // NewRootCmd creates a new root command for orbitalisd. It is called once in the
 // main function.
 func NewRootCmd() *cobra.Command {
+	extraVersionInfo := initVersionInfo()
+
 	// we "pre"-instantiate the application for getting the injected/configured encoding configuration
 	tempApp := l1app.NewL1App(log.NewNopLogger(), dbm.NewMemDB(), true, simtestutil.NewAppOptionsWithFlagHome(l1app.DefaultNodeHome))
 	encodingConfig := params.EncodingConfig{
@@ -93,8 +97,12 @@ func NewRootCmd() *cobra.Command {
 			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customCMTConfig)
 		},
 	}
+	rootCmd.SetContext(context.WithValue(context.Background(), version.ContextKey{}, extraVersionInfo))
 
 	initRootCmd(rootCmd, encodingConfig.TxConfig, tempApp.BasicModuleManager)
+	if versionCmd, _, err := rootCmd.Find([]string{"version"}); err == nil && versionCmd != nil {
+		versionCmd.SetContext(context.WithValue(context.Background(), version.ContextKey{}, extraVersionInfo))
+	}
 
 	// add keyring to autocli opts
 	autoCliOpts := tempApp.AutoCliOpts()

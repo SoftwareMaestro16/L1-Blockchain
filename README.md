@@ -78,6 +78,8 @@ Smoke test:
 
 ## Example CLI
 
+See [docs/operator-commands.md](docs/operator-commands.md) for the full prototype operator command runbook.
+
 ```powershell
 build\orbitalisd.exe query block --node tcp://127.0.0.1:26657
 build\orbitalisd.exe query bank denom-metadata norb --node tcp://127.0.0.1:26657 --output json

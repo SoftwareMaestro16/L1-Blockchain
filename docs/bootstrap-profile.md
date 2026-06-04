@@ -71,6 +71,8 @@ Module account permissions are intentionally narrow:
 
 ## Commands
 
+For the full operator CLI runbook, including reusable endpoint variables, common tx flags, and troubleshooting, see [operator-commands.md](operator-commands.md).
+
 Initialize the default 3-validator localnet:
 
 ```powershell
