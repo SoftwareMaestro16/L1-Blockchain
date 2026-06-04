@@ -4,8 +4,16 @@ function Invoke-LocalnetCliJson {
     [string[]]$Arguments
   )
 
-  $output = & $Binary @Arguments 2>&1
-  if ($LASTEXITCODE -ne 0) {
+  $previousErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    $output = & $Binary @Arguments 2>&1
+    $exitCode = $LASTEXITCODE
+  } finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
+
+  if ($exitCode -ne 0) {
     throw "orbitalisd command failed: $Binary $($Arguments -join ' ')`n$($output -join "`n")"
   }
 
@@ -45,7 +53,13 @@ function Invoke-LocalnetCliJsonAllowFailure {
     [string[]]$Arguments
   )
 
-  $output = & $Binary @Arguments 2>&1
+  $previousErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    $output = & $Binary @Arguments 2>&1
+  } finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
   $text = $output -join "`n"
   $jsonStart = $text.IndexOf("{")
   if ($jsonStart -lt 0) {

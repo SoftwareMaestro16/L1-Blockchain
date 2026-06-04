@@ -84,7 +84,7 @@ func TestCreateDenomRejectsNativeTokenSpoofing(t *testing.T) {
 	admin := l1app.AddTestAddrsIncremental(app, ctx, 1, sdkmath.NewInt(1_000_000))[0]
 	msgServer := tokenfactorykeeper.NewMsgServerImpl(app.TokenFactoryKeeper)
 
-	for _, subdenom := range []string{appparams.BaseDenom, appparams.DisplayDenom, appparams.TokenName} {
+	for _, subdenom := range []string{appparams.BaseDenom, appparams.DisplayDenom, "orb", appparams.TokenName} {
 		t.Run(subdenom, func(t *testing.T) {
 			_, err := msgServer.CreateDenom(ctx, &types.MsgCreateDenom{
 				Creator:  admin.String(),
@@ -121,4 +121,52 @@ func TestFactoryTokenMetadataDoesNotReplaceNativeMetadata(t *testing.T) {
 	require.Equal(t, createRes.NewTokenDenom, factoryMetadata.Symbol)
 	require.NotEqual(t, appparams.BaseDenom, factoryMetadata.Base)
 	require.NotEqual(t, appparams.DisplayDenom, factoryMetadata.Display)
+}
+
+func TestAdminTransferRejectsOldAdminAndPreservesSupply(t *testing.T) {
+	app := l1app.Setup(t, false)
+	ctx := app.NewContext(false)
+	addrs := l1app.AddTestAddrsIncremental(app, ctx, 2, sdkmath.NewInt(1_000_000))
+	admin, newAdmin := addrs[0], addrs[1]
+	msgServer := tokenfactorykeeper.NewMsgServerImpl(app.TokenFactoryKeeper)
+
+	createRes, err := msgServer.CreateDenom(ctx, &types.MsgCreateDenom{
+		Creator:  admin.String(),
+		Subdenom: "adminflow",
+	})
+	require.NoError(t, err)
+	denom := createRes.NewTokenDenom
+
+	_, err = msgServer.Mint(ctx, &types.MsgMint{
+		Sender:        admin.String(),
+		Amount:        sdk.NewInt64Coin(denom, 1_000),
+		MintToAddress: admin.String(),
+	})
+	require.NoError(t, err)
+
+	_, err = msgServer.ChangeAdmin(ctx, &types.MsgChangeAdmin{
+		Sender:   admin.String(),
+		Denom:    denom,
+		NewAdmin: newAdmin.String(),
+	})
+	require.NoError(t, err)
+
+	_, err = msgServer.Mint(ctx, &types.MsgMint{
+		Sender:        admin.String(),
+		Amount:        sdk.NewInt64Coin(denom, 1),
+		MintToAddress: admin.String(),
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorized)
+
+	_, err = msgServer.Mint(ctx, &types.MsgMint{
+		Sender:        newAdmin.String(),
+		Amount:        sdk.NewInt64Coin(denom, 100),
+		MintToAddress: newAdmin.String(),
+	})
+	require.NoError(t, err)
+
+	supply := app.BankKeeper.GetSupply(ctx, denom)
+	require.Equal(t, "1100", supply.Amount.String())
+	require.Equal(t, "1000", app.BankKeeper.GetBalance(ctx, admin, denom).Amount.String())
+	require.Equal(t, "100", app.BankKeeper.GetBalance(ctx, newAdmin, denom).Amount.String())
 }

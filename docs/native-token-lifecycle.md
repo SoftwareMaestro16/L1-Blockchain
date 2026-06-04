@@ -105,6 +105,14 @@ Send `norb` and pay fees in `norb`:
 build\orbitalisd.exe tx bank send node0 $node1 1000norb --home .localnet\node0\orbitalisd --chain-id orbitalis-local-1 --keyring-backend test --fees 1000000norb --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
 ```
 
+Delegate `norb` to a bonded validator:
+
+```powershell
+$validator = (build\orbitalisd.exe query staking validators --node tcp://127.0.0.1:26657 --output json | ConvertFrom-Json).validators[0].operator_address
+build\orbitalisd.exe tx staking delegate $validator 5000000norb --from node0 --home .localnet\node0\orbitalisd --chain-id orbitalis-local-1 --keyring-backend test --fees 1000000norb --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
+build\orbitalisd.exe query staking delegation $node0 $validator --node tcp://127.0.0.1:26657 --output json
+```
+
 Query fee, staking, and mint params:
 
 ```powershell
@@ -138,4 +146,5 @@ buf lint
 go build -o build/orbitalisd.exe ./cmd/l1d
 .\tests\e2e\native_token_smoke.ps1
 .\tests\e2e\native_token_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5
+.\tests\e2e\pos_smoke.ps1
 ```

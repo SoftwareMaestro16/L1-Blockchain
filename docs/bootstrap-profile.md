@@ -159,6 +159,15 @@ Run the native token lifecycle smoke documented in [native-token-lifecycle.md](n
 
 The native token smoke validates bank metadata, `norb` supply and balances, staking/fees/mint denom consistency, and a `bank send` transaction that pays fees in `norb`.
 
+Run the tokenfactory lifecycle smoke documented in [tokenfactory-lifecycle.md](tokenfactory-lifecycle.md):
+
+```powershell
+.\tests\e2e\tokenfactory_smoke.ps1
+.\tests\e2e\tokenfactory_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5
+```
+
+The tokenfactory smoke validates create/query/mint/burn/change-admin, bank balance and supply consistency, REST denom query, native-spoof rejection, duplicate denom rejection, burn-from mismatch, invalid admin rejection, old-admin rejection, and new-admin mint.
+
 Run the fees ante policy smoke documented in [fees-ante-policy.md](fees-ante-policy.md):
 
 ```powershell

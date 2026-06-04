@@ -74,6 +74,7 @@ Prototype acceptance and targeted smoke tests:
 .\tests\e2e\localnet_smoke.ps1
 .\tests\e2e\pos_smoke.ps1
 .\tests\e2e\native_token_smoke.ps1
+.\tests\e2e\tokenfactory_smoke.ps1
 .\tests\e2e\fees_ante_smoke.ps1
 .\tests\e2e\dex_smoke.ps1
 .\tests\e2e\query_surface_smoke.ps1

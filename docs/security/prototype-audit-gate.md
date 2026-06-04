@@ -101,7 +101,7 @@ Each release candidate needs a reviewer to mark every item `PASS`, `FINDING`, or
 | Native metadata, staking/fees/mint denom consistency | `app/app_test.go`, `tests/e2e/native_token_smoke.ps1` |
 | Invalid PoS delegation denom/funds/validator | `app/pos_test.go` |
 | Wrong/malformed fee denom and non-FeeTx | `x/fees/keeper/ante_test.go`, `tests/e2e/fees_ante_smoke.ps1` |
-| Tokenfactory unauthorized burn/native spoofing | `x/tokenfactory/keeper/msg_server_test.go` |
+| Tokenfactory unauthorized mint/burn/admin/native spoofing and supply checks | `x/tokenfactory/keeper/msg_server_test.go`, `tests/e2e/tokenfactory_smoke.ps1` |
 | Tokenfactory query malformed/not found/bounded list | `x/tokenfactory/keeper/query_server_test.go` |
 | DEX duplicate pair, wrong denom, corrupted pool, LP accounting, slippage | `x/dex/keeper/msg_server_test.go`, `x/dex/keeper/math_test.go`, `tests/e2e/dex_smoke.ps1` |
 | DEX query malformed/not found/bounded list | `x/dex/keeper/query_server_test.go` |
