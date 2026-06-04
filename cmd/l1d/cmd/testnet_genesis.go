@@ -150,7 +150,7 @@ func calculateIP(ip string, i int) (string, error) {
 func writeFile(name, dir string, contents []byte) error {
 	file := filepath.Join(dir, name)
 
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := os.MkdirAll(dir, 0o750); err != nil {
 		return fmt.Errorf("could not create directory %q: %w", dir, err)
 	}
 

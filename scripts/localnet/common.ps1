@@ -297,6 +297,31 @@ function Wait-LocalnetValidators {
   }
 }
 
+function Get-LocalnetTotalVotingPower {
+  param([int]$RPCPort = 26657)
+
+  $validators = Invoke-LocalnetRpc -RPCPort $RPCPort -Path "validators?per_page=100"
+  $total = [int64]0
+  foreach ($validator in @($validators.result.validators)) {
+    $total += [int64]$validator.voting_power
+  }
+  return $total
+}
+
+function Wait-LocalnetTotalVotingPowerGreater {
+  param(
+    [int64]$PreviousPower,
+    [int]$RPCPort = 26657,
+    [int]$TimeoutSeconds = 60
+  )
+
+  return Wait-LocalnetCondition -TimeoutSeconds $TimeoutSeconds -Description "validator voting power greater than $PreviousPower on RPC $RPCPort" -Condition {
+    $power = Get-LocalnetTotalVotingPower -RPCPort $RPCPort
+    if ($power -gt $PreviousPower) { return $power }
+    return $null
+  }
+}
+
 function Wait-LocalnetPeers {
   param(
     [int]$ExpectedMinPeers,
@@ -358,6 +383,67 @@ function Invoke-LocalnetCliJson {
   return $text.Substring($jsonStart) | ConvertFrom-Json
 }
 
+function Get-LocalnetStakingParams {
+  param(
+    [string]$Binary,
+    [int]$RPCPort = 26657
+  )
+
+  $node = "tcp://127.0.0.1:$RPCPort"
+  $result = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "staking", "params", "--node", $node, "--output", "json")
+  return $result.params
+}
+
+function Get-LocalnetStakingValidators {
+  param(
+    [string]$Binary,
+    [int]$RPCPort = 26657
+  )
+
+  $node = "tcp://127.0.0.1:$RPCPort"
+  $result = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "staking", "validators", "--node", $node, "--output", "json")
+  return @($result.validators)
+}
+
+function Get-LocalnetBondedValidator {
+  param(
+    [string]$Binary,
+    [int]$RPCPort = 26657
+  )
+
+  foreach ($validator in @(Get-LocalnetStakingValidators -Binary $Binary -RPCPort $RPCPort)) {
+    $status = [string]$validator.status
+    if ($status -eq "BOND_STATUS_BONDED" -or $status -eq "3") {
+      return $validator
+    }
+  }
+  throw "No bonded staking validator found on RPC $RPCPort"
+}
+
+function Get-LocalnetSlashingParams {
+  param(
+    [string]$Binary,
+    [int]$RPCPort = 26657
+  )
+
+  $node = "tcp://127.0.0.1:$RPCPort"
+  $result = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "slashing", "params", "--node", $node, "--output", "json")
+  return $result.params
+}
+
+function Get-LocalnetSigningInfos {
+  param(
+    [string]$Binary,
+    [int]$RPCPort = 26657
+  )
+
+  $node = "tcp://127.0.0.1:$RPCPort"
+  $result = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "slashing", "signing-infos", "--node", $node, "--output", "json")
+  if ($result.info) { return @($result.info) }
+  if ($result.signing_infos) { return @($result.signing_infos) }
+  return @()
+}
+
 function Get-LocalnetKeyAddress {
   param(
     [string]$Binary,
@@ -370,6 +456,68 @@ function Get-LocalnetKeyAddress {
     throw "failed to read key $KeyName from $NodeHome`n$($output -join "`n")"
   }
   return (($output | Select-Object -Last 1).ToString().Trim())
+}
+
+function Send-LocalnetDelegateTx {
+  param(
+    [string]$Binary,
+    [string]$FromHome,
+    [string]$FromKey = "node0",
+    [string]$ValidatorAddress,
+    [string]$Amount = "5000000norb",
+    [string]$Fees = "1000000norb",
+    [string]$ChainId = "orbitalis-local-1",
+    [int]$RPCPort = 26657,
+    [int]$TimeoutSeconds = 60
+  )
+
+  $node = "tcp://127.0.0.1:$RPCPort"
+  $tx = Invoke-LocalnetCliJson -Binary $Binary -Arguments @(
+    "tx", "staking", "delegate", $ValidatorAddress, $Amount,
+    "--from", $FromKey,
+    "--home", $FromHome,
+    "--chain-id", $ChainId,
+    "--keyring-backend", "test",
+    "--fees", $Fees,
+    "--yes",
+    "--broadcast-mode", "sync",
+    "--node", $node,
+    "--output", "json"
+  )
+
+  $txHash = $tx.txhash
+  if (-not $txHash -and $tx.tx_response) {
+    $txHash = $tx.tx_response.txhash
+  }
+  if (-not $txHash) {
+    throw "staking delegate did not return txhash"
+  }
+
+  return Wait-LocalnetCondition -TimeoutSeconds $TimeoutSeconds -Description "staking delegate tx $txHash" -Condition {
+    try {
+      $result = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "tx", $txHash, "--node", $node, "--output", "json")
+      if ($result.tx_response.code -eq 0 -or $result.code -eq 0) { return $result }
+      throw "staking delegate tx failed with code $($result.tx_response.code)$($result.code)"
+    } catch {
+      return $null
+    }
+  }
+}
+
+function Get-LocalnetDelegation {
+  param(
+    [string]$Binary,
+    [string]$DelegatorAddress,
+    [string]$ValidatorAddress,
+    [int]$RPCPort = 26657
+  )
+
+  $node = "tcp://127.0.0.1:$RPCPort"
+  return Invoke-LocalnetCliJson -Binary $Binary -Arguments @(
+    "query", "staking", "delegation", $DelegatorAddress, $ValidatorAddress,
+    "--node", $node,
+    "--output", "json"
+  )
 }
 
 function Send-LocalnetBankTx {

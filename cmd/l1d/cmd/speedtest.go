@@ -21,7 +21,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
-var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+var r = rand.New(rand.NewSource(time.Now().UnixNano())) // #nosec G404 -- speedtest uses math/rand for non-secret tx distribution.
 
 func NewBankSpeedTest() *cobra.Command {
 	cmd := &cobra.Command{

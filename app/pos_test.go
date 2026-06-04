@@ -17,11 +17,7 @@ func TestPoSDelegationUpdatesValidatorPower(t *testing.T) {
 	app := Setup(t, false)
 	ctx := app.NewContext(false)
 
-	validators, err := app.StakingKeeper.GetAllValidators(ctx)
-	require.NoError(t, err)
-	require.Len(t, validators, 1)
-
-	validator := validators[0]
+	validator := GetBondedTestValidator(t, app, ctx)
 	require.Equal(t, stakingtypes.Bonded, validator.Status)
 	require.False(t, validator.Jailed)
 
@@ -64,6 +60,53 @@ func TestPoSDelegationUpdatesValidatorPower(t *testing.T) {
 	require.True(t, found, "expected validator-set update with new voting power")
 }
 
+func TestPoSRejectsInvalidDelegations(t *testing.T) {
+	tests := []struct {
+		name             string
+		fundedCoins      sdk.Coins
+		delegationAmount sdk.Coin
+		validatorAddress string
+	}{
+		{
+			name:             "wrong denom",
+			fundedCoins:      sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 10_000_000), sdk.NewInt64Coin("uatom", 10_000_000)),
+			delegationAmount: sdk.NewInt64Coin("uatom", 5_000_000),
+		},
+		{
+			name:             "insufficient funds",
+			fundedCoins:      sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 1)),
+			delegationAmount: sdk.NewInt64Coin(BondDenom, 5_000_000),
+		},
+		{
+			name:             "invalid validator address",
+			fundedCoins:      sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 10_000_000)),
+			delegationAmount: sdk.NewInt64Coin(BondDenom, 5_000_000),
+			validatorAddress: "not-a-validator-address",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			app := Setup(t, false)
+			ctx := app.NewContext(false)
+			validator := GetBondedTestValidator(t, app, ctx)
+			validatorAddress := validator.OperatorAddress
+			if tc.validatorAddress != "" {
+				validatorAddress = tc.validatorAddress
+			}
+
+			delegator := AddTestAddrsWithCoins(t, app, ctx, 1, tc.fundedCoins)[0]
+			msgServer := stakingkeeper.NewMsgServerImpl(app.StakingKeeper)
+			_, err := msgServer.Delegate(ctx, stakingtypes.NewMsgDelegate(
+				delegator.String(),
+				validatorAddress,
+				tc.delegationAmount,
+			))
+			require.Error(t, err)
+		})
+	}
+}
+
 func TestSlashingParamsAndSigningInfoRoundTrip(t *testing.T) {
 	app := Setup(t, false)
 	ctx := app.NewContext(false)
@@ -75,11 +118,8 @@ func TestSlashingParamsAndSigningInfoRoundTrip(t *testing.T) {
 	require.True(t, params.SlashFractionDoubleSign.IsPositive())
 	require.True(t, params.SlashFractionDowntime.IsPositive())
 
-	validators, err := app.StakingKeeper.GetAllValidators(ctx)
-	require.NoError(t, err)
-	require.NotEmpty(t, validators)
-
-	consAddrBytes, err := validators[0].GetConsAddr()
+	validator := GetBondedTestValidator(t, app, ctx)
+	consAddrBytes, err := validator.GetConsAddr()
 	require.NoError(t, err)
 	consAddr := sdk.ConsAddress(consAddrBytes)
 	expected := slashingtypes.NewValidatorSigningInfo(consAddr, 7, 3, time.Unix(0, 0).UTC(), false, 2)

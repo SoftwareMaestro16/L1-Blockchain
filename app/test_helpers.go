@@ -28,6 +28,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // SetupOptions defines arguments that are passed into `Simapp` constructor.
@@ -184,6 +185,38 @@ func GenesisStateWithSingleValidator(t *testing.T, app *L1App) GenesisState {
 // initial balance of accAmt in random order
 func AddTestAddrsIncremental(app *L1App, ctx sdk.Context, accNum int, accAmt sdkmath.Int) []sdk.AccAddress {
 	return addTestAddrs(app, ctx, accNum, accAmt, simtestutil.CreateIncrementalAccounts)
+}
+
+func GetBondedTestValidator(t *testing.T, app *L1App, ctx sdk.Context) stakingtypes.Validator {
+	t.Helper()
+
+	validators, err := app.StakingKeeper.GetAllValidators(ctx)
+	require.NoError(t, err)
+	for _, validator := range validators {
+		if validator.Status == stakingtypes.Bonded {
+			return validator
+		}
+	}
+	require.FailNow(t, "expected at least one bonded validator")
+	return stakingtypes.Validator{}
+}
+
+func AddTestAddrsWithCoins(t *testing.T, app *L1App, ctx sdk.Context, accNum int, coins sdk.Coins) []sdk.AccAddress {
+	t.Helper()
+
+	testAddrs := simtestutil.CreateIncrementalAccounts(accNum)
+	for _, addr := range testAddrs {
+		FundTestAddr(t, app, ctx, addr, coins)
+	}
+
+	return testAddrs
+}
+
+func FundTestAddr(t *testing.T, app *L1App, ctx sdk.Context, addr sdk.AccAddress, coins sdk.Coins) {
+	t.Helper()
+
+	require.NoError(t, app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, coins))
+	require.NoError(t, app.BankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr, coins))
 }
 
 func addTestAddrs(app *L1App, ctx sdk.Context, accNum int, accAmt sdkmath.Int, strategy simtestutil.GenerateAccountStrategy) []sdk.AccAddress {
