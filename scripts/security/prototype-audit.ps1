@@ -245,39 +245,8 @@ try {
       -Notes "module cache integrity; local cache mutations require cleanup or documented triage"
   }
 
-  Invoke-AuditPowerShell -Name "determinism-scan" -Script {
-    $scanOut = Join-Path $OutputDir "determinism-patterns.txt"
-    $patterns = @(
-      @{ Name = "map iteration"; Pattern = "range\s+.*map\[" },
-      @{ Name = "platform int/uint"; Pattern = "\b(int|uint)\b" },
-      @{ Name = "float usage"; Pattern = "float32|float64" },
-      @{ Name = "goroutine"; Pattern = "go\s+func" },
-      @{ Name = "select"; Pattern = "select\s*\{" },
-      @{ Name = "wall clock"; Pattern = "time\.Now\(" },
-      @{ Name = "random"; Pattern = "rand\." }
-    )
-    "Prototype determinism pattern scan" | Set-Content -LiteralPath $scanOut
-    foreach ($item in $patterns) {
-      "" | Add-Content -LiteralPath $scanOut
-      "## $($item.Name): $($item.Pattern)" | Add-Content -LiteralPath $scanOut
-      $previousErrorActionPreference = $ErrorActionPreference
-      $ErrorActionPreference = "Continue"
-      try {
-        $matches = & rg -n $item.Pattern app x cmd `
-          -g "!**/*.pb.go" `
-          -g "!**/*.pb.gw.go" `
-          -g "!**/*_test.go" 2>$null
-        $rgExitCode = $LASTEXITCODE
-      } finally {
-        $ErrorActionPreference = $previousErrorActionPreference
-      }
-      if ($rgExitCode -eq 0) {
-        $matches | Add-Content -LiteralPath $scanOut
-      } else {
-        "no matches" | Add-Content -LiteralPath $scanOut
-      }
-    }
-    Get-Content -LiteralPath $scanOut
+  Invoke-AuditPowerShell -Name "deterministic-execution-gate" -Script {
+    & .\scripts\security\determinism-gate.ps1 -OutputDir (Join-Path $OutputDir "determinism-gate")
   }
 
   if ($Profile -eq "Nightly" -and -not $SkipAcceptance) {

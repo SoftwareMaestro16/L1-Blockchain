@@ -50,7 +50,7 @@ Outputs are written under ignored `.work\security\prototype-audit-*`:
 
 - `summary.md`: pass/fail/triage table.
 - `results.json`: machine-readable result list.
-- `determinism-patterns.txt`: Cosmos nondeterminism grep results.
+- `determinism-gate/summary.md`: deterministic execution findings classified by AppHash/consensus impact.
 - `gosec.json`: source findings with generated protobuf excluded.
 - tool logs for `go vet`, `go test`, `buf lint`, `gitleaks`, `govulncheck`, and `go mod verify`.
 
@@ -68,6 +68,7 @@ Use `-Strict` to make triage-required tool findings return non-zero. Default mod
 | Source static scan | `gosec -exclude-generated` over `go list` package dirs | Triage all source findings |
 | Dependency advisories | `govulncheck -scan=package ./...` | Triage all package findings |
 | Module integrity | `go mod verify` | Full gate; fail unless local cache mutation is documented |
+| Deterministic execution | `scripts\security\determinism-gate.ps1` | Fail on untriaged High/Critical finding |
 | Acceptance smoke | `tests\e2e\prototype_acceptance.ps1 -Profile Smoke` | Release gate |
 | 5-validator full profile | `prototype-audit.ps1 -Profile Nightly` | Manual/nightly |
 
@@ -94,7 +95,7 @@ Each release candidate needs a reviewer to mark every item `PASS`, `FINDING`, or
 
 | Risk | Regression Coverage |
 | --- | --- |
-| Deterministic default genesis serialization | `app/determinism_test.go` |
+| Deterministic default genesis/export/empty block sequence | `app/determinism_test.go`, `scripts/security/determinism-gate.ps1` |
 | Native metadata, staking/fees/mint denom consistency | `app/app_test.go`, `tests/e2e/native_token_smoke.ps1` |
 | Invalid PoS delegation denom/funds/validator | `app/pos_test.go` |
 | Wrong/malformed fee denom and non-FeeTx | `x/fees/keeper/ante_test.go`, `tests/e2e/fees_ante_smoke.ps1` |
