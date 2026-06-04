@@ -32,7 +32,7 @@ func setupDexPool(t *testing.T) (*l1app.L1App, sdk.Context, types.MsgServer, sdk
 	res, err := msgServer.CreatePool(ctx, &types.MsgCreatePool{
 		Creator: creator.String(),
 		TokenA:  sdk.NewInt64Coin("uatom", 1_000),
-		TokenB:  sdk.NewInt64Coin("uorb", 1_000),
+		TokenB:  sdk.NewInt64Coin("norb", 1_000),
 	})
 	require.NoError(t, err)
 
@@ -47,7 +47,7 @@ func TestAddLiquidityRejectsMalformedMinShares(t *testing.T) {
 		Depositor: depositor.String(),
 		PoolId:    poolID,
 		TokenA:    sdk.NewInt64Coin("uatom", 100),
-		TokenB:    sdk.NewInt64Coin("uorb", 100),
+		TokenB:    sdk.NewInt64Coin("norb", 100),
 		MinShares: "not-an-int",
 	})
 	require.Error(t, err)
@@ -63,8 +63,8 @@ func TestAddLiquidityRejectsCorruptedPoolStateWithoutPanic(t *testing.T) {
 
 	require.NoError(t, app.DexKeeper.SetPool(ctx, types.Pool{
 		Id:          99,
-		Denom0:      "uatom",
-		Denom1:      "uorb",
+		Denom0:      "norb",
+		Denom1:      "uatom",
 		Reserve0:    "not-an-int",
 		Reserve1:    "100",
 		TotalShares: "100",
@@ -77,7 +77,7 @@ func TestAddLiquidityRejectsCorruptedPoolStateWithoutPanic(t *testing.T) {
 			Depositor: depositor.String(),
 			PoolId:    99,
 			TokenA:    sdk.NewInt64Coin("uatom", 100),
-			TokenB:    sdk.NewInt64Coin("uorb", 100),
+			TokenB:    sdk.NewInt64Coin("norb", 100),
 			MinShares: "1",
 		})
 	})

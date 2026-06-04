@@ -8,8 +8,8 @@ func validGenesisState() GenesisState {
 		Pools: []Pool{
 			{
 				Id:          1,
-				Denom0:      "uatom",
-				Denom1:      "uorb",
+				Denom0:      "norb",
+				Denom1:      "uatom",
 				Reserve0:    "100",
 				Reserve1:    "200",
 				TotalShares: "100",
@@ -37,15 +37,15 @@ func TestGenesisValidateRejectsInvalidPoolState(t *testing.T) {
 			gs.NextPoolId = 1
 		},
 		"non canonical denoms": func(gs *GenesisState) {
-			gs.Pools[0].Denom0 = "uorb"
-			gs.Pools[0].Denom1 = "uatom"
+			gs.Pools[0].Denom0 = "uatom"
+			gs.Pools[0].Denom1 = "norb"
 		},
 		"duplicate pair": func(gs *GenesisState) {
 			gs.NextPoolId = 3
 			gs.Pools = append(gs.Pools, Pool{
 				Id:          2,
-				Denom0:      "uatom",
-				Denom1:      "uorb",
+				Denom0:      "norb",
+				Denom1:      "uatom",
 				Reserve0:    "50",
 				Reserve1:    "50",
 				TotalShares: "50",

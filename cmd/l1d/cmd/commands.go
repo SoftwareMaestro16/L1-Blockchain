@@ -74,7 +74,7 @@ func initAppConfig() (string, interface{}) {
 	//   own app.toml to override, or use this default value.
 	//
 	// In Orbitalis, we set the min gas prices to 0.
-	srvCfg.MinGasPrices = "0uorb"
+	srvCfg.MinGasPrices = "0norb"
 	// srvCfg.BaseConfig.IAVLDisableFastNode = true // disable fastnode by default
 
 	// Now we set the custom config default values.

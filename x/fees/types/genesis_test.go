@@ -3,7 +3,11 @@ package types
 import "testing"
 
 func TestDefaultParamsValidate(t *testing.T) {
-	if err := DefaultParams().Validate(); err != nil {
+	params := DefaultParams()
+	if len(params.AllowedFeeDenoms) != 1 || params.AllowedFeeDenoms[0] != "norb" {
+		t.Fatalf("expected only norb as default fee denom: %v", params.AllowedFeeDenoms)
+	}
+	if err := params.Validate(); err != nil {
 		t.Fatalf("default params should validate: %v", err)
 	}
 }

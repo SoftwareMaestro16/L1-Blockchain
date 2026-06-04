@@ -19,13 +19,13 @@ if (Test-Path $OutputDir) { Remove-Item -LiteralPath $OutputDir -Recurse -Force 
   --validator-count 3 `
   --output-dir $OutputDir `
   --chain-id orbitalis-local-1 `
-  --staking-denom uorb `
+  --staking-denom norb `
   --node-daemon-home orbitalisd `
   --node-dir-prefix node `
   --keyring-backend test `
   --single-host `
   --commit-timeout 1s `
-  --minimum-gas-prices 0uorb
+  --minimum-gas-prices 0norb
 
 $ports = @(
   @{OldP2P=16656; OldRPC=26657; OldAPI=1317; OldGRPC=9090; P2P=26656; RPC=26657; API=1317; GRPC=9090},
@@ -50,7 +50,7 @@ for ($i = 0; $i -lt 3; $i++) {
   $app = Get-Content -Raw -LiteralPath $appToml
   $app = $app -replace ":$($p.OldAPI)", ":$($p.API)"
   $app = $app -replace ":$($p.OldGRPC)", ":$($p.GRPC)"
-  $app = $app -replace 'minimum-gas-prices = ""', 'minimum-gas-prices = "0uorb"'
+  $app = $app -replace 'minimum-gas-prices = ""', 'minimum-gas-prices = "0norb"'
   Set-Content -LiteralPath $appToml -Value $app
 }
 

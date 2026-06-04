@@ -6,9 +6,10 @@ All chain constants that affect state transitions must be represented in genesis
 
 Initial Orbitalis chain choices:
 - Address prefix: `orb`
-- Native base denom: `uorb`
+- Native base denom: `norb`
 - Display denom: `ORB`
 - Native token name: `Orbitalis`
+- Native token decimals: `9`
 - Governance authority: the `x/gov` module account or SDK authority configured at genesis.
 
 ## `x/tokenfactory`

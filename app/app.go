@@ -51,6 +51,7 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	appparams "github.com/sovereign-l1/l1/app/params"
 	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feeskeeper "github.com/sovereign-l1/l1/x/fees/keeper"
@@ -59,13 +60,13 @@ import (
 	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 )
 
-const appName = "Orbitalis"
+const appName = appparams.ChainName
 
 const (
 	AccountAddressPrefix   = "orb"
 	ValidatorAddressPrefix = "orbvaloper"
 	ConsensusAddressPrefix = "orbvalcons"
-	BondDenom              = "uorb"
+	BondDenom              = appparams.BaseDenom
 )
 
 var (

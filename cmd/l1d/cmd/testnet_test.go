@@ -24,7 +24,10 @@ import (
 	genutiltest "github.com/cosmos/cosmos-sdk/x/genutil/client/testutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/mint"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	appparams "github.com/sovereign-l1/l1/app/params"
 )
 
 func Test_TestnetCmd(t *testing.T) {
@@ -67,4 +70,22 @@ func Test_TestnetCmd(t *testing.T) {
 
 	bankGenState := banktypes.GetGenesisStateFromAppState(encodingConfig.Codec, appState)
 	require.NotEmpty(t, bankGenState.Supply.String())
+	require.Contains(t, bankGenState.Supply.String(), appparams.BaseDenom)
+
+	var native banktypes.Metadata
+	for _, metadata := range bankGenState.DenomMetadata {
+		if metadata.Base == appparams.BaseDenom {
+			native = metadata
+			break
+		}
+	}
+	require.Equal(t, appparams.NativeTokenMetadata(), native)
+	require.NoError(t, native.Validate())
+
+	stakingGenState := stakingtypes.GetGenesisStateFromAppState(encodingConfig.Codec, appState)
+	require.Equal(t, appparams.BaseDenom, stakingGenState.Params.BondDenom)
+
+	var mintGenState minttypes.GenesisState
+	encodingConfig.Codec.MustUnmarshalJSON(appState[minttypes.ModuleName], &mintGenState)
+	require.Equal(t, appparams.BaseDenom, mintGenState.Params.MintDenom)
 }

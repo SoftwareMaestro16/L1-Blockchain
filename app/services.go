@@ -98,7 +98,7 @@ func (app *L1App) AutoCliOpts() autocli.AppOptions {
 }
 
 func (a *L1App) DefaultGenesis() map[string]json.RawMessage {
-	return a.BasicModuleManager.DefaultGenesis(a.appCodec)
+	return withNativeTokenMetadata(a.appCodec, a.BasicModuleManager.DefaultGenesis(a.appCodec))
 }
 
 func (app *L1App) GetKey(storeKey string) *storetypes.KVStoreKey {
