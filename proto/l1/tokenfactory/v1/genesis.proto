@@ -1,0 +1,15 @@
+syntax = "proto3";
+package l1.tokenfactory.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/tokenfactory/types";
+
+message GenesisState {
+  repeated DenomAuthorityMetadata denoms = 1 [(gogoproto.nullable) = false];
+}
+
+message DenomAuthorityMetadata {
+  string denom = 1;
+  string admin = 2;
+}

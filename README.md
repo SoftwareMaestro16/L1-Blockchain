@@ -1,39 +1,86 @@
-# L1 Blockchain
+# Orbitalis Blockchain
 
-Sovereign Cosmos SDK Layer 1 blockchain workspace.
+Orbitalis is a sovereign Cosmos SDK Layer 1 blockchain implemented in Go. The native token is Orbitalis with display ticker `ORB`; the staking and fee base denom is `uorb`.
 
-This is not an L2, not a sidechain, and not dependent on Ethereum execution. The target stack is Go, Cosmos SDK, CometBFT, Protobuf, and module-isolated KVStore state.
+## Architecture
 
-## Current Stage
+```mermaid
+flowchart LR
+  CLI["orbitalisd CLI"] --> RPC["gRPC / REST / CometBFT RPC"]
+  RPC --> APP["Cosmos SDK BaseApp"]
+  P2P["CometBFT P2P Gossip"] --> CONS["CometBFT BFT PoS Consensus"]
+  CONS --> APP
+  APP --> CORE["x/auth x/bank x/staking x/mint x/distribution x/slashing x/gov"]
+  APP --> CUSTOM["x/tokenfactory x/dex x/fees"]
+  CORE --> STORE["Module KVStores"]
+  CUSTOM --> STORE
+```
 
-The repository is in architecture bootstrap. The first implementation increment defines the target chain architecture, module boundaries, genesis and params model, security testing strategy, and PR-sized scaffold plan.
+## Implemented
 
-No node binary or Cosmos application code has been scaffolded yet.
+- `cmd/l1d`: Orbitalis node binary source and CLI.
+- `app`: direct Cosmos SDK `BaseApp` assembly pinned to Cosmos SDK `v0.54.3` and CometBFT `v0.39.3`.
+- `x/tokenfactory`: factory denoms, admin-controlled mint/burn, admin transfer, queries.
+- `x/dex`: constant-product AMM pools, liquidity add/remove, exact-input swaps, LP tokens.
+- `x/fees`: native fee-denom policy; v1 accepts only `uorb` fees.
+- `scripts/localnet`: 3-validator localnet init/start/stop/reset scripts.
 
-## Engineering Rules
+## Build And Test
 
-- Follow the [engineering governance standard](docs/engineering-governance.md) before implementation, refactoring, testing, or debugging.
-- Follow the [skill orchestration standard](docs/skill-orchestration.md) before selecting tools, skills, or MCP integrations.
-- Every feature must be small enough for a focused commit.
-- Use Conventional Commit messages.
-- Keep module state deterministic and isolated.
-- Put configurable values in genesis or module params, not hardcoded logic.
-- Keep MsgServer orchestration thin and place state logic behind keeper methods.
-- Treat queries as read-only.
-- Run checks, commit, and push to `origin/main` by default after completed work.
+```powershell
+$env:PATH = "$PWD\.work\tools\go1.25.11\go\bin;$env:PATH"
+go test ./...
+go vet ./...
+go build -o build/orbitalisd.exe ./cmd/l1d
+```
 
-## Documents
+If you already have Go `1.25.x` on PATH, the `.work` toolchain is not required.
 
-- [System architecture](docs/architecture.md)
-- [Repository structure](docs/repo-structure.md)
-- [Module boundaries](docs/module-boundaries.md)
-- [Genesis and params model](docs/genesis-params.md)
-- [Security and testing strategy](docs/security-testing.md)
-- [Engineering governance](docs/engineering-governance.md)
-- [Skill orchestration](docs/skill-orchestration.md)
-- [Bootstrap implementation plan](docs/bootstrap-plan.md)
-- [COSMOS_L1_SKILLS](docs/cosmos-l1-skills.md)
+Proto checks:
 
-## Privacy Guard
+```powershell
+$env:PATH = "$PWD\.work\tools\bin;$env:PATH"
+buf lint
+buf generate
+```
 
-This repository tracks source and documentation only. Local research caches, node data, wallets, keys, mnemonics, validator keys, and private configuration are intentionally ignored.
+`buf generate` writes verification output into ignored `.work\bufgen`; checked-in generated Go code lives under `x\*\types`.
+
+## Local 3-Node Network
+
+```powershell
+.\scripts\localnet\init.ps1
+.\scripts\localnet\start.ps1
+```
+
+Ports:
+
+- node0: P2P `26656`, RPC `26657`, gRPC `9090`, REST `1317`
+- node1: P2P `26756`, RPC `26757`, gRPC `9091`, REST `1318`
+- node2: P2P `26856`, RPC `26857`, gRPC `9092`, REST `1319`
+
+Stop or reset:
+
+```powershell
+.\scripts\localnet\stop.ps1
+.\scripts\localnet\reset.ps1
+```
+
+Smoke test:
+
+```powershell
+.\tests\e2e\localnet_smoke.ps1
+```
+
+## Example CLI
+
+```powershell
+build\orbitalisd.exe query block --node tcp://127.0.0.1:26657
+build\orbitalisd.exe tx bank send node0 <to-address> 100uorb --home .localnet\node0\orbitalisd --chain-id orbitalis-local-1 --keyring-backend test --fees 1uorb
+build\orbitalisd.exe tx tokenfactory create-denom gold --home .localnet\node0\orbitalisd --chain-id orbitalis-local-1 --keyring-backend test --fees 1uorb
+build\orbitalisd.exe query fees params --node tcp://127.0.0.1:26657
+```
+
+## External Databases
+
+Orbitalis validator/full nodes do not require Redis or PostgreSQL for consensus, mempool, or state. Use external databases only for off-chain services such as indexers, explorers, analytics, or API caching, and pass credentials through environment variables or secret managers.

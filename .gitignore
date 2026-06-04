@@ -25,7 +25,8 @@ config/*.toml.local
 
 # Cosmos / CometBFT node state
 .ignite/
-.l1d/
+.orbitalis/
+.localnet/
 data/
 node_home/
 networks/local/

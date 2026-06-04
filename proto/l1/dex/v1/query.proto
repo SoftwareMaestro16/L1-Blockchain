@@ -1,0 +1,32 @@
+syntax = "proto3";
+package l1.dex.v1;
+
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "l1/dex/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/dex/types";
+
+service Query {
+  rpc Pool(QueryPoolRequest) returns (QueryPoolResponse) {
+    option (google.api.http).get = "/l1/dex/v1/pools/{pool_id}";
+  }
+
+  rpc Pools(QueryPoolsRequest) returns (QueryPoolsResponse) {
+    option (google.api.http).get = "/l1/dex/v1/pools";
+  }
+}
+
+message QueryPoolRequest {
+  uint64 pool_id = 1;
+}
+
+message QueryPoolResponse {
+  Pool pool = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryPoolsRequest {}
+
+message QueryPoolsResponse {
+  repeated Pool pools = 1 [(gogoproto.nullable) = false];
+}

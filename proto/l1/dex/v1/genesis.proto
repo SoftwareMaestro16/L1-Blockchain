@@ -1,0 +1,21 @@
+syntax = "proto3";
+package l1.dex.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/dex/types";
+
+message GenesisState {
+  uint64 next_pool_id = 1;
+  repeated Pool pools = 2 [(gogoproto.nullable) = false];
+}
+
+message Pool {
+  uint64 id = 1;
+  string denom0 = 2;
+  string denom1 = 3;
+  string reserve0 = 4;
+  string reserve1 = 5;
+  string total_shares = 6;
+  string lp_denom = 7;
+}

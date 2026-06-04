@@ -1,0 +1,20 @@
+syntax = "proto3";
+package l1.fees.v1;
+
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "l1/fees/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/fees/types";
+
+service Query {
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/l1/fees/v1/params";
+  }
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  Params params = 1 [(gogoproto.nullable) = false];
+}

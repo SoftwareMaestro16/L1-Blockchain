@@ -4,10 +4,11 @@
 
 All chain constants that affect state transitions must be represented in genesis or module params. No consensus-critical value should be hardcoded in keeper logic.
 
-Initial chain choices for scaffold:
-- Address prefix: `l1`
-- Native base denom: `ul1`
-- Display denom: `L1`
+Initial Orbitalis chain choices:
+- Address prefix: `orb`
+- Native base denom: `uorb`
+- Display denom: `ORB`
+- Native token name: `Orbitalis`
 - Governance authority: the `x/gov` module account or SDK authority configured at genesis.
 
 ## `x/tokenfactory`

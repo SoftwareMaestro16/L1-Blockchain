@@ -23,7 +23,7 @@ Commit: `feat(app): scaffold sovereign cosmos sdk chain`
 Planned command:
 
 ```powershell
-ignite scaffold chain github.com/SoftwareMaestro16/L1-Blockchain --address-prefix l1 --default-denom ul1 --no-module --skip-git --path .
+ignite scaffold chain github.com/SoftwareMaestro16/L1-Blockchain --address-prefix orb --default-denom uorb --no-module --skip-git --path .
 ```
 
 Post-scaffold work:

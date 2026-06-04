@@ -1,0 +1,32 @@
+syntax = "proto3";
+package l1.tokenfactory.v1;
+
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "l1/tokenfactory/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/tokenfactory/types";
+
+service Query {
+  rpc Denom(QueryDenomRequest) returns (QueryDenomResponse) {
+    option (google.api.http).get = "/l1/tokenfactory/v1/denoms/{denom}";
+  }
+
+  rpc Denoms(QueryDenomsRequest) returns (QueryDenomsResponse) {
+    option (google.api.http).get = "/l1/tokenfactory/v1/denoms";
+  }
+}
+
+message QueryDenomRequest {
+  string denom = 1;
+}
+
+message QueryDenomResponse {
+  DenomAuthorityMetadata metadata = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryDenomsRequest {}
+
+message QueryDenomsResponse {
+  repeated DenomAuthorityMetadata denoms = 1 [(gogoproto.nullable) = false];
+}

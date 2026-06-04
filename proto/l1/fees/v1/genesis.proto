@@ -1,0 +1,16 @@
+syntax = "proto3";
+package l1.fees.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/fees/types";
+
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message Params {
+  repeated string allowed_fee_denoms = 1;
+  string validator_rewards_ratio = 2;
+  string community_pool_ratio = 3;
+}
