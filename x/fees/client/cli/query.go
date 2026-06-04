@@ -17,7 +17,7 @@ func GetQueryCmd() *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	cmd.AddCommand(NewParamsCmd())
+	cmd.AddCommand(NewParamsCmd(), NewAccountingCmd(), NewModuleBalancesCmd())
 	return cmd
 }
 
@@ -32,6 +32,48 @@ func NewParamsCmd() *cobra.Command {
 				return err
 			}
 			res, err := types.NewQueryClient(clientCtx).Params(cmd.Context(), &types.QueryParamsRequest{})
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewAccountingCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "accounting",
+		Short: "Query protocol fee accounting",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			res, err := types.NewQueryClient(clientCtx).Accounting(cmd.Context(), &types.QueryAccountingRequest{})
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewModuleBalancesCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "module-balances",
+		Short: "Query protocol fee module account balances",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			res, err := types.NewQueryClient(clientCtx).ModuleBalances(cmd.Context(), &types.QueryModuleBalancesRequest{})
 			if err != nil {
 				return err
 			}

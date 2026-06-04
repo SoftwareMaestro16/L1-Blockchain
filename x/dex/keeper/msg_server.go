@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/sovereign-l1/l1/observability"
 	"github.com/sovereign-l1/l1/x/dex/types"
 )
 
@@ -18,7 +19,15 @@ func NewMsgServerImpl(k Keeper) types.MsgServer {
 	return msgServer{Keeper: k}
 }
 
-func (m msgServer) CreatePool(ctx context.Context, msg *types.MsgCreatePool) (*types.MsgCreatePoolResponse, error) {
+func (m msgServer) CreatePool(ctx context.Context, msg *types.MsgCreatePool) (res *types.MsgCreatePoolResponse, err error) {
+	defer recordDexResult("create_pool", &err)
+	params, err := m.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !params.PoolCreationEnabled {
+		return nil, types.ErrOperationDisabled.Wrap("pool creation is disabled")
+	}
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return nil, err
@@ -27,14 +36,26 @@ func (m msgServer) CreatePool(ctx context.Context, msg *types.MsgCreatePool) (*t
 	if err != nil {
 		return nil, err
 	}
+	if _, found, err := m.GetPoolIDByPair(ctx, token0.Denom, token1.Denom); err != nil {
+		return nil, err
+	} else if found {
+		return nil, types.ErrInvalidPool.Wrap("pool pair already exists")
+	}
 	id, err := m.GetNextPoolID(ctx)
 	if err != nil {
 		return nil, err
 	}
 	lp := lpDenom(id)
 	shares := minInt(token0.Amount, token1.Amount)
+	minInitialLiquidity, err := parsePositiveInt("min_initial_liquidity", params.MinInitialLiquidity)
+	if err != nil {
+		return nil, err
+	}
 	if !shares.IsPositive() {
 		return nil, types.ErrInvalidLiquidity.Wrap("initial shares must be positive")
+	}
+	if shares.LT(minInitialLiquidity) {
+		return nil, types.ErrInvalidLiquidity.Wrap("initial shares below protocol minimum")
 	}
 	if err := m.bankKeeper.SendCoinsFromAccountToModule(ctx, creator, types.ModuleName, sdk.NewCoins(token0, token1)); err != nil {
 		return nil, err
@@ -61,10 +82,20 @@ func (m msgServer) CreatePool(ctx context.Context, msg *types.MsgCreatePool) (*t
 	if err := m.SetNextPoolID(ctx, id+1); err != nil {
 		return nil, err
 	}
+	observability.RecordDexPoolCreated()
+	recordNorbLiquidityDelta(token0, token1)
 	return &types.MsgCreatePoolResponse{PoolId: id, LpDenom: lp, MintedShares: shareCoin}, nil
 }
 
-func (m msgServer) AddLiquidity(ctx context.Context, msg *types.MsgAddLiquidity) (*types.MsgAddLiquidityResponse, error) {
+func (m msgServer) AddLiquidity(ctx context.Context, msg *types.MsgAddLiquidity) (res *types.MsgAddLiquidityResponse, err error) {
+	defer recordDexResult("add_liquidity", &err)
+	params, err := m.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !params.LiquidityEnabled {
+		return nil, types.ErrOperationDisabled.Wrap("liquidity operations are disabled")
+	}
 	depositor, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		return nil, err
@@ -113,10 +144,19 @@ func (m msgServer) AddLiquidity(ctx context.Context, msg *types.MsgAddLiquidity)
 	if err := m.SetPool(ctx, pool); err != nil {
 		return nil, err
 	}
+	recordNorbLiquidityDelta(token0, token1)
 	return &types.MsgAddLiquidityResponse{MintedShares: shareCoin}, nil
 }
 
-func (m msgServer) RemoveLiquidity(ctx context.Context, msg *types.MsgRemoveLiquidity) (*types.MsgRemoveLiquidityResponse, error) {
+func (m msgServer) RemoveLiquidity(ctx context.Context, msg *types.MsgRemoveLiquidity) (res *types.MsgRemoveLiquidityResponse, err error) {
+	defer recordDexResult("remove_liquidity", &err)
+	params, err := m.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !params.LiquidityEnabled {
+		return nil, types.ErrOperationDisabled.Wrap("liquidity operations are disabled")
+	}
 	withdrawer, err := sdk.AccAddressFromBech32(msg.Withdrawer)
 	if err != nil {
 		return nil, err
@@ -159,10 +199,19 @@ func (m msgServer) RemoveLiquidity(ctx context.Context, msg *types.MsgRemoveLiqu
 	if err := m.SetPool(ctx, pool); err != nil {
 		return nil, err
 	}
+	recordNorbLiquidityDelta(negativeCoin(out0), negativeCoin(out1))
 	return &types.MsgRemoveLiquidityResponse{TokenA: out0, TokenB: out1}, nil
 }
 
-func (m msgServer) SwapExactAmountIn(ctx context.Context, msg *types.MsgSwapExactAmountIn) (*types.MsgSwapExactAmountInResponse, error) {
+func (m msgServer) SwapExactAmountIn(ctx context.Context, msg *types.MsgSwapExactAmountIn) (res *types.MsgSwapExactAmountInResponse, err error) {
+	defer recordDexResult("swap_exact_amount_in", &err)
+	params, err := m.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !params.SwapsEnabled {
+		return nil, types.ErrOperationDisabled.Wrap("swaps are disabled")
+	}
 	trader, err := sdk.AccAddressFromBech32(msg.Trader)
 	if err != nil {
 		return nil, err
@@ -183,12 +232,12 @@ func (m msgServer) SwapExactAmountIn(ctx context.Context, msg *types.MsgSwapExac
 	}
 	var out sdk.Coin
 	if msg.TokenIn.Denom == pool.Denom0 && msg.TokenOutDenom == pool.Denom1 {
-		outAmt := calcSwapOut(reserve0, reserve1, msg.TokenIn.Amount)
+		outAmt := calcSwapOut(reserve0, reserve1, msg.TokenIn.Amount, params.SwapFeeBps)
 		out = sdk.NewCoin(pool.Denom1, outAmt)
 		pool.Reserve0 = intString(reserve0.Add(msg.TokenIn.Amount))
 		pool.Reserve1 = intString(reserve1.Sub(outAmt))
 	} else if msg.TokenIn.Denom == pool.Denom1 && msg.TokenOutDenom == pool.Denom0 {
-		outAmt := calcSwapOut(reserve1, reserve0, msg.TokenIn.Amount)
+		outAmt := calcSwapOut(reserve1, reserve0, msg.TokenIn.Amount, params.SwapFeeBps)
 		out = sdk.NewCoin(pool.Denom0, outAmt)
 		pool.Reserve1 = intString(reserve1.Add(msg.TokenIn.Amount))
 		pool.Reserve0 = intString(reserve0.Sub(outAmt))
@@ -211,5 +260,40 @@ func (m msgServer) SwapExactAmountIn(ctx context.Context, msg *types.MsgSwapExac
 	if err := m.SetPool(ctx, pool); err != nil {
 		return nil, err
 	}
+	observability.RecordDexSwap()
+	recordNorbLiquidityDelta(msg.TokenIn, negativeCoin(out))
 	return &types.MsgSwapExactAmountInResponse{TokenOut: out}, nil
+}
+
+func (m msgServer) UpdateParams(ctx context.Context, msg *types.MsgUpdateParams) (res *types.MsgUpdateParamsResponse, err error) {
+	defer recordDexResult("update_params", &err)
+	if msg == nil {
+		return nil, types.ErrInvalidParams.Wrap("empty request")
+	}
+	if msg.Authority != m.Authority() {
+		return nil, types.ErrUnauthorized.Wrap("invalid authority")
+	}
+	if err := m.SetParams(ctx, msg.Params); err != nil {
+		return nil, err
+	}
+	return &types.MsgUpdateParamsResponse{}, nil
+}
+
+func recordDexResult(action string, err *error) {
+	if err != nil && *err != nil {
+		observability.RecordModuleError(types.ModuleName, action, "error")
+	}
+}
+
+func recordNorbLiquidityDelta(coins ...sdk.Coin) {
+	for _, coin := range coins {
+		if coin.Denom != "norb" || !coin.Amount.IsInt64() {
+			continue
+		}
+		observability.RecordDexLiquidityNorbDelta(coin.Amount.Int64())
+	}
+}
+
+func negativeCoin(coin sdk.Coin) sdk.Coin {
+	return sdk.Coin{Denom: coin.Denom, Amount: coin.Amount.Neg()}
 }

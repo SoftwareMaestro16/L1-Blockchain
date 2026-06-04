@@ -8,6 +8,9 @@ const (
 	RouterKey  = ModuleName
 )
 
-var ParamsKey = []byte{0x01}
+var (
+	ParamsKey           = []byte{0x01}
+	ProtocolFeeStateKey = []byte{0x02}
+)
 
 const BondDenom = appparams.BaseDenom

@@ -9,10 +9,60 @@ import (
 )
 
 func DefaultGenesisState() *GenesisState {
-	return &GenesisState{NextPoolId: DefaultNextPoolID, Pools: []Pool{}}
+	return &GenesisState{NextPoolId: DefaultNextPoolID, Pools: []Pool{}, Params: DefaultParams()}
+}
+
+func DefaultParams() Params {
+	return Params{
+		SwapFeeBps:          DefaultSwapFeeBps,
+		MaxSwapFeeBps:       DefaultMaxSwapFeeBps,
+		PoolCreationEnabled: true,
+		SwapsEnabled:        true,
+		LiquidityEnabled:    true,
+		MinInitialLiquidity: "1",
+	}
+}
+
+func NormalizeParams(params Params) Params {
+	if isZeroParams(params) {
+		return DefaultParams()
+	}
+	if params.MaxSwapFeeBps == 0 {
+		params.MaxSwapFeeBps = DefaultMaxSwapFeeBps
+	}
+	if params.MinInitialLiquidity == "" {
+		params.MinInitialLiquidity = "1"
+	}
+	return params
+}
+
+func isZeroParams(params Params) bool {
+	return params.SwapFeeBps == 0 &&
+		params.MaxSwapFeeBps == 0 &&
+		!params.PoolCreationEnabled &&
+		!params.SwapsEnabled &&
+		!params.LiquidityEnabled &&
+		params.MinInitialLiquidity == ""
+}
+
+func (p Params) Validate() error {
+	if p.MaxSwapFeeBps == 0 || p.MaxSwapFeeBps > DefaultMaxSwapFeeBps {
+		return fmt.Errorf("max_swap_fee_bps must be between 1 and %d", DefaultMaxSwapFeeBps)
+	}
+	if p.SwapFeeBps > p.MaxSwapFeeBps {
+		return fmt.Errorf("swap_fee_bps must be <= max_swap_fee_bps")
+	}
+	if err := validatePositiveInt("min_initial_liquidity", p.MinInitialLiquidity); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (gs GenesisState) Validate() error {
+	params := NormalizeParams(gs.Params)
+	if err := params.Validate(); err != nil {
+		return err
+	}
 	if gs.NextPoolId == 0 {
 		return fmt.Errorf("next_pool_id must be positive")
 	}

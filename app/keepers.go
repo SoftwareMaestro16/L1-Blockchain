@@ -208,15 +208,20 @@ func (app *L1App) initKeepers(
 		appCodec,
 		runtime.NewKVStoreService(keys[tokenfactorytypes.StoreKey]),
 		app.BankKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	app.DexKeeper = dexkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[dextypes.StoreKey]),
 		app.BankKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	app.FeesKeeper = feeskeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[feestypes.StoreKey]),
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.DistrKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	return txConfig

@@ -20,16 +20,28 @@ type Keeper struct {
 	cdc          codec.BinaryCodec
 	storeService corestore.KVStoreService
 	bankKeeper   types.BankKeeper
+	authority    string
 }
 
-func NewKeeper(cdc codec.BinaryCodec, storeService corestore.KVStoreService, bankKeeper types.BankKeeper) Keeper {
-	return Keeper{cdc: cdc, storeService: storeService, bankKeeper: bankKeeper}
+func NewKeeper(cdc codec.BinaryCodec, storeService corestore.KVStoreService, bankKeeper types.BankKeeper, authority string) Keeper {
+	return Keeper{cdc: cdc, storeService: storeService, bankKeeper: bankKeeper, authority: authority}
 }
+
+func (k Keeper) Authority() string { return k.authority }
 
 func poolKey(id uint64) []byte {
 	key := make([]byte, 1+8)
 	key[0] = types.PoolPrefix[0]
 	binary.BigEndian.PutUint64(key[1:], id)
+	return key
+}
+
+func pairKey(denom0, denom1 string) []byte {
+	key := make([]byte, 1, 1+len(denom0)+1+len(denom1))
+	key[0] = types.PoolPairPrefix[0]
+	key = append(key, denom0...)
+	key = append(key, 0x00)
+	key = append(key, denom1...)
 	return key
 }
 
@@ -106,7 +118,17 @@ func (k Keeper) SetNextPoolID(ctx context.Context, id uint64) error {
 }
 
 func (k Keeper) SetPool(ctx context.Context, pool types.Pool) error {
-	return k.storeService.OpenKVStore(ctx).Set(poolKey(pool.Id), k.cdc.MustMarshal(&pool))
+	bz, err := k.cdc.Marshal(&pool)
+	if err != nil {
+		return err
+	}
+	store := k.storeService.OpenKVStore(ctx)
+	if err := store.Set(poolKey(pool.Id), bz); err != nil {
+		return err
+	}
+	idBz := make([]byte, 8)
+	binary.BigEndian.PutUint64(idBz, pool.Id)
+	return store.Set(pairKey(pool.Denom0, pool.Denom1), idBz)
 }
 
 func (k Keeper) GetPool(ctx context.Context, id uint64) (types.Pool, bool, error) {
@@ -115,8 +137,21 @@ func (k Keeper) GetPool(ctx context.Context, id uint64) (types.Pool, bool, error
 		return types.Pool{}, false, err
 	}
 	var pool types.Pool
-	k.cdc.MustUnmarshal(bz, &pool)
+	if err := k.cdc.Unmarshal(bz, &pool); err != nil {
+		return types.Pool{}, false, err
+	}
 	return pool, true, nil
+}
+
+func (k Keeper) GetPoolIDByPair(ctx context.Context, denom0, denom1 string) (uint64, bool, error) {
+	bz, err := k.storeService.OpenKVStore(ctx).Get(pairKey(denom0, denom1))
+	if err != nil || bz == nil {
+		return 0, false, err
+	}
+	if len(bz) != 8 {
+		return 0, false, types.ErrInvalidPool.Wrap("corrupted pair index")
+	}
+	return binary.BigEndian.Uint64(bz), true, nil
 }
 
 func (k Keeper) GetAllPools(ctx context.Context) ([]types.Pool, error) {
@@ -129,36 +164,81 @@ func (k Keeper) GetAllPools(ctx context.Context) ([]types.Pool, error) {
 	var pools []types.Pool
 	for ; iter.Valid(); iter.Next() {
 		var pool types.Pool
-		k.cdc.MustUnmarshal(iter.Value(), &pool)
+		if err := k.cdc.Unmarshal(iter.Value(), &pool); err != nil {
+			return nil, err
+		}
 		pools = append(pools, pool)
 	}
 	return pools, nil
 }
 
-func (k Keeper) InitGenesis(ctx context.Context, gs types.GenesisState) {
+func (k Keeper) InitGenesis(ctx context.Context, gs types.GenesisState) error {
+	if err := gs.Validate(); err != nil {
+		return err
+	}
+	if err := k.SetParams(ctx, gs.Params); err != nil {
+		return err
+	}
 	if gs.NextPoolId == 0 {
 		gs.NextPoolId = types.DefaultNextPoolID
 	}
 	if err := k.SetNextPoolID(ctx, gs.NextPoolId); err != nil {
-		panic(err)
+		return err
 	}
 	for _, pool := range gs.Pools {
 		if err := k.SetPool(ctx, pool); err != nil {
-			panic(err)
+			return err
 		}
 	}
+	return nil
 }
 
-func (k Keeper) ExportGenesis(ctx context.Context) *types.GenesisState {
+func (k Keeper) ExportGenesis(ctx context.Context) (*types.GenesisState, error) {
 	next, err := k.GetNextPoolID(ctx)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	pools, err := k.GetAllPools(ctx)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return &types.GenesisState{NextPoolId: next, Pools: pools}
+	params, err := k.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	gs := &types.GenesisState{NextPoolId: next, Pools: pools, Params: params}
+	if err := gs.Validate(); err != nil {
+		return nil, err
+	}
+	return gs, nil
+}
+
+func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
+	params = types.NormalizeParams(params)
+	if err := params.Validate(); err != nil {
+		return types.ErrInvalidParams.Wrap(err.Error())
+	}
+	bz, err := k.cdc.Marshal(&params)
+	if err != nil {
+		return err
+	}
+	return k.storeService.OpenKVStore(ctx).Set(types.ParamsKey, bz)
+}
+
+func (k Keeper) GetParams(ctx context.Context) (types.Params, error) {
+	bz, err := k.storeService.OpenKVStore(ctx).Get(types.ParamsKey)
+	if err != nil || bz == nil {
+		return types.DefaultParams(), err
+	}
+	var params types.Params
+	if err := k.cdc.Unmarshal(bz, &params); err != nil {
+		return types.Params{}, err
+	}
+	params = types.NormalizeParams(params)
+	if err := params.Validate(); err != nil {
+		return types.Params{}, types.ErrInvalidParams.Wrap(err.Error())
+	}
+	return params, nil
 }
 
 func canonicalPair(a, b sdk.Coin) (sdk.Coin, sdk.Coin, error) {
@@ -194,7 +274,7 @@ func minInt(a, b sdkmath.Int) sdkmath.Int {
 	return b
 }
 
-func calcSwapOut(reserveIn, reserveOut, amountIn sdkmath.Int) sdkmath.Int {
-	amountInAfterFee := amountIn.MulRaw(types.BpsDenominator - types.PoolFeeBps).QuoRaw(types.BpsDenominator)
+func calcSwapOut(reserveIn, reserveOut, amountIn sdkmath.Int, feeBps uint32) sdkmath.Int {
+	amountInAfterFee := amountIn.MulRaw(types.BpsDenominator - int64(feeBps)).QuoRaw(types.BpsDenominator)
 	return reserveOut.Mul(amountInAfterFee).Quo(reserveIn.Add(amountInAfterFee))
 }

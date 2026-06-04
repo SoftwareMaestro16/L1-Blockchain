@@ -1,60 +1,100 @@
 param(
   [string]$OutputDir = "",
-  [string]$Binary = ""
+  [string]$Binary = "",
+  [ValidateRange(1, 100)][int]$ValidatorCount = 3,
+  [string]$ChainId = "orbitalis-local-1",
+  [int]$BaseP2PPort = 26656,
+  [int]$BaseRPCPort = 26657,
+  [int]$BaseGRPCPort = 9090,
+  [int]$BaseRESTPort = 1317,
+  [int]$BasePprofPort = 6060,
+  [int]$BaseMetricsPort = 26660,
+  [int]$BaseAppMetricsPort = 27660,
+  [switch]$DebugSecrets
 )
 
 $ErrorActionPreference = "Stop"
-$RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
-if ($OutputDir -eq "") { $OutputDir = Join-Path $RepoRoot ".localnet" }
-if ($Binary -eq "") { $Binary = Join-Path $RepoRoot "build\orbitalisd.exe" }
+Set-StrictMode -Version 2.0
+. (Join-Path $PSScriptRoot "common.ps1")
 
-$Go = Join-Path $RepoRoot ".work\tools\go1.25.11\go\bin\go.exe"
-if (!(Test-Path $Go)) { $Go = "go" }
+$RepoRoot = Get-RepoRoot
+$OutputDir = Resolve-LocalnetPath -OutputDir $OutputDir
+$Binary = Resolve-BinaryPath -Binary $Binary
+Assert-SafeLocalnetPath -Path $OutputDir
 
-New-Item -ItemType Directory -Force -Path (Split-Path $Binary) | Out-Null
-& $Go build -o $Binary ./cmd/l1d
+if (Test-Path -LiteralPath $OutputDir) {
+  & (Join-Path $PSScriptRoot "stop.ps1") -OutputDir $OutputDir
+  Remove-Item -LiteralPath $OutputDir -Recurse -Force
+}
 
-if (Test-Path $OutputDir) { Remove-Item -LiteralPath $OutputDir -Recurse -Force }
-& $Binary testnet init-files `
-  --validator-count 3 `
-  --output-dir $OutputDir `
-  --chain-id orbitalis-local-1 `
-  --staking-denom norb `
-  --node-daemon-home orbitalisd `
-  --node-dir-prefix node `
-  --keyring-backend test `
-  --single-host `
-  --commit-timeout 1s `
-  --minimum-gas-prices 0norb
+Build-OrbitalisBinary -Binary $Binary
+New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
+Set-PrivateLocalnetDirectory -Path $OutputDir
+$logDir = Join-Path $OutputDir "logs"
+New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 
-$ports = @(
-  @{OldP2P=16656; OldRPC=26657; OldAPI=1317; OldGRPC=9090; P2P=26656; RPC=26657; API=1317; GRPC=9090},
-  @{OldP2P=16657; OldRPC=26658; OldAPI=1318; OldGRPC=9091; P2P=26756; RPC=26757; API=1318; GRPC=9091},
-  @{OldP2P=16658; OldRPC=26659; OldAPI=1319; OldGRPC=9092; P2P=26856; RPC=26857; API=1319; GRPC=9092}
+$initArgs = @(
+  "testnet", "init-files",
+  "--validator-count", "$ValidatorCount",
+  "--output-dir", $OutputDir,
+  "--chain-id", $ChainId,
+  "--staking-denom", "norb",
+  "--node-daemon-home", $script:LocalnetNodeHomeName,
+  "--node-dir-prefix", "node",
+  "--keyring-backend", "test",
+  "--single-host",
+  "--commit-timeout", "1s",
+  "--minimum-gas-prices", $script:DefaultMinGasPrices
 )
 
-for ($i = 0; $i -lt 3; $i++) {
-  $nodeHome = Join-Path $OutputDir "node$i\orbitalisd"
+$initLog = Join-Path $logDir "init.log"
+Invoke-ExternalChecked -FilePath $Binary -Arguments $initArgs -LogPath $initLog -FailureMessage "testnet init-files failed" -SuppressFailureOutput:(!$DebugSecrets) -EchoOutput:$DebugSecrets | Out-Null
+
+for ($i = 0; $i -lt $ValidatorCount; $i++) {
+  $nodeHome = Get-NodeHome -OutputDir $OutputDir -Index $i
   $configToml = Join-Path $nodeHome "config\config.toml"
   $appToml = Join-Path $nodeHome "config\app.toml"
-  $p = $ports[$i]
+  $ports = Get-NodePorts -Index $i -BaseP2PPort $BaseP2PPort -BaseRPCPort $BaseRPCPort -BaseGRPCPort $BaseGRPCPort -BaseRESTPort $BaseRESTPort -BasePprofPort $BasePprofPort -BaseMetricsPort $BaseMetricsPort -BaseAppMetricsPort $BaseAppMetricsPort
 
   $config = Get-Content -Raw -LiteralPath $configToml
-  $config = $config -replace ":16656", ":26656"
-  $config = $config -replace ":16657", ":26756"
-  $config = $config -replace ":16658", ":26856"
-  $config = $config -replace ":$($p.OldRPC)", ":$($p.RPC)"
-  $config = $config -replace 'pprof_laddr = "localhost:\d+"', "pprof_laddr = `"localhost:$(6060 + $i)`""
+  for ($j = 0; $j -lt $ValidatorCount; $j++) {
+    $oldP2P = 16656 + $j
+    $newP2P = $BaseP2PPort + ($j * 100)
+    $config = $config -replace ":$oldP2P", ":$newP2P"
+  }
+  $oldRPC = 26657 + $i
+  $config = $config -replace ":$oldRPC", ":$($ports.rpc)"
+  $config = $config -replace 'pprof_laddr = "localhost:\d+"', "pprof_laddr = `"localhost:$($ports.pprof)`""
+  $config = $config -replace 'prometheus = false', 'prometheus = true'
+  $config = $config -replace 'prometheus_listen_addr = ":[0-9]+"', "prometheus_listen_addr = `":$($ports.metrics)`""
   Set-Content -LiteralPath $configToml -Value $config
 
   $app = Get-Content -Raw -LiteralPath $appToml
-  $app = $app -replace ":$($p.OldAPI)", ":$($p.API)"
-  $app = $app -replace ":$($p.OldGRPC)", ":$($p.GRPC)"
-  $app = $app -replace 'minimum-gas-prices = ""', 'minimum-gas-prices = "0norb"'
+  $oldAPI = 1317 + $i
+  $oldGRPC = 9090 + $i
+  $app = $app -replace ":$oldAPI", ":$($ports.rest)"
+  $app = $app -replace ":$oldGRPC", ":$($ports.grpc)"
+  $app = $app -replace 'minimum-gas-prices = ".*"', "minimum-gas-prices = `"$($script:DefaultMinGasPrices)`""
   Set-Content -LiteralPath $appToml -Value $app
 }
 
-Write-Host "Initialized 3-node localnet at $OutputDir"
-Write-Host "node0: p2p 26656, rpc 26657, grpc 9090, rest 1317"
-Write-Host "node1: p2p 26756, rpc 26757, grpc 9091, rest 1318"
-Write-Host "node2: p2p 26856, rpc 26857, grpc 9092, rest 1319"
+Write-LocalnetManifest `
+  -OutputDir $OutputDir `
+  -ValidatorCount $ValidatorCount `
+  -ChainId $ChainId `
+  -BaseP2PPort $BaseP2PPort `
+  -BaseRPCPort $BaseRPCPort `
+  -BaseGRPCPort $BaseGRPCPort `
+  -BaseRESTPort $BaseRESTPort `
+  -BasePprofPort $BasePprofPort `
+  -BaseMetricsPort $BaseMetricsPort `
+  -BaseAppMetricsPort $BaseAppMetricsPort
+
+Write-Host "Initialized $ValidatorCount-node localnet at $OutputDir"
+for ($i = 0; $i -lt $ValidatorCount; $i++) {
+  $ports = Get-NodePorts -Index $i -BaseP2PPort $BaseP2PPort -BaseRPCPort $BaseRPCPort -BaseGRPCPort $BaseGRPCPort -BaseRESTPort $BaseRESTPort -BasePprofPort $BasePprofPort -BaseMetricsPort $BaseMetricsPort -BaseAppMetricsPort $BaseAppMetricsPort
+  Write-Host ("node{0}: p2p {1}, rpc {2}, grpc {3}, rest {4}, comet metrics {5}, app metrics {6}" -f $i, $ports.p2p, $ports.rpc, $ports.grpc, $ports.rest, $ports.metrics, $ports.app_metrics)
+}
+if (!$DebugSecrets) {
+  Write-Host "Init output captured at $initLog; rerun with -DebugSecrets only when mnemonic output is explicitly needed."
+}

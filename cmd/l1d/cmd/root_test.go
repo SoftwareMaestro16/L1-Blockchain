@@ -32,6 +32,13 @@ func TestRootCommandBranding(t *testing.T) {
 	require.Contains(t, rootCmd.Short, "Orbitalis")
 }
 
+func TestObservabilityFlagsRegistered(t *testing.T) {
+	rootCmd := cmd.NewRootCmd()
+
+	require.NotNil(t, rootCmd.PersistentFlags().Lookup("observability-metrics"))
+	require.NotNil(t, rootCmd.PersistentFlags().Lookup("observability-metrics-addr"))
+}
+
 func TestHomeFlagRegistration(t *testing.T) {
 	homeDir := "/tmp/foo"
 

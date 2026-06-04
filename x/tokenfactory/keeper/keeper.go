@@ -3,8 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"regexp"
-	"strings"
 
 	corestore "cosmossdk.io/core/store"
 
@@ -16,25 +14,30 @@ import (
 	"github.com/sovereign-l1/l1/x/tokenfactory/types"
 )
 
-var subdenomRe = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9/:._-]{2,63}$`)
-
 type Keeper struct {
 	cdc          codec.BinaryCodec
 	storeService corestore.KVStoreService
 	bankKeeper   types.BankKeeper
+	authority    string
 }
 
-func NewKeeper(cdc codec.BinaryCodec, storeService corestore.KVStoreService, bankKeeper types.BankKeeper) Keeper {
-	return Keeper{cdc: cdc, storeService: storeService, bankKeeper: bankKeeper}
+func NewKeeper(cdc codec.BinaryCodec, storeService corestore.KVStoreService, bankKeeper types.BankKeeper, authority string) Keeper {
+	return Keeper{cdc: cdc, storeService: storeService, bankKeeper: bankKeeper, authority: authority}
 }
+
+func (k Keeper) Authority() string { return k.authority }
 
 func denomKey(denom string) []byte {
 	return append(types.DenomPrefix, []byte(denom)...)
 }
 
 func (k Keeper) SetDenom(ctx context.Context, meta types.DenomAuthorityMetadata) error {
+	bz, err := k.cdc.Marshal(&meta)
+	if err != nil {
+		return err
+	}
 	store := k.storeService.OpenKVStore(ctx)
-	return store.Set(denomKey(meta.Denom), k.cdc.MustMarshal(&meta))
+	return store.Set(denomKey(meta.Denom), bz)
 }
 
 func (k Keeper) GetDenom(ctx context.Context, denom string) (types.DenomAuthorityMetadata, bool, error) {
@@ -44,7 +47,9 @@ func (k Keeper) GetDenom(ctx context.Context, denom string) (types.DenomAuthorit
 		return types.DenomAuthorityMetadata{}, false, err
 	}
 	var meta types.DenomAuthorityMetadata
-	k.cdc.MustUnmarshal(bz, &meta)
+	if err := k.cdc.Unmarshal(bz, &meta); err != nil {
+		return types.DenomAuthorityMetadata{}, false, err
+	}
 	return meta, true, nil
 }
 
@@ -59,37 +64,86 @@ func (k Keeper) GetAllDenoms(ctx context.Context) ([]types.DenomAuthorityMetadat
 	var out []types.DenomAuthorityMetadata
 	for ; iter.Valid(); iter.Next() {
 		var meta types.DenomAuthorityMetadata
-		k.cdc.MustUnmarshal(iter.Value(), &meta)
+		if err := k.cdc.Unmarshal(iter.Value(), &meta); err != nil {
+			return nil, err
+		}
 		out = append(out, meta)
 	}
 	return out, nil
 }
 
-func (k Keeper) FullDenom(creator, subdenom string) (string, error) {
+func (k Keeper) FullDenom(ctx context.Context, creator, subdenom string) (string, error) {
 	creatorAddr, err := sdk.AccAddressFromBech32(creator)
 	if err != nil {
 		return "", err
 	}
-	if !subdenomRe.MatchString(subdenom) || strings.Contains(subdenom, "//") {
-		return "", types.ErrInvalidDenom.Wrap("subdenom must be 3-64 chars and start with a letter")
+	params, err := k.GetParams(ctx)
+	if err != nil {
+		return "", err
+	}
+	if err := types.ValidateSubdenom(subdenom, params); err != nil {
+		return "", types.ErrInvalidDenom.Wrap(err.Error())
 	}
 	return fmt.Sprintf("%s/%s/%s", types.FactoryDenomPrefix, creatorAddr.String(), subdenom), nil
 }
 
-func (k Keeper) InitGenesis(ctx context.Context, gs types.GenesisState) {
+func (k Keeper) InitGenesis(ctx context.Context, gs types.GenesisState) error {
+	if err := gs.Validate(); err != nil {
+		return err
+	}
+	if err := k.SetParams(ctx, gs.Params); err != nil {
+		return err
+	}
 	for _, meta := range gs.Denoms {
 		if err := k.SetDenom(ctx, meta); err != nil {
-			panic(err)
+			return err
 		}
 	}
+	return nil
 }
 
-func (k Keeper) ExportGenesis(ctx context.Context) *types.GenesisState {
+func (k Keeper) ExportGenesis(ctx context.Context) (*types.GenesisState, error) {
 	denoms, err := k.GetAllDenoms(ctx)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return &types.GenesisState{Denoms: denoms}
+	params, err := k.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	gs := &types.GenesisState{Denoms: denoms, Params: params}
+	if err := gs.Validate(); err != nil {
+		return nil, err
+	}
+	return gs, nil
+}
+
+func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
+	params = types.NormalizeParams(params)
+	if err := params.Validate(); err != nil {
+		return types.ErrInvalidParams.Wrap(err.Error())
+	}
+	bz, err := k.cdc.Marshal(&params)
+	if err != nil {
+		return err
+	}
+	return k.storeService.OpenKVStore(ctx).Set(types.ParamsKey, bz)
+}
+
+func (k Keeper) GetParams(ctx context.Context) (types.Params, error) {
+	bz, err := k.storeService.OpenKVStore(ctx).Get(types.ParamsKey)
+	if err != nil || bz == nil {
+		return types.DefaultParams(), err
+	}
+	var params types.Params
+	if err := k.cdc.Unmarshal(bz, &params); err != nil {
+		return types.Params{}, err
+	}
+	params = types.NormalizeParams(params)
+	if err := params.Validate(); err != nil {
+		return types.Params{}, types.ErrInvalidParams.Wrap(err.Error())
+	}
+	return params, nil
 }
 
 func BankMetadata(denom string) banktypes.Metadata {

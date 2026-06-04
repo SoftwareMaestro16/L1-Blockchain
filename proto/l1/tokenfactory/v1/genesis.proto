@@ -7,9 +7,18 @@ option go_package = "github.com/sovereign-l1/l1/x/tokenfactory/types";
 
 message GenesisState {
   repeated DenomAuthorityMetadata denoms = 1 [(gogoproto.nullable) = false];
+  Params params = 2 [(gogoproto.nullable) = false];
 }
 
 message DenomAuthorityMetadata {
   string denom = 1;
   string admin = 2;
+}
+
+message Params {
+  uint32 min_subdenom_length = 1;
+  uint32 max_subdenom_length = 2;
+  bool denom_creation_enabled = 3;
+  bool minting_enabled = 4;
+  bool burning_enabled = 5;
 }

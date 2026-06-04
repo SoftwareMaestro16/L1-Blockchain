@@ -25,10 +25,24 @@ func (k Keeper) Denom(ctx context.Context, req *types.QueryDenomRequest) (*types
 	return &types.QueryDenomResponse{Metadata: meta}, nil
 }
 
-func (k Keeper) Denoms(ctx context.Context, _ *types.QueryDenomsRequest) (*types.QueryDenomsResponse, error) {
+func (k Keeper) Denoms(ctx context.Context, req *types.QueryDenomsRequest) (*types.QueryDenomsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
 	denoms, err := k.GetAllDenoms(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return &types.QueryDenomsResponse{Denoms: denoms}, nil
+}
+
+func (k Keeper) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	params, err := k.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &types.QueryParamsResponse{Params: params}, nil
 }

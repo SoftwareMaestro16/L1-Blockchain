@@ -19,7 +19,7 @@ import (
 // file.
 func (app *L1App) ExportAppStateAndValidators(forZeroHeight bool, jailAllowedAddrs, modulesToExport []string) (servertypes.ExportedApp, error) {
 	// as if they could withdraw from the start of the next block
-	ctx := app.NewContextLegacy(true, cmtproto.Header{Height: app.LastBlockHeight()})
+	ctx := app.NewUncachedContext(false, cmtproto.Header{Height: app.LastBlockHeight()})
 
 	// We export at last height + 1, because that's the height at which
 	// CometBFT will start InitChain.
@@ -27,6 +27,9 @@ func (app *L1App) ExportAppStateAndValidators(forZeroHeight bool, jailAllowedAdd
 	if forZeroHeight {
 		height = 0
 		app.prepForZeroHeightGenesis(ctx, jailAllowedAddrs)
+	}
+	if err := app.ensureCoreGenesisCollections(ctx); err != nil {
+		return servertypes.ExportedApp{}, err
 	}
 
 	genState, err := app.ModuleManager.ExportGenesisForModules(ctx, app.appCodec, modulesToExport)

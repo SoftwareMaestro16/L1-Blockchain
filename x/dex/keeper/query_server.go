@@ -25,10 +25,24 @@ func (k Keeper) Pool(ctx context.Context, req *types.QueryPoolRequest) (*types.Q
 	return &types.QueryPoolResponse{Pool: pool}, nil
 }
 
-func (k Keeper) Pools(ctx context.Context, _ *types.QueryPoolsRequest) (*types.QueryPoolsResponse, error) {
+func (k Keeper) Pools(ctx context.Context, req *types.QueryPoolsRequest) (*types.QueryPoolsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
 	pools, err := k.GetAllPools(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return &types.QueryPoolsResponse{Pools: pools}, nil
+}
+
+func (k Keeper) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	params, err := k.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &types.QueryParamsResponse{Params: params}, nil
 }

@@ -1,0 +1,200 @@
+name: adversarial-e2e
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "tests/**"
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: read
+
+env:
+  GOMAXPROCS: "2"
+  GOFLAGS: "-p=1"
+  GO_VERSION_FILE: go.mod
+  BUF_VERSION: "1.70.0"
+  GOCOSMOS_VERSION: "v1.7.0"
+  GRPC_GATEWAY_VERSION: "v1.16.0"
+  ORBITALIS_BINARY: build\orbitalisd.exe
+
+jobs:
+  unit-adversarial:
+    name: unit and adversarial tests
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+          cache: true
+
+      - name: Run unit and adversarial tests
+        shell: pwsh
+        run: go test ./app ./observability ./x/... ./tests/adversarial
+
+  integration:
+    name: integration tests
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+          cache: true
+
+      - name: Run integration tests
+        shell: pwsh
+        run: go test ./tests/integration
+
+  vet:
+    name: go vet
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+          cache: true
+
+      - name: Run go vet
+        shell: pwsh
+        run: go vet ./...
+
+  proto:
+    name: proto lint and generation
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+          cache: true
+
+      - name: Setup Buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: ${{ env.BUF_VERSION }}
+
+      - name: Install proto generators
+        shell: pwsh
+        run: |
+          go install github.com/cosmos/gogoproto/protoc-gen-gocosmos@${{ env.GOCOSMOS_VERSION }}
+          go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@${{ env.GRPC_GATEWAY_VERSION }}
+          "$env:USERPROFILE\go\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Lint proto
+        shell: pwsh
+        run: buf lint
+
+      - name: Generate proto verification output
+        shell: pwsh
+        run: |
+          if (Test-Path .work\bufgen) {
+            Remove-Item -Recurse -Force .work\bufgen
+          }
+          buf generate
+          if (-not (Test-Path .work\bufgen)) {
+            throw "buf generate did not create .work\bufgen"
+          }
+          $generated = Get-ChildItem .work\bufgen -Recurse -File | Select-Object -First 1
+          if (-not $generated) {
+            throw "buf generate created no files"
+          }
+
+  build:
+    name: build orbitalisd
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+          cache: true
+
+      - name: Build binary
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build | Out-Null
+          go build -o $env:ORBITALIS_BINARY .\cmd\l1d
+
+  e2e-smoke:
+    name: adversarial localnet smoke
+    runs-on: windows-latest
+    timeout-minutes: 35
+    needs:
+      - unit-adversarial
+      - integration
+      - vet
+      - proto
+      - build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+          cache: true
+
+      - name: Build binary
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build | Out-Null
+          go build -o $env:ORBITALIS_BINARY .\cmd\l1d
+
+      - name: Run adversarial localnet smoke
+        shell: pwsh
+        run: .\tests\e2e\adversarial_smoke.ps1 -Binary $env:ORBITALIS_BINARY -SpamCount 3 -TimeoutSeconds 120
+
+  nightly-localnet:
+    name: nightly scaled localnet smoke
+    runs-on: windows-latest
+    timeout-minutes: 60
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs:
+      - e2e-smoke
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+          cache: true
+
+      - name: Build binary
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build | Out-Null
+          go build -o $env:ORBITALIS_BINARY .\cmd\l1d
+
+      - name: Run scaled localnet smoke
+        shell: pwsh
+        run: .\tests\e2e\localnet_smoke.ps1 -Binary $env:ORBITALIS_BINARY -ValidatorCounts 3,5,10 -TimeoutSeconds 180

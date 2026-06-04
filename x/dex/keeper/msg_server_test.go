@@ -54,6 +54,119 @@ func TestAddLiquidityRejectsMalformedMinShares(t *testing.T) {
 	require.Contains(t, err.Error(), "min_shares")
 }
 
+func TestMsgUpdateParamsRejectsUnauthorizedAuthority(t *testing.T) {
+	app := l1app.Setup(t, false)
+	ctx := app.NewContext(false)
+	msgServer := dexkeeper.NewMsgServerImpl(app.DexKeeper)
+
+	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
+		Authority: "orb1unauthorized",
+		Params:    types.DefaultParams(),
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorized)
+}
+
+func TestMsgUpdateParamsRejectsInvalidParams(t *testing.T) {
+	app := l1app.Setup(t, false)
+	ctx := app.NewContext(false)
+	msgServer := dexkeeper.NewMsgServerImpl(app.DexKeeper)
+	params := types.DefaultParams()
+	params.SwapFeeBps = params.MaxSwapFeeBps + 1
+
+	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
+		Authority: app.DexKeeper.Authority(),
+		Params:    params,
+	})
+	require.ErrorIs(t, err, types.ErrInvalidParams)
+}
+
+func TestMsgUpdateParamsDisablesPoolCreation(t *testing.T) {
+	app := l1app.Setup(t, false)
+	ctx := app.NewContext(false)
+	creator := l1app.AddTestAddrsIncremental(app, ctx, 1, sdkmath.NewInt(1_000_000))[0]
+	msgServer := dexkeeper.NewMsgServerImpl(app.DexKeeper)
+	params := types.DefaultParams()
+	params.PoolCreationEnabled = false
+
+	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
+		Authority: app.DexKeeper.Authority(),
+		Params:    params,
+	})
+	require.NoError(t, err)
+
+	_, err = msgServer.CreatePool(ctx, &types.MsgCreatePool{
+		Creator: creator.String(),
+		TokenA:  sdk.NewInt64Coin("uatom", 1_000),
+		TokenB:  sdk.NewInt64Coin("norb", 1_000),
+	})
+	require.ErrorIs(t, err, types.ErrOperationDisabled)
+}
+
+func TestMsgUpdateParamsDisablesSwapsAndLiquidity(t *testing.T) {
+	app, ctx, msgServer, creator, poolID := setupDexPool(t)
+	params := types.DefaultParams()
+	params.SwapsEnabled = false
+
+	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
+		Authority: app.DexKeeper.Authority(),
+		Params:    params,
+	})
+	require.NoError(t, err)
+
+	_, err = msgServer.SwapExactAmountIn(ctx, &types.MsgSwapExactAmountIn{
+		Trader:        creator.String(),
+		PoolId:        poolID,
+		TokenIn:       sdk.NewInt64Coin("uatom", 10),
+		TokenOutDenom: "norb",
+		MinAmountOut:  "1",
+	})
+	require.ErrorIs(t, err, types.ErrOperationDisabled)
+
+	params = types.DefaultParams()
+	params.LiquidityEnabled = false
+	_, err = msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
+		Authority: app.DexKeeper.Authority(),
+		Params:    params,
+	})
+	require.NoError(t, err)
+
+	_, err = msgServer.AddLiquidity(ctx, &types.MsgAddLiquidity{
+		Depositor: creator.String(),
+		PoolId:    poolID,
+		TokenA:    sdk.NewInt64Coin("uatom", 1),
+		TokenB:    sdk.NewInt64Coin("norb", 1),
+		MinShares: "1",
+	})
+	require.ErrorIs(t, err, types.ErrOperationDisabled)
+}
+
+func TestCreatePoolRejectsDuplicatePairViaIndex(t *testing.T) {
+	app, ctx, msgServer, creator, _ := setupDexPool(t)
+	fundAccount(t, app, ctx, creator, sdk.NewCoins(sdk.NewInt64Coin("uatom", 1_000)))
+
+	_, err := msgServer.CreatePool(ctx, &types.MsgCreatePool{
+		Creator: creator.String(),
+		TokenA:  sdk.NewInt64Coin("norb", 100),
+		TokenB:  sdk.NewInt64Coin("uatom", 100),
+	})
+	require.ErrorIs(t, err, types.ErrInvalidPool)
+}
+
+func TestParamsQueryReturnsCurrentParamsAndRejectsNil(t *testing.T) {
+	app := l1app.Setup(t, false)
+	ctx := app.NewContext(false)
+	_, err := app.DexKeeper.Params(ctx, nil)
+	require.Error(t, err)
+
+	params := types.DefaultParams()
+	params.SwapFeeBps = 100
+	require.NoError(t, app.DexKeeper.SetParams(ctx, params))
+
+	res, err := app.DexKeeper.Params(ctx, &types.QueryParamsRequest{})
+	require.NoError(t, err)
+	require.Equal(t, uint32(100), res.Params.SwapFeeBps)
+}
+
 func TestAddLiquidityRejectsCorruptedPoolStateWithoutPanic(t *testing.T) {
 	app := l1app.Setup(t, false)
 	ctx := app.NewContext(false)

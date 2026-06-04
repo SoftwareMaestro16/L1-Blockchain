@@ -11,10 +11,30 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/l1/fees/v1/params";
   }
+
+  rpc Accounting(QueryAccountingRequest) returns (QueryAccountingResponse) {
+    option (google.api.http).get = "/l1/fees/v1/accounting";
+  }
+
+  rpc ModuleBalances(QueryModuleBalancesRequest) returns (QueryModuleBalancesResponse) {
+    option (google.api.http).get = "/l1/fees/v1/module_balances";
+  }
 }
 
 message QueryParamsRequest {}
 
 message QueryParamsResponse {
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAccountingRequest {}
+
+message QueryAccountingResponse {
+  ProtocolFeeState protocol_fee_state = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryModuleBalancesRequest {}
+
+message QueryModuleBalancesResponse {
+  repeated ModuleBalance balances = 1 [(gogoproto.nullable) = false];
 }

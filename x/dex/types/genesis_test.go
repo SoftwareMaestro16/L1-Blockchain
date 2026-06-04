@@ -70,3 +70,43 @@ func TestGenesisValidateAcceptsValidPoolState(t *testing.T) {
 		t.Fatalf("expected valid genesis state: %v", err)
 	}
 }
+
+func TestDefaultParamsValidate(t *testing.T) {
+	params := DefaultParams()
+	if params.SwapFeeBps != DefaultSwapFeeBps {
+		t.Fatalf("unexpected default swap fee: %d", params.SwapFeeBps)
+	}
+	if !params.PoolCreationEnabled || !params.SwapsEnabled || !params.LiquidityEnabled {
+		t.Fatal("default DEX params should enable protocol operations")
+	}
+	if err := params.Validate(); err != nil {
+		t.Fatalf("default params should validate: %v", err)
+	}
+}
+
+func TestParamsRejectUnsafeValues(t *testing.T) {
+	tests := map[string]func(*Params){
+		"fee above cap": func(params *Params) {
+			params.SwapFeeBps = params.MaxSwapFeeBps + 1
+		},
+		"cap above immutable bound": func(params *Params) {
+			params.MaxSwapFeeBps = DefaultMaxSwapFeeBps + 1
+		},
+		"zero min initial liquidity": func(params *Params) {
+			params.MinInitialLiquidity = "0"
+		},
+		"malformed min initial liquidity": func(params *Params) {
+			params.MinInitialLiquidity = "not-int"
+		},
+	}
+
+	for name, mutate := range tests {
+		t.Run(name, func(t *testing.T) {
+			params := DefaultParams()
+			mutate(&params)
+			if err := params.Validate(); err == nil {
+				t.Fatal("expected invalid DEX params")
+			}
+		})
+	}
+}

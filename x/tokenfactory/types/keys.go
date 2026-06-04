@@ -8,6 +8,7 @@ const (
 
 var (
 	DenomPrefix = []byte{0x01}
+	ParamsKey   = []byte{0x02}
 )
 
 const FactoryDenomPrefix = "factory"

@@ -25,6 +25,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type GenesisState struct {
 	Denoms []DenomAuthorityMetadata `protobuf:"bytes,1,rep,name=denoms,proto3" json:"denoms"`
+	Params Params                   `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -65,6 +66,13 @@ func (m *GenesisState) GetDenoms() []DenomAuthorityMetadata {
 		return m.Denoms
 	}
 	return nil
+}
+
+func (m *GenesisState) GetParams() Params {
+	if m != nil {
+		return m.Params
+	}
+	return Params{}
 }
 
 type DenomAuthorityMetadata struct {
@@ -119,31 +127,116 @@ func (m *DenomAuthorityMetadata) GetAdmin() string {
 	return ""
 }
 
+type Params struct {
+	MinSubdenomLength    uint32 `protobuf:"varint,1,opt,name=min_subdenom_length,json=minSubdenomLength,proto3" json:"min_subdenom_length,omitempty"`
+	MaxSubdenomLength    uint32 `protobuf:"varint,2,opt,name=max_subdenom_length,json=maxSubdenomLength,proto3" json:"max_subdenom_length,omitempty"`
+	DenomCreationEnabled bool   `protobuf:"varint,3,opt,name=denom_creation_enabled,json=denomCreationEnabled,proto3" json:"denom_creation_enabled,omitempty"`
+	MintingEnabled       bool   `protobuf:"varint,4,opt,name=minting_enabled,json=mintingEnabled,proto3" json:"minting_enabled,omitempty"`
+	BurningEnabled       bool   `protobuf:"varint,5,opt,name=burning_enabled,json=burningEnabled,proto3" json:"burning_enabled,omitempty"`
+}
+
+func (m *Params) Reset()         { *m = Params{} }
+func (m *Params) String() string { return proto.CompactTextString(m) }
+func (*Params) ProtoMessage()    {}
+func (*Params) Descriptor() ([]byte, []int) {
+	return fileDescriptor_042b072b97784d6e, []int{2}
+}
+func (m *Params) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Params) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Params.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Params) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Params.Merge(m, src)
+}
+func (m *Params) XXX_Size() int {
+	return m.Size()
+}
+func (m *Params) XXX_DiscardUnknown() {
+	xxx_messageInfo_Params.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Params proto.InternalMessageInfo
+
+func (m *Params) GetMinSubdenomLength() uint32 {
+	if m != nil {
+		return m.MinSubdenomLength
+	}
+	return 0
+}
+
+func (m *Params) GetMaxSubdenomLength() uint32 {
+	if m != nil {
+		return m.MaxSubdenomLength
+	}
+	return 0
+}
+
+func (m *Params) GetDenomCreationEnabled() bool {
+	if m != nil {
+		return m.DenomCreationEnabled
+	}
+	return false
+}
+
+func (m *Params) GetMintingEnabled() bool {
+	if m != nil {
+		return m.MintingEnabled
+	}
+	return false
+}
+
+func (m *Params) GetBurningEnabled() bool {
+	if m != nil {
+		return m.BurningEnabled
+	}
+	return false
+}
+
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "l1.tokenfactory.v1.GenesisState")
 	proto.RegisterType((*DenomAuthorityMetadata)(nil), "l1.tokenfactory.v1.DenomAuthorityMetadata")
+	proto.RegisterType((*Params)(nil), "l1.tokenfactory.v1.Params")
 }
 
 func init() { proto.RegisterFile("l1/tokenfactory/v1/genesis.proto", fileDescriptor_042b072b97784d6e) }
 
 var fileDescriptor_042b072b97784d6e = []byte{
-	// 248 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x52, 0xc8, 0x31, 0xd4, 0x2f,
-	0xc9, 0xcf, 0x4e, 0xcd, 0x4b, 0x4b, 0x4c, 0x2e, 0xc9, 0x2f, 0xaa, 0xd4, 0x2f, 0x33, 0xd4, 0x4f,
-	0x4f, 0xcd, 0x4b, 0x2d, 0xce, 0x2c, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0xca, 0x31,
-	0xd4, 0x43, 0x56, 0xa1, 0x57, 0x66, 0x28, 0x25, 0x92, 0x9e, 0x9f, 0x9e, 0x0f, 0x96, 0xd6, 0x07,
-	0xb1, 0x20, 0x2a, 0x95, 0x22, 0xb8, 0x78, 0xdc, 0x21, 0x5a, 0x83, 0x4b, 0x12, 0x4b, 0x52, 0x85,
-	0x3c, 0xb8, 0xd8, 0x52, 0x52, 0xf3, 0xf2, 0x73, 0x8b, 0x25, 0x18, 0x15, 0x98, 0x35, 0xb8, 0x8d,
-	0xb4, 0xf4, 0x30, 0x8d, 0xd2, 0x73, 0x01, 0xa9, 0x70, 0x2c, 0x2d, 0xc9, 0xc8, 0x2f, 0xca, 0x2c,
-	0xa9, 0xf4, 0x4d, 0x2d, 0x49, 0x4c, 0x49, 0x2c, 0x49, 0x74, 0x62, 0x39, 0x71, 0x4f, 0x9e, 0x21,
-	0x08, 0xaa, 0x5f, 0xc9, 0x85, 0x4b, 0x0c, 0xbb, 0x3a, 0x21, 0x11, 0x2e, 0x56, 0xb0, 0x1a, 0x09,
-	0x46, 0x05, 0x46, 0x0d, 0xce, 0x20, 0x08, 0x07, 0x24, 0x9a, 0x98, 0x92, 0x9b, 0x99, 0x27, 0xc1,
-	0x04, 0x11, 0x05, 0x73, 0x9c, 0x3c, 0x4f, 0x3c, 0x92, 0x63, 0xbc, 0xf0, 0x48, 0x8e, 0xf1, 0xc1,
-	0x23, 0x39, 0xc6, 0x09, 0x8f, 0xe5, 0x18, 0x2e, 0x3c, 0x96, 0x63, 0xb8, 0xf1, 0x58, 0x8e, 0x21,
-	0x4a, 0x3f, 0x3d, 0xb3, 0x24, 0xa3, 0x34, 0x49, 0x2f, 0x39, 0x3f, 0x57, 0xbf, 0x38, 0xbf, 0x2c,
-	0xb5, 0x28, 0x35, 0x33, 0x3d, 0x4f, 0x37, 0xc7, 0x50, 0x3f, 0xc7, 0x50, 0xbf, 0x02, 0x35, 0x7c,
-	0x4a, 0x2a, 0x0b, 0x52, 0x8b, 0x93, 0xd8, 0xc0, 0x3e, 0x36, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff,
-	0xfb, 0x0c, 0x2a, 0xc8, 0x3f, 0x01, 0x00, 0x00,
+	// 384 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0xd2, 0x4f, 0x4f, 0xf2, 0x30,
+	0x1c, 0x07, 0xf0, 0x95, 0x3f, 0xcb, 0x43, 0x79, 0xfe, 0xe4, 0x99, 0x84, 0x2c, 0x1c, 0xe6, 0xc2,
+	0xc5, 0xc5, 0xc4, 0x35, 0x43, 0x0f, 0x5e, 0x45, 0x8c, 0x9a, 0x68, 0x62, 0xc6, 0xcd, 0x0b, 0xe9,
+	0x58, 0x1d, 0x8d, 0x5b, 0x4b, 0xb6, 0x8e, 0xc0, 0xbb, 0x30, 0xbe, 0x2a, 0x8e, 0x1c, 0x3d, 0x19,
+	0x03, 0x6f, 0xc0, 0x97, 0x60, 0x68, 0xa7, 0x41, 0xe1, 0xd6, 0xfe, 0xbe, 0x9f, 0xdf, 0xb7, 0x97,
+	0x42, 0x3b, 0xf6, 0x90, 0xe0, 0x8f, 0x84, 0x3d, 0xe0, 0xa1, 0xe0, 0xe9, 0x0c, 0x4d, 0x3c, 0x14,
+	0x11, 0x46, 0x32, 0x9a, 0xb9, 0xe3, 0x94, 0x0b, 0x6e, 0x18, 0xb1, 0xe7, 0x6e, 0x0a, 0x77, 0xe2,
+	0xb5, 0x1a, 0x11, 0x8f, 0xb8, 0x8c, 0xd1, 0xfa, 0xa4, 0x64, 0xfb, 0x19, 0xc0, 0xdf, 0x97, 0x6a,
+	0xb7, 0x2f, 0xb0, 0x20, 0xc6, 0x15, 0xd4, 0x43, 0xc2, 0x78, 0x92, 0x99, 0xc0, 0x2e, 0x3b, 0xf5,
+	0xce, 0xa1, 0xbb, 0xdd, 0xe5, 0xf6, 0xd6, 0xe2, 0x2c, 0x17, 0x23, 0x9e, 0x52, 0x31, 0xbb, 0x25,
+	0x02, 0x87, 0x58, 0xe0, 0x6e, 0x65, 0xfe, 0xba, 0xaf, 0xf9, 0xc5, 0xbe, 0x71, 0x0a, 0xf5, 0x31,
+	0x4e, 0x71, 0x92, 0x99, 0x25, 0x1b, 0x38, 0xf5, 0x4e, 0x6b, 0x57, 0xd3, 0x9d, 0x14, 0x9f, 0x9b,
+	0xca, 0xb7, 0x7b, 0xb0, 0xb9, 0xfb, 0x05, 0xa3, 0x01, 0xab, 0xb2, 0xdd, 0x04, 0x36, 0x70, 0x6a,
+	0xbe, 0xba, 0xac, 0xa7, 0x38, 0x4c, 0x28, 0x93, 0x0f, 0xd5, 0x7c, 0x75, 0x69, 0xbf, 0x03, 0xa8,
+	0xab, 0x7a, 0xc3, 0x85, 0x7b, 0x09, 0x65, 0x83, 0x2c, 0x0f, 0xe4, 0xc2, 0x20, 0x26, 0x2c, 0x12,
+	0x23, 0x59, 0xf2, 0xc7, 0xff, 0x9f, 0x50, 0xd6, 0x2f, 0x92, 0x1b, 0x19, 0x48, 0x8f, 0xa7, 0x5b,
+	0xbe, 0x54, 0x78, 0x3c, 0xfd, 0xe1, 0x4f, 0x60, 0x53, 0xc1, 0x61, 0x4a, 0xb0, 0xa0, 0x9c, 0x0d,
+	0x08, 0xc3, 0x41, 0x4c, 0x42, 0xb3, 0x6c, 0x03, 0xe7, 0x97, 0xdf, 0x90, 0xe9, 0x79, 0x11, 0x5e,
+	0xa8, 0xcc, 0x38, 0x80, 0xff, 0x12, 0xca, 0x04, 0x65, 0xd1, 0x17, 0xaf, 0x48, 0xfe, 0xb7, 0x18,
+	0x6f, 0xc0, 0x20, 0x4f, 0xd9, 0x26, 0xac, 0x2a, 0x58, 0x8c, 0x0b, 0xd8, 0xbd, 0x9e, 0x2f, 0x2d,
+	0xb0, 0x58, 0x5a, 0xe0, 0x6d, 0x69, 0x81, 0xa7, 0x95, 0xa5, 0x2d, 0x56, 0x96, 0xf6, 0xb2, 0xb2,
+	0xb4, 0x7b, 0x14, 0x51, 0x31, 0xca, 0x03, 0x77, 0xc8, 0x13, 0x94, 0xf1, 0x09, 0x49, 0x09, 0x8d,
+	0xd8, 0x51, 0xec, 0xa1, 0xd8, 0x43, 0xd3, 0xef, 0xbf, 0x49, 0xcc, 0xc6, 0x24, 0x0b, 0x74, 0xf9,
+	0x3f, 0x8e, 0x3f, 0x02, 0x00, 0x00, 0xff, 0xff, 0xbb, 0x84, 0x27, 0x9f, 0x6d, 0x02, 0x00, 0x00,
 }
 
 func (m *GenesisState) Marshal() (dAtA []byte, err error) {
@@ -166,6 +259,16 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	{
+		size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGenesis(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
 	if len(m.Denoms) > 0 {
 		for iNdEx := len(m.Denoms) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -220,6 +323,69 @@ func (m *DenomAuthorityMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
+func (m *Params) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Params) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.BurningEnabled {
+		i--
+		if m.BurningEnabled {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.MintingEnabled {
+		i--
+		if m.MintingEnabled {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.DenomCreationEnabled {
+		i--
+		if m.DenomCreationEnabled {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.MaxSubdenomLength != 0 {
+		i = encodeVarintGenesis(dAtA, i, uint64(m.MaxSubdenomLength))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.MinSubdenomLength != 0 {
+		i = encodeVarintGenesis(dAtA, i, uint64(m.MinSubdenomLength))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintGenesis(dAtA []byte, offset int, v uint64) int {
 	offset -= sovGenesis(v)
 	base := offset
@@ -243,6 +409,8 @@ func (m *GenesisState) Size() (n int) {
 			n += 1 + l + sovGenesis(uint64(l))
 		}
 	}
+	l = m.Params.Size()
+	n += 1 + l + sovGenesis(uint64(l))
 	return n
 }
 
@@ -259,6 +427,30 @@ func (m *DenomAuthorityMetadata) Size() (n int) {
 	l = len(m.Admin)
 	if l > 0 {
 		n += 1 + l + sovGenesis(uint64(l))
+	}
+	return n
+}
+
+func (m *Params) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.MinSubdenomLength != 0 {
+		n += 1 + sovGenesis(uint64(m.MinSubdenomLength))
+	}
+	if m.MaxSubdenomLength != 0 {
+		n += 1 + sovGenesis(uint64(m.MaxSubdenomLength))
+	}
+	if m.DenomCreationEnabled {
+		n += 2
+	}
+	if m.MintingEnabled {
+		n += 2
+	}
+	if m.BurningEnabled {
+		n += 2
 	}
 	return n
 }
@@ -329,6 +521,39 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			}
 			m.Denoms = append(m.Denoms, DenomAuthorityMetadata{})
 			if err := m.Denoms[len(m.Denoms)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -446,6 +671,154 @@ func (m *DenomAuthorityMetadata) Unmarshal(dAtA []byte) error {
 			}
 			m.Admin = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenesis(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Params) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenesis
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Params: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Params: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinSubdenomLength", wireType)
+			}
+			m.MinSubdenomLength = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinSubdenomLength |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxSubdenomLength", wireType)
+			}
+			m.MaxSubdenomLength = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxSubdenomLength |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DenomCreationEnabled", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.DenomCreationEnabled = bool(v != 0)
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MintingEnabled", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.MintingEnabled = bool(v != 0)
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BurningEnabled", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.BurningEnabled = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGenesis(dAtA[iNdEx:])

@@ -8,6 +8,7 @@ option go_package = "github.com/sovereign-l1/l1/x/dex/types";
 message GenesisState {
   uint64 next_pool_id = 1;
   repeated Pool pools = 2 [(gogoproto.nullable) = false];
+  Params params = 3 [(gogoproto.nullable) = false];
 }
 
 message Pool {
@@ -18,4 +19,13 @@ message Pool {
   string reserve1 = 5;
   string total_shares = 6;
   string lp_denom = 7;
+}
+
+message Params {
+  uint32 swap_fee_bps = 1;
+  uint32 max_swap_fee_bps = 2;
+  bool pool_creation_enabled = 3;
+  bool swaps_enabled = 4;
+  bool liquidity_enabled = 5;
+  string min_initial_liquidity = 6;
 }

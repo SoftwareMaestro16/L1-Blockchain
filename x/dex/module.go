@@ -21,6 +21,8 @@ import (
 	"github.com/sovereign-l1/l1/x/dex/types"
 )
 
+const ConsensusVersion = 2
+
 var (
 	_ module.AppModuleBasic = AppModule{}
 	_ module.HasGenesis     = AppModule{}
@@ -57,6 +59,11 @@ func (AppModule) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtim
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+
+	m := keeper.NewMigrator(am.keeper)
+	if err := cfg.RegisterMigration(types.ModuleName, 1, m.Migrate1to2); err != nil {
+		panic(fmt.Sprintf("failed to register x/%s migration from version 1 to 2: %v", types.ModuleName, err))
+	}
 }
 
 func (am AppModule) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
@@ -73,14 +80,22 @@ func (am AppModule) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodingConf
 
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, bz json.RawMessage) {
 	var gs types.GenesisState
-	cdc.MustUnmarshalJSON(bz, &gs)
-	am.keeper.InitGenesis(ctx, gs)
+	if err := cdc.UnmarshalJSON(bz, &gs); err != nil {
+		panic(fmt.Errorf("failed to unmarshal %s genesis state: %w", types.ModuleName, err))
+	}
+	if err := am.keeper.InitGenesis(ctx, gs); err != nil {
+		panic(fmt.Errorf("failed to initialize %s genesis: %w", types.ModuleName, err))
+	}
 }
 
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
-	return cdc.MustMarshalJSON(am.keeper.ExportGenesis(ctx))
+	gs, err := am.keeper.ExportGenesis(ctx)
+	if err != nil {
+		panic(fmt.Errorf("failed to export %s genesis: %w", types.ModuleName, err))
+	}
+	return cdc.MustMarshalJSON(gs)
 }
 
-func (am AppModule) ConsensusVersion() uint64    { return 1 }
+func (am AppModule) ConsensusVersion() uint64    { return ConsensusVersion }
 func (am AppModule) GetTxCmd() *cobra.Command    { return cli.GetTxCmd() }
 func (am AppModule) GetQueryCmd() *cobra.Command { return cli.GetQueryCmd() }

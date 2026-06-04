@@ -24,7 +24,8 @@ Keeper dependencies:
 Security invariants:
 - Only authorized admins can mint, burn, or transfer admin rights.
 - Total supply changes must match bank keeper mint/burn results.
-- Denom names and metadata lengths must be param-limited.
+- Subdenom length bounds and mint/burn/create emergency flags are governance-controlled.
+- Governance cannot seize an existing factory denom admin role.
 
 ## `x/dex`
 
@@ -52,7 +53,9 @@ Security invariants:
 - Integer math only.
 - No pool operation can create value.
 - LP shares must remain backed by pool reserves.
-- User-provided min-out and deadlines protect against stale execution and slippage.
+- User-provided min-out values protect against slippage.
+- Governance-controlled DEX params are bounded and cannot mutate reserves or LP supply.
+- Duplicate pair lookup uses a deterministic pair index instead of scanning all pools.
 
 ## `x/fees`
 

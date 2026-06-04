@@ -89,3 +89,11 @@ func Test_TestnetCmd(t *testing.T) {
 	encodingConfig.Codec.MustUnmarshalJSON(appState[minttypes.ModuleName], &mintGenState)
 	require.Equal(t, appparams.BaseDenom, mintGenState.Params.MintDenom)
 }
+
+func TestTestnetStartDoesNotPrintMnemonicByDefault(t *testing.T) {
+	cmd := testnetStartCmd()
+	printMnemonic, err := cmd.Flags().GetBool(flagPrintMnemonic)
+	require.NoError(t, err)
+	require.False(t, printMnemonic)
+	require.Equal(t, "false", cmd.Flags().Lookup(flagPrintMnemonic).DefValue)
+}

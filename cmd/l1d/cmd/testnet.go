@@ -210,7 +210,7 @@ Example:
 	cmd.Flags().String(flagRPCAddress, "tcp://0.0.0.0:26657", "the RPC address to listen on")
 	cmd.Flags().String(flagAPIAddress, "tcp://0.0.0.0:1317", "the address to listen on for REST API")
 	cmd.Flags().String(flagGRPCAddress, "0.0.0.0:9090", "the gRPC server address to listen on")
-	cmd.Flags().Bool(flagPrintMnemonic, true, "print mnemonic of first validator to stdout for manual testing")
+	cmd.Flags().Bool(flagPrintMnemonic, false, "print mnemonic of first validator to stdout for manual testing")
 	return cmd
 }
 
@@ -234,10 +234,10 @@ func initTestnetFiles(
 	appConfig := srvconfig.DefaultConfig()
 	appConfig.MinGasPrices = args.minGasPrices
 	appConfig.API.Enable = true
-	appConfig.Telemetry.Enabled = true                                        //nolint:staticcheck // TODO: switch to OpenTelemetry
-	appConfig.Telemetry.PrometheusRetentionTime = 60                          //nolint:staticcheck // TODO: switch to OpenTelemetry
-	appConfig.Telemetry.EnableHostnameLabel = false                           //nolint:staticcheck // TODO: switch to OpenTelemetry
-	appConfig.Telemetry.GlobalLabels = [][]string{{"chain_id", args.chainID}} //nolint:staticcheck // TODO: switch to OpenTelemetry
+	appConfig.Telemetry.Enabled = true                                        //nolint:staticcheck // See docs/observability.md for OpenTelemetry migration plan.
+	appConfig.Telemetry.PrometheusRetentionTime = 60                          //nolint:staticcheck // See docs/observability.md for OpenTelemetry migration plan.
+	appConfig.Telemetry.EnableHostnameLabel = false                           //nolint:staticcheck // See docs/observability.md for OpenTelemetry migration plan.
+	appConfig.Telemetry.GlobalLabels = [][]string{{"chain_id", args.chainID}} //nolint:staticcheck // See docs/observability.md for OpenTelemetry migration plan.
 
 	var (
 		genAccounts []authtypes.GenesisAccount

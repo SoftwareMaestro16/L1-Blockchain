@@ -11,6 +11,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgAddLiquidity{}, "l1/dex/MsgAddLiquidity", nil)
 	cdc.RegisterConcrete(&MsgRemoveLiquidity{}, "l1/dex/MsgRemoveLiquidity", nil)
 	cdc.RegisterConcrete(&MsgSwapExactAmountIn{}, "l1/dex/MsgSwapExactAmountIn", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "l1/dex/MsgUpdateParams", nil)
 }
 
 func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
@@ -20,5 +21,6 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 		&MsgAddLiquidity{},
 		&MsgRemoveLiquidity{},
 		&MsgSwapExactAmountIn{},
+		&MsgUpdateParams{},
 	)
 }
