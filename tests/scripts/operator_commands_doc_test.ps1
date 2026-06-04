@@ -91,6 +91,7 @@ Assert-Contains -Text $guideText -Pattern '--keyring-backend test.*local|local.*
 Assert-Contains -Text $guideText -Pattern 'norb' -Message "operator guide must use norb examples"
 Assert-Contains -Text $guideText -Pattern 'ORB.*display metadata only|display metadata only.*ORB' -Message "operator guide must clarify ORB display-only status"
 Assert-Contains -Text $guideText -Pattern 'observability\.md' -Message "operator guide must link troubleshooting observability docs"
+Assert-Contains -Text $guideText -Pattern 'operator-troubleshooting\.md' -Message "operator guide must link troubleshooting runbook"
 Assert-Contains -Text $guideText -Pattern 'prototype-audit\.ps1 -Profile Fast' -Message "operator guide must include security audit check"
 
 Assert-NotContains -Text $guideText -Pattern '(?i)print-mnemonic\s+\$?true|--print-mnemonic|mnemonic:\s*[a-z]' -Message "operator guide must not tell operators to print mnemonics"

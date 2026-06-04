@@ -86,6 +86,8 @@ SDK telemetry mode is reported by `health.ps1` from generated app config. CometB
 
 ## Quick Triage
 
+For symptom-specific operator commands and fixes, see [Operator Troubleshooting Runbook](operator-troubleshooting.md).
+
 - `Port ... is already in use`: run `.\scripts\localnet\stop.ps1` or shift base ports.
 - `REST ... 503`: check `.\scripts\localnet\health.ps1`; localnet gRPC address must be `127.0.0.1:<grpc-port>`.
 - `height does not increase`: inspect `node*.out.log` for consensus timeout, disk, or validator errors.

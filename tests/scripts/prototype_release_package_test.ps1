@@ -58,6 +58,7 @@ Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "release-manifest.jso
 Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "QUICKSTART.md")) "missing quickstart"
 Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "RELEASE-NOTES.md")) "missing release notes"
 Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "SHA256SUMS.txt")) "missing checksums"
+Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "docs\operator-troubleshooting.md")) "missing troubleshooting runbook"
 Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "docs\release\prototype-limitations.md")) "missing limitations doc"
 Assert-True (Test-Path -LiteralPath $archive) "missing archive"
 Assert-True (Test-Path -LiteralPath $archiveSha) "missing archive checksum"
@@ -75,6 +76,7 @@ Assert-True ($checksumText -match "bin/orbitalisd.exe") "binary checksum missing
 Assert-True ($checksumText -match "release-manifest.json") "manifest checksum missing"
 Assert-True ($checksumText -match "QUICKSTART.md") "quickstart checksum missing"
 Assert-True ($checksumText -match "RELEASE-NOTES.md") "release notes checksum missing"
+Assert-True ($checksumText -match "docs/operator-troubleshooting.md") "troubleshooting runbook checksum missing"
 Assert-True ($checksumText -match "docs/release/prototype-limitations.md") "limitations doc checksum missing"
 
 $binaryHash = (Get-FileHash -LiteralPath (Join-Path $packageDir "bin\orbitalisd.exe") -Algorithm SHA256).Hash.ToLowerInvariant()

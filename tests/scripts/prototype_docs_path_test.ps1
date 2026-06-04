@@ -40,6 +40,7 @@ $securityText = Get-Content -Raw -LiteralPath $SecurityTestingPath
 foreach ($link in @(
     'docs/prototype-contract\.md',
     'docs/operator-commands\.md',
+    'docs/operator-troubleshooting\.md',
     'docs/transaction-lifecycle-matrix\.md',
     'docs/event-contract\.md',
     'docs/prototype-acceptance-suite\.md',

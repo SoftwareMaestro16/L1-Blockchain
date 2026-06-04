@@ -16,6 +16,7 @@ Each package produced by `scripts\release\prototype-package.ps1` contains:
 - copied operator docs:
   - `README.md`
   - `docs/operator-commands.md`
+  - `docs/operator-troubleshooting.md`
   - `docs/prototype-acceptance-suite.md`
   - `docs/security/prototype-audit-gate.md`
   - `docs/query-surface.md`

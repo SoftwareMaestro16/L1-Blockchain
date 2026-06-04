@@ -246,6 +246,8 @@ Diagnostic bundles include logs, safe config files, RPC status snapshots, and he
 
 ## Troubleshooting
 
+Use [Operator Troubleshooting Runbook](operator-troubleshooting.md) for symptom-specific commands and fixes. Quick local reminders:
+
 - `account sequence mismatch`: wait one block or re-run the command after the previous tx is committed.
 - `fee denom testtoken not accepted; use norb`: use `--fees 1000000norb`.
 - `pool already exists`: query `dex pools` and use the existing `pool_id`.
@@ -280,4 +282,4 @@ Build a local prototype package after the checks pass:
 .\scripts\release\prototype-package.ps1 -Version prototype-local -TargetOS windows -TargetArch amd64
 ```
 
-See also [Executable Prototype Contract](prototype-contract.md), [Prototype Acceptance Suite](prototype-acceptance-suite.md), [Prototype Release Package](release/prototype-package.md), [Prototype Query Surface](query-surface.md), and [Prototype Observability](observability.md).
+See also [Executable Prototype Contract](prototype-contract.md), [Operator Troubleshooting Runbook](operator-troubleshooting.md), [Prototype Acceptance Suite](prototype-acceptance-suite.md), [Prototype Release Package](release/prototype-package.md), [Prototype Query Surface](query-surface.md), and [Prototype Observability](observability.md).

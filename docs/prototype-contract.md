@@ -154,6 +154,7 @@ NICE TO HAVE:
 Primary docs:
 
 - [Operator Commands](operator-commands.md)
+- [Operator Troubleshooting Runbook](operator-troubleshooting.md)
 - [Transaction Lifecycle Matrix](transaction-lifecycle-matrix.md)
 - [Tx Event Contract](event-contract.md)
 - [Bootstrap Profile](bootstrap-profile.md)

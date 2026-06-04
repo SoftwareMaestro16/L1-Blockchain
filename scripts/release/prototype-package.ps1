@@ -175,6 +175,7 @@ try {
   foreach ($doc in @(
       "README.md",
       "docs\operator-commands.md",
+      "docs\operator-troubleshooting.md",
       "docs\prototype-acceptance-suite.md",
       "docs\security\prototype-audit-gate.md",
       "docs\query-surface.md",
@@ -212,6 +213,7 @@ Use the repository operator guide for full localnet setup and command examples:
 
 - `README.md`
 - `docs/operator-commands.md`
+- `docs/operator-troubleshooting.md`
 - `docs/observability.md`
 - `docs/security/prototype-audit-gate.md`
 - `docs/release/prototype-limitations.md`
