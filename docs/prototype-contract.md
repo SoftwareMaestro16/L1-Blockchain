@@ -59,6 +59,7 @@ For `.localnet-5`, set `$HOME` and `$NODE1_HOME` under `.localnet-5`. Keep `$NOD
 | Mempool/CheckTx negative flow | wrong fee, insufficient funds, invalid sequence replay, unauthorized mint, invalid DEX pool, malformed denom | Rejection phase and error are documented; target module state and balances remain unchanged, except normal SDK fees for failed DeliverTx. | `docs/mempool-checktx-negative-flow.md`, `tests/e2e/mempool_negative_smoke.ps1` |
 | DEX create pool/swap/query | Create/mint a factory denom; `tx dex create-pool 10000000norb "10000000$GOLD"`; `query dex pool 1`; `tx dex swap-exact-in 1 100000norb $GOLD 1`; query balances and pool. | Pool `1` has `lp/1`, reserves are non-zero, swap increases output balance, REST/gRPC pool query returns matching state. | `docs/dex-e2e-flow.md`, `x/dex/keeper/msg_server_test.go`, `tests/e2e/dex_smoke.ps1`, `tests/e2e/prototype_acceptance.ps1` |
 | DEX slippage failure | `tx dex swap-exact-in 1 100000norb $GOLD 1000000 ...` | Tx is rejected with `amount out below minimum`; balances/reserves are unchanged. | `tests/e2e/dex_smoke.ps1`, `tests/e2e/prototype_acceptance.ps1 -Profile Full` |
+| Minimal load profile | `scripts/localnet/load-profile.ps1 -Scenario mixed -Count 12 -RatePerSecond 2` | Local-only summary records block progress, tx latency, successes, failures, failure rate, and per-operation counts for bank/tokenfactory/DEX mixed load. | `docs/minimal-load-profile.md`, `tests/e2e/load_profile_smoke.ps1` |
 | Staking delegation and slashing query | `query staking validators`; select a bonded validator; `tx staking delegate <orbvaloper...> 5000000norb`; `query staking delegation <orb1...> <orbvaloper...>`; `query slashing params`; `query slashing signing-infos` | Validators are bonded, staking denom is `norb`, delegation commits, delegation query returns `norb`, total voting power increases, slashing params are positive. | `docs/pos-smoke-flow.md`, `app/pos_test.go`, `tests/e2e/pos_smoke.ps1`, `tests/e2e/prototype_acceptance.ps1` |
 | Stop/reset | `.\scripts\localnet\stop.ps1`; `.\scripts\localnet\reset.ps1` | Matching node processes stop; reset only deletes a resolved localnet directory inside the repo and never deletes repo root or arbitrary paths. | `scripts/localnet/common.ps1`, `tests/e2e/localnet_smoke.ps1`, `tests/e2e/prototype_acceptance.ps1` |
 
@@ -136,6 +137,7 @@ MUST FIX before declaring the prototype working:
 SHOULD FIX but not a blocker for local prototype declaration:
 
 - 5-validator full profile is manual/nightly rather than mandatory on every PR.
+- Minimal load profile is a local prototype baseline, not a production performance claim.
 - High-cardinality query load benchmarks should be added before public explorer/API load testing.
 - Known dependency advisories require reachability triage or upstream upgrade before release tagging.
 - Dummy vote-extension behavior remains unsuitable for public validator networks.
