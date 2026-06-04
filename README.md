@@ -29,13 +29,12 @@ flowchart LR
 ## Build And Test
 
 ```powershell
-$env:PATH = "$PWD\.work\tools\go1.25.11\go\bin;$env:PATH"
+.\scripts\build-orbitalisd.ps1
 go test ./...
 go vet ./...
-go build -o build/orbitalisd.exe ./cmd/l1d
 ```
 
-If you already have Go `1.25.x` on PATH, the `.work` toolchain is not required.
+The build script prefers the repo-local Go toolchain under `.work\tools\go1.25.11`, falls back to `go` on PATH, runs `go mod verify`, builds `build\orbitalisd.exe`, and prints version/build metadata. It keeps Go build, temp, and module caches under ignored `.work` so a modified global Go module cache does not make local builds non-reproducible.
 
 Proto checks:
 
@@ -78,9 +77,11 @@ Prototype acceptance and targeted smoke tests:
 .\tests\e2e\query_surface_smoke.ps1
 ```
 
-## Example CLI
+## Operator CLI
 
 See [docs/prototype-contract.md](docs/prototype-contract.md) for the executable working-prototype contract, [docs/operator-commands.md](docs/operator-commands.md) for the full prototype operator command runbook, [docs/prototype-acceptance-suite.md](docs/prototype-acceptance-suite.md) for the one-command acceptance suite, [docs/security/prototype-audit-gate.md](docs/security/prototype-audit-gate.md) for the release security gate, [docs/release/prototype-package.md](docs/release/prototype-package.md) for prerelease packages, [docs/query-surface.md](docs/query-surface.md) for gRPC/REST endpoints, and [docs/observability.md](docs/observability.md) for health checks and diagnostics.
+
+The README keeps only the shortest probes. Use the operator runbook for the end-to-end build, init, start, query, tx, diagnose, and stop transcript.
 
 ```powershell
 build\orbitalisd.exe query block --node tcp://127.0.0.1:26657
@@ -88,10 +89,7 @@ build\orbitalisd.exe query bank denom-metadata norb --node tcp://127.0.0.1:26657
 build\orbitalisd.exe query bank total-supply-of norb --node tcp://127.0.0.1:26657 --output json
 build\orbitalisd.exe query bank balance <orb1-address> norb --node tcp://127.0.0.1:26657 --output json
 build\orbitalisd.exe query fees params --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
-build\orbitalisd.exe tx bank send node0 <to-address> 100000000000norb --home .localnet\node0\orbitalisd --chain-id orbitalis-local-1 --keyring-backend test --fees 1000000norb
-build\orbitalisd.exe tx tokenfactory create-denom gold --from node0 --home .localnet\node0\orbitalisd --chain-id orbitalis-local-1 --keyring-backend test --fees 1000000norb
-build\orbitalisd.exe tx dex create-pool 10000000norb 10000000<factory-denom> --from node0 --home .localnet\node0\orbitalisd --chain-id orbitalis-local-1 --keyring-backend test --fees 1000000norb
-build\orbitalisd.exe query dex pool 1 --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
+.\scripts\localnet\health.ps1 -ValidatorCount 3
 ```
 
 ## External Databases

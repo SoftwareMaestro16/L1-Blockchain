@@ -106,12 +106,18 @@ func TestPrototypeCommandsAreRegistered(t *testing.T) {
 
 	for _, path := range [][]string{
 		{"query", "block"},
+		{"query", "bank", "balance"},
+		{"query", "staking", "validators"},
+		{"query", "slashing", "params"},
 		{"query", "fees", "params"},
 		{"query", "tokenfactory", "denom"},
 		{"query", "dex", "pool"},
 		{"tx", "bank", "send"},
+		{"tx", "staking", "delegate"},
 		{"tx", "tokenfactory", "create-denom"},
 		{"tx", "tokenfactory", "mint"},
+		{"tx", "tokenfactory", "burn"},
+		{"tx", "tokenfactory", "change-admin"},
 		{"tx", "dex", "create-pool"},
 		{"tx", "dex", "add-liquidity"},
 		{"tx", "dex", "swap-exact-in"},
@@ -121,6 +127,31 @@ func TestPrototypeCommandsAreRegistered(t *testing.T) {
 	} {
 		found := requireCommand(t, rootCmd, path...)
 		require.NotEmpty(t, found.Short, strings.Join(path, " "))
+	}
+}
+
+func TestOperatorTxCommandsExposeCommonFlags(t *testing.T) {
+	rootCmd := cmd.NewRootCmd()
+	flagNames := []string{"from", "chain-id", "keyring-backend", "fees", "node", "output"}
+
+	for _, path := range [][]string{
+		{"tx", "bank", "send"},
+		{"tx", "staking", "delegate"},
+		{"tx", "tokenfactory", "create-denom"},
+		{"tx", "tokenfactory", "mint"},
+		{"tx", "tokenfactory", "burn"},
+		{"tx", "tokenfactory", "change-admin"},
+		{"tx", "dex", "create-pool"},
+		{"tx", "dex", "add-liquidity"},
+		{"tx", "dex", "swap-exact-in"},
+		{"tx", "dex", "remove-liquidity"},
+	} {
+		t.Run(strings.Join(path, " "), func(t *testing.T) {
+			command := requireCommand(t, rootCmd, path...)
+			for _, flagName := range flagNames {
+				require.NotNil(t, command.Flag(flagName), "%s missing --%s", strings.Join(path, " "), flagName)
+			}
+		})
 	}
 }
 

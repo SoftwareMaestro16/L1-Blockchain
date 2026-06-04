@@ -6,12 +6,13 @@ It is scoped to local prototype operation. Commands that use `--keyring-backend 
 
 ## Build And Version
 
-Use the repo-local Go toolchain when it exists:
+Build with the one-command wrapper:
 
 ```powershell
-$env:PATH = "$PWD\.work\tools\go1.25.11\go\bin;$env:PATH"
-go build -o build\orbitalisd.exe ./cmd/l1d
+.\scripts\build-orbitalisd.ps1
 ```
+
+The wrapper uses ignored `.work\gocache`, `.work\gotmp`, and `.work\gomodcache` directories. This keeps local builds isolated from a modified global Go module cache.
 
 Check the binary:
 
@@ -31,13 +32,11 @@ Expected version fields:
 - `extra_info.cometbft_version` is non-empty
 - `extra_info.dirty` is `true`, `false`, or `unknown`
 
-Release-like builds can override the default metadata with ldflags:
+Release-like builds can override the default metadata through the wrapper:
 
 ```powershell
 $commit = git rev-parse HEAD
-$date = Get-Date -AsUTC -Format "yyyy-MM-ddTHH:mm:ssZ"
-$dirty = if ((git status --porcelain) -eq $null) { "false" } else { "true" }
-go build -o build\orbitalisd.exe -ldflags "-X github.com/sovereign-l1/l1/cmd/l1d/cmd.appVersion=prototype -X github.com/sovereign-l1/l1/cmd/l1d/cmd.gitCommit=$commit -X github.com/sovereign-l1/l1/cmd/l1d/cmd.buildDate=$date -X github.com/sovereign-l1/l1/cmd/l1d/cmd.dirty=$dirty" ./cmd/l1d
+.\scripts\build-orbitalisd.ps1 -Version prototype-local -Commit $commit -Force
 ```
 
 ## Localnet
@@ -130,6 +129,16 @@ build\orbitalisd.exe query slashing params --node $NODE --output json
 build\orbitalisd.exe query slashing signing-infos --node $NODE --output json
 ```
 
+## Staking Tx
+
+Delegate to any bonded validator returned by the validators query:
+
+```powershell
+$VALIDATOR = (build\orbitalisd.exe query staking validators --node $NODE --output json | ConvertFrom-Json).validators[0].operator_address
+build\orbitalisd.exe tx staking delegate $VALIDATOR 5000000norb --from $FROM --home $HOME --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
+build\orbitalisd.exe query staking delegation $NODE0 $VALIDATOR --node $NODE --output json
+```
+
 ## Bank Tx
 
 Get a recipient from node1:
@@ -209,6 +218,23 @@ build\orbitalisd.exe tx dex swap-exact-in 1 100000norb $DEXGOLD 1000000 --from $
 
 Expected rejection logs include `minted shares below minimum` or `amount out below minimum`.
 
+## Diagnose
+
+Run a health check while the localnet is running:
+
+```powershell
+.\scripts\localnet\health.ps1 -ValidatorCount 3
+.\scripts\localnet\health.ps1 -ValidatorCount 3 -Json
+```
+
+Collect a sanitized diagnostic bundle under ignored `.work` paths:
+
+```powershell
+.\scripts\localnet\diagnostics.ps1 -ValidatorCount 3
+```
+
+Diagnostic bundles include logs, safe config files, RPC status snapshots, and health output. They exclude keyrings, `priv_validator_key.json`, `priv_validator_state.json`, and `node_key.json`.
+
 ## Troubleshooting
 
 - `account sequence mismatch`: wait one block or re-run the command after the previous tx is committed.
@@ -225,6 +251,7 @@ build\orbitalisd.exe --help
 build\orbitalisd.exe version --long --output json
 build\orbitalisd.exe query fees params --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
 build\orbitalisd.exe query dex pool 1 --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
+.\tests\scripts\operator_commands_doc_test.ps1
 .\tests\e2e\prototype_acceptance.ps1
 .\scripts\security\prototype-audit.ps1 -Profile Fast
 .\tests\e2e\localnet_smoke.ps1
