@@ -1,33 +1,83 @@
 param(
   [string]$OutputDir = "",
-  [string]$Binary = ""
+  [string]$Binary = "",
+  [int]$ValidatorCount = 0,
+  [switch]$CleanLogs,
+  [switch]$Restart
 )
 
 $ErrorActionPreference = "Stop"
-$RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
-if ($OutputDir -eq "") { $OutputDir = Join-Path $RepoRoot ".localnet" }
-if ($Binary -eq "") { $Binary = Join-Path $RepoRoot "build\orbitalisd.exe" }
+Set-StrictMode -Version 2.0
+. (Join-Path $PSScriptRoot "common.ps1")
 
-if (!(Test-Path $Binary) -or !(Test-Path $OutputDir)) {
-  & (Join-Path $PSScriptRoot "init.ps1") -OutputDir $OutputDir -Binary $Binary
+$OutputDir = Resolve-LocalnetPath -OutputDir $OutputDir
+$Binary = Resolve-BinaryPath -Binary $Binary
+$requestedCount = $ValidatorCount
+$ValidatorCount = Get-ManifestValidatorCount -OutputDir $OutputDir -ValidatorCount $ValidatorCount
+
+if (!(Test-Path -LiteralPath $Binary) -or !(Test-Path -LiteralPath $OutputDir)) {
+  & (Join-Path $PSScriptRoot "init.ps1") -OutputDir $OutputDir -Binary $Binary -ValidatorCount $ValidatorCount
 }
+
+$manifest = Read-LocalnetManifest -OutputDir $OutputDir
+if ($null -eq $manifest) {
+  throw "localnet manifest not found in $OutputDir; run scripts/localnet/init.ps1 first"
+}
+if ($requestedCount -gt 0 -and [int]$manifest.validator_count -ne $requestedCount) {
+  throw "requested validator count $requestedCount does not match initialized manifest count $($manifest.validator_count)"
+}
+$ValidatorCount = [int]$manifest.validator_count
 
 $pidDir = Join-Path $OutputDir "pids"
 $logDir = Join-Path $OutputDir "logs"
 New-Item -ItemType Directory -Force -Path $pidDir, $logDir | Out-Null
+if ($CleanLogs) {
+  Get-ChildItem -LiteralPath $logDir -Filter "*.log" -ErrorAction SilentlyContinue | Remove-Item -Force
+}
 
-for ($i = 0; $i -lt 3; $i++) {
-  $nodeHome = Join-Path $OutputDir "node$i\orbitalisd"
-  $stdout = Join-Path $logDir "node$i.out.log"
-  $stderr = Join-Path $logDir "node$i.err.log"
-  $proc = Start-Process -FilePath $Binary `
-    -ArgumentList @("start", "--home", $nodeHome) `
-    -RedirectStandardOutput $stdout `
-    -RedirectStandardError $stderr `
-    -WindowStyle Hidden `
-    -PassThru
-  Set-Content -LiteralPath (Join-Path $pidDir "node$i.pid") -Value $proc.Id
-  Write-Host "Started node$i pid=$($proc.Id)"
+$started = @()
+try {
+  for ($i = 0; $i -lt $ValidatorCount; $i++) {
+    $pidFile = Join-Path $pidDir "node$i.pid"
+    if (Test-Path -LiteralPath $pidFile) {
+      $pidValue = [int](Get-Content -Raw -LiteralPath $pidFile)
+      $existing = Get-Process -Id $pidValue -ErrorAction SilentlyContinue
+      if ($existing) {
+        if (!$Restart) {
+          Write-Host "node$i already running pid=$pidValue"
+          continue
+        }
+        Stop-Process -Id $pidValue -Force
+      }
+      Remove-Item -LiteralPath $pidFile -Force
+    }
+
+    $nodeHome = Get-NodeHome -OutputDir $OutputDir -Index $i
+    if (!(Test-Path -LiteralPath $nodeHome)) {
+      throw "node home missing for node${i}: $nodeHome"
+    }
+    $stdout = Join-Path $logDir "node$i.out.log"
+    $stderr = Join-Path $logDir "node$i.err.log"
+    $proc = Start-Process -FilePath $Binary `
+      -ArgumentList @("start", "--home", $nodeHome, "--log_level", "info") `
+      -RedirectStandardOutput $stdout `
+      -RedirectStandardError $stderr `
+      -WindowStyle Hidden `
+      -PassThru
+    Start-Sleep -Milliseconds 500
+    if ($proc.HasExited) {
+      throw "node$i exited immediately with code $($proc.ExitCode); see $stderr"
+    }
+    Set-Content -LiteralPath $pidFile -Value $proc.Id
+    $started += $proc.Id
+    Write-Host "Started node$i pid=$($proc.Id)"
+  }
+}
+catch {
+  foreach ($pidValue in $started) {
+    Stop-Process -Id $pidValue -Force -ErrorAction SilentlyContinue
+  }
+  throw
 }
 
 Write-Host "Logs: $logDir"

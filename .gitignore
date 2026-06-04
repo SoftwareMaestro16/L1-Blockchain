@@ -28,6 +28,7 @@ config/*.toml.local
 .ignite/
 .orbitalis/
 .localnet/
+.localnet*/
 data/
 node_home/
 networks/local/
