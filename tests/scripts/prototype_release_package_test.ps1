@@ -43,7 +43,8 @@ try {
     -TargetArch amd64 `
     -OutputRoot $OutputRoot `
     -Binary $fakeBin `
-    -SkipBuild | Out-Host
+    -SkipBuild `
+    -AllowDirty | Out-Host
 } finally {
   Pop-Location
 }
@@ -54,6 +55,8 @@ $archiveSha = "$archive.sha256"
 
 Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "bin\orbitalisd.exe")) "missing packaged binary"
 Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "release-manifest.json")) "missing manifest"
+Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "QUICKSTART.md")) "missing quickstart"
+Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "RELEASE-NOTES.md")) "missing release notes"
 Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "SHA256SUMS.txt")) "missing checksums"
 Assert-True (Test-Path -LiteralPath $archive) "missing archive"
 Assert-True (Test-Path -LiteralPath $archiveSha) "missing archive checksum"
@@ -62,13 +65,30 @@ $manifest = Get-Content -Raw -LiteralPath (Join-Path $packageDir "release-manife
 Assert-True ($manifest.version -eq "prototype-test") "manifest version mismatch"
 Assert-True ($manifest.commit -eq "deadbeef0000") "manifest commit mismatch"
 Assert-True ($manifest.status -match "not mainnet-ready") "manifest must state prototype status"
+Assert-True ($null -ne $manifest.dirty) "manifest must include dirty flag"
+Assert-True (($manifest.excluded -join " ") -match "\.localnet") "manifest must list excluded runtime state"
+Assert-True (($manifest.required_checks -join " ") -match "prototype-audit") "manifest must list security audit check"
 
 $checksumText = Get-Content -Raw -LiteralPath (Join-Path $packageDir "SHA256SUMS.txt")
 Assert-True ($checksumText -match "bin/orbitalisd.exe") "binary checksum missing"
 Assert-True ($checksumText -match "release-manifest.json") "manifest checksum missing"
+Assert-True ($checksumText -match "QUICKSTART.md") "quickstart checksum missing"
+Assert-True ($checksumText -match "RELEASE-NOTES.md") "release notes checksum missing"
+
+$binaryHash = (Get-FileHash -LiteralPath (Join-Path $packageDir "bin\orbitalisd.exe") -Algorithm SHA256).Hash.ToLowerInvariant()
+Assert-True ($checksumText -match [regex]::Escape("$binaryHash  bin/orbitalisd.exe")) "binary checksum does not match packaged binary"
+
+$archiveHash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+$archiveHashText = Get-Content -Raw -LiteralPath $archiveSha
+Assert-True ($archiveHashText -match [regex]::Escape($archiveHash)) "archive checksum mismatch"
 
 $forbidden = Get-ChildItem -LiteralPath $packageDir -Recurse -Force |
-  Where-Object { $_.FullName -match '\\(\.work|\.localnet|keyring|priv_validator_key\.json|priv_validator_state\.json|node_key\.json)$' }
+  Where-Object { $_.FullName -match '\\(\.work|\.localnet|keyring|\.env|diagnostics|priv_validator_key\.json|priv_validator_state\.json|node_key\.json)$' }
 Assert-True (@($forbidden).Count -eq 0) "package contains forbidden local/private material"
+
+$notes = Get-Content -Raw -LiteralPath (Join-Path $packageDir "RELEASE-NOTES.md")
+Assert-True ($notes -match "dirty tree at package time") "release notes must include dirty flag"
+Assert-True ($notes -match "Known Limitations") "release notes must include limitations"
+Assert-True ($notes -match "prototype-audit") "release notes must list security evidence"
 
 Write-Host "prototype release package script test passed"

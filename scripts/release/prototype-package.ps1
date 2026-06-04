@@ -8,7 +8,10 @@ param(
   [string]$OutputRoot = "",
   [string]$Binary = "",
   [string[]]$EvidencePath = @(),
-  [switch]$SkipBuild
+  [switch]$SkipBuild,
+  [switch]$AllowDirty,
+  [switch]$RunChecks,
+  [switch]$RunAcceptanceSmoke
 )
 
 $ErrorActionPreference = "Stop"
@@ -64,6 +67,54 @@ function Get-ReleaseRelativePath {
   return $full.Substring($rootFull.Length).Replace('\', '/')
 }
 
+function Get-ReleaseGitStatus {
+  Push-Location (Get-ReleaseRepoRoot)
+  try {
+    return @(& git status --porcelain --untracked-files=all)
+  } finally {
+    Pop-Location
+  }
+}
+
+function Assert-ReleaseCleanTree {
+  param([switch]$AllowDirty)
+  $status = @(Get-ReleaseGitStatus)
+  if ($status.Count -gt 0 -and -not $AllowDirty) {
+    $preview = ($status | Select-Object -First 20) -join "`n"
+    throw "Release package requires a clean git tree. Commit, stash, or remove changes before packaging.`n$preview"
+  }
+  return $status
+}
+
+function Invoke-ReleaseCheck {
+  param([string]$Name, [scriptblock]$Script)
+  Write-Host "==> $Name"
+  & $Script
+  if ($LASTEXITCODE -ne 0) {
+    throw "$Name failed"
+  }
+}
+
+function Invoke-ReleaseCompressArchive {
+  param(
+    [string]$Path,
+    [string]$DestinationPath,
+    [int]$Attempts = 5
+  )
+
+  for ($i = 1; $i -le $Attempts; $i++) {
+    try {
+      Compress-Archive -Path $Path -DestinationPath $DestinationPath -Force -ErrorAction Stop
+      return
+    } catch {
+      if ($i -eq $Attempts) {
+        throw
+      }
+      Start-Sleep -Milliseconds (250 * $i)
+    }
+  }
+}
+
 $RepoRoot = Get-ReleaseRepoRoot
 Push-Location $RepoRoot
 try {
@@ -75,6 +126,18 @@ try {
   }
   if ($Version -notmatch '^[A-Za-z0-9._-]+$') {
     throw "Version may contain only letters, numbers, dot, underscore, or dash: $Version"
+  }
+  $gitStatus = @(Assert-ReleaseCleanTree -AllowDirty:$AllowDirty)
+  $dirty = $gitStatus.Count -gt 0
+
+  if ($RunChecks) {
+    Invoke-ReleaseCheck -Name "go test" -Script { go test -p=1 ./... }
+    Invoke-ReleaseCheck -Name "go vet" -Script { go vet -p=1 ./... }
+    Invoke-ReleaseCheck -Name "buf lint" -Script { buf lint }
+    Invoke-ReleaseCheck -Name "prototype audit" -Script { & .\scripts\security\prototype-audit.ps1 -Profile Fast }
+  }
+  if ($RunAcceptanceSmoke) {
+    Invoke-ReleaseCheck -Name "prototype acceptance smoke" -Script { & .\tests\e2e\prototype_acceptance.ps1 -Profile Smoke }
   }
 
   $OutputRoot = Resolve-ReleasePath -Path $OutputRoot -DefaultRelativePath "dist\prototype"
@@ -130,17 +193,86 @@ try {
     Copy-ReleaseItem -Source $resolved -Destination (Join-Path $packageDir "evidence\$leaf")
   }
 
+  $quickstart = @"
+# Orbitalis Prototype Quickstart
+
+This is a prerelease prototype artifact, not mainnet validator software.
+
+## Verify
+
+````powershell
+Get-FileHash .\bin\$binName -Algorithm SHA256
+Get-Content .\SHA256SUMS.txt
+````
+
+## Run A Local Node
+
+Use the repository operator guide for full localnet setup and command examples:
+
+- `README.md`
+- `docs/operator-commands.md`
+- `docs/observability.md`
+- `docs/security/prototype-audit-gate.md`
+
+Prototype tx fees use `norb`, for example `--fees 1000000norb`.
+"@
+  $quickstart | Set-Content -LiteralPath (Join-Path $packageDir "QUICKSTART.md")
+
   $manifest = [ordered]@{
-    name         = "Orbitalis prototype release package"
-    version      = $Version
-    commit       = $Commit
-    target_os    = $TargetOS
-    target_arch  = $TargetArch
-    binary       = "bin/$binName"
-    created_utc  = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-    status       = "prototype prerelease; not mainnet-ready"
+    name            = "Orbitalis prototype release package"
+    version         = $Version
+    commit          = $Commit
+    dirty           = $dirty
+    target_os       = $TargetOS
+    target_arch     = $TargetArch
+    binary          = "bin/$binName"
+    created_utc     = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    status          = "prototype prerelease; not mainnet-ready"
+    required_checks = @(
+      "go test -p=1 ./...",
+      "go vet -p=1 ./...",
+      "buf lint",
+      "scripts/security/prototype-audit.ps1 -Profile Fast or stronger",
+      "tests/e2e/prototype_acceptance.ps1 -Profile Smoke"
+    )
+    checks_executed = [ordered]@{
+      run_checks           = [bool]$RunChecks
+      run_acceptance_smoke = [bool]$RunAcceptanceSmoke
+    }
+    evidence        = @($EvidencePath | ForEach-Object { Split-Path $_ -Leaf })
+    excluded        = @(".work", ".localnet", "keyrings", "mnemonics", "validator private keys", "node keys", ".env files", "diagnostic bundles")
   }
   $manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $packageDir "release-manifest.json")
+
+  $notes = @"
+# Orbitalis $Version Prototype Release Notes
+
+- commit: `$Commit`
+- dirty tree at package time: `$dirty`
+- target: `$TargetOS/$TargetArch`
+- status: prototype prerelease; not mainnet-ready
+
+## Test Evidence
+
+Required before publishing:
+
+- `go test -p=1 ./...`
+- `go vet -p=1 ./...`
+- `buf lint`
+- `scripts\security\prototype-audit.ps1 -Profile Fast` or stronger
+- `tests\e2e\prototype_acceptance.ps1 -Profile Smoke`
+
+Packaged evidence files are copied under `evidence/` when passed through `-EvidencePath`.
+
+## Known Limitations
+
+- Prototype only; no mainnet economics or validator onboarding guarantees.
+- Localnet uses local-only test keyrings under ignored directories.
+- Query list endpoints have prototype caps; pagination/load work remains before public high-cardinality use.
+- Vote extension behavior is prototype-only and must be replaced or disabled before a public validator network.
+- Current dependency/security triage must match `docs/security/prototype-audit-gate.md` for each release run.
+"@
+  $notes | Set-Content -LiteralPath (Join-Path $packageDir "RELEASE-NOTES.md")
 
   $checksumPath = Join-Path $packageDir "SHA256SUMS.txt"
   Get-ChildItem -LiteralPath $packageDir -File -Recurse |
@@ -153,7 +285,7 @@ try {
 
   $archive = Join-Path $packageRoot "$packageName.zip"
   if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force }
-  Compress-Archive -Path (Join-Path $packageDir "*") -DestinationPath $archive -Force
+  Invoke-ReleaseCompressArchive -Path (Join-Path $packageDir "*") -DestinationPath $archive
   $archiveHash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
   "$archiveHash  $(Split-Path $archive -Leaf)" | Set-Content -LiteralPath "$archive.sha256"
 

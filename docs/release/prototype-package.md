@@ -10,6 +10,8 @@ Each package produced by `scripts\release\prototype-package.ps1` contains:
 
 - `bin/orbitalisd` or `bin/orbitalisd.exe`
 - `release-manifest.json`
+- `QUICKSTART.md`
+- `RELEASE-NOTES.md`
 - `SHA256SUMS.txt`
 - copied operator docs:
   - `README.md`
@@ -30,22 +32,36 @@ Artifacts must not contain `.work`, `.localnet`, keyrings, mnemonics, validator 
 
 ## Local Build
 
-Build a Windows package from the current checkout:
+Build a Windows package from a clean current checkout:
 
 ```powershell
+git status --short
+go test -p=1 ./...
+go vet -p=1 ./...
+buf lint
+.\scripts\security\prototype-audit.ps1 -Profile Fast
+.\tests\e2e\prototype_acceptance.ps1 -Profile Smoke
 .\scripts\release\prototype-package.ps1 -Version prototype-local -TargetOS windows -TargetArch amd64
 ```
+
+`prototype-package.ps1` refuses a dirty git tree by default. `-AllowDirty` is only for local dry-runs and package-script tests; publishable artifacts must come from a clean checkout.
 
 Reuse an existing binary:
 
 ```powershell
-.\scripts\release\prototype-package.ps1 -Version prototype-local -SkipBuild -Binary build\orbitalisd.exe
+.\scripts\release\prototype-package.ps1 -Version prototype-local -SkipBuild -Binary build\orbitalisd.exe -AllowDirty
 ```
 
 Attach sanitized evidence:
 
 ```powershell
 .\scripts\release\prototype-package.ps1 -Version prototype-local -EvidencePath .work\security\prototype-audit-YYYYMMDD-HHMMSS\summary.md
+```
+
+Run package-owned checks from the script when preparing a manual prerelease:
+
+```powershell
+.\scripts\release\prototype-package.ps1 -Version prototype-v0.1.0-rc.1 -RunChecks -RunAcceptanceSmoke
 ```
 
 ## GitHub Workflow
@@ -77,6 +93,8 @@ A prototype prerelease should attach or link:
 - checksums for each binary/archive.
 
 Known `triage_required` findings from the audit gate are acceptable only when they match [prototype-audit-gate.md](../security/prototype-audit-gate.md) and have an owner.
+
+`release-manifest.json` records `version`, `commit`, `dirty`, `target_os`, `target_arch`, required checks, checks executed by the script, copied evidence names, and excluded runtime/private material. `RELEASE-NOTES.md` repeats the commit, dirty flag, test evidence expectations, and known limitations so an operator can verify the artifact without reading CI logs first.
 
 ## Known Limitations
 
