@@ -76,6 +76,8 @@ Generated `.pb.go`/`.pb.gw.go` scanner noise must be excluded through tool flags
 
 ## Cosmos Manual Checklist
 
+Use [Cosmos Security Audit Checklist](cosmos-security-checklist.md) as the detailed reviewer checklist. The table below is the release summary form.
+
 Each release candidate needs a reviewer to mark every item `PASS`, `FINDING`, or `N/A`.
 
 | Area | Review |

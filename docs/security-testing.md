@@ -64,3 +64,5 @@ After each implementation increment:
 The detailed governance loop lives in [Engineering Governance](engineering-governance.md) and is mandatory before code changes, after tests, and before commits.
 
 The prototype release gate lives in [Prototype Security And Determinism Audit Gate](security/prototype-audit-gate.md). It is the mandatory runnable checklist for V2 prototype release readiness.
+
+The Cosmos-specific manual review lives in [Cosmos Security Audit Checklist](security/cosmos-security-checklist.md). It is mandatory for prototype changes touching app wiring, custom modules, proto/query surface, localnet scripts, or release artifacts.
