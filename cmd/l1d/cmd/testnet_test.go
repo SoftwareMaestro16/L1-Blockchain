@@ -2,9 +2,16 @@ package cmd
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
@@ -12,65 +19,107 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/types/module"
-	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/cosmos/cosmos-sdk/x/consensus"
-	"github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltest "github.com/cosmos/cosmos-sdk/x/genutil/client/testutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	"github.com/cosmos/cosmos-sdk/x/mint"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	l1app "github.com/sovereign-l1/l1/app"
 	appparams "github.com/sovereign-l1/l1/app/params"
+	dextypes "github.com/sovereign-l1/l1/x/dex/types"
+	feestypes "github.com/sovereign-l1/l1/x/fees/types"
+	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 )
 
 func Test_TestnetCmd(t *testing.T) {
-	moduleBasic := module.NewBasicManager(
-		auth.AppModuleBasic{},
-		genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
-		bank.AppModuleBasic{},
-		staking.AppModuleBasic{},
-		mint.AppModuleBasic{},
-		distribution.AppModuleBasic{},
-		consensus.AppModuleBasic{},
-	)
-
 	home := t.TempDir()
-	encodingConfig := moduletestutil.MakeTestEncodingConfig(auth.AppModuleBasic{}, staking.AppModuleBasic{})
+	testApp := l1app.NewL1App(log.NewNopLogger(), dbm.NewMemDB(), true, simtestutil.NewAppOptionsWithFlagHome(home))
+	moduleBasic := testApp.BasicModuleManager
+	cdc := testApp.AppCodec()
+	txConfig := testApp.TxConfig()
 	logger := log.NewNopLogger()
 	cfg, err := genutiltest.CreateDefaultCometConfig(home)
 	require.NoError(t, err)
 
-	err = genutiltest.ExecInitCmd(moduleBasic, home, encodingConfig.Codec)
+	err = genutiltest.ExecInitCmd(moduleBasic, home, cdc)
 	require.NoError(t, err)
 
 	serverCtx := server.NewContext(viper.New(), cfg, logger)
 	clientCtx := client.Context{}.
-		WithCodec(encodingConfig.Codec).
+		WithCodec(cdc).
 		WithHomeDir(home).
-		WithTxConfig(encodingConfig.TxConfig)
+		WithTxConfig(txConfig)
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, server.ServerContextKey, serverCtx)
 	ctx = context.WithValue(ctx, client.ClientContextKey, &clientCtx)
 	cmd := testnetInitFilesCmd(moduleBasic, banktypes.GenesisBalancesIterator{})
-	cmd.SetArgs([]string{fmt.Sprintf("--%s=test", flags.FlagKeyringBackend), fmt.Sprintf("--output-dir=%s", home)})
+	outputDir := filepath.Join(home, "localnet")
+	const validatorCount = 3
+	cmd.SetArgs([]string{
+		fmt.Sprintf("--%s=test", flags.FlagKeyringBackend),
+		fmt.Sprintf("--%s=%s", flags.FlagChainID, "orbitalis-local-1"),
+		fmt.Sprintf("--%s=%d", flagNumValidators, validatorCount),
+		fmt.Sprintf("--%s=%s", flagOutputDir, outputDir),
+		fmt.Sprintf("--%s=%s", flagStakingDenom, appparams.BaseDenom),
+		fmt.Sprintf("--%s=0%s", server.FlagMinGasPrices, appparams.BaseDenom),
+		fmt.Sprintf("--%s", flagSingleHost),
+	})
 	err = cmd.ExecuteContext(ctx)
 	require.NoError(t, err)
 
-	genFile := cfg.GenesisFile()
-	appState, _, err := genutiltypes.GenesisStateFromGenFile(genFile)
-	require.NoError(t, err)
+	var firstGenesisHash string
+	var firstGenesisRaw []byte
+	for i := 0; i < validatorCount; i++ {
+		genFile := filepath.Join(outputDir, fmt.Sprintf("node%d", i), "orbitalisd", "config", "genesis.json")
+		genesisRaw, err := os.ReadFile(genFile)
+		require.NoError(t, err)
+		require.NotRegexp(t, `(?i)\b(mnemonic|private[_-]?key|priv_validator|secret|seed|wallet)\b`, string(genesisRaw))
 
-	bankGenState := banktypes.GetGenesisStateFromAppState(encodingConfig.Codec, appState)
+		hash := sha256.Sum256(genesisRaw)
+		genesisHash := hex.EncodeToString(hash[:])
+		if i == 0 {
+			firstGenesisHash = genesisHash
+			firstGenesisRaw = genesisRaw
+		} else {
+			require.Equal(t, firstGenesisHash, genesisHash)
+			require.JSONEq(t, string(firstGenesisRaw), string(genesisRaw))
+		}
+
+		appState, appGenesis, err := genutiltypes.GenesisStateFromGenFile(genFile)
+		require.NoError(t, err)
+		require.NoError(t, appGenesis.ValidateAndComplete())
+		require.Equal(t, "orbitalis-local-1", appGenesis.ChainID)
+		require.Equal(t, int64(1), appGenesis.InitialHeight)
+		require.NoError(t, moduleBasic.ValidateGenesis(cdc, txConfig, appState))
+
+		if i == 0 {
+			assertPrototypeGenesisProfile(t, cdc, txConfig, appState, validatorCount)
+		}
+	}
+}
+
+func assertPrototypeGenesisProfile(
+	t *testing.T,
+	cdc codec.Codec,
+	txConfig client.TxConfig,
+	appState map[string]json.RawMessage,
+	validatorCount int,
+) {
+	t.Helper()
+
+	authGenState := authtypes.GetGenesisStateFromAppState(cdc, appState)
+	require.Len(t, authGenState.Accounts, validatorCount)
+
+	bankGenState := banktypes.GetGenesisStateFromAppState(cdc, appState)
 	require.NotEmpty(t, bankGenState.Supply.String())
 	require.Contains(t, bankGenState.Supply.String(), appparams.BaseDenom)
+	require.Len(t, bankGenState.Balances, validatorCount)
 
 	var native banktypes.Metadata
 	for _, metadata := range bankGenState.DenomMetadata {
@@ -82,10 +131,49 @@ func Test_TestnetCmd(t *testing.T) {
 	require.Equal(t, appparams.NativeTokenMetadata(), native)
 	require.NoError(t, native.Validate())
 
-	stakingGenState := stakingtypes.GetGenesisStateFromAppState(encodingConfig.Codec, appState)
+	expectedAccountCoins := sdk.NewCoins(
+		sdk.NewCoin("testtoken", sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)),
+		sdk.NewCoin(appparams.BaseDenom, sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)),
+	).Sort()
+	for _, balance := range bankGenState.Balances {
+		require.True(t, strings.HasPrefix(balance.Address, l1app.AccountAddressPrefix), balance.Address)
+		require.Equal(t, expectedAccountCoins, balance.Coins)
+	}
+
+	stakingGenState := stakingtypes.GetGenesisStateFromAppState(cdc, appState)
 	require.Equal(t, appparams.BaseDenom, stakingGenState.Params.BondDenom)
 
 	var mintGenState minttypes.GenesisState
-	encodingConfig.Codec.MustUnmarshalJSON(appState[minttypes.ModuleName], &mintGenState)
+	cdc.MustUnmarshalJSON(appState[minttypes.ModuleName], &mintGenState)
 	require.Equal(t, appparams.BaseDenom, mintGenState.Params.MintDenom)
+
+	var feesGenState feestypes.GenesisState
+	cdc.MustUnmarshalJSON(appState[feestypes.ModuleName], &feesGenState)
+	require.Equal(t, feestypes.DefaultGenesisState(), &feesGenState)
+
+	var tokenfactoryGenState tokenfactorytypes.GenesisState
+	cdc.MustUnmarshalJSON(appState[tokenfactorytypes.ModuleName], &tokenfactoryGenState)
+	require.Empty(t, tokenfactoryGenState.Denoms)
+	require.NoError(t, tokenfactoryGenState.Validate())
+
+	var dexGenState dextypes.GenesisState
+	cdc.MustUnmarshalJSON(appState[dextypes.ModuleName], &dexGenState)
+	require.Equal(t, dextypes.DefaultNextPoolID, dexGenState.NextPoolId)
+	require.Empty(t, dexGenState.Pools)
+	require.NoError(t, dexGenState.Validate())
+
+	genutilGenState := genutiltypes.GetGenesisStateFromAppState(cdc, appState)
+	require.Len(t, genutilGenState.GenTxs, validatorCount)
+	expectedSelfDelegation := sdk.NewCoin(appparams.BaseDenom, sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction))
+	for _, genTx := range genutilGenState.GenTxs {
+		tx, err := genutiltypes.ValidateAndGetGenTx(genTx, txConfig.TxJSONDecoder(), genutiltypes.DefaultMessageValidator)
+		require.NoError(t, err)
+		msgs := tx.GetMsgs()
+		require.Len(t, msgs, 1)
+		createValMsg, ok := msgs[0].(*stakingtypes.MsgCreateValidator)
+		require.True(t, ok)
+		require.Equal(t, expectedSelfDelegation, createValMsg.Value)
+		require.True(t, createValMsg.MinSelfDelegation.IsPositive())
+		require.True(t, strings.HasPrefix(createValMsg.ValidatorAddress, l1app.ValidatorAddressPrefix), createValMsg.ValidatorAddress)
+	}
 }

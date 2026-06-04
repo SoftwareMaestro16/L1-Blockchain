@@ -14,62 +14,42 @@ Initial Orbitalis chain choices:
 
 ## `x/tokenfactory`
 
-Params:
-- `denom_creation_fee`
-- `max_denom_name_len`
-- `max_metadata_len`
-- `minting_enabled`
-- `burning_enabled`
-
 Genesis state:
-- `params`
 - `denoms`
-- `admins`
-- `metadata`
 
 Validation:
 - Denom IDs must be canonical and collision-free.
 - Admin addresses must decode with the chain address codec.
-- Existing supply must match bank state when imported.
+- Denoms must use the `factory/<admin>/<subdenom>` prefix.
+- Prototype default genesis starts with no factory denoms.
 
 ## `x/dex`
 
-Params:
-- `swap_fee_bps`
-- `protocol_fee_bps`
-- `max_fee_bps`
-- `min_initial_liquidity`
-- `max_pools`
-- `pool_creation_fee`
-
 Genesis state:
-- `params`
-- `pools`
-- `lp_positions`
 - `next_pool_id`
+- `pools`
 
 Validation:
 - Pool IDs must be unique and monotonic.
 - Asset pairs must be canonical sorted pairs.
 - Reserves and LP supply must be positive for active pools.
-- Fee values must be bounded by `max_fee_bps`.
+- LP denom must match `lp/<pool_id>`.
+- Prototype default genesis starts with `next_pool_id = 1` and no pools.
 
 ## `x/fees`
 
-Params:
-- `collector_module_account`
-- `distribution_weights`
-- `min_distribution_amount`
-- `enabled`
-
 Genesis state:
 - `params`
-- `accrued_fees`
 
 Validation:
-- Distribution weights must sum exactly to the configured denominator.
-- Collector account must be a valid module account.
-- Disabled fees must not leave partially active distribution routes.
+- The only prototype fee denom is `norb`.
+- Validator rewards ratio and community pool ratio must be valid decimals between `0` and `1`.
+- Fee split ratios must sum exactly to `1`.
+- Prototype default params are `allowed_fee_denoms = ["norb"]`, `validator_rewards_ratio = "0.98"`, and `community_pool_ratio = "0.02"`.
+
+## Local Bootstrap Profile
+
+The tracked local profile is `orbitalis-local-1`. Its operator-facing genesis, account, validator, endpoint, and audit contract is defined in [Orbitalis Local Bootstrap Profile](bootstrap-profile.md).
 
 ## Upgrade Policy
 

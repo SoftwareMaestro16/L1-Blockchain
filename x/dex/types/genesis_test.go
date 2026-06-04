@@ -52,6 +52,18 @@ func TestGenesisValidateRejectsInvalidPoolState(t *testing.T) {
 				LpDenom:     "lp/2",
 			})
 		},
+		"duplicate pool id": func(gs *GenesisState) {
+			gs.NextPoolId = 3
+			gs.Pools = append(gs.Pools, Pool{
+				Id:          1,
+				Denom0:      "uosmo",
+				Denom1:      "uatom",
+				Reserve0:    "50",
+				Reserve1:    "50",
+				TotalShares: "50",
+				LpDenom:     "lp/1",
+			})
+		},
 	}
 
 	for name, mutate := range tests {

@@ -1,6 +1,7 @@
 param(
   [int]$MinHeight = 3,
-  [int]$TimeoutSeconds = 60
+  [int]$TimeoutSeconds = 60,
+  [int]$ValidatorCount = 3
 )
 
 $ErrorActionPreference = "Stop"
@@ -52,14 +53,14 @@ function Wait-ForHeight {
 
 Push-Location $RepoRoot
 try {
-  & .\scripts\localnet\init.ps1
-  & .\scripts\localnet\start.ps1
+  & .\scripts\localnet\init.ps1 -ValidatorCount $ValidatorCount
+  & .\scripts\localnet\start.ps1 -ValidatorCount $ValidatorCount
 
   $height = Wait-ForHeight -TargetHeight $MinHeight -TimeoutSeconds $TimeoutSeconds
   Write-Host "localnet reached height $height"
 
   & .\scripts\localnet\stop.ps1
-  & .\scripts\localnet\start.ps1
+  & .\scripts\localnet\start.ps1 -ValidatorCount $ValidatorCount
 
   $restartHeight = Wait-ForHeight -TargetHeight ($height + 1) -TimeoutSeconds $TimeoutSeconds
   Write-Host "localnet restart preserved state and reached height $restartHeight"
