@@ -84,3 +84,43 @@ func TestAddLiquidityRejectsCorruptedPoolStateWithoutPanic(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "pool state")
 }
+
+func TestPoolAccountingMatchesBankBalancesAndLPSupply(t *testing.T) {
+	app, ctx, msgServer, creator, poolID := setupDexPool(t)
+	fundAccount(t, app, ctx, creator, sdk.NewCoins(sdk.NewInt64Coin("uatom", 1_000)))
+
+	_, err := msgServer.AddLiquidity(ctx, &types.MsgAddLiquidity{
+		Depositor: creator.String(),
+		PoolId:    poolID,
+		TokenA:    sdk.NewInt64Coin("uatom", 100),
+		TokenB:    sdk.NewInt64Coin("norb", 100),
+		MinShares: "1",
+	})
+	require.NoError(t, err)
+
+	_, err = msgServer.SwapExactAmountIn(ctx, &types.MsgSwapExactAmountIn{
+		Trader:        creator.String(),
+		PoolId:        poolID,
+		TokenIn:       sdk.NewInt64Coin("uatom", 10),
+		TokenOutDenom: "norb",
+		MinAmountOut:  "1",
+	})
+	require.NoError(t, err)
+
+	pool, found, err := app.DexKeeper.GetPool(ctx, poolID)
+	require.NoError(t, err)
+	require.True(t, found)
+
+	reserve0, ok := sdkmath.NewIntFromString(pool.Reserve0)
+	require.True(t, ok)
+	reserve1, ok := sdkmath.NewIntFromString(pool.Reserve1)
+	require.True(t, ok)
+	totalShares, ok := sdkmath.NewIntFromString(pool.TotalShares)
+	require.True(t, ok)
+
+	moduleAddr := app.AccountKeeper.GetModuleAddress(types.ModuleName)
+	require.NotNil(t, moduleAddr)
+	require.Equal(t, sdk.NewCoin(pool.Denom0, reserve0), app.BankKeeper.GetBalance(ctx, moduleAddr, pool.Denom0))
+	require.Equal(t, sdk.NewCoin(pool.Denom1, reserve1), app.BankKeeper.GetBalance(ctx, moduleAddr, pool.Denom1))
+	require.Equal(t, sdk.NewCoin(pool.LpDenom, totalShares), app.BankKeeper.GetSupply(ctx, pool.LpDenom))
+}
