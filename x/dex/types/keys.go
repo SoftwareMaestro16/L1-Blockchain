@@ -9,6 +9,7 @@ const (
 var (
 	PoolPrefix        = []byte{0x01}
 	NextPoolIDKey     = []byte{0x02}
+	PairPrefix        = []byte{0x03}
 	DefaultNextPoolID = uint64(1)
 )
 
