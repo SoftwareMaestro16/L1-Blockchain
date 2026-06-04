@@ -2,24 +2,30 @@ package app
 
 import (
 	"bytes"
-	"crypto/rand"
+	"crypto/sha256"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	DeterministicVoteExtensionsAppOption = "orbitalis.vote_extensions.deterministic_for_testing"
+	voteExtensionDomain                  = "orbitalis/vote-extension/v1"
+)
+
 type (
-	// VoteExtensionHandler defines a dummy vote extension handler for L1App.
-	//
-	// NOTE: This implementation is solely used for testing purposes. DO NOT use
-	// in a production application!
+	// VoteExtensionHandler is deterministic and must only be enabled through
+	// DeterministicVoteExtensionsAppOption in test/dev networks.
 	VoteExtensionHandler struct{}
 
-	// VoteExtension defines the structure used to create a dummy vote extension.
+	// VoteExtension defines the explicitly deterministic vote extension payload.
 	VoteExtension struct {
 		Hash   []byte
 		Height int64
@@ -38,17 +44,10 @@ func (h *VoteExtensionHandler) SetHandlers(bApp *baseapp.BaseApp) {
 
 func (h *VoteExtensionHandler) ExtendVote() sdk.ExtendVoteHandler {
 	return func(_ sdk.Context, req *abci.RequestExtendVote) (*abci.ResponseExtendVote, error) {
-		buf := make([]byte, 1024)
-
-		_, err := rand.Read(buf)
-		if err != nil {
-			return nil, fmt.Errorf("failed to generate random vote extension data: %w", err)
-		}
-
 		ve := VoteExtension{
 			Hash:   req.Hash,
 			Height: req.Height,
-			Data:   buf,
+			Data:   deterministicVoteExtensionData(req.Hash, req.Height),
 		}
 
 		bz, err := json.Marshal(ve)
@@ -75,10 +74,37 @@ func (h *VoteExtensionHandler) VerifyVoteExtension() sdk.VerifyVoteExtensionHand
 		case !bytes.Equal(req.Hash, ve.Hash):
 			return &abci.ResponseVerifyVoteExtension{Status: abci.ResponseVerifyVoteExtension_REJECT}, nil
 
-		case len(ve.Data) != 1024:
+		case !bytes.Equal(ve.Data, deterministicVoteExtensionData(req.Hash, req.Height)):
 			return &abci.ResponseVerifyVoteExtension{Status: abci.ResponseVerifyVoteExtension_REJECT}, nil
 		}
 
 		return &abci.ResponseVerifyVoteExtension{Status: abci.ResponseVerifyVoteExtension_ACCEPT}, nil
+	}
+}
+
+func deterministicVoteExtensionData(hash []byte, height int64) []byte {
+	heightBz := make([]byte, 8)
+	binary.BigEndian.PutUint64(heightBz, uint64(height))
+
+	sum := sha256.New()
+	sum.Write([]byte(voteExtensionDomain))
+	sum.Write(heightBz)
+	sum.Write(hash)
+	return sum.Sum(nil)
+}
+
+func deterministicVoteExtensionsEnabled(appOpts servertypes.AppOptions) bool {
+	if appOpts == nil {
+		return false
+	}
+
+	switch value := appOpts.Get(DeterministicVoteExtensionsAppOption).(type) {
+	case bool:
+		return value
+	case string:
+		enabled, err := strconv.ParseBool(value)
+		return err == nil && enabled
+	default:
+		return false
 	}
 }
