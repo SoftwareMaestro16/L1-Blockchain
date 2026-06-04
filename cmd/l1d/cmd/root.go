@@ -93,6 +93,7 @@ func NewRootCmd() *cobra.Command {
 			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customCMTConfig)
 		},
 	}
+	configureVersionMetadata(rootCmd)
 
 	initRootCmd(rootCmd, encodingConfig.TxConfig, tempApp.BasicModuleManager)
 

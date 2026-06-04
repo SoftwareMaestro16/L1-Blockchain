@@ -27,11 +27,33 @@ flowchart LR
 
 ## Build And Test
 
+Stable Windows prototype build:
+
+```powershell
+.\scripts\build-orbitalisd.ps1
+build\orbitalisd.exe version --long --output json
+```
+
+If `build\orbitalisd.exe` already exists without a build manifest, rerun with
+`-Force` after confirming the artifact can be replaced:
+
+```powershell
+.\scripts\build-orbitalisd.ps1 -Force
+```
+
+The wrapper prefers the pinned `.work` Go toolchain when present, verifies Go
+`1.25.x`, runs `go mod verify`, builds with `-trimpath` and read-only modules,
+writes `build\orbitalisd.exe.build.json`, and writes a SHA-256 checksum next to
+the binary.
+
+Acceptance checks:
+
 ```powershell
 $env:PATH = "$PWD\.work\tools\go1.25.11\go\bin;$env:PATH"
 go test ./...
 go vet ./...
 go build -o build/orbitalisd.exe ./cmd/l1d
+build\orbitalisd.exe version --long
 ```
 
 If you already have Go `1.25.x` on PATH, the `.work` toolchain is not required.

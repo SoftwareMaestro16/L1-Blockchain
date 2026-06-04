@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	cmtversion "github.com/cometbft/cometbft/version"
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	sdkversion "github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 )
 
@@ -30,6 +32,22 @@ func TestRootCommandBranding(t *testing.T) {
 
 	require.Equal(t, "orbitalisd", rootCmd.Use)
 	require.Contains(t, rootCmd.Short, "Orbitalis")
+}
+
+func TestVersionMetadataDefaults(t *testing.T) {
+	rootCmd := cmd.NewRootCmd()
+
+	require.Equal(t, "Orbitalis", sdkversion.Name)
+	require.Equal(t, "orbitalisd", sdkversion.AppName)
+	require.NotEmpty(t, sdkversion.Version)
+	require.NotEmpty(t, sdkversion.Commit)
+	require.NotEmpty(t, sdkversion.BuildTags)
+
+	extraInfo, ok := rootCmd.Context().Value(sdkversion.ContextKey{}).(sdkversion.ExtraInfo)
+	require.True(t, ok)
+	require.NotEmpty(t, extraInfo["build_date"])
+	require.NotEmpty(t, extraInfo["dirty"])
+	require.Equal(t, cmtversion.TMCoreSemVer, extraInfo["cometbft_version"])
 }
 
 func TestHomeFlagRegistration(t *testing.T) {
