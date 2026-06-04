@@ -234,4 +234,10 @@ build\orbitalisd.exe query dex pool 1 --grpc-addr 127.0.0.1:9090 --grpc-insecure
 .\tests\e2e\query_surface_smoke.ps1
 ```
 
-See also [Prototype Acceptance Suite](prototype-acceptance-suite.md), [Prototype Query Surface](query-surface.md), and [Prototype Observability](observability.md).
+Build a local prototype package after the checks pass:
+
+```powershell
+.\scripts\release\prototype-package.ps1 -Version prototype-local -TargetOS windows -TargetArch amd64
+```
+
+See also [Prototype Acceptance Suite](prototype-acceptance-suite.md), [Prototype Release Package](release/prototype-package.md), [Prototype Query Surface](query-surface.md), and [Prototype Observability](observability.md).

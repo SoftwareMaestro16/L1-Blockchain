@@ -202,6 +202,7 @@ go build -o build/orbitalisd.exe ./cmd/l1d
 .\scripts\localnet\validate-genesis.ps1
 .\tests\e2e\prototype_acceptance.ps1
 .\scripts\security\prototype-audit.ps1 -Profile Fast
+.\scripts\release\prototype-package.ps1 -Version prototype-local -TargetOS windows -TargetArch amd64
 .\tests\e2e\prototype_acceptance.ps1 -Profile Full -OutputDir .localnet-5 -ValidatorCount 5
 .\tests\e2e\localnet_smoke.ps1
 .\tests\e2e\localnet_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5

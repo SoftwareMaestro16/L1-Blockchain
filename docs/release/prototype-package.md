@@ -1,0 +1,107 @@
+# Orbitalis Prototype Release Package
+
+This document defines the release package for the Orbitalis working L1 prototype.
+
+The package is a prerelease/testnet artifact. It is not a mainnet-ready release and must not be marketed as production validator software.
+
+## Contents
+
+Each package produced by `scripts\release\prototype-package.ps1` contains:
+
+- `bin/orbitalisd` or `bin/orbitalisd.exe`
+- `release-manifest.json`
+- `SHA256SUMS.txt`
+- copied operator docs:
+  - `README.md`
+  - `docs/operator-commands.md`
+  - `docs/prototype-acceptance-suite.md`
+  - `docs/security/prototype-audit-gate.md`
+  - `docs/query-surface.md`
+  - `docs/observability.md`
+  - `docs/release/prototype-package.md`
+- optional evidence under `evidence/`
+
+The script also creates:
+
+- `orbitalis-<version>-<os>-<arch>.zip`
+- `orbitalis-<version>-<os>-<arch>.zip.sha256`
+
+Artifacts must not contain `.work`, `.localnet`, keyrings, mnemonics, validator private keys, node keys, environment files, Redis/PostgreSQL URLs, or local diagnostic bundles unless explicitly copied as sanitized evidence.
+
+## Local Build
+
+Build a Windows package from the current checkout:
+
+```powershell
+.\scripts\release\prototype-package.ps1 -Version prototype-local -TargetOS windows -TargetArch amd64
+```
+
+Reuse an existing binary:
+
+```powershell
+.\scripts\release\prototype-package.ps1 -Version prototype-local -SkipBuild -Binary build\orbitalisd.exe
+```
+
+Attach sanitized evidence:
+
+```powershell
+.\scripts\release\prototype-package.ps1 -Version prototype-local -EvidencePath .work\security\prototype-audit-YYYYMMDD-HHMMSS\summary.md
+```
+
+## GitHub Workflow
+
+Manual workflow: `.github/workflows/prototype-release.yml`.
+
+The workflow:
+
+1. Checks out a clean tree.
+2. Sets up Go from `go.mod`.
+3. Installs release tooling.
+4. Runs unit tests, vet, `buf lint`, gitleaks, and the prototype audit gate.
+5. Optionally runs `tests\e2e\prototype_acceptance.ps1 -Profile Smoke`.
+6. Builds matrix artifacts for Windows amd64, Linux amd64, and Linux arm64.
+7. Generates checksums.
+8. Uploads artifacts.
+9. Optionally creates a GitHub prerelease.
+
+## Required Evidence
+
+A prototype prerelease should attach or link:
+
+- workflow run URL,
+- `go test -p=1 ./...` output,
+- `go vet -p=1 ./...` output,
+- `buf lint` output,
+- `scripts\security\prototype-audit.ps1 -Profile Full` summary,
+- `tests\e2e\prototype_acceptance.ps1 -Profile Smoke` transcript,
+- checksums for each binary/archive.
+
+Known `triage_required` findings from the audit gate are acceptable only when they match [prototype-audit-gate.md](../security/prototype-audit-gate.md) and have an owner.
+
+## Known Limitations
+
+- Prototype only. No mainnet economics or validator onboarding guarantees.
+- IBC, external bridge, explorer/indexer, production governance economics, and exchange-grade DEX routing are out of scope.
+- Localnet uses test keyrings under ignored directories.
+- Local minimum gas price is `0norb`; examples still use `1000000norb` fees to exercise the ante path.
+- Query list endpoints have prototype caps; pagination is a MUST FIX before high-cardinality public use.
+- The vote extension handler is dummy/test-oriented and must be replaced or disabled before a public validator network.
+- `govulncheck` dependency advisories and `go mod verify` cache integrity findings must be triaged for each release run.
+
+## Tagging
+
+Use prerelease-style versions until the project has a mainnet readiness gate:
+
+```text
+prototype-v0.1.0
+prototype-v0.1.0-rc.1
+testnet-v0.1.0
+```
+
+Before tagging, require:
+
+```powershell
+git status --short
+.\scripts\security\prototype-audit.ps1 -Profile Full
+.\tests\e2e\prototype_acceptance.ps1 -Profile Smoke
+```

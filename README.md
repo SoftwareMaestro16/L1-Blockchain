@@ -80,7 +80,7 @@ Prototype acceptance and targeted smoke tests:
 
 ## Example CLI
 
-See [docs/operator-commands.md](docs/operator-commands.md) for the full prototype operator command runbook, [docs/prototype-acceptance-suite.md](docs/prototype-acceptance-suite.md) for the one-command acceptance suite, [docs/security/prototype-audit-gate.md](docs/security/prototype-audit-gate.md) for the release security gate, [docs/query-surface.md](docs/query-surface.md) for gRPC/REST endpoints, and [docs/observability.md](docs/observability.md) for health checks and diagnostics.
+See [docs/operator-commands.md](docs/operator-commands.md) for the full prototype operator command runbook, [docs/prototype-acceptance-suite.md](docs/prototype-acceptance-suite.md) for the one-command acceptance suite, [docs/security/prototype-audit-gate.md](docs/security/prototype-audit-gate.md) for the release security gate, [docs/release/prototype-package.md](docs/release/prototype-package.md) for prerelease packages, [docs/query-surface.md](docs/query-surface.md) for gRPC/REST endpoints, and [docs/observability.md](docs/observability.md) for health checks and diagnostics.
 
 ```powershell
 build\orbitalisd.exe query block --node tcp://127.0.0.1:26657

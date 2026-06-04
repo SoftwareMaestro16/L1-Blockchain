@@ -49,6 +49,18 @@ function Assert-AuditWorkspacePath {
   }
 }
 
+function Resolve-AuditTool {
+  param(
+    [string]$Name,
+    [string]$LocalPath
+  )
+
+  if (Test-Path -LiteralPath $LocalPath) { return $LocalPath }
+  $cmd = Get-Command $Name -ErrorAction SilentlyContinue
+  if ($cmd) { return $cmd.Source }
+  return $LocalPath
+}
+
 function Add-AuditResult {
   param(
     [string]$Name,
@@ -144,10 +156,10 @@ if (!(Test-Path -LiteralPath $Go)) {
 }
 
 $ToolBin = Join-Path $RepoRoot ".work\tools\bin"
-$Buf = Join-Path $ToolBin "buf.exe"
-$Gitleaks = Join-Path $ToolBin "gitleaks.exe"
-$Gosec = Join-Path $ToolBin "gosec.exe"
-$Govulncheck = Join-Path $ToolBin "govulncheck.exe"
+$Buf = Resolve-AuditTool -Name "buf" -LocalPath (Join-Path $ToolBin "buf.exe")
+$Gitleaks = Resolve-AuditTool -Name "gitleaks" -LocalPath (Join-Path $ToolBin "gitleaks.exe")
+$Gosec = Resolve-AuditTool -Name "gosec" -LocalPath (Join-Path $ToolBin "gosec.exe")
+$Govulncheck = Resolve-AuditTool -Name "govulncheck" -LocalPath (Join-Path $ToolBin "govulncheck.exe")
 
 $goCache = Join-Path $RepoRoot ".work\gocache"
 $goTmp = Join-Path $RepoRoot ".work\gotmp"

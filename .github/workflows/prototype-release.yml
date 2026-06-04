@@ -1,0 +1,162 @@
+name: Prototype Release Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Prototype version, for example prototype-v0.1.0-rc.1"
+        required: false
+        default: ""
+      run_e2e:
+        description: "Run 3-validator prototype acceptance smoke"
+        required: true
+        type: boolean
+        default: true
+      create_release:
+        description: "Create a GitHub prerelease"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  security-events: write
+
+jobs:
+  checks:
+    name: Checks And Audit
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Validate release inputs
+        shell: pwsh
+        run: |
+          if ("${{ inputs.create_release }}" -eq "true" -and [string]::IsNullOrWhiteSpace("${{ inputs.version }}")) {
+            throw "version is required when create_release=true"
+          }
+
+      - name: Install tools
+        shell: pwsh
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@latest
+          go install github.com/securego/gosec/v2/cmd/gosec@latest
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Unit tests
+        shell: pwsh
+        run: go test -p=1 ./...
+
+      - name: Vet
+        shell: pwsh
+        run: go vet -p=1 ./...
+
+      - name: Buf lint
+        shell: pwsh
+        run: buf lint
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prototype audit gate
+        shell: pwsh
+        run: .\scripts\security\prototype-audit.ps1 -Profile Full -SkipTests -SkipGitleaksHistory
+
+      - name: Upload audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: prototype-audit-evidence
+          path: .work/security/prototype-audit-*/**
+
+  acceptance:
+    name: Acceptance Smoke
+    if: ${{ inputs.run_e2e }}
+    runs-on: windows-latest
+    needs: checks
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run prototype acceptance smoke
+        shell: pwsh
+        run: .\tests\e2e\prototype_acceptance.ps1 -Profile Smoke
+
+      - name: Upload diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prototype-acceptance-diagnostics
+          path: .work/diagnostics/**
+
+  package:
+    name: Package ${{ matrix.target_os }}-${{ matrix.target_arch }}
+    runs-on: ${{ matrix.runner }}
+    needs: checks
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-latest
+            target_os: windows
+            target_arch: amd64
+          - runner: ubuntu-latest
+            target_os: linux
+            target_arch: amd64
+          - runner: ubuntu-latest
+            target_os: linux
+            target_arch: arm64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build package
+        shell: pwsh
+        run: |
+          ./scripts/release/prototype-package.ps1 `
+            -Version "${{ inputs.version }}" `
+            -TargetOS "${{ matrix.target_os }}" `
+            -TargetArch "${{ matrix.target_arch }}"
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbitalis-${{ matrix.target_os }}-${{ matrix.target_arch }}
+          path: dist/prototype/**
+
+  prerelease:
+    name: GitHub Prerelease
+    if: ${{ always() && inputs.create_release && needs.checks.result == 'success' && needs.package.result == 'success' && (!inputs.run_e2e || needs.acceptance.result == 'success') }}
+    runs-on: ubuntu-latest
+    needs:
+      - checks
+      - acceptance
+      - package
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: Create prerelease
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          name: Orbitalis ${{ inputs.version }}
+          prerelease: true
+          generate_release_notes: true
+          files: release-artifacts/**/*
