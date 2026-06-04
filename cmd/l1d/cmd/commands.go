@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 
 	cmtcfg "github.com/cometbft/cometbft/config"
 	dbm "github.com/cosmos/cosmos-db"
@@ -11,6 +12,7 @@ import (
 	"cosmossdk.io/log/v2"
 	confixcmd "cosmossdk.io/tools/confix/cmd"
 	l1app "github.com/sovereign-l1/l1/app"
+	appparams "github.com/sovereign-l1/l1/app/params"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
@@ -74,7 +76,7 @@ func initAppConfig() (string, interface{}) {
 	//   own app.toml to override, or use this default value.
 	//
 	// In Orbitalis, we set the min gas prices to 0.
-	srvCfg.MinGasPrices = "0norb"
+	srvCfg.MinGasPrices = fmt.Sprintf("0%s", appparams.BaseDenom)
 	// srvCfg.BaseConfig.IAVLDisableFastNode = true // disable fastnode by default
 
 	// Now we set the custom config default values.

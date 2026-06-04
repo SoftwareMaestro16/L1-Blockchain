@@ -23,6 +23,13 @@ func (gs GenesisState) Validate() error {
 		if !strings.HasPrefix(denom.Denom, FactoryDenomPrefix+"/") {
 			return fmt.Errorf("denom %s must use %s prefix", denom.Denom, FactoryDenomPrefix)
 		}
+		parts := strings.SplitN(denom.Denom, "/", 3)
+		if len(parts) != 3 || parts[1] == "" || parts[2] == "" {
+			return fmt.Errorf("denom %s must use factory/{admin}/{subdenom} format", denom.Denom)
+		}
+		if IsReservedNativeSubdenom(parts[2]) {
+			return fmt.Errorf("denom %s must not spoof native ORB/norb", denom.Denom)
+		}
 		if denom.Admin == "" {
 			return fmt.Errorf("empty admin for denom %s", denom.Denom)
 		}

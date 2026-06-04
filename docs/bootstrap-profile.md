@@ -25,6 +25,8 @@ Each generated validator account starts with:
 - `1000000000testtoken`
 - `500000000norb`
 
+`testtoken` is a local bootstrap test asset for module and DEX experiments only. It is not the native token, staking denom, fee denom, or display unit for `ORB`.
+
 Each validator gentx self-delegates:
 
 - `100000000norb`
@@ -135,6 +137,15 @@ Run the proof-of-stake smoke flow documented in [pos-smoke-flow.md](pos-smoke-fl
 
 The PoS smoke validates staking params, bonded validators, delegation from a funded local account, delegation query state, slashing params, signing infos, and validator voting power updates.
 
+Run the native token lifecycle smoke documented in [native-token-lifecycle.md](native-token-lifecycle.md):
+
+```powershell
+.\tests\e2e\native_token_smoke.ps1
+.\tests\e2e\native_token_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5
+```
+
+The native token smoke validates bank metadata, `norb` supply and balances, staking/fees/mint denom consistency, and a `bank send` transaction that pays fees in `norb`.
+
 Export state after the network has started:
 
 ```powershell
@@ -164,6 +175,8 @@ go build -o build/orbitalisd.exe ./cmd/l1d
 .\tests\e2e\localnet_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5
 .\tests\e2e\pos_smoke.ps1
 .\tests\e2e\pos_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5
+.\tests\e2e\native_token_smoke.ps1
+.\tests\e2e\native_token_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5
 ```
 
 Security baseline:

@@ -128,11 +128,10 @@ func assertPrototypeGenesisProfile(
 			break
 		}
 	}
-	require.Equal(t, appparams.NativeTokenMetadata(), native)
-	require.NoError(t, native.Validate())
+	requireNativeTokenMetadata(t, native)
 
 	expectedAccountCoins := sdk.NewCoins(
-		sdk.NewCoin("testtoken", sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)),
+		sdk.NewCoin(appparams.TestAssetDenom, sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)),
 		sdk.NewCoin(appparams.BaseDenom, sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)),
 	).Sort()
 	for _, balance := range bankGenState.Balances {
@@ -176,4 +175,28 @@ func assertPrototypeGenesisProfile(
 		require.True(t, createValMsg.MinSelfDelegation.IsPositive())
 		require.True(t, strings.HasPrefix(createValMsg.ValidatorAddress, l1app.ValidatorAddressPrefix), createValMsg.ValidatorAddress)
 	}
+}
+
+func requireNativeTokenMetadata(t *testing.T, native banktypes.Metadata) {
+	t.Helper()
+
+	require.NoError(t, native.Validate())
+	require.Equal(t, appparams.BaseDenom, native.Base)
+	require.Equal(t, appparams.DisplayDenom, native.Display)
+	require.Equal(t, appparams.TokenName, native.Name)
+	require.Equal(t, appparams.TokenSymbol, native.Symbol)
+	requireDenomUnit(t, native, appparams.BaseDenom, 0)
+	requireDenomUnit(t, native, appparams.DisplayDenom, appparams.DisplayDenomExponent)
+}
+
+func requireDenomUnit(t *testing.T, metadata banktypes.Metadata, denom string, exponent uint32) {
+	t.Helper()
+
+	for _, unit := range metadata.DenomUnits {
+		if unit.Denom == denom {
+			require.Equal(t, exponent, unit.Exponent)
+			return
+		}
+	}
+	require.Failf(t, "missing denom unit", "denom %s", denom)
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
+	appparams "github.com/sovereign-l1/l1/app/params"
 	tokenfactorykeeper "github.com/sovereign-l1/l1/x/tokenfactory/keeper"
 	"github.com/sovereign-l1/l1/x/tokenfactory/types"
 )
@@ -75,4 +76,49 @@ func TestAdminCanBurnOwnFactoryTokens(t *testing.T) {
 
 	balance := app.BankKeeper.GetBalance(ctx, admin, denom)
 	require.Equal(t, "60", balance.Amount.String())
+}
+
+func TestCreateDenomRejectsNativeTokenSpoofing(t *testing.T) {
+	app := l1app.Setup(t, false)
+	ctx := app.NewContext(false)
+	admin := l1app.AddTestAddrsIncremental(app, ctx, 1, sdkmath.NewInt(1_000_000))[0]
+	msgServer := tokenfactorykeeper.NewMsgServerImpl(app.TokenFactoryKeeper)
+
+	for _, subdenom := range []string{appparams.BaseDenom, appparams.DisplayDenom, appparams.TokenName} {
+		t.Run(subdenom, func(t *testing.T) {
+			_, err := msgServer.CreateDenom(ctx, &types.MsgCreateDenom{
+				Creator:  admin.String(),
+				Subdenom: subdenom,
+			})
+			require.ErrorIs(t, err, types.ErrInvalidDenom)
+			require.Contains(t, err.Error(), "native ORB/norb")
+		})
+	}
+}
+
+func TestFactoryTokenMetadataDoesNotReplaceNativeMetadata(t *testing.T) {
+	app := l1app.Setup(t, false)
+	ctx := app.NewContext(false)
+	admin := l1app.AddTestAddrsIncremental(app, ctx, 1, sdkmath.NewInt(1_000_000))[0]
+	msgServer := tokenfactorykeeper.NewMsgServerImpl(app.TokenFactoryKeeper)
+
+	createRes, err := msgServer.CreateDenom(ctx, &types.MsgCreateDenom{
+		Creator:  admin.String(),
+		Subdenom: "gold",
+	})
+	require.NoError(t, err)
+
+	nativeMetadata, found := app.BankKeeper.GetDenomMetaData(ctx, appparams.BaseDenom)
+	require.True(t, found)
+	require.Equal(t, appparams.BaseDenom, nativeMetadata.Base)
+	require.Equal(t, appparams.DisplayDenom, nativeMetadata.Display)
+	require.Equal(t, appparams.TokenSymbol, nativeMetadata.Symbol)
+
+	factoryMetadata, found := app.BankKeeper.GetDenomMetaData(ctx, createRes.NewTokenDenom)
+	require.True(t, found)
+	require.Equal(t, createRes.NewTokenDenom, factoryMetadata.Base)
+	require.Equal(t, createRes.NewTokenDenom, factoryMetadata.Display)
+	require.Equal(t, createRes.NewTokenDenom, factoryMetadata.Symbol)
+	require.NotEqual(t, appparams.BaseDenom, factoryMetadata.Base)
+	require.NotEqual(t, appparams.DisplayDenom, factoryMetadata.Display)
 }

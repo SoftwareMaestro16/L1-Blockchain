@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
+	appparams "github.com/sovereign-l1/l1/app/params"
 	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
 	"github.com/sovereign-l1/l1/x/dex/types"
 )
@@ -32,7 +33,7 @@ func setupDexPool(t *testing.T) (*l1app.L1App, sdk.Context, types.MsgServer, sdk
 	res, err := msgServer.CreatePool(ctx, &types.MsgCreatePool{
 		Creator: creator.String(),
 		TokenA:  sdk.NewInt64Coin("uatom", 1_000),
-		TokenB:  sdk.NewInt64Coin("norb", 1_000),
+		TokenB:  sdk.NewInt64Coin(appparams.BaseDenom, 1_000),
 	})
 	require.NoError(t, err)
 
@@ -47,7 +48,7 @@ func TestAddLiquidityRejectsMalformedMinShares(t *testing.T) {
 		Depositor: depositor.String(),
 		PoolId:    poolID,
 		TokenA:    sdk.NewInt64Coin("uatom", 100),
-		TokenB:    sdk.NewInt64Coin("norb", 100),
+		TokenB:    sdk.NewInt64Coin(appparams.BaseDenom, 100),
 		MinShares: "not-an-int",
 	})
 	require.Error(t, err)
@@ -63,7 +64,7 @@ func TestAddLiquidityRejectsCorruptedPoolStateWithoutPanic(t *testing.T) {
 
 	require.NoError(t, app.DexKeeper.SetPool(ctx, types.Pool{
 		Id:          99,
-		Denom0:      "norb",
+		Denom0:      appparams.BaseDenom,
 		Denom1:      "uatom",
 		Reserve0:    "not-an-int",
 		Reserve1:    "100",
@@ -77,7 +78,7 @@ func TestAddLiquidityRejectsCorruptedPoolStateWithoutPanic(t *testing.T) {
 			Depositor: depositor.String(),
 			PoolId:    99,
 			TokenA:    sdk.NewInt64Coin("uatom", 100),
-			TokenB:    sdk.NewInt64Coin("norb", 100),
+			TokenB:    sdk.NewInt64Coin(appparams.BaseDenom, 100),
 			MinShares: "1",
 		})
 	})
@@ -93,7 +94,7 @@ func TestPoolAccountingMatchesBankBalancesAndLPSupply(t *testing.T) {
 		Depositor: creator.String(),
 		PoolId:    poolID,
 		TokenA:    sdk.NewInt64Coin("uatom", 100),
-		TokenB:    sdk.NewInt64Coin("norb", 100),
+		TokenB:    sdk.NewInt64Coin(appparams.BaseDenom, 100),
 		MinShares: "1",
 	})
 	require.NoError(t, err)
@@ -102,7 +103,7 @@ func TestPoolAccountingMatchesBankBalancesAndLPSupply(t *testing.T) {
 		Trader:        creator.String(),
 		PoolId:        poolID,
 		TokenIn:       sdk.NewInt64Coin("uatom", 10),
-		TokenOutDenom: "norb",
+		TokenOutDenom: appparams.BaseDenom,
 		MinAmountOut:  "1",
 	})
 	require.NoError(t, err)
@@ -123,4 +124,16 @@ func TestPoolAccountingMatchesBankBalancesAndLPSupply(t *testing.T) {
 	require.Equal(t, sdk.NewCoin(pool.Denom0, reserve0), app.BankKeeper.GetBalance(ctx, moduleAddr, pool.Denom0))
 	require.Equal(t, sdk.NewCoin(pool.Denom1, reserve1), app.BankKeeper.GetBalance(ctx, moduleAddr, pool.Denom1))
 	require.Equal(t, sdk.NewCoin(pool.LpDenom, totalShares), app.BankKeeper.GetSupply(ctx, pool.LpDenom))
+}
+
+func TestCreatePoolLPDenomCannotSpoofNativeToken(t *testing.T) {
+	app, ctx, _, _, poolID := setupDexPool(t)
+
+	pool, found, err := app.DexKeeper.GetPool(ctx, poolID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, "lp/1", pool.LpDenom)
+	require.NotEqual(t, appparams.BaseDenom, pool.LpDenom)
+	require.NotEqual(t, appparams.DisplayDenom, pool.LpDenom)
+	require.NotEqual(t, appparams.TokenSymbol, pool.LpDenom)
 }

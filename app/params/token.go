@@ -9,6 +9,8 @@ const (
 	TokenName            = "Orbitalis"
 	TokenSymbol          = "ORB"
 	DisplayDenomExponent = uint32(9)
+	BaseUnitsPerDisplay  = int64(1_000_000_000)
+	TestAssetDenom       = "testtoken"
 )
 
 func NativeTokenMetadata() banktypes.Metadata {
@@ -19,8 +21,8 @@ func NativeTokenMetadata() banktypes.Metadata {
 		Name:        TokenName,
 		Symbol:      TokenSymbol,
 		DenomUnits: []*banktypes.DenomUnit{
-			{Denom: BaseDenom, Exponent: 0, Aliases: []string{}},
-			{Denom: DisplayDenom, Exponent: DisplayDenomExponent, Aliases: []string{}},
+			{Denom: BaseDenom, Exponent: 0},
+			{Denom: DisplayDenom, Exponent: DisplayDenomExponent},
 		},
 	}
 }

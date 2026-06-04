@@ -15,6 +15,7 @@ import (
 	"cosmossdk.io/math"
 	"cosmossdk.io/math/unsafe"
 	l1app "github.com/sovereign-l1/l1/app"
+	appparams "github.com/sovereign-l1/l1/app/params"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -85,7 +86,11 @@ func addTestnetFlagsToCmd(cmd *cobra.Command) {
 	cmd.Flags().IntP(flagNumValidators, "v", 4, "Number of validators to initialize the testnet with")
 	cmd.Flags().StringP(flagOutputDir, "o", "./.testnets", "Directory to store initialization data for the testnet")
 	cmd.Flags().String(flags.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")
-	cmd.Flags().String(server.FlagMinGasPrices, fmt.Sprintf("0.000006%s", sdk.DefaultBondDenom), "Minimum gas prices to accept for transactions; All fees in a tx must meet this minimum (e.g. 0.01photino,0.001stake)")
+	cmd.Flags().String(
+		server.FlagMinGasPrices,
+		fmt.Sprintf("0.000006%s", sdk.DefaultBondDenom),
+		fmt.Sprintf("Minimum gas prices to accept for transactions; all prototype fees should use %s (e.g. 0.000006%s)", appparams.BaseDenom, appparams.BaseDenom),
+	)
 	cmd.Flags().String(flags.FlagKeyType, string(hd.Secp256k1Type), "Key signing algorithm to generate keys for")
 
 	// support old flags name for backwards compatibility
@@ -336,7 +341,7 @@ func initTestnetFiles(
 		accTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)
 		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)
 		coins := sdk.Coins{
-			sdk.NewCoin("testtoken", accTokens),
+			sdk.NewCoin(appparams.TestAssetDenom, accTokens),
 			sdk.NewCoin(args.bondTokenDenom, accStakingTokens),
 		}
 

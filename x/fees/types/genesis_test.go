@@ -1,10 +1,14 @@
 package types
 
-import "testing"
+import (
+	"testing"
+
+	appparams "github.com/sovereign-l1/l1/app/params"
+)
 
 func TestDefaultParamsValidate(t *testing.T) {
 	params := DefaultParams()
-	if len(params.AllowedFeeDenoms) != 1 || params.AllowedFeeDenoms[0] != "norb" {
+	if len(params.AllowedFeeDenoms) != 1 || params.AllowedFeeDenoms[0] != appparams.BaseDenom {
 		t.Fatalf("expected only norb as default fee denom: %v", params.AllowedFeeDenoms)
 	}
 	if err := params.Validate(); err != nil {

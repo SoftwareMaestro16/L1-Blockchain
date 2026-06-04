@@ -73,6 +73,9 @@ func (k Keeper) FullDenom(creator, subdenom string) (string, error) {
 	if !subdenomRe.MatchString(subdenom) || strings.Contains(subdenom, "//") {
 		return "", types.ErrInvalidDenom.Wrap("subdenom must be 3-64 chars and start with a letter")
 	}
+	if types.IsReservedNativeSubdenom(subdenom) {
+		return "", types.ErrInvalidDenom.Wrap("subdenom must not spoof native ORB/norb")
+	}
 	return fmt.Sprintf("%s/%s/%s", types.FactoryDenomPrefix, creatorAddr.String(), subdenom), nil
 }
 

@@ -444,6 +444,45 @@ function Get-LocalnetSigningInfos {
   return @()
 }
 
+function Get-LocalnetBankMetadata {
+  param(
+    [string]$Binary,
+    [string]$Denom = "norb",
+    [int]$RPCPort = 26657
+  )
+
+  $node = "tcp://127.0.0.1:$RPCPort"
+  $result = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "bank", "denom-metadata", $Denom, "--node", $node, "--output", "json")
+  return $result.metadata
+}
+
+function Get-LocalnetBankSupplyOf {
+  param(
+    [string]$Binary,
+    [string]$Denom = "norb",
+    [int]$RPCPort = 26657
+  )
+
+  $node = "tcp://127.0.0.1:$RPCPort"
+  $result = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "bank", "total-supply-of", $Denom, "--node", $node, "--output", "json")
+  if ($result.amount) { return $result.amount }
+  return $result
+}
+
+function Get-LocalnetBankBalance {
+  param(
+    [string]$Binary,
+    [string]$Address,
+    [string]$Denom = "norb",
+    [int]$RPCPort = 26657
+  )
+
+  $node = "tcp://127.0.0.1:$RPCPort"
+  $result = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "bank", "balance", $Address, $Denom, "--node", $node, "--output", "json")
+  if ($result.balance) { return $result.balance }
+  return $result
+}
+
 function Get-LocalnetKeyAddress {
   param(
     [string]$Binary,

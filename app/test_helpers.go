@@ -74,6 +74,7 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 	genesisState := app.DefaultGenesis()
 	genesisState, err = simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balance)
 	require.NoError(t, err)
+	genesisState = withNativeTokenMetadata(app.AppCodec(), genesisState)
 
 	if !isCheckTx {
 		// init chain must be called to stop deliverState from being nil
@@ -127,6 +128,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *cmttypes.ValidatorSet, genAccs
 	app, genesisState := setup(true, 5)
 	genesisState, err := simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, genAccs, balances...)
 	require.NoError(t, err)
+	genesisState = withNativeTokenMetadata(app.AppCodec(), genesisState)
 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 	require.NoError(t, err)
@@ -177,6 +179,7 @@ func GenesisStateWithSingleValidator(t *testing.T, app *L1App) GenesisState {
 	genesisState := app.DefaultGenesis()
 	genesisState, err = simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balances...)
 	require.NoError(t, err)
+	genesisState = withNativeTokenMetadata(app.AppCodec(), genesisState)
 
 	return genesisState
 }

@@ -24,6 +24,7 @@ flowchart LR
 - `x/dex`: constant-product AMM pools, liquidity add/remove, exact-input swaps, LP tokens.
 - `x/fees`: native fee-denom policy; v1 accepts only `norb` fees.
 - `scripts/localnet`: 3-validator localnet init/start/stop/reset scripts.
+- Native token lifecycle: `norb` is the base transaction/staking/fee denom; `ORB` is display metadata only.
 
 ## Build And Test
 
@@ -70,12 +71,16 @@ Smoke test:
 
 ```powershell
 .\tests\e2e\localnet_smoke.ps1
+.\tests\e2e\native_token_smoke.ps1
 ```
 
 ## Example CLI
 
 ```powershell
 build\orbitalisd.exe query block --node tcp://127.0.0.1:26657
+build\orbitalisd.exe query bank denom-metadata norb --node tcp://127.0.0.1:26657 --output json
+build\orbitalisd.exe query bank total-supply-of norb --node tcp://127.0.0.1:26657 --output json
+build\orbitalisd.exe query bank balance <orb1-address> norb --node tcp://127.0.0.1:26657 --output json
 build\orbitalisd.exe tx bank send node0 <to-address> 100000000000norb --home .localnet\node0\orbitalisd --chain-id orbitalis-local-1 --keyring-backend test --fees 1000000norb
 build\orbitalisd.exe tx tokenfactory create-denom gold --home .localnet\node0\orbitalisd --chain-id orbitalis-local-1 --keyring-backend test --fees 1000000norb
 build\orbitalisd.exe query fees params --node tcp://127.0.0.1:26657

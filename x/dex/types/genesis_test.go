@@ -1,6 +1,10 @@
 package types
 
-import "testing"
+import (
+	"testing"
+
+	appparams "github.com/sovereign-l1/l1/app/params"
+)
 
 func validGenesisState() GenesisState {
 	return GenesisState{
@@ -8,7 +12,7 @@ func validGenesisState() GenesisState {
 		Pools: []Pool{
 			{
 				Id:          1,
-				Denom0:      "norb",
+				Denom0:      appparams.BaseDenom,
 				Denom1:      "uatom",
 				Reserve0:    "100",
 				Reserve1:    "200",
@@ -38,13 +42,13 @@ func TestGenesisValidateRejectsInvalidPoolState(t *testing.T) {
 		},
 		"non canonical denoms": func(gs *GenesisState) {
 			gs.Pools[0].Denom0 = "uatom"
-			gs.Pools[0].Denom1 = "norb"
+			gs.Pools[0].Denom1 = appparams.BaseDenom
 		},
 		"duplicate pair": func(gs *GenesisState) {
 			gs.NextPoolId = 3
 			gs.Pools = append(gs.Pools, Pool{
 				Id:          2,
-				Denom0:      "norb",
+				Denom0:      appparams.BaseDenom,
 				Denom1:      "uatom",
 				Reserve0:    "50",
 				Reserve1:    "50",
