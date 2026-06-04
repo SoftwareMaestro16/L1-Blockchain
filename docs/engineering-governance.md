@@ -25,11 +25,15 @@ Before writing or changing code:
 ## Code Structure Rules
 
 - No file should exceed 300-500 lines; split earlier when responsibilities diverge.
+- Generated files such as `*.pb.go` and `*.pulsar.go` are exempt from the authored-code file-size target and must not be edited manually.
 - No magic numbers or embedded consensus configuration in logic.
 - Blockchain configuration must live in params, genesis, or explicit app configuration.
 - Each module owns one responsibility and must be testable in isolation.
 - Use explicit interfaces and dependency injection where possible.
 - Prefer small functions with predictable control flow and no hidden side effects.
+- Runtime consensus, keeper, MsgServer, and query paths should return typed errors instead of panicking.
+- Startup-only panics are acceptable only when app initialization cannot safely continue; genesis/export panics must stay out of user transaction paths.
+- Changes to permissions, authority checks, denom validation, fee policy, DEX math, or module account capabilities require explicit security review notes and targeted tests.
 
 ## Testing Requirements
 

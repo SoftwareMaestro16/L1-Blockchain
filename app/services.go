@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"maps"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
@@ -19,12 +18,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
-	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 func (app *L1App) Name() string { return app.BaseApp.Name() }
@@ -101,19 +97,6 @@ func (a *L1App) DefaultGenesis() map[string]json.RawMessage {
 	return withNativeTokenMetadata(a.appCodec, a.BasicModuleManager.DefaultGenesis(a.appCodec))
 }
 
-func (app *L1App) GetKey(storeKey string) *storetypes.KVStoreKey {
-	return app.keys[storeKey]
-}
-
-func (app *L1App) GetStoreKeys() []storetypes.StoreKey {
-	keys := make([]storetypes.StoreKey, 0, len(app.keys))
-	for _, key := range app.keys {
-		keys = append(keys, key)
-	}
-
-	return keys
-}
-
 func (app *L1App) SimulationManager() *module.SimulationManager {
 	return app.sm
 }
@@ -147,19 +130,4 @@ func (app *L1App) RegisterNodeService(clientCtx client.Context, cfg config.Confi
 	nodeservice.RegisterNodeService(clientCtx, app.GRPCQueryRouter(), cfg, func() int64 {
 		return app.CommitMultiStore().EarliestVersion()
 	})
-}
-
-func GetMaccPerms() map[string][]string {
-	return maps.Clone(maccPerms)
-}
-
-func BlockedAddresses() map[string]bool {
-	modAccAddrs := make(map[string]bool)
-	for acc := range GetMaccPerms() {
-		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
-	}
-
-	delete(modAccAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-
-	return modAccAddrs
 }

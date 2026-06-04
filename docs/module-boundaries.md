@@ -7,24 +7,21 @@ Purpose: create and manage custom denoms without EVM dependency.
 State:
 - Denom registry keyed by full denom.
 - Admin record per denom.
-- Optional metadata record per denom.
-- Module params.
+- Bank metadata is written through `x/bank` when a denom is created.
 
 Minimal Msg surface:
 - `MsgCreateDenom`
 - `MsgMint`
 - `MsgBurn`
 - `MsgChangeAdmin`
-- `MsgUpdateParams`
 
 Keeper dependencies:
 - Bank keeper interface for mint, burn, send, and metadata operations.
-- Account/address codec where required by the scaffolded SDK version.
 
 Security invariants:
 - Only authorized admins can mint, burn, or transfer admin rights.
 - Total supply changes must match bank keeper mint/burn results.
-- Denom names and metadata lengths must be param-limited.
+- Denom names must pass factory denom validation.
 
 ## `x/dex`
 
@@ -32,50 +29,42 @@ Purpose: deterministic constant-product AMM.
 
 State:
 - Pool registry keyed by pool ID.
-- Asset pair index.
-- LP share accounting.
-- Fee accumulator references.
-- Module params.
+- Next pool ID counter.
+- LP share accounting through minted bank coins.
 
 Minimal Msg surface:
 - `MsgCreatePool`
 - `MsgAddLiquidity`
 - `MsgRemoveLiquidity`
-- `MsgSwapExactIn`
-- `MsgUpdateParams`
+- `MsgSwapExactAmountIn`
 
 Keeper dependencies:
-- Bank keeper interface for escrow, pool balances, and LP share movement.
-- Fees keeper interface for protocol fee accounting.
+- Bank keeper interface for escrow, pool balances, LP share mint/burn, and account transfers.
 
 Security invariants:
 - Integer math only.
 - No pool operation can create value.
 - LP shares must remain backed by pool reserves.
-- User-provided min-out and deadlines protect against stale execution and slippage.
+- User-provided min-out and min-share fields protect against slippage.
 
 ## `x/fees`
 
 Purpose: centralize protocol fee policy and distribution.
 
 State:
-- Fee collector module account reference.
-- Distribution weights.
-- Accrued fee records where needed.
 - Module params.
+- Allowed fee denoms.
 
 Minimal Msg surface:
 - `MsgUpdateParams`
 - Future fee claim/distribution messages only if they cannot be handled by hooks.
 
 Keeper dependencies:
-- Bank keeper interface for balances and transfers.
-- Distribution or auth module interfaces only when explicitly required.
+- Governance authority string for parameter updates.
 
 Security invariants:
-- Distribution weights must sum to the configured denominator.
 - Governance authority controls params.
-- Fee collection must be idempotent for repeated block execution inputs.
+- Fee denom policy must remain explicit and deterministic.
 
 ## `x/bridge`
 

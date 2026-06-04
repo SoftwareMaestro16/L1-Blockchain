@@ -6,7 +6,11 @@
 .
   app/
     app.go
-    module_manager.go
+    keepers.go
+    modules.go
+    services.go
+    module_accounts.go
+    store_keys.go
   cmd/
     l1d/
       main.go
@@ -38,6 +42,8 @@
 ## Ownership Rules
 
 - `app/` wires keepers, stores, module order, hooks, and upgrade handlers.
+- `app/module_accounts.go` owns module account permissions and blocked address policy.
+- `app/store_keys.go` owns KV store key inventory and store key accessors.
 - `cmd/l1d/` owns the Orbitalis daemon entrypoint; build artifacts are named `orbitalisd`.
 - `proto/` owns public wire contracts for Msg, Query, state, and genesis.
 - `x/<module>/keeper/` owns state access and business logic.

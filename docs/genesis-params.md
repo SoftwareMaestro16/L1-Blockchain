@@ -15,17 +15,10 @@ Initial Orbitalis chain choices:
 ## `x/tokenfactory`
 
 Params:
-- `denom_creation_fee`
-- `max_denom_name_len`
-- `max_metadata_len`
-- `minting_enabled`
-- `burning_enabled`
+- None in v1.
 
 Genesis state:
-- `params`
 - `denoms`
-- `admins`
-- `metadata`
 
 Validation:
 - Denom IDs must be canonical and collision-free.
@@ -35,41 +28,32 @@ Validation:
 ## `x/dex`
 
 Params:
-- `swap_fee_bps`
-- `protocol_fee_bps`
-- `max_fee_bps`
-- `min_initial_liquidity`
-- `max_pools`
-- `pool_creation_fee`
+- None in v1. The pool fee constant is part of the module implementation and must not change without a security review and migration plan.
 
 Genesis state:
-- `params`
 - `pools`
-- `lp_positions`
 - `next_pool_id`
 
 Validation:
 - Pool IDs must be unique and monotonic.
 - Asset pairs must be canonical sorted pairs.
 - Reserves and LP supply must be positive for active pools.
-- Fee values must be bounded by `max_fee_bps`.
+- `next_pool_id` must be greater than every imported pool ID.
 
 ## `x/fees`
 
 Params:
-- `collector_module_account`
-- `distribution_weights`
-- `min_distribution_amount`
-- `enabled`
+- `allowed_fee_denoms`
+- `validator_rewards_ratio`
+- `community_pool_ratio`
 
 Genesis state:
 - `params`
-- `accrued_fees`
 
 Validation:
-- Distribution weights must sum exactly to the configured denominator.
-- Collector account must be a valid module account.
-- Disabled fees must not leave partially active distribution routes.
+- v1 allows only the native base denom `norb` in `allowed_fee_denoms`.
+- Validator rewards and community pool ratios must be between `0` and `1`.
+- Fee split ratios must sum exactly to `1`.
 
 ## Upgrade Policy
 
