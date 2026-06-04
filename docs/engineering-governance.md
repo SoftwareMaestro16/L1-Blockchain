@@ -60,7 +60,8 @@ After implementation:
 - Use Conventional Commits with clear scope.
 - Include the reason and improvement in the implementation summary.
 - Run relevant checks before commit.
-- Push completed commits to `origin/main` unless explicitly told not to.
+- Push completed commits to a topic branch and open a PR; direct pushes to `origin/main` are reserved for explicitly approved emergency recovery.
+- Critical/high security findings must be fixed before push/merge, or documented with a linked issue, severity assessment, owner, and decision.
 
 ## Required Response Order
 

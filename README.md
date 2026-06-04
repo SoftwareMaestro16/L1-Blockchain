@@ -46,6 +46,20 @@ buf generate
 
 `buf generate` writes verification output into ignored `.work\bufgen`; checked-in generated Go code lives under `x\*\types`.
 
+Security tooling:
+
+```powershell
+$env:PATH = "$PWD\.work\tools\bin;$env:PATH"
+go mod verify
+New-Item -ItemType Directory -Force .work\security | Out-Null
+cmd /c "govulncheck -scan=package -format json ./... > .work\security\govulncheck.json"
+go run .\scripts\security\govulncheck_triage.go -triage security\govulncheck-triage.json -input .work\security\govulncheck.json
+gosec -conf .gosec.json -exclude-generated -severity high -confidence medium ./...
+gitleaks detect --source . --config .gitleaks.toml --redact --no-banner --verbose
+```
+
+Install pinned local tool versions and review triage policy in [docs/security-tooling.md](docs/security-tooling.md).
+
 ## Local 3-Node Network
 
 ```powershell

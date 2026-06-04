@@ -1,0 +1,39 @@
+{
+  "accepted": [
+    {
+      "id": "GO-2026-4479",
+      "severity": "high",
+      "issue": "ORB-SEC-001",
+      "owner": "security",
+      "decision": "No fixed version is published for github.com/pion/dtls/v2. Orbitalis does not configure DTLS directly; exposure is transitive through networking dependencies. Monitor upstream and retest with symbol-level govulncheck before testnet release."
+    },
+    {
+      "id": "GO-2024-2584",
+      "severity": "high",
+      "issue": "ORB-SEC-002",
+      "owner": "protocol",
+      "decision": "No fixed Cosmos SDK version is published for the slashing-evasion advisory affecting github.com/cosmos/cosmos-sdk. Orbitalis keeps x/slashing enabled and must track upstream remediation before public validator onboarding."
+    },
+    {
+      "id": "GO-2023-1821",
+      "severity": "medium",
+      "issue": "ORB-SEC-003",
+      "owner": "protocol",
+      "decision": "The advisory affects x/crisis behavior. Orbitalis does not expose custom crisis flows in v1, but the dependency is retained through Cosmos SDK. Keep documented until upstream publishes a remediation path."
+    },
+    {
+      "id": "GO-2023-1881",
+      "severity": "medium",
+      "issue": "ORB-SEC-004",
+      "owner": "protocol",
+      "decision": "The advisory affects x/crisis ConstantFee accounting. Orbitalis does not rely on x/crisis fees for protocol security in v1. Keep documented until upstream publishes a remediation path."
+    },
+    {
+      "id": "GO-2025-3442",
+      "severity": "medium",
+      "issue": "ORB-SEC-005",
+      "owner": "networking",
+      "decision": "The advisory is fixed in CometBFT v1.0.1, but Orbitalis is pinned to the Cosmos SDK v0.54.x CometBFT v0.39 family. Track CometBFT/Cosmos compatibility before upgrading consensus dependencies."
+    }
+  ]
+}

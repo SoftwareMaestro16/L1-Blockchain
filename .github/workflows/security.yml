@@ -1,0 +1,164 @@
+name: security
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "security/**"
+  workflow_dispatch:
+  schedule:
+    - cron: "23 2 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION_FILE: go.mod
+  GOVULNCHECK_VERSION: "v1.3.0"
+  GOSEC_VERSION: "v2.22.10"
+  GITLEAKS_VERSION: "v8.30.1"
+
+jobs:
+  govulncheck:
+    name: govulncheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+          cache: true
+
+      - name: Verify module checksums
+        run: go mod verify
+
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@${{ env.GOVULNCHECK_VERSION }}
+
+      - name: Run govulncheck
+        run: |
+          mkdir -p .work/security
+          set +e
+          govulncheck -scan=package -format json ./... > .work/security/govulncheck.json
+          scan_status=$?
+          set -e
+          if [ "$scan_status" -ne 0 ] && [ "$scan_status" -ne 3 ]; then
+            echo "::error::govulncheck failed with exit status ${scan_status}"
+            exit "$scan_status"
+          fi
+          go run ./scripts/security/govulncheck_triage.go -triage security/govulncheck-triage.json -input .work/security/govulncheck.json | tee .work/security/govulncheck-triage.txt
+
+      - name: Summarize govulncheck
+        if: always()
+        run: |
+          {
+            echo "## govulncheck"
+            if [ -f .work/security/govulncheck-triage.txt ]; then
+              cat .work/security/govulncheck-triage.txt
+            else
+              echo "govulncheck did not produce a triage summary."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload govulncheck artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: govulncheck-results
+          path: |
+            .work/security/govulncheck.json
+            .work/security/govulncheck-triage.txt
+          if-no-files-found: ignore
+          retention-days: 14
+
+  gosec:
+    name: gosec high severity
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+          cache: true
+
+      - name: Install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@${{ env.GOSEC_VERSION }}
+
+      - name: Run gosec
+        run: |
+          mkdir -p .work/security
+          gosec -conf .gosec.json -exclude-generated -severity high -confidence medium -fmt sarif -out .work/security/gosec.sarif ./...
+
+      - name: Upload gosec artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gosec-results
+          path: .work/security/gosec.sarif
+          if-no-files-found: ignore
+          retention-days: 14
+
+  secret-scan:
+    name: gitleaks secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+          cache: true
+
+      - name: Install gitleaks
+        run: go install github.com/zricethezav/gitleaks/v8@${{ env.GITLEAKS_VERSION }}
+
+      - name: Run gitleaks
+        run: |
+          mkdir -p .work/security
+          gitleaks detect --source . --config .gitleaks.toml --redact --no-banner --verbose --report-format json --report-path .work/security/gitleaks.json
+
+      - name: Upload gitleaks artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-results
+          path: .work/security/gitleaks.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  dependency-review:
+    name: dependency review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          vulnerability-check: true
+          license-check: false

@@ -1,0 +1,11 @@
+name: Orbitalis CodeQL config
+
+queries:
+  - uses: security-and-quality
+
+paths-ignore:
+  - ".work/**"
+  - "build/**"
+  - ".localnet*/**"
+  - "x/**/types/*.pb.go"
+  - "x/**/types/*.pb.gw.go"

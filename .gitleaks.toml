@@ -1,0 +1,13 @@
+title = "Orbitalis Gitleaks Config"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated, local runtime, and build output paths"
+paths = [
+  '''^\.work/''',
+  '''^build/''',
+  '''^\.localnet.*?/''',
+  '''^x/.*/types/.*\.pb(\.gw)?\.go$'''
+]

@@ -21,7 +21,8 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
-var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+// Speedtest uses pseudo-randomness only for non-security load generation.
+var r = rand.New(rand.NewSource(time.Now().UnixNano())) // #nosec G404
 
 func NewBankSpeedTest() *cobra.Command {
 	cmd := &cobra.Command{

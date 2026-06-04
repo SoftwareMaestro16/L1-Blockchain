@@ -60,3 +60,5 @@ After each implementation increment:
 - Next refactor proposal.
 
 The detailed governance loop lives in [Engineering Governance](engineering-governance.md) and is mandatory before code changes, after tests, and before commits.
+
+Automated security tooling and dependency update policy live in [Security Tooling And Dependency Hygiene](security-tooling.md). These checks are required pre-audit guardrails, not replacements for manual Cosmos SDK consensus and module review.
