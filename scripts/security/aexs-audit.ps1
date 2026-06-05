@@ -120,6 +120,37 @@ function Test-AexsTextAny {
   return $false
 }
 
+function Get-AexsMarkdownSection {
+  param([string]$Text, [string]$Heading)
+  $lines = $Text -split "`r?`n"
+  $section = @()
+  $capture = $false
+  foreach ($line in $lines) {
+    if ($line -eq "## $Heading") {
+      $capture = $true
+      continue
+    }
+    if ($capture -and $line -match '^##\s+') {
+      break
+    }
+    if ($capture) {
+      $section += $line
+    }
+  }
+  return ($section -join "`n")
+}
+
+function Get-AexsMissingTerms {
+  param([string]$Text, [string[]]$Terms)
+  $missing = @()
+  foreach ($term in $Terms) {
+    if (-not (Test-AexsTextAny -Text $Text -Terms @($term))) {
+      $missing += $term
+    }
+  }
+  return $missing
+}
+
 function Get-AexsAtomicTaskRecords {
   param(
     [string]$Text,
@@ -391,10 +422,64 @@ $requiredSourceTerms = @(
   "Coverage Matrix"
 )
 
+$campaignSetupSection = Get-AexsMarkdownSection -Text $taskText -Heading "Campaign Setup Tasks"
+$scenarioGeneratorSection = Get-AexsMarkdownSection -Text $taskText -Heading "Scenario Generator Tasks"
+
+$requiredCampaignTerms = @(
+  "Create a deterministic campaign id.",
+  "Record git commit, branch, dirty status, Go version, OS, and test command",
+  "Record the fuzz seed list.",
+  "Record the target modules.",
+  "stateless fuzzing",
+  "stateful multi-block fuzzing",
+  "adversarial red-team fuzzing",
+  "deterministic replay",
+  "stress mode",
+  "chaos mode",
+  "in-memory app runner",
+  "single-validator localnet",
+  "multi-validator localnet",
+  "sharding simulator",
+  "first critical exploit",
+  "max run count",
+  "max wall-clock duration",
+  "coverage threshold reached",
+  "deterministic divergence"
+)
+
+$requiredScenarioTerms = @(
+  "Generate random bank transfer sequences.",
+  "Generate random staking, delegation, unbonding, redelegation, and reward",
+  "Generate random validator lifecycle and slashing evidence sequences.",
+  "Generate random fee and spam bursts.",
+  "Generate random tokenfactory create, mint, burn, and admin sequences.",
+  "Generate random DEX create-pool, add-liquidity, remove-liquidity, and swap",
+  "Generate random governance proposal, vote, and parameter update sequences.",
+  "Generate random identity domain registration, auction, renewal, resolver",
+  "Generate random AVM deploy, external call, internal call, bounced call",
+  "Generate random async message, queue, delayed execution, bounce, and refund",
+  "routing, and shard activation scenarios.",
+  "Preserve seed and step list for every generated scenario."
+)
+
 $sourceFailures = @()
 foreach ($term in $requiredSourceTerms) {
   if (-not (Test-AexsTextAny -Text $taskText -Terms @($term)) -and -not (Test-AexsTextAny -Text $pipelineText -Terms @($term))) {
     $sourceFailures += "missing source term: $term"
+  }
+}
+if ([string]::IsNullOrWhiteSpace($campaignSetupSection)) {
+  $sourceFailures += "missing Campaign Setup Tasks section"
+} else {
+  foreach ($term in @(Get-AexsMissingTerms -Text $campaignSetupSection -Terms $requiredCampaignTerms)) {
+    $sourceFailures += "missing campaign setup term: $term"
+  }
+}
+if ([string]::IsNullOrWhiteSpace($scenarioGeneratorSection)) {
+  $sourceFailures += "missing Scenario Generator Tasks section"
+} else {
+  foreach ($term in @(Get-AexsMissingTerms -Text $scenarioGeneratorSection -Terms $requiredScenarioTerms)) {
+    $sourceFailures += "missing scenario generator term: $term"
   }
 }
 
@@ -503,6 +588,215 @@ $testCommands = @(
   "go test -run '^$' -fuzz <target> -fuzztime <duration>"
 )
 
+$stopConditions = @(
+  [ordered]@{ id = "first_critical_exploit"; label = "first critical exploit"; enabled = $true; action = "stop immediately and write exploit report" },
+  [ordered]@{ id = "max_run_count"; label = "max run count"; enabled = $true; value = 10000; action = "stop after deterministic run budget" },
+  [ordered]@{ id = "max_wall_clock_duration"; label = "max wall-clock duration"; enabled = $true; value = "4h"; action = "stop after bounded campaign duration" },
+  [ordered]@{ id = "coverage_threshold_reached"; label = "coverage threshold reached"; enabled = $true; value = "95% planned coverage and 100% mandatory invariant execution for selected scope"; action = "stop successful campaign scope" },
+  [ordered]@{ id = "deterministic_divergence"; label = "deterministic divergence"; enabled = $true; action = "stop immediately and preserve replay inputs" }
+)
+
+$scenarioGenerators = @(
+  [ordered]@{
+    id                 = "bank_transfer_sequences"
+    name               = "random bank transfer sequences"
+    flow_covered       = "bank send, multi-send, module transfer, balance query"
+    state_transitions  = "account balances, module balances, total supply checks"
+    attack_surfaces    = "double spend, malformed address, zero address, overflow, partial multi-send"
+    invariant_targets  = "no negative balances; total supply consistency"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  },
+  [ordered]@{
+    id                 = "staking_lifecycle_sequences"
+    name               = "random staking, delegation, unbonding, redelegation, and reward sequences"
+    flow_covered       = "create validator, delegate, redelegate, unbond, reward eligibility"
+    state_transitions  = "validator power, delegator shares, staking pool, unbonding records"
+    attack_surfaces    = "stake grinding, reward farming, non-naet bond, slash evasion"
+    invariant_targets  = "validator set consistency; staking pool consistency"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  },
+  [ordered]@{
+    id                 = "validator_slashing_sequences"
+    name               = "random validator lifecycle and slashing evidence sequences"
+    flow_covered       = "validator create/edit, liveness, downtime, equivocation evidence"
+    state_transitions  = "validator status, jail/tombstone state, slash amount, active set removal"
+    attack_surfaces    = "stale evidence, malformed proof, duplicate evidence, redelegation evasion"
+    invariant_targets  = "deterministic evidence; slash accounting consistency"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  },
+  [ordered]@{
+    id                 = "fee_spam_bursts"
+    name               = "random fee and spam bursts"
+    flow_covered       = "ante fee validation, fee denom policy, fee split, spam admission"
+    state_transitions  = "fee collection, burn/treasury/reward accounting, rejected tx state"
+    attack_surfaces    = "fee underpayment, non-naet fee, missing fee, fee-griefing spam"
+    invariant_targets  = "naet-only fees; exact fee distribution"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  },
+  [ordered]@{
+    id                 = "tokenfactory_admin_sequences"
+    name               = "random tokenfactory create, mint, burn, and admin sequences"
+    flow_covered       = "create denom, mint, burn, change admin, metadata query"
+    state_transitions  = "denom state, supply, admin authority, bank metadata"
+    attack_surfaces    = "unauthorized mint/burn, admin takeover, native denom spoof, burn-from mismatch"
+    invariant_targets  = "supply delta exact; authority consistency"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  },
+  [ordered]@{
+    id                 = "dex_pool_swap_sequences"
+    name               = "random DEX create-pool, add-liquidity, remove-liquidity, and swap sequences"
+    flow_covered       = "create pool, add liquidity, remove liquidity, swap, LP mint/burn"
+    state_transitions  = "reserves, LP supply, pair index, module balances"
+    attack_surfaces    = "pool drain, reserve desync, LP inflation, slippage bypass, rounding exploit"
+    invariant_targets  = "reserves match balances; LP supply matches shares"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  },
+  [ordered]@{
+    id                 = "governance_param_sequences"
+    name               = "random governance proposal, vote, and parameter update sequences"
+    flow_covered       = "proposal, deposit, vote, tally, delayed param execution"
+    state_transitions  = "proposal status, vote state, module params, execution queue"
+    attack_surfaces    = "governance replay, proposal spam, parameter abuse, upgrade hijack"
+    invariant_targets  = "authorized params only; hard bounds preserved"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  },
+  [ordered]@{
+    id                 = "identity_domain_sequences"
+    name               = "random identity domain registration, auction, renewal, resolver, reverse lookup, and subdomain sequences"
+    flow_covered       = "domain auction, assign, renew, expire, resolver update, reverse lookup, subdomain"
+    state_transitions  = "domain record, resolver record, reverse mapping, NFT representation"
+    attack_surfaces    = "resolver hijack, expired reuse, auction manipulation, subdomain collision"
+    invariant_targets  = "domain uniqueness; resolver validity; owner consistency"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  },
+  [ordered]@{
+    id                 = "avm_contract_sequences"
+    name               = "random AVM deploy, external call, internal call, bounced call, query, and migrate sequences"
+    flow_covered       = "deploy, external/internal/bounced call, query, migrate"
+    state_transitions  = "contract state, gas use, output messages, migration state"
+    attack_surfaces    = "crash input, infinite loop, bad bytecode, sandbox escape, nondeterministic host behavior"
+    invariant_targets  = "bounded gas; deterministic state; no panic"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  },
+  [ordered]@{
+    id                 = "async_queue_sequences"
+    name               = "random async message, queue, delayed execution, bounce, and refund sequences"
+    flow_covered       = "async send, enqueue, delayed execution, bounce, refund, receipt"
+    state_transitions  = "message state, queue state, receipt state, refund marker"
+    attack_surfaces    = "message replay, queue flood, double refund, stale receipt replay"
+    invariant_targets  = "deterministic ordering; refund uniqueness; no double spend"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  },
+  [ordered]@{
+    id                 = "load_routing_sharding_sequences"
+    name               = "random LOAD_SCORE, routing, and shard activation scenarios"
+    flow_covered       = "LOAD_SCORE update, route decision, shard activation, routing epoch"
+    state_transitions  = "load window, route output, shard assignment, shard activation state"
+    attack_surfaces    = "load poisoning, route desync, shard overload targeting, priority fee gaming"
+    invariant_targets  = "score bounds; MAX_DELTA; deterministic route; no starvation"
+    seed_required      = $true
+    step_list_required = $true
+    status             = "planned_not_executed"
+  }
+)
+
+$invalidStopConditions = @()
+foreach ($condition in $stopConditions) {
+  $conditionReasons = @()
+  foreach ($field in @("id", "label", "action")) {
+    if ([string]::IsNullOrWhiteSpace([string]$condition[$field])) {
+      $conditionReasons += "missing $field"
+    }
+  }
+  if ($condition["enabled"] -ne $true) {
+    $conditionReasons += "condition disabled"
+  }
+  $condition["valid"] = $conditionReasons.Count -eq 0
+  $condition["invalid_reasons"] = $conditionReasons
+  if ($conditionReasons.Count -gt 0) {
+    $invalidStopConditions += $condition
+  }
+}
+
+$invalidScenarioGenerators = @()
+foreach ($scenario in $scenarioGenerators) {
+  $scenarioReasons = @()
+  foreach ($field in @(
+      "id",
+      "name",
+      "flow_covered",
+      "state_transitions",
+      "attack_surfaces",
+      "invariant_targets",
+      "status"
+    )) {
+    if ([string]::IsNullOrWhiteSpace([string]$scenario[$field])) {
+      $scenarioReasons += "missing $field"
+    }
+  }
+  if ($scenario["seed_required"] -ne $true) {
+    $scenarioReasons += "seed not required"
+  }
+  if ($scenario["step_list_required"] -ne $true) {
+    $scenarioReasons += "step list not required"
+  }
+  $scenario["valid"] = $scenarioReasons.Count -eq 0
+  $scenario["invalid_reasons"] = $scenarioReasons
+  if ($scenarioReasons.Count -gt 0) {
+    $invalidScenarioGenerators += $scenario
+  }
+}
+
+$campaignSetup = [ordered]@{
+  campaign_id       = $campaignId
+  git_commit        = $commit
+  git_branch        = $branch
+  git_dirty_status  = $dirtyStatus
+  go_version        = Get-AexsGoVersion
+  os                = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription
+  test_commands     = $testCommands
+  fuzz_seeds        = $fuzzSeeds
+  target_modules    = @($moduleRows | ForEach-Object { $_["module"] })
+  runtime_modes     = @($runtimeModes | ForEach-Object { [ordered]@{ name = $_; enabled = $true; source = "TO_AUDIT.md" } })
+  simulator_modes   = @($simulatorModes | ForEach-Object { [ordered]@{ name = $_; enabled = $true; source = "TO_AUDIT.md" } })
+  stop_conditions   = $stopConditions
+  setup_complete    = ($invalidStopConditions.Count -eq 0)
+}
+
+$scenarioCatalog = [ordered]@{
+  campaign_id             = $campaignId
+  generator_count         = $scenarioGenerators.Count
+  invalid_generator_count = $invalidScenarioGenerators.Count
+  invalid_generators      = @($invalidScenarioGenerators | ForEach-Object { $_["id"] })
+  seed_policy             = [ordered]@{
+    deterministic_seed_required = $true
+    step_list_required          = $true
+    output_path                 = ".work/aexs/scenarios/"
+    replay_requirement          = "Every generated scenario must preserve seed and exact step list."
+  }
+  generators              = $scenarioGenerators
+}
+
 $summary = [ordered]@{
   campaign_id                         = $campaignId
   output_dir                          = $campaignDir
@@ -520,6 +814,11 @@ $summary = [ordered]@{
   simulator_modes                     = $simulatorModes
   target_modules                      = @($moduleRows | ForEach-Object { $_["module"] })
   module_count                        = $moduleRows.Count
+  stop_conditions                     = $stopConditions
+  invalid_stop_condition_count        = $invalidStopConditions.Count
+  scenario_generator_count            = $scenarioGenerators.Count
+  invalid_scenario_generator_count    = $invalidScenarioGenerators.Count
+  scenario_generators                 = @($scenarioGenerators | ForEach-Object { $_["id"] })
   atomic_task_count                   = $atomicTasks.Count
   invalid_atomic_task_count           = $invalidAtomicTasks.Count
   invalid_atomic_tasks                = @($invalidAtomicTasks | ForEach-Object { $_["task_id"] })
@@ -540,11 +839,16 @@ $summary = [ordered]@{
 $coveragePath = Join-Path $campaignDir "coverage-matrix.json"
 $atomicTasksPath = Join-Path $campaignDir "atomic-tasks.json"
 $atomicTasksMarkdownPath = Join-Path $campaignDir "atomic-tasks.md"
+$campaignSetupPath = Join-Path $campaignDir "campaign-setup.json"
+$scenarioCatalogPath = Join-Path $campaignDir "scenario-generator.json"
+$scenarioCatalogMarkdownPath = Join-Path $campaignDir "scenario-generator.md"
 $summaryPath = Join-Path $campaignDir "summary.json"
 $resultPath = Join-Path $campaignDir "AUDIT_RESULT.md"
 $taskCopyPath = Join-Path $campaignDir "TO_AUDIT.md"
 $moduleRows | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $coveragePath
 $atomicTasks | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $atomicTasksPath
+$campaignSetup | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $campaignSetupPath
+$scenarioCatalog | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $scenarioCatalogPath
 $summary | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $summaryPath
 Copy-Item -LiteralPath $taskPath -Destination $taskCopyPath -Force
 
@@ -565,6 +869,25 @@ foreach ($task in $atomicTasks) {
 }
 $taskReport | Set-Content -LiteralPath $atomicTasksMarkdownPath
 
+$scenarioReport = @()
+$scenarioReport += "# AEXS Scenario Generator Catalog"
+$scenarioReport += ""
+$scenarioReport += "- campaign id: $campaignId"
+$scenarioReport += "- generator count: $($scenarioGenerators.Count)"
+$scenarioReport += "- invalid generator count: $($invalidScenarioGenerators.Count)"
+$scenarioReport += "- seed policy: deterministic seed and exact step list required for every generated scenario"
+$scenarioReport += ""
+$scenarioReport += "| Scenario | Flow | State transitions | Attack surfaces | Invariants | Status |"
+$scenarioReport += "| --- | --- | --- | --- | --- | --- |"
+foreach ($scenario in $scenarioGenerators) {
+  $flow = ([string]$scenario["flow_covered"]).Replace("|", "/")
+  $state = ([string]$scenario["state_transitions"]).Replace("|", "/")
+  $attack = ([string]$scenario["attack_surfaces"]).Replace("|", "/")
+  $invariant = ([string]$scenario["invariant_targets"]).Replace("|", "/")
+  $scenarioReport += "| $($scenario["id"]) | $flow | $state | $attack | $invariant | $($scenario["status"]) |"
+}
+$scenarioReport | Set-Content -LiteralPath $scenarioCatalogMarkdownPath
+
 $report = @()
 $report += "# AEXS Audit Result"
 $report += ""
@@ -577,6 +900,9 @@ $report += "- planned coverage: $plannedCoverageAverage%"
 $report += "- mandatory invariant pass rate: $mandatoryInvariantPassRate%"
 $report += "- atomic task records: $($atomicTasks.Count)"
 $report += "- invalid atomic task records: $($invalidAtomicTasks.Count)"
+$report += "- stop conditions: $($stopConditions.Count)"
+$report += "- scenario generators: $($scenarioGenerators.Count)"
+$report += "- invalid scenario generators: $($invalidScenarioGenerators.Count)"
 $report += ""
 $report += "## Gate Decision"
 $report += ""
@@ -605,6 +931,12 @@ $report | Set-Content -LiteralPath $resultPath
 
 if ($sourceFailures.Count -gt 0) {
   throw "AEXS audit source validation failed: $($sourceFailures -join '; ')"
+}
+if ($invalidStopConditions.Count -gt 0) {
+  throw "AEXS stop condition validation failed for condition(s): $(@($invalidStopConditions | ForEach-Object { $_["id"] }) -join ', ')"
+}
+if ($invalidScenarioGenerators.Count -gt 0) {
+  throw "AEXS scenario generator validation failed for generator(s): $(@($invalidScenarioGenerators | ForEach-Object { $_["id"] }) -join ', ')"
 }
 if ($invalidAtomicTasks.Count -gt 0) {
   throw "AEXS atomic task validation failed for task(s): $(@($invalidAtomicTasks | ForEach-Object { $_["task_id"] }) -join ', ')"

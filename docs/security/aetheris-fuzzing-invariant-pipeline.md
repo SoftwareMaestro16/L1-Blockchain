@@ -343,13 +343,17 @@ The pre-campaign structural audit is implemented by:
 
 The runner validates `TO_AUDIT.md`, this pipeline document, the mandatory
 module list, atomic task counts, mandatory coverage matrix rows, per-task
-defensive/adversarial records, reproduction seeds, and evidence links. It
-writes deterministic campaign output under `.work\aexs\`:
+defensive/adversarial records, reproduction seeds, campaign setup fields,
+runtime/simulator modes, stop conditions, scenario generator coverage, and
+evidence links. It writes deterministic campaign output under `.work\aexs\`:
 
 - `summary.json`;
+- `campaign-setup.json`;
 - `coverage-matrix.json`;
 - `atomic-tasks.json`;
 - `atomic-tasks.md`;
+- `scenario-generator.json`;
+- `scenario-generator.md`;
 - `AUDIT_RESULT.md`;
 - `TO_AUDIT.md`.
 
@@ -370,6 +374,15 @@ Every generated atomic task record contains:
 - adversarial simulation result;
 - pass/fail result;
 - reproduction seed or exact manual reproduction steps.
+
+Every campaign setup record contains the deterministic campaign id, git commit,
+branch, dirty status, Go version, OS, test command set, fuzz seed list, target
+modules, enabled runtime modes, enabled simulator modes, and stop conditions.
+
+Every scenario generator record contains the scenario family id, flow covered,
+state transition covered, attack surface covered, invariant targets, execution
+status, and explicit requirements to preserve deterministic seed and exact step
+list for replay.
 
 ## Chaos Mode
 

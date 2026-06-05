@@ -54,6 +54,9 @@ try {
   Assert-True ($result.atomic_task_count -ge 120) "AEXS must generate at least five atomic task records for every target module"
   Assert-True ($result.invalid_atomic_task_count -eq 0) "AEXS must not generate invalid atomic task records"
   Assert-True (@($result.modules_with_invalid_atomic_tasks).Count -eq 0) "no module can have invalid atomic task records"
+  Assert-True ($result.invalid_stop_condition_count -eq 0) "AEXS must not generate invalid stop conditions"
+  Assert-True ($result.scenario_generator_count -ge 11) "AEXS must record all required scenario generator families"
+  Assert-True ($result.invalid_scenario_generator_count -eq 0) "AEXS must not generate invalid scenario generator records"
 
   foreach ($module in @(
       "app",
@@ -76,8 +79,76 @@ try {
     Assert-Contains -Values $result.target_modules -Expected $module -Message "AEXS target module missing: $module"
   }
 
-  foreach ($name in @("summary.json", "coverage-matrix.json", "atomic-tasks.json", "atomic-tasks.md", "AUDIT_RESULT.md", "TO_AUDIT.md")) {
+  foreach ($name in @(
+      "summary.json",
+      "campaign-setup.json",
+      "coverage-matrix.json",
+      "atomic-tasks.json",
+      "atomic-tasks.md",
+      "scenario-generator.json",
+      "scenario-generator.md",
+      "AUDIT_RESULT.md",
+      "TO_AUDIT.md"
+    )) {
     Assert-True (Test-Path -LiteralPath (Join-Path $result.output_dir $name)) "AEXS output missing $name"
+  }
+
+  $campaignSetup = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "campaign-setup.json") | ConvertFrom-Json
+  Assert-True ($campaignSetup.campaign_id -eq $result.campaign_id) "campaign setup campaign id must match summary"
+  Assert-True ($campaignSetup.git_commit -eq $result.git_commit) "campaign setup git commit must match summary"
+  Assert-True ($campaignSetup.setup_complete -eq $true) "campaign setup must be complete"
+  Assert-True (@($campaignSetup.fuzz_seeds).Count -eq @($result.fuzz_seeds).Count) "campaign setup must record fuzz seed list"
+  Assert-True (@($campaignSetup.target_modules).Count -eq @($result.target_modules).Count) "campaign setup must record target modules"
+  foreach ($mode in @(
+      "stateless fuzzing",
+      "stateful multi-block fuzzing",
+      "adversarial red-team fuzzing",
+      "deterministic replay",
+      "stress mode",
+      "chaos mode"
+    )) {
+    Assert-Contains -Values @($campaignSetup.runtime_modes | ForEach-Object { $_.name }) -Expected $mode -Message "runtime mode missing: $mode"
+  }
+  foreach ($mode in @(
+      "in-memory app runner",
+      "single-validator localnet",
+      "multi-validator localnet",
+      "sharding simulator"
+    )) {
+    Assert-Contains -Values @($campaignSetup.simulator_modes | ForEach-Object { $_.name }) -Expected $mode -Message "simulator mode missing: $mode"
+  }
+  foreach ($condition in @(
+      "first_critical_exploit",
+      "max_run_count",
+      "max_wall_clock_duration",
+      "coverage_threshold_reached",
+      "deterministic_divergence"
+    )) {
+    Assert-Contains -Values @($campaignSetup.stop_conditions | ForEach-Object { $_.id }) -Expected $condition -Message "stop condition missing: $condition"
+  }
+  Assert-True (@($campaignSetup.stop_conditions | Where-Object { $_.valid -ne $true }).Count -eq 0) "all stop conditions must be valid"
+
+  $scenarioCatalog = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "scenario-generator.json") | ConvertFrom-Json
+  Assert-True ($scenarioCatalog.campaign_id -eq $result.campaign_id) "scenario catalog campaign id must match summary"
+  Assert-True ($scenarioCatalog.generator_count -eq $result.scenario_generator_count) "scenario generator count must match summary"
+  Assert-True ($scenarioCatalog.invalid_generator_count -eq 0) "scenario catalog must not contain invalid generators"
+  Assert-True ($scenarioCatalog.seed_policy.deterministic_seed_required -eq $true) "scenario catalog must require deterministic seeds"
+  Assert-True ($scenarioCatalog.seed_policy.step_list_required -eq $true) "scenario catalog must require step lists"
+  foreach ($scenario in $scenarioCatalog.generators) {
+    foreach ($field in @(
+        "id",
+        "name",
+        "flow_covered",
+        "state_transitions",
+        "attack_surfaces",
+        "invariant_targets",
+        "status"
+      )) {
+      Assert-True (-not [string]::IsNullOrWhiteSpace([string]$scenario.$field)) "scenario generator $($scenario.id) missing $field"
+    }
+    Assert-True ($scenario.seed_required -eq $true) "scenario generator $($scenario.id) must require seed preservation"
+    Assert-True ($scenario.step_list_required -eq $true) "scenario generator $($scenario.id) must require step list preservation"
+    Assert-True ($scenario.valid -eq $true) "scenario generator $($scenario.id) must be valid"
   }
 
   $coverage = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "coverage-matrix.json") | ConvertFrom-Json
