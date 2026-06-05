@@ -1740,6 +1740,176 @@ function Get-AexsInvariantChecklistOverride {
       mutation_inputs     = "future version no-op migration, corrupted version map, reordered module state, malformed export, restart after migration"
       expected_rejection  = "migration cannot alter roots or invariants outside explicit migration contract"
     }
+    "DEXINV-01" = [ordered]@{
+      flow                = "DEX reserve and module account balance reconciliation"
+      state               = "Pool reserves match module account balances"
+      attack              = "reserve desync through failed bank send, direct module account drift, corrupted pool reserves, swap/add/remove partial update"
+      expected_behavior   = "every accepted DEX transition reconciles pool reserve fields against module account balances for both pool denoms"
+      expected_events     = "pool reserve, add liquidity, remove liquidity, and swap events reconcile to module account balance deltas"
+      expected_error_path = "reserve mismatch rejects or records a critical invariant failure before pool state is accepted"
+      mutation_inputs     = "corrupted reserve field, missing bank movement, partial add liquidity, partial swap, export/import with mismatched module balances"
+      expected_rejection  = "pool state cannot commit when reserves do not match module account balances"
+    }
+    "DEXINV-02" = [ordered]@{
+      flow                = "DEX LP supply and pool total share reconciliation"
+      state               = "LP supply matches pool total shares"
+      attack              = "LP inflation, forged LP mint, missing LP burn, corrupted pool total shares, export/import LP supply drift"
+      expected_behavior   = "LP token total supply and pool total shares move by the same deterministic delta on add/remove liquidity"
+      expected_events     = "LP mint and burn events reconcile exactly to pool total share changes"
+      expected_error_path = "LP supply/share mismatch rejects before liquidity state mutation is committed"
+      mutation_inputs     = "oversized LP mint, wrong LP denom, remove liquidity without burn, corrupted total shares, duplicate pool id export"
+      expected_rejection  = "LP supply cannot diverge from pool total shares"
+    }
+    "DEXINV-03" = [ordered]@{
+      flow                = "DEX liquidity non-negativity across reserves and shares"
+      state               = "No negative liquidity"
+      attack              = "underflow during remove liquidity, zero-liquidity pool manipulation, oversized withdrawal, signed integer conversion"
+      expected_behavior   = "reserves, total shares, and user LP burns are checked before arithmetic that could underflow"
+      expected_events     = "no negative liquidity, negative reserve, or negative share event is emitted"
+      expected_error_path = "negative-liquidity path rejects before bank movement or pool mutation"
+      mutation_inputs     = "remove more shares than supply, zero reserve swap, max amount subtraction, tiny liquidity rounding edge"
+      expected_rejection  = "DEX arithmetic cannot produce negative reserves, shares, or output liquidity"
+    }
+    "DEXINV-04" = [ordered]@{
+      flow                = "DEX LP denom authenticity"
+      state               = "No fake LP token"
+      attack              = "wrong LP denom burn, forged LP token, pool id collision, tokenfactory spoofed lp/{pool_id} denom"
+      expected_behavior   = "remove liquidity accepts only the canonical LP denom derived from the exact pool id"
+      expected_events     = "LP burn events always reference the canonical pool LP denom"
+      expected_error_path = "fake LP token rejects before reserves, shares, or module balances mutate"
+      mutation_inputs     = "wrong lp denom, duplicate pool id, forged lp/{pool_id}, non-LP denom, tokenfactory-created LP-like denom"
+      expected_rejection  = "fake LP tokens cannot redeem reserves or mutate pool state"
+    }
+    "DEXINV-05" = [ordered]@{
+      flow                = "DEX swap output non-negativity"
+      state               = "Swap output is non-negative"
+      attack              = "rounding underflow, fee-adjusted input underflow, tiny reserve edge, max amount overflow, zero-input swap"
+      expected_behavior   = "swap math rejects zero/invalid inputs and computes output with non-negative bounded integer arithmetic"
+      expected_events     = "swap events never contain negative output or impossible reserve delta"
+      expected_error_path = "invalid swap output rejects before bank send or reserve mutation"
+      mutation_inputs     = "zero amount in, max amount in, tiny reserves, fee rounding edge, corrupted reserve signs"
+      expected_rejection  = "swap cannot produce negative output or commit impossible reserve deltas"
+    }
+    "DEXINV-06" = [ordered]@{
+      flow                = "DEX slippage bound enforcement"
+      state               = "Slippage bounds are enforced"
+      attack              = "slippage bypass, stale quote replay, min-output off-by-one, rounded output below bound, route manipulation"
+      expected_behavior   = "swap execution compares deterministic output against user min-output before any state mutation"
+      expected_events     = "no successful swap event appears when output is below the requested slippage bound"
+      expected_error_path = "slippage failure rejects before reserve, LP, or bank state mutation"
+      mutation_inputs     = "min output one above computed amount, stale quote, tiny reserves, rounded fee output, replayed route"
+      expected_rejection  = "swap below slippage bound cannot execute or move funds"
+    }
+    "DEXINV-07" = [ordered]@{
+      flow                = "DEX fee-adjusted constant-product preservation"
+      state               = "Constant-product constraints hold after fee-adjusted swaps"
+      attack              = "constant-product break, rounding leak, fee bypass, reserve ordering bug, repeated tiny swap drain"
+      expected_behavior   = "post-swap reserves satisfy the configured fee-adjusted constant-product inequality"
+      expected_events     = "swap events preserve or improve the expected fee-adjusted invariant within deterministic rounding rules"
+      expected_error_path = "constant-product violation rejects before reserve or bank state mutation"
+      mutation_inputs     = "tiny repeated swaps, extreme reserve ratio, max input, zero fee edge, denom order reversal"
+      expected_rejection  = "fee-adjusted swaps cannot reduce reserves below the constant-product constraint"
+    }
+    "DEXINV-08" = [ordered]@{
+      flow                = "DEX atomic bank movement and pool state rollback"
+      state               = "Failed bank movement cannot mutate pool state"
+      attack              = "failed send partial update, insufficient funds after reserve write, module account error, LP mint failure after reserve mutation"
+      expected_behavior   = "DEX message handlers commit pool state only after all required bank movements succeed in the cached context"
+      expected_events     = "failed bank movement emits no successful pool, reserve, swap, or LP event"
+      expected_error_path = "bank movement failure rolls back reserve, share, LP supply, and module balance changes"
+      mutation_inputs     = "insufficient funds, blocked module account send, bad denom, LP mint failure, bank send panic surrogate in simulator"
+      expected_rejection  = "failed bank movement cannot leave partially mutated pool state"
+    }
+    "LOAD-01" = [ordered]@{
+      flow                = "LOAD_SCORE range enforcement"
+      state               = '`LOAD_SCORE` is always in `[0,1]`'
+      attack              = "out-of-range metric injection, overflowed metric normalization, negative metric value, corrupted genesis params"
+      expected_behavior   = "load calculation clamps or rejects metric inputs so the final score remains in the protocol range"
+      expected_events     = "load update events record only values between 0 and 1"
+      expected_error_path = "invalid metric or param rejects before load state mutation"
+      mutation_inputs     = "negative mempool score, block utilization above one, max integer execution time, invalid weight sum, corrupted params"
+      expected_rejection  = "LOAD_SCORE outside [0,1] cannot be committed"
+    }
+    "LOAD-02" = [ordered]@{
+      flow                = "deterministic EMA smoothing"
+      state               = "EMA smoothing is deterministic"
+      attack              = "node-local latency input, floating-point drift, map-order metric aggregation, wall-clock metric sampling"
+      expected_behavior   = "EMA uses protocol constants and deterministic fixed-point or canonical arithmetic for identical inputs"
+      expected_events     = "same input window produces identical EMA and load update events on replay"
+      expected_error_path = "non-deterministic metric source is rejected from consensus load state"
+      mutation_inputs     = "same metrics in different map insertion order, repeated replay, platform variation, node-local latency sample"
+      expected_rejection  = "EMA smoothing cannot depend on local time, local latency, random values, or unordered iteration"
+    }
+    "LOAD-03" = [ordered]@{
+      flow                = "LOAD_SCORE spike cap enforcement"
+      state               = '`LOAD_SCORE` cannot jump beyond `MAX_DELTA`'
+      attack              = "spam burst, gas spike, execution-time spike, oscillating load poisoning, EMA slow poison"
+      expected_behavior   = "per-block score update applies the MAX_DELTA cap after deterministic EMA calculation"
+      expected_events     = "load update event delta never exceeds MAX_DELTA"
+      expected_error_path = "uncapped load jump is rejected or reduced before state mutation"
+      mutation_inputs     = "zero-to-one load burst, alternating max/min metrics, max mempool spam, saturated gas block"
+      expected_rejection  = "LOAD_SCORE cannot move by more than MAX_DELTA in one block"
+    }
+    "LOAD-04" = [ordered]@{
+      flow                = "deterministic zone routing decision"
+      state               = "Same transaction and state produce the same zone decision"
+      attack              = "routing hint manipulation, message classification ambiguity, validator preference injection, map-order tx metadata"
+      expected_behavior   = "zone selection is a pure function of stable tx class, protocol state, and deterministic load state"
+      expected_events     = "same transaction and state emit the same zone route decision on replay"
+      expected_error_path = "ambiguous or unknown tx class rejects before route state is accepted"
+      mutation_inputs     = "unknown msg type, conflicting routing hint, same tx with different local metadata order, validator-local preference"
+      expected_rejection  = "same tx/state cannot route to different zones"
+    }
+    "LOAD-05" = [ordered]@{
+      flow                = "deterministic shard routing decision"
+      state               = "Same transaction and state produce the same shard decision"
+      attack              = "routing epoch manipulation, active shard count mismatch, primary actor ambiguity, hash tie-break manipulation"
+      expected_behavior   = "shard selection uses canonical zone id, primary actor, routing epoch, active shard count, and deterministic hash"
+      expected_events     = "same transaction and state emit the same shard id on replay"
+      expected_error_path = "missing primary actor or zero active shards rejects before shard decision is committed"
+      mutation_inputs     = "empty primary actor, zero active shards, changed local shard order, same tx across routing epoch boundary"
+      expected_rejection  = "same tx/state cannot route to different shards"
+    }
+    "LOAD-06" = [ordered]@{
+      flow                = "routing loop prevention"
+      state               = "No routing loop"
+      attack              = "cross-zone route cycle, async message bounce loop, self-routing route hint, recursive message forwarding"
+      expected_behavior   = "routing records destination once per routing step and bounded message forwarding prevents cyclic route execution"
+      expected_events     = "route and message events contain bounded acyclic routing path markers"
+      expected_error_path = "looping route or exceeded route depth rejects before queue or route mutation"
+      mutation_inputs     = "destination equals source with forwarding, A->B->A route sequence, malformed async route, bounce recursion"
+      expected_rejection  = "routing cannot create an infinite loop or unbounded message cycle"
+    }
+    "LOAD-07" = [ordered]@{
+      flow                = "shard starvation prevention"
+      state               = "No shard starvation"
+      attack              = "priority queue starvation, high-fee monopolization, skewed shard assignment, delayed low-priority queue never drains"
+      expected_behavior   = "deterministic priority and scheduling rules preserve bounded progress for valid queued shard work"
+      expected_events     = "scheduler and shard events show bounded deferral instead of permanent starvation"
+      expected_error_path = "priority or load policy that would permanently starve a shard fails invariant checks"
+      mutation_inputs     = "continuous high-priority spam, skewed primary actor set, repeated routing epoch changes, overloaded single shard"
+      expected_rejection  = "valid shard work cannot be starved indefinitely by fee, priority, or routing manipulation"
+    }
+    "LOAD-08" = [ordered]@{
+      flow                = "hot-zone monopolization resistance"
+      state               = "No hot-zone monopolization"
+      attack              = "single-zone spam monopoly, load poisoning to force full sharding, fee gaming to crowd out other zones, hot actor targeting"
+      expected_behavior   = "load-driven routing and shard activation isolate hot zones without consuming unrelated zone execution capacity"
+      expected_events     = "hot-zone load events do not suppress unrelated zone route and shard progress events"
+      expected_error_path = "cross-zone resource monopolization fails load/routing invariant checks"
+      mutation_inputs     = "Financial Zone spam burst, contract hot account spam, high-fee single-zone flood, oscillating load poison"
+      expected_rejection  = "one hot zone cannot monopolize all zones or unrelated shard execution"
+    }
+    "LOAD-09" = [ordered]@{
+      flow                = "deterministic priority ordering across nodes"
+      state               = "No priority ordering divergence across nodes"
+      attack              = "priority tie-break drift, fee-class overflow, reputation over-cap, tx hash tie-break mismatch, local mempool order dependency"
+      expected_behavior   = "priority ordering uses canonical priority class, bounded fee class, bounded reputation, admission height, and tx hash"
+      expected_events     = "same admitted tx set produces identical priority order and route events on every node"
+      expected_error_path = "unbounded fee/reputation class or missing tie-break rejects before priority queue admission"
+      mutation_inputs     = "same tx set in different local order, fee overpayment, reputation above cap, identical priority keys except tx hash"
+      expected_rejection  = "priority ordering cannot diverge across nodes due to local ordering or unbounded classes"
+    }
   }
   if ($overrides.ContainsKey($InvariantId)) {
     return $overrides[$InvariantId]
@@ -2106,7 +2276,26 @@ $requiredInvariantChecklistTerms = @(
   "Validator set matches staking keeper state.",
   "Slashing evidence is objective and deterministic.",
   "Genesis validation rejects malformed accounts, balances, params, and",
-  "Upgrade and migration paths preserve state roots and module invariants."
+  "Upgrade and migration paths preserve state roots and module invariants.",
+  "DEX Invariants",
+  "Pool reserves match module account balances.",
+  "LP supply matches pool total shares.",
+  "No negative liquidity.",
+  "No fake LP token.",
+  "Swap output is non-negative.",
+  "Slippage bounds are enforced.",
+  "Constant-product constraints hold after fee-adjusted swaps.",
+  "Failed bank movement cannot mutate pool state.",
+  "Load, Routing, And Sharding Invariants",
+  '`LOAD_SCORE` is always in `[0,1]`.',
+  'EMA smoothing is deterministic.',
+  '`LOAD_SCORE` cannot jump beyond `MAX_DELTA`.',
+  "Same transaction and state produce the same zone decision.",
+  "Same transaction and state produce the same shard decision.",
+  "No routing loop.",
+  "No shard starvation.",
+  "No hot-zone monopolization.",
+  "No priority ordering divergence across nodes."
 )
 
 $sourceFailures = @()

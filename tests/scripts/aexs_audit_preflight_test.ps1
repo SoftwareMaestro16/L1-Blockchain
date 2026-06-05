@@ -159,7 +159,24 @@ try {
       "STATE-05",
       "STATE-06",
       "STATE-07",
-      "STATE-08"
+      "STATE-08",
+      "DEXINV-01",
+      "DEXINV-02",
+      "DEXINV-03",
+      "DEXINV-04",
+      "DEXINV-05",
+      "DEXINV-06",
+      "DEXINV-07",
+      "DEXINV-08",
+      "LOAD-01",
+      "LOAD-02",
+      "LOAD-03",
+      "LOAD-04",
+      "LOAD-05",
+      "LOAD-06",
+      "LOAD-07",
+      "LOAD-08",
+      "LOAD-09"
     )) {
     Assert-True ($invariantById.ContainsKey($invariantId)) "mandatory invariant checklist record missing: $invariantId"
   }
@@ -174,6 +191,23 @@ try {
   Assert-True ($invariantById["STATE-06"].attack_surface_covered -match "malformed proof") "STATE-06 must record slashing evidence adversarial path"
   Assert-True ($invariantById["STATE-07"].defensive_analysis_result.expected_error_path -match "malformed genesis") "STATE-07 must record malformed genesis rejection"
   Assert-True ($invariantById["STATE-08"].state_transition_covered -match "preserve state roots") "STATE-08 must record migration root preservation"
+  Assert-True ($invariantById["DEXINV-01"].attack_surface_covered -match "reserve desync") "DEXINV-01 must record reserve desync"
+  Assert-True ($invariantById["DEXINV-02"].attack_surface_covered -match "LP inflation") "DEXINV-02 must record LP inflation"
+  Assert-True ($invariantById["DEXINV-03"].attack_surface_covered -match "underflow") "DEXINV-03 must record liquidity underflow"
+  Assert-True ($invariantById["DEXINV-04"].attack_surface_covered -match "fake LP token|forged LP token") "DEXINV-04 must record fake LP token"
+  Assert-True ($invariantById["DEXINV-05"].attack_surface_covered -match "rounding underflow") "DEXINV-05 must record non-negative swap output adversarial path"
+  Assert-True ($invariantById["DEXINV-06"].attack_surface_covered -match "slippage bypass") "DEXINV-06 must record slippage bypass"
+  Assert-True ($invariantById["DEXINV-07"].attack_surface_covered -match "constant-product break") "DEXINV-07 must record constant-product break"
+  Assert-True ($invariantById["DEXINV-08"].attack_surface_covered -match "failed send partial update") "DEXINV-08 must record failed bank movement partial update"
+  Assert-True ($invariantById["LOAD-01"].attack_surface_covered -match "out-of-range metric") "LOAD-01 must record load score bounds"
+  Assert-True ($invariantById["LOAD-02"].attack_surface_covered -match "node-local latency") "LOAD-02 must record deterministic EMA risks"
+  Assert-True ($invariantById["LOAD-03"].attack_surface_covered -match "spam burst") "LOAD-03 must record MAX_DELTA spike abuse"
+  Assert-True ($invariantById["LOAD-04"].attack_surface_covered -match "routing hint manipulation") "LOAD-04 must record zone route manipulation"
+  Assert-True ($invariantById["LOAD-05"].attack_surface_covered -match "routing epoch manipulation") "LOAD-05 must record shard route manipulation"
+  Assert-True ($invariantById["LOAD-06"].attack_surface_covered -match "route cycle") "LOAD-06 must record routing loop"
+  Assert-True ($invariantById["LOAD-07"].attack_surface_covered -match "starvation") "LOAD-07 must record shard starvation"
+  Assert-True ($invariantById["LOAD-08"].attack_surface_covered -match "single-zone spam") "LOAD-08 must record hot-zone monopolization"
+  Assert-True ($invariantById["LOAD-09"].attack_surface_covered -match "local mempool order") "LOAD-09 must record priority divergence"
 
   $campaignSetup = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "campaign-setup.json") | ConvertFrom-Json
   Assert-True ($campaignSetup.campaign_id -eq $result.campaign_id) "campaign setup campaign id must match summary"

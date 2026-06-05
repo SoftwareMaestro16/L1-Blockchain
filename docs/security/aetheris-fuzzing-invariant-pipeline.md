@@ -392,7 +392,15 @@ It also includes the consensus and state invariants for same-input AppHash
 determinism, signed transaction replay rejection, invalid signer no-mutation,
 malformed transaction no-mutation, validator-set/staking consistency, objective
 slashing evidence, malformed genesis rejection, and upgrade/migration root
-preservation.
+preservation. DEX checklist records cover reserve/module-balance
+reconciliation, LP supply/share reconciliation, non-negative liquidity, LP
+denom authenticity, non-negative swap output, slippage enforcement,
+fee-adjusted constant-product preservation, and atomic rollback when bank
+movement fails. Load, routing, and sharding checklist records cover
+`LOAD_SCORE` bounds, deterministic EMA smoothing, `MAX_DELTA` spike caps,
+same-input zone and shard decisions, routing-loop prevention, shard starvation
+prevention, hot-zone monopolization resistance, and deterministic priority
+ordering across nodes.
 
 The base-chain `x/auth`, `x/bank`, `x/staking`, `x/slashing`, `x/gov`,
 `x/distribution`, `x/fees`, `x/tokenfactory`, `x/dex`, `x/identity`,
