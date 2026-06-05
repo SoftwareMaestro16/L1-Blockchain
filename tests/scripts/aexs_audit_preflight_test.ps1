@@ -311,7 +311,17 @@ try {
       "EXEC-02",
       "EXEC-03",
       "EXEC-04",
-      "EXEC-05"
+      "EXEC-05",
+      "VM-01",
+      "VM-02",
+      "VM-03",
+      "VM-04",
+      "VM-05",
+      "MSG-01",
+      "MSG-02",
+      "MSG-03",
+      "MSG-04",
+      "MSG-05"
     )) {
     Assert-True ($atomicTaskById.ContainsKey($taskId)) "required base-chain atomic task missing: $taskId"
   }
@@ -374,6 +384,16 @@ try {
   Assert-True ($atomicTaskById["EXEC-03"].adversarial_simulation_result.attack_attempt -match "partial rollback") "EXEC-03 must record partial rollback attack"
   Assert-True ($atomicTaskById["EXEC-04"].invariant_tested -match "failed execution") "EXEC-04 must record no-partial-write invariant"
   Assert-True ($atomicTaskById["EXEC-05"].adversarial_simulation_result.expected_rejection -match "routing constraints") "EXEC-05 must record routing constraint rejection"
+  Assert-True ($atomicTaskById["VM-01"].function_or_flow_covered -match "AVM deploy") "VM-01 must record AVM lifecycle flow"
+  Assert-True ($atomicTaskById["VM-02"].adversarial_simulation_result.mutation_inputs -match "zero gas") "VM-02 must record zero gas mutation"
+  Assert-True ($atomicTaskById["VM-03"].adversarial_simulation_result.attack_attempt -match "sandbox escape") "VM-03 must record sandbox escape attack"
+  Assert-True ($atomicTaskById["VM-04"].invariant_tested -match "rejected AVM execution") "VM-04 must record rejected execution no-commit invariant"
+  Assert-True ($atomicTaskById["VM-05"].adversarial_simulation_result.expected_rejection -match "double-refund") "VM-05 must record double-refund rejection"
+  Assert-True ($atomicTaskById["MSG-01"].function_or_flow_covered -match "async send") "MSG-01 must record messaging lifecycle flow"
+  Assert-True ($atomicTaskById["MSG-02"].adversarial_simulation_result.mutation_inputs -match "expired message") "MSG-02 must record expired message mutation"
+  Assert-True ($atomicTaskById["MSG-03"].adversarial_simulation_result.attack_attempt -match "forged proof") "MSG-03 must record forged proof attack"
+  Assert-True ($atomicTaskById["MSG-04"].invariant_tested -match "replay/export/import") "MSG-04 must record replay/export/import invariant"
+  Assert-True ($atomicTaskById["MSG-05"].adversarial_simulation_result.expected_rejection -match "double-refund") "MSG-05 must record refund double-spend rejection"
 
   $enforceFailed = $false
   try {

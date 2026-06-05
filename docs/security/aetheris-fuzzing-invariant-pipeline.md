@@ -380,20 +380,23 @@ Every generated atomic task record contains:
 
 The base-chain `x/auth`, `x/bank`, `x/staking`, `x/slashing`, `x/gov`,
 `x/distribution`, `x/fees`, `x/tokenfactory`, `x/dex`, `x/identity`,
-`x/reputation`, and `x/execution` atomic tasks are expanded into task-specific
-records for signature validation, replay prevention, sequence integrity,
-fee/priority abuse, bank sends, multi-send atomicity, supply consistency,
-zero-address handling, native-denom spoofing, staking lifecycle, validator-set
-consistency, unbonding risk, slashing evidence, tombstone/jail state, slash
-accounting, proposal replay, upgrade hijack, hard parameter bounds, reward
-withdrawal, commission accounting, rounding remainders, community-pool leakage,
-`naet` fee collection, non-FeeTx bypass, fee split accounting, tokenfactory
-authority, burn-from mismatch, exact supply deltas, factory asset fee spoofing,
-AMM reserve accounting, LP supply consistency, constant-product swap safety,
-domain ownership, resolver integrity, reverse lookup authorization, auction
-escrow, refund safety, reputation farming, sybil bypass, priority manipulation,
-deterministic reputation replay, execution dispatch, rollback safety, stable
-receipts, deterministic traces, and routing constraint enforcement. These
+`x/reputation`, `x/execution`, `x/vm` / AVM, and `x/messaging` atomic tasks are
+expanded into task-specific records for signature validation, replay prevention,
+sequence integrity, fee/priority abuse, bank sends, multi-send atomicity, supply
+consistency, zero-address handling, native-denom spoofing, staking lifecycle,
+validator-set consistency, unbonding risk, slashing evidence, tombstone/jail
+state, slash accounting, proposal replay, upgrade hijack, hard parameter bounds,
+reward withdrawal, commission accounting, rounding remainders, community-pool
+leakage, `naet` fee collection, non-FeeTx bypass, fee split accounting,
+tokenfactory authority, burn-from mismatch, exact supply deltas, factory asset
+fee spoofing, AMM reserve accounting, LP supply consistency, constant-product
+swap safety, domain ownership, resolver integrity, reverse lookup authorization,
+auction escrow, refund safety, reputation farming, sybil bypass, priority
+manipulation, deterministic reputation replay, execution dispatch, rollback
+safety, stable receipts, deterministic traces, routing constraint enforcement,
+AVM gas bounds, sandbox isolation, deterministic host behavior, rejected VM
+no-commit semantics, async message proofs, receipt replay markers, canonical
+message ordering, bounce handling, and refund double-spend prevention. These
 records must not collapse back to generic module-level attack descriptions.
 
 Every campaign setup record contains the deterministic campaign id, git commit,

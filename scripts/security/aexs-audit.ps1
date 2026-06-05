@@ -822,6 +822,116 @@ function Get-AexsAtomicTaskOverride {
       mutation_inputs     = "zero fee execution, gas underpayment execution, oversized memo execution, forged reputation execution, missing route execution"
       expected_rejection  = "execution economic abuse must not bypass fee, gas, memo, reputation, or routing constraints"
     }
+    "VM-01" = [ordered]@{
+      flow                = "AVM deploy, external call, internal call, bounced call, query, migrate entrypoint validation"
+      state               = "contract code, contract state, call results, query output, migration state, and emitted messages update deterministically"
+      attack              = "valid AVM lifecycle baseline plus unauthorized code owner or contract admin control sample"
+      invariant           = "AVM lifecycle preserves deterministic entrypoint validation, gas accounting, state writes, and emitted messages"
+      expected_behavior   = "valid deploy, external call, internal call, bounced call, query, and migrate paths validate entrypoints and execute exactly once"
+      expected_events     = "AVM events match deploy, call, bounce, query, migrate, state, gas, and emitted-message deltas"
+      expected_error_path = "unauthorized code owner or contract admin control sample is rejected before code, state, or queue mutation"
+      mutation_inputs     = "valid AVM deploy, valid external call, valid internal call, valid bounced call, valid query, valid migrate, unauthorized admin control"
+      expected_rejection  = "unauthorized AVM lifecycle variants must fail without contract state, code, queue, gas, or message mutation"
+    }
+    "VM-02" = [ordered]@{
+      flow                = "max code size, missing entrypoint, bad code hash, zero gas, max gas, malformed bytecode"
+      state               = "AVM edge cases leave code store, contract state, gas accounting, and emitted messages unchanged unless explicitly accepted"
+      attack              = "oversized code, missing entrypoint, bad code hash, zero gas, max gas boundary, malformed bytecode"
+      invariant           = "AVM accepts only bounded code, valid entrypoints, valid code hashes, valid gas limits, and well-formed bytecode"
+      expected_behavior   = "valid AVM boundaries execute deterministically; invalid boundaries reject before contract state mutation"
+      expected_events     = "accepted boundary AVM events match gas/state deltas; rejected edge cases emit no success events"
+      expected_error_path = "AVM validation rejects oversized code, missing entrypoints, bad code hashes, zero gas, unsafe max gas, or malformed bytecode"
+      mutation_inputs     = "max code size plus one, missing entrypoint, bad code hash, zero gas, max gas plus one, malformed bytecode"
+      expected_rejection  = "invalid AVM edge cases must not alter code store, contract state, gas accounting, queues, or emitted messages"
+    }
+    "VM-03" = [ordered]@{
+      flow                = "VM crash input, infinite loop, stack overflow, sandbox escape, nondeterministic host behavior"
+      state               = "adversarial AVM attempts cannot crash consensus, escape sandbox, exhaust unbounded gas, or use nondeterministic host behavior"
+      attack              = "VM crash input, infinite loop, stack overflow, sandbox escape, nondeterministic host behavior"
+      invariant           = "AVM malformed input does not panic and host functions remain gas-bounded, sandboxed, and deterministic"
+      expected_behavior   = "adversarial AVM mutations fail deterministically with bounded gas and without state corruption"
+      expected_events     = "failed AVM attacks emit no misleading deploy, execute, migrate, state, gas, or message success events"
+      expected_error_path = "AVM runtime rejects crash input, infinite loop, stack overflow, sandbox escape, or nondeterministic host call before commit"
+      mutation_inputs     = "panic-shaped bytecode, infinite loop bytecode, deep stack bytecode, forbidden host call, local-time host call, randomness host call"
+      expected_rejection  = "AVM attacks must not panic consensus, escape sandbox, exceed gas bounds, commit state, or use nondeterministic host behavior"
+    }
+    "VM-04" = [ordered]@{
+      flow                = "deterministic contract state changes and rejected execution no state commit"
+      state               = "contract state changes are deterministic and rejected execution cannot commit state"
+      attack              = "state drift attempt through mixed accepted and rejected AVM deploy, execute, query, migrate, and bounced call operations"
+      invariant           = "contract state changes are deterministic and rejected AVM execution cannot commit state"
+      expected_behavior   = "AVM state integrity holds across deploy, execute, query, migrate, bounce, replay, export, and import sequences"
+      expected_events     = "AVM events reconcile to final contract state, gas, queue, and emitted-message deltas"
+      expected_error_path = "failed AVM execution preserves pre-failure code store, contract state, gas, queue, and emitted-message snapshots"
+      mutation_inputs     = "accepted execute followed by failed execute, accepted migrate followed by failed migrate, failed query side-effect attempt, export/import after contract state changes"
+      expected_rejection  = "rejected AVM operations must preserve deterministic state and no-state-commit consistency"
+    }
+    "VM-05" = [ordered]@{
+      flow                = "AVM economic abuse around gas underpayment, non-naet protocol fees, double-refund, and storage limits"
+      state               = "AVM cannot underpay gas, pay protocol fees in non-naet, double-refund, or bypass storage limits"
+      attack              = "gas underpayment, non-naet fee payment, double-refund, storage limit bypass"
+      invariant           = "AVM cannot underpay gas, pay protocol fees in non-naet, double-refund, or bypass storage limits"
+      expected_behavior   = "AVM economic rules enforce ante fees, gas metering, refund idempotence, and bounded storage before commit"
+      expected_events     = "no gas underpayment, non-naet fee acceptance, double-refund, or storage-limit success event appears for rejected AVM economic abuse paths"
+      expected_error_path = "AVM economic abuse rejects before contract state, refund, storage, gas, or fee accounting mutation"
+      mutation_inputs     = "execute with underpaid gas, factory denom fee, duplicate refund receipt, oversized storage write, query response storage bypass"
+      expected_rejection  = "AVM economic abuse must not underpay gas, pay protocol fees in non-naet, double-refund, or bypass storage limits"
+    }
+    "MSG-01" = [ordered]@{
+      flow                = "async send, internal message delivery, proof/receipt fields, cross-zone message classification"
+      state               = "message state, receipt fields, proof references, classification, and delivery markers update deterministically"
+      attack              = "valid messaging lifecycle baseline plus unauthorized sender or destination control sample"
+      invariant           = "messaging lifecycle preserves deterministic classification, proof fields, receipts, delivery, and replay markers"
+      expected_behavior   = "valid async send, internal delivery, proof/receipt validation, and cross-zone classification execute exactly once"
+      expected_events     = "messaging events match send, delivery, proof, receipt, classification, and replay-marker deltas"
+      expected_error_path = "unauthorized sender or destination control sample is rejected before message, receipt, or queue mutation"
+      mutation_inputs     = "valid async send, valid internal delivery, valid proof fields, valid receipt fields, valid cross-zone classification, unauthorized sender control"
+      expected_rejection  = "unauthorized messaging lifecycle variants must fail without message, receipt, proof, queue, or replay-marker mutation"
+    }
+    "MSG-02" = [ordered]@{
+      flow                = "missing destination, expired message, max body, zero value, malformed opcode, invalid query id"
+      state               = "messaging edge cases leave message state, receipts, queues, and value accounting unchanged unless explicitly accepted"
+      attack              = "missing destination, expired message, oversized body, zero value, malformed opcode, invalid query id"
+      invariant           = "messaging accepts only valid destinations, live messages, bounded bodies, valid value semantics, opcodes, and query ids"
+      expected_behavior   = "valid messaging boundaries execute deterministically; invalid boundaries reject before message or value mutation"
+      expected_events     = "accepted boundary messaging events match receipt/value deltas; rejected edge cases emit no success events"
+      expected_error_path = "messaging validation rejects missing destination, expired message, oversized body, invalid zero-value path, malformed opcode, or invalid query id"
+      mutation_inputs     = "missing destination, expired message, max body plus one, zero value where value required, malformed opcode, invalid query id"
+      expected_rejection  = "invalid messaging edge cases must not alter message state, receipts, queues, replay markers, or value accounting"
+    }
+    "MSG-03" = [ordered]@{
+      flow                = "message replay, message ordering attack, forged proof, stale receipt replay, message starvation"
+      state               = "adversarial messaging attempts cannot replay messages, reorder canonically, forge proofs, replay stale receipts, or starve queues"
+      attack              = "message replay, message ordering attack, forged proof, stale receipt replay, message starvation"
+      invariant           = "messaging proof validation, replay markers, receipt uniqueness, canonical ordering, and queue progress cannot be bypassed"
+      expected_behavior   = "adversarial messaging mutations fail deterministically before message, receipt, queue, or value state corruption"
+      expected_events     = "failed messaging attacks emit no misleading send, delivery, proof, receipt, replay, or queue success events"
+      expected_error_path = "messaging transition rejects replay, ordering, forged proof, stale receipt, or starvation attack before commit"
+      mutation_inputs     = "duplicate message id, out-of-order delivery, forged proof root, stale receipt replay, high-priority starvation sequence"
+      expected_rejection  = "messaging attacks must not replay messages, reorder delivery, forge proofs, replay stale receipts, or starve messages"
+    }
+    "MSG-04" = [ordered]@{
+      flow                = "message state, receipts, and queue entries deterministic across replay/export/import"
+      state               = "message state, receipt state, queue entries, replay markers, and ordering do not diverge across replay/export/import"
+      attack              = "state drift attempt through mixed accepted and rejected messaging send, delivery, receipt, proof, and queue operations"
+      invariant           = "message state, receipts, and queue entries are deterministic across replay/export/import"
+      expected_behavior   = "messaging state integrity holds across send, delivery, receipt, proof, replay, export, and import sequences"
+      expected_events     = "messaging events reconcile to final message, receipt, queue, replay-marker, and ordering deltas"
+      expected_error_path = "failed messaging operations preserve pre-failure message, receipt, proof, queue, replay-marker, and value snapshots"
+      mutation_inputs     = "accepted send followed by failed replay, accepted receipt followed by stale receipt replay, accepted proof followed by forged proof, export/import after message delivery"
+      expected_rejection  = "rejected messaging operations must preserve deterministic replay, receipt, queue, and export/import consistency"
+    }
+    "MSG-05" = [ordered]@{
+      flow                = "message forwarding fees, value transfer, bounce, and refund double-spend prevention"
+      state               = "message forwarding fees, value transfer, bounce, and refund cannot double-spend"
+      attack              = "forwarding fee bypass, value transfer double-spend, bounce double-spend, refund double-spend"
+      invariant           = "message forwarding fees, value transfer, bounce, and refund cannot double-spend"
+      expected_behavior   = "messaging economic rules enforce fee payment, value conservation, single-use bounces, and single-use refunds"
+      expected_events     = "no fee bypass, value double-spend, bounce double-spend, or refund double-spend event appears for rejected messaging economic abuse paths"
+      expected_error_path = "messaging economic abuse rejects before fee, value, bounce, refund, receipt, or replay-marker mutation"
+      mutation_inputs     = "forward without fee, duplicate value transfer, duplicate bounce receipt, duplicate refund receipt, forged refund destination"
+      expected_rejection  = "messaging economic abuse must not bypass forwarding fees, double-spend value, double-bounce, or double-refund"
+    }
   }
   if ($overrides.ContainsKey($TaskId)) {
     return $overrides[$TaskId]
