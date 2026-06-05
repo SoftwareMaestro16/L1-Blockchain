@@ -351,7 +351,17 @@ try {
       "MEMO-02",
       "MEMO-03",
       "MEMO-04",
-      "MEMO-05"
+      "MEMO-05",
+      "INDEX-01",
+      "INDEX-02",
+      "INDEX-03",
+      "INDEX-04",
+      "INDEX-05",
+      "SHARD-01",
+      "SHARD-02",
+      "SHARD-03",
+      "SHARD-04",
+      "SHARD-05"
     )) {
     Assert-True ($atomicTaskById.ContainsKey($taskId)) "required base-chain atomic task missing: $taskId"
   }
@@ -454,6 +464,16 @@ try {
   Assert-True ($atomicTaskById["MEMO-03"].adversarial_simulation_result.attack_attempt -match "memo spam") "MEMO-03 must record memo spam attack"
   Assert-True ($atomicTaskById["MEMO-04"].invariant_tested -match "immutable after block inclusion") "MEMO-04 must record memo immutability invariant"
   Assert-True ($atomicTaskById["MEMO-05"].adversarial_simulation_result.expected_rejection -match "byte fee") "MEMO-05 must record memo fee bypass rejection"
+  Assert-True ($atomicTaskById["INDEX-01"].function_or_flow_covered -match "tx hash") "INDEX-01 must record index lifecycle flow"
+  Assert-True ($atomicTaskById["INDEX-02"].adversarial_simulation_result.mutation_inputs -match "pagination") "INDEX-02 must record pagination mutation"
+  Assert-True ($atomicTaskById["INDEX-03"].adversarial_simulation_result.attack_attempt -match "index poisoning") "INDEX-03 must record index poisoning attack"
+  Assert-True ($atomicTaskById["INDEX-04"].invariant_tested -match "never overrides consensus state") "INDEX-04 must record non-authoritative consensus invariant"
+  Assert-True ($atomicTaskById["INDEX-05"].adversarial_simulation_result.expected_rejection -match "route funds") "INDEX-05 must record no fund routing rejection"
+  Assert-True ($atomicTaskById["SHARD-01"].function_or_flow_covered -match "LOAD_SCORE") "SHARD-01 must record load/routing lifecycle flow"
+  Assert-True ($atomicTaskById["SHARD-02"].adversarial_simulation_result.mutation_inputs -match "oscillating load") "SHARD-02 must record oscillating load mutation"
+  Assert-True ($atomicTaskById["SHARD-03"].adversarial_simulation_result.attack_attempt -match "load poisoning") "SHARD-03 must record load poisoning attack"
+  Assert-True ($atomicTaskById["SHARD-04"].invariant_tested -match "same tx and state") "SHARD-04 must record same-input routing invariant"
+  Assert-True ($atomicTaskById["SHARD-05"].adversarial_simulation_result.expected_rejection -match "deterministic protocol rules") "SHARD-05 must record deterministic routing abuse rejection"
 
   $enforceFailed = $false
   try {

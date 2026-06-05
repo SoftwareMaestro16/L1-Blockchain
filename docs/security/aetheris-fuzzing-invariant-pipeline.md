@@ -381,33 +381,36 @@ Every generated atomic task record contains:
 The base-chain `x/auth`, `x/bank`, `x/staking`, `x/slashing`, `x/gov`,
 `x/distribution`, `x/fees`, `x/tokenfactory`, `x/dex`, `x/identity`,
 `x/reputation`, `x/execution`, `x/vm` / AVM, `x/messaging`, `x/queue`, and
-`x/events`, `x/actors`, `x/scheduler`, `x/storage`, and `x/memo` atomic tasks
-are expanded into task-specific records for signature validation, replay
-prevention, sequence integrity, fee/priority abuse, bank sends, multi-send
-atomicity, supply consistency, zero-address handling, native-denom spoofing,
-staking lifecycle, validator-set consistency, unbonding risk, slashing evidence,
-tombstone/jail state, slash accounting, proposal replay, upgrade hijack, hard
-parameter bounds, reward withdrawal, commission accounting, rounding remainders,
-community-pool leakage, `naet` fee collection, non-FeeTx bypass, fee split
-accounting, tokenfactory authority, burn-from mismatch, exact supply deltas,
-factory asset fee spoofing, AMM reserve accounting, LP supply consistency,
-constant-product swap safety, domain ownership, resolver integrity, reverse
-lookup authorization, auction escrow, refund safety, reputation farming, sybil
-bypass, priority manipulation, deterministic reputation replay, execution
-dispatch, rollback safety, stable receipts, deterministic traces, routing
-constraint enforcement, AVM gas bounds, sandbox isolation, deterministic host
-behavior, rejected VM no-commit semantics, async message proofs, receipt replay
-markers, canonical message ordering, bounce handling, refund double-spend
-prevention, queue sequence counters, queue depth bounds, per-block processing
-limits, deterministic event emission, event spoofing prevention, event receipt
-linkage, event-as-authority rejection, actor isolation, mailbox bounds,
-monotonic logical time, actor cost enforcement, deterministic scheduler plans,
-read/write conflict handling, priority tie-breaks, starvation prevention,
-fee/reputation cap enforcement, deterministic storage roots, snapshot/export
-integrity, bounded storage pagination, storage rent/deposit enforcement, UTF-8
-memo validation, memo immutability, memo index safety, and memo byte-fee
-enforcement. These records must not collapse back to generic module-level attack
-descriptions.
+`x/events`, `x/actors`, `x/scheduler`, `x/storage`, `x/memo`, `x/indexer`, and
+`x/sharding/sim` atomic tasks are expanded into task-specific records for
+signature validation, replay prevention, sequence integrity, fee/priority abuse,
+bank sends, multi-send atomicity, supply consistency, zero-address handling,
+native-denom spoofing, staking lifecycle, validator-set consistency, unbonding
+risk, slashing evidence, tombstone/jail state, slash accounting, proposal
+replay, upgrade hijack, hard parameter bounds, reward withdrawal, commission
+accounting, rounding remainders, community-pool leakage, `naet` fee collection,
+non-FeeTx bypass, fee split accounting, tokenfactory authority, burn-from
+mismatch, exact supply deltas, factory asset fee spoofing, AMM reserve
+accounting, LP supply consistency, constant-product swap safety, domain
+ownership, resolver integrity, reverse lookup authorization, auction escrow,
+refund safety, reputation farming, sybil bypass, priority manipulation,
+deterministic reputation replay, execution dispatch, rollback safety, stable
+receipts, deterministic traces, routing constraint enforcement, AVM gas bounds,
+sandbox isolation, deterministic host behavior, rejected VM no-commit semantics,
+async message proofs, receipt replay markers, canonical message ordering, bounce
+handling, refund double-spend prevention, queue sequence counters, queue depth
+bounds, per-block processing limits, deterministic event emission, event
+spoofing prevention, event receipt linkage, event-as-authority rejection, actor
+isolation, mailbox bounds, monotonic logical time, actor cost enforcement,
+deterministic scheduler plans, read/write conflict handling, priority
+tie-breaks, starvation prevention, fee/reputation cap enforcement,
+deterministic storage roots, snapshot/export integrity, bounded storage
+pagination, storage rent/deposit enforcement, UTF-8 memo validation, memo
+immutability, memo index safety, memo byte-fee enforcement, non-authoritative
+index output, index rebuildability, stale-cache rejection, deterministic
+`LOAD_SCORE`, route/shard assignment determinism, load poisoning rejection, shard
+starvation prevention, and deterministic routing economic bounds. These records
+must not collapse back to generic module-level attack descriptions.
 
 Every campaign setup record contains the deterministic campaign id, git commit,
 branch, dirty status, Go version, OS, test command set, fuzz seed list, target

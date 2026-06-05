@@ -1262,6 +1262,116 @@ function Get-AexsAtomicTaskOverride {
       mutation_inputs     = "long memo with zero byte fee, compressed-looking memo underpay, high reputation memo fee bypass, control chars to avoid byte count, split memo fields"
       expected_rejection  = "memo economic abuse must not bypass memo cost, byte fee, or reputation multiplier"
     }
+    "INDEX-01" = [ordered]@{
+      flow                = "query indexing for tx hash, sender, receiver, domain, contract, memo, event, token, and NFT surfaces"
+      state               = "index records, query cursors, surface mappings, receipt links, and rebuild metadata update deterministically from committed state"
+      attack              = "valid index lifecycle baseline plus unauthorized index writer control sample"
+      invariant           = "index output is deterministic, rebuildable, and non-authoritative over consensus state"
+      expected_behavior   = "valid tx hash, sender, receiver, domain, contract, memo, event, token, and NFT indexing records committed state exactly once"
+      expected_events     = "index events or rebuild logs match committed event/state source records without changing consensus state"
+      expected_error_path = "unauthorized index writer control sample is rejected before index record, cursor, cache, or query state mutation"
+      mutation_inputs     = "valid tx hash index, valid sender index, valid receiver index, valid domain index, valid contract index, valid memo index, valid event index, valid token index, valid NFT index, unauthorized index writer"
+      expected_rejection  = "unauthorized index lifecycle variants must fail without index record, cursor, cache, or consensus state mutation"
+    }
+    "INDEX-02" = [ordered]@{
+      flow                = "empty result, pagination, duplicate records, deleted state, max query size"
+      state               = "index edge cases leave records, cursors, deleted markers, query bounds, and rebuild metadata deterministic"
+      attack              = "empty result ambiguity, pagination abuse, duplicate record injection, deleted state resurrection, max query size overflow"
+      invariant           = "index queries are bounded, pagination-safe, duplicate-safe, and consistent with deleted consensus state"
+      expected_behavior   = "valid index boundaries execute deterministically; invalid boundaries reject before index or query mutation"
+      expected_events     = "accepted boundary index events match query/index deltas; rejected edge cases emit no success events"
+      expected_error_path = "index validation rejects unsafe pagination, duplicate records, deleted-state resurrection, and max query size overflow"
+      mutation_inputs     = "empty result query, pagination page limit plus one, invalid pagination next key, duplicate index record, deleted state lookup, max query size plus one"
+      expected_rejection  = "invalid index edge cases must not alter index records, cursors, deleted markers, query bounds, rebuild metadata, or consensus state"
+    }
+    "INDEX-03" = [ordered]@{
+      flow                = "index poisoning, stale resolver lookup, fake event indexing, inconsistent domain cache"
+      state               = "adversarial index attempts cannot poison records, serve stale resolver state, index fake events, or diverge domain cache"
+      attack              = "index poisoning, stale resolver lookup, fake event indexing, inconsistent domain cache"
+      invariant           = "index data must be rebuildable from committed events/state and cannot override canonical state"
+      expected_behavior   = "adversarial index mutations fail deterministically before index, cache, query, or rebuild corruption"
+      expected_events     = "failed index attacks emit no misleading index, resolver, domain, event, or query success records"
+      expected_error_path = "index path rejects poisoning, stale resolver, fake event, or inconsistent domain cache before serving authoritative-looking output"
+      mutation_inputs     = "forged index record, stale resolver cache, fake event record, inconsistent domain cache entry, mismatched committed height"
+      expected_rejection  = "index attacks must not poison indexes, serve stale resolver lookup, index fake events, or create inconsistent domain cache"
+    }
+    "INDEX-04" = [ordered]@{
+      flow                = "index output never overrides consensus state and can be rebuilt from committed events/state"
+      state               = "index records, query output, cursors, caches, and rebuild state reconcile with committed events/state"
+      attack              = "state drift attempt through index rebuild, stale cache, deleted state, fake event, and replay/export/import operations"
+      invariant           = "index output never overrides consensus state and can be rebuilt from committed events/state"
+      expected_behavior   = "index state integrity holds across query, rebuild, cache invalidation, replay, export, and import sequences"
+      expected_events     = "index events and rebuild logs reconcile to committed state, receipts, events, and query output"
+      expected_error_path = "failed index operations preserve pre-failure index records, cursors, caches, rebuild state, and consensus state references"
+      mutation_inputs     = "accepted index then rebuild, fake event then rebuild, stale cache invalidation, export/import after indexed txs, deleted state rebuild"
+      expected_rejection  = "rejected index operations must preserve non-authoritative output and committed-state rebuildability"
+    }
+    "INDEX-05" = [ordered]@{
+      flow                = "index economic abuse around priority/search, fund routing, balance changes, and protocol fee bypass"
+      state               = "index priority/search cannot route funds, change balances, or bypass protocol fees"
+      attack              = "index priority fund routing, search result balance change, protocol fee bypass through index priority"
+      invariant           = "index priority/search cannot route funds, change balances, or bypass protocol fees"
+      expected_behavior   = "index economic rules keep query priority and search ranking observational and non-consensus-authoritative"
+      expected_events     = "no fund route, balance change, fee bypass, or consensus mutation event appears for rejected index economic abuse paths"
+      expected_error_path = "index economic abuse rejects before fund routing, balance, fee, query priority, search, or consensus state mutation"
+      mutation_inputs     = "paid search priority routing funds, index result as balance proof, fake fee-paid index record, priority query changing route, search rank changing transfer target"
+      expected_rejection  = "index economic abuse must not route funds, change balances, or bypass protocol fees"
+    }
+    "SHARD-01" = [ordered]@{
+      flow                = "LOAD_SCORE, zone selection, shard activation, shard assignment, commitment output"
+      state               = "load state, route decision, active shard set, shard assignment, and commitment output update deterministically"
+      attack              = "valid sharding/load lifecycle baseline plus unauthorized routing input control sample"
+      invariant           = "load score, zone route, shard activation, shard assignment, and commitments are deterministic"
+      expected_behavior   = "valid LOAD_SCORE update, zone selection, shard activation, shard assignment, and commitment output execute exactly once"
+      expected_events     = "sharding simulator events match load, route, shard, assignment, and commitment deltas"
+      expected_error_path = "unauthorized routing input control sample is rejected before load, route, shard, or commitment mutation"
+      mutation_inputs     = "valid LOAD_SCORE update, valid zone selection, valid shard activation, valid shard assignment, valid commitment output, unauthorized route input"
+      expected_rejection  = "unauthorized sharding lifecycle variants must fail without load, route, shard, assignment, or commitment mutation"
+    }
+    "SHARD-02" = [ordered]@{
+      flow                = "zero load, max load, oscillating load, empty shard, max shard count, routing epoch changes"
+      state               = "sharding edge cases leave load windows, active shards, route decisions, routing epochs, and commitments deterministic"
+      attack              = "zero load boundary, max load boundary, oscillating load, empty shard, max shard count overflow, routing epoch boundary"
+      invariant           = "load/routing accepts bounded score inputs, bounded shard counts, deterministic epochs, and stable oscillation handling"
+      expected_behavior   = "valid sharding boundaries execute deterministically; invalid boundaries reject before route or shard mutation"
+      expected_events     = "accepted boundary sharding events match load/route/shard deltas; rejected edge cases emit no success events"
+      expected_error_path = "sharding validation rejects invalid load scores, shard counts, empty shard misuse, and unsafe routing epoch changes"
+      mutation_inputs     = "zero load, max load, oscillating load sequence, empty shard, max shard count plus one, routing epoch change, invalid negative load"
+      expected_rejection  = "invalid sharding edge cases must not alter load windows, active shards, route decisions, epochs, or commitments"
+    }
+    "SHARD-03" = [ordered]@{
+      flow                = "load poisoning, shard overload targeting, routing loop, route desync, shard starvation"
+      state               = "adversarial sharding attempts cannot poison load, target overload, loop routes, desync routes, or starve shards"
+      attack              = "load poisoning, shard overload targeting, routing loop, route desync, shard starvation"
+      invariant           = "load score bounds, deterministic routing, shard assignment, and starvation prevention cannot be bypassed"
+      expected_behavior   = "adversarial sharding mutations fail deterministically before load, route, shard, or commitment corruption"
+      expected_events     = "failed sharding attacks emit no misleading load, route, shard, starvation, or commitment success events"
+      expected_error_path = "sharding simulator rejects load poisoning, overload targeting, routing loops, route desync, or starvation before commit"
+      mutation_inputs     = "poisoned load metric, hot-shard targeting key, routing loop input, divergent route hint, shard starvation sequence"
+      expected_rejection  = "sharding attacks must not poison load, target overload, create routing loops, desync routes, or starve shards"
+    }
+    "SHARD-04" = [ordered]@{
+      flow                = "same tx and state produce same route, shard, commitment, and replay output"
+      state               = "load state, route decision, shard assignment, commitment output, and replay output do not diverge across replay/export/import"
+      attack              = "state drift attempt through same tx/state with different insertion order, route hints, replay, export, and import"
+      invariant           = "same tx and state produce same route, same shard, same commitment, and same replay output"
+      expected_behavior   = "sharding state integrity holds across load update, route, shard assignment, commitment, replay, export, and import sequences"
+      expected_events     = "sharding events reconcile to final load, route, shard, commitment, and replay output deltas"
+      expected_error_path = "failed sharding operations preserve pre-failure load, route, shard, commitment, and replay snapshots"
+      mutation_inputs     = "same tx with different map insertion order, accepted route followed by replay, same state export/import, same route with ignored hint, commitment recomputation"
+      expected_rejection  = "rejected sharding operations must preserve deterministic same-tx same-route same-shard same-commitment consistency"
+    }
+    "SHARD-05" = [ordered]@{
+      flow                = "sharding economic abuse around fee level, reputation, priority, and deterministic protocol routing"
+      state               = "fee level, reputation, or priority cannot manipulate routing outside deterministic protocol rules"
+      attack              = "fee-level route manipulation, reputation route manipulation, priority route manipulation, deterministic routing bypass"
+      invariant           = "fee level, reputation, or priority cannot manipulate routing outside deterministic protocol rules"
+      expected_behavior   = "sharding economic rules keep fee, reputation, and priority inputs bounded to deterministic routing policy"
+      expected_events     = "no route manipulation, shard manipulation, commitment manipulation, or priority bypass event appears for rejected sharding economic abuse paths"
+      expected_error_path = "sharding economic abuse rejects before route, shard, commitment, fee, reputation, or priority state mutation"
+      mutation_inputs     = "overpaid fee route hint, forged reputation class, priority above cap, route hint outside epoch, validator-local routing preference"
+      expected_rejection  = "sharding economic abuse must not let fee level, reputation, or priority manipulate routing outside deterministic protocol rules"
+    }
   }
   if ($overrides.ContainsKey($TaskId)) {
     return $overrides[$TaskId]
