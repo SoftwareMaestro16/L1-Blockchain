@@ -70,7 +70,7 @@ jobs:
         run: .\scripts\security\prototype-audit.ps1 -Profile Full -SkipTests -SkipGitleaksHistory
 
       - name: Upload audit evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: prototype-audit-evidence
           path: .work/security/prototype-audit-*/**
@@ -94,7 +94,7 @@ jobs:
 
       - name: Upload diagnostics on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: prototype-acceptance-diagnostics
           path: .work/diagnostics/**
@@ -133,7 +133,7 @@ jobs:
             -TargetArch "${{ matrix.target_arch }}"
 
       - name: Upload package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: orbitalis-${{ matrix.target_os }}-${{ matrix.target_arch }}
           path: dist/prototype/**
