@@ -240,16 +240,13 @@ func appendIndex(index map[string][]MemoStoreRecord, key string, record MemoStor
 }
 
 func sortMemoIndex(index MemoIndex) {
-	for _, bucket := range []map[string][]MemoStoreRecord{
-		index.ByTxHash,
-		index.BySender,
-		index.ByReceiver,
-		index.ByDomain,
-		index.ByContract,
-		index.ByAsset,
-		index.ByEventType,
-	} {
+	for _, bucket := range memoIndexBuckets(index) {
+		keys := make([]string, 0, len(bucket))
 		for key := range bucket {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		for _, key := range keys {
 			sort.SliceStable(bucket[key], func(i, j int) bool {
 				if bucket[key][i].BlockHeight == bucket[key][j].BlockHeight {
 					return string(bucket[key][i].TxHash) < string(bucket[key][j].TxHash)
@@ -257,6 +254,18 @@ func sortMemoIndex(index MemoIndex) {
 				return bucket[key][i].BlockHeight < bucket[key][j].BlockHeight
 			})
 		}
+	}
+}
+
+func memoIndexBuckets(index MemoIndex) []map[string][]MemoStoreRecord {
+	return []map[string][]MemoStoreRecord{
+		index.ByTxHash,
+		index.BySender,
+		index.ByReceiver,
+		index.ByDomain,
+		index.ByContract,
+		index.ByAsset,
+		index.ByEventType,
 	}
 }
 

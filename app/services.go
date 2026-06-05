@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"maps"
-	"time"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
@@ -57,10 +56,9 @@ func (app *L1App) EndBlocker(ctx sdk.Context) (sdk.EndBlock, error) {
 }
 
 func (app *L1App) FinalizeBlock(req *abci.RequestFinalizeBlock) (*abci.ResponseFinalizeBlock, error) {
-	start := time.Now()
 	res, err := app.BaseApp.FinalizeBlock(req)
-	// Wall-clock timing is process telemetry only; it does not read or write consensus state.
-	observability.RecordFinalizeBlock(req.Height, req.Time, len(req.Txs), time.Since(start))
+	// Avoid wall-clock measurement inside ABCI; consensus-adjacent telemetry only uses request data here.
+	observability.RecordFinalizeBlock(req.Height, req.Time, len(req.Txs), -1)
 	if err != nil {
 		observability.RecordModuleError("app", "finalize_block", "error")
 	}
