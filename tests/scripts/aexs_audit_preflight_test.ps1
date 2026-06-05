@@ -271,7 +271,17 @@ try {
       "SLASH-02",
       "SLASH-03",
       "SLASH-04",
-      "SLASH-05"
+      "SLASH-05",
+      "GOV-01",
+      "GOV-02",
+      "GOV-03",
+      "GOV-04",
+      "GOV-05",
+      "DIST-01",
+      "DIST-02",
+      "DIST-03",
+      "DIST-04",
+      "DIST-05"
     )) {
     Assert-True ($atomicTaskById.ContainsKey($taskId)) "required base-chain atomic task missing: $taskId"
   }
@@ -294,6 +304,16 @@ try {
   Assert-True ($atomicTaskById["SLASH-03"].adversarial_simulation_result.attack_attempt -match "redelegation slash evasion") "SLASH-03 must record redelegation slashing bypass"
   Assert-True ($atomicTaskById["SLASH-04"].invariant_tested -match "validator-set removal") "SLASH-04 must record validator-set removal invariant"
   Assert-True ($atomicTaskById["SLASH-05"].adversarial_simulation_result.expected_rejection -match "restore stake") "SLASH-05 must record slashed stake recovery rejection"
+  Assert-True ($atomicTaskById["GOV-01"].function_or_flow_covered -match "proposal creation") "GOV-01 must record governance lifecycle flow"
+  Assert-True ($atomicTaskById["GOV-02"].adversarial_simulation_result.mutation_inputs -match "zero deposit") "GOV-02 must record zero deposit mutation"
+  Assert-True ($atomicTaskById["GOV-03"].adversarial_simulation_result.attack_attempt -match "upgrade hijack") "GOV-03 must record upgrade hijack attack"
+  Assert-True ($atomicTaskById["GOV-04"].invariant_tested -match "authorized params") "GOV-04 must record authorized params invariant"
+  Assert-True ($atomicTaskById["GOV-05"].adversarial_simulation_result.expected_rejection -match "hard protocol bounds") "GOV-05 must record economic hard-bounds rejection"
+  Assert-True ($atomicTaskById["DIST-01"].function_or_flow_covered -match "validator commission") "DIST-01 must record distribution lifecycle flow"
+  Assert-True ($atomicTaskById["DIST-02"].adversarial_simulation_result.mutation_inputs -match "rounding remainder") "DIST-02 must record rounding remainder mutation"
+  Assert-True ($atomicTaskById["DIST-03"].adversarial_simulation_result.attack_attempt -match "reward double claim") "DIST-03 must record reward double claim attack"
+  Assert-True ($atomicTaskById["DIST-04"].invariant_tested -match "outstanding rewards") "DIST-04 must record outstanding rewards invariant"
+  Assert-True ($atomicTaskById["DIST-05"].adversarial_simulation_result.expected_rejection -match "treasury/community-pool funds") "DIST-05 must record treasury/community-pool leakage rejection"
 
   $enforceFailed = $false
   try {

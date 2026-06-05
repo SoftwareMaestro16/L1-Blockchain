@@ -382,6 +382,116 @@ function Get-AexsAtomicTaskOverride {
       mutation_inputs     = "slash then parameter change, slash then export/import, slash then migration, slash then unjail timing race"
       expected_rejection  = "slashed stake recovery attempts must not restore stake or remove tombstone incorrectly"
     }
+    "GOV-01" = [ordered]@{
+      flow                = "proposal creation, voting, tallying, parameter update, delayed execution"
+      state               = "accepted governance proposal updates proposal status, votes, tally result, params, and delayed execution queue deterministically"
+      attack              = "valid governance lifecycle baseline plus unauthorized proposer or voter control sample"
+      invariant           = "governance lifecycle executes only accepted proposals after deterministic voting and delay rules"
+      expected_behavior   = "valid proposal, vote, tally, and delayed execution update authorized governance state exactly once"
+      expected_events     = "governance events match proposal status, vote, tally, and executed parameter deltas"
+      expected_error_path = "unauthorized proposer or voter control sample is rejected before proposal or vote state mutation"
+      mutation_inputs     = "valid proposal, valid vote, valid tally, valid delayed execution, unauthorized proposer, unauthorized voter"
+      expected_rejection  = "unauthorized governance lifecycle variants must fail without proposal, vote, tally, or params mutation"
+    }
+    "GOV-02" = [ordered]@{
+      flow                = "proposal spam, malformed params, expired voting period, zero deposit, invalid authority"
+      state               = "invalid governance edge cases leave proposals, deposits, votes, params, and execution queues unchanged"
+      attack              = "proposal spam, malformed params, expired voting period, zero deposit, invalid authority"
+      invariant           = "governance accepts only valid authority, deposits, voting windows, and bounded params"
+      expected_behavior   = "valid governance boundaries execute deterministically; invalid boundaries reject before state mutation"
+      expected_events     = "accepted boundary proposals emit accurate governance events; rejected edge cases emit no success events"
+      expected_error_path = "governance validation rejects malformed params, expired periods, zero deposits, or invalid authority"
+      mutation_inputs     = "many proposals in one block, malformed param value, expired voting period vote, zero deposit, invalid authority address"
+      expected_rejection  = "invalid governance edge cases must not alter proposal status, deposits, votes, params, or execution queues"
+    }
+    "GOV-03" = [ordered]@{
+      flow                = "governance replay, proposal front-running, emergency parameter abuse, upgrade hijack"
+      state               = "adversarial governance attempts cannot replay execution, bypass delays, abuse emergency params, or hijack upgrades"
+      attack              = "governance replay, proposal front-running, emergency parameter abuse, upgrade hijack"
+      invariant           = "governance execution is single-use, authority-bound, delay-bound, and limited to authorized handlers"
+      expected_behavior   = "adversarial governance mutations fail or resolve deterministically without unauthorized params or upgrades"
+      expected_events     = "failed governance attacks emit no misleading execution, authority, or upgrade success events"
+      expected_error_path = "governance handler rejects replay, front-running, emergency abuse, or upgrade hijack before commit"
+      mutation_inputs     = "replayed executed proposal, duplicate proposal id, front-run param proposal, emergency param outside bounds, forged upgrade authority"
+      expected_rejection  = "governance attacks must not execute twice, bypass delay, change unauthorized params, or schedule unauthorized upgrades"
+    }
+    "GOV-04" = [ordered]@{
+      flow                = "authorized params update and rejected proposal state integrity"
+      state               = "accepted proposals update only authorized params and rejected proposals leave state unchanged"
+      attack              = "state drift attempt through mixed accepted, rejected, expired, and unauthorized governance proposals"
+      invariant           = "accepted proposals update only authorized params; rejected proposals preserve pre-proposal state"
+      expected_behavior   = "governance state integrity holds across proposal execution, rejection, expiry, and export/import"
+      expected_events     = "governance events reconcile to authorized param changes and no-op rejected proposals"
+      expected_error_path = "failed proposals preserve pre-failure params, module state, deposits, votes, and delayed execution queue"
+      mutation_inputs     = "accepted fee param update followed by rejected staking param update, expired proposal, unauthorized param route, export/import after proposals"
+      expected_rejection  = "rejected governance operations must preserve params, deposits, votes, and delayed execution state"
+    }
+    "GOV-05" = [ordered]@{
+      flow                = "governance economic abuse around fee, inflation, staking, and burn params"
+      state               = "governance cannot set fee, inflation, staking, or burn params outside hard protocol bounds"
+      attack              = "unsafe fee param, unsafe inflation param, unsafe staking param, unsafe burn param"
+      invariant           = "governance-controlled economic params remain inside hard protocol bounds"
+      expected_behavior   = "governance economic rules preserve hard bounds and delayed execution requirements"
+      expected_events     = "no economic param success event appears for rejected out-of-bounds governance proposals"
+      expected_error_path = "economic param abuse rejects before params, mint, burn, fee, or staking state mutation"
+      mutation_inputs     = "negative fee param, unbounded inflation, zero unbonding time, slash-free staking params, burn rate above max"
+      expected_rejection  = "governance economic abuse must not set fee, inflation, staking, or burn params outside hard protocol bounds"
+    }
+    "DIST-01" = [ordered]@{
+      flow                = "validator commission, delegator rewards, community pool accounting, reward withdrawal"
+      state               = "validator commission, delegator rewards, community pool, and withdrawal balances update deterministically"
+      attack              = "valid distribution lifecycle baseline plus unauthorized withdrawal control sample"
+      invariant           = "distribution rewards are paid only through authorized reward and commission paths"
+      expected_behavior   = "valid commission, reward accrual, community pool accounting, and withdrawals update balances exactly once"
+      expected_events     = "distribution events match commission, reward, community pool, and withdrawal deltas"
+      expected_error_path = "unauthorized reward withdrawal control sample is rejected before distribution or bank state mutation"
+      mutation_inputs     = "valid validator commission, valid delegator reward accrual, valid community pool accounting, valid withdraw, unauthorized withdraw"
+      expected_rejection  = "unauthorized distribution lifecycle variants must fail without reward, commission, or pool mutation"
+    }
+    "DIST-02" = [ordered]@{
+      flow                = "tiny rewards, rounding remainders, jailed validators, zero delegations, repeated withdrawals"
+      state               = "distribution edge cases preserve deterministic rewards, remainders, commission, and module balances"
+      attack              = "tiny reward rounding, jailed validator reward claim, zero delegation claim, repeated withdrawal"
+      invariant           = "distribution rounding and edge rewards cannot create extra funds or negative outstanding rewards"
+      expected_behavior   = "valid distribution boundaries execute deterministically; invalid boundaries reject before balance mutation"
+      expected_events     = "accepted boundary withdrawals emit accurate reward events; rejected edge cases emit no success events"
+      expected_error_path = "distribution validation rejects invalid jailed, zero-delegation, or repeated withdrawal paths"
+      mutation_inputs     = "one-atto reward, rounding remainder, jailed validator, zero delegation, repeated withdrawal in same sequence"
+      expected_rejection  = "invalid distribution edge cases must not alter rewards, commission, community pool, or module balances"
+    }
+    "DIST-03" = [ordered]@{
+      flow                = "reward double claim, commission bypass, reward inflation, module balance desync"
+      state               = "adversarial distribution attempts cannot double claim, bypass commission, inflate rewards, or desync module balances"
+      attack              = "reward double claim, commission bypass, reward inflation, module balance desync"
+      invariant           = "distribution cannot pay more than accrued rewards or desynchronize bank/module accounting"
+      expected_behavior   = "adversarial distribution mutations fail or resolve deterministically without extra rewards"
+      expected_events     = "failed distribution attacks emit no misleading withdraw, commission, or reward success events"
+      expected_error_path = "distribution keeper or bank send path rejects invalid reward manipulation before commit"
+      mutation_inputs     = "duplicate withdraw, commission address spoof, inflated outstanding rewards, module account balance mismatch"
+      expected_rejection  = "distribution attacks must not double pay rewards, bypass commission, inflate rewards, or desync module balances"
+    }
+    "DIST-04" = [ordered]@{
+      flow                = "outstanding rewards, module balances, supply accounting determinism"
+      state               = "outstanding rewards, module balances, and supply accounting reconcile after accepted and rejected distribution operations"
+      attack              = "state drift attempt through mixed accepted and rejected reward withdrawals and commission claims"
+      invariant           = "outstanding rewards, module balances, and supply accounting stay deterministic"
+      expected_behavior   = "distribution state integrity holds across withdrawal, commission, community pool, and export/import sequences"
+      expected_events     = "distribution events reconcile to final reward, commission, pool, and balance deltas"
+      expected_error_path = "failed distribution operations preserve pre-failure outstanding rewards and module balance snapshot"
+      mutation_inputs     = "accepted withdraw followed by failed duplicate withdraw, accepted commission followed by failed spoof, export/import after rewards"
+      expected_rejection  = "rejected distribution operations must preserve outstanding reward, module balance, and supply consistency"
+    }
+    "DIST-05" = [ordered]@{
+      flow                = "distribution economic abuse around unauthorized mint and treasury or community-pool leakage"
+      state               = "distribution cannot mint outside authorized reward path or leak treasury/community-pool funds"
+      attack              = "unauthorized reward mint, treasury leak, community pool leak, reward path spoof"
+      invariant           = "distribution cannot mint outside authorized reward path or leak treasury/community-pool funds"
+      expected_behavior   = "distribution economic rules preserve module account authorization, reward limits, and community-pool accounting"
+      expected_events     = "no mint, treasury leak, or community-pool leak event appears for rejected economic abuse paths"
+      expected_error_path = "economic abuse rejects before mint, bank send, treasury, community pool, or reward state mutation"
+      mutation_inputs     = "mint-shaped reward withdrawal, unauthorized treasury transfer, community pool drain, forged reward module account"
+      expected_rejection  = "distribution economic abuse must not mint unauthorized rewards or leak treasury/community-pool funds"
+    }
   }
   if ($overrides.ContainsKey($TaskId)) {
     return $overrides[$TaskId]
