@@ -37,6 +37,7 @@ func TestPolicyDefinesPhase11ReadinessSurface(t *testing.T) {
 	require.Equal(t, UploadPermissionGovernanceOnly, policy.UploadPermission)
 	require.Equal(t, InstantiatePermissionCodeOwnerOnly, policy.InstantiatePermission)
 	require.Equal(t, AdminPolicyRequired, policy.AdminPolicy)
+	require.True(t, policy.MigrationsEnabled)
 	require.Equal(t, uint64(800*1024), policy.MaxContractSizeBytes)
 	require.Equal(t, uint64(3*1024*1024), policy.MaxProposalContractSizeBytes)
 	require.Equal(t, uint64(3_000_000), policy.SmartQueryGasLimit)
@@ -137,6 +138,8 @@ func TestAllowlistUploadInstantiateExecuteMigrateLifecycle(t *testing.T) {
 	require.NoError(t, ValidateInstantiateAddresses(ownerAddr, ownerAddr, policy))
 	require.NoError(t, CanExecute(ownerAddr, contractAddr, policy))
 	require.NoError(t, CanMigrate(ownerAddr, ownerAddr, policy))
+	policy.MigrationsEnabled = false
+	require.ErrorContains(t, CanMigrate(ownerAddr, ownerAddr, policy), "disabled by governance")
 }
 
 func TestInstantiateOwnerOnlyAndMigrationRejectAdminTakeover(t *testing.T) {

@@ -85,6 +85,9 @@ func CanMigrate(actor, admin string, p Policy) error {
 	if err := requireEnabled(p); err != nil {
 		return err
 	}
+	if !p.MigrationsEnabled {
+		return errors.New("wasm migrations are disabled by governance")
+	}
 	if err := addressing.ValidateUserAddress("wasm migrate actor", actor); err != nil {
 		return err
 	}

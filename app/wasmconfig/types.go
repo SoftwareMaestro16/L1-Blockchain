@@ -58,6 +58,7 @@ type Policy struct {
 	UploadPermission             UploadPermission
 	InstantiatePermission        InstantiatePermission
 	AdminPolicy                  AdminPolicy
+	MigrationsEnabled            bool
 	PinnedCodePolicy             PinnedCodePolicy
 	GovernanceAuthority          string
 	UploadAllowlist              []string
@@ -78,6 +79,7 @@ func DefaultPolicy() Policy {
 		UploadPermission:             UploadPermissionGovernanceOnly,
 		InstantiatePermission:        InstantiatePermissionCodeOwnerOnly,
 		AdminPolicy:                  AdminPolicyRequired,
+		MigrationsEnabled:            true,
 		PinnedCodePolicy:             PinnedCodePolicyDisabled,
 		MaxContractSizeBytes:         DefaultMaxContractSizeBytes,
 		MaxProposalContractSizeBytes: DefaultMaxProposalContractSizeBytes,
