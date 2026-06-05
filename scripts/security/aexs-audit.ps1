@@ -602,6 +602,116 @@ function Get-AexsAtomicTaskOverride {
       mutation_inputs     = "factory denom as fee, factory denom named AET, factory denom named naet, mint shaped as native supply, native metadata spoof"
       expected_rejection  = "tokenfactory economic abuse must not pay protocol fees, spoof AET, or inflate native supply"
     }
+    "DEX-01" = [ordered]@{
+      flow                = "pool creation, add liquidity, remove liquidity, swap, LP mint, LP burn"
+      state               = "pool records, reserves, LP supply, shares, and module balances update deterministically"
+      attack              = "valid DEX lifecycle baseline plus unauthorized pool module account control sample"
+      invariant           = "DEX lifecycle preserves reserves, LP supply, shares, and module bank balance consistency"
+      expected_behavior   = "valid pool creation, liquidity changes, swaps, LP mint, and LP burn update AMM state exactly once"
+      expected_events     = "DEX events match pool, reserve, LP supply, share, and swap deltas"
+      expected_error_path = "unauthorized pool module account control sample is rejected before pool, LP, or bank state mutation"
+      mutation_inputs     = "valid create pool, valid add liquidity, valid remove liquidity, valid swap, valid LP mint, valid LP burn, unauthorized pool module movement"
+      expected_rejection  = "unauthorized DEX lifecycle variants must fail without pool, reserve, LP, or bank mutation"
+    }
+    "DEX-02" = [ordered]@{
+      flow                = "duplicate pair, tiny reserves, zero liquidity, same denom pair, invalid pool id, max amount"
+      state               = "invalid DEX edge cases leave pool records, reserves, LP supply, shares, and balances unchanged"
+      attack              = "duplicate pair, tiny reserve, zero liquidity, same denom pair, invalid pool id, max amount boundary"
+      invariant           = "DEX accepts only canonical pairs, positive liquidity, valid pool ids, and bounded amounts"
+      expected_behavior   = "valid DEX boundaries execute deterministically; invalid boundaries reject before pool or bank mutation"
+      expected_events     = "accepted boundary DEX events match accounting deltas; rejected edge cases emit no success events"
+      expected_error_path = "DEX validation rejects duplicate pairs, tiny invalid reserves, zero liquidity, same denom pairs, invalid pool ids, or unsafe max amounts"
+      mutation_inputs     = "duplicate pair, one-unit reserve, zero liquidity, same denom pair, invalid pool id, max amount plus one"
+      expected_rejection  = "invalid DEX edge cases must not alter pool records, reserves, LP supply, shares, or balances"
+    }
+    "DEX-03" = [ordered]@{
+      flow                = "pool drain, LP inflation, reserve desync, failed bank movement partial update, slippage bypass"
+      state               = "adversarial DEX attempts cannot drain pools, inflate LP, desync reserves, partially move funds, or bypass slippage"
+      attack              = "pool drain, LP inflation, reserve desync, failed bank movement partial update, slippage bypass"
+      invariant           = "DEX bank movements are atomic and AMM reserves, LP supply, and slippage constraints cannot be bypassed"
+      expected_behavior   = "adversarial DEX mutations fail deterministically before pool or bank state corruption"
+      expected_events     = "failed DEX attacks emit no misleading pool, LP, reserve, or swap success events"
+      expected_error_path = "DEX keeper or bank send path rejects pool drain, LP inflation, reserve desync, partial bank movement, or slippage bypass before commit"
+      mutation_inputs     = "oversized swap drain, forged LP mint, manual reserve mismatch, bank send failure after reserve update attempt, min-out slippage bypass"
+      expected_rejection  = "DEX attacks must not drain pools, inflate LP supply, desync reserves, partially commit bank movement, or bypass slippage"
+    }
+    "DEX-04" = [ordered]@{
+      flow                = "reserves match module balances, LP supply matches shares, failed operations leave pool state unchanged"
+      state               = "reserves, module balances, LP supply, shares, and failed operation snapshots reconcile deterministically"
+      attack              = "state drift attempt through mixed accepted and rejected DEX pool, liquidity, and swap operations"
+      invariant           = "reserves match module balances and LP supply matches shares"
+      expected_behavior   = "DEX state integrity holds across pool, liquidity, swap, failure, and export/import sequences"
+      expected_events     = "DEX events reconcile to final reserve, balance, LP supply, and share deltas"
+      expected_error_path = "failed DEX operations preserve pre-failure pool, reserve, LP supply, share, and module balance snapshots"
+      mutation_inputs     = "accepted add liquidity followed by failed swap, accepted swap followed by failed remove liquidity, accepted create pool followed by duplicate create, export/import after pool updates"
+      expected_rejection  = "rejected DEX operations must preserve reserve/module balance and LP/share consistency"
+    }
+    "DEX-05" = [ordered]@{
+      flow                = "constant-product and fee-adjusted swap math under rounding, ordering, and malformed denom input"
+      state               = "constant-product, fee-adjusted reserves, LP supply, and pool balances cannot be exploited by rounding, ordering, or malformed denoms"
+      attack              = "rounding leak, ordering manipulation, malformed denom pair, fee-adjusted swap math abuse"
+      invariant           = "constant-product and fee-adjusted swap math cannot be exploited through rounding, ordering, or malformed denoms"
+      expected_behavior   = "DEX economic math preserves protocol-favorable rounding, canonical ordering, and denom validation"
+      expected_events     = "no profitable rounding, ordering, or malformed-denom success event appears for rejected DEX economic abuse paths"
+      expected_error_path = "DEX economic abuse rejects before swap, LP, reserve, or bank state mutation"
+      mutation_inputs     = "tiny swap rounding loop, reversed denom order, malformed denom, fee bypass amount, repeated swap ordering sequence"
+      expected_rejection  = "DEX economic abuse must not violate constant-product math, bypass fees, leak rounding value, or accept malformed denoms"
+    }
+    "ID-01" = [ordered]@{
+      flow                = "domain auction, assignment, renewal, expiry, resolver update, reverse lookup, subdomain flow"
+      state               = "domain records, ownership, expiry, resolver records, reverse lookup, subdomains, and NFT representation update deterministically"
+      attack              = "valid identity lifecycle baseline plus unauthorized owner control sample"
+      invariant           = "identity lifecycle preserves domain uniqueness, owner authority, resolver validity, and NFT ownership consistency"
+      expected_behavior   = "valid auction, assignment, renewal, expiry, resolver update, reverse lookup, and subdomain operations update identity state exactly once"
+      expected_events     = "identity events match domain, owner, resolver, reverse, subdomain, and NFT deltas"
+      expected_error_path = "unauthorized owner control sample is rejected before domain, resolver, reverse, subdomain, or NFT state mutation"
+      mutation_inputs     = "valid domain auction, valid assignment, valid renewal, valid expiry, valid resolver update, valid reverse lookup, valid subdomain, unauthorized owner control"
+      expected_rejection  = "unauthorized identity lifecycle variants must fail without domain, resolver, reverse, subdomain, or NFT mutation"
+    }
+    "ID-02" = [ordered]@{
+      flow                = "invalid name, duplicate name, expired domain, missing resolver, zero resolver, max metadata"
+      state               = "invalid identity edge cases leave domain records, resolver records, reverse records, expiry, metadata, and NFT state unchanged"
+      attack              = "invalid name, duplicate name, expired domain resolution, missing resolver, zero resolver, oversized metadata"
+      invariant           = "identity accepts only canonical unique names, active domains, valid resolvers, and bounded metadata"
+      expected_behavior   = "valid identity boundaries execute deterministically; invalid boundaries reject before registry mutation"
+      expected_events     = "accepted boundary identity events match state deltas; rejected edge cases emit no success events"
+      expected_error_path = "identity validation rejects invalid names, duplicate names, expired domains, missing resolvers, zero resolvers, or oversized metadata"
+      mutation_inputs     = "empty name, mixed-case duplicate name, expired domain action, missing resolver query, zero resolver address, max metadata plus one"
+      expected_rejection  = "invalid identity edge cases must not alter domain records, resolver records, reverse records, expiry, metadata, or NFT state"
+    }
+    "ID-03" = [ordered]@{
+      flow                = "domain hijack, auction manipulation, resolver overwrite, reverse lookup poisoning, subdomain collision"
+      state               = "adversarial identity attempts cannot hijack domains, manipulate auctions, overwrite resolvers, poison reverse lookup, or collide subdomains"
+      attack              = "domain hijack, auction manipulation, resolver overwrite, reverse lookup poisoning, subdomain collision"
+      invariant           = "identity ownership, auction ordering, resolver authority, reverse lookup authorization, and subdomain uniqueness cannot be bypassed"
+      expected_behavior   = "adversarial identity mutations fail deterministically before ownership or resolver state corruption"
+      expected_events     = "failed identity attacks emit no misleading domain transfer, resolver update, reverse, auction, or subdomain success events"
+      expected_error_path = "identity state transition rejects hijack, auction manipulation, resolver overwrite, reverse poisoning, or subdomain collision before commit"
+      mutation_inputs     = "non-owner transfer, bid reveal manipulation, non-owner resolver overwrite, reverse lookup for another address, duplicate subdomain"
+      expected_rejection  = "identity attacks must not hijack domains, manipulate auctions, overwrite resolvers, poison reverse lookup, or create subdomain collisions"
+    }
+    "ID-04" = [ordered]@{
+      flow                = "registry owner, resolver record, expiry, NFT representation consistency"
+      state               = "registry owner, resolver record, expiry, reverse records, subdomains, and NFT representation do not diverge"
+      attack              = "state drift attempt through mixed accepted and rejected identity ownership, resolver, expiry, and NFT operations"
+      invariant           = "registry owner, resolver record, expiry, and NFT representation do not diverge"
+      expected_behavior   = "identity state integrity holds across lifecycle, resolver, subdomain, transfer, and export/import sequences"
+      expected_events     = "identity events reconcile to final owner, resolver, expiry, reverse, subdomain, and NFT deltas"
+      expected_error_path = "failed identity operations preserve pre-failure owner, resolver, expiry, reverse, subdomain, metadata, and NFT snapshots"
+      mutation_inputs     = "accepted assignment followed by failed resolver update, accepted renewal followed by failed transfer, accepted NFT transfer followed by old-owner resolver update, export/import after domain changes"
+      expected_rejection  = "rejected identity operations must preserve owner, resolver, expiry, and NFT representation consistency"
+    }
+    "ID-05" = [ordered]@{
+      flow                = "auction bids, renewal fees, refunds, and domain payments to valid targets"
+      state               = "auction bids, renewal fees, refunds, and domain payments cannot be stolen or routed to invalid targets"
+      attack              = "auction bid theft, renewal fee theft, refund theft, invalid payment target routing"
+      invariant           = "identity economic flows preserve bid escrow, renewal fee accounting, refunds, and valid payment targets"
+      expected_behavior   = "identity economic rules keep auction escrow, renewal fees, refunds, and payments deterministic and authorized"
+      expected_events     = "no bid theft, renewal fee theft, refund theft, or invalid-target payment event appears for rejected identity economic abuse paths"
+      expected_error_path = "identity economic abuse rejects before escrow, fee, refund, payment, owner, or resolver state mutation"
+      mutation_inputs     = "losing bid refund redirect, renewal fee redirect, auction escrow drain, invalid payment target, duplicate refund claim"
+      expected_rejection  = "identity economic abuse must not steal bids, renewal fees, refunds, or route domain payments to invalid targets"
+    }
   }
   if ($overrides.ContainsKey($TaskId)) {
     return $overrides[$TaskId]

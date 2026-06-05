@@ -291,7 +291,17 @@ try {
       "TF-02",
       "TF-03",
       "TF-04",
-      "TF-05"
+      "TF-05",
+      "DEX-01",
+      "DEX-02",
+      "DEX-03",
+      "DEX-04",
+      "DEX-05",
+      "ID-01",
+      "ID-02",
+      "ID-03",
+      "ID-04",
+      "ID-05"
     )) {
     Assert-True ($atomicTaskById.ContainsKey($taskId)) "required base-chain atomic task missing: $taskId"
   }
@@ -334,6 +344,16 @@ try {
   Assert-True ($atomicTaskById["TF-03"].adversarial_simulation_result.attack_attempt -match "burn-from mismatch") "TF-03 must record burn-from mismatch attack"
   Assert-True ($atomicTaskById["TF-04"].invariant_tested -match "supply delta") "TF-04 must record exact supply delta invariant"
   Assert-True ($atomicTaskById["TF-05"].adversarial_simulation_result.expected_rejection -match "spoof AET") "TF-05 must record native spoofing rejection"
+  Assert-True ($atomicTaskById["DEX-01"].function_or_flow_covered -match "pool creation") "DEX-01 must record DEX lifecycle flow"
+  Assert-True ($atomicTaskById["DEX-02"].adversarial_simulation_result.mutation_inputs -match "duplicate pair") "DEX-02 must record duplicate pair mutation"
+  Assert-True ($atomicTaskById["DEX-03"].adversarial_simulation_result.attack_attempt -match "pool drain") "DEX-03 must record pool drain attack"
+  Assert-True ($atomicTaskById["DEX-04"].invariant_tested -match "reserves match module balances") "DEX-04 must record reserves/balances invariant"
+  Assert-True ($atomicTaskById["DEX-05"].adversarial_simulation_result.expected_rejection -match "constant-product") "DEX-05 must record constant-product rejection"
+  Assert-True ($atomicTaskById["ID-01"].function_or_flow_covered -match "domain auction") "ID-01 must record identity lifecycle flow"
+  Assert-True ($atomicTaskById["ID-02"].adversarial_simulation_result.mutation_inputs -match "zero resolver") "ID-02 must record zero resolver mutation"
+  Assert-True ($atomicTaskById["ID-03"].adversarial_simulation_result.attack_attempt -match "domain hijack") "ID-03 must record domain hijack attack"
+  Assert-True ($atomicTaskById["ID-04"].invariant_tested -match "NFT representation") "ID-04 must record NFT representation invariant"
+  Assert-True ($atomicTaskById["ID-05"].adversarial_simulation_result.expected_rejection -match "invalid targets") "ID-05 must record invalid payment target rejection"
 
   $enforceFailed = $false
   try {
