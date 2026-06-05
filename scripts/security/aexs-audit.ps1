@@ -1535,6 +1535,375 @@ function Test-AexsAtomicTaskRecord {
   return $reasons
 }
 
+function Get-AexsInvariantChecklistPrefix {
+  param([string]$Category)
+  switch -Regex ($Category) {
+    '^Economic Invariants$' { return "ECON" }
+    '^Consensus And State Invariants$' { return "STATE" }
+    '^DEX Invariants$' { return "DEXINV" }
+    '^Load, Routing, And Sharding Invariants$' { return "LOAD" }
+    '^Identity And Resolver Invariants$' { return "IDINV" }
+    '^Execution, AVM, And Queue Invariants$' { return "EXECINV" }
+    default {
+      $words = @([regex]::Matches($Category.ToUpperInvariant(), '[A-Z0-9]+') | ForEach-Object { $_.Value })
+      if ($words.Count -eq 0) {
+        return "INV"
+      }
+      return (($words | Select-Object -First 2) -join "")
+    }
+  }
+}
+
+function Get-AexsInvariantChecklistScope {
+  param([string]$Category)
+  switch -Regex ($Category) {
+    '^Economic Invariants$' { return "global/economics" }
+    '^Consensus And State Invariants$' { return "app/consensus-state" }
+    '^DEX Invariants$' { return "x/dex" }
+    '^Load, Routing, And Sharding Invariants$' { return "x/sharding/sim" }
+    '^Identity And Resolver Invariants$' { return "x/identity" }
+    '^Execution, AVM, And Queue Invariants$' { return "x/vm+x/queue" }
+    default { return "global/invariants" }
+  }
+}
+
+function Get-AexsInvariantChecklistOverride {
+  param([string]$InvariantId)
+  $overrides = @{
+    "ECON-01" = [ordered]@{
+      flow                = "global supply equation across account balances, module balances, burned accounting, and staked accounting"
+      state               = "accepted value-moving transitions preserve the equation sum(account balances) + module balances + burned + staked = total_supply"
+      attack              = "supply drift through mixed bank, module, burn, staking, mint, export, and import transitions"
+      expected_behavior   = "every executed block recomputes the global supply equation from canonical stores and records any mismatch as a critical invariant break"
+      expected_events     = "no supply drift, unauthorized mint, unauthorized burn, or accounting mismatch event appears after accepted value transitions"
+      expected_error_path = "malformed or unauthorized value transition rejects before balance, module account, burned, staked, or supply mutation"
+      mutation_inputs     = "unauthorized mint, unauthorized burn, partial bank send failure, staking loop, distribution withdrawal loop, export/import replay"
+      expected_rejection  = "any transition that would make the supply equation false is rejected or reported as a critical invariant failure"
+    }
+    "ECON-02" = [ordered]@{
+      flow                = "balance non-negativity across account and module balances"
+      state               = "accepted transfers, burns, fees, staking, and DEX operations cannot create negative balances"
+      attack              = "underflow, oversized send, partial multi-send, fee drain, burn overflow, and insufficient-funds mutation"
+      expected_behavior   = "bank and module accounting reject any transition that would underflow an account or module balance"
+      expected_events     = "no negative-balance event or committed negative balance appears in exported state"
+      expected_error_path = "underflow path rejects before balance mutation"
+      mutation_inputs     = "max amount send, insufficient funds send, duplicated output multi-send, oversized burn, fee larger than balance"
+      expected_rejection  = "negative balance attempts must fail without mutating state"
+    }
+    "ECON-03" = [ordered]@{
+      flow                = "mint authority boundaries for native, module, and tokenfactory supply"
+      state               = "only explicitly authorized mint paths can increase supply"
+      attack              = "unauthorized mint, module account spoofing, tokenfactory admin bypass, governance authority spoofing"
+      expected_behavior   = "minting requires the module-specific authority and denom-specific permission before any supply increase"
+      expected_events     = "no mint event is emitted from an unauthorized signer or unauthorized module account"
+      expected_error_path = "unauthorized mint rejects before bank supply or denom metadata mutation"
+      mutation_inputs     = "wrong admin, zero admin, wrong module account, forged authority, native denom mint through tokenfactory"
+      expected_rejection  = "unauthorized mint attempts cannot increase supply"
+    }
+    "ECON-04" = [ordered]@{
+      flow                = "burn authority boundaries for user, module, and tokenfactory supply"
+      state               = "only explicitly authorized burn paths can decrease supply or burn from a source account"
+      attack              = "unauthorized burn, burn-from mismatch, module account burn spoofing, native-denom burn abuse"
+      expected_behavior   = "burning requires owner/module/admin authorization and exact source-account control"
+      expected_events     = "no burn event is emitted for an unauthorized signer, wrong source, or wrong denom authority"
+      expected_error_path = "unauthorized burn rejects before balance, supply, or metadata mutation"
+      mutation_inputs     = "wrong admin burn, burn from another account, zero admin, oversized burn, native denom burn through factory path"
+      expected_rejection  = "unauthorized burn attempts cannot decrease supply or debit another account"
+    }
+    "ECON-05" = [ordered]@{
+      flow                = "protocol fee denom admission policy"
+      state               = "ante fee checks accept no fee denom other than naet"
+      attack              = "fee denom spoofing, multi-denom fee bypass, tokenfactory asset fee payment, missing fee bypass"
+      expected_behavior   = "the fee policy rejects every transaction whose protocol fee set contains a non-naet denom"
+      expected_events     = "no fee-collected event exists for non-naet denoms"
+      expected_error_path = "non-naet fee rejects in ante before message execution"
+      mutation_inputs     = "non-naet fee, mixed naet/factory fee, malformed denom, missing fee, zero fee where min fee applies"
+      expected_rejection  = "non-naet protocol fee paths cannot enter execution"
+    }
+    "ECON-06" = [ordered]@{
+      flow                = "fee collection and distribution accounting"
+      state               = "fee distribution totals match collected fees for treasury, burn, validators, and community pool"
+      attack              = "rounding loss, split overflow, malformed tx shape, duplicate fee deduction, distribution module desync"
+      expected_behavior   = "collected fees are allocated exactly once according to bounded deterministic split params"
+      expected_events     = "fee collected and fee distributed events reconcile to the same total amount"
+      expected_error_path = "invalid fee split or accounting mismatch rejects before distribution state mutation"
+      mutation_inputs     = "tiny fee, max fee, split edge percentages, multi-message tx, failed message after ante, export/import"
+      expected_rejection  = "fee distribution cannot create, lose, or double-count collected fees"
+    }
+    "ECON-07" = [ordered]@{
+      flow                = "treasury, burn, validator reward, and community pool deterministic accounting"
+      state               = "economic sinks and reward destinations are deterministic for the same block input"
+      attack              = "map-order distribution drift, rounding nondeterminism, validator order manipulation, treasury routing spoof"
+      expected_behavior   = "destination ordering and rounding rules are canonical and produce identical accounting on replay"
+      expected_events     = "reward, burn, treasury, and community pool events are stable for same input"
+      expected_error_path = "invalid destination or unbounded split rejects before accounting mutation"
+      mutation_inputs     = "different validator insertion order, tiny rewards, max rewards, malformed treasury address, replay/export/import"
+      expected_rejection  = "economic destination accounting cannot diverge across nodes"
+    }
+    "ECON-08" = [ordered]@{
+      flow                = "staking reward loop resistance"
+      state               = "staking rewards cannot be farmed through repeated delegation, unbonding, redelegation, withdrawal, or export/import loops"
+      attack              = "reward farming loop, timing manipulation, repeated withdrawal, delegation-share rounding exploit"
+      expected_behavior   = "reward accrual depends only on canonical stake, time/height rules, and distribution indexes"
+      expected_events     = "no repeated withdrawal or stake-loop event pays more than accrued rewards"
+      expected_error_path = "invalid reward-loop sequence rejects before reward or staking state mutation"
+      mutation_inputs     = "delegate/withdraw loop, redelegate/withdraw loop, unbond/rebond loop, tiny share rounding, export/import replay"
+      expected_rejection  = "staking reward loops cannot mint or redirect extra rewards"
+    }
+    "ECON-09" = [ordered]@{
+      flow                = "supply export/import round-trip stability"
+      state               = "supply cannot drift after deterministic export/import"
+      attack              = "export ordering drift, missing module account, duplicate balance, corrupted genesis, denom metadata mismatch"
+      expected_behavior   = "exported state imports to the same supply, balances, staking, burned accounting, and module balances"
+      expected_events     = "no supply-changing event appears during pure export/import validation"
+      expected_error_path = "corrupted export/import state rejects during genesis validation before chain start"
+      mutation_inputs     = "duplicate balance, duplicate module account, missing staking pool, malformed supply, reordered denoms"
+      expected_rejection  = "export/import cannot change total supply or accepted accounting"
+    }
+    "STATE-01" = [ordered]@{
+      flow                = "same block input app-hash determinism"
+      state               = "same block input produces same app hash"
+      attack              = "map iteration drift, random source, wall-clock dependency, goroutine race, platform-dependent integer behavior"
+      expected_behavior   = "FinalizeBlock/Commit over identical genesis and tx sequence yields identical AppHash"
+      expected_events     = "block events and app hash are identical for same ordered input"
+      expected_error_path = "nondeterministic state transition is recorded as a critical consensus failure"
+      mutation_inputs     = "same tx list with different local map insertion order, replayed genesis, repeated block execution, restart replay"
+      expected_rejection  = "nondeterministic app hash is never accepted as production-safe"
+    }
+    "STATE-02" = [ordered]@{
+      flow                = "signed transaction replay protection"
+      state               = "same signed transaction cannot execute twice"
+      attack              = "exact signed byte replay, sequence reuse, mempool rebroadcast, export/import replay"
+      expected_behavior   = "accepted transaction increments sequence and any byte-for-byte replay fails before message execution"
+      expected_events     = "second execution emits no state-mutating success event"
+      expected_error_path = "replayed tx rejects in ante before account, balance, fee, or module state mutation"
+      mutation_inputs     = "same signed tx bytes twice, same sequence with altered memo, same tx after restart, wrong chain id"
+      expected_rejection  = "replayed signed transaction cannot mutate state twice"
+    }
+    "STATE-03" = [ordered]@{
+      flow                = "invalid signer state mutation prevention"
+      state               = "invalid signer cannot mutate state"
+      attack              = "wrong signer, missing signer, malformed public key, zero address signer, unauthorized authority"
+      expected_behavior   = "signature and signer checks complete before any message state transition"
+      expected_events     = "no module success event is emitted for invalid signer paths"
+      expected_error_path = "invalid signer rejects in ante or msg ValidateBasic before state mutation"
+      mutation_inputs     = "invalid signature, zero signer, wrong admin, wrong authority, malformed public key"
+      expected_rejection  = "invalid signer paths leave all module state unchanged"
+    }
+    "STATE-04" = [ordered]@{
+      flow                = "malformed transaction pre-mutation failure"
+      state               = "malformed transaction fails before state mutation"
+      attack              = "malformed protobuf, invalid memo bytes, malformed auth info, malformed message fields, oversized tx"
+      expected_behavior   = "decode, basic validation, ante, and message validation reject malformed tx before writes"
+      expected_events     = "malformed tx does not emit successful module events"
+      expected_error_path = "malformed transaction rejects before cache context write commit"
+      mutation_inputs     = "corrupted protobuf bytes, invalid UTF-8 memo, missing auth info, oversized payload, malformed address"
+      expected_rejection  = "malformed transaction cannot partially mutate state"
+    }
+    "STATE-05" = [ordered]@{
+      flow                = "validator set and staking keeper consistency"
+      state               = "validator set matches staking keeper state"
+      attack              = "validator power spoofing, stale validator update, missing slash update, invalid gentx, export/import mismatch"
+      expected_behavior   = "EndBlock validator updates derive only from canonical staking keeper state"
+      expected_events     = "validator-set update events match staking keeper validator power and status"
+      expected_error_path = "invalid validator-set update source rejects or fails deterministic invariant check"
+      mutation_inputs     = "validator create/remove, delegation power change, slash, jail, unbonding, exported validator state reorder"
+      expected_rejection  = "CometBFT validator updates cannot diverge from staking keeper state"
+    }
+    "STATE-06" = [ordered]@{
+      flow                = "objective deterministic slashing evidence"
+      state               = "slashing evidence is objective and deterministic"
+      attack              = "stale evidence, duplicate evidence, malformed proof, redelegation timing evasion, unbonding timing evasion"
+      expected_behavior   = "the same valid evidence produces the same slash/jail/tombstone transition on every node"
+      expected_events     = "slash, jail, and tombstone events are identical for the same objective evidence"
+      expected_error_path = "invalid or duplicate evidence rejects before slashing state mutation"
+      mutation_inputs     = "duplicate evidence, stale height, malformed validator address, invalid signature proof, evidence after unbonding"
+      expected_rejection  = "subjective or malformed evidence cannot mutate slashing state"
+    }
+    "STATE-07" = [ordered]@{
+      flow                = "genesis validation for malformed state"
+      state               = "genesis validation rejects malformed accounts, balances, params, and module state"
+      attack              = "duplicate accounts, duplicate balances, invalid params, malformed custom module genesis, invalid denom metadata"
+      expected_behavior   = "ValidateGenesis rejects malformed state before InitChain can commit it"
+      expected_events     = "no startup success or state migration event exists for rejected genesis"
+      expected_error_path = "malformed genesis fails startup-only validation with explicit error"
+      mutation_inputs     = "duplicate account, negative/overflow balance, invalid naet metadata, invalid params, duplicate custom module ids"
+      expected_rejection  = "malformed genesis cannot start a chain"
+    }
+    "STATE-08" = [ordered]@{
+      flow                = "upgrade and migration state preservation"
+      state               = "upgrade and migration paths preserve state roots and module invariants"
+      attack              = "migration ordering drift, missing module version, panic path, duplicate migration, corrupted version map"
+      expected_behavior   = "upgrade handlers and migrations are deterministic, version-gated, and preserve declared module invariants"
+      expected_events     = "migration events and post-migration roots are stable for the same pre-upgrade state"
+      expected_error_path = "invalid migration state rejects before committing partial upgraded state"
+      mutation_inputs     = "future version no-op migration, corrupted version map, reordered module state, malformed export, restart after migration"
+      expected_rejection  = "migration cannot alter roots or invariants outside explicit migration contract"
+    }
+  }
+  if ($overrides.ContainsKey($InvariantId)) {
+    return $overrides[$InvariantId]
+  }
+  return $null
+}
+
+function Get-AexsInvariantChecklistRecords {
+  param([string]$Text, [string]$CampaignId)
+  $section = Get-AexsMarkdownSection -Text $Text -Heading "Invariant Checklist"
+  if ([string]::IsNullOrWhiteSpace($section)) {
+    return @()
+  }
+
+  $items = @()
+  $category = ""
+  $current = $null
+  foreach ($line in ($section -split "`r?`n")) {
+    if ($line -match '^###\s+(.+?)\s*$') {
+      if ($null -ne $current) {
+        $items += $current
+        $current = $null
+      }
+      $category = $Matches[1].Trim()
+      continue
+    }
+
+    if ($line -match '^- \[ \]\s+(.+?)\s*$') {
+      if ($null -ne $current) {
+        $items += $current
+      }
+      $current = [ordered]@{
+        category    = $category
+        description = $Matches[1].Trim()
+      }
+      continue
+    }
+
+    if ($null -ne $current -and $line -match '^\s+(.+?)\s*$') {
+      $current["description"] = ($current["description"] + " " + $Matches[1].Trim()).Trim()
+    }
+  }
+  if ($null -ne $current) {
+    $items += $current
+  }
+
+  $categoryCounts = @{}
+  $records = @()
+  foreach ($item in $items) {
+    $category = [string]$item["category"]
+    if ([string]::IsNullOrWhiteSpace($category)) {
+      $category = "Uncategorized Invariants"
+    }
+    $prefix = Get-AexsInvariantChecklistPrefix -Category $category
+    if (-not $categoryCounts.ContainsKey($prefix)) {
+      $categoryCounts[$prefix] = 0
+    }
+    $categoryCounts[$prefix] = [int]$categoryCounts[$prefix] + 1
+    $invariantId = "{0}-{1:00}" -f $prefix, [int]$categoryCounts[$prefix]
+    $invariantText = ([string]$item["description"]).Trim().TrimEnd(".")
+    $scope = Get-AexsInvariantChecklistScope -Category $category
+    $override = Get-AexsInvariantChecklistOverride -InvariantId $invariantId
+    $seedHash = (Get-AexsSha256Hex -Text "$CampaignId|invariant-checklist|$invariantId|$invariantText").Substring(0, 16)
+    $seed = "aexs-$($invariantId.ToLowerInvariant())-$seedHash"
+    $flow = Get-AexsOverrideValue -Override $override -Field "flow" -Fallback "$category mandatory invariant check"
+    $state = Get-AexsOverrideValue -Override $override -Field "state" -Fallback $invariantText
+    $attack = Get-AexsOverrideValue -Override $override -Field "attack" -Fallback "malformed input, replay, unauthorized signer, boundary values, state corruption, or module-specific exploit against $category"
+    $expectedBehavior = Get-AexsOverrideValue -Override $override -Field "expected_behavior" -Fallback "campaign executes this invariant after relevant simulated transitions"
+    $expectedEvents = Get-AexsOverrideValue -Override $override -Field "expected_events" -Fallback "events remain consistent with committed state or no events are emitted on rejection"
+    $expectedErrorPath = Get-AexsOverrideValue -Override $override -Field "expected_error_path" -Fallback "invalid transition fails before committing state that violates the invariant"
+    $mutationInputs = Get-AexsOverrideValue -Override $override -Field "mutation_inputs" -Fallback "generated scenario seed, mutated tx bytes, corrupted genesis fragment, replayed sequence, and boundary values"
+    $expectedRejection = Get-AexsOverrideValue -Override $override -Field "expected_rejection" -Fallback "any invariant violation is rejected or recorded as a critical audit failure"
+
+    $records += [ordered]@{
+      module                         = $scope
+      category                       = $category
+      invariant_id                   = $invariantId
+      task_id                        = $invariantId
+      function_or_flow_covered       = $flow
+      state_transition_covered       = $state
+      attack_surface_covered         = $attack
+      invariant_tested               = $invariantText
+      defensive_analysis_result      = [ordered]@{
+        status                    = "planned_not_executed"
+        expected_behavior         = $expectedBehavior
+        expected_state_transition = $state
+        expected_events           = $expectedEvents
+        expected_error_path       = $expectedErrorPath
+        expected_invariant        = $invariantText
+      }
+      adversarial_simulation_result  = [ordered]@{
+        status             = "planned_not_executed"
+        attack_attempt     = $attack
+        mutation_inputs    = $mutationInputs
+        expected_rejection = $expectedRejection
+        replay_mode        = "deterministic replay by seed and step list"
+      }
+      pass_fail_result               = "not_executed"
+      reproduction_seed_or_steps     = [ordered]@{
+        seed  = $seed
+        steps = @(
+          "Run AEXS mandatory invariant check $invariantId",
+          "Use seed $seed",
+          "Execute defensive state-transition replay",
+          "Execute adversarial mutation simulation",
+          "Record pass_fail_result only after executed evidence exists"
+        )
+      }
+      valid                          = $true
+      invalid_reasons                = @()
+    }
+  }
+  return $records
+}
+
+function Test-AexsInvariantChecklistRecord {
+  param([object]$Record)
+  $reasons = @()
+  foreach ($field in @(
+      "module",
+      "category",
+      "invariant_id",
+      "function_or_flow_covered",
+      "state_transition_covered",
+      "attack_surface_covered",
+      "invariant_tested",
+      "pass_fail_result"
+    )) {
+    if ([string]::IsNullOrWhiteSpace([string]$Record[$field])) {
+      $reasons += "missing $field"
+    }
+  }
+  foreach ($field in @(
+      "status",
+      "expected_behavior",
+      "expected_state_transition",
+      "expected_events",
+      "expected_error_path",
+      "expected_invariant"
+    )) {
+    if ([string]::IsNullOrWhiteSpace([string]$Record["defensive_analysis_result"][$field])) {
+      $reasons += "missing defensive_analysis_result.$field"
+    }
+  }
+  foreach ($field in @(
+      "status",
+      "attack_attempt",
+      "mutation_inputs",
+      "expected_rejection",
+      "replay_mode"
+    )) {
+    if ([string]::IsNullOrWhiteSpace([string]$Record["adversarial_simulation_result"][$field])) {
+      $reasons += "missing adversarial_simulation_result.$field"
+    }
+  }
+  if ($null -eq $Record["reproduction_seed_or_steps"] -or [string]::IsNullOrWhiteSpace([string]$Record["reproduction_seed_or_steps"]["seed"])) {
+    $reasons += "missing reproduction seed"
+  }
+  if ($null -eq $Record["reproduction_seed_or_steps"] -or @($Record["reproduction_seed_or_steps"]["steps"]).Count -eq 0) {
+    $reasons += "missing reproduction steps"
+  }
+  return $reasons
+}
+
 function Get-AexsEvidence {
   param([object]$Module)
   $repoRoot = Get-AexsRepoRoot
@@ -1663,6 +2032,7 @@ $requiredSourceTerms = @(
 $campaignSetupSection = Get-AexsMarkdownSection -Text $taskText -Heading "Campaign Setup Tasks"
 $scenarioGeneratorSection = Get-AexsMarkdownSection -Text $taskText -Heading "Scenario Generator Tasks"
 $transactionMutatorSection = Get-AexsMarkdownSection -Text $taskText -Heading "Transaction Mutator Tasks"
+$invariantChecklistSection = Get-AexsMarkdownSection -Text $taskText -Heading "Invariant Checklist"
 
 $requiredCampaignTerms = @(
   "Create a deterministic campaign id.",
@@ -1721,6 +2091,24 @@ $requiredMutatorTerms = @(
   "Record mutation metadata for every scenario."
 )
 
+$requiredInvariantChecklistTerms = @(
+  "Economic Invariants",
+  "sum(account balances) + module balances + burned + staked = total_supply",
+  'No fee denom other than `naet` is accepted.',
+  "Fee distribution totals match collected fees.",
+  "Staking rewards cannot be farmed through state loops.",
+  "Supply cannot drift after export/import.",
+  "Consensus And State Invariants",
+  "Same block input produces same app hash.",
+  "Same signed transaction cannot execute twice.",
+  "Invalid signer cannot mutate state.",
+  "Malformed transaction fails before state mutation.",
+  "Validator set matches staking keeper state.",
+  "Slashing evidence is objective and deterministic.",
+  "Genesis validation rejects malformed accounts, balances, params, and",
+  "Upgrade and migration paths preserve state roots and module invariants."
+)
+
 $sourceFailures = @()
 foreach ($term in $requiredSourceTerms) {
   if (-not (Test-AexsTextAny -Text $taskText -Terms @($term)) -and -not (Test-AexsTextAny -Text $pipelineText -Terms @($term))) {
@@ -1746,6 +2134,13 @@ if ([string]::IsNullOrWhiteSpace($transactionMutatorSection)) {
 } else {
   foreach ($term in @(Get-AexsMissingTerms -Text $transactionMutatorSection -Terms $requiredMutatorTerms)) {
     $sourceFailures += "missing transaction mutator term: $term"
+  }
+}
+if ([string]::IsNullOrWhiteSpace($invariantChecklistSection)) {
+  $sourceFailures += "missing Invariant Checklist section"
+} else {
+  foreach ($term in @(Get-AexsMissingTerms -Text $invariantChecklistSection -Terms $requiredInvariantChecklistTerms)) {
+    $sourceFailures += "missing invariant checklist term: $term"
   }
 }
 
@@ -1818,6 +2213,13 @@ $modulesBelowPlan = @($moduleRows | Where-Object { $_["planned_coverage_percent"
 $modulesWithoutInvariantEvidence = @($moduleRows | Where-Object { -not $_["has_invariant_evidence"] })
 $modulesWithoutFuzzEvidence = @($moduleRows | Where-Object { -not $_["has_fuzz_evidence"] })
 $modulesWithoutAdversarialEvidence = @($moduleRows | Where-Object { -not $_["has_adversarial_evidence"] })
+$invariantChecklistRecords = @(Get-AexsInvariantChecklistRecords -Text $taskText -CampaignId $campaignId)
+foreach ($record in $invariantChecklistRecords) {
+  $invalidReasons = @(Test-AexsInvariantChecklistRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidInvariantChecklistRecords = @($invariantChecklistRecords | Where-Object { -not $_["valid"] })
 $mandatoryInvariantPassRate = 0
 $auditPassed = $false
 $productionSafe = $false
@@ -2379,6 +2781,11 @@ $summary = [ordered]@{
   transaction_mutator_count           = $transactionMutators.Count
   invalid_transaction_mutator_count   = $invalidTransactionMutators.Count
   transaction_mutators                = @($transactionMutators | ForEach-Object { $_["id"] })
+  invariant_checklist_count           = $invariantChecklistRecords.Count
+  invalid_invariant_checklist_count   = $invalidInvariantChecklistRecords.Count
+  invariant_checklist_ids             = @($invariantChecklistRecords | ForEach-Object { $_["invariant_id"] })
+  invariant_checklist_categories      = @($invariantChecklistRecords | ForEach-Object { $_["category"] } | Sort-Object -Unique)
+  invalid_invariant_checklist_records = @($invalidInvariantChecklistRecords | ForEach-Object { $_["invariant_id"] })
   atomic_task_count                   = $atomicTasks.Count
   invalid_atomic_task_count           = $invalidAtomicTasks.Count
   invalid_atomic_tasks                = @($invalidAtomicTasks | ForEach-Object { $_["task_id"] })
@@ -2399,6 +2806,8 @@ $summary = [ordered]@{
 $coveragePath = Join-Path $campaignDir "coverage-matrix.json"
 $atomicTasksPath = Join-Path $campaignDir "atomic-tasks.json"
 $atomicTasksMarkdownPath = Join-Path $campaignDir "atomic-tasks.md"
+$invariantChecklistPath = Join-Path $campaignDir "invariant-checklist.json"
+$invariantChecklistMarkdownPath = Join-Path $campaignDir "invariant-checklist.md"
 $campaignSetupPath = Join-Path $campaignDir "campaign-setup.json"
 $scenarioCatalogPath = Join-Path $campaignDir "scenario-generator.json"
 $scenarioCatalogMarkdownPath = Join-Path $campaignDir "scenario-generator.md"
@@ -2409,6 +2818,7 @@ $resultPath = Join-Path $campaignDir "AUDIT_RESULT.md"
 $taskCopyPath = Join-Path $campaignDir "TO_AUDIT.md"
 $moduleRows | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $coveragePath
 $atomicTasks | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $atomicTasksPath
+$invariantChecklistRecords | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $invariantChecklistPath
 $campaignSetup | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $campaignSetupPath
 $scenarioCatalog | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $scenarioCatalogPath
 $transactionMutatorCatalog | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $transactionMutatorPath
@@ -2431,6 +2841,24 @@ foreach ($task in $atomicTasks) {
   $taskReport += "| $($task["task_id"]) | $($task["module"]) | $($task["task_type"]) | $flow | $invariant | $($task["defensive_analysis_result"]["status"]) | $($task["adversarial_simulation_result"]["status"]) | $($task["pass_fail_result"]) | $seed |"
 }
 $taskReport | Set-Content -LiteralPath $atomicTasksMarkdownPath
+
+$invariantReport = @()
+$invariantReport += "# AEXS Mandatory Invariant Checklist"
+$invariantReport += ""
+$invariantReport += "- campaign id: $campaignId"
+$invariantReport += "- invariant count: $($invariantChecklistRecords.Count)"
+$invariantReport += "- invalid invariant count: $($invalidInvariantChecklistRecords.Count)"
+$invariantReport += "- status: planned_not_executed"
+$invariantReport += ""
+$invariantReport += "| Invariant | Category | Scope | State transition | Attack surface | Defensive status | Adversarial status | Result | Seed |"
+$invariantReport += "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+foreach ($record in $invariantChecklistRecords) {
+  $state = ([string]$record["state_transition_covered"]).Replace("|", "/")
+  $attack = ([string]$record["attack_surface_covered"]).Replace("|", "/")
+  $seed = [string]$record["reproduction_seed_or_steps"]["seed"]
+  $invariantReport += "| $($record["invariant_id"]) | $($record["category"]) | $($record["module"]) | $state | $attack | $($record["defensive_analysis_result"]["status"]) | $($record["adversarial_simulation_result"]["status"]) | $($record["pass_fail_result"]) | $seed |"
+}
+$invariantReport | Set-Content -LiteralPath $invariantChecklistMarkdownPath
 
 $scenarioReport = @()
 $scenarioReport += "# AEXS Scenario Generator Catalog"
@@ -2488,6 +2916,8 @@ $report += "- scenario generators: $($scenarioGenerators.Count)"
 $report += "- invalid scenario generators: $($invalidScenarioGenerators.Count)"
 $report += "- transaction mutators: $($transactionMutators.Count)"
 $report += "- invalid transaction mutators: $($invalidTransactionMutators.Count)"
+$report += "- mandatory invariant checklist records: $($invariantChecklistRecords.Count)"
+$report += "- invalid mandatory invariant checklist records: $($invalidInvariantChecklistRecords.Count)"
 $report += ""
 $report += "## Gate Decision"
 $report += ""
@@ -2500,13 +2930,22 @@ $report += "- modules without invariant evidence: $(@($modulesWithoutInvariantEv
 $report += "- modules without fuzz evidence: $(@($modulesWithoutFuzzEvidence | ForEach-Object { $_["module"] }) -join ', ')"
 $report += "- modules without adversarial evidence: $(@($modulesWithoutAdversarialEvidence | ForEach-Object { $_["module"] }) -join ', ')"
 $report += "- modules with invalid atomic tasks: $(@($modulesWithInvalidAtomicTasks | ForEach-Object { $_["module"] }) -join ', ')"
+$report += "- invalid mandatory invariant checklist records: $(@($invalidInvariantChecklistRecords | ForEach-Object { $_["invariant_id"] }) -join ', ')"
 $report += ""
 $report += "## Module Matrix"
 $report += ""
 $report += "| Module | Tasks | Atomic records | Planned coverage | Invariant evidence | Fuzz evidence | Adversarial evidence | Safe |"
 $report += "| --- | ---: | ---: | ---: | --- | --- | --- | --- |"
 foreach ($row in $moduleRows) {
-  $report += "| $($row["module"]) | $($row["task_count"]) | $($row["atomic_task_records"]) | $($row["planned_coverage_percent"])% | $($row["has_invariant_evidence"]) | $($row["has_fuzz_evidence"]) | $($row["has_adversarial_evidence"]) | $($row["safe"]) |"
+$report += "| $($row["module"]) | $($row["task_count"]) | $($row["atomic_task_records"]) | $($row["planned_coverage_percent"])% | $($row["has_invariant_evidence"]) | $($row["has_fuzz_evidence"]) | $($row["has_adversarial_evidence"]) | $($row["safe"]) |"
+}
+$report += ""
+$report += "## Mandatory Invariant Checklist"
+$report += ""
+$report += "| Invariant | Category | Scope | Result |"
+$report += "| --- | --- | --- | --- |"
+foreach ($record in $invariantChecklistRecords) {
+  $report += "| $($record["invariant_id"]) | $($record["category"]) | $($record["module"]) | $($record["pass_fail_result"]) |"
 }
 $report += ""
 $report += "## Required Next Step"
@@ -2528,6 +2967,12 @@ if ($invalidTransactionMutators.Count -gt 0) {
 }
 if ($invalidAtomicTasks.Count -gt 0) {
   throw "AEXS atomic task validation failed for task(s): $(@($invalidAtomicTasks | ForEach-Object { $_["task_id"] }) -join ', ')"
+}
+if ($invariantChecklistRecords.Count -lt 17) {
+  throw "AEXS invariant checklist validation failed: fewer than required economic and consensus invariant records"
+}
+if ($invalidInvariantChecklistRecords.Count -gt 0) {
+  throw "AEXS invariant checklist validation failed for record(s): $(@($invalidInvariantChecklistRecords | ForEach-Object { $_["invariant_id"] }) -join ', ')"
 }
 if ($modulesBelowPlan.Count -gt 0) {
   throw "AEXS planned coverage gate failed for module(s): $(@($modulesBelowPlan | ForEach-Object { $_["module"] }) -join ', ')"

@@ -353,6 +353,8 @@ campaign output under `.work\aexs\`:
 - `coverage-matrix.json`;
 - `atomic-tasks.json`;
 - `atomic-tasks.md`;
+- `invariant-checklist.json`;
+- `invariant-checklist.md`;
 - `scenario-generator.json`;
 - `scenario-generator.md`;
 - `transaction-mutator.json`;
@@ -377,6 +379,20 @@ Every generated atomic task record contains:
 - adversarial simulation result;
 - pass/fail result;
 - reproduction seed or exact manual reproduction steps.
+
+Every generated mandatory invariant checklist record contains the invariant id,
+invariant family, scope, state transition covered, attack surface covered,
+defensive analysis result, adversarial simulation result, pass/fail result, and
+reproduction seed or exact manual reproduction steps. The checklist is generated
+from `TO_AUDIT.md` and explicitly includes the economic invariants for global
+supply consistency, non-negative balances, authorized mint/burn, `naet`-only
+protocol fees, fee distribution accounting, deterministic treasury/burn/reward
+accounting, staking reward-loop resistance, and export/import supply stability.
+It also includes the consensus and state invariants for same-input AppHash
+determinism, signed transaction replay rejection, invalid signer no-mutation,
+malformed transaction no-mutation, validator-set/staking consistency, objective
+slashing evidence, malformed genesis rejection, and upgrade/migration root
+preservation.
 
 The base-chain `x/auth`, `x/bank`, `x/staking`, `x/slashing`, `x/gov`,
 `x/distribution`, `x/fees`, `x/tokenfactory`, `x/dex`, `x/identity`,

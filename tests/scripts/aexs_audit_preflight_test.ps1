@@ -59,6 +59,8 @@ try {
   Assert-True ($result.invalid_scenario_generator_count -eq 0) "AEXS must not generate invalid scenario generator records"
   Assert-True ($result.transaction_mutator_count -ge 17) "AEXS must record all required transaction mutator families"
   Assert-True ($result.invalid_transaction_mutator_count -eq 0) "AEXS must not generate invalid transaction mutator records"
+  Assert-True ($result.invariant_checklist_count -ge 17) "AEXS must record the required economic and consensus invariant checklist"
+  Assert-True ($result.invalid_invariant_checklist_count -eq 0) "AEXS must not generate invalid invariant checklist records"
 
   foreach ($module in @(
       "app",
@@ -87,6 +89,8 @@ try {
       "coverage-matrix.json",
       "atomic-tasks.json",
       "atomic-tasks.md",
+      "invariant-checklist.json",
+      "invariant-checklist.md",
       "scenario-generator.json",
       "scenario-generator.md",
       "transaction-mutator.json",
@@ -96,6 +100,80 @@ try {
     )) {
     Assert-True (Test-Path -LiteralPath (Join-Path $result.output_dir $name)) "AEXS output missing $name"
   }
+
+  $invariantChecklist = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "invariant-checklist.json") | ConvertFrom-Json
+  Assert-True (@($invariantChecklist).Count -eq $result.invariant_checklist_count) "summary invariant checklist count must match invariant-checklist.json"
+  $invariantById = @{}
+  foreach ($record in $invariantChecklist) {
+    $invariantById[$record.invariant_id] = $record
+    foreach ($field in @(
+        "module",
+        "category",
+        "invariant_id",
+        "function_or_flow_covered",
+        "state_transition_covered",
+        "attack_surface_covered",
+        "invariant_tested",
+        "pass_fail_result"
+      )) {
+      Assert-True (-not [string]::IsNullOrWhiteSpace([string]$record.$field)) "invariant checklist $($record.invariant_id) missing $field"
+    }
+    foreach ($field in @(
+        "status",
+        "expected_behavior",
+        "expected_state_transition",
+        "expected_events",
+        "expected_error_path",
+        "expected_invariant"
+      )) {
+      Assert-True (-not [string]::IsNullOrWhiteSpace([string]$record.defensive_analysis_result.$field)) "invariant checklist $($record.invariant_id) missing defensive_analysis_result.$field"
+    }
+    foreach ($field in @(
+        "status",
+        "attack_attempt",
+        "mutation_inputs",
+        "expected_rejection",
+        "replay_mode"
+      )) {
+      Assert-True (-not [string]::IsNullOrWhiteSpace([string]$record.adversarial_simulation_result.$field)) "invariant checklist $($record.invariant_id) missing adversarial_simulation_result.$field"
+    }
+    Assert-True (-not [string]::IsNullOrWhiteSpace([string]$record.reproduction_seed_or_steps.seed)) "invariant checklist $($record.invariant_id) missing reproduction seed"
+    Assert-True (@($record.reproduction_seed_or_steps.steps).Count -gt 0) "invariant checklist $($record.invariant_id) missing reproduction steps"
+    Assert-True ($record.pass_fail_result -eq "not_executed") "preflight invariant $($record.invariant_id) must stay not_executed"
+    Assert-True ($record.valid -eq $true) "invariant checklist $($record.invariant_id) must be valid"
+  }
+  foreach ($invariantId in @(
+      "ECON-01",
+      "ECON-02",
+      "ECON-03",
+      "ECON-04",
+      "ECON-05",
+      "ECON-06",
+      "ECON-07",
+      "ECON-08",
+      "ECON-09",
+      "STATE-01",
+      "STATE-02",
+      "STATE-03",
+      "STATE-04",
+      "STATE-05",
+      "STATE-06",
+      "STATE-07",
+      "STATE-08"
+    )) {
+    Assert-True ($invariantById.ContainsKey($invariantId)) "mandatory invariant checklist record missing: $invariantId"
+  }
+  Assert-True ($invariantById["ECON-01"].invariant_tested -match "total_supply") "ECON-01 must record the global supply equation"
+  Assert-True ($invariantById["ECON-05"].attack_surface_covered -match "fee denom spoofing") "ECON-05 must record non-naet fee attack surface"
+  Assert-True ($invariantById["ECON-06"].state_transition_covered -match "Fee distribution totals match collected fees") "ECON-06 must record collected fee distribution totals"
+  Assert-True ($invariantById["ECON-08"].attack_surface_covered -match "reward farming loop") "ECON-08 must record staking reward farming"
+  Assert-True ($invariantById["ECON-09"].state_transition_covered -match "Supply cannot drift after deterministic export/import") "ECON-09 must record export/import supply drift"
+  Assert-True ($invariantById["STATE-01"].state_transition_covered -match "Same block input produces same app hash") "STATE-01 must record app hash determinism"
+  Assert-True ($invariantById["STATE-02"].attack_surface_covered -match "signed byte replay") "STATE-02 must record tx replay"
+  Assert-True ($invariantById["STATE-05"].state_transition_covered -match "validator set matches staking keeper state") "STATE-05 must record validator set/staking consistency"
+  Assert-True ($invariantById["STATE-06"].attack_surface_covered -match "malformed proof") "STATE-06 must record slashing evidence adversarial path"
+  Assert-True ($invariantById["STATE-07"].defensive_analysis_result.expected_error_path -match "malformed genesis") "STATE-07 must record malformed genesis rejection"
+  Assert-True ($invariantById["STATE-08"].state_transition_covered -match "preserve state roots") "STATE-08 must record migration root preservation"
 
   $campaignSetup = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "campaign-setup.json") | ConvertFrom-Json
   Assert-True ($campaignSetup.campaign_id -eq $result.campaign_id) "campaign setup campaign id must match summary"
