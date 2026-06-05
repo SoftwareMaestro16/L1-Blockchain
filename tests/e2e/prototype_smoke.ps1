@@ -13,6 +13,8 @@ param(
   [int]$PortStride = 100,
   [string]$TimeoutCommit = "1s",
   [string]$LogLevel = "info",
+  [ValidateSet("base", "execution-os-sim", "zones-prototype", "mesh-prototype", "identity-prototype")]
+  [string]$ProfileName = "base",
   [bool]$EnableAPI = $true,
   [bool]$EnableGRPC = $true,
   [bool]$EnableRPC = $true,
@@ -43,6 +45,7 @@ $args = @{
   PortStride       = $PortStride
   TimeoutCommit    = $TimeoutCommit
   LogLevel         = $LogLevel
+  ProfileName      = $ProfileName
   EnableAPI        = $EnableAPI
   EnableGRPC       = $EnableGRPC
   EnableRPC        = $EnableRPC

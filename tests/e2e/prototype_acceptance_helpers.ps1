@@ -32,6 +32,7 @@ function Invoke-AcceptanceLocalnetScript {
     PortStride     = $Context.PortStride
     TimeoutCommit  = $Context.TimeoutCommit
     LogLevel       = $Context.LogLevel
+    Profile        = if ($Context.Profile) { $Context.Profile } else { "base" }
     EnableAPI      = $Context.EnableAPI
     EnableGRPC     = $Context.EnableGRPC
     EnableRPC      = $Context.EnableRPC

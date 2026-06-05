@@ -56,6 +56,25 @@ func BenchmarkAppendCommitments(b *testing.B) {
 	}
 }
 
+func BenchmarkZoneCommitmentValidation(b *testing.B) {
+	commitments := make([]ZoneCommitment, 0, 1024)
+	previous := ""
+	for i := 1; i <= 1024; i++ {
+		commitment := benchCommitment(b, ZoneIDFinancial, uint64(i), previous)
+		commitments = append(commitments, commitment)
+		previous = commitment.CommitmentHash
+	}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		commitment := commitments[i%len(commitments)]
+		if err := commitment.ValidateHash(); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
 func BenchmarkExportImportState(b *testing.B) {
 	state := EmptyState()
 	var err error

@@ -15,6 +15,8 @@ param(
   [int]$PortStride = 100,
   [string]$TimeoutCommit = "1s",
   [string]$LogLevel = "info",
+  [ValidateSet("base", "execution-os-sim", "zones-prototype", "mesh-prototype", "identity-prototype")]
+  [string]$ProfileName = "base",
   [bool]$EnableAPI = $true,
   [bool]$EnableGRPC = $true,
   [bool]$EnableRPC = $true,
@@ -70,6 +72,7 @@ $ctx = [pscustomobject]@{
   PortStride     = $PortStride
   TimeoutCommit  = $TimeoutCommit
   LogLevel       = $LogLevel
+  Profile        = $ProfileName
   EnableAPI      = $EnableAPI
   EnableGRPC     = $EnableGRPC
   EnableRPC      = $EnableRPC

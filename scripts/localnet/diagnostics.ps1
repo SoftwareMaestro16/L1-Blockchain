@@ -1,7 +1,10 @@
 param(
   [string]$OutputDir = "",
+  [string]$Binary = "",
   [string]$BundleDir = "",
   [int]$ValidatorCount = 0,
+  [ValidateSet("base", "execution-os-sim", "zones-prototype", "mesh-prototype", "identity-prototype")]
+  [string]$Profile = "base",
   [int]$BaseP2PPort = 26656,
   [int]$BaseRPCPort = 26657,
   [int]$BaseRESTPort = 1317,
@@ -20,7 +23,9 @@ $ErrorActionPreference = "Stop"
 
 $RepoRoot = Get-LocalnetRepoRoot
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "localnet output directory"
+Assert-LocalnetProfile -Profile $Profile
 
 if ([string]::IsNullOrWhiteSpace($BundleDir)) {
   $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -75,6 +80,20 @@ ConvertTo-Json -InputObject @(Get-LocalnetProcessSnapshot -OutputDir $OutputDir)
   Set-Content -LiteralPath (Join-Path $BundleDir "processes.json")
 ConvertTo-Json -InputObject @(Get-LocalnetRecentLogs -OutputDir $OutputDir -TailLines 40) -Depth 5 |
   Set-Content -LiteralPath (Join-Path $BundleDir "recent-logs.json")
+
+try {
+  if (Test-Path -LiteralPath $Binary) {
+    & (Join-Path $PSScriptRoot "execution-os-diagnostics.ps1") `
+      -OutputDir $OutputDir `
+      -Binary $Binary `
+      -Profile $Profile `
+      -Json | Set-Content -LiteralPath (Join-Path $BundleDir "execution-os.json")
+  } else {
+    "Binary not found at $Binary" | Set-Content -LiteralPath (Join-Path $BundleDir "execution-os.error.txt")
+  }
+} catch {
+  $_.Exception.Message | Set-Content -LiteralPath (Join-Path $BundleDir "execution-os.error.txt")
+}
 
 $p = Get-LocalnetPortProfile -Index 0 -BaseP2PPort $BaseP2PPort -BaseRPCPort $BaseRPCPort -BaseRESTPort $BaseRESTPort -BaseGRPCPort $BaseGRPCPort -BasePprofPort $BasePprofPort -PortStride $PortStride
 

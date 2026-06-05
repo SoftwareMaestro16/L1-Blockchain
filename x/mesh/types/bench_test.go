@@ -17,6 +17,18 @@ func BenchmarkApplyMessage(b *testing.B) {
 	}
 }
 
+func BenchmarkMeshProofVerification(b *testing.B) {
+	state, msg := benchMeshFixture(b)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if err := ValidateSourceProof(state, msg, 100); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
 func BenchmarkSortMessages(b *testing.B) {
 	state, msg := benchMeshFixture(b)
 	commitment := state.FinalizedCommitments[0]

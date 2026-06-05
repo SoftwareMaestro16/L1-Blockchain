@@ -11,6 +11,8 @@ param(
   [int]$PortStride = 100,
   [string]$TimeoutCommit = "1s",
   [string]$LogLevel = "info",
+  [ValidateSet("base", "execution-os-sim", "zones-prototype", "mesh-prototype", "identity-prototype")]
+  [string]$Profile = "base",
   [bool]$EnableAPI = $true,
   [bool]$EnableGRPC = $true,
   [bool]$EnableRPC = $true
@@ -23,6 +25,7 @@ $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localn
 $Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "localnet output directory"
 if ($ValidatorCount -lt 1) { throw "ValidatorCount must be at least 1" }
+Assert-LocalnetProfile -Profile $Profile
 
 if (!(Test-Path $Binary) -or !(Test-Path $OutputDir)) {
   & (Join-Path $PSScriptRoot "init.ps1") `
@@ -113,6 +116,37 @@ foreach ($node in $nodes) {
   $appState = $doc.app_state
   if ($null -eq $appState) {
     throw "missing app_state for $($node.Name)"
+  }
+
+  $prototypeModules = @("load", "routing", "zones", "mesh")
+  foreach ($moduleName in $prototypeModules) {
+    if ($null -eq $appState.$moduleName) {
+      throw "missing $moduleName prototype genesis for $($node.Name)"
+    }
+  }
+  if ($Profile -eq "base") {
+    foreach ($moduleName in $prototypeModules) {
+      if ($appState.$moduleName.Params.Enabled -ne $false) {
+        throw "$moduleName prototype must be disabled in base profile"
+      }
+    }
+  } else {
+    if ($appState.load.Params.Enabled -ne $true -or $appState.routing.Params.Enabled -ne $true) {
+      throw "load and routing prototypes must be enabled for profile $Profile"
+    }
+    if ($appState.load.Params.TestnetProfile -ne $true -or $appState.routing.Params.TestnetProfile -ne $true) {
+      throw "load and routing prototypes must be marked testnet profile for $Profile"
+    }
+  }
+  if ($Profile -in @("zones-prototype", "mesh-prototype", "identity-prototype")) {
+    if ($appState.zones.Params.Enabled -ne $true -or @($appState.zones.State.ActiveZones).Count -lt 4) {
+      throw "zones prototype profile must activate the core execution zones"
+    }
+  }
+  if ($Profile -eq "mesh-prototype") {
+    if ($appState.mesh.Params.Enabled -ne $true -or @($appState.mesh.State.Destinations).Count -lt 2) {
+      throw "mesh prototype profile must enable mesh destinations"
+    }
   }
 
   $bankMetadata = @($appState.bank.denom_metadata | Where-Object { $_.base -eq "naet" })

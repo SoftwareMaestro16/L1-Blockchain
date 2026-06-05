@@ -116,6 +116,7 @@ func initRootCmd(
 		snapshot.Cmd(newApp),
 		NewBankSpeedTest(),
 		NewAddressCmd(),
+		NewExecutionOSCmd(),
 	)
 
 	server.AddCommandsWithStartCmdOptions(rootCmd, l1app.DefaultNodeHome, newApp, appExport, server.StartCmdOptions{

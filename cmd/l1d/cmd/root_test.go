@@ -113,6 +113,9 @@ func TestPrototypeCommandsAreRegistered(t *testing.T) {
 
 	for _, path := range [][]string{
 		{"address", "convert"},
+		{"execution-os", "profiles"},
+		{"execution-os", "smoke"},
+		{"execution-os", "diagnostics"},
 		{"query", "block"},
 		{"query", "bank", "balance"},
 		{"query", "staking", "validators"},

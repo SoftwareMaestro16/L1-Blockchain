@@ -11,6 +11,8 @@ param(
   [int]$PortStride = 100,
   [string]$TimeoutCommit = "1s",
   [string]$LogLevel = "info",
+  [ValidateSet("base", "execution-os-sim", "zones-prototype", "mesh-prototype", "identity-prototype")]
+  [string]$Profile = "base",
   [bool]$EnableAPI = $true,
   [bool]$EnableGRPC = $true,
   [bool]$EnableRPC = $true,
@@ -32,6 +34,7 @@ $waitElapsedMs = 0
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
 $Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "localnet output directory"
+Assert-LocalnetProfile -Profile $Profile
 
 if (!(Test-Path $Binary) -or !(Test-Path $OutputDir)) {
   if ($NoInit) {
@@ -49,6 +52,7 @@ if (!(Test-Path $Binary) -or !(Test-Path $OutputDir)) {
     PortStride     = $PortStride
     TimeoutCommit  = $TimeoutCommit
     LogLevel       = $LogLevel
+    Profile        = $Profile
     EnableAPI      = $EnableAPI
     EnableGRPC     = $EnableGRPC
     EnableRPC      = $EnableRPC
@@ -142,6 +146,7 @@ $timing = [ordered]@{
   script                 = "localnet/start.ps1"
   chain_id               = $ChainId
   validators             = $actualValidatorCount
+  profile                = $Profile
   wait                   = [bool]$Wait
   started_at_utc         = $startupStartedAt.ToUniversalTime().ToString("o")
   total_ms               = [int64]$startupTimer.ElapsedMilliseconds
