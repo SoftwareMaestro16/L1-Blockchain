@@ -424,6 +424,7 @@ $requiredSourceTerms = @(
 
 $campaignSetupSection = Get-AexsMarkdownSection -Text $taskText -Heading "Campaign Setup Tasks"
 $scenarioGeneratorSection = Get-AexsMarkdownSection -Text $taskText -Heading "Scenario Generator Tasks"
+$transactionMutatorSection = Get-AexsMarkdownSection -Text $taskText -Heading "Transaction Mutator Tasks"
 
 $requiredCampaignTerms = @(
   "Create a deterministic campaign id.",
@@ -462,6 +463,26 @@ $requiredScenarioTerms = @(
   "Preserve seed and step list for every generated scenario."
 )
 
+$requiredMutatorTerms = @(
+  "Inject invalid signatures.",
+  "Replay already accepted transaction bytes.",
+  "Manipulate nonce and sequence values.",
+  "Corrupt fee denom and fee amount fields.",
+  "fee paths.",
+  "Inject extreme gas values.",
+  "Inject malformed addresses.",
+  "DEX actor fields.",
+  "Corrupt memo fields, including invalid UTF-8 and oversized memo payloads.",
+  "Inject malformed routing hints.",
+  "Inject invalid domain resolution and expired domain actions.",
+  "Inject fake cross-zone messages.",
+  "Inject queue depth abuse.",
+  "Inject oversized AVM payloads.",
+  "Inject invalid AVM entrypoint inputs.",
+  "Inject malformed genesis fragments for simulator startup tests.",
+  "Record mutation metadata for every scenario."
+)
+
 $sourceFailures = @()
 foreach ($term in $requiredSourceTerms) {
   if (-not (Test-AexsTextAny -Text $taskText -Terms @($term)) -and -not (Test-AexsTextAny -Text $pipelineText -Terms @($term))) {
@@ -480,6 +501,13 @@ if ([string]::IsNullOrWhiteSpace($scenarioGeneratorSection)) {
 } else {
   foreach ($term in @(Get-AexsMissingTerms -Text $scenarioGeneratorSection -Terms $requiredScenarioTerms)) {
     $sourceFailures += "missing scenario generator term: $term"
+  }
+}
+if ([string]::IsNullOrWhiteSpace($transactionMutatorSection)) {
+  $sourceFailures += "missing Transaction Mutator Tasks section"
+} else {
+  foreach ($term in @(Get-AexsMissingTerms -Text $transactionMutatorSection -Terms $requiredMutatorTerms)) {
+    $sourceFailures += "missing transaction mutator term: $term"
   }
 }
 
@@ -720,6 +748,247 @@ $scenarioGenerators = @(
   }
 )
 
+$transactionMutators = @(
+  [ordered]@{
+    id                = "invalid_signatures"
+    name              = "inject invalid signatures"
+    mutation_type     = "signature_corruption"
+    target_modules    = @("x/auth", "app")
+    flow_covered      = "signature verification and signer extraction"
+    state_transitions = "auth rejection before account sequence or state mutation"
+    attack_surfaces   = "invalid signature, wrong public key, tx malleability"
+    invariant_targets = "invalid signer cannot mutate state"
+    expected_rejection = "ante handler rejects before message execution"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "replay_accepted_tx_bytes"
+    name              = "replay already accepted transaction bytes"
+    mutation_type     = "replay"
+    target_modules    = @("x/auth", "app", "x/bank")
+    flow_covered      = "account sequence validation and replay prevention"
+    state_transitions = "accepted tx increments sequence once; replay is rejected"
+    attack_surfaces   = "same signed bytes, cross-context replay, duplicate delivery"
+    invariant_targets = "same signed transaction cannot execute twice"
+    expected_rejection = "replay fails sequence or chain-id validation"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "nonce_sequence_manipulation"
+    name              = "manipulate nonce and sequence values"
+    mutation_type     = "sequence_corruption"
+    target_modules    = @("x/auth", "app")
+    flow_covered      = "nonce and account sequence checks"
+    state_transitions = "sequence changes only for accepted txs"
+    attack_surfaces   = "future nonce, stale nonce, duplicate sequence, account mismatch"
+    invariant_targets = "rejected auth paths do not increment sequence"
+    expected_rejection = "invalid sequence rejected before state mutation"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "fee_field_corruption"
+    name              = "corrupt fee denom and fee amount fields"
+    mutation_type     = "fee_corruption"
+    target_modules    = @("x/fees", "x/auth", "app")
+    flow_covered      = "fee denom, amount, gas limit, and ante fee checks"
+    state_transitions = "fee accounting changes only for accepted native-fee txs"
+    attack_surfaces   = "malformed fee amount, multi-denom fee, denom spoofing"
+    invariant_targets = "naet-only fees; exact fee distribution"
+    expected_rejection = "malformed or disallowed fee rejected before message execution"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "missing_or_non_naet_fee"
+    name              = "inject missing fee and non-naet fee paths"
+    mutation_type     = "fee_policy_bypass"
+    target_modules    = @("x/fees", "app")
+    flow_covered      = "native fee policy and fee bypass rejection"
+    state_transitions = "no module state changes after rejected fee path"
+    attack_surfaces   = "missing fee, zero fee, non-naet fee, non-FeeTx bypass"
+    invariant_targets = "no fee denom other than naet is accepted"
+    expected_rejection = "non-native or missing fee rejected by ante policy"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "extreme_gas_values"
+    name              = "inject extreme gas values"
+    mutation_type     = "gas_boundary"
+    target_modules    = @("x/fees", "x/vm", "app")
+    flow_covered      = "gas limit, gas accounting, simulation mode, VM gas bounds"
+    state_transitions = "gas exhaustion rejects or aborts without partial state commit"
+    attack_surfaces   = "zero gas, max gas, overflow-like gas, gas griefing"
+    invariant_targets = "gas is bounded and deterministic"
+    expected_rejection = "invalid gas rejected or exhausted execution rolled back"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "malformed_addresses"
+    name              = "inject malformed addresses"
+    mutation_type     = "address_corruption"
+    target_modules    = @("x/auth", "x/bank", "x/tokenfactory", "x/dex", "x/identity")
+    flow_covered      = "address parsing, signer checks, recipient/admin/resolver validation"
+    state_transitions = "malformed address rejection before state mutation"
+    attack_surfaces   = "bad bech32, wrong prefix, truncated bytes, overlong bytes"
+    invariant_targets = "invalid signer cannot mutate state; resolver validity"
+    expected_rejection = "malformed address rejected by validation path"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "zero_address_fields"
+    name              = "inject zero address in signer, recipient, admin, authority, resolver, and DEX actor fields"
+    mutation_type     = "zero_address"
+    target_modules    = @("x/auth", "x/bank", "x/tokenfactory", "x/dex", "x/identity", "x/vm")
+    flow_covered      = "zero address validation across value-bearing actor fields"
+    state_transitions = "zero address input fails before ownership or balance mutation"
+    attack_surfaces   = "zero signer, recipient, admin, authority, resolver, DEX actor"
+    invariant_targets = "no zero address ownership or value routing"
+    expected_rejection = "zero address rejected by message validation or ante path"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "malformed_memo_fields"
+    name              = "corrupt memo fields, including invalid UTF-8 and oversized memo payloads"
+    mutation_type     = "memo_corruption"
+    target_modules    = @("x/memo", "app", "x/indexer")
+    flow_covered      = "memo validation, byte length checks, memo indexing"
+    state_transitions = "memo metadata written only for accepted txs"
+    attack_surfaces   = "invalid UTF-8, oversized memo, binary payload, indexing abuse"
+    invariant_targets = "memo cannot alter execution result"
+    expected_rejection = "invalid or oversized memo rejected before message execution"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "malformed_routing_hints"
+    name              = "inject malformed routing hints"
+    mutation_type     = "routing_corruption"
+    target_modules    = @("x/routing", "x/sharding/sim", "x/execution")
+    flow_covered      = "route classification, zone decision, shard assignment"
+    state_transitions = "routing hints cannot override deterministic route"
+    attack_surfaces   = "invalid zone, invalid shard, forged priority, hot-zone steering"
+    invariant_targets = "same tx and state produce same route"
+    expected_rejection = "malformed hint ignored or rejected without route divergence"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "invalid_domain_resolution"
+    name              = "inject invalid domain resolution and expired domain actions"
+    mutation_type     = "identity_resolution_corruption"
+    target_modules    = @("x/identity", "x/indexer")
+    flow_covered      = "domain normalization, expiry, resolver lookup, reverse lookup"
+    state_transitions = "domain and resolver state unchanged for invalid actions"
+    attack_surfaces   = "expired domain action, resolver spoof, duplicate normalized name"
+    invariant_targets = "domain uniqueness; resolver validity; owner consistency"
+    expected_rejection = "expired or invalid resolver action rejected before value movement"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "fake_cross_zone_messages"
+    name              = "inject fake cross-zone messages"
+    mutation_type     = "mesh_message_forgery"
+    target_modules    = @("x/messaging", "x/mesh", "x/sharding/sim")
+    flow_covered      = "cross-zone message proof, receipt, replay marker, finality reference"
+    state_transitions = "message/receipt state changes only after valid proof"
+    attack_surfaces   = "forged proof, stale finality, wrong destination, duplicate receipt"
+    invariant_targets = "cross-zone replay is rejected; no double spend"
+    expected_rejection = "fake message rejected by proof or replay validation"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "queue_depth_abuse"
+    name              = "inject queue depth abuse"
+    mutation_type     = "queue_dos"
+    target_modules    = @("x/queue", "x/messaging", "x/aetherisvm")
+    flow_covered      = "enqueue, delayed execution, depth limit, per-block processing limit"
+    state_transitions = "queue depth and sequence counters remain bounded"
+    attack_surfaces   = "queue flood, message loop, starvation, duplicate sequence"
+    invariant_targets = "queue order; depth bounds; refund uniqueness"
+    expected_rejection = "queue overflow or invalid depth rejected without sequence corruption"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "oversized_avm_payloads"
+    name              = "inject oversized AVM payloads"
+    mutation_type     = "vm_size_boundary"
+    target_modules    = @("x/vm", "x/aetherisvm")
+    flow_covered      = "AVM code size, payload size, query response size, storage size"
+    state_transitions = "oversized payload rejected without contract state commit"
+    attack_surfaces   = "oversized code, oversized message, oversized query response, storage bloat"
+    invariant_targets = "AVM gas and storage are bounded and deterministic"
+    expected_rejection = "oversized VM payload rejected by limits"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "invalid_avm_entrypoints"
+    name              = "inject invalid AVM entrypoint inputs"
+    mutation_type     = "vm_entrypoint_corruption"
+    target_modules    = @("x/vm", "x/aetherisvm")
+    flow_covered      = "deploy, execute, query, migrate, bounced-call entrypoint validation"
+    state_transitions = "invalid entrypoint rejects before contract state transition"
+    attack_surfaces   = "missing entrypoint, malformed args, invalid migrate, bounced-call spoof"
+    invariant_targets = "AVM malformed input does not panic; rejected execution cannot commit state"
+    expected_rejection = "invalid entrypoint rejected without panic or partial commit"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "malformed_genesis_fragments"
+    name              = "inject malformed genesis fragments for simulator startup tests"
+    mutation_type     = "genesis_corruption"
+    target_modules    = @("app", "x/auth", "x/bank", "x/staking", "x/fees", "x/tokenfactory", "x/dex")
+    flow_covered      = "genesis validation, InitGenesis, export/import startup path"
+    state_transitions = "invalid genesis rejected before app startup state commit"
+    attack_surfaces   = "duplicate accounts, duplicate denoms, invalid params, hidden privileged account"
+    invariant_targets = "genesis validation rejects malformed module state"
+    expected_rejection = "malformed genesis fragment rejected by validation"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  },
+  [ordered]@{
+    id                = "mutation_metadata_recording"
+    name              = "record mutation metadata for every scenario"
+    mutation_type     = "reporting_integrity"
+    target_modules    = @("aexs")
+    flow_covered      = "mutation metadata, scenario seed, step list, replay manifest"
+    state_transitions = "runtime report records mutation without changing consensus state"
+    attack_surfaces   = "missing seed, missing step list, ambiguous reproduction, non-replayable exploit"
+    invariant_targets = "every mutation is reproducible by seed and exact steps"
+    expected_rejection = "audit record invalid if metadata is incomplete"
+    seed_required     = $true
+    metadata_required = $true
+    status            = "planned_not_executed"
+  }
+)
+
 $invalidStopConditions = @()
 foreach ($condition in $stopConditions) {
   $conditionReasons = @()
@@ -767,6 +1036,40 @@ foreach ($scenario in $scenarioGenerators) {
   }
 }
 
+$invalidTransactionMutators = @()
+foreach ($mutator in $transactionMutators) {
+  $mutatorReasons = @()
+  foreach ($field in @(
+      "id",
+      "name",
+      "mutation_type",
+      "flow_covered",
+      "state_transitions",
+      "attack_surfaces",
+      "invariant_targets",
+      "expected_rejection",
+      "status"
+    )) {
+    if ([string]::IsNullOrWhiteSpace([string]$mutator[$field])) {
+      $mutatorReasons += "missing $field"
+    }
+  }
+  if (@($mutator["target_modules"]).Count -eq 0) {
+    $mutatorReasons += "missing target_modules"
+  }
+  if ($mutator["seed_required"] -ne $true) {
+    $mutatorReasons += "seed not required"
+  }
+  if ($mutator["metadata_required"] -ne $true) {
+    $mutatorReasons += "metadata not required"
+  }
+  $mutator["valid"] = $mutatorReasons.Count -eq 0
+  $mutator["invalid_reasons"] = $mutatorReasons
+  if ($mutatorReasons.Count -gt 0) {
+    $invalidTransactionMutators += $mutator
+  }
+}
+
 $campaignSetup = [ordered]@{
   campaign_id       = $campaignId
   git_commit        = $commit
@@ -797,6 +1100,22 @@ $scenarioCatalog = [ordered]@{
   generators              = $scenarioGenerators
 }
 
+$transactionMutatorCatalog = [ordered]@{
+  campaign_id           = $campaignId
+  mutator_count         = $transactionMutators.Count
+  invalid_mutator_count = $invalidTransactionMutators.Count
+  invalid_mutators      = @($invalidTransactionMutators | ForEach-Object { $_["id"] })
+  metadata_policy       = [ordered]@{
+    mutation_metadata_required = $true
+    deterministic_seed_required = $true
+    target_module_required     = $true
+    expected_rejection_required = $true
+    output_path                = ".work/aexs/mutations/"
+    replay_requirement         = "Every mutated scenario must preserve mutation id, seed, input delta, expected rejection, and exact step list."
+  }
+  mutators              = $transactionMutators
+}
+
 $summary = [ordered]@{
   campaign_id                         = $campaignId
   output_dir                          = $campaignDir
@@ -819,6 +1138,9 @@ $summary = [ordered]@{
   scenario_generator_count            = $scenarioGenerators.Count
   invalid_scenario_generator_count    = $invalidScenarioGenerators.Count
   scenario_generators                 = @($scenarioGenerators | ForEach-Object { $_["id"] })
+  transaction_mutator_count           = $transactionMutators.Count
+  invalid_transaction_mutator_count   = $invalidTransactionMutators.Count
+  transaction_mutators                = @($transactionMutators | ForEach-Object { $_["id"] })
   atomic_task_count                   = $atomicTasks.Count
   invalid_atomic_task_count           = $invalidAtomicTasks.Count
   invalid_atomic_tasks                = @($invalidAtomicTasks | ForEach-Object { $_["task_id"] })
@@ -842,6 +1164,8 @@ $atomicTasksMarkdownPath = Join-Path $campaignDir "atomic-tasks.md"
 $campaignSetupPath = Join-Path $campaignDir "campaign-setup.json"
 $scenarioCatalogPath = Join-Path $campaignDir "scenario-generator.json"
 $scenarioCatalogMarkdownPath = Join-Path $campaignDir "scenario-generator.md"
+$transactionMutatorPath = Join-Path $campaignDir "transaction-mutator.json"
+$transactionMutatorMarkdownPath = Join-Path $campaignDir "transaction-mutator.md"
 $summaryPath = Join-Path $campaignDir "summary.json"
 $resultPath = Join-Path $campaignDir "AUDIT_RESULT.md"
 $taskCopyPath = Join-Path $campaignDir "TO_AUDIT.md"
@@ -849,6 +1173,7 @@ $moduleRows | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $coveragePath
 $atomicTasks | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $atomicTasksPath
 $campaignSetup | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $campaignSetupPath
 $scenarioCatalog | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $scenarioCatalogPath
+$transactionMutatorCatalog | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $transactionMutatorPath
 $summary | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $summaryPath
 Copy-Item -LiteralPath $taskPath -Destination $taskCopyPath -Force
 
@@ -888,6 +1213,26 @@ foreach ($scenario in $scenarioGenerators) {
 }
 $scenarioReport | Set-Content -LiteralPath $scenarioCatalogMarkdownPath
 
+$mutatorReport = @()
+$mutatorReport += "# AEXS Transaction Mutator Catalog"
+$mutatorReport += ""
+$mutatorReport += "- campaign id: $campaignId"
+$mutatorReport += "- mutator count: $($transactionMutators.Count)"
+$mutatorReport += "- invalid mutator count: $($invalidTransactionMutators.Count)"
+$mutatorReport += "- metadata policy: mutation id, deterministic seed, target modules, expected rejection, and replay steps required"
+$mutatorReport += ""
+$mutatorReport += "| Mutator | Type | Targets | Flow | Attack surfaces | Invariants | Expected rejection | Status |"
+$mutatorReport += "| --- | --- | --- | --- | --- | --- | --- | --- |"
+foreach ($mutator in $transactionMutators) {
+  $targets = (@($mutator["target_modules"]) -join ", ").Replace("|", "/")
+  $flow = ([string]$mutator["flow_covered"]).Replace("|", "/")
+  $attack = ([string]$mutator["attack_surfaces"]).Replace("|", "/")
+  $invariant = ([string]$mutator["invariant_targets"]).Replace("|", "/")
+  $expected = ([string]$mutator["expected_rejection"]).Replace("|", "/")
+  $mutatorReport += "| $($mutator["id"]) | $($mutator["mutation_type"]) | $targets | $flow | $attack | $invariant | $expected | $($mutator["status"]) |"
+}
+$mutatorReport | Set-Content -LiteralPath $transactionMutatorMarkdownPath
+
 $report = @()
 $report += "# AEXS Audit Result"
 $report += ""
@@ -903,6 +1248,8 @@ $report += "- invalid atomic task records: $($invalidAtomicTasks.Count)"
 $report += "- stop conditions: $($stopConditions.Count)"
 $report += "- scenario generators: $($scenarioGenerators.Count)"
 $report += "- invalid scenario generators: $($invalidScenarioGenerators.Count)"
+$report += "- transaction mutators: $($transactionMutators.Count)"
+$report += "- invalid transaction mutators: $($invalidTransactionMutators.Count)"
 $report += ""
 $report += "## Gate Decision"
 $report += ""
@@ -937,6 +1284,9 @@ if ($invalidStopConditions.Count -gt 0) {
 }
 if ($invalidScenarioGenerators.Count -gt 0) {
   throw "AEXS scenario generator validation failed for generator(s): $(@($invalidScenarioGenerators | ForEach-Object { $_["id"] }) -join ', ')"
+}
+if ($invalidTransactionMutators.Count -gt 0) {
+  throw "AEXS transaction mutator validation failed for mutator(s): $(@($invalidTransactionMutators | ForEach-Object { $_["id"] }) -join ', ')"
 }
 if ($invalidAtomicTasks.Count -gt 0) {
   throw "AEXS atomic task validation failed for task(s): $(@($invalidAtomicTasks | ForEach-Object { $_["task_id"] }) -join ', ')"

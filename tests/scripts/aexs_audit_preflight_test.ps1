@@ -57,6 +57,8 @@ try {
   Assert-True ($result.invalid_stop_condition_count -eq 0) "AEXS must not generate invalid stop conditions"
   Assert-True ($result.scenario_generator_count -ge 11) "AEXS must record all required scenario generator families"
   Assert-True ($result.invalid_scenario_generator_count -eq 0) "AEXS must not generate invalid scenario generator records"
+  Assert-True ($result.transaction_mutator_count -ge 17) "AEXS must record all required transaction mutator families"
+  Assert-True ($result.invalid_transaction_mutator_count -eq 0) "AEXS must not generate invalid transaction mutator records"
 
   foreach ($module in @(
       "app",
@@ -87,6 +89,8 @@ try {
       "atomic-tasks.md",
       "scenario-generator.json",
       "scenario-generator.md",
+      "transaction-mutator.json",
+      "transaction-mutator.md",
       "AUDIT_RESULT.md",
       "TO_AUDIT.md"
     )) {
@@ -149,6 +153,54 @@ try {
     Assert-True ($scenario.seed_required -eq $true) "scenario generator $($scenario.id) must require seed preservation"
     Assert-True ($scenario.step_list_required -eq $true) "scenario generator $($scenario.id) must require step list preservation"
     Assert-True ($scenario.valid -eq $true) "scenario generator $($scenario.id) must be valid"
+  }
+
+  $mutatorCatalog = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "transaction-mutator.json") | ConvertFrom-Json
+  Assert-True ($mutatorCatalog.campaign_id -eq $result.campaign_id) "transaction mutator catalog campaign id must match summary"
+  Assert-True ($mutatorCatalog.mutator_count -eq $result.transaction_mutator_count) "transaction mutator count must match summary"
+  Assert-True ($mutatorCatalog.invalid_mutator_count -eq 0) "transaction mutator catalog must not contain invalid mutators"
+  Assert-True ($mutatorCatalog.metadata_policy.mutation_metadata_required -eq $true) "transaction mutator catalog must require mutation metadata"
+  Assert-True ($mutatorCatalog.metadata_policy.deterministic_seed_required -eq $true) "transaction mutator catalog must require deterministic seeds"
+  Assert-True ($mutatorCatalog.metadata_policy.expected_rejection_required -eq $true) "transaction mutator catalog must require expected rejection paths"
+  foreach ($mutatorId in @(
+      "invalid_signatures",
+      "replay_accepted_tx_bytes",
+      "nonce_sequence_manipulation",
+      "fee_field_corruption",
+      "missing_or_non_naet_fee",
+      "extreme_gas_values",
+      "malformed_addresses",
+      "zero_address_fields",
+      "malformed_memo_fields",
+      "malformed_routing_hints",
+      "invalid_domain_resolution",
+      "fake_cross_zone_messages",
+      "queue_depth_abuse",
+      "oversized_avm_payloads",
+      "invalid_avm_entrypoints",
+      "malformed_genesis_fragments",
+      "mutation_metadata_recording"
+    )) {
+    Assert-Contains -Values @($mutatorCatalog.mutators | ForEach-Object { $_.id }) -Expected $mutatorId -Message "transaction mutator missing: $mutatorId"
+  }
+  foreach ($mutator in $mutatorCatalog.mutators) {
+    foreach ($field in @(
+        "id",
+        "name",
+        "mutation_type",
+        "flow_covered",
+        "state_transitions",
+        "attack_surfaces",
+        "invariant_targets",
+        "expected_rejection",
+        "status"
+      )) {
+      Assert-True (-not [string]::IsNullOrWhiteSpace([string]$mutator.$field)) "transaction mutator $($mutator.id) missing $field"
+    }
+    Assert-True (@($mutator.target_modules).Count -gt 0) "transaction mutator $($mutator.id) must target at least one module"
+    Assert-True ($mutator.seed_required -eq $true) "transaction mutator $($mutator.id) must require seed preservation"
+    Assert-True ($mutator.metadata_required -eq $true) "transaction mutator $($mutator.id) must require mutation metadata"
+    Assert-True ($mutator.valid -eq $true) "transaction mutator $($mutator.id) must be valid"
   }
 
   $coverage = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "coverage-matrix.json") | ConvertFrom-Json

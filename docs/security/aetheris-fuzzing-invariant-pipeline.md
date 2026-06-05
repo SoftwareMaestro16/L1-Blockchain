@@ -345,7 +345,8 @@ The runner validates `TO_AUDIT.md`, this pipeline document, the mandatory
 module list, atomic task counts, mandatory coverage matrix rows, per-task
 defensive/adversarial records, reproduction seeds, campaign setup fields,
 runtime/simulator modes, stop conditions, scenario generator coverage, and
-evidence links. It writes deterministic campaign output under `.work\aexs\`:
+transaction mutator coverage, and evidence links. It writes deterministic
+campaign output under `.work\aexs\`:
 
 - `summary.json`;
 - `campaign-setup.json`;
@@ -354,6 +355,8 @@ evidence links. It writes deterministic campaign output under `.work\aexs\`:
 - `atomic-tasks.md`;
 - `scenario-generator.json`;
 - `scenario-generator.md`;
+- `transaction-mutator.json`;
+- `transaction-mutator.md`;
 - `AUDIT_RESULT.md`;
 - `TO_AUDIT.md`.
 
@@ -383,6 +386,11 @@ Every scenario generator record contains the scenario family id, flow covered,
 state transition covered, attack surface covered, invariant targets, execution
 status, and explicit requirements to preserve deterministic seed and exact step
 list for replay.
+
+Every transaction mutator record contains the mutator id, mutation type, target
+modules, flow covered, state transition covered, attack surface covered,
+invariant targets, expected rejection path, execution status, and explicit
+requirements to preserve mutation metadata and deterministic replay seed.
 
 ## Chaos Mode
 
