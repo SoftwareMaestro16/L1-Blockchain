@@ -400,7 +400,12 @@ movement fails. Load, routing, and sharding checklist records cover
 `LOAD_SCORE` bounds, deterministic EMA smoothing, `MAX_DELTA` spike caps,
 same-input zone and shard decisions, routing-loop prevention, shard starvation
 prevention, hot-zone monopolization resistance, and deterministic priority
-ordering across nodes.
+ordering across nodes. Identity and resolver checklist records cover canonical
+domain uniqueness, active-domain re-auction rejection, expired-domain renewal or
+auction lifecycle enforcement, malformed and zero-address resolver rejection,
+resolver-payment rollback before funds move, owner-approved reverse lookup
+consistency, registry/NFT owner reconciliation, and parent-policy enforcement
+for subdomain ownership and resolver delegation.
 
 The base-chain `x/auth`, `x/bank`, `x/staking`, `x/slashing`, `x/gov`,
 `x/distribution`, `x/fees`, `x/tokenfactory`, `x/dex`, `x/identity`,

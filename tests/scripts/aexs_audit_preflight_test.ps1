@@ -176,7 +176,15 @@ try {
       "LOAD-06",
       "LOAD-07",
       "LOAD-08",
-      "LOAD-09"
+      "LOAD-09",
+      "IDINV-01",
+      "IDINV-02",
+      "IDINV-03",
+      "IDINV-04",
+      "IDINV-05",
+      "IDINV-06",
+      "IDINV-07",
+      "IDINV-08"
     )) {
     Assert-True ($invariantById.ContainsKey($invariantId)) "mandatory invariant checklist record missing: $invariantId"
   }
@@ -208,6 +216,14 @@ try {
   Assert-True ($invariantById["LOAD-07"].attack_surface_covered -match "starvation") "LOAD-07 must record shard starvation"
   Assert-True ($invariantById["LOAD-08"].attack_surface_covered -match "single-zone spam") "LOAD-08 must record hot-zone monopolization"
   Assert-True ($invariantById["LOAD-09"].attack_surface_covered -match "local mempool order") "LOAD-09 must record priority divergence"
+  Assert-True ($invariantById["IDINV-01"].attack_surface_covered -match "duplicate normalized name") "IDINV-01 must record duplicate normalized name"
+  Assert-True ($invariantById["IDINV-02"].attack_surface_covered -match "active domain re-auction") "IDINV-02 must record active domain re-auction"
+  Assert-True ($invariantById["IDINV-03"].attack_surface_covered -match "expired domain direct takeover") "IDINV-03 must record expired domain takeover"
+  Assert-True ($invariantById["IDINV-04"].attack_surface_covered -match "zero address resolver") "IDINV-04 must record zero resolver target"
+  Assert-True ($invariantById["IDINV-05"].attack_surface_covered -match "unresolved name payment") "IDINV-05 must record unresolved resolver payment"
+  Assert-True ($invariantById["IDINV-06"].attack_surface_covered -match "reverse lookup poisoning") "IDINV-06 must record reverse lookup poisoning"
+  Assert-True ($invariantById["IDINV-07"].attack_surface_covered -match "NFT transfer without registry update") "IDINV-07 must record registry/NFT divergence"
+  Assert-True ($invariantById["IDINV-08"].attack_surface_covered -match "parent policy bypass") "IDINV-08 must record subdomain parent policy bypass"
 
   $campaignSetup = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "campaign-setup.json") | ConvertFrom-Json
   Assert-True ($campaignSetup.campaign_id -eq $result.campaign_id) "campaign setup campaign id must match summary"

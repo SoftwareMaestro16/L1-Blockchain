@@ -1910,6 +1910,86 @@ function Get-AexsInvariantChecklistOverride {
       mutation_inputs     = "same tx set in different local order, fee overpayment, reputation above cap, identical priority keys except tx hash"
       expected_rejection  = "priority ordering cannot diverge across nodes due to local ordering or unbounded classes"
     }
+    "IDINV-01" = [ordered]@{
+      flow                = "identity domain normalization and uniqueness"
+      state               = "Domain names are unique"
+      attack              = "duplicate normalized name, mixed-case spoof, whitespace spoof, unicode confusable label, duplicate import entry"
+      expected_behavior   = "domain registration normalizes labels canonically and rejects duplicates before ownership state changes"
+      expected_events     = "successful registration events contain one canonical domain id and no duplicate normalized name"
+      expected_error_path = "duplicate or malformed normalized domain rejects before registry, resolver, auction, or NFT state mutation"
+      mutation_inputs     = "AET case variants, leading/trailing whitespace, empty label, duplicate genesis domain, confusable label fixture"
+      expected_rejection  = "two active records cannot exist for the same normalized domain"
+    }
+    "IDINV-02" = [ordered]@{
+      flow                = "active domain auction exclusion"
+      state               = "Active domains cannot be re-auctioned"
+      attack              = "active domain re-auction, commit/reveal replay, auction id collision, owner griefing through duplicate auction"
+      expected_behavior   = "auction start checks canonical domain lifecycle and rejects names that are active and unexpired"
+      expected_events     = "no auction-created event is emitted for an active domain"
+      expected_error_path = "active domain auction attempt rejects before escrow, bid, ownership, or resolver state mutation"
+      mutation_inputs     = "auction start for active domain, replayed reveal, duplicate auction id, active domain with pending renewal"
+      expected_rejection  = "active domain ownership cannot be displaced by a new auction"
+    }
+    "IDINV-03" = [ordered]@{
+      flow                = "expired domain renewal and re-auction lifecycle"
+      state               = "Expired domains require auction or explicit renewal path"
+      attack              = "expired domain direct takeover, post-expiry resolver hijack, renewal window bypass, stale owner replay"
+      expected_behavior   = "expired domains resolve only through explicit renewal rules or the configured auction/re-registration path"
+      expected_events     = "expired domain state transitions emit renewal or auction lifecycle events before owner changes"
+      expected_error_path = "direct expired-domain mutation rejects before owner, resolver, reverse lookup, or NFT state mutation"
+      mutation_inputs     = "expired domain resolver update, direct owner set, renewal outside window, stale owner signature replay"
+      expected_rejection  = "expired domain cannot be reassigned or resolved outside the lifecycle rules"
+    }
+    "IDINV-04" = [ordered]@{
+      flow                = "resolver target validation"
+      state               = "Resolver cannot point to malformed or zero address"
+      attack              = "zero address resolver, malformed bech32 resolver, wrong prefix resolver, malformed contract target, zone endpoint spoof"
+      expected_behavior   = "resolver updates validate target type, address format, zero-address rejection, and domain ownership before commit"
+      expected_events     = "resolver update events never contain malformed or zero address targets"
+      expected_error_path = "invalid resolver target rejects before resolver, reverse lookup, payment route, or index state mutation"
+      mutation_inputs     = "zero address, malformed bech32, wrong prefix, empty contract address, oversized zone endpoint"
+      expected_rejection  = "resolver records cannot commit malformed or zero-address targets"
+    }
+    "IDINV-05" = [ordered]@{
+      flow                = "resolver-based payment preflight and rollback"
+      state               = "Resolver-based payment fails before funds move if unresolved"
+      attack              = "unresolved name payment drain, stale resolver cache, resolver deletion race, failed lookup after fee deduction"
+      expected_behavior   = "name-based payment resolves canonical destination before any fund movement or value escrow"
+      expected_events     = "unresolved payment emits no successful send, escrow, or resolver-payment event"
+      expected_error_path = "unresolved or expired resolver path rejects before bank send, fee split, or queue state mutation"
+      mutation_inputs     = "unknown domain, expired domain, deleted resolver, stale cache hit, resolver target zeroed between check and send"
+      expected_rejection  = "resolver-based payment cannot move funds without a live valid resolver target"
+    }
+    "IDINV-06" = [ordered]@{
+      flow                = "reverse lookup owner-approved consistency"
+      state               = "Reverse lookup is consistent with owner-approved mapping"
+      attack              = "reverse lookup poisoning, unauthorized primary name set, stale reverse after transfer, address-owner spoof"
+      expected_behavior   = "reverse lookup updates require address-owner authorization and consistency with the forward domain owner mapping"
+      expected_events     = "reverse lookup events reference the authorized address owner and canonical domain"
+      expected_error_path = "unauthorized or inconsistent reverse lookup rejects before reverse index or resolver state mutation"
+      mutation_inputs     = "wrong signer reverse update, transferred domain stale reverse, domain not owned by address, malformed address"
+      expected_rejection  = "reverse lookup cannot claim a primary domain without owner-approved forward consistency"
+    }
+    "IDINV-07" = [ordered]@{
+      flow                = "domain registry owner and NFT owner reconciliation"
+      state               = "Domain registry owner and NFT representation owner do not diverge"
+      attack              = "NFT transfer without registry update, registry owner overwrite, export/import owner drift, duplicate NFT id"
+      expected_behavior   = "domain ownership changes update the registry owner and deterministic NFT owner atomically"
+      expected_events     = "domain transfer and NFT transfer events reconcile to the same owner and domain id"
+      expected_error_path = "owner divergence rejects before registry, NFT, resolver, or reverse lookup state commits"
+      mutation_inputs     = "registry-only transfer, NFT-only transfer, duplicate NFT id import, stale owner export/import, failed resolver invalidation"
+      expected_rejection  = "domain registry owner and NFT representation owner cannot diverge"
+    }
+    "IDINV-08" = [ordered]@{
+      flow                = "subdomain ownership and resolver delegation boundaries"
+      state               = "Subdomain ownership and resolver delegation do not bypass parent rules"
+      attack              = "subdomain takeover, parent policy bypass, child resolver overwrite, sibling collision, delegated resolver privilege escalation"
+      expected_behavior   = "subdomain issuance and resolver delegation obey parent owner policy and child owner authorization"
+      expected_events     = "subdomain and delegation events include parent policy, child owner, and canonical subdomain id"
+      expected_error_path = "unauthorized subdomain or delegation update rejects before subdomain, resolver, reverse lookup, or NFT state mutation"
+      mutation_inputs     = "wrong parent signer, child resolver overwrite by parent when policy forbids, duplicate child label, delegated admin escalation"
+      expected_rejection  = "subdomain ownership or resolver delegation cannot bypass parent policy or child owner authorization"
+    }
   }
   if ($overrides.ContainsKey($InvariantId)) {
     return $overrides[$InvariantId]
@@ -2295,7 +2375,16 @@ $requiredInvariantChecklistTerms = @(
   "No routing loop.",
   "No shard starvation.",
   "No hot-zone monopolization.",
-  "No priority ordering divergence across nodes."
+  "No priority ordering divergence across nodes.",
+  "Identity And Resolver Invariants",
+  "Domain names are unique.",
+  "Active domains cannot be re-auctioned.",
+  "Expired domains require auction or explicit renewal path.",
+  "Resolver cannot point to malformed or zero address.",
+  "Resolver-based payment fails before funds move if unresolved.",
+  "Reverse lookup is consistent with owner-approved mapping.",
+  "Domain registry owner and NFT representation owner do not diverge.",
+  "Subdomain ownership and resolver delegation do not bypass parent rules."
 )
 
 $sourceFailures = @()
