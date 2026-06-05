@@ -1,3 +1,24 @@
+function Invoke-ExternalChecked {
+  param(
+    [Parameter(Mandatory = $true)][string]$FilePath,
+    [string[]]$Arguments = @(),
+    [string]$FailureMessage = "external command failed"
+  )
+
+  $previousErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    $output = & $FilePath @Arguments 2>&1
+    $exitCode = $LASTEXITCODE
+  } finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
+  if ($exitCode -ne 0) {
+    throw "$FailureMessage`: $FilePath $($Arguments -join ' ')`n$($output -join "`n")"
+  }
+  return $output
+}
+
 function Invoke-LocalnetCliJson {
   param(
     [string]$Binary,

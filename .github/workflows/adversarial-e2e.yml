@@ -170,7 +170,7 @@ jobs:
 
       - name: Run adversarial localnet smoke
         shell: pwsh
-        run: .\tests\e2e\adversarial_smoke.ps1 -Binary $env:ORBITALIS_BINARY -SpamCount 3 -TimeoutSeconds 120
+        run: .\tests\e2e\adversarial_smoke.ps1 -Binary $env:ORBITALIS_BINARY -SpamCount 3 -TimeoutSeconds 120 -SkipBuild
 
   nightly-localnet:
     name: nightly scaled localnet smoke

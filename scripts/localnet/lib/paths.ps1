@@ -54,3 +54,24 @@ function Remove-LocalnetDirectory {
     Remove-Item -LiteralPath $resolved -Recurse -Force
   }
 }
+
+function Read-LocalnetManifest {
+  param([string]$OutputDir)
+
+  $resolved = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
+  $manifestPath = Join-Path $resolved "manifest.json"
+  if (-not (Test-Path -LiteralPath $manifestPath)) {
+    return $null
+  }
+  return Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
+}
+
+function Get-NodeHome {
+  param(
+    [string]$OutputDir,
+    [int]$Index
+  )
+
+  $resolved = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
+  return Join-Path $resolved "node$Index\orbitalisd"
+}

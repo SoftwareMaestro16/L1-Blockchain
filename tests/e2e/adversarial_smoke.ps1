@@ -2,7 +2,16 @@ param(
   [int]$SpamCount = 5,
   [int]$TimeoutSeconds = 90,
   [string]$OutputDir = "",
-  [string]$Binary = ""
+  [string]$Binary = "",
+  [string]$ChainId = "orbitalis-local-1",
+  [string]$Fees = "1000000norb",
+  [int]$BaseP2PPort = 26656,
+  [int]$BaseRPCPort = 26657,
+  [int]$BaseRESTPort = 1317,
+  [int]$BaseGRPCPort = 9090,
+  [int]$BasePprofPort = 6060,
+  [int]$PortStride = 100,
+  [switch]$SkipBuild
 )
 
 $ErrorActionPreference = "Stop"
@@ -10,11 +19,11 @@ Set-StrictMode -Version 2.0
 
 $RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
 . (Join-Path $RepoRoot "scripts\localnet\common.ps1")
-$Binary = Resolve-BinaryPath -Binary $Binary
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\orbitalisd.exe"
 if ([string]::IsNullOrWhiteSpace($OutputDir)) {
   $OutputDir = Join-Path $RepoRoot ".localnet-adversarial"
 }
-$OutputDir = Resolve-LocalnetPath -OutputDir $OutputDir
+$OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet-adversarial"
 
 function Get-CliJson {
   param([Parameter(Mandatory = $true)]$Output)
@@ -159,14 +168,35 @@ function Assert-TxRejected {
 
 Push-Location $RepoRoot
 try {
-  & .\scripts\localnet\init.ps1 -OutputDir $OutputDir -Binary $Binary -ValidatorCount 3
-  & .\scripts\localnet\start.ps1 -OutputDir $OutputDir -Binary $Binary -ValidatorCount 3 -CleanLogs
+  & .\scripts\localnet\init.ps1 `
+    -OutputDir $OutputDir `
+    -Binary $Binary `
+    -ChainId $ChainId `
+    -ValidatorCount 3 `
+    -BaseP2PPort $BaseP2PPort `
+    -BaseRPCPort $BaseRPCPort `
+    -BaseRESTPort $BaseRESTPort `
+    -BaseGRPCPort $BaseGRPCPort `
+    -BasePprofPort $BasePprofPort `
+    -PortStride $PortStride `
+    -SkipBuild:$SkipBuild
+  & .\scripts\localnet\start.ps1 `
+    -OutputDir $OutputDir `
+    -Binary $Binary `
+    -ValidatorCount 3 `
+    -BaseP2PPort $BaseP2PPort `
+    -BaseRPCPort $BaseRPCPort `
+    -BaseRESTPort $BaseRESTPort `
+    -BaseGRPCPort $BaseGRPCPort `
+    -BasePprofPort $BasePprofPort `
+    -PortStride $PortStride `
+    -CleanLogs
 
-  $manifest = Read-LocalnetManifest -OutputDir $OutputDir
-  $node = [string]$manifest.nodes[0].rpc_url
+  $node0Ports = Get-LocalnetPortProfile -Index 0 -BaseP2PPort $BaseP2PPort -BaseRPCPort $BaseRPCPort -BaseRESTPort $BaseRESTPort -BaseGRPCPort $BaseGRPCPort -BasePprofPort $BasePprofPort -PortStride $PortStride
+  $node = "tcp://127.0.0.1:$($node0Ports.RPC)"
   $home0 = Get-NodeHome -OutputDir $OutputDir -Index 0
   $home1 = Get-NodeHome -OutputDir $OutputDir -Index 1
-  $chainId = [string]$manifest.chain_id
+  $chainId = $ChainId
   $addr1 = Get-KeyAddress -NodeHome $home1 -Name "node1"
   $height = Wait-ForHeight -Node $node -TargetHeight 3 -TimeoutSeconds $TimeoutSeconds
 
@@ -194,7 +224,7 @@ try {
     "--chain-id", $chainId,
     "--keyring-backend", "test",
     "--node", $node,
-    "--fees", $script:DefaultFee,
+    "--fees", $Fees,
     "--gas", "auto",
     "--gas-adjustment", "1.2",
     "--broadcast-mode", "sync",
