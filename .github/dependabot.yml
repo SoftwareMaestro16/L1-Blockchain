@@ -7,7 +7,7 @@ updates:
       day: monday
       time: "04:00"
       timezone: UTC
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0
     labels:
       - dependencies
       - security
@@ -21,7 +21,7 @@ updates:
       day: monday
       time: "04:30"
       timezone: UTC
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0
     labels:
       - dependencies
       - security
