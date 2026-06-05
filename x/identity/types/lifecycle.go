@@ -324,9 +324,6 @@ func DomainNFTItemID(name string) string {
 
 func aetToNaet(amount int64) sdkmath.Int {
 	multiplier := int64(1_000_000_000)
-	if appparams.DisplayDenomExponent != 9 {
-		panic("domain price constants require 9-decimal AET")
-	}
 	return sdkmath.NewInt(amount).MulRaw(multiplier)
 }
 

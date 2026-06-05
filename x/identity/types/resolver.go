@@ -35,6 +35,8 @@ type ResolverRecord struct {
 	Domain        string
 	Owner         sdk.AccAddress
 	Primary       sdk.AccAddress
+	Contract      sdk.AccAddress
+	ZoneEndpoint  string
 	Records       map[string]sdk.AccAddress
 	Metadata      []byte
 	UpdatedAtUnix int64
@@ -43,6 +45,8 @@ type ResolverRecord struct {
 type ResolverUpdate struct {
 	Domain        string
 	Primary       sdk.AccAddress
+	Contract      sdk.AccAddress
+	ZoneEndpoint  string
 	Records       map[string]sdk.AccAddress
 	Metadata      []byte
 	UpdatedAtUnix int64
@@ -78,10 +82,16 @@ func ApplyResolverUpdate(existing *ResolverRecord, domainRecord DomainRecord, ac
 	if err := CanUpdateResolver(actor, domainRecord.Owner, update.Domain, changedKeys, grant, nowUnix); err != nil {
 		return ResolverRecord{}, ResolverEvent{}, err
 	}
+	normalizedDomain, err := NormalizeResolverDomain(update.Domain)
+	if err != nil {
+		return ResolverRecord{}, ResolverEvent{}, err
+	}
 	record := ResolverRecord{
-		Domain:        normalizeResolverDomainMust(update.Domain),
+		Domain:        normalizedDomain,
 		Owner:         append(sdk.AccAddress(nil), domainRecord.Owner...),
 		Primary:       cloneAddress(update.Primary),
+		Contract:      cloneAddress(update.Contract),
+		ZoneEndpoint:  strings.TrimSpace(update.ZoneEndpoint),
 		Records:       cloneResolverRecords(update.Records),
 		Metadata:      append([]byte(nil), update.Metadata...),
 		UpdatedAtUnix: update.UpdatedAtUnix,
@@ -181,6 +191,17 @@ func ValidateResolverRecord(record ResolverRecord) error {
 		if err := addressing.RejectZeroAddress("resolver primary", record.Primary); err != nil {
 			return err
 		}
+	}
+	if len(record.Contract) > 0 {
+		if err := addressing.RejectZeroAddress("resolver contract", record.Contract); err != nil {
+			return err
+		}
+	}
+	if strings.TrimSpace(record.ZoneEndpoint) != record.ZoneEndpoint {
+		return errors.New("resolver zone endpoint must not have surrounding whitespace")
+	}
+	if len(record.ZoneEndpoint) > MaxResolverMetadataBytes {
+		return fmt.Errorf("resolver zone endpoint must not exceed %d bytes", MaxResolverMetadataBytes)
 	}
 	if len(record.Records) > MaxResolverRecords {
 		return fmt.Errorf("resolver records must not exceed %d", MaxResolverRecords)
@@ -292,6 +313,12 @@ func ResolverUpdateKeys(update ResolverUpdate) []string {
 	keys := make([]string, 0, len(update.Records)+2)
 	if len(update.Primary) > 0 {
 		keys = append(keys, ResolverKeyPrimary)
+	}
+	if len(update.Contract) > 0 {
+		keys = append(keys, ResolverKeyContract)
+	}
+	if strings.TrimSpace(update.ZoneEndpoint) != "" {
+		keys = append(keys, "zone_endpoint")
 	}
 	if len(update.Metadata) > 0 {
 		keys = append(keys, ResolverKeyMetadata)
@@ -405,12 +432,4 @@ func cloneAddress(addr sdk.AccAddress) sdk.AccAddress {
 		return nil
 	}
 	return append(sdk.AccAddress(nil), addr...)
-}
-
-func normalizeResolverDomainMust(domain string) string {
-	normalized, err := NormalizeResolverDomain(domain)
-	if err != nil {
-		panic(err)
-	}
-	return normalized
 }
