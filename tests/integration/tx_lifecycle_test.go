@@ -8,6 +8,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/stretchr/testify/require"
 
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	testutil "github.com/sovereign-l1/l1/tests/testutil"
 	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
@@ -96,7 +97,7 @@ func TestTokenfactoryDexFeesCrossModuleLifecycle(t *testing.T) {
 
 	denomQuery, err := app.TokenFactoryKeeper.Denom(ctx, &tftypes.QueryDenomRequest{Denom: denom})
 	require.NoError(t, err)
-	require.Equal(t, admin.String(), denomQuery.Metadata.Admin)
+	require.Equal(t, orbitaladdress.FormatAccAddress(admin), denomQuery.Metadata.Admin)
 	poolQuery, err := app.DexKeeper.Pool(ctx, &dextypes.QueryPoolRequest{PoolId: createPool.PoolId})
 	require.NoError(t, err)
 	testutil.AssertPoolAccounting(t, app, ctx, poolQuery.Pool)

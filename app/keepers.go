@@ -13,7 +13,6 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sigtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
-	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
@@ -42,9 +41,11 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/cosmos/cosmos-sdk/x/tx/signing"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feeskeeper "github.com/sovereign-l1/l1/x/fees/keeper"
@@ -60,10 +61,11 @@ func (app *L1App) initKeepers(
 	appOpts servertypes.AppOptions,
 	keys map[string]*storetypes.KVStoreKey,
 ) client.TxConfig {
+	govAuthority := orbitaladdress.FormatAccAddress(authtypes.NewModuleAddress(govtypes.ModuleName))
 	app.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[consensusparamtypes.StoreKey]),
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 		runtime.EventService{},
 	)
 	app.BaseApp.SetParamStore(app.ConsensusParamsKeeper.ParamsStore)
@@ -73,9 +75,9 @@ func (app *L1App) initKeepers(
 		runtime.NewKVStoreService(keys[authtypes.StoreKey]),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		authcodec.NewBech32Codec(AccountAddressPrefix),
+		orbitaladdress.Codec{},
 		AccountAddressPrefix,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 		authkeeper.WithUnorderedTransactions(true),
 	)
 
@@ -84,7 +86,7 @@ func (app *L1App) initKeepers(
 		runtime.NewKVStoreService(keys[banktypes.StoreKey]),
 		app.AccountKeeper,
 		BlockedAddresses(),
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 		logger,
 	)
 
@@ -93,6 +95,7 @@ func (app *L1App) initKeepers(
 		appCodec,
 		authtx.ConfigOptions{
 			EnabledSignModes:           enabledSignModes,
+			SigningOptions:             &signing.Options{AddressCodec: orbitaladdress.Codec{}, ValidatorAddressCodec: orbitaladdress.Codec{}},
 			TextualCoinMetadataQueryFn: txmodule.NewBankKeeperCoinMetadataQueryFn(app.BankKeeper),
 		},
 	)
@@ -106,9 +109,9 @@ func (app *L1App) initKeepers(
 		runtime.NewKVStoreService(keys[stakingtypes.StoreKey]),
 		app.AccountKeeper,
 		app.BankKeeper,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		authcodec.NewBech32Codec(ValidatorAddressPrefix),
-		authcodec.NewBech32Codec(ConsensusAddressPrefix),
+		govAuthority,
+		orbitaladdress.Codec{},
+		orbitaladdress.Codec{},
 	)
 	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
@@ -117,14 +120,14 @@ func (app *L1App) initKeepers(
 		app.AccountKeeper,
 		app.BankKeeper,
 		authtypes.FeeCollectorName,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 	)
 	app.ProtocolPoolKeeper = protocolpoolkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[protocolpooltypes.StoreKey]),
 		app.AccountKeeper,
 		app.BankKeeper,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 	)
 	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec,
@@ -133,7 +136,7 @@ func (app *L1App) initKeepers(
 		app.BankKeeper,
 		app.StakingKeeper,
 		authtypes.FeeCollectorName,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 		distrkeeper.WithExternalCommunityPool(app.ProtocolPoolKeeper),
 	)
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
@@ -141,7 +144,7 @@ func (app *L1App) initKeepers(
 		legacyAmino,
 		runtime.NewKVStoreService(keys[slashingtypes.StoreKey]),
 		app.StakingKeeper,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 	)
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(
 		appCodec,
@@ -171,7 +174,7 @@ func (app *L1App) initKeepers(
 		appCodec,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		app.BaseApp,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 	)
 
 	govRouter := govv1beta1.NewRouter()
@@ -184,7 +187,7 @@ func (app *L1App) initKeepers(
 		app.DistrKeeper,
 		app.MsgServiceRouter(),
 		govtypes.DefaultConfig(),
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 		govkeeper.NewDefaultCalculateVoteResultsAndVotingPower(app.StakingKeeper),
 	)
 	govKeeper.SetLegacyRouter(govRouter)
@@ -208,13 +211,13 @@ func (app *L1App) initKeepers(
 		appCodec,
 		runtime.NewKVStoreService(keys[tokenfactorytypes.StoreKey]),
 		app.BankKeeper,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 	)
 	app.DexKeeper = dexkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[dextypes.StoreKey]),
 		app.BankKeeper,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 	)
 	app.FeesKeeper = feeskeeper.NewKeeper(
 		appCodec,
@@ -222,7 +225,7 @@ func (app *L1App) initKeepers(
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.DistrKeeper,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		govAuthority,
 	)
 	return txConfig
 }

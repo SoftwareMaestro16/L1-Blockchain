@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	appparams "github.com/sovereign-l1/l1/app/params"
 	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
 	"github.com/sovereign-l1/l1/x/dex/types"
@@ -101,12 +102,13 @@ func TestCreatePoolRejectsDuplicatePair(t *testing.T) {
 
 func TestDexLifecycleEmitsStableEventsAndStateQueries(t *testing.T) {
 	app, ctx, msgServer, trader, poolID := setupDexPool(t)
+	traderText := orbitaladdress.FormatAccAddress(trader)
 	pool, found, err := app.DexKeeper.GetPool(ctx, poolID)
 	require.NoError(t, err)
 	require.True(t, found)
 	requireEvent(t, ctx, types.EventTypeCreatePool, map[string]string{
 		types.AttributeKeyPoolID:       "1",
-		types.AttributeKeyCreator:      trader.String(),
+		types.AttributeKeyCreator:      traderText,
 		types.AttributeKeyDenom0:       pool.Denom0,
 		types.AttributeKeyDenom1:       pool.Denom1,
 		types.AttributeKeyAmount0:      "1000",
@@ -127,7 +129,7 @@ func TestDexLifecycleEmitsStableEventsAndStateQueries(t *testing.T) {
 	require.NoError(t, err)
 	requireEvent(t, ctx, types.EventTypeAddLiquidity, map[string]string{
 		types.AttributeKeyPoolID:       "1",
-		types.AttributeKeyDepositor:    trader.String(),
+		types.AttributeKeyDepositor:    traderText,
 		types.AttributeKeyDenom0:       pool.Denom0,
 		types.AttributeKeyDenom1:       pool.Denom1,
 		types.AttributeKeyAmount0:      "100",
@@ -150,7 +152,7 @@ func TestDexLifecycleEmitsStableEventsAndStateQueries(t *testing.T) {
 	require.NoError(t, err)
 	requireEvent(t, ctx, types.EventTypeSwapExactAmountIn, map[string]string{
 		types.AttributeKeyPoolID:   "1",
-		types.AttributeKeyTrader:   trader.String(),
+		types.AttributeKeyTrader:   traderText,
 		types.AttributeKeyTokenIn:  "10uatom",
 		types.AttributeKeyTokenOut: swapRes.TokenOut.String(),
 	})
@@ -164,7 +166,7 @@ func TestDexLifecycleEmitsStableEventsAndStateQueries(t *testing.T) {
 	require.NoError(t, err)
 	requireEvent(t, ctx, types.EventTypeRemoveLiquidity, map[string]string{
 		types.AttributeKeyPoolID:     "1",
-		types.AttributeKeyWithdrawer: trader.String(),
+		types.AttributeKeyWithdrawer: traderText,
 		types.AttributeKeyLPDenom:    pool.LpDenom,
 		types.AttributeKeyShares:     "50",
 		types.AttributeKeyDenom0:     removeRes.TokenA.Denom,

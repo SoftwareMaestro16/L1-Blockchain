@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	appparams "github.com/sovereign-l1/l1/app/params"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	tokenfactorykeeper "github.com/sovereign-l1/l1/x/tokenfactory/keeper"
@@ -76,6 +77,8 @@ func TestTokenfactoryLifecycleEmitsStableEventsAndStateQueries(t *testing.T) {
 	ctx := app.NewContext(false)
 	addrs := l1app.AddTestAddrsIncremental(app, ctx, 2, sdkmath.NewInt(1_000_000))
 	admin, newAdmin := addrs[0], addrs[1]
+	adminText := orbitaladdress.FormatAccAddress(admin)
+	newAdminText := orbitaladdress.FormatAccAddress(newAdmin)
 	msgServer := tokenfactorykeeper.NewMsgServerImpl(app.TokenFactoryKeeper)
 
 	createRes, err := msgServer.CreateDenom(ctx, &types.MsgCreateDenom{
@@ -86,13 +89,13 @@ func TestTokenfactoryLifecycleEmitsStableEventsAndStateQueries(t *testing.T) {
 	denom := createRes.NewTokenDenom
 	requireEvent(t, ctx, types.EventTypeCreateDenom, map[string]string{
 		types.AttributeKeyDenom:   denom,
-		types.AttributeKeyCreator: admin.String(),
-		types.AttributeKeyAdmin:   admin.String(),
+		types.AttributeKeyCreator: adminText,
+		types.AttributeKeyAdmin:   adminText,
 	})
 	meta, found, err := app.TokenFactoryKeeper.GetDenom(ctx, denom)
 	require.NoError(t, err)
 	require.True(t, found)
-	require.Equal(t, admin.String(), meta.Admin)
+	require.Equal(t, adminText, meta.Admin)
 
 	_, err = msgServer.Mint(ctx, &types.MsgMint{
 		Sender:        admin.String(),
@@ -102,9 +105,9 @@ func TestTokenfactoryLifecycleEmitsStableEventsAndStateQueries(t *testing.T) {
 	require.NoError(t, err)
 	requireEvent(t, ctx, types.EventTypeMint, map[string]string{
 		types.AttributeKeyDenom:         denom,
-		types.AttributeKeySender:        admin.String(),
+		types.AttributeKeySender:        adminText,
 		types.AttributeKeyAmount:        "100",
-		types.AttributeKeyMintToAddress: admin.String(),
+		types.AttributeKeyMintToAddress: adminText,
 	})
 	require.Equal(t, "100", app.BankKeeper.GetBalance(ctx, admin, denom).Amount.String())
 	require.Equal(t, "100", app.BankKeeper.GetSupply(ctx, denom).Amount.String())
@@ -117,9 +120,9 @@ func TestTokenfactoryLifecycleEmitsStableEventsAndStateQueries(t *testing.T) {
 	require.NoError(t, err)
 	requireEvent(t, ctx, types.EventTypeBurn, map[string]string{
 		types.AttributeKeyDenom:           denom,
-		types.AttributeKeySender:          admin.String(),
+		types.AttributeKeySender:          adminText,
 		types.AttributeKeyAmount:          "40",
-		types.AttributeKeyBurnFromAddress: admin.String(),
+		types.AttributeKeyBurnFromAddress: adminText,
 	})
 	require.Equal(t, "60", app.BankKeeper.GetBalance(ctx, admin, denom).Amount.String())
 	require.Equal(t, "60", app.BankKeeper.GetSupply(ctx, denom).Amount.String())
@@ -132,13 +135,13 @@ func TestTokenfactoryLifecycleEmitsStableEventsAndStateQueries(t *testing.T) {
 	require.NoError(t, err)
 	requireEvent(t, ctx, types.EventTypeChangeAdmin, map[string]string{
 		types.AttributeKeyDenom:    denom,
-		types.AttributeKeySender:   admin.String(),
-		types.AttributeKeyNewAdmin: newAdmin.String(),
+		types.AttributeKeySender:   adminText,
+		types.AttributeKeyNewAdmin: newAdminText,
 	})
 	meta, found, err = app.TokenFactoryKeeper.GetDenom(ctx, denom)
 	require.NoError(t, err)
 	require.True(t, found)
-	require.Equal(t, newAdmin.String(), meta.Admin)
+	require.Equal(t, newAdminText, meta.Admin)
 }
 
 func TestAdminCanBurnOwnFactoryTokens(t *testing.T) {

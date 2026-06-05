@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	tokenfactorykeeper "github.com/sovereign-l1/l1/x/tokenfactory/keeper"
 	"github.com/sovereign-l1/l1/x/tokenfactory/types"
 )
@@ -43,7 +44,7 @@ func TestDenomQueryReturnsMetadata(t *testing.T) {
 	res, err := app.TokenFactoryKeeper.Denom(ctx, &types.QueryDenomRequest{Denom: createRes.NewTokenDenom})
 	require.NoError(t, err)
 	require.Equal(t, createRes.NewTokenDenom, res.Metadata.Denom)
-	require.Equal(t, admin.String(), res.Metadata.Admin)
+	require.Equal(t, orbitaladdress.FormatAccAddress(admin), res.Metadata.Admin)
 }
 
 func TestDenomQueryErrorsAreGrpcStatusCompatible(t *testing.T) {

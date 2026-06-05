@@ -112,6 +112,7 @@ func TestPrototypeCommandsAreRegistered(t *testing.T) {
 	rootCmd := cmd.NewRootCmd()
 
 	for _, path := range [][]string{
+		{"address", "convert"},
 		{"query", "block"},
 		{"query", "bank", "balance"},
 		{"query", "staking", "validators"},
@@ -135,6 +136,26 @@ func TestPrototypeCommandsAreRegistered(t *testing.T) {
 		found := requireCommand(t, rootCmd, path...)
 		require.NotEmpty(t, found.Short, strings.Join(path, " "))
 	}
+}
+
+func TestAddressConvertCommandOutputsRawAndUserFriendly(t *testing.T) {
+	rootCmd := cmd.NewRootCmd()
+	var out bytes.Buffer
+	rootCmd.SetOut(&out)
+	rootCmd.SetErr(&out)
+	homeDir := t.TempDir()
+	rootCmd.SetArgs([]string{"address", "convert", "orb1yrdln94htlwyugypgnsv4yspdq2gzj728q8pyz", fmt.Sprintf("--%s=%s", flags.FlagHome, homeDir)})
+
+	require.NoError(t, svrcmd.Execute(rootCmd, "", homeDir))
+
+	var res struct {
+		Raw          string `json:"raw"`
+		UserFriendly string `json:"user_friendly"`
+	}
+	require.NoError(t, json.Unmarshal(out.Bytes(), &res), out.String())
+	require.Regexp(t, `^0:[0-9a-f]{64}$`, res.Raw)
+	require.Regexp(t, `^ORB[A-Za-z0-9_-]{45}$`, res.UserFriendly)
+	require.Len(t, res.UserFriendly, 48)
 }
 
 func TestOperatorTxCommandsExposeCommonFlags(t *testing.T) {

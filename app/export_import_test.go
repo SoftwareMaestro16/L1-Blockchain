@@ -13,6 +13,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	appparams "github.com/sovereign-l1/l1/app/params"
 	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
@@ -53,7 +54,8 @@ func TestStateExportImportPreservesPrototypeModuleData(t *testing.T) {
 	exportedGenesis, exportedAppState := exportGenesisFromContext(t, app, ctx)
 	require.NoError(t, app.BasicModuleManager.ValidateGenesis(app.AppCodec(), app.TxConfig(), exportedGenesis))
 
-	requireExportedPrototypeState(t, app, exportedGenesis, admin.String(), factoryDenom)
+	adminText := orbitaladdress.FormatAccAddress(admin)
+	requireExportedPrototypeState(t, app, exportedGenesis, adminText, factoryDenom)
 
 	imported, _ := setup(false, 5)
 	_, err = imported.InitChain(&abci.RequestInitChain{
@@ -67,7 +69,7 @@ func TestStateExportImportPreservesPrototypeModuleData(t *testing.T) {
 	meta, found, err := imported.TokenFactoryKeeper.GetDenom(importedCtx, factoryDenom)
 	require.NoError(t, err)
 	require.True(t, found)
-	require.Equal(t, admin.String(), meta.Admin)
+	require.Equal(t, adminText, meta.Admin)
 
 	pool, found, err := imported.DexKeeper.GetPool(importedCtx, 1)
 	require.NoError(t, err)

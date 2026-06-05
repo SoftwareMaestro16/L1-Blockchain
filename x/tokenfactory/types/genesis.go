@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 const (
@@ -103,7 +105,7 @@ func (gs GenesisState) Validate() error {
 		if denom.Admin == "" {
 			return fmt.Errorf("empty admin for denom %s", denom.Denom)
 		}
-		if _, err := sdk.AccAddressFromBech32(denom.Admin); err != nil {
+		if _, err := orbitaladdress.ParseAccAddress(denom.Admin); err != nil {
 			return fmt.Errorf("invalid admin for denom %s: %w", denom.Denom, err)
 		}
 		if _, ok := seen[denom.Denom]; ok {

@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/dex/types"
 )
 
@@ -41,7 +42,7 @@ func NewCreatePoolCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			msg := &types.MsgCreatePool{Creator: clientCtx.GetFromAddress().String(), TokenA: a, TokenB: b}
+			msg := &types.MsgCreatePool{Creator: orbitaladdress.FormatAccAddress(clientCtx.GetFromAddress()), TokenA: a, TokenB: b}
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
@@ -71,7 +72,7 @@ func NewAddLiquidityCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			msg := &types.MsgAddLiquidity{Depositor: clientCtx.GetFromAddress().String(), PoolId: poolID, TokenA: a, TokenB: b, MinShares: args[3]}
+			msg := &types.MsgAddLiquidity{Depositor: orbitaladdress.FormatAccAddress(clientCtx.GetFromAddress()), PoolId: poolID, TokenA: a, TokenB: b, MinShares: args[3]}
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
@@ -97,7 +98,7 @@ func NewRemoveLiquidityCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			msg := &types.MsgRemoveLiquidity{Withdrawer: clientCtx.GetFromAddress().String(), PoolId: poolID, Shares: shares}
+			msg := &types.MsgRemoveLiquidity{Withdrawer: orbitaladdress.FormatAccAddress(clientCtx.GetFromAddress()), PoolId: poolID, Shares: shares}
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
@@ -123,7 +124,7 @@ func NewSwapCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			msg := &types.MsgSwapExactAmountIn{Trader: clientCtx.GetFromAddress().String(), PoolId: poolID, TokenIn: in, TokenOutDenom: args[2], MinAmountOut: args[3]}
+			msg := &types.MsgSwapExactAmountIn{Trader: orbitaladdress.FormatAccAddress(clientCtx.GetFromAddress()), PoolId: poolID, TokenIn: in, TokenOutDenom: args[2], MinAmountOut: args[3]}
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

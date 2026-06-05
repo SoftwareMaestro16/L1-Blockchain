@@ -9,6 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/fees/types"
 )
 
@@ -191,7 +192,7 @@ func (k Keeper) GetModuleBalances(ctx context.Context) ([]types.ModuleBalance, e
 		}
 		balances = append(balances, types.ModuleBalance{
 			ModuleName: moduleName,
-			Address:    addr.String(),
+			Address:    orbitaladdress.FormatAccAddress(addr),
 			Balance:    k.bankKeeper.GetAllBalances(ctx, addr),
 		})
 	}

@@ -6,6 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/observability"
 	"github.com/sovereign-l1/l1/x/dex/types"
 	txutil "github.com/sovereign-l1/l1/x/internal/tx"
@@ -30,10 +31,11 @@ func (m msgServer) CreatePool(ctx context.Context, msg *types.MsgCreatePool) (re
 	if !params.PoolCreationEnabled {
 		return nil, types.ErrOperationDisabled.Wrap("pool creation is disabled")
 	}
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	creator, err := orbitaladdress.ParseAccAddress(msg.Creator)
 	if err != nil {
 		return nil, err
 	}
+	creatorText := orbitaladdress.FormatAccAddress(creator)
 	token0, token1, err := canonicalPair(msg.TokenA, msg.TokenB)
 	if err != nil {
 		return nil, err
@@ -91,7 +93,7 @@ func (m msgServer) CreatePool(ctx context.Context, msg *types.MsgCreatePool) (re
 		sdk.UnwrapSDKContext(cacheCtx).EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeCreatePool,
 			sdk.NewAttribute(types.AttributeKeyPoolID, strconv.FormatUint(id, 10)),
-			sdk.NewAttribute(types.AttributeKeyCreator, creator.String()),
+			sdk.NewAttribute(types.AttributeKeyCreator, creatorText),
 			sdk.NewAttribute(types.AttributeKeyDenom0, pool.Denom0),
 			sdk.NewAttribute(types.AttributeKeyDenom1, pool.Denom1),
 			sdk.NewAttribute(types.AttributeKeyAmount0, pool.Reserve0),
@@ -117,10 +119,11 @@ func (m msgServer) AddLiquidity(ctx context.Context, msg *types.MsgAddLiquidity)
 	if !params.LiquidityEnabled {
 		return nil, types.ErrOperationDisabled.Wrap("liquidity operations are disabled")
 	}
-	depositor, err := sdk.AccAddressFromBech32(msg.Depositor)
+	depositor, err := orbitaladdress.ParseAccAddress(msg.Depositor)
 	if err != nil {
 		return nil, err
 	}
+	depositorText := orbitaladdress.FormatAccAddress(depositor)
 	pool, found, err := m.GetPool(ctx, msg.PoolId)
 	if err != nil {
 		return nil, err
@@ -169,7 +172,7 @@ func (m msgServer) AddLiquidity(ctx context.Context, msg *types.MsgAddLiquidity)
 		sdk.UnwrapSDKContext(cacheCtx).EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeAddLiquidity,
 			sdk.NewAttribute(types.AttributeKeyPoolID, strconv.FormatUint(msg.PoolId, 10)),
-			sdk.NewAttribute(types.AttributeKeyDepositor, depositor.String()),
+			sdk.NewAttribute(types.AttributeKeyDepositor, depositorText),
 			sdk.NewAttribute(types.AttributeKeyDenom0, pool.Denom0),
 			sdk.NewAttribute(types.AttributeKeyDenom1, pool.Denom1),
 			sdk.NewAttribute(types.AttributeKeyAmount0, token0.Amount.String()),
@@ -194,10 +197,11 @@ func (m msgServer) RemoveLiquidity(ctx context.Context, msg *types.MsgRemoveLiqu
 	if !params.LiquidityEnabled {
 		return nil, types.ErrOperationDisabled.Wrap("liquidity operations are disabled")
 	}
-	withdrawer, err := sdk.AccAddressFromBech32(msg.Withdrawer)
+	withdrawer, err := orbitaladdress.ParseAccAddress(msg.Withdrawer)
 	if err != nil {
 		return nil, err
 	}
+	withdrawerText := orbitaladdress.FormatAccAddress(withdrawer)
 	pool, found, err := m.GetPool(ctx, msg.PoolId)
 	if err != nil {
 		return nil, err
@@ -240,7 +244,7 @@ func (m msgServer) RemoveLiquidity(ctx context.Context, msg *types.MsgRemoveLiqu
 		sdk.UnwrapSDKContext(cacheCtx).EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeRemoveLiquidity,
 			sdk.NewAttribute(types.AttributeKeyPoolID, strconv.FormatUint(msg.PoolId, 10)),
-			sdk.NewAttribute(types.AttributeKeyWithdrawer, withdrawer.String()),
+			sdk.NewAttribute(types.AttributeKeyWithdrawer, withdrawerText),
 			sdk.NewAttribute(types.AttributeKeyLPDenom, msg.Shares.Denom),
 			sdk.NewAttribute(types.AttributeKeyShares, msg.Shares.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeyDenom0, out0.Denom),
@@ -265,10 +269,11 @@ func (m msgServer) SwapExactAmountIn(ctx context.Context, msg *types.MsgSwapExac
 	if !params.SwapsEnabled {
 		return nil, types.ErrOperationDisabled.Wrap("swaps are disabled")
 	}
-	trader, err := sdk.AccAddressFromBech32(msg.Trader)
+	trader, err := orbitaladdress.ParseAccAddress(msg.Trader)
 	if err != nil {
 		return nil, err
 	}
+	traderText := orbitaladdress.FormatAccAddress(trader)
 	pool, found, err := m.GetPool(ctx, msg.PoolId)
 	if err != nil {
 		return nil, err
@@ -317,7 +322,7 @@ func (m msgServer) SwapExactAmountIn(ctx context.Context, msg *types.MsgSwapExac
 		sdk.UnwrapSDKContext(cacheCtx).EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeSwapExactAmountIn,
 			sdk.NewAttribute(types.AttributeKeyPoolID, strconv.FormatUint(msg.PoolId, 10)),
-			sdk.NewAttribute(types.AttributeKeyTrader, trader.String()),
+			sdk.NewAttribute(types.AttributeKeyTrader, traderText),
 			sdk.NewAttribute(types.AttributeKeyTokenIn, msg.TokenIn.String()),
 			sdk.NewAttribute(types.AttributeKeyTokenOut, out.String()),
 		))

@@ -9,6 +9,7 @@ import (
 
 	"cosmossdk.io/log/v2"
 	l1app "github.com/sovereign-l1/l1/app"
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/app/params"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -21,6 +22,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtxconfig "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	txsigning "github.com/cosmos/cosmos-sdk/x/tx/signing"
 )
 
 // NewRootCmd creates a new root command for orbitalisd. It is called once in the
@@ -74,6 +76,7 @@ func NewRootCmd() *cobra.Command {
 				enabledSignModes := append(tx.DefaultSignModes, signing.SignMode_SIGN_MODE_TEXTUAL)
 				txConfigOpts := tx.ConfigOptions{
 					EnabledSignModes:           enabledSignModes,
+					SigningOptions:             &txsigning.Options{AddressCodec: orbitaladdress.Codec{}, ValidatorAddressCodec: orbitaladdress.Codec{}},
 					TextualCoinMetadataQueryFn: authtxconfig.NewGRPCCoinMetadataQueryFn(initClientCtx),
 				}
 				txConfig, err := tx.NewTxConfigWithOptions(

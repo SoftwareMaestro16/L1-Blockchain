@@ -13,6 +13,8 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 // ExportAppStateAndValidators exports the state of the application for a genesis
@@ -63,7 +65,7 @@ func (app *L1App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []s
 	allowedAddrsMap := make(map[string]bool)
 
 	for _, addr := range jailAllowedAddrs {
-		_, err := sdk.ValAddressFromBech32(addr)
+		_, err := app.StakingKeeper.ValidatorAddressCodec().StringToBytes(addr)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -92,12 +94,17 @@ func (app *L1App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []s
 	}
 
 	for _, delegation := range dels {
-		valAddr, err := sdk.ValAddressFromBech32(delegation.ValidatorAddress)
+		valBz, err := app.StakingKeeper.ValidatorAddressCodec().StringToBytes(delegation.ValidatorAddress)
 		if err != nil {
 			panic(err)
 		}
+		valAddr := sdk.ValAddress(valBz)
 
-		delAddr := sdk.MustAccAddressFromBech32(delegation.DelegatorAddress)
+		delBz, err := app.AccountKeeper.AddressCodec().StringToBytes(delegation.DelegatorAddress)
+		if err != nil {
+			panic(err)
+		}
+		delAddr := sdk.AccAddress(delBz)
 
 		_, _ = app.DistrKeeper.WithdrawDelegationRewards(ctx, delAddr, valAddr)
 	}
@@ -140,11 +147,16 @@ func (app *L1App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []s
 
 	// reinitialize all delegations
 	for _, del := range dels {
-		valAddr, err := sdk.ValAddressFromBech32(del.ValidatorAddress)
+		valBz, err := app.StakingKeeper.ValidatorAddressCodec().StringToBytes(del.ValidatorAddress)
 		if err != nil {
 			panic(err)
 		}
-		delAddr := sdk.MustAccAddressFromBech32(del.DelegatorAddress)
+		valAddr := sdk.ValAddress(valBz)
+		delBz, err := app.AccountKeeper.AddressCodec().StringToBytes(del.DelegatorAddress)
+		if err != nil {
+			panic(err)
+		}
+		delAddr := sdk.AccAddress(delBz)
 
 		if err := app.DistrKeeper.Hooks().BeforeDelegationCreated(ctx, delAddr, valAddr); err != nil {
 			// never called as BeforeDelegationCreated always returns nil
@@ -205,7 +217,7 @@ func (app *L1App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []s
 		}
 
 		validator.UnbondingHeight = 0
-		if applyAllowedAddrs && !allowedAddrsMap[addr.String()] {
+		if applyAllowedAddrs && !allowedAddrsMap[orbitaladdress.FormatValAddress(addr)] {
 			validator.Jailed = true
 		}
 

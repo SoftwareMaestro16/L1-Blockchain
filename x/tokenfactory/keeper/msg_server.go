@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	txutil "github.com/sovereign-l1/l1/x/internal/tx"
 	"github.com/sovereign-l1/l1/x/tokenfactory/types"
 )
@@ -31,7 +32,7 @@ func (m msgServer) CreateDenom(ctx context.Context, msg *types.MsgCreateDenom) (
 	if err != nil {
 		return nil, err
 	}
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	creator, err := orbitaladdress.ParseAccAddress(msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +41,8 @@ func (m msgServer) CreateDenom(ctx context.Context, msg *types.MsgCreateDenom) (
 	} else if found {
 		return nil, types.ErrDenomExists.Wrap(denom)
 	}
-	meta := types.DenomAuthorityMetadata{Denom: denom, Admin: creator.String()}
+	creatorText := orbitaladdress.FormatAccAddress(creator)
+	meta := types.DenomAuthorityMetadata{Denom: denom, Admin: creatorText}
 	if err := m.SetDenom(ctx, meta); err != nil {
 		return nil, err
 	}
@@ -48,8 +50,8 @@ func (m msgServer) CreateDenom(ctx context.Context, msg *types.MsgCreateDenom) (
 	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeCreateDenom,
 		sdk.NewAttribute(types.AttributeKeyDenom, denom),
-		sdk.NewAttribute(types.AttributeKeyCreator, creator.String()),
-		sdk.NewAttribute(types.AttributeKeyAdmin, creator.String()),
+		sdk.NewAttribute(types.AttributeKeyCreator, creatorText),
+		sdk.NewAttribute(types.AttributeKeyAdmin, creatorText),
 	))
 	return &types.MsgCreateDenomResponse{NewTokenDenom: denom}, nil
 }
@@ -62,10 +64,11 @@ func (m msgServer) Mint(ctx context.Context, msg *types.MsgMint) (*types.MsgMint
 	if !params.MintingEnabled {
 		return nil, types.ErrOperationDisabled.Wrap("minting is disabled")
 	}
-	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	sender, err := orbitaladdress.ParseAccAddress(msg.Sender)
 	if err != nil {
 		return nil, err
 	}
+	senderText := orbitaladdress.FormatAccAddress(sender)
 	meta, found, err := m.GetDenom(ctx, msg.Amount.Denom)
 	if err != nil {
 		return nil, err
@@ -73,13 +76,14 @@ func (m msgServer) Mint(ctx context.Context, msg *types.MsgMint) (*types.MsgMint
 	if !found {
 		return nil, types.ErrDenomMissing.Wrap(msg.Amount.Denom)
 	}
-	if meta.Admin != sender.String() {
+	if meta.Admin != senderText {
 		return nil, types.ErrUnauthorized.Wrap("only denom admin can mint")
 	}
-	to, err := sdk.AccAddressFromBech32(msg.MintToAddress)
+	to, err := orbitaladdress.ParseAccAddress(msg.MintToAddress)
 	if err != nil {
 		return nil, err
 	}
+	toText := orbitaladdress.FormatAccAddress(to)
 	if !msg.Amount.IsValid() || !msg.Amount.IsPositive() {
 		return nil, types.ErrInvalidDenom.Wrap("mint amount must be positive")
 	}
@@ -94,9 +98,9 @@ func (m msgServer) Mint(ctx context.Context, msg *types.MsgMint) (*types.MsgMint
 		sdk.UnwrapSDKContext(cacheCtx).EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeMint,
 			sdk.NewAttribute(types.AttributeKeyDenom, msg.Amount.Denom),
-			sdk.NewAttribute(types.AttributeKeySender, sender.String()),
+			sdk.NewAttribute(types.AttributeKeySender, senderText),
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.Amount.String()),
-			sdk.NewAttribute(types.AttributeKeyMintToAddress, to.String()),
+			sdk.NewAttribute(types.AttributeKeyMintToAddress, toText),
 		))
 		return nil
 	}); err != nil {
@@ -113,10 +117,11 @@ func (m msgServer) Burn(ctx context.Context, msg *types.MsgBurn) (*types.MsgBurn
 	if !params.BurningEnabled {
 		return nil, types.ErrOperationDisabled.Wrap("burning is disabled")
 	}
-	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	sender, err := orbitaladdress.ParseAccAddress(msg.Sender)
 	if err != nil {
 		return nil, err
 	}
+	senderText := orbitaladdress.FormatAccAddress(sender)
 	meta, found, err := m.GetDenom(ctx, msg.Amount.Denom)
 	if err != nil {
 		return nil, err
@@ -124,13 +129,14 @@ func (m msgServer) Burn(ctx context.Context, msg *types.MsgBurn) (*types.MsgBurn
 	if !found {
 		return nil, types.ErrDenomMissing.Wrap(msg.Amount.Denom)
 	}
-	if meta.Admin != sender.String() {
+	if meta.Admin != senderText {
 		return nil, types.ErrUnauthorized.Wrap("only denom admin can burn")
 	}
-	from, err := sdk.AccAddressFromBech32(msg.BurnFromAddress)
+	from, err := orbitaladdress.ParseAccAddress(msg.BurnFromAddress)
 	if err != nil {
 		return nil, err
 	}
+	fromText := orbitaladdress.FormatAccAddress(from)
 	if !from.Equals(sender) {
 		return nil, types.ErrUnauthorized.Wrap("burn_from_address must match sender")
 	}
@@ -148,9 +154,9 @@ func (m msgServer) Burn(ctx context.Context, msg *types.MsgBurn) (*types.MsgBurn
 		sdk.UnwrapSDKContext(cacheCtx).EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeBurn,
 			sdk.NewAttribute(types.AttributeKeyDenom, msg.Amount.Denom),
-			sdk.NewAttribute(types.AttributeKeySender, sender.String()),
+			sdk.NewAttribute(types.AttributeKeySender, senderText),
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.Amount.String()),
-			sdk.NewAttribute(types.AttributeKeyBurnFromAddress, from.String()),
+			sdk.NewAttribute(types.AttributeKeyBurnFromAddress, fromText),
 		))
 		return nil
 	}); err != nil {
@@ -160,10 +166,11 @@ func (m msgServer) Burn(ctx context.Context, msg *types.MsgBurn) (*types.MsgBurn
 }
 
 func (m msgServer) ChangeAdmin(ctx context.Context, msg *types.MsgChangeAdmin) (*types.MsgChangeAdminResponse, error) {
-	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	sender, err := orbitaladdress.ParseAccAddress(msg.Sender)
 	if err != nil {
 		return nil, err
 	}
+	senderText := orbitaladdress.FormatAccAddress(sender)
 	meta, found, err := m.GetDenom(ctx, msg.Denom)
 	if err != nil {
 		return nil, err
@@ -171,22 +178,23 @@ func (m msgServer) ChangeAdmin(ctx context.Context, msg *types.MsgChangeAdmin) (
 	if !found {
 		return nil, types.ErrDenomMissing.Wrap(msg.Denom)
 	}
-	if meta.Admin != sender.String() {
+	if meta.Admin != senderText {
 		return nil, types.ErrUnauthorized.Wrap("only denom admin can change admin")
 	}
-	newAdmin, err := sdk.AccAddressFromBech32(msg.NewAdmin)
+	newAdmin, err := orbitaladdress.ParseAccAddress(msg.NewAdmin)
 	if err != nil {
 		return nil, err
 	}
-	meta.Admin = newAdmin.String()
+	newAdminText := orbitaladdress.FormatAccAddress(newAdmin)
+	meta.Admin = newAdminText
 	if err := m.SetDenom(ctx, meta); err != nil {
 		return nil, err
 	}
 	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeChangeAdmin,
 		sdk.NewAttribute(types.AttributeKeyDenom, msg.Denom),
-		sdk.NewAttribute(types.AttributeKeySender, sender.String()),
-		sdk.NewAttribute(types.AttributeKeyNewAdmin, newAdmin.String()),
+		sdk.NewAttribute(types.AttributeKeySender, senderText),
+		sdk.NewAttribute(types.AttributeKeyNewAdmin, newAdminText),
 	))
 	return &types.MsgChangeAdminResponse{}, nil
 }

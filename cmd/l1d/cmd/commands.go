@@ -115,6 +115,7 @@ func initRootCmd(
 		pruning.Cmd(newApp, l1app.DefaultNodeHome),
 		snapshot.Cmd(newApp),
 		NewBankSpeedTest(),
+		NewAddressCmd(),
 	)
 
 	server.AddCommandsWithStartCmdOptions(rootCmd, l1app.DefaultNodeHome, newApp, appExport, server.StartCmdOptions{
