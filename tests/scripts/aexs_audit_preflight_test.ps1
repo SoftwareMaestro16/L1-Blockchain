@@ -261,9 +261,19 @@ try {
       "BANK-02",
       "BANK-03",
       "BANK-04",
-      "BANK-05"
+      "BANK-05",
+      "STAKE-01",
+      "STAKE-02",
+      "STAKE-03",
+      "STAKE-04",
+      "STAKE-05",
+      "SLASH-01",
+      "SLASH-02",
+      "SLASH-03",
+      "SLASH-04",
+      "SLASH-05"
     )) {
-    Assert-True ($atomicTaskById.ContainsKey($taskId)) "required auth/bank atomic task missing: $taskId"
+    Assert-True ($atomicTaskById.ContainsKey($taskId)) "required base-chain atomic task missing: $taskId"
   }
   Assert-True ($atomicTaskById["AUTH-01"].function_or_flow_covered -match "signature verification") "AUTH-01 must use task-specific signature flow"
   Assert-True ($atomicTaskById["AUTH-03"].adversarial_simulation_result.mutation_inputs -match "bit-flipped signature") "AUTH-03 must record concrete invalid signature mutation"
@@ -274,6 +284,16 @@ try {
   Assert-True ($atomicTaskById["BANK-03"].adversarial_simulation_result.expected_rejection -match "partial recipient credits") "BANK-03 must record atomic multi-send rejection"
   Assert-True ($atomicTaskById["BANK-04"].invariant_tested -match "total supply") "BANK-04 must record supply consistency invariant"
   Assert-True ($atomicTaskById["BANK-05"].adversarial_simulation_result.attack_attempt -match "native denom spoof") "BANK-05 must record native denom spoofing attack"
+  Assert-True ($atomicTaskById["STAKE-01"].function_or_flow_covered -match "validator creation") "STAKE-01 must record staking lifecycle flow"
+  Assert-True ($atomicTaskById["STAKE-02"].adversarial_simulation_result.mutation_inputs -match "non-naet bond denom") "STAKE-02 must record non-naet bond denom mutation"
+  Assert-True ($atomicTaskById["STAKE-03"].adversarial_simulation_result.attack_attempt -match "stake grinding") "STAKE-03 must record stake grinding attack"
+  Assert-True ($atomicTaskById["STAKE-04"].invariant_tested -match "validator tokens") "STAKE-04 must record validator token/share invariant"
+  Assert-True ($atomicTaskById["STAKE-05"].adversarial_simulation_result.expected_rejection -match "extra rewards") "STAKE-05 must record reward inflation rejection"
+  Assert-True ($atomicTaskById["SLASH-01"].function_or_flow_covered -match "downtime evidence") "SLASH-01 must record slashing evidence flow"
+  Assert-True ($atomicTaskById["SLASH-02"].adversarial_simulation_result.mutation_inputs -match "duplicate evidence") "SLASH-02 must record duplicate evidence mutation"
+  Assert-True ($atomicTaskById["SLASH-03"].adversarial_simulation_result.attack_attempt -match "redelegation slash evasion") "SLASH-03 must record redelegation slashing bypass"
+  Assert-True ($atomicTaskById["SLASH-04"].invariant_tested -match "validator-set removal") "SLASH-04 must record validator-set removal invariant"
+  Assert-True ($atomicTaskById["SLASH-05"].adversarial_simulation_result.expected_rejection -match "restore stake") "SLASH-05 must record slashed stake recovery rejection"
 
   $enforceFailed = $false
   try {

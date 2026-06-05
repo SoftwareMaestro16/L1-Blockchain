@@ -272,6 +272,116 @@ function Get-AexsAtomicTaskOverride {
       mutation_inputs     = "bank send shaped as mint, bank send shaped as burn, denom metadata spoof, non-naet fee asset"
       expected_rejection  = "bank economic abuse must not alter supply, native metadata, or protocol fee acceptance"
     }
+    "STAKE-01" = [ordered]@{
+      flow                = "validator creation, delegation, redelegation, unbonding, reward eligibility"
+      state               = "validator records, delegations, redelegations, unbonding entries, and reward eligibility update deterministically"
+      attack              = "valid staking lifecycle baseline plus unauthorized operator control sample"
+      invariant           = "validator set and staking pool remain consistent after accepted staking lifecycle operations"
+      expected_behavior   = "valid staking lifecycle messages update validator power, delegator shares, and unbonding records exactly once"
+      expected_events     = "staking lifecycle events match committed validator and delegation deltas"
+      expected_error_path = "unauthorized operator or delegator control sample is rejected before staking state mutation"
+      mutation_inputs     = "valid create-validator, valid delegate, valid redelegate, valid unbond, unauthorized operator control"
+      expected_rejection  = "unauthorized staking lifecycle variants must fail without validator power or delegation mutation"
+    }
+    "STAKE-02" = [ordered]@{
+      flow                = "invalid validator address, non-naet bond denom, zero self-delegation, max commission, unbonding window boundaries"
+      state               = "invalid staking edge cases leave validator, delegation, and pool state unchanged"
+      attack              = "bad validator address, wrong bond denom, zero self-delegation, extreme commission, boundary unbonding window"
+      invariant           = "staking accepts only valid validator addresses, naet bond denom, bounded commission, and valid unbonding windows"
+      expected_behavior   = "valid staking boundaries execute deterministically; invalid boundaries reject before staking mutation"
+      expected_events     = "accepted boundary staking events match state deltas; rejected edge cases emit no success events"
+      expected_error_path = "staking message validation rejects invalid address, denom, self-delegation, commission, or unbonding boundary"
+      mutation_inputs     = "malformed validator address, non-naet bond denom, zero self-delegation, max commission, expired or premature unbonding window"
+      expected_rejection  = "invalid staking edge cases must not alter validator power, delegator shares, or pools"
+    }
+    "STAKE-03" = [ordered]@{
+      flow                = "stake grinding, delegation manipulation, reward farming loop, validator power spoofing"
+      state               = "adversarial staking attempts cannot create unauthorized power, shares, or reward eligibility"
+      attack              = "stake grinding, delegation manipulation, reward farming loop, validator power spoofing"
+      invariant           = "validator power and delegator shares derive only from valid bonded stake"
+      expected_behavior   = "adversarial staking mutations fail or resolve deterministically without extra rewards"
+      expected_events     = "failed staking attacks emit no misleading validator power or reward events"
+      expected_error_path = "staking keeper or ante validation rejects invalid stake manipulation before commit"
+      mutation_inputs     = "rapid redelegation loop, repeated delegate/unbond loop, spoofed validator operator, manipulated shares, reward timing loop"
+      expected_rejection  = "staking attacks must not inflate validator power, delegator shares, or rewards"
+    }
+    "STAKE-04" = [ordered]@{
+      flow                = "validator tokens, delegator shares, staking pools, validator-set update integrity"
+      state               = "validator tokens, shares, pools, and validator updates reconcile after accepted and rejected staking operations"
+      attack              = "state drift attempt through mixed accepted and rejected staking lifecycle operations"
+      invariant           = "validator tokens, delegator shares, staking pools, and validator set updates remain consistent"
+      expected_behavior   = "staking state integrity holds across lifecycle sequences and export/import"
+      expected_events     = "staking events reconcile to validator power and pool deltas"
+      expected_error_path = "failed staking operations preserve pre-failure validator, delegation, pool, and validator-update state"
+      mutation_inputs     = "accepted delegate followed by failed redelegate, accepted unbond followed by failed delegate, export/import after validator updates"
+      expected_rejection  = "rejected staking operations must preserve staking pool and validator-set consistency"
+    }
+    "STAKE-05" = [ordered]@{
+      flow                = "staking economic abuse around reward inflation, unbonding risk, and slash-immune stake"
+      state               = "staking paths cannot inflate rewards, bypass unbonding, or create slash-immune stake"
+      attack              = "reward inflation, unbonding risk bypass, slash-immune stake creation"
+      invariant           = "staking cannot inflate rewards, bypass unbonding risk, or create slash-immune stake"
+      expected_behavior   = "staking economic rules preserve bonded risk and reward eligibility"
+      expected_events     = "no reward or unbonding success event appears for rejected economic abuse paths"
+      expected_error_path = "economic abuse rejects before reward, unbonding, or slash-protection state mutation"
+      mutation_inputs     = "delegate/redelegate reward loop, immediate unbond bypass, hidden self-delegation, slash-exempt stake marker"
+      expected_rejection  = "staking economic abuse must not create extra rewards, bypass unbonding, or avoid slashing exposure"
+    }
+    "SLASH-01" = [ordered]@{
+      flow                = "downtime evidence, equivocation evidence, validator status update, stake penalty"
+      state               = "valid slashing evidence updates signing info, validator status, slash amount, and validator set deterministically"
+      attack              = "valid evidence baseline plus mismatched validator control sample"
+      invariant           = "valid objective evidence causes deterministic stake penalty and validator status change"
+      expected_behavior   = "valid downtime or equivocation evidence slashes and jails/tombstones according to params"
+      expected_events     = "slashing events match validator status and stake penalty deltas"
+      expected_error_path = "mismatched validator evidence control sample is rejected before slashing state mutation"
+      mutation_inputs     = "valid downtime evidence, valid equivocation evidence, mismatched validator evidence control"
+      expected_rejection  = "invalid evidence must not slash or alter validator status"
+    }
+    "SLASH-02" = [ordered]@{
+      flow                = "stale evidence, duplicate evidence, unknown validator, jailed validator, boundary heights"
+      state               = "invalid slashing edge cases leave validator status, signing info, and stake unchanged"
+      attack              = "stale evidence, duplicate evidence, unknown validator, jailed validator replay, boundary height evidence"
+      invariant           = "slashing evidence is objective, fresh, unique, and bound to known validators"
+      expected_behavior   = "valid boundary evidence applies once; invalid edge evidence rejects deterministically"
+      expected_events     = "duplicate or stale evidence emits no second slash success event"
+      expected_error_path = "slashing evidence validation rejects stale, duplicate, unknown, or invalid-height evidence"
+      mutation_inputs     = "stale evidence height, duplicate evidence bytes, unknown validator address, already jailed validator, min/max boundary height"
+      expected_rejection  = "invalid slashing edge cases must not double-slash or alter stake"
+    }
+    "SLASH-03" = [ordered]@{
+      flow                = "slashing bypass through redelegation, unbonding, delayed evidence, malformed proof"
+      state               = "slashing exposure persists across redelegation and unbonding windows"
+      attack              = "redelegation slash evasion, unbonding slash evasion, delayed evidence bypass, malformed proof acceptance"
+      invariant           = "slashing cannot be bypassed by stake movement or malformed evidence"
+      expected_behavior   = "slashable stake remains slashable across valid evidence windows"
+      expected_events     = "slashing or rejection events reconcile with evidence validity and stake exposure"
+      expected_error_path = "malformed proof rejects while valid delayed evidence still applies within protocol window"
+      mutation_inputs     = "redelegate before evidence, unbond before evidence, delayed evidence within window, malformed evidence proof"
+      expected_rejection  = "bypass attempts must not protect slashable stake or accept malformed proof"
+    }
+    "SLASH-04" = [ordered]@{
+      flow                = "slash accounting, jailed/tombstoned state, validator-set removal determinism"
+      state               = "slash accounting, jail/tombstone flags, and validator updates remain deterministic after slashing"
+      attack              = "state drift attempt through repeated slashing, jail, tombstone, and validator update paths"
+      invariant           = "slash accounting, jailed/tombstoned state, and validator-set removal are deterministic"
+      expected_behavior   = "slashing state integrity holds across evidence sequences and export/import"
+      expected_events     = "slashing events reconcile to stake penalty and validator update output"
+      expected_error_path = "failed or duplicate slashing paths preserve pre-failure signing info and validator state"
+      mutation_inputs     = "valid slash then duplicate slash, tombstone then duplicate evidence, export/import after validator removal"
+      expected_rejection  = "duplicate or invalid slashing paths must not alter slash accounting twice"
+    }
+    "SLASH-05" = [ordered]@{
+      flow                = "slashed stake recovery through timing, migration, export/import, governance parameter race"
+      state               = "slashed stake cannot be recovered by timing, migration, export/import, or parameter races"
+      attack              = "timing recovery, migration recovery, export/import recovery, governance parameter race"
+      invariant           = "slashed stake and tombstone state remain final unless protocol explicitly permits recovery"
+      expected_behavior   = "slashing economic finality survives operational and governance boundary paths"
+      expected_events     = "no stake recovery event appears for rejected slashing recovery paths"
+      expected_error_path = "recovery attempts reject or preserve slashed/tombstoned state during migration/export/import/param changes"
+      mutation_inputs     = "slash then parameter change, slash then export/import, slash then migration, slash then unjail timing race"
+      expected_rejection  = "slashed stake recovery attempts must not restore stake or remove tombstone incorrectly"
+    }
   }
   if ($overrides.ContainsKey($TaskId)) {
     return $overrides[$TaskId]
