@@ -378,15 +378,18 @@ Every generated atomic task record contains:
 - pass/fail result;
 - reproduction seed or exact manual reproduction steps.
 
-The base-chain `x/auth`, `x/bank`, `x/staking`, `x/slashing`, `x/gov`, and
-`x/distribution` atomic tasks are expanded into task-specific records for
-signature validation, replay prevention, sequence integrity, fee/priority
-abuse, bank sends, multi-send atomicity, supply consistency, zero-address
-handling, native-denom spoofing, staking lifecycle, validator-set consistency,
-unbonding risk, slashing evidence, tombstone/jail state, slash accounting,
-proposal replay, upgrade hijack, hard parameter bounds, reward withdrawal,
-commission accounting, rounding remainders, and community-pool leakage. These
-records must not collapse back to generic module-level attack descriptions.
+The base-chain `x/auth`, `x/bank`, `x/staking`, `x/slashing`, `x/gov`,
+`x/distribution`, `x/fees`, and `x/tokenfactory` atomic tasks are expanded into
+task-specific records for signature validation, replay prevention, sequence
+integrity, fee/priority abuse, bank sends, multi-send atomicity, supply
+consistency, zero-address handling, native-denom spoofing, staking lifecycle,
+validator-set consistency, unbonding risk, slashing evidence, tombstone/jail
+state, slash accounting, proposal replay, upgrade hijack, hard parameter bounds,
+reward withdrawal, commission accounting, rounding remainders, community-pool
+leakage, `naet` fee collection, non-FeeTx bypass, fee split accounting,
+tokenfactory authority, burn-from mismatch, exact supply deltas, and factory
+asset fee spoofing. These records must not collapse back to generic
+module-level attack descriptions.
 
 Every campaign setup record contains the deterministic campaign id, git commit,
 branch, dirty status, Go version, OS, test command set, fuzz seed list, target

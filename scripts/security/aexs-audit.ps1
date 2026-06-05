@@ -492,6 +492,116 @@ function Get-AexsAtomicTaskOverride {
       mutation_inputs     = "mint-shaped reward withdrawal, unauthorized treasury transfer, community pool drain, forged reward module account"
       expected_rejection  = "distribution economic abuse must not mint unauthorized rewards or leak treasury/community-pool funds"
     }
+    "FEES-01" = [ordered]@{
+      flow                = "valid naet fee collection, minimum fee enforcement, split accounting, params query"
+      state               = "accepted fee path collects naet, applies minimum fee, records split accounting, and exposes stable params"
+      attack              = "valid fee baseline plus unauthorized fee collector control sample"
+      invariant           = "valid fee collection accepts only naet and preserves configured split accounting"
+      expected_behavior   = "valid naet fee tx passes ante validation, collects fees exactly once, and returns deterministic params query output"
+      expected_events     = "fee collection events match collected amount, denom, and split accounting deltas"
+      expected_error_path = "unauthorized fee collector control sample is rejected before fee accounting mutation"
+      mutation_inputs     = "valid naet fee, valid minimum fee, valid split accounting, valid params query, unauthorized collector control"
+      expected_rejection  = "unauthorized fee collection variants must fail without fee accounting or message execution"
+    }
+    "FEES-02" = [ordered]@{
+      flow                = "missing fee, zero fee, multi-denom fee, malformed fee, max fee, simulation mode"
+      state               = "fee edge cases either pass explicit simulation rules or leave fee accounting and message state unchanged"
+      attack              = "missing fee, zero fee, multi-denom fee, malformed fee, max fee, simulation mode abuse"
+      invariant           = "fee validation is naet-only, bounded, deterministic, and simulation-mode explicit"
+      expected_behavior   = "valid fee boundaries execute deterministically; invalid fee boundaries reject before message execution"
+      expected_events     = "accepted boundary fee events match accounting deltas; rejected fee edge cases emit no success events"
+      expected_error_path = "ante fee decorator rejects missing, zero, multi-denom, malformed, or unsafe max-fee input unless explicit simulation mode applies"
+      mutation_inputs     = "missing fee, zero naet fee, multi-denom fee with naet plus factory denom, malformed fee amount, max int fee, simulation mode tx"
+      expected_rejection  = "invalid fee edge cases must not execute messages or mutate fee accounting"
+    }
+    "FEES-03" = [ordered]@{
+      flow                = "fee underpayment, fee denom spoofing, fee-griefing spam, non-FeeTx bypass"
+      state               = "adversarial fee attempts cannot underpay, spoof denom, consume priority, or bypass FeeTx validation"
+      attack              = "fee underpayment, fee denom spoofing, fee-griefing spam, non-FeeTx bypass"
+      invariant           = "fee policy cannot be bypassed by tx shape, denom spoofing, spam, or missing FeeTx interface"
+      expected_behavior   = "adversarial fee mutations fail deterministically before message execution or priority admission"
+      expected_events     = "failed fee attacks emit no fee acceptance, priority success, or message execution events"
+      expected_error_path = "ante fee validation rejects underpaid, spoofed, spam-shaped, or non-FeeTx transactions before commit"
+      mutation_inputs     = "below-min fee, factory denom named like naet, many low-fee spam txs, tx object without FeeTx semantics"
+      expected_rejection  = "fee attacks must not underpay, spoof naet, bypass FeeTx checks, or gain accepted priority"
+    }
+    "FEES-04" = [ordered]@{
+      flow                = "failed ante check state integrity for message execution and fee accounting"
+      state               = "failed ante checks do not execute messages, increment business state, or corrupt fee accounting"
+      attack              = "state corruption attempt through failed fee ante path"
+      invariant           = "failed fee ante checks cannot execute messages or mutate fee accounting"
+      expected_behavior   = "fee state integrity holds across rejected ante paths and export/import"
+      expected_events     = "no module message, fee split, burn, treasury, or validator reward success event after failed ante"
+      expected_error_path = "failed fee ante path returns before message server execution and before persistent fee accounting"
+      mutation_inputs     = "bad fee followed by state-changing msg, non-naet fee with tokenfactory mint msg, malformed fee with bank send"
+      expected_rejection  = "failed ante fee checks must preserve message state, account state, and fee accounting snapshots"
+    }
+    "FEES-05" = [ordered]@{
+      flow                = "fee split, burn, treasury, validator reward accounting under tx shape and load state"
+      state               = "fee split, burn, treasury, and validator reward accounting cannot be manipulated by tx shape or load state"
+      attack              = "fee split manipulation, burn bypass, treasury reroute, validator reward skew through tx shape or load state"
+      invariant           = "fee split, burn, treasury, and validator reward accounting are deterministic and bounded"
+      expected_behavior   = "fee economic rules preserve configured accounting regardless of valid tx shape or deterministic load state"
+      expected_events     = "fee distribution events reconcile exactly to collected naet and configured split"
+      expected_error_path = "economic fee abuse rejects before burn, treasury, reward, or split accounting mutation"
+      mutation_inputs     = "multi-msg tx fee shape, high-load fee path, low-load fee path, malformed split params, forged validator reward target"
+      expected_rejection  = "fee economic abuse must not manipulate split, burn, treasury, or validator reward accounting"
+    }
+    "TF-01" = [ordered]@{
+      flow                = "create denom, mint, burn, change admin, metadata query"
+      state               = "denom records, admin metadata, bank supply, and metadata query output update deterministically"
+      attack              = "valid tokenfactory lifecycle baseline plus unauthorized admin control sample"
+      invariant           = "tokenfactory lifecycle mutates denom state only under current admin authority"
+      expected_behavior   = "valid create, mint, burn, admin change, and metadata query update denom state and supply exactly once"
+      expected_events     = "tokenfactory events match denom creation, mint, burn, admin change, and metadata deltas"
+      expected_error_path = "unauthorized admin control sample is rejected before denom, supply, or metadata mutation"
+      mutation_inputs     = "valid create denom, valid mint, valid burn, valid change admin, valid metadata query, unauthorized admin control"
+      expected_rejection  = "unauthorized tokenfactory lifecycle variants must fail without denom, supply, or admin mutation"
+    }
+    "TF-02" = [ordered]@{
+      flow                = "invalid subdenom, duplicate denom, zero admin, native denom spoof, max metadata size"
+      state               = "invalid tokenfactory edge cases leave denom records, admin metadata, supply, and bank metadata unchanged"
+      attack              = "invalid subdenom, duplicate denom, zero admin, native denom spoof, oversized metadata"
+      invariant           = "tokenfactory accepts only canonical denoms, non-zero admins, unique denoms, and bounded metadata"
+      expected_behavior   = "valid tokenfactory boundaries execute deterministically; invalid boundaries reject before state mutation"
+      expected_events     = "accepted boundary tokenfactory events match state deltas; rejected edge cases emit no success events"
+      expected_error_path = "tokenfactory validation rejects invalid subdenom, duplicate denom, zero admin, native spoof, or oversized metadata"
+      mutation_inputs     = "empty subdenom, invalid subdenom chars, duplicate denom, zero admin, naet-like denom, max metadata size plus one"
+      expected_rejection  = "invalid tokenfactory edge cases must not alter denom records, supply, admin metadata, or native metadata"
+    }
+    "TF-03" = [ordered]@{
+      flow                = "unauthorized mint, unauthorized burn, admin takeover, metadata spoofing, burn-from mismatch"
+      state               = "adversarial tokenfactory attempts cannot mint, burn, take admin, spoof metadata, or burn from another account"
+      attack              = "unauthorized mint, unauthorized burn, admin takeover, metadata spoofing, burn-from mismatch"
+      invariant           = "tokenfactory authority, metadata, and burn source checks cannot be bypassed"
+      expected_behavior   = "adversarial tokenfactory mutations fail deterministically before supply or authority mutation"
+      expected_events     = "failed tokenfactory attacks emit no mint, burn, metadata, or admin success events"
+      expected_error_path = "tokenfactory msg server rejects unauthorized mint/burn/admin/metadata/burn-from paths before bank movement"
+      mutation_inputs     = "non-admin mint, non-admin burn, forged change admin, spoofed metadata update, burn from different holder"
+      expected_rejection  = "tokenfactory attacks must not mint, burn, change admin, spoof metadata, or burn from mismatched accounts"
+    }
+    "TF-04" = [ordered]@{
+      flow                = "supply delta exactness and authority metadata consistency"
+      state               = "supply changes exactly by minted or burned amount and authority metadata remains consistent"
+      attack              = "state drift attempt through mixed accepted and rejected tokenfactory mint, burn, and admin operations"
+      invariant           = "tokenfactory supply delta is exact and authority metadata remains consistent"
+      expected_behavior   = "tokenfactory state integrity holds across lifecycle sequences and export/import"
+      expected_events     = "tokenfactory events reconcile to final supply, admin, metadata, and bank balance deltas"
+      expected_error_path = "failed tokenfactory operations preserve pre-failure supply, admin, metadata, and balances"
+      mutation_inputs     = "accepted mint followed by failed mint, accepted burn followed by failed burn-from mismatch, change admin then old-admin mint, export/import after supply changes"
+      expected_rejection  = "rejected tokenfactory operations must preserve supply delta exactness and authority metadata consistency"
+    }
+    "TF-05" = [ordered]@{
+      flow                = "tokenfactory economic abuse around protocol fees, AET spoofing, and native supply inflation"
+      state               = "tokenfactory assets cannot pay protocol fees, spoof AET, or inflate native supply"
+      attack              = "factory asset fee payment, AET spoof, native supply inflation, native metadata collision"
+      invariant           = "tokenfactory assets cannot pay protocol fees, spoof AET, or inflate native supply"
+      expected_behavior   = "tokenfactory economic rules keep factory denoms separate from native fee and native supply authority"
+      expected_events     = "no protocol fee acceptance, native mint, or native metadata spoof event appears for rejected tokenfactory abuse paths"
+      expected_error_path = "economic abuse rejects before fee acceptance, native supply mutation, or native metadata mutation"
+      mutation_inputs     = "factory denom as fee, factory denom named AET, factory denom named naet, mint shaped as native supply, native metadata spoof"
+      expected_rejection  = "tokenfactory economic abuse must not pay protocol fees, spoof AET, or inflate native supply"
+    }
   }
   if ($overrides.ContainsKey($TaskId)) {
     return $overrides[$TaskId]
