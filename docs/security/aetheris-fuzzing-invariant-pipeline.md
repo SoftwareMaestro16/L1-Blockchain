@@ -342,11 +342,14 @@ The pre-campaign structural audit is implemented by:
 ```
 
 The runner validates `TO_AUDIT.md`, this pipeline document, the mandatory
-module list, atomic task counts, mandatory coverage matrix rows, and evidence
-links. It writes deterministic campaign output under `.work\aexs\`:
+module list, atomic task counts, mandatory coverage matrix rows, per-task
+defensive/adversarial records, reproduction seeds, and evidence links. It
+writes deterministic campaign output under `.work\aexs\`:
 
 - `summary.json`;
 - `coverage-matrix.json`;
+- `atomic-tasks.json`;
+- `atomic-tasks.md`;
 - `AUDIT_RESULT.md`;
 - `TO_AUDIT.md`.
 
@@ -354,6 +357,19 @@ The runner deliberately returns `NOT_SAFE_PRE_CAMPAIGN` until a real fuzzing
 and invariant campaign records executed results. `-EnforceSafe` must fail until
 mandatory invariants have a `100%` pass rate, planned fuzz/invariant coverage
 is at least `95%`, and no untriaged Critical or High exploit remains.
+
+Every generated atomic task record contains:
+
+- module;
+- task id;
+- function or flow covered;
+- state transition covered;
+- attack surface covered;
+- invariant tested;
+- defensive analysis result;
+- adversarial simulation result;
+- pass/fail result;
+- reproduction seed or exact manual reproduction steps.
 
 ## Chaos Mode
 

@@ -51,6 +51,9 @@ try {
   Assert-True ($result.production_safe -eq $false) "pre-campaign audit must not be production safe"
   Assert-True ($result.mandatory_invariant_pass_rate -eq 0) "pre-campaign invariant pass rate must be zero until execution evidence exists"
   Assert-True (@($result.modules_below_planned_threshold).Count -eq 0) "no module can be below planned coverage threshold"
+  Assert-True ($result.atomic_task_count -ge 120) "AEXS must generate at least five atomic task records for every target module"
+  Assert-True ($result.invalid_atomic_task_count -eq 0) "AEXS must not generate invalid atomic task records"
+  Assert-True (@($result.modules_with_invalid_atomic_tasks).Count -eq 0) "no module can have invalid atomic task records"
 
   foreach ($module in @(
       "app",
@@ -73,15 +76,56 @@ try {
     Assert-Contains -Values $result.target_modules -Expected $module -Message "AEXS target module missing: $module"
   }
 
-  foreach ($name in @("summary.json", "coverage-matrix.json", "AUDIT_RESULT.md", "TO_AUDIT.md")) {
+  foreach ($name in @("summary.json", "coverage-matrix.json", "atomic-tasks.json", "atomic-tasks.md", "AUDIT_RESULT.md", "TO_AUDIT.md")) {
     Assert-True (Test-Path -LiteralPath (Join-Path $result.output_dir $name)) "AEXS output missing $name"
   }
 
   $coverage = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "coverage-matrix.json") | ConvertFrom-Json
   Assert-True (@($coverage).Count -ge 24) "coverage matrix must include all required module surfaces"
   Assert-True (@($coverage | Where-Object { $_.task_count -lt 5 }).Count -eq 0) "every module must have at least five tasks"
+  Assert-True (@($coverage | Where-Object { $_.atomic_task_records -lt 5 }).Count -eq 0) "every module must have at least five atomic task records"
+  Assert-True (@($coverage | Where-Object { @($_.invalid_atomic_tasks).Count -gt 0 }).Count -eq 0) "no module may contain invalid atomic task records"
   Assert-True (@($coverage | Where-Object { $_.planned_coverage_percent -lt 95 }).Count -eq 0) "every module must meet planned coverage threshold"
   Assert-True (@($coverage | Where-Object { $_.safe -eq $true }).Count -eq 0) "no module may be marked safe by preflight alone"
+
+  $atomicTasks = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "atomic-tasks.json") | ConvertFrom-Json
+  Assert-True (@($atomicTasks).Count -eq $result.atomic_task_count) "summary atomic task count must match atomic-tasks.json"
+  foreach ($task in $atomicTasks) {
+    foreach ($field in @(
+        "module",
+        "task_id",
+        "function_or_flow_covered",
+        "state_transition_covered",
+        "attack_surface_covered",
+        "invariant_tested",
+        "pass_fail_result"
+      )) {
+      Assert-True (-not [string]::IsNullOrWhiteSpace([string]$task.$field)) "atomic task $($task.task_id) missing $field"
+    }
+    foreach ($field in @(
+        "status",
+        "expected_behavior",
+        "expected_state_transition",
+        "expected_events",
+        "expected_error_path",
+        "expected_invariant"
+      )) {
+      Assert-True (-not [string]::IsNullOrWhiteSpace([string]$task.defensive_analysis_result.$field)) "atomic task $($task.task_id) missing defensive_analysis_result.$field"
+    }
+    foreach ($field in @(
+        "status",
+        "attack_attempt",
+        "mutation_inputs",
+        "expected_rejection",
+        "replay_mode"
+      )) {
+      Assert-True (-not [string]::IsNullOrWhiteSpace([string]$task.adversarial_simulation_result.$field)) "atomic task $($task.task_id) missing adversarial_simulation_result.$field"
+    }
+    Assert-True (-not [string]::IsNullOrWhiteSpace([string]$task.reproduction_seed_or_steps.seed)) "atomic task $($task.task_id) missing reproduction seed"
+    Assert-True (@($task.reproduction_seed_or_steps.steps).Count -gt 0) "atomic task $($task.task_id) missing reproduction steps"
+    Assert-True ($task.pass_fail_result -eq "not_executed") "preflight atomic task $($task.task_id) must stay not_executed"
+    Assert-True ($task.valid -eq $true) "atomic task $($task.task_id) must be valid"
+  }
 
   $enforceFailed = $false
   try {

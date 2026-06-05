@@ -120,6 +120,152 @@ function Test-AexsTextAny {
   return $false
 }
 
+function Get-AexsAtomicTaskRecords {
+  param(
+    [string]$Text,
+    [object]$Module,
+    [string[]]$MatrixCells,
+    [string]$CampaignId
+  )
+
+  $records = @()
+  $current = $null
+  $lines = $Text -split "`r?`n"
+  $taskPattern = "^- \[ \]\s+($([regex]::Escape($Module["Prefix"]))-\d{2})\s+([^:]+):\s*(.*)$"
+  foreach ($line in $lines) {
+    if ($line -match $taskPattern) {
+      if ($null -ne $current) {
+        $records += $current
+      }
+      $current = [ordered]@{
+        task_id     = $Matches[1]
+        task_type   = $Matches[2].Trim()
+        description = $Matches[3].Trim()
+      }
+      continue
+    }
+
+    if ($null -eq $current) {
+      continue
+    }
+
+    if ($line -match '^- \[ \]\s+[A-Z]+-\d{2}\b' -or $line -match '^###\s+' -or $line -match '^##\s+') {
+      $records += $current
+      $current = $null
+      continue
+    }
+
+    if ($line -match '^\s+\S') {
+      $current["description"] = ($current["description"] + " " + $line.Trim()).Trim()
+    }
+  }
+  if ($null -ne $current) {
+    $records += $current
+  }
+
+  $functionCell = if ($MatrixCells.Count -ge 2) { $MatrixCells[1] } else { "" }
+  $stateCell = if ($MatrixCells.Count -ge 3) { $MatrixCells[2] } else { "" }
+  $attackCell = if ($MatrixCells.Count -ge 4) { $MatrixCells[3] } else { "" }
+  $invariantCell = if ($MatrixCells.Count -ge 5) { $MatrixCells[4] } else { "" }
+
+  $out = @()
+  foreach ($record in $records) {
+    $seedHash = (Get-AexsSha256Hex -Text "$CampaignId|$($Module["Module"])|$($record["task_id"])").Substring(0, 16)
+    $seed = "aexs-$($record["task_id"].ToLowerInvariant())-$seedHash"
+    $flow = if ([string]::IsNullOrWhiteSpace($functionCell)) { $record["description"] } else { $functionCell }
+    $attack = if ([string]::IsNullOrWhiteSpace($attackCell)) { $record["description"] } else { $attackCell }
+    $invariant = if ([string]::IsNullOrWhiteSpace($invariantCell)) { "module-specific invariant from TO_AUDIT task $($record["task_id"])" } else { $invariantCell }
+    $state = if ([string]::IsNullOrWhiteSpace($stateCell)) { "state transition from TO_AUDIT task $($record["task_id"])" } else { $stateCell }
+
+    $out += [ordered]@{
+      module                         = $Module["Module"]
+      task_id                        = $record["task_id"]
+      task_type                      = $record["task_type"]
+      function_or_flow_covered       = $flow
+      state_transition_covered       = $state
+      attack_surface_covered         = $attack
+      invariant_tested               = $invariant
+      defensive_analysis_result      = [ordered]@{
+        status                    = "planned_not_executed"
+        expected_behavior         = $record["description"]
+        expected_state_transition = $state
+        expected_events           = "stable module events or no events for rejected path"
+        expected_error_path       = "malformed, unauthorized, replayed, or boundary input must fail before unintended state mutation"
+        expected_invariant        = $invariant
+      }
+      adversarial_simulation_result  = [ordered]@{
+        status             = "planned_not_executed"
+        attack_attempt     = $attack
+        mutation_inputs    = "malformed input, replay, unauthorized signer, bad fee, boundary values, state corruption attempt, or module-specific exploit"
+        expected_rejection = "attack must not violate invariant or mutate state outside the expected transition"
+        replay_mode        = "deterministic replay by seed and step list"
+      }
+      pass_fail_result               = "not_executed"
+      reproduction_seed_or_steps     = [ordered]@{
+        seed  = $seed
+        steps = @(
+          "Run AEXS campaign for task $($record["task_id"])",
+          "Use seed $seed",
+          "Record defensive analysis result",
+          "Record adversarial simulation result",
+          "Update pass_fail_result with pass or fail after execution"
+        )
+      }
+      valid                          = $true
+      invalid_reasons                = @()
+    }
+  }
+  return $out
+}
+
+function Test-AexsAtomicTaskRecord {
+  param([object]$Task)
+  $reasons = @()
+  foreach ($field in @(
+      "module",
+      "task_id",
+      "function_or_flow_covered",
+      "state_transition_covered",
+      "attack_surface_covered",
+      "invariant_tested",
+      "pass_fail_result"
+    )) {
+    if ([string]::IsNullOrWhiteSpace([string]$Task[$field])) {
+      $reasons += "missing $field"
+    }
+  }
+  foreach ($field in @(
+      "status",
+      "expected_behavior",
+      "expected_state_transition",
+      "expected_events",
+      "expected_error_path",
+      "expected_invariant"
+    )) {
+    if ([string]::IsNullOrWhiteSpace([string]$Task["defensive_analysis_result"][$field])) {
+      $reasons += "missing defensive_analysis_result.$field"
+    }
+  }
+  foreach ($field in @(
+      "status",
+      "attack_attempt",
+      "mutation_inputs",
+      "expected_rejection",
+      "replay_mode"
+    )) {
+    if ([string]::IsNullOrWhiteSpace([string]$Task["adversarial_simulation_result"][$field])) {
+      $reasons += "missing adversarial_simulation_result.$field"
+    }
+  }
+  if ($null -eq $Task["reproduction_seed_or_steps"] -or [string]::IsNullOrWhiteSpace([string]$Task["reproduction_seed_or_steps"]["seed"])) {
+    $reasons += "missing reproduction seed"
+  }
+  if ($null -eq $Task["reproduction_seed_or_steps"] -or @($Task["reproduction_seed_or_steps"]["steps"]).Count -eq 0) {
+    $reasons += "missing reproduction steps"
+  }
+  return $reasons
+}
+
 function Get-AexsEvidence {
   param([object]$Module)
   $repoRoot = Get-AexsRepoRoot
@@ -253,10 +399,18 @@ foreach ($term in $requiredSourceTerms) {
 }
 
 $moduleRows = @()
+$atomicTasks = @()
 foreach ($module in $moduleCatalog) {
   $taskCount = Get-AexsTaskCount -Text $taskText -Prefix $module.Prefix
   $matrixRow = Get-AexsMatrixRowText -Text $taskText -Label $module.Label
   $matrixCells = Get-AexsMatrixCells -Row $matrixRow
+  $moduleAtomicTasks = @(Get-AexsAtomicTaskRecords -Text $taskText -Module $module -MatrixCells $matrixCells -CampaignId $campaignId)
+  foreach ($task in $moduleAtomicTasks) {
+    $invalidReasons = @(Test-AexsAtomicTaskRecord -Task $task)
+    $task["valid"] = $invalidReasons.Count -eq 0
+    $task["invalid_reasons"] = $invalidReasons
+    $atomicTasks += $task
+  }
   $hasMatrixRow = $matrixRow -ne ""
   $hasAttackSurface = $hasMatrixRow -and $matrixCells.Count -ge 5 -and -not [string]::IsNullOrWhiteSpace($matrixCells[3])
   $hasInvariantPlan = $hasMatrixRow -and $matrixCells.Count -ge 5 -and -not [string]::IsNullOrWhiteSpace($matrixCells[4])
@@ -282,6 +436,8 @@ foreach ($module in $moduleCatalog) {
     module                    = $module.Module
     task_prefix               = $module.Prefix
     task_count                = $taskCount
+    atomic_task_records       = $moduleAtomicTasks.Count
+    invalid_atomic_tasks      = @($moduleAtomicTasks | Where-Object { -not $_["valid"] } | ForEach-Object { $_["task_id"] })
     planned_coverage_percent  = $plannedCoverage
     has_matrix_row            = $hasMatrixRow
     has_attack_surface        = $hasAttackSurface
@@ -305,7 +461,9 @@ foreach ($row in $moduleRows) {
   $plannedCoverageTotal += [double]$row["planned_coverage_percent"]
 }
 $plannedCoverageAverage = [math]::Round(($plannedCoverageTotal / [double]$moduleRows.Count), 2)
-$modulesBelowPlan = @($moduleRows | Where-Object { $_["planned_coverage_percent"] -lt 95 -or $_["task_count"] -lt 5 -or -not $_["has_matrix_row"] -or -not $_["has_invariant_plan"] })
+$invalidAtomicTasks = @($atomicTasks | Where-Object { -not $_["valid"] })
+$modulesWithInvalidAtomicTasks = @($moduleRows | Where-Object { @($_["invalid_atomic_tasks"]).Count -gt 0 })
+$modulesBelowPlan = @($moduleRows | Where-Object { $_["planned_coverage_percent"] -lt 95 -or $_["task_count"] -lt 5 -or $_["atomic_task_records"] -lt 5 -or -not $_["has_matrix_row"] -or -not $_["has_invariant_plan"] -or @($_["invalid_atomic_tasks"]).Count -gt 0 })
 $modulesWithoutInvariantEvidence = @($moduleRows | Where-Object { -not $_["has_invariant_evidence"] })
 $modulesWithoutFuzzEvidence = @($moduleRows | Where-Object { -not $_["has_fuzz_evidence"] })
 $modulesWithoutAdversarialEvidence = @($moduleRows | Where-Object { -not $_["has_adversarial_evidence"] })
@@ -362,6 +520,10 @@ $summary = [ordered]@{
   simulator_modes                     = $simulatorModes
   target_modules                      = @($moduleRows | ForEach-Object { $_["module"] })
   module_count                        = $moduleRows.Count
+  atomic_task_count                   = $atomicTasks.Count
+  invalid_atomic_task_count           = $invalidAtomicTasks.Count
+  invalid_atomic_tasks                = @($invalidAtomicTasks | ForEach-Object { $_["task_id"] })
+  modules_with_invalid_atomic_tasks   = @($modulesWithInvalidAtomicTasks | ForEach-Object { $_["module"] })
   planned_coverage_percent            = $plannedCoverageAverage
   modules_below_planned_threshold     = @($modulesBelowPlan | ForEach-Object { $_["module"] })
   modules_without_invariant_evidence  = @($modulesWithoutInvariantEvidence | ForEach-Object { $_["module"] })
@@ -376,12 +538,32 @@ $summary = [ordered]@{
 }
 
 $coveragePath = Join-Path $campaignDir "coverage-matrix.json"
+$atomicTasksPath = Join-Path $campaignDir "atomic-tasks.json"
+$atomicTasksMarkdownPath = Join-Path $campaignDir "atomic-tasks.md"
 $summaryPath = Join-Path $campaignDir "summary.json"
 $resultPath = Join-Path $campaignDir "AUDIT_RESULT.md"
 $taskCopyPath = Join-Path $campaignDir "TO_AUDIT.md"
 $moduleRows | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $coveragePath
+$atomicTasks | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $atomicTasksPath
 $summary | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $summaryPath
 Copy-Item -LiteralPath $taskPath -Destination $taskCopyPath -Force
+
+$taskReport = @()
+$taskReport += "# AEXS Atomic Audit Tasks"
+$taskReport += ""
+$taskReport += "- campaign id: $campaignId"
+$taskReport += "- task count: $($atomicTasks.Count)"
+$taskReport += "- invalid task count: $($invalidAtomicTasks.Count)"
+$taskReport += ""
+$taskReport += "| Task | Module | Type | Flow | Invariant | Defensive status | Adversarial status | Result | Seed |"
+$taskReport += "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+foreach ($task in $atomicTasks) {
+  $flow = ([string]$task["function_or_flow_covered"]).Replace("|", "/")
+  $invariant = ([string]$task["invariant_tested"]).Replace("|", "/")
+  $seed = [string]$task["reproduction_seed_or_steps"]["seed"]
+  $taskReport += "| $($task["task_id"]) | $($task["module"]) | $($task["task_type"]) | $flow | $invariant | $($task["defensive_analysis_result"]["status"]) | $($task["adversarial_simulation_result"]["status"]) | $($task["pass_fail_result"]) | $seed |"
+}
+$taskReport | Set-Content -LiteralPath $atomicTasksMarkdownPath
 
 $report = @()
 $report += "# AEXS Audit Result"
@@ -393,6 +575,8 @@ $report += "- output dir: $campaignDir"
 $report += "- decision: NOT_SAFE_PRE_CAMPAIGN"
 $report += "- planned coverage: $plannedCoverageAverage%"
 $report += "- mandatory invariant pass rate: $mandatoryInvariantPassRate%"
+$report += "- atomic task records: $($atomicTasks.Count)"
+$report += "- invalid atomic task records: $($invalidAtomicTasks.Count)"
 $report += ""
 $report += "## Gate Decision"
 $report += ""
@@ -404,13 +588,14 @@ $report += "- modules below 95% planned coverage: $(@($modulesBelowPlan | ForEac
 $report += "- modules without invariant evidence: $(@($modulesWithoutInvariantEvidence | ForEach-Object { $_["module"] }) -join ', ')"
 $report += "- modules without fuzz evidence: $(@($modulesWithoutFuzzEvidence | ForEach-Object { $_["module"] }) -join ', ')"
 $report += "- modules without adversarial evidence: $(@($modulesWithoutAdversarialEvidence | ForEach-Object { $_["module"] }) -join ', ')"
+$report += "- modules with invalid atomic tasks: $(@($modulesWithInvalidAtomicTasks | ForEach-Object { $_["module"] }) -join ', ')"
 $report += ""
 $report += "## Module Matrix"
 $report += ""
-$report += "| Module | Tasks | Planned coverage | Invariant evidence | Fuzz evidence | Adversarial evidence | Safe |"
-$report += "| --- | ---: | ---: | --- | --- | --- | --- |"
+$report += "| Module | Tasks | Atomic records | Planned coverage | Invariant evidence | Fuzz evidence | Adversarial evidence | Safe |"
+$report += "| --- | ---: | ---: | ---: | --- | --- | --- | --- |"
 foreach ($row in $moduleRows) {
-  $report += "| $($row["module"]) | $($row["task_count"]) | $($row["planned_coverage_percent"])% | $($row["has_invariant_evidence"]) | $($row["has_fuzz_evidence"]) | $($row["has_adversarial_evidence"]) | $($row["safe"]) |"
+  $report += "| $($row["module"]) | $($row["task_count"]) | $($row["atomic_task_records"]) | $($row["planned_coverage_percent"])% | $($row["has_invariant_evidence"]) | $($row["has_fuzz_evidence"]) | $($row["has_adversarial_evidence"]) | $($row["safe"]) |"
 }
 $report += ""
 $report += "## Required Next Step"
@@ -420,6 +605,9 @@ $report | Set-Content -LiteralPath $resultPath
 
 if ($sourceFailures.Count -gt 0) {
   throw "AEXS audit source validation failed: $($sourceFailures -join '; ')"
+}
+if ($invalidAtomicTasks.Count -gt 0) {
+  throw "AEXS atomic task validation failed for task(s): $(@($invalidAtomicTasks | ForEach-Object { $_["task_id"] }) -join ', ')"
 }
 if ($modulesBelowPlan.Count -gt 0) {
   throw "AEXS planned coverage gate failed for module(s): $(@($modulesBelowPlan | ForEach-Object { $_["module"] }) -join ', ')"
