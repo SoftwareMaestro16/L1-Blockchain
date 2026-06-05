@@ -95,7 +95,20 @@ jobs:
           set -e
 
           if [[ -s gosec.json ]]; then
-            cat gosec.json
+            python3 - <<'PY'
+          import json
+
+          with open("gosec.json", encoding="utf-8") as report:
+              data = json.load(report)
+
+          for issue in data.get("Issues", []):
+              print(
+                  "gosec finding: "
+                  f"{issue.get('rule_id')} "
+                  f"{issue.get('file')}:{issue.get('line')}:{issue.get('column')} "
+                  f"{issue.get('details')}"
+              )
+          PY
           fi
 
           gosec -exclude-generated -severity high -confidence medium -fmt sarif -out gosec.sarif "${package_dirs[@]}" || true
