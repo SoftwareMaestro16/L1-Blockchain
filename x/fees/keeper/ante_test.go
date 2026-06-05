@@ -9,6 +9,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
@@ -18,10 +19,11 @@ import (
 type feeTx struct {
 	fees  sdk.Coins
 	payer sdk.AccAddress
+	msgs  []sdk.Msg
 }
 
 func (tx feeTx) GetMsgs() []sdk.Msg {
-	return nil
+	return tx.msgs
 }
 
 func (tx feeTx) GetMsgsV2() ([]protov2.Message, error) {
@@ -160,6 +162,24 @@ func TestAnteHandlerDecoratorRejectsZeroFee(t *testing.T) {
 	_, err := app.FeesKeeper.AnteHandlerDecorator(next)(ctx, feeTx{fees: sdk.Coins{}}, false)
 	require.ErrorIs(t, err, types.ErrInvalidFee)
 	require.False(t, called)
+}
+
+func TestAnteHandlerDecoratorAllowsGenesisCreateValidatorWithoutFee(t *testing.T) {
+	app := l1app.Setup(t, false)
+	ctx := app.NewContext(false).WithBlockHeight(0)
+
+	called := false
+	next := func(ctx sdk.Context, _ sdk.Tx, _ bool) (sdk.Context, error) {
+		called = true
+		return ctx, nil
+	}
+
+	_, err := app.FeesKeeper.AnteHandlerDecorator(next)(ctx, feeTx{
+		fees: sdk.Coins{},
+		msgs: []sdk.Msg{&stakingtypes.MsgCreateValidator{}},
+	}, false)
+	require.NoError(t, err)
+	require.True(t, called)
 }
 
 func TestAnteHandlerDecoratorRejectsBelowMinimumFee(t *testing.T) {

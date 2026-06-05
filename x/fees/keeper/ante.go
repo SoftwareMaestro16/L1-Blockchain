@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/sovereign-l1/l1/observability"
 	"github.com/sovereign-l1/l1/x/fees/types"
@@ -9,6 +10,9 @@ import (
 
 func (k Keeper) AnteHandlerDecorator(next sdk.AnteHandler) sdk.AnteHandler {
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (sdk.Context, error) {
+		if isGenesisCreateValidatorTx(ctx, tx) {
+			return next(ctx, tx, simulate)
+		}
 		feeTx, ok := tx.(sdk.FeeTx)
 		if !ok {
 			observability.RecordFeeRejected("missing_fee_tx")
@@ -32,4 +36,20 @@ func (k Keeper) AnteHandlerDecorator(next sdk.AnteHandler) sdk.AnteHandler {
 		observability.RecordFeeAccepted()
 		return newCtx, nil
 	}
+}
+
+func isGenesisCreateValidatorTx(ctx sdk.Context, tx sdk.Tx) bool {
+	if ctx.BlockHeight() != 0 {
+		return false
+	}
+	msgs := tx.GetMsgs()
+	if len(msgs) == 0 {
+		return false
+	}
+	for _, msg := range msgs {
+		if _, ok := msg.(*stakingtypes.MsgCreateValidator); !ok {
+			return false
+		}
+	}
+	return true
 }
