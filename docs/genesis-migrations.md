@@ -7,6 +7,23 @@
 - Keeper `ExportGenesis` methods return errors and validate the exported state before returning it.
 - AppModule `InitGenesis` and `ExportGenesis` may panic only because the Cosmos SDK module interface has no error return; these are startup/operator-export invariants, not transaction execution paths.
 - Custom module migrations must be registered for every `ConsensusVersion` bump. No-op migrations are allowed only when they still validate current exportable state.
+- App-level genesis policy runs before module `InitGenesis` and rejects Orbitalis-specific invariants that the SDK cannot infer, including zero auth accounts, invalid bank balances, staking denom drift away from `norb`, and fee denom drift away from `norb`.
+
+## Acceptance Chain
+
+The required deterministic chain is:
+
+```text
+DefaultGenesis -> InitChain/InitGenesis -> ExportAppStateAndValidators -> ValidateGenesis
+```
+
+Acceptance tests assert that:
+
+- default genesis validates before init;
+- init and export are panic-free on valid default state;
+- repeated export of the same state is byte-identical;
+- exported state validates through the module manager;
+- duplicate auth accounts, malformed account `Any` values, duplicate balances, malformed balance addresses, supply mismatch, staking denom drift, and fee denom drift are rejected before they can become committed state.
 
 ## Current Custom Module Versions
 
@@ -30,4 +47,6 @@ Before merging a state-breaking change:
 - register a migration from the previous version;
 - add a migration test that starts from the previous version map;
 - add corrupted-state tests for any new fields or indexes;
-- run `go test ./...`, `go vet ./...`, `buf lint`, `buf generate`, build, and localnet smoke.
+- update the upgrade handler only through an explicit upgrade name and a reviewed version-map migration path;
+- never mutate store layout without a migration that validates existing exportable state before and after the migration;
+- run `go test ./...`, `go vet ./...`, `buf lint`, generated-protobuf verification, build, and localnet smoke.

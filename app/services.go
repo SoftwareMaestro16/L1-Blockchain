@@ -28,14 +28,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	protocolpooltypes "github.com/cosmos/cosmos-sdk/x/protocolpool/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	orbitaladdress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/observability"
+	feestypes "github.com/sovereign-l1/l1/x/fees/types"
 )
 
 func (app *L1App) Name() string { return app.BaseApp.Name() }
@@ -76,7 +79,7 @@ func (app *L1App) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*abc
 	if err != nil {
 		return nil, err
 	}
-	if err := app.validateOrbitalisAuthGenesis(genesisState); err != nil {
+	if err := app.validateOrbitalisGenesis(genesisState); err != nil {
 		return nil, err
 	}
 	res, err := app.ModuleManager.InitGenesis(ctx, app.appCodec, genesisState)
@@ -89,17 +92,87 @@ func (app *L1App) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*abc
 	return res, nil
 }
 
+func (app *L1App) validateOrbitalisGenesis(genesisState GenesisState) error {
+	if err := app.validateOrbitalisAuthGenesis(genesisState); err != nil {
+		return err
+	}
+	if err := app.validateOrbitalisBankGenesis(genesisState); err != nil {
+		return err
+	}
+	if err := app.validateOrbitalisStakingGenesis(genesisState); err != nil {
+		return err
+	}
+	return app.validateOrbitalisFeeGenesis(genesisState)
+}
+
 func (app *L1App) validateOrbitalisAuthGenesis(genesisState GenesisState) error {
-	authGenesis := authtypes.GetGenesisStateFromAppState(app.appCodec, genesisState)
+	var authGenesis authtypes.GenesisState
+	if genesisState[authtypes.ModuleName] == nil {
+		return fmt.Errorf("missing %s genesis state", authtypes.ModuleName)
+	}
+	if err := app.appCodec.UnmarshalJSON(genesisState[authtypes.ModuleName], &authGenesis); err != nil {
+		return fmt.Errorf("invalid %s genesis state: %w", authtypes.ModuleName, err)
+	}
 	accounts, err := authtypes.UnpackAccounts(authGenesis.Accounts)
 	if err != nil {
 		return err
 	}
+	seenAccounts := make(map[string]struct{}, len(accounts))
 	for _, account := range accounts {
 		addr := account.GetAddress()
+		addrText := addr.String()
+		if _, found := seenAccounts[addrText]; found {
+			return fmt.Errorf("duplicate auth genesis account: %s", orbitaladdress.FormatAccAddress(addr))
+		}
+		seenAccounts[addrText] = struct{}{}
 		if orbitaladdress.IsZeroAccAddress(addr) {
 			return fmt.Errorf("auth genesis account %s must not be zero address", orbitaladdress.ZeroRawAddress)
 		}
+	}
+	return nil
+}
+
+func (app *L1App) validateOrbitalisBankGenesis(genesisState GenesisState) error {
+	var bankGenesis banktypes.GenesisState
+	if genesisState[banktypes.ModuleName] == nil {
+		return fmt.Errorf("missing %s genesis state", banktypes.ModuleName)
+	}
+	if err := app.appCodec.UnmarshalJSON(genesisState[banktypes.ModuleName], &bankGenesis); err != nil {
+		return fmt.Errorf("invalid %s genesis state: %w", banktypes.ModuleName, err)
+	}
+	if err := bankGenesis.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (app *L1App) validateOrbitalisStakingGenesis(genesisState GenesisState) error {
+	var stakingGenesis stakingtypes.GenesisState
+	if genesisState[stakingtypes.ModuleName] == nil {
+		return fmt.Errorf("missing %s genesis state", stakingtypes.ModuleName)
+	}
+	if err := app.appCodec.UnmarshalJSON(genesisState[stakingtypes.ModuleName], &stakingGenesis); err != nil {
+		return fmt.Errorf("invalid %s genesis state: %w", stakingtypes.ModuleName, err)
+	}
+	if stakingGenesis.Params.BondDenom != BondDenom {
+		return fmt.Errorf("invalid staking denom: expected %s, got %s", BondDenom, stakingGenesis.Params.BondDenom)
+	}
+	return nil
+}
+
+func (app *L1App) validateOrbitalisFeeGenesis(genesisState GenesisState) error {
+	var feesGenesis feestypes.GenesisState
+	if genesisState[feestypes.ModuleName] == nil {
+		return fmt.Errorf("missing %s genesis state", feestypes.ModuleName)
+	}
+	if err := app.appCodec.UnmarshalJSON(genesisState[feestypes.ModuleName], &feesGenesis); err != nil {
+		return fmt.Errorf("invalid %s genesis state: %w", feestypes.ModuleName, err)
+	}
+	if err := feesGenesis.Validate(); err != nil {
+		return err
+	}
+	if len(feesGenesis.Params.AllowedFeeDenoms) != 1 || feesGenesis.Params.AllowedFeeDenoms[0] != BondDenom {
+		return fmt.Errorf("allowed fee denom must be exactly %s", BondDenom)
 	}
 	return nil
 }

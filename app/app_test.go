@@ -231,6 +231,136 @@ func TestInitChainRejectsZeroGenesisAccount(t *testing.T) {
 	require.ErrorContains(t, err, "must not be zero address")
 }
 
+func TestGenesisRejectsDuplicateAndMalformedAccounts(t *testing.T) {
+	tests := map[string]struct {
+		mutate   func(*L1App, GenesisState)
+		errMatch string
+	}{
+		"duplicate auth account": {
+			mutate: func(app *L1App, genesis GenesisState) {
+				authGenesis := authtypes.GetGenesisStateFromAppState(app.AppCodec(), genesis)
+				require.NotEmpty(t, authGenesis.Accounts)
+				authGenesis.Accounts = append(authGenesis.Accounts, authGenesis.Accounts[0])
+				genesis[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(&authGenesis)
+			},
+			errMatch: "duplicate account",
+		},
+		"malformed auth account any": {
+			mutate: func(app *L1App, genesis GenesisState) {
+				var authRaw map[string]json.RawMessage
+				require.NoError(t, json.Unmarshal(genesis[authtypes.ModuleName], &authRaw))
+				authRaw["accounts"] = json.RawMessage(`[{"@type":"/orbitalis.malformed.GenesisAccount"}]`)
+				raw, err := json.Marshal(authRaw)
+				require.NoError(t, err)
+				genesis[authtypes.ModuleName] = raw
+			},
+			errMatch: "unable to resolve type URL",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			app, genesis := setup(true, 5)
+			genesis = GenesisStateWithSingleValidator(t, app)
+			tc.mutate(app, genesis)
+			requireGenesisValidationError(t, app, genesis, tc.errMatch)
+		})
+	}
+}
+
+func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
+	tests := map[string]struct {
+		mutate   func(*L1App, GenesisState)
+		errMatch string
+	}{
+		"duplicate bank balance": {
+			mutate: func(app *L1App, genesis GenesisState) {
+				bankGenesis := banktypes.GetGenesisStateFromAppState(app.AppCodec(), genesis)
+				require.NotEmpty(t, bankGenesis.Balances)
+				bankGenesis.Balances = append(bankGenesis.Balances, bankGenesis.Balances[0])
+				genesis[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
+			},
+			errMatch: "duplicate balance",
+		},
+		"malformed bank balance address": {
+			mutate: func(app *L1App, genesis GenesisState) {
+				bankGenesis := banktypes.GetGenesisStateFromAppState(app.AppCodec(), genesis)
+				bankGenesis.Balances = append(bankGenesis.Balances, banktypes.Balance{
+					Address: "not-an-orb-address",
+					Coins:   sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 1)),
+				})
+				genesis[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
+			},
+			errMatch: "decoding bech32 failed",
+		},
+		"bank supply mismatch": {
+			mutate: func(app *L1App, genesis GenesisState) {
+				bankGenesis := banktypes.GetGenesisStateFromAppState(app.AppCodec(), genesis)
+				bankGenesis.Supply = bankGenesis.Supply.Add(sdk.NewInt64Coin(appparams.BaseDenom, 1))
+				genesis[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
+			},
+			errMatch: "genesis supply is incorrect",
+		},
+		"staking denom mismatch": {
+			mutate: func(app *L1App, genesis GenesisState) {
+				stakingGenesis := stakingtypes.GetGenesisStateFromAppState(app.AppCodec(), genesis)
+				stakingGenesis.Params.BondDenom = appparams.TestAssetDenom
+				genesis[stakingtypes.ModuleName] = app.AppCodec().MustMarshalJSON(stakingGenesis)
+			},
+			errMatch: "invalid staking denom",
+		},
+		"fees denom mismatch": {
+			mutate: func(app *L1App, genesis GenesisState) {
+				var feesGenesis feestypes.GenesisState
+				app.AppCodec().MustUnmarshalJSON(genesis[feestypes.ModuleName], &feesGenesis)
+				feesGenesis.Params.AllowedFeeDenoms = []string{appparams.TestAssetDenom}
+				genesis[feestypes.ModuleName] = app.AppCodec().MustMarshalJSON(&feesGenesis)
+			},
+			errMatch: "v1 only accepts fee denom norb",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			app, genesis := setup(true, 5)
+			genesis = GenesisStateWithSingleValidator(t, app)
+			tc.mutate(app, genesis)
+			requireGenesisValidationError(t, app, genesis, tc.errMatch)
+		})
+	}
+}
+
+func TestDefaultGenesisInitExportValidateAcceptanceChain(t *testing.T) {
+	app, genesis := setup(true, 5)
+	genesis = GenesisStateWithSingleValidator(t, app)
+	stateBytes, err := json.MarshalIndent(genesis, "", " ")
+	require.NoError(t, err)
+
+	_, err = app.InitChain(&abci.RequestInitChain{
+		Validators:      []abci.ValidatorUpdate{},
+		ConsensusParams: sims.DefaultConsensusParams,
+		AppStateBytes:   stateBytes,
+	})
+	require.NoError(t, err)
+	_, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: 1,
+		Hash:   app.LastCommitID().Hash,
+	})
+	require.NoError(t, err)
+	_, err = app.Commit()
+	require.NoError(t, err)
+
+	exportedA, err := app.ExportAppStateAndValidators(false, nil, nil)
+	require.NoError(t, err)
+	exportedB, err := app.ExportAppStateAndValidators(false, nil, nil)
+	require.NoError(t, err)
+	require.Equal(t, exportedA.AppState, exportedB.AppState)
+
+	var exportedGenesis GenesisState
+	require.NoError(t, json.Unmarshal(exportedA.AppState, &exportedGenesis))
+	require.NoError(t, app.BasicModuleManager.ValidateGenesis(app.AppCodec(), app.TxConfig(), exportedGenesis))
+}
+
 func TestPrototypeModuleAccountPermissionsAreNarrow(t *testing.T) {
 	expected := map[string][]string{
 		authtypes.FeeCollectorName:                  nil,
@@ -264,6 +394,32 @@ func cloneGenesisState(genesis GenesisState) GenesisState {
 		clone[moduleName] = append(json.RawMessage(nil), raw...)
 	}
 	return clone
+}
+
+func requireGenesisValidationError(t *testing.T, app *L1App, genesis GenesisState, errMatch string) {
+	t.Helper()
+	appPolicyErr := app.validateOrbitalisGenesis(genesis)
+	moduleErr := app.BasicModuleManager.ValidateGenesis(app.AppCodec(), app.TxConfig(), genesis)
+	require.True(t, appPolicyErr != nil || moduleErr != nil, "expected app policy or module genesis validation error")
+	matched := appPolicyErr != nil && strings.Contains(appPolicyErr.Error(), errMatch)
+	matched = matched || moduleErr != nil && strings.Contains(moduleErr.Error(), errMatch)
+	require.Truef(
+		t,
+		matched,
+		"expected error containing %q, got app policy error %v and module error %v",
+		errMatch,
+		appPolicyErr,
+		moduleErr,
+	)
+
+	stateBytes, marshalErr := json.MarshalIndent(genesis, "", " ")
+	require.NoError(t, marshalErr)
+	_, err := app.InitChain(&abci.RequestInitChain{
+		Validators:      []abci.ValidatorUpdate{},
+		ConsensusParams: sims.DefaultConsensusParams,
+		AppStateBytes:   stateBytes,
+	})
+	require.Error(t, err)
 }
 
 func TestAppGenesisExportImportRoundTripAndDeterminism(t *testing.T) {
