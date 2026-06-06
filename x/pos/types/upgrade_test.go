@@ -770,6 +770,131 @@ func TestPosGovernanceParameterManifestRejectsMissingDuplicateAndUnsafeSpecs(t *
 	require.ErrorContains(t, rootMismatch.Validate(compatibility), "root mismatch")
 }
 
+func TestPosAcceptanceCriteriaManifestCoversImplementationPlanningGate(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	boundaries := DefaultPoSModuleBoundaryManifest()
+	messages := DefaultPosMessageQueryManifest()
+	migration := DefaultPosMigrationStrategyManifest()
+	tests := DefaultPosRequiredTestCoverageManifest()
+	observability := DefaultPosObservabilityManifest()
+	governance := DefaultPosGovernanceParameterManifest()
+	keepers := DefaultKeeperIntegrationManifest()
+	manifest := DefaultPosAcceptanceCriteriaManifest()
+
+	require.NoError(t, manifest.Validate(compatibility, boundaries, messages, migration, tests, observability, governance, keepers))
+	require.Equal(t, ComputePosAcceptanceCriteriaRoot(manifest), manifest.Root)
+	require.Len(t, manifest.Criteria, len(RequiredPosAcceptanceCriterionNames()))
+	for _, name := range RequiredPosAcceptanceCriterionNames() {
+		criterion, found := PosAcceptanceCriterionByName(manifest, name)
+		require.True(t, found, name)
+		require.Equal(t, "implementation_planning", criterion.PlanningGate)
+		require.NotEmpty(t, criterion.ModuleNames)
+		require.NotEmpty(t, criterion.EvidenceRefs)
+		require.NotEmpty(t, criterion.TestCoverageRefs)
+		require.NotEmpty(t, criterion.MigrationPhases)
+	}
+
+	epoch, found := PosAcceptanceCriterionByName(manifest, "epoch_lifecycle_deterministic_queryable")
+	require.True(t, found)
+	require.Contains(t, epoch.ModuleNames, "epoch")
+	require.Contains(t, epoch.QueryRefs, "QueryCurrentEpoch")
+	require.Contains(t, epoch.QueryRefs, "QueryEpoch")
+	require.Contains(t, epoch.TestCoverageRefs, "epoch phase transition")
+	require.Equal(t, []uint32{1}, epoch.MigrationPhases)
+
+	evidence, found := PosAcceptanceCriterionByName(manifest, "structured_evidence_lifecycle")
+	require.True(t, found)
+	require.Contains(t, evidence.ModuleNames, "evidence")
+	require.Contains(t, evidence.QueryRefs, "QueryEvidenceDeposit")
+	require.Contains(t, evidence.QueryRefs, "QueryEvidenceDecision")
+	require.Contains(t, evidence.TestCoverageRefs, "evidence cannot be finalized twice")
+	require.Equal(t, []uint32{4}, evidence.MigrationPhases)
+
+	optionalRoles, found := PosAcceptanceCriterionByName(manifest, "optional_fishermen_collators_bounded_authority")
+	require.True(t, found)
+	require.Contains(t, optionalRoles.ModuleNames, "collators")
+	require.Contains(t, optionalRoles.ModuleNames, "fishermen")
+	require.Contains(t, optionalRoles.QueryRefs, "QueryCollatorRegistry")
+	require.Contains(t, optionalRoles.QueryRefs, "QueryFishermanRegistry")
+	require.Contains(t, optionalRoles.TestCoverageRefs, "collator invalid output")
+	require.Contains(t, optionalRoles.TestCoverageRefs, "fisherman valid and invalid proof submissions")
+
+	rewards, found := PosAcceptanceCriterionByName(manifest, "performance_rewards_bounded_distribution")
+	require.True(t, found)
+	require.Contains(t, rewards.ModuleNames, "distribution")
+	require.Contains(t, rewards.ModuleNames, "performance")
+	require.Contains(t, rewards.QueryRefs, "QueryRewardMultiplier")
+	require.Contains(t, rewards.TestCoverageRefs, "distribution rewards use performance multiplier")
+	require.Equal(t, []uint32{3}, rewards.MigrationPhases)
+}
+
+func TestPosAcceptanceCriteriaManifestRejectsIncompleteOrUnlinkedCriteria(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	boundaries := DefaultPoSModuleBoundaryManifest()
+	messages := DefaultPosMessageQueryManifest()
+	migration := DefaultPosMigrationStrategyManifest()
+	tests := DefaultPosRequiredTestCoverageManifest()
+	observability := DefaultPosObservabilityManifest()
+	governance := DefaultPosGovernanceParameterManifest()
+	keepers := DefaultKeeperIntegrationManifest()
+	manifest := DefaultPosAcceptanceCriteriaManifest()
+
+	missing := manifest
+	missing.Criteria = append([]PosAcceptanceCriterionSpec{}, manifest.Criteria...)
+	missing.Criteria = missing.Criteria[1:]
+	missing.Root = ComputePosAcceptanceCriteriaRoot(missing)
+	require.ErrorContains(t, missing.Validate(compatibility, boundaries, messages, migration, tests, observability, governance, keepers), "epoch_lifecycle_deterministic_queryable")
+
+	duplicate := manifest
+	duplicate.Criteria = append([]PosAcceptanceCriterionSpec{}, manifest.Criteria...)
+	duplicate.Criteria = append(duplicate.Criteria, manifest.Criteria[0])
+	duplicate.Root = ComputePosAcceptanceCriteriaRoot(duplicate)
+	require.ErrorContains(t, duplicate.Validate(compatibility, boundaries, messages, migration, tests, observability, governance, keepers), "duplicate pos acceptance criterion")
+
+	unknownModule := manifest
+	unknownModule.Criteria = append([]PosAcceptanceCriterionSpec{}, manifest.Criteria...)
+	unknownModule.Criteria[0].ModuleNames = append([]string{}, unknownModule.Criteria[0].ModuleNames...)
+	unknownModule.Criteria[0].ModuleNames[0] = "unknown_module"
+	unknownModule.Root = ComputePosAcceptanceCriteriaRoot(unknownModule)
+	require.ErrorContains(t, unknownModule.Validate(compatibility, boundaries, messages, migration, tests, observability, governance, keepers), "unknown module")
+
+	unknownQuery := manifest
+	unknownQuery.Criteria = append([]PosAcceptanceCriterionSpec{}, manifest.Criteria...)
+	unknownQuery.Criteria[0].QueryRefs = append([]string{}, unknownQuery.Criteria[0].QueryRefs...)
+	unknownQuery.Criteria[0].QueryRefs[0] = "QueryUnknown"
+	unknownQuery.Root = ComputePosAcceptanceCriteriaRoot(unknownQuery)
+	require.ErrorContains(t, unknownQuery.Validate(compatibility, boundaries, messages, migration, tests, observability, governance, keepers), "unknown query")
+
+	unknownCoverage := manifest
+	unknownCoverage.Criteria = append([]PosAcceptanceCriterionSpec{}, manifest.Criteria...)
+	unknownCoverage.Criteria[0].TestCoverageRefs = append([]string{}, unknownCoverage.Criteria[0].TestCoverageRefs...)
+	unknownCoverage.Criteria[0].TestCoverageRefs[0] = "unknown coverage"
+	unknownCoverage.Root = ComputePosAcceptanceCriteriaRoot(unknownCoverage)
+	require.ErrorContains(t, unknownCoverage.Validate(compatibility, boundaries, messages, migration, tests, observability, governance, keepers), "unknown test coverage")
+
+	unknownPhase := manifest
+	unknownPhase.Criteria = append([]PosAcceptanceCriterionSpec{}, manifest.Criteria...)
+	unknownPhase.Criteria[0].MigrationPhases = []uint32{99}
+	unknownPhase.Root = ComputePosAcceptanceCriteriaRoot(unknownPhase)
+	require.ErrorContains(t, unknownPhase.Validate(compatibility, boundaries, messages, migration, tests, observability, governance, keepers), "unknown migration phase")
+
+	missingEvidence := manifest
+	missingEvidence.Criteria = append([]PosAcceptanceCriterionSpec{}, manifest.Criteria...)
+	missingEvidence.Criteria[0].EvidenceRefs = nil
+	missingEvidence.Root = ComputePosAcceptanceCriteriaRoot(missingEvidence)
+	require.ErrorContains(t, missingEvidence.Validate(compatibility, boundaries, messages, migration, tests, observability, governance, keepers), "evidence artifacts")
+
+	badGate := manifest
+	badGate.Criteria = append([]PosAcceptanceCriterionSpec{}, manifest.Criteria...)
+	badGate.Criteria[0].PlanningGate = "runtime_activation"
+	badGate.Root = ComputePosAcceptanceCriteriaRoot(badGate)
+	require.ErrorContains(t, badGate.Validate(compatibility, boundaries, messages, migration, tests, observability, governance, keepers), "implementation planning")
+
+	rootMismatch := manifest
+	rootMismatch.Root = PosEmptyRootHash
+	require.ErrorContains(t, rootMismatch.Validate(compatibility, boundaries, messages, migration, tests, observability, governance, keepers), "root mismatch")
+}
+
 func TestKeeperIntegrationManifestCoversSDKKeepersHooksAndExportImport(t *testing.T) {
 	compatibility := DefaultCosmosSDKCompatibilityManifest()
 	boundaries := DefaultPoSModuleBoundaryManifest()

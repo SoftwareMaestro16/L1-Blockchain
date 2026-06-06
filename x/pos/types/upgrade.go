@@ -1079,6 +1079,22 @@ type PosGovernanceParameterManifest struct {
 	Root       string
 }
 
+type PosAcceptanceCriterionSpec struct {
+	Name             string
+	Requirement      string
+	ModuleNames      []string
+	EvidenceRefs     []string
+	QueryRefs        []string
+	TestCoverageRefs []string
+	MigrationPhases  []uint32
+	PlanningGate     string
+}
+
+type PosAcceptanceCriteriaManifest struct {
+	Criteria []PosAcceptanceCriterionSpec
+	Root     string
+}
+
 type KeeperIntegrationManifest struct {
 	KeeperInterfaces      []KeeperInterfaceSpec
 	StakingLifecycleHooks []KeeperHookSpec
@@ -2963,6 +2979,360 @@ func PosGovernanceParameterByName(manifest PosGovernanceParameterManifest, categ
 		}
 	}
 	return PosGovernanceParameterSpec{}, false
+}
+
+func DefaultPosAcceptanceCriteriaManifest() PosAcceptanceCriteriaManifest {
+	manifest := PosAcceptanceCriteriaManifest{Criteria: []PosAcceptanceCriterionSpec{
+		{
+			Name:             "epoch_lifecycle_deterministic_queryable",
+			Requirement:      "epoch lifecycle is deterministic and queryable",
+			ModuleNames:      []string{"epoch", "staking"},
+			EvidenceRefs:     []string{"EpochRecord", "epoch_root", "epoch_seed"},
+			QueryRefs:        []string{"QueryCurrentEpoch", "QueryEpoch"},
+			TestCoverageRefs: []string{"epoch phase transition", "epoch seed derivation", "existing staking state migrates into epoch system"},
+			MigrationPhases:  []uint32{1},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "validator_scoring_fixed_point",
+			Requirement:      "validator scoring is deterministic and fixed point",
+			ModuleNames:      []string{"validator_economy", "performance"},
+			EvidenceRefs:     []string{"ValidatorScoreRecord", "validator_score_root", "fixed_point_math"},
+			QueryRefs:        []string{"QueryValidatorScore", "QueryElectionRanking"},
+			TestCoverageRefs: []string{"validator score calculation", "validator election ranking is deterministic", "validator score calculation for 400 validators"},
+			MigrationPhases:  []uint32{1, 4},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "stake_saturation_centralization_pressure",
+			Requirement:      "effective stake saturation reduces marginal centralization pressure",
+			ModuleNames:      []string{"validator_economy", "security_metrics"},
+			EvidenceRefs:     []string{"effective_stake", "stake_saturation_cap_factor", "max_voting_power_per_validator"},
+			QueryRefs:        []string{"QueryValidatorEffectiveStake", "QueryValidatorSaturation", "QuerySecurityMetrics"},
+			TestCoverageRefs: []string{"effective stake saturation", "effective stake <= raw stake", "stake concentration above soft cap", "stake splitting across validators"},
+			MigrationPhases:  []uint32{1, 4},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "delegation_risk_metadata_queryable",
+			Requirement:      "delegation risk metadata is stored and queryable",
+			ModuleNames:      []string{"delegation_market", "staking", "slashing"},
+			EvidenceRefs:     []string{"DelegationRecord", "RiskWindowRecord", "commission_tolerance"},
+			QueryRefs:        []string{"QueryDelegationRiskExposure", "QueryValidatorRisk", "QueryDelegationActivationEpoch"},
+			TestCoverageRefs: []string{"delegation affects future epoch only after activation delay", "validator cannot escape slash exposure by redelegation", "delegation market response to commission increase"},
+			MigrationPhases:  []uint32{1, 3, 4},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "task_groups_reproducible",
+			Requirement:      "task groups are reproducible from committed validator set and epoch seed",
+			ModuleNames:      []string{"taskgroups", "epoch", "validator_economy"},
+			EvidenceRefs:     []string{"TaskGroup", "task_group_root", "assignment_seed"},
+			QueryRefs:        []string{"QueryTaskGroup", "QueryTaskGroupsByValidator", "QueryAssignmentProof"},
+			TestCoverageRefs: []string{"task assignment function", "task groups are reproducible from epoch seed", "task group root matches assignments", "task group assignment for many workloads"},
+			MigrationPhases:  []uint32{2},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "proposer_rotation_fallback_deterministic",
+			Requirement:      "proposer rotation and fallback are deterministic",
+			ModuleNames:      []string{"taskgroups", "validator_economy"},
+			EvidenceRefs:     []string{"ProposerPriority", "fallback_order", "slot_assignment"},
+			QueryRefs:        []string{"QueryProposerForSlot", "QueryProposerRotation"},
+			TestCoverageRefs: []string{"proposer priority calculation", "proposer fallback works"},
+			MigrationPhases:  []uint32{2},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "verification_receipts_for_assigned_workloads",
+			Requirement:      "validators submit verification receipts for assigned workloads",
+			ModuleNames:      []string{"taskgroups", "performance"},
+			EvidenceRefs:     []string{"VerificationReceipt", "verifier_participation", "receipt_aggregation"},
+			QueryRefs:        []string{"QueryVerificationReceipt", "QueryPerformanceRecord"},
+			TestCoverageRefs: []string{"verification receipts aggregate correctly", "invalid task execution"},
+			MigrationPhases:  []uint32{2, 4},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "structured_evidence_lifecycle",
+			Requirement:      "structured evidence has deposit verification group decision and finalization paths",
+			ModuleNames:      []string{"evidence", "taskgroups", "slashing"},
+			EvidenceRefs:     []string{"EvidenceRecord", "evidence_deposit", "verification_group", "MsgFinalizeEvidence"},
+			QueryRefs:        []string{"QueryEvidence", "QueryEvidenceDeposit", "QueryEvidenceVerificationGroup", "QueryEvidenceDecision"},
+			TestCoverageRefs: []string{"evidence id derivation", "valid evidence triggers penalty", "invalid evidence burns reporter deposit", "evidence cannot be finalized twice", "high evidence spam"},
+			MigrationPhases:  []uint32{4},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "slashing_severity_role_routing",
+			Requirement:      "slashing supports severity role weight confiscation jailing tombstone and routing",
+			ModuleNames:      []string{"slashing", "evidence", "distribution", "validator_economy"},
+			EvidenceRefs:     []string{"SlashingRecord", "severity_matrix", "role_weight_matrix", "penalty_routing"},
+			QueryRefs:        []string{"QueryEvidence", "QuerySecurityMetrics"},
+			TestCoverageRefs: []string{"penalty scaling", "slash routing", "penalty routing exactly equals slashed amount", "valid evidence triggers penalty"},
+			MigrationPhases:  []uint32{4},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "optional_fishermen_collators_bounded_authority",
+			Requirement:      "fishermen and collators are optional roles with bounded authority",
+			ModuleNames:      []string{"fishermen", "collators", "evidence", "taskgroups"},
+			EvidenceRefs:     []string{"CollatorRecord", "Fisherman", "fraud_proof_deposit", "candidate_output"},
+			QueryRefs:        []string{"QueryCollatorRegistry", "QueryCollatorOutput", "QueryFishermanRegistry", "QueryFraudProof"},
+			TestCoverageRefs: []string{"collator invalid output", "fisherman valid and invalid proof submissions"},
+			MigrationPhases:  []uint32{4},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "performance_rewards_bounded_distribution",
+			Requirement:      "performance based rewards integrate with distribution using bounded multipliers",
+			ModuleNames:      []string{"performance", "distribution", "mint"},
+			EvidenceRefs:     []string{"PerformanceRecord", "reward_multiplier_bounds", "RewardMultiplierIntegration"},
+			QueryRefs:        []string{"QueryPerformanceRecord", "QueryRewardMultiplier"},
+			TestCoverageRefs: []string{"reward multiplier calculation", "distribution rewards use performance multiplier", "performance root matches records", "reward distribution with performance multipliers"},
+			MigrationPhases:  []uint32{3},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "unbonding_redelegation_risk_window",
+			Requirement:      "unbonding and redelegation retain slash exposure through configured risk window",
+			ModuleNames:      []string{"staking", "delegation_market", "slashing"},
+			EvidenceRefs:     []string{"RiskWindowRecord", "slashable_window", "redelegation_risk_retention"},
+			QueryRefs:        []string{"QuerySlashableWindow", "QueryDelegationRiskExposure"},
+			TestCoverageRefs: []string{"risk window calculation", "unbonding stake is slashed for historical fault", "validator cannot escape slash exposure by redelegation"},
+			MigrationPhases:  []uint32{1, 4},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "read_only_scoring_migration_preserves_staking",
+			Requirement:      "migration can start with read only scoring while preserving existing staking behavior",
+			ModuleNames:      []string{"staking", "epoch", "validator_economy"},
+			EvidenceRefs:     []string{"scoring_epoch_simulation", "PreservesExistingStaking", "ReadOnlyUntilExit"},
+			QueryRefs:        []string{"QueryValidatorScore", "QueryValidatorSaturation"},
+			TestCoverageRefs: []string{"existing staking state migrates into epoch system", "delegation affects future epoch only after activation delay"},
+			MigrationPhases:  []uint32{1},
+			PlanningGate:     "implementation_planning",
+		},
+		{
+			Name:             "test_coverage_determinism_invariants_simulations_performance",
+			Requirement:      "tests cover determinism invariants simulations and performance",
+			ModuleNames:      []string{"epoch", "validator_economy", "taskgroups", "evidence", "performance"},
+			EvidenceRefs:     []string{"PosRequiredTestCoverageManifest", "invariant_tests", "simulation_tests", "performance_tests"},
+			QueryRefs:        []string{"QuerySecurityMetrics"},
+			TestCoverageRefs: []string{"validator election ranking is deterministic", "task group root matches assignments", "stake concentration above soft cap", "validator score calculation for 400 validators"},
+			MigrationPhases:  []uint32{1, 2, 3, 4},
+			PlanningGate:     "implementation_planning",
+		},
+	}}
+	manifest.Root = ComputePosAcceptanceCriteriaRoot(manifest)
+	return manifest
+}
+
+func RequiredPosAcceptanceCriterionNames() []string {
+	return []string{
+		"epoch_lifecycle_deterministic_queryable",
+		"validator_scoring_fixed_point",
+		"stake_saturation_centralization_pressure",
+		"delegation_risk_metadata_queryable",
+		"task_groups_reproducible",
+		"proposer_rotation_fallback_deterministic",
+		"verification_receipts_for_assigned_workloads",
+		"structured_evidence_lifecycle",
+		"slashing_severity_role_routing",
+		"optional_fishermen_collators_bounded_authority",
+		"performance_rewards_bounded_distribution",
+		"unbonding_redelegation_risk_window",
+		"read_only_scoring_migration_preserves_staking",
+		"test_coverage_determinism_invariants_simulations_performance",
+	}
+}
+
+func (m PosAcceptanceCriteriaManifest) Validate(
+	compatibility CosmosSDKCompatibilityManifest,
+	boundaries PosModuleBoundaryManifest,
+	messages PosMessageQueryManifest,
+	migration PosMigrationStrategyManifest,
+	tests PosRequiredTestCoverageManifest,
+	observability PosObservabilityManifest,
+	governance PosGovernanceParameterManifest,
+	keepers KeeperIntegrationManifest,
+) error {
+	if err := compatibility.Validate(); err != nil {
+		return err
+	}
+	if err := boundaries.Validate(compatibility); err != nil {
+		return err
+	}
+	if err := messages.Validate(compatibility, boundaries); err != nil {
+		return err
+	}
+	if err := migration.Validate(compatibility); err != nil {
+		return err
+	}
+	if err := tests.Validate(compatibility, migration); err != nil {
+		return err
+	}
+	if err := observability.Validate(compatibility); err != nil {
+		return err
+	}
+	if err := governance.Validate(compatibility); err != nil {
+		return err
+	}
+	if err := keepers.Validate(compatibility, boundaries); err != nil {
+		return err
+	}
+	if len(m.Criteria) == 0 {
+		return errors.New("pos acceptance criteria are required")
+	}
+	knownModules := knownKeeperIntegrationModules(compatibility)
+	knownQueries := knownPosQueryNames(messages)
+	knownCoverage := knownPosTestCoverageNames(tests)
+	knownPhases := make(map[uint32]struct{}, len(migration.Phases))
+	for _, phase := range migration.Phases {
+		knownPhases[phase.PhaseID] = struct{}{}
+	}
+	seen := make(map[string]struct{}, len(m.Criteria))
+	for _, criterion := range m.Criteria {
+		if err := criterion.Validate(knownModules, knownQueries, knownCoverage, knownPhases); err != nil {
+			return err
+		}
+		if _, found := seen[criterion.Name]; found {
+			return fmt.Errorf("duplicate pos acceptance criterion %s", criterion.Name)
+		}
+		seen[criterion.Name] = struct{}{}
+	}
+	for _, required := range RequiredPosAcceptanceCriterionNames() {
+		if _, found := seen[required]; !found {
+			return fmt.Errorf("required pos acceptance criterion %s is missing", required)
+		}
+	}
+	if err := validatePosHash("pos acceptance criteria root", m.Root); err != nil {
+		return err
+	}
+	if expected := ComputePosAcceptanceCriteriaRoot(m); expected != m.Root {
+		return errors.New("pos acceptance criteria root mismatch")
+	}
+	return nil
+}
+
+func (c PosAcceptanceCriterionSpec) Validate(
+	knownModules map[string]struct{},
+	knownQueries map[string]struct{},
+	knownCoverage map[string]struct{},
+	knownPhases map[uint32]struct{},
+) error {
+	if err := validatePosToken("pos acceptance criterion name", c.Name); err != nil {
+		return err
+	}
+	if err := validatePosResponsibility("pos acceptance criterion requirement", c.Requirement); err != nil {
+		return err
+	}
+	if len(c.ModuleNames) == 0 {
+		return fmt.Errorf("pos acceptance criterion %s must reference modules", c.Name)
+	}
+	for _, moduleName := range c.ModuleNames {
+		if err := validatePosToken("pos acceptance criterion module", moduleName); err != nil {
+			return err
+		}
+		if _, found := knownModules[moduleName]; !found {
+			return fmt.Errorf("pos acceptance criterion %s references unknown module %s", c.Name, moduleName)
+		}
+	}
+	if len(c.EvidenceRefs) == 0 {
+		return fmt.Errorf("pos acceptance criterion %s must reference evidence artifacts", c.Name)
+	}
+	for _, evidenceRef := range c.EvidenceRefs {
+		if err := validatePosToken("pos acceptance criterion evidence ref", evidenceRef); err != nil {
+			return err
+		}
+	}
+	for _, queryRef := range c.QueryRefs {
+		if err := validatePosToken("pos acceptance criterion query ref", queryRef); err != nil {
+			return err
+		}
+		if _, found := knownQueries[queryRef]; !found {
+			return fmt.Errorf("pos acceptance criterion %s references unknown query %s", c.Name, queryRef)
+		}
+	}
+	if len(c.TestCoverageRefs) == 0 {
+		return fmt.Errorf("pos acceptance criterion %s must reference test coverage", c.Name)
+	}
+	for _, coverageRef := range c.TestCoverageRefs {
+		if err := validatePosResponsibility("pos acceptance criterion test coverage ref", coverageRef); err != nil {
+			return err
+		}
+		if _, found := knownCoverage[coverageRef]; !found {
+			return fmt.Errorf("pos acceptance criterion %s references unknown test coverage %s", c.Name, coverageRef)
+		}
+	}
+	if len(c.MigrationPhases) == 0 {
+		return fmt.Errorf("pos acceptance criterion %s must reference migration phases", c.Name)
+	}
+	for _, phaseID := range c.MigrationPhases {
+		if _, found := knownPhases[phaseID]; !found {
+			return fmt.Errorf("pos acceptance criterion %s references unknown migration phase %d", c.Name, phaseID)
+		}
+	}
+	if c.PlanningGate != "implementation_planning" {
+		return fmt.Errorf("pos acceptance criterion %s must gate implementation planning", c.Name)
+	}
+	return nil
+}
+
+func ComputePosAcceptanceCriteriaRoot(manifest PosAcceptanceCriteriaManifest) string {
+	return posHashRoot("aetheris-pos-acceptance-criteria-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(manifest.Criteria)))
+		for _, criterion := range manifest.Criteria {
+			posWritePart(w, criterion.Name)
+			posWritePart(w, criterion.Requirement)
+			posWriteStringSlice(w, criterion.ModuleNames)
+			posWriteStringSlice(w, criterion.EvidenceRefs)
+			posWriteStringSlice(w, criterion.QueryRefs)
+			posWriteStringSlice(w, criterion.TestCoverageRefs)
+			posWriteUint64(w, uint64(len(criterion.MigrationPhases)))
+			for _, phaseID := range criterion.MigrationPhases {
+				posWriteUint64(w, uint64(phaseID))
+			}
+			posWritePart(w, criterion.PlanningGate)
+		}
+	})
+}
+
+func PosAcceptanceCriterionByName(manifest PosAcceptanceCriteriaManifest, name string) (PosAcceptanceCriterionSpec, bool) {
+	for _, criterion := range manifest.Criteria {
+		if criterion.Name == name {
+			return criterion, true
+		}
+	}
+	return PosAcceptanceCriterionSpec{}, false
+}
+
+func knownPosQueryNames(manifest PosMessageQueryManifest) map[string]struct{} {
+	known := make(map[string]struct{}, len(manifest.Queries))
+	for _, query := range manifest.Queries {
+		known[query.QueryName] = struct{}{}
+	}
+	return known
+}
+
+func knownPosTestCoverageNames(manifest PosRequiredTestCoverageManifest) map[string]struct{} {
+	known := make(map[string]struct{})
+	for _, spec := range manifest.UnitTests {
+		known[spec.Name] = struct{}{}
+	}
+	for _, spec := range manifest.IntegrationTests {
+		known[spec.Name] = struct{}{}
+	}
+	for _, spec := range manifest.InvariantTests {
+		known[spec.Name] = struct{}{}
+	}
+	for _, spec := range manifest.SimulationTests {
+		known[spec.Name] = struct{}{}
+	}
+	for _, spec := range manifest.PerformanceTests {
+		known[spec.Name] = struct{}{}
+	}
+	return known
 }
 
 func DefaultKeeperIntegrationManifest() KeeperIntegrationManifest {
