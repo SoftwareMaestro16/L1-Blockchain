@@ -283,6 +283,191 @@ func TestRedelegationRewardPreviewIsAdvisoryAndDoesNotMoveStake(t *testing.T) {
 	require.Equal(t, beforeTo, state.totalDelegatedAtValidator("val-to"))
 }
 
+func TestValidatorCaptureSignalsEmitMachineReadableEventsAndAdvisoryAlerts(t *testing.T) {
+	metadata, changed, err := TrackValidatorMetadataChange(ValidatorMetadataChangeInput{
+		EpochID:   10,
+		Height:    100,
+		Validator: "val-capture",
+		Previous: ValidatorMetadataSnapshot{
+			OperatorID:     "operator-a",
+			ConsensusKeyID: "key-a",
+			Moniker:        "validator-a",
+			PayoutAddress:  "payout-a",
+		},
+		Current: ValidatorMetadataSnapshot{
+			OperatorID:     "operator-b",
+			ConsensusKeyID: "key-b",
+			Moniker:        "validator-b",
+			PayoutAddress:  "payout-b",
+		},
+		CooldownEpochs: 2,
+	})
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.True(t, metadata.Material)
+	require.Equal(t, uint64(12), metadata.CooldownUntilEpoch)
+	require.Equal(t, ValidatorEventMetadataChange, metadata.Event.Type)
+	require.Equal(t, []string{"consensus_key_id", "moniker", "operator_id", "payout_address"}, metadata.ChangedFields)
+
+	commission, changed, err := TrackValidatorCommissionChange(CommissionChangeInput{
+		EpochID:                   10,
+		Height:                    101,
+		Validator:                 "val-capture",
+		PreviousCommissionBps:     500,
+		NewCommissionBps:          1_400,
+		MaxIncreaseBpsPerInterval: 300,
+		WarningPeriodEpochs:       2,
+	})
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.True(t, commission.RiskFlag)
+	require.Equal(t, uint64(12), commission.EffectiveEpoch)
+	require.Equal(t, ValidatorEventCommissionChange, commission.Event.Type)
+
+	report, err := EvaluateValidatorCaptureRisk(CaptureRiskInput{
+		Validator:         "val-capture",
+		CurrentEpoch:      11,
+		Height:            110,
+		PreviousCandidate: marketCandidate("val-capture", 5_000, 1_000, 500),
+		CurrentCandidate:  marketCandidate("val-capture", 3_000, 6_000, 1_400),
+		MetadataChanges:   []ValidatorMetadataChangeRecord{metadata},
+		CommissionHistory: []ValidatorCommissionRecord{
+			{EpochID: 9, Height: 90, Validator: "val-capture", CommissionBps: 500},
+			{EpochID: 11, Height: 110, Validator: "val-capture", CommissionBps: 1_400},
+		},
+		SlashHistory: []ValidatorSlashHistoryRecord{
+			{EpochID: 10, Height: 100, Validator: "val-capture", Misbehavior: postypes.MisbehaviorDowntime, SlashFractionBps: 100, SelfBondSlashedNaet: sdkmath.NewInt(10), DelegatorSlashedNaet: sdkmath.NewInt(10), TotalSlashedNaet: sdkmath.NewInt(20)},
+		},
+		Params: CaptureRiskParams{
+			MaterialChangeCooldownEpochs:        2,
+			CommissionChangeIntervalEpochs:      4,
+			MaxCommissionIncreaseBpsPerInterval: 300,
+			SuddenDelegationInflowBps:           3_000,
+			SelfDelegationWithdrawalBps:         2_500,
+			RecentSlashWindowEpochs:             4,
+			HighRiskIndicatorThreshold:          2,
+		},
+	})
+	require.NoError(t, err)
+	require.True(t, report.HighRisk)
+	require.True(t, report.AdvisoryOnly)
+	require.False(t, report.SlashableBehavior)
+	require.Len(t, report.Indicators, 5)
+	require.Len(t, report.AlertEvents, 5)
+	require.Contains(t, captureIndicatorNames(report.Indicators), CaptureRiskSuddenDelegationInflow)
+	require.Contains(t, captureIndicatorNames(report.Indicators), CaptureRiskRapidCommissionChange)
+	require.Contains(t, captureIndicatorNames(report.Indicators), CaptureRiskRecentSlash)
+	require.Contains(t, captureIndicatorNames(report.Indicators), CaptureRiskSelfDelegationWithdrawal)
+	require.Contains(t, captureIndicatorNames(report.Indicators), CaptureRiskOperatorMetadataInconsistency)
+	require.True(t, report.AlertEvents[0].AdvisoryOnly)
+}
+
+func TestRiskAdjustedYieldProjectionRewardBandsAndVarianceAreQueryable(t *testing.T) {
+	params := testParams()
+	candidate := marketCandidate("val-yield", 1_000, 1_000, 1_000)
+	delegation := marketDelegation("del-a", "val-yield", 1_000, "")
+	score := testRecord(6, "val-yield", 2_000)
+	score.PerformanceFactor = 9_000
+	score.UptimeFactor = 9_000
+	score.ReliabilityIndex = 9_000
+	slash := ValidatorSlashHistoryRecord{
+		EpochID:              4,
+		Height:               40,
+		Validator:            "val-yield",
+		Misbehavior:          postypes.MisbehaviorDowntime,
+		SlashFractionBps:     100,
+		SelfBondSlashedNaet:  sdkmath.NewInt(10),
+		DelegatorSlashedNaet: sdkmath.NewInt(10),
+		TotalSlashedNaet:     sdkmath.NewInt(20),
+	}
+	state, err := NewValidatorMarketState(params, []postypes.Candidate{candidate}, []DelegationRecord{delegation}, []ValidatorScoreRecord{score}, []ValidatorSlashHistoryRecord{slash}, nil)
+	require.NoError(t, err)
+	decParams := DefaultDecentralizationParams(params)
+	decParams.MaxValidatorShareBps = postypes.BasisPoints
+
+	projection, found, err := state.QueryRiskAdjustedYieldProjection(RiskAdjustedYieldInput{
+		Delegator:                 "del-a",
+		Validator:                 "val-yield",
+		AmountNaet:                sdkmath.NewInt(1_000),
+		AnnualRewardsNaet:         sdkmath.NewInt(200),
+		UnbondingLiquidityCostBps: 200,
+		Decentralization:          decParams,
+		ActiveValidatorIDs:        []string{"val-yield"},
+	})
+	require.NoError(t, err)
+	require.True(t, found)
+	require.True(t, projection.ReproducibleFromQueries)
+	require.Equal(t, uint32(1_000), projection.GrossRewardRateBps)
+	require.Equal(t, uint32(1_000), projection.CommissionBps)
+	require.Equal(t, uint32(9_000), projection.HistoricalUptimeBps)
+	require.Equal(t, uint32(1_500), projection.SlashProbabilityProxyBps)
+	require.Equal(t, uint32(606), projection.RiskAdjustedYieldBps)
+	require.Equal(t, sdkmath.NewInt(60), projection.ExpectedRewardNaet)
+	require.Equal(t, sdkmath.NewInt(49), projection.LowRewardNaet)
+	require.Equal(t, sdkmath.NewInt(70), projection.HighRewardNaet)
+	require.Equal(t, uint32(1_700), projection.UncertaintyBps)
+
+	variance, found, err := ComputeValidatorRewardVariance("val-yield", []ValidatorRewardObservation{
+		{EpochID: 1, Validator: "val-yield", RewardPerStakeBps: 800},
+		{EpochID: 2, Validator: "val-yield", RewardPerStakeBps: 1_000},
+		{EpochID: 3, Validator: "val-yield", RewardPerStakeBps: 1_200},
+	})
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, uint32(3), variance.ObservationCount)
+	require.Equal(t, uint32(1_000), variance.MeanRewardBps)
+	require.Equal(t, uint32(133), variance.VarianceBps)
+}
+
+func TestDelegationSimulatorHandlesCommissionSlashAndDampeningInputs(t *testing.T) {
+	params := testParams()
+	params.MaxVotingPowerBps = postypes.BasisPoints
+	candidates := []postypes.Candidate{
+		marketCandidate("val-from", 2_000, 1_000, 500),
+		marketCandidate("val-to", 1_000, 7_000, 500),
+	}
+	delegations := []DelegationRecord{
+		marketDelegation("del-a", "val-from", 1_000, ""),
+		marketDelegation("del-target", "val-to", 7_000, ""),
+	}
+	scores := []ValidatorScoreRecord{
+		testRecord(8, "val-from", 3_000),
+		testRecord(8, "val-to", 8_000),
+	}
+	state, err := NewValidatorMarketState(params, candidates, delegations, scores, nil, nil)
+	require.NoError(t, err)
+	decParams := DefaultDecentralizationParams(params)
+	decParams.MaxValidatorShareBps = 4_000
+	decParams.MaxTopNShareBps = postypes.BasisPoints
+
+	result, found, err := state.SimulateDelegation(DelegationSimulationInput{
+		Delegator:         "del-a",
+		FromValidator:     "val-from",
+		ToValidator:       "val-to",
+		AmountNaet:        sdkmath.NewInt(1_000),
+		AnnualRewardsNaet: sdkmath.NewInt(500),
+		CurrentEpoch:      9,
+		Height:            90,
+		CommissionOverrides: []ValidatorCommissionRecord{
+			{EpochID: 9, Height: 90, Validator: "val-to", CommissionBps: 1_500},
+		},
+		SlashEvents: []ValidatorSlashHistoryRecord{
+			{EpochID: 9, Height: 90, Validator: "val-to", Misbehavior: postypes.MisbehaviorDowntime, SlashFractionBps: 100, SelfBondSlashedNaet: sdkmath.NewInt(10), DelegatorSlashedNaet: sdkmath.NewInt(10), TotalSlashedNaet: sdkmath.NewInt(20)},
+		},
+		Decentralization:          decParams,
+		ActiveValidatorIDs:        []string{"val-from", "val-to"},
+		UnbondingLiquidityCostBps: 100,
+	})
+	require.NoError(t, err)
+	require.True(t, found)
+	require.True(t, result.AdvisoryOnly)
+	require.Equal(t, uint32(1_500), result.TargetProjection.CommissionBps)
+	require.True(t, result.TargetProjection.SlashProbabilityProxyBps > 0)
+	require.True(t, result.TargetProjection.ConcentrationAdjustmentBps > 0)
+	require.True(t, result.RedelegationCost.EstimatedCostNaet.IsPositive())
+	require.Equal(t, result.TargetProjection.ExpectedRewardNaet.Sub(result.CurrentProjection.ExpectedRewardNaet), result.ProjectedRewardDeltaNaet)
+}
+
 func TestDelegationMarketQueriesExposeRiskYieldSaturationAndHistory(t *testing.T) {
 	params := testParams()
 	params.StakeSaturationThresholdNaet = sdkmath.NewInt(1_000)
@@ -454,6 +639,14 @@ func policyEvaluationMap(evaluations []DelegationPolicyEvaluation) map[string]De
 	out := make(map[string]DelegationPolicyEvaluation, len(evaluations))
 	for _, evaluation := range evaluations {
 		out[evaluation.PolicyName] = evaluation
+	}
+	return out
+}
+
+func captureIndicatorNames(indicators []CaptureRiskIndicator) []string {
+	out := make([]string, len(indicators))
+	for i, indicator := range indicators {
+		out[i] = indicator.Name
 	}
 	return out
 }

@@ -87,6 +87,16 @@ const (
 
 	ConcentrationStatusNormal  = "normal"
 	ConcentrationStatusWarning = "warning"
+
+	ValidatorEventMetadataChange   = "validator_metadata_change"
+	ValidatorEventCommissionChange = "validator_commission_change"
+	DelegatorAlertCaptureRisk      = "delegator_alert_capture_risk"
+
+	CaptureRiskSuddenDelegationInflow        = "sudden_delegation_inflow"
+	CaptureRiskRapidCommissionChange         = "rapid_commission_change"
+	CaptureRiskRecentSlash                   = "recent_slash"
+	CaptureRiskSelfDelegationWithdrawal      = "self_delegation_withdrawal"
+	CaptureRiskOperatorMetadataInconsistency = "operator_metadata_inconsistency"
 )
 
 type ValidatorRiskScoreComponents struct {
@@ -171,6 +181,193 @@ type RedelegationRewardPreview struct {
 	PolicyEvaluations     []DelegationPolicyEvaluation
 	AdvisoryOnly          bool
 	StakeMovementExecuted bool
+}
+
+type EventAttribute struct {
+	Key   string
+	Value string
+}
+
+type ValidatorMachineEvent struct {
+	Type       string
+	Validator  string
+	EpochID    uint64
+	Height     int64
+	Attributes []EventAttribute
+}
+
+type ValidatorMetadataSnapshot struct {
+	OperatorID      string
+	ConsensusKeyID  string
+	Moniker         string
+	Website         string
+	SecurityContact string
+	PayoutAddress   string
+}
+
+type ValidatorMetadataChangeInput struct {
+	EpochID        uint64
+	Height         int64
+	Validator      string
+	Previous       ValidatorMetadataSnapshot
+	Current        ValidatorMetadataSnapshot
+	CooldownEpochs uint64
+}
+
+type ValidatorMetadataChangeRecord struct {
+	EpochID            uint64
+	Height             int64
+	Validator          string
+	Previous           ValidatorMetadataSnapshot
+	Current            ValidatorMetadataSnapshot
+	ChangedFields      []string
+	Material           bool
+	CooldownUntilEpoch uint64
+	Event              ValidatorMachineEvent
+}
+
+type CommissionChangeInput struct {
+	EpochID                   uint64
+	Height                    int64
+	Validator                 string
+	PreviousCommissionBps     uint32
+	NewCommissionBps          uint32
+	MaxIncreaseBpsPerInterval uint32
+	WarningPeriodEpochs       uint64
+}
+
+type CommissionChangeRecord struct {
+	EpochID               uint64
+	Height                int64
+	Validator             string
+	PreviousCommissionBps uint32
+	NewCommissionBps      uint32
+	IncreaseBps           uint32
+	RiskFlag              bool
+	EffectiveEpoch        uint64
+	Event                 ValidatorMachineEvent
+}
+
+type CaptureRiskParams struct {
+	MaterialChangeCooldownEpochs        uint64
+	CommissionChangeIntervalEpochs      uint64
+	MaxCommissionIncreaseBpsPerInterval uint32
+	SuddenDelegationInflowBps           uint32
+	SelfDelegationWithdrawalBps         uint32
+	RecentSlashWindowEpochs             uint64
+	HighRiskIndicatorThreshold          uint32
+}
+
+type CaptureRiskInput struct {
+	Validator         string
+	CurrentEpoch      uint64
+	Height            int64
+	PreviousCandidate postypes.Candidate
+	CurrentCandidate  postypes.Candidate
+	MetadataChanges   []ValidatorMetadataChangeRecord
+	CommissionHistory []ValidatorCommissionRecord
+	SlashHistory      []ValidatorSlashHistoryRecord
+	Params            CaptureRiskParams
+}
+
+type CaptureRiskIndicator struct {
+	Name        string
+	SeverityBps uint32
+	Detail      string
+}
+
+type DelegatorAlertEvent struct {
+	Type         string
+	Validator    string
+	EpochID      uint64
+	Height       int64
+	Reason       string
+	AdvisoryOnly bool
+}
+
+type CaptureRiskReport struct {
+	Validator         string
+	RiskScoreBps      uint32
+	Indicators        []CaptureRiskIndicator
+	AlertEvents       []DelegatorAlertEvent
+	HighRisk          bool
+	AdvisoryOnly      bool
+	SlashableBehavior bool
+}
+
+type RiskAdjustedYieldInput struct {
+	Delegator                 string
+	Validator                 string
+	AmountNaet                sdkmath.Int
+	AnnualRewardsNaet         sdkmath.Int
+	UnbondingLiquidityCostBps uint32
+	Decentralization          DecentralizationParams
+	ActiveValidatorIDs        []string
+}
+
+type RiskAdjustedYieldProjection struct {
+	Validator                  string
+	Delegator                  string
+	GrossRewardRateBps         uint32
+	CommissionBps              uint32
+	HistoricalUptimeBps        uint32
+	SlashProbabilityProxyBps   uint32
+	ConcentrationAdjustmentBps uint32
+	UnbondingLiquidityCostBps  uint32
+	RiskAdjustedYieldBps       uint32
+	ExpectedRewardNaet         sdkmath.Int
+	LowRewardNaet              sdkmath.Int
+	HighRewardNaet             sdkmath.Int
+	UncertaintyBps             uint32
+	ReproducibleFromQueries    bool
+}
+
+type ValidatorRewardObservation struct {
+	EpochID           uint64
+	Validator         string
+	RewardPerStakeBps uint32
+}
+
+type ValidatorRewardVariance struct {
+	Validator        string
+	ObservationCount uint32
+	MeanRewardBps    uint32
+	MinRewardBps     uint32
+	MaxRewardBps     uint32
+	VarianceBps      uint32
+}
+
+type RedelegationCostEstimate struct {
+	AmountNaet         sdkmath.Int
+	UnbondingSeconds   uint64
+	LiquidityCostBps   uint32
+	CommissionDeltaBps int32
+	RiskDeltaBps       int32
+	EstimatedCostNaet  sdkmath.Int
+}
+
+type DelegationSimulationInput struct {
+	Delegator                 string
+	FromValidator             string
+	ToValidator               string
+	AmountNaet                sdkmath.Int
+	AnnualRewardsNaet         sdkmath.Int
+	CurrentEpoch              uint64
+	Height                    int64
+	CommissionOverrides       []ValidatorCommissionRecord
+	SlashEvents               []ValidatorSlashHistoryRecord
+	Decentralization          DecentralizationParams
+	ActiveValidatorIDs        []string
+	UnbondingLiquidityCostBps uint32
+}
+
+type DelegationSimulationResult struct {
+	CurrentProjection        RiskAdjustedYieldProjection
+	TargetProjection         RiskAdjustedYieldProjection
+	RedelegationPreview      RedelegationRewardPreview
+	RedelegationCost         RedelegationCostEstimate
+	ProjectedRewardDeltaNaet sdkmath.Int
+	AdvisoryOnly             bool
 }
 
 type FirstLossSelfBondAccounting struct {
@@ -619,6 +816,227 @@ func (p DecentralizationParams) Validate(posParams postypes.Params) error {
 		return errors.New("minimum self delegation amount must be positive")
 	}
 	return nil
+}
+
+func DefaultCaptureRiskParams(params postypes.Params) CaptureRiskParams {
+	return CaptureRiskParams{
+		MaterialChangeCooldownEpochs:        2,
+		CommissionChangeIntervalEpochs:      4,
+		MaxCommissionIncreaseBpsPerInterval: 500,
+		SuddenDelegationInflowBps:           3_000,
+		SelfDelegationWithdrawalBps:         2_500,
+		RecentSlashWindowEpochs:             params.EvidenceWindowEpochs,
+		HighRiskIndicatorThreshold:          2,
+	}
+}
+
+func (p CaptureRiskParams) Validate(params postypes.Params) error {
+	if err := params.Validate(); err != nil {
+		return err
+	}
+	if p.MaterialChangeCooldownEpochs == 0 {
+		return errors.New("material change cooldown epochs must be positive")
+	}
+	if p.CommissionChangeIntervalEpochs == 0 {
+		return errors.New("commission change interval epochs must be positive")
+	}
+	if p.RecentSlashWindowEpochs == 0 {
+		return errors.New("recent slash window epochs must be positive")
+	}
+	if p.MaxCommissionIncreaseBpsPerInterval > params.MaxCommissionBps {
+		return fmt.Errorf("max commission increase must be <= %d bps", params.MaxCommissionBps)
+	}
+	for _, item := range []struct {
+		name  string
+		value uint32
+	}{
+		{name: "sudden_delegation_inflow_bps", value: p.SuddenDelegationInflowBps},
+		{name: "self_delegation_withdrawal_bps", value: p.SelfDelegationWithdrawalBps},
+		{name: "high_risk_indicator_threshold", value: p.HighRiskIndicatorThreshold},
+	} {
+		if item.value == 0 {
+			return fmt.Errorf("%s must be positive", item.name)
+		}
+		if item.value > postypes.BasisPoints {
+			return fmt.Errorf("%s must be <= %d bps", item.name, postypes.BasisPoints)
+		}
+	}
+	return nil
+}
+
+func TrackValidatorMetadataChange(input ValidatorMetadataChangeInput) (ValidatorMetadataChangeRecord, bool, error) {
+	validator := strings.TrimSpace(input.Validator)
+	if input.EpochID == 0 {
+		return ValidatorMetadataChangeRecord{}, false, errors.New("metadata change epoch id is required")
+	}
+	if input.Height < 0 {
+		return ValidatorMetadataChangeRecord{}, false, errors.New("metadata change height cannot be negative")
+	}
+	if err := validateEconomyToken("metadata change validator", validator); err != nil {
+		return ValidatorMetadataChangeRecord{}, false, err
+	}
+	if input.CooldownEpochs == 0 {
+		input.CooldownEpochs = DefaultCaptureRiskParams(postypes.DefaultParams()).MaterialChangeCooldownEpochs
+	}
+	changed := metadataChangedFields(input.Previous, input.Current)
+	if len(changed) == 0 {
+		return ValidatorMetadataChangeRecord{}, false, nil
+	}
+	material := metadataChangeMaterial(changed)
+	cooldownUntil := input.EpochID
+	if material {
+		cooldownUntil += input.CooldownEpochs
+	}
+	attrs := []EventAttribute{
+		{Key: "changed_fields", Value: strings.Join(changed, ",")},
+		{Key: "material", Value: boolString(material)},
+		{Key: "cooldown_until_epoch", Value: fmt.Sprintf("%d", cooldownUntil)},
+	}
+	record := ValidatorMetadataChangeRecord{
+		EpochID:            input.EpochID,
+		Height:             input.Height,
+		Validator:          validator,
+		Previous:           normalizeMetadataSnapshot(input.Previous),
+		Current:            normalizeMetadataSnapshot(input.Current),
+		ChangedFields:      changed,
+		Material:           material,
+		CooldownUntilEpoch: cooldownUntil,
+		Event: ValidatorMachineEvent{
+			Type:       ValidatorEventMetadataChange,
+			Validator:  validator,
+			EpochID:    input.EpochID,
+			Height:     input.Height,
+			Attributes: attrs,
+		},
+	}
+	return record, true, nil
+}
+
+func TrackValidatorCommissionChange(input CommissionChangeInput) (CommissionChangeRecord, bool, error) {
+	validator := strings.TrimSpace(input.Validator)
+	if input.EpochID == 0 {
+		return CommissionChangeRecord{}, false, errors.New("commission change epoch id is required")
+	}
+	if input.Height < 0 {
+		return CommissionChangeRecord{}, false, errors.New("commission change height cannot be negative")
+	}
+	if err := validateEconomyToken("commission change validator", validator); err != nil {
+		return CommissionChangeRecord{}, false, err
+	}
+	if input.PreviousCommissionBps > postypes.DefaultMaxCommissionBps || input.NewCommissionBps > postypes.DefaultMaxCommissionBps {
+		return CommissionChangeRecord{}, false, errors.New("commission change cannot exceed 20%")
+	}
+	if input.WarningPeriodEpochs == 0 {
+		input.WarningPeriodEpochs = 1
+	}
+	if input.PreviousCommissionBps == input.NewCommissionBps {
+		return CommissionChangeRecord{}, false, nil
+	}
+	increase := uint32(0)
+	if input.NewCommissionBps > input.PreviousCommissionBps {
+		increase = input.NewCommissionBps - input.PreviousCommissionBps
+	}
+	riskFlag := input.MaxIncreaseBpsPerInterval > 0 && increase > input.MaxIncreaseBpsPerInterval
+	record := CommissionChangeRecord{
+		EpochID:               input.EpochID,
+		Height:                input.Height,
+		Validator:             validator,
+		PreviousCommissionBps: input.PreviousCommissionBps,
+		NewCommissionBps:      input.NewCommissionBps,
+		IncreaseBps:           increase,
+		RiskFlag:              riskFlag,
+		EffectiveEpoch:        input.EpochID + input.WarningPeriodEpochs,
+		Event: ValidatorMachineEvent{
+			Type:      ValidatorEventCommissionChange,
+			Validator: validator,
+			EpochID:   input.EpochID,
+			Height:    input.Height,
+			Attributes: []EventAttribute{
+				{Key: "previous_commission_bps", Value: fmt.Sprintf("%d", input.PreviousCommissionBps)},
+				{Key: "new_commission_bps", Value: fmt.Sprintf("%d", input.NewCommissionBps)},
+				{Key: "increase_bps", Value: fmt.Sprintf("%d", increase)},
+				{Key: "effective_epoch", Value: fmt.Sprintf("%d", input.EpochID+input.WarningPeriodEpochs)},
+				{Key: "risk_flag", Value: boolString(riskFlag)},
+			},
+		},
+	}
+	return record, true, nil
+}
+
+func EvaluateValidatorCaptureRisk(input CaptureRiskInput) (CaptureRiskReport, error) {
+	validator := strings.TrimSpace(input.Validator)
+	if err := validateEconomyToken("capture risk validator", validator); err != nil {
+		return CaptureRiskReport{}, err
+	}
+	if input.CurrentEpoch == 0 {
+		return CaptureRiskReport{}, errors.New("capture risk current epoch is required")
+	}
+	params := input.Params
+	if params.MaterialChangeCooldownEpochs == 0 {
+		params = DefaultCaptureRiskParams(postypes.DefaultParams())
+	}
+	if err := params.Validate(postypes.DefaultParams()); err != nil {
+		return CaptureRiskReport{}, err
+	}
+	indicators := make([]CaptureRiskIndicator, 0, 5)
+	prevDelegated := normalizeEconomyInt(input.PreviousCandidate.DelegatedStakeNaet)
+	currentDelegated := normalizeEconomyInt(input.CurrentCandidate.DelegatedStakeNaet)
+	if currentDelegated.GT(prevDelegated) {
+		inflow := currentDelegated.Sub(prevDelegated)
+		inflowBps := shareBps(inflow, maxPositiveInt(prevDelegated, sdkmath.NewInt(1)))
+		if prevDelegated.IsZero() && inflow.IsPositive() {
+			inflowBps = postypes.BasisPoints
+		}
+		if inflowBps >= params.SuddenDelegationInflowBps {
+			indicators = append(indicators, CaptureRiskIndicator{Name: CaptureRiskSuddenDelegationInflow, SeverityBps: inflowBps, Detail: "delegated stake increased sharply"})
+		}
+	}
+	prevSelf := normalizeEconomyInt(input.PreviousCandidate.SelfStakeNaet)
+	currentSelf := normalizeEconomyInt(input.CurrentCandidate.SelfStakeNaet)
+	if prevSelf.IsPositive() && currentSelf.LT(prevSelf) {
+		withdrawalBps := shareBps(prevSelf.Sub(currentSelf), prevSelf)
+		if withdrawalBps >= params.SelfDelegationWithdrawalBps {
+			indicators = append(indicators, CaptureRiskIndicator{Name: CaptureRiskSelfDelegationWithdrawal, SeverityBps: withdrawalBps, Detail: "validator self-delegation decreased"})
+		}
+	}
+	if rapid, increaseBps := rapidCommissionIncrease(input.CommissionHistory, validator, input.CurrentEpoch, params.CommissionChangeIntervalEpochs, params.MaxCommissionIncreaseBpsPerInterval); rapid {
+		indicators = append(indicators, CaptureRiskIndicator{Name: CaptureRiskRapidCommissionChange, SeverityBps: increaseBps, Detail: "commission increased faster than governance interval limit"})
+	}
+	if recentSlash := recentSlashCount(input.SlashHistory, validator, input.CurrentEpoch, params.RecentSlashWindowEpochs); recentSlash > 0 {
+		indicators = append(indicators, CaptureRiskIndicator{Name: CaptureRiskRecentSlash, SeverityBps: minBps(uint64(recentSlash) * 1_000), Detail: "validator has recent slash history"})
+	}
+	for _, change := range input.MetadataChanges {
+		if change.Validator == validator && change.Material && input.CurrentEpoch <= change.CooldownUntilEpoch {
+			indicators = append(indicators, CaptureRiskIndicator{Name: CaptureRiskOperatorMetadataInconsistency, SeverityBps: 2_500, Detail: strings.Join(change.ChangedFields, ",")})
+			break
+		}
+	}
+	sortCaptureRiskIndicators(indicators)
+	score := uint64(0)
+	for _, indicator := range indicators {
+		score += uint64(indicator.SeverityBps)
+	}
+	report := CaptureRiskReport{
+		Validator:         validator,
+		RiskScoreBps:      minBps(score),
+		Indicators:        indicators,
+		HighRisk:          uint32(len(indicators)) >= params.HighRiskIndicatorThreshold,
+		AdvisoryOnly:      true,
+		SlashableBehavior: false,
+	}
+	if report.HighRisk {
+		for _, indicator := range indicators {
+			report.AlertEvents = append(report.AlertEvents, DelegatorAlertEvent{
+				Type:         DelegatorAlertCaptureRisk,
+				Validator:    validator,
+				EpochID:      input.CurrentEpoch,
+				Height:       input.Height,
+				Reason:       indicator.Name,
+				AdvisoryOnly: true,
+			})
+		}
+	}
+	return report, nil
 }
 
 func PropagateSlash(input SlashPropagationInput) (SlashPropagationResult, error) {
@@ -1087,6 +1505,158 @@ func (s ValidatorMarketState) QueryRedelegationRewardPreview(delegator string, f
 	}, true, nil
 }
 
+func (s ValidatorMarketState) QueryRiskAdjustedYieldProjection(input RiskAdjustedYieldInput) (RiskAdjustedYieldProjection, bool, error) {
+	if input.UnbondingLiquidityCostBps > postypes.BasisPoints {
+		return RiskAdjustedYieldProjection{}, false, fmt.Errorf("unbonding liquidity cost must be <= %d bps", postypes.BasisPoints)
+	}
+	yield, found, err := s.QueryDelegationYieldEstimate(input.Delegator, input.Validator, input.AmountNaet, input.AnnualRewardsNaet, input.Decentralization, input.ActiveValidatorIDs)
+	if err != nil || !found {
+		return RiskAdjustedYieldProjection{}, found, err
+	}
+	components, found, err := s.QueryValidatorRiskComponents(input.Validator, input.Decentralization, input.ActiveValidatorIDs)
+	if err != nil || !found {
+		return RiskAdjustedYieldProjection{}, found, err
+	}
+	disclosure, found, err := s.QueryValidatorDisclosure(input.Validator, input.Decentralization, input.ActiveValidatorIDs)
+	if err != nil || !found {
+		return RiskAdjustedYieldProjection{}, found, err
+	}
+	slashProxy := minBps(uint64(components.SlashHistoryRiskBps) + uint64(components.ReliabilityRiskBps)/2)
+	riskYield := uint64(yield.NetYieldBps)
+	riskYield = riskYield * uint64(disclosure.UptimeBps) / uint64(postypes.BasisPoints)
+	riskYield = riskYield * uint64(postypes.BasisPoints-slashProxy) / uint64(postypes.BasisPoints)
+	riskYield = riskYield * uint64(postypes.BasisPoints-yield.ConcentrationAdjustmentBps) / uint64(postypes.BasisPoints)
+	riskYield = riskYield * uint64(postypes.BasisPoints-input.UnbondingLiquidityCostBps) / uint64(postypes.BasisPoints)
+	riskAdjusted := minBps(riskYield)
+	amount := normalizeEconomyInt(input.AmountNaet)
+	if !amount.IsPositive() {
+		amount = yield.DelegationAmountNaet
+	}
+	expected := mulIntBps(amount, riskAdjusted)
+	uncertainty := minBps(uint64(slashProxy) + uint64(yield.ConcentrationAdjustmentBps) + uint64(input.UnbondingLiquidityCostBps))
+	low := expected.MulRaw(int64(postypes.BasisPoints - uncertainty)).QuoRaw(int64(postypes.BasisPoints))
+	highBand := uncertainty
+	if highBand > 5_000 {
+		highBand = 5_000
+	}
+	high := expected.MulRaw(int64(postypes.BasisPoints + highBand)).QuoRaw(int64(postypes.BasisPoints))
+	return RiskAdjustedYieldProjection{
+		Validator:                  yield.Validator,
+		Delegator:                  yield.Delegator,
+		GrossRewardRateBps:         yield.GrossYieldBps,
+		CommissionBps:              yield.CommissionBps,
+		HistoricalUptimeBps:        disclosure.UptimeBps,
+		SlashProbabilityProxyBps:   slashProxy,
+		ConcentrationAdjustmentBps: yield.ConcentrationAdjustmentBps,
+		UnbondingLiquidityCostBps:  input.UnbondingLiquidityCostBps,
+		RiskAdjustedYieldBps:       riskAdjusted,
+		ExpectedRewardNaet:         expected,
+		LowRewardNaet:              low,
+		HighRewardNaet:             high,
+		UncertaintyBps:             uncertainty,
+		ReproducibleFromQueries:    true,
+	}, true, nil
+}
+
+func ComputeValidatorRewardVariance(validator string, observations []ValidatorRewardObservation) (ValidatorRewardVariance, bool, error) {
+	validator = strings.TrimSpace(validator)
+	if err := validateEconomyToken("reward variance validator", validator); err != nil {
+		return ValidatorRewardVariance{}, false, err
+	}
+	values := make([]uint32, 0, len(observations))
+	for _, observation := range observations {
+		if observation.EpochID == 0 {
+			return ValidatorRewardVariance{}, false, errors.New("reward observation epoch id is required")
+		}
+		if observation.RewardPerStakeBps > postypes.BasisPoints {
+			return ValidatorRewardVariance{}, false, fmt.Errorf("reward observation bps must be <= %d", postypes.BasisPoints)
+		}
+		if strings.TrimSpace(observation.Validator) == validator {
+			values = append(values, observation.RewardPerStakeBps)
+		}
+	}
+	if len(values) == 0 {
+		return ValidatorRewardVariance{}, false, nil
+	}
+	sort.SliceStable(values, func(i, j int) bool { return values[i] < values[j] })
+	sum := uint64(0)
+	for _, value := range values {
+		sum += uint64(value)
+	}
+	mean := uint32(sum / uint64(len(values)))
+	deviation := uint64(0)
+	for _, value := range values {
+		if value > mean {
+			deviation += uint64(value - mean)
+		} else {
+			deviation += uint64(mean - value)
+		}
+	}
+	return ValidatorRewardVariance{
+		Validator:        validator,
+		ObservationCount: uint32(len(values)),
+		MeanRewardBps:    mean,
+		MinRewardBps:     values[0],
+		MaxRewardBps:     values[len(values)-1],
+		VarianceBps:      uint32(deviation / uint64(len(values))),
+	}, true, nil
+}
+
+func (s ValidatorMarketState) SimulateDelegation(input DelegationSimulationInput) (DelegationSimulationResult, bool, error) {
+	amount := normalizeEconomyInt(input.AmountNaet)
+	if !amount.IsPositive() {
+		return DelegationSimulationResult{}, false, errors.New("delegation simulation amount must be positive")
+	}
+	simulated := s
+	if len(input.CommissionOverrides) > 0 {
+		simulated.CommissionHistory = append([]ValidatorCommissionRecord{}, s.CommissionHistory...)
+		simulated.CommissionHistory = append(simulated.CommissionHistory, input.CommissionOverrides...)
+		sortCommissionHistory(simulated.CommissionHistory)
+	}
+	if len(input.SlashEvents) > 0 {
+		simulated.SlashHistory = append([]ValidatorSlashHistoryRecord{}, s.SlashHistory...)
+		simulated.SlashHistory = append(simulated.SlashHistory, input.SlashEvents...)
+		sortSlashHistory(simulated.SlashHistory)
+	}
+	current, found, err := simulated.QueryRiskAdjustedYieldProjection(RiskAdjustedYieldInput{
+		Delegator:                 input.Delegator,
+		Validator:                 input.FromValidator,
+		AmountNaet:                amount,
+		AnnualRewardsNaet:         input.AnnualRewardsNaet,
+		UnbondingLiquidityCostBps: input.UnbondingLiquidityCostBps,
+		Decentralization:          input.Decentralization,
+		ActiveValidatorIDs:        input.ActiveValidatorIDs,
+	})
+	if err != nil || !found {
+		return DelegationSimulationResult{}, found, err
+	}
+	target, found, err := simulated.QueryRiskAdjustedYieldProjection(RiskAdjustedYieldInput{
+		Delegator:                 input.Delegator,
+		Validator:                 input.ToValidator,
+		AmountNaet:                amount,
+		AnnualRewardsNaet:         input.AnnualRewardsNaet,
+		UnbondingLiquidityCostBps: input.UnbondingLiquidityCostBps,
+		Decentralization:          input.Decentralization,
+		ActiveValidatorIDs:        input.ActiveValidatorIDs,
+	})
+	if err != nil || !found {
+		return DelegationSimulationResult{}, found, err
+	}
+	preview, found, err := simulated.QueryRedelegationRewardPreview(input.Delegator, input.FromValidator, input.ToValidator, amount, input.AnnualRewardsNaet, input.Decentralization, input.ActiveValidatorIDs)
+	if err != nil || !found {
+		return DelegationSimulationResult{}, found, err
+	}
+	cost := simulated.estimateRedelegationCost(amount, current, target, input.UnbondingLiquidityCostBps)
+	return DelegationSimulationResult{
+		CurrentProjection:        current,
+		TargetProjection:         target,
+		RedelegationPreview:      preview,
+		RedelegationCost:         cost,
+		ProjectedRewardDeltaNaet: target.ExpectedRewardNaet.Sub(current.ExpectedRewardNaet),
+		AdvisoryOnly:             true,
+	}, true, nil
+}
+
 func (s ValidatorMarketState) QueryConcentrationReport(params DecentralizationParams, activeValidatorIDs []string) (ActiveSetConcentrationReport, error) {
 	if params.MinSelfDelegationNaet.IsNil() {
 		params = DefaultDecentralizationParams(s.Params)
@@ -1249,6 +1819,27 @@ func (s ValidatorMarketState) delegatorConcentrationBps(validator string) uint32
 	return shareBps(maxDelegation, total)
 }
 
+func (s ValidatorMarketState) estimateRedelegationCost(amount sdkmath.Int, current RiskAdjustedYieldProjection, target RiskAdjustedYieldProjection, liquidityCostBps uint32) RedelegationCostEstimate {
+	commissionDelta := int32(target.CommissionBps) - int32(current.CommissionBps)
+	riskDelta := int32(target.SlashProbabilityProxyBps+target.ConcentrationAdjustmentBps) - int32(current.SlashProbabilityProxyBps+current.ConcentrationAdjustmentBps)
+	totalCostBps := uint32(0)
+	if commissionDelta > 0 {
+		totalCostBps += uint32(commissionDelta)
+	}
+	if riskDelta > 0 {
+		totalCostBps += uint32(riskDelta)
+	}
+	totalCostBps = minBps(uint64(totalCostBps) + uint64(liquidityCostBps))
+	return RedelegationCostEstimate{
+		AmountNaet:         amount,
+		UnbondingSeconds:   s.Params.UnbondingSeconds,
+		LiquidityCostBps:   liquidityCostBps,
+		CommissionDeltaBps: commissionDelta,
+		RiskDeltaBps:       riskDelta,
+		EstimatedCostNaet:  mulIntBps(amount, totalCostBps),
+	}
+}
+
 func DefaultDelegationPolicyTemplates(params postypes.Params) []DelegationPolicyTemplate {
 	maxConcentration := params.MaxVotingPowerBps
 	if maxConcentration == 0 {
@@ -1391,6 +1982,124 @@ func hasWarning(warnings []string, target string) bool {
 		}
 	}
 	return false
+}
+
+func metadataChangedFields(previous ValidatorMetadataSnapshot, current ValidatorMetadataSnapshot) []string {
+	previous = normalizeMetadataSnapshot(previous)
+	current = normalizeMetadataSnapshot(current)
+	fields := make([]string, 0, 6)
+	if previous.OperatorID != current.OperatorID {
+		fields = append(fields, "operator_id")
+	}
+	if previous.ConsensusKeyID != current.ConsensusKeyID {
+		fields = append(fields, "consensus_key_id")
+	}
+	if previous.Moniker != current.Moniker {
+		fields = append(fields, "moniker")
+	}
+	if previous.Website != current.Website {
+		fields = append(fields, "website")
+	}
+	if previous.SecurityContact != current.SecurityContact {
+		fields = append(fields, "security_contact")
+	}
+	if previous.PayoutAddress != current.PayoutAddress {
+		fields = append(fields, "payout_address")
+	}
+	sort.Strings(fields)
+	return fields
+}
+
+func normalizeMetadataSnapshot(snapshot ValidatorMetadataSnapshot) ValidatorMetadataSnapshot {
+	return ValidatorMetadataSnapshot{
+		OperatorID:      strings.TrimSpace(snapshot.OperatorID),
+		ConsensusKeyID:  strings.TrimSpace(snapshot.ConsensusKeyID),
+		Moniker:         strings.TrimSpace(snapshot.Moniker),
+		Website:         strings.TrimSpace(snapshot.Website),
+		SecurityContact: strings.TrimSpace(snapshot.SecurityContact),
+		PayoutAddress:   strings.TrimSpace(snapshot.PayoutAddress),
+	}
+}
+
+func metadataChangeMaterial(fields []string) bool {
+	for _, field := range fields {
+		switch field {
+		case "operator_id", "consensus_key_id", "security_contact", "payout_address":
+			return true
+		}
+	}
+	return false
+}
+
+func rapidCommissionIncrease(records []ValidatorCommissionRecord, validator string, currentEpoch uint64, intervalEpochs uint64, maxIncreaseBps uint32) (bool, uint32) {
+	if currentEpoch == 0 || intervalEpochs == 0 {
+		return false, 0
+	}
+	validator = strings.TrimSpace(validator)
+	windowStart := uint64(1)
+	if currentEpoch > intervalEpochs {
+		windowStart = currentEpoch - intervalEpochs
+	}
+	minCommission := uint32(postypes.BasisPoints)
+	maxCommission := uint32(0)
+	found := false
+	for _, record := range records {
+		if record.Validator != validator || record.EpochID < windowStart || record.EpochID > currentEpoch {
+			continue
+		}
+		found = true
+		if record.CommissionBps < minCommission {
+			minCommission = record.CommissionBps
+		}
+		if record.CommissionBps > maxCommission {
+			maxCommission = record.CommissionBps
+		}
+	}
+	if !found || maxCommission <= minCommission {
+		return false, 0
+	}
+	increase := maxCommission - minCommission
+	return increase > maxIncreaseBps, increase
+}
+
+func recentSlashCount(records []ValidatorSlashHistoryRecord, validator string, currentEpoch uint64, windowEpochs uint64) uint32 {
+	if currentEpoch == 0 || windowEpochs == 0 {
+		return 0
+	}
+	validator = strings.TrimSpace(validator)
+	count := uint32(0)
+	for _, record := range records {
+		if record.Validator != validator || record.EpochID > currentEpoch {
+			continue
+		}
+		if currentEpoch-record.EpochID <= windowEpochs {
+			count++
+		}
+	}
+	return count
+}
+
+func sortCaptureRiskIndicators(indicators []CaptureRiskIndicator) {
+	sort.SliceStable(indicators, func(i, j int) bool {
+		if indicators[i].SeverityBps != indicators[j].SeverityBps {
+			return indicators[i].SeverityBps > indicators[j].SeverityBps
+		}
+		return indicators[i].Name < indicators[j].Name
+	})
+}
+
+func boolString(value bool) string {
+	if value {
+		return "true"
+	}
+	return "false"
+}
+
+func maxPositiveInt(a sdkmath.Int, b sdkmath.Int) sdkmath.Int {
+	if a.IsPositive() && a.GTE(b) {
+		return a
+	}
+	return b
 }
 
 func normalizeActiveSet(activeValidatorIDs []string) map[string]struct{} {
