@@ -1065,6 +1065,20 @@ type PosObservabilityManifest struct {
 	Root    string
 }
 
+type PosGovernanceParameterSpec struct {
+	Category        string
+	Name            string
+	ModuleName      string
+	ValueKind       string
+	UpdateAuthority string
+	SafetyLevel     string
+}
+
+type PosGovernanceParameterManifest struct {
+	Parameters []PosGovernanceParameterSpec
+	Root       string
+}
+
 type KeeperIntegrationManifest struct {
 	KeeperInterfaces      []KeeperInterfaceSpec
 	StakingLifecycleHooks []KeeperHookSpec
@@ -2799,6 +2813,156 @@ func PosAlertByName(manifest PosObservabilityManifest, name string) (PosAlertSpe
 		}
 	}
 	return PosAlertSpec{}, false
+}
+
+func DefaultPosGovernanceParameterManifest() PosGovernanceParameterManifest {
+	manifest := PosGovernanceParameterManifest{Parameters: []PosGovernanceParameterSpec{
+		{Category: "epoch", Name: "epoch_duration", ModuleName: "epoch", ValueKind: "duration_seconds", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "epoch", Name: "phase_durations", ModuleName: "epoch", ValueKind: "duration_set", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "epoch", Name: "epoch_seed_source", ModuleName: "epoch", ValueKind: "enum", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "epoch", Name: "settlement_work_limit", ModuleName: "epoch", ValueKind: "uint64", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "validator_economy", Name: "score_component_weights", ModuleName: "validator_economy", ValueKind: "weight_set_bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "validator_economy", Name: "stake_saturation_cap_factor", ModuleName: "validator_economy", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "validator_economy", Name: "threshold_stake", ModuleName: "validator_economy", ValueKind: "sdk_int", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "validator_economy", Name: "max_voting_power_per_validator", ModuleName: "validator_economy", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "validator_economy", Name: "score_decay_rate", ModuleName: "validator_economy", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "validator_economy", Name: "minimum_score_for_active_set", ModuleName: "validator_economy", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "taskgroups", Name: "minimum_group_size", ModuleName: "taskgroups", ValueKind: "uint32", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "taskgroups", Name: "maximum_task_groups_per_validator", ModuleName: "taskgroups", ValueKind: "uint32", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "taskgroups", Name: "workload_role_requirements", ModuleName: "taskgroups", ValueKind: "role_requirement_set", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "taskgroups", Name: "assignment_seed_domain", ModuleName: "taskgroups", ValueKind: "domain_string", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "evidence", Name: "evidence_deposit", ModuleName: "evidence", ValueKind: "sdk_int", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "evidence", Name: "evidence_submission_window", ModuleName: "evidence", ValueKind: "epoch_count", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "evidence", Name: "verification_group_size", ModuleName: "evidence", ValueKind: "uint32", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "evidence", Name: "decision_threshold", ModuleName: "evidence", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "evidence", Name: "reporter_reward_cap", ModuleName: "evidence", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "slashing", Name: "severity_matrix", ModuleName: "slashing", ValueKind: "severity_matrix", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "slashing", Name: "role_weight_matrix", ModuleName: "slashing", ValueKind: "role_weight_matrix", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "slashing", Name: "repeat_offense_multiplier", ModuleName: "slashing", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "slashing", Name: "burn_allocation", ModuleName: "slashing", ValueKind: "allocation_bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "slashing", Name: "treasury_allocation", ModuleName: "slashing", ValueKind: "allocation_bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "slashing", Name: "reporter_allocation", ModuleName: "slashing", ValueKind: "allocation_bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "performance", Name: "reward_multiplier_bounds", ModuleName: "performance", ValueKind: "bps_bounds", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "performance", Name: "uptime_window", ModuleName: "performance", ValueKind: "epoch_count", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "performance", Name: "latency_window", ModuleName: "performance", ValueKind: "epoch_count", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "performance", Name: "task_completion_window", ModuleName: "performance", ValueKind: "epoch_count", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "performance", Name: "performance_decay_rate", ModuleName: "performance", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "high"},
+		{Category: "unbonding", Name: "unbonding_period", ModuleName: "staking", ValueKind: "duration_seconds", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "unbonding", Name: "slashable_window", ModuleName: "staking", ValueKind: "epoch_count", UpdateAuthority: "governance", SafetyLevel: "critical"},
+		{Category: "unbonding", Name: "redelegation_risk_retention", ModuleName: "staking", ValueKind: "retention_policy", UpdateAuthority: "governance", SafetyLevel: "critical"},
+	}}
+	manifest.Root = ComputePosGovernanceParameterRoot(manifest)
+	return manifest
+}
+
+func RequiredPosGovernanceParametersByCategory() map[string][]string {
+	return map[string][]string{
+		"epoch":             {"epoch_duration", "phase_durations", "epoch_seed_source", "settlement_work_limit"},
+		"validator_economy": {"score_component_weights", "stake_saturation_cap_factor", "threshold_stake", "max_voting_power_per_validator", "score_decay_rate", "minimum_score_for_active_set"},
+		"taskgroups":        {"minimum_group_size", "maximum_task_groups_per_validator", "workload_role_requirements", "assignment_seed_domain"},
+		"evidence":          {"evidence_deposit", "evidence_submission_window", "verification_group_size", "decision_threshold", "reporter_reward_cap"},
+		"slashing":          {"severity_matrix", "role_weight_matrix", "repeat_offense_multiplier", "burn_allocation", "treasury_allocation", "reporter_allocation"},
+		"performance":       {"reward_multiplier_bounds", "uptime_window", "latency_window", "task_completion_window", "performance_decay_rate"},
+		"unbonding":         {"unbonding_period", "slashable_window", "redelegation_risk_retention"},
+	}
+}
+
+func (m PosGovernanceParameterManifest) Validate(compatibility CosmosSDKCompatibilityManifest) error {
+	if err := compatibility.Validate(); err != nil {
+		return err
+	}
+	if len(m.Parameters) == 0 {
+		return errors.New("pos governance parameters are required")
+	}
+	knownModules := knownPoSModuleNames(compatibility)
+	seen := make(map[string]struct{}, len(m.Parameters))
+	byCategory := make(map[string]map[string]struct{})
+	for _, parameter := range m.Parameters {
+		if err := parameter.Validate(knownModules); err != nil {
+			return err
+		}
+		key := parameter.Category + "/" + parameter.Name
+		if _, found := seen[key]; found {
+			return fmt.Errorf("duplicate pos governance parameter %s", key)
+		}
+		seen[key] = struct{}{}
+		if byCategory[parameter.Category] == nil {
+			byCategory[parameter.Category] = make(map[string]struct{})
+		}
+		byCategory[parameter.Category][parameter.Name] = struct{}{}
+	}
+	for category, requiredNames := range RequiredPosGovernanceParametersByCategory() {
+		categoryParams := byCategory[category]
+		for _, name := range requiredNames {
+			if _, found := categoryParams[name]; !found {
+				return fmt.Errorf("required pos governance parameter %s/%s is missing", category, name)
+			}
+		}
+	}
+	if err := validatePosHash("pos governance parameter root", m.Root); err != nil {
+		return err
+	}
+	if expected := ComputePosGovernanceParameterRoot(m); expected != m.Root {
+		return errors.New("pos governance parameter root mismatch")
+	}
+	return nil
+}
+
+func (p PosGovernanceParameterSpec) Validate(knownModules map[string]struct{}) error {
+	if err := validatePosToken("pos governance parameter category", p.Category); err != nil {
+		return err
+	}
+	if _, found := RequiredPosGovernanceParametersByCategory()[p.Category]; !found {
+		return fmt.Errorf("pos governance parameter category %s is unknown", p.Category)
+	}
+	if err := validatePosToken("pos governance parameter name", p.Name); err != nil {
+		return err
+	}
+	if err := validatePosToken("pos governance parameter module", p.ModuleName); err != nil {
+		return err
+	}
+	if _, found := knownModules[p.ModuleName]; !found {
+		return fmt.Errorf("pos governance parameter %s/%s references unknown module %s", p.Category, p.Name, p.ModuleName)
+	}
+	if err := validatePosToken("pos governance parameter value kind", p.ValueKind); err != nil {
+		return err
+	}
+	if err := validatePosToken("pos governance parameter update authority", p.UpdateAuthority); err != nil {
+		return err
+	}
+	return validatePosGovernanceSafetyLevel(p.SafetyLevel)
+}
+
+func validatePosGovernanceSafetyLevel(level string) error {
+	switch level {
+	case "low", "medium", "high", "critical":
+		return nil
+	default:
+		return fmt.Errorf("pos governance parameter safety level %s is invalid", level)
+	}
+}
+
+func ComputePosGovernanceParameterRoot(manifest PosGovernanceParameterManifest) string {
+	return posHashRoot("aetheris-pos-governance-parameters-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(manifest.Parameters)))
+		for _, parameter := range manifest.Parameters {
+			posWritePart(w, parameter.Category)
+			posWritePart(w, parameter.Name)
+			posWritePart(w, parameter.ModuleName)
+			posWritePart(w, parameter.ValueKind)
+			posWritePart(w, parameter.UpdateAuthority)
+			posWritePart(w, parameter.SafetyLevel)
+		}
+	})
+}
+
+func PosGovernanceParameterByName(manifest PosGovernanceParameterManifest, category string, name string) (PosGovernanceParameterSpec, bool) {
+	for _, parameter := range manifest.Parameters {
+		if parameter.Category == category && parameter.Name == name {
+			return parameter, true
+		}
+	}
+	return PosGovernanceParameterSpec{}, false
 }
 
 func DefaultKeeperIntegrationManifest() KeeperIntegrationManifest {
