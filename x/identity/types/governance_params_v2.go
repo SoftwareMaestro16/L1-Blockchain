@@ -18,6 +18,8 @@ const (
 	IdentityGovernanceMaximumScopedDelegatesPerDomain uint32 = 64
 	IdentityGovernanceMaximumZonePolicyBytesV2        uint64 = 4 * 1024
 	IdentityGovernanceAuctionFinalizationDelayV2      uint64 = 1
+	IdentityGovernanceCacheRecordMaximumLifetimeV2    uint64 = DefaultRegistrationPeriodBlocks
+	IdentityGovernanceStorePruningHorizonV2           uint64 = DefaultRegistrationPeriodBlocks
 )
 
 type IdentityGovernanceNameParamsV2 struct {
@@ -85,14 +87,24 @@ type IdentityGovernanceAuctionParamsV2 struct {
 	FeeCommunityPoolBps      uint32
 }
 
+type IdentityGovernancePerformanceParamsV2 struct {
+	BatchResolverUpdateMaximumSize          uint32
+	BatchRenewalMaximumSize                 uint32
+	RecursiveProofMaximumDepth              uint8
+	CacheRecordMaximumLifetime              uint64
+	StorePruningHorizonForProofAvailability uint64
+	ABCIExpiryWorkLimit                     uint32
+}
+
 type IdentityGovernanceParamsV2 struct {
-	NameParams       IdentityGovernanceNameParamsV2
-	LifecycleParams  IdentityGovernanceLifecycleParamsV2
-	PricingParams    IdentityGovernancePricingParamsV2
-	ResolverParams   IdentityGovernanceResolverParamsV2
-	DelegationParams IdentityGovernanceDelegationParamsV2
-	AuctionParams    IdentityGovernanceAuctionParamsV2
-	ParamsHash       string
+	NameParams        IdentityGovernanceNameParamsV2
+	LifecycleParams   IdentityGovernanceLifecycleParamsV2
+	PricingParams     IdentityGovernancePricingParamsV2
+	ResolverParams    IdentityGovernanceResolverParamsV2
+	DelegationParams  IdentityGovernanceDelegationParamsV2
+	AuctionParams     IdentityGovernanceAuctionParamsV2
+	PerformanceParams IdentityGovernancePerformanceParamsV2
+	ParamsHash        string
 }
 
 func DefaultIdentityGovernanceNameParamsV2() IdentityGovernanceNameParamsV2 {
@@ -178,14 +190,26 @@ func DefaultIdentityGovernanceAuctionParamsV2() IdentityGovernanceAuctionParamsV
 	}
 }
 
+func DefaultIdentityGovernancePerformanceParamsV2() IdentityGovernancePerformanceParamsV2 {
+	return IdentityGovernancePerformanceParamsV2{
+		BatchResolverUpdateMaximumSize:          MaxIdentityTxBatchResolverUpdatesV2,
+		BatchRenewalMaximumSize:                 MaxIdentityTxBatchRenewDomainsV2,
+		RecursiveProofMaximumDepth:              MaxDomainLabels,
+		CacheRecordMaximumLifetime:              IdentityGovernanceCacheRecordMaximumLifetimeV2,
+		StorePruningHorizonForProofAvailability: IdentityGovernanceStorePruningHorizonV2,
+		ABCIExpiryWorkLimit:                     IdentityGovernanceExpiryProcessingLimitV2,
+	}
+}
+
 func DefaultIdentityGovernanceParamsV2() (IdentityGovernanceParamsV2, error) {
 	params := IdentityGovernanceParamsV2{
-		NameParams:       DefaultIdentityGovernanceNameParamsV2(),
-		LifecycleParams:  DefaultIdentityGovernanceLifecycleParamsV2(),
-		PricingParams:    DefaultIdentityGovernancePricingParamsV2(),
-		ResolverParams:   DefaultIdentityGovernanceResolverParamsV2(),
-		DelegationParams: DefaultIdentityGovernanceDelegationParamsV2(),
-		AuctionParams:    DefaultIdentityGovernanceAuctionParamsV2(),
+		NameParams:        DefaultIdentityGovernanceNameParamsV2(),
+		LifecycleParams:   DefaultIdentityGovernanceLifecycleParamsV2(),
+		PricingParams:     DefaultIdentityGovernancePricingParamsV2(),
+		ResolverParams:    DefaultIdentityGovernanceResolverParamsV2(),
+		DelegationParams:  DefaultIdentityGovernanceDelegationParamsV2(),
+		AuctionParams:     DefaultIdentityGovernanceAuctionParamsV2(),
+		PerformanceParams: DefaultIdentityGovernancePerformanceParamsV2(),
 	}
 	params.ParamsHash = ComputeIdentityGovernanceParamsHashV2(params)
 	return params, ValidateIdentityGovernanceParamsV2(params)
@@ -208,6 +232,9 @@ func ValidateIdentityGovernanceParamsV2(params IdentityGovernanceParamsV2) error
 		return err
 	}
 	if err := ValidateIdentityGovernanceAuctionParamsV2(params.AuctionParams); err != nil {
+		return err
+	}
+	if err := ValidateIdentityGovernancePerformanceParamsV2(params.PerformanceParams); err != nil {
 		return err
 	}
 	if params.LifecycleParams.RenewalWindowDuration >= params.LifecycleParams.MaximumRegistrationDuration {
@@ -371,6 +398,51 @@ func ValidateIdentityGovernanceAuctionParamsV2(params IdentityGovernanceAuctionP
 	return nil
 }
 
+func ValidateIdentityGovernancePerformanceParamsV2(params IdentityGovernancePerformanceParamsV2) error {
+	if params.BatchResolverUpdateMaximumSize == 0 || params.BatchResolverUpdateMaximumSize > MaxIdentityTxBatchResolverUpdatesV2 {
+		return fmt.Errorf("identity governance performance batch resolver update maximum size must be in 1..%d", MaxIdentityTxBatchResolverUpdatesV2)
+	}
+	if params.BatchRenewalMaximumSize == 0 || params.BatchRenewalMaximumSize > MaxIdentityTxBatchRenewDomainsV2 {
+		return fmt.Errorf("identity governance performance batch renewal maximum size must be in 1..%d", MaxIdentityTxBatchRenewDomainsV2)
+	}
+	if params.RecursiveProofMaximumDepth == 0 || params.RecursiveProofMaximumDepth > MaxDomainLabels {
+		return fmt.Errorf("identity governance performance recursive proof maximum depth must be in 1..%d", MaxDomainLabels)
+	}
+	if params.CacheRecordMaximumLifetime == 0 {
+		return errors.New("identity governance performance cache record maximum lifetime is required")
+	}
+	if params.StorePruningHorizonForProofAvailability == 0 {
+		return errors.New("identity governance performance store pruning horizon for proof availability is required")
+	}
+	if params.StorePruningHorizonForProofAvailability < params.CacheRecordMaximumLifetime {
+		return errors.New("identity governance performance store pruning horizon must cover cache record maximum lifetime")
+	}
+	if params.ABCIExpiryWorkLimit == 0 {
+		return errors.New("identity governance performance ABCI++ expiry work limit is required")
+	}
+	return nil
+}
+
+func IdentityGovernanceValidateBatchResolverUpdateCountV2(params IdentityGovernanceParamsV2, count int) error {
+	if err := ValidateIdentityGovernanceParamsV2(params); err != nil {
+		return err
+	}
+	if count < 0 || count > int(params.PerformanceParams.BatchResolverUpdateMaximumSize) {
+		return fmt.Errorf("identity governance resolver batch update count must be in 0..%d", params.PerformanceParams.BatchResolverUpdateMaximumSize)
+	}
+	return nil
+}
+
+func IdentityGovernanceValidateBatchRenewalCountV2(params IdentityGovernanceParamsV2, count int) error {
+	if err := ValidateIdentityGovernanceParamsV2(params); err != nil {
+		return err
+	}
+	if count < 0 || count > int(params.PerformanceParams.BatchRenewalMaximumSize) {
+		return fmt.Errorf("identity governance batch renewal count must be in 0..%d", params.PerformanceParams.BatchRenewalMaximumSize)
+	}
+	return nil
+}
+
 func ApplyIdentityGovernanceParamsToRuntimeV2(params IdentityGovernanceParamsV2) (IdentityParams, IdentityPricingParamsV2, IdentitySpamCostParamsV2, IdentityAuctionFairnessParamsV2, error) {
 	if err := ValidateIdentityGovernanceParamsV2(params); err != nil {
 		return IdentityParams{}, IdentityPricingParamsV2{}, IdentitySpamCostParamsV2{}, IdentityAuctionFairnessParamsV2{}, err
@@ -416,6 +488,7 @@ func ComputeIdentityGovernanceParamsHashV2(params IdentityGovernanceParamsV2) st
 	resolver := params.ResolverParams
 	delegation := params.DelegationParams
 	auction := params.AuctionParams
+	performance := params.PerformanceParams
 	parts := []string{
 		"identity-governance-params-v2",
 		fmt.Sprint(name.MaximumLabels),
@@ -463,6 +536,12 @@ func ComputeIdentityGovernanceParamsHashV2(params IdentityGovernanceParamsV2) st
 		fmt.Sprint(auction.FeeTreasuryBps),
 		fmt.Sprint(auction.FeeRewardsBps),
 		fmt.Sprint(auction.FeeCommunityPoolBps),
+		fmt.Sprint(performance.BatchResolverUpdateMaximumSize),
+		fmt.Sprint(performance.BatchRenewalMaximumSize),
+		fmt.Sprint(performance.RecursiveProofMaximumDepth),
+		fmt.Sprint(performance.CacheRecordMaximumLifetime),
+		fmt.Sprint(performance.StorePruningHorizonForProofAvailability),
+		fmt.Sprint(performance.ABCIExpiryWorkLimit),
 	}
 	parts = append(parts, sortedBreakdownStringsV2(name.ReservedLabels)...)
 	parts = append(parts, sortedBreakdownStringsV2(resolver.AllowedEndpointSchemes)...)

@@ -65,6 +65,13 @@ func TestIdentityGovernanceParamsV2DefaultsCoverSection16(t *testing.T) {
 	require.Equal(t, uint32(3_000), params.AuctionParams.FeeTreasuryBps)
 	require.Equal(t, uint32(2_000), params.AuctionParams.FeeRewardsBps)
 	require.Equal(t, uint32(2_000), params.AuctionParams.FeeCommunityPoolBps)
+
+	require.Equal(t, uint32(MaxIdentityTxBatchResolverUpdatesV2), params.PerformanceParams.BatchResolverUpdateMaximumSize)
+	require.Equal(t, uint32(MaxIdentityTxBatchRenewDomainsV2), params.PerformanceParams.BatchRenewalMaximumSize)
+	require.Equal(t, uint8(MaxDomainLabels), params.PerformanceParams.RecursiveProofMaximumDepth)
+	require.Equal(t, IdentityGovernanceCacheRecordMaximumLifetimeV2, params.PerformanceParams.CacheRecordMaximumLifetime)
+	require.Equal(t, IdentityGovernanceStorePruningHorizonV2, params.PerformanceParams.StorePruningHorizonForProofAvailability)
+	require.Equal(t, IdentityGovernanceExpiryProcessingLimitV2, params.PerformanceParams.ABCIExpiryWorkLimit)
 	require.NotEmpty(t, params.ParamsHash)
 }
 
@@ -223,4 +230,44 @@ func TestIdentityGovernanceParamsV2RejectsInvalidResolverDelegationAuction(t *te
 	badSplit.AuctionParams.FeeRewardsBps++
 	badSplit.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badSplit)
 	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badSplit), "fee split")
+}
+
+func TestIdentityGovernanceParamsV2RejectsInvalidPerformance(t *testing.T) {
+	params, err := DefaultIdentityGovernanceParamsV2()
+	require.NoError(t, err)
+
+	badResolverBatch := params
+	badResolverBatch.PerformanceParams.BatchResolverUpdateMaximumSize = MaxIdentityTxBatchResolverUpdatesV2 + 1
+	badResolverBatch.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badResolverBatch)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badResolverBatch), "batch resolver update maximum size")
+
+	badRenewalBatch := params
+	badRenewalBatch.PerformanceParams.BatchRenewalMaximumSize = 0
+	badRenewalBatch.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badRenewalBatch)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badRenewalBatch), "batch renewal maximum size")
+
+	badRecursiveDepth := params
+	badRecursiveDepth.PerformanceParams.RecursiveProofMaximumDepth = MaxDomainLabels + 1
+	badRecursiveDepth.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badRecursiveDepth)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badRecursiveDepth), "recursive proof maximum depth")
+
+	badCacheLifetime := params
+	badCacheLifetime.PerformanceParams.CacheRecordMaximumLifetime = 0
+	badCacheLifetime.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badCacheLifetime)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badCacheLifetime), "cache record maximum lifetime")
+
+	badPruningHorizon := params
+	badPruningHorizon.PerformanceParams.StorePruningHorizonForProofAvailability = badPruningHorizon.PerformanceParams.CacheRecordMaximumLifetime - 1
+	badPruningHorizon.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badPruningHorizon)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badPruningHorizon), "store pruning horizon")
+
+	badExpiryWork := params
+	badExpiryWork.PerformanceParams.ABCIExpiryWorkLimit = 0
+	badExpiryWork.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badExpiryWork)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badExpiryWork), "ABCI++ expiry work limit")
+
+	require.NoError(t, IdentityGovernanceValidateBatchResolverUpdateCountV2(params, int(params.PerformanceParams.BatchResolverUpdateMaximumSize)))
+	require.ErrorContains(t, IdentityGovernanceValidateBatchResolverUpdateCountV2(params, int(params.PerformanceParams.BatchResolverUpdateMaximumSize)+1), "resolver batch update count")
+	require.NoError(t, IdentityGovernanceValidateBatchRenewalCountV2(params, int(params.PerformanceParams.BatchRenewalMaximumSize)))
+	require.ErrorContains(t, IdentityGovernanceValidateBatchRenewalCountV2(params, int(params.PerformanceParams.BatchRenewalMaximumSize)+1), "batch renewal count")
 }
