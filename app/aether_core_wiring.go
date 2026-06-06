@@ -37,6 +37,7 @@ import (
 	paymentstypes "github.com/sovereign-l1/l1/x/payments/types"
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
+	shardingcoordinatortypes "github.com/sovereign-l1/l1/x/sharding-coordinator/types"
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
 	systemregistrytypes "github.com/sovereign-l1/l1/x/system-registry/types"
 	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
@@ -68,6 +69,7 @@ var aetherCorePrototypeModules = []string{
 	identityroottypes.ModuleName,
 	bridgehubtypes.ModuleName,
 	crosschainregistrytypes.ModuleName,
+	shardingcoordinatortypes.ModuleName,
 }
 
 var aetherCoreSystemModules = []string{
@@ -102,6 +104,7 @@ func AetherCorePrototypeStoreKeys() []string {
 		identityroottypes.StoreKey,
 		bridgehubtypes.StoreKey,
 		crosschainregistrytypes.StoreKey,
+		shardingcoordinatortypes.StoreKey,
 	}
 }
 
@@ -153,6 +156,7 @@ func aetherCoreBeginBlockerOrder() []string {
 		identityroottypes.ModuleName,
 		bridgehubtypes.ModuleName,
 		crosschainregistrytypes.ModuleName,
+		shardingcoordinatortypes.ModuleName,
 	}
 }
 
@@ -183,6 +187,7 @@ func aetherCoreEndBlockerOrder() []string {
 		identityroottypes.ModuleName,
 		bridgehubtypes.ModuleName,
 		crosschainregistrytypes.ModuleName,
+		shardingcoordinatortypes.ModuleName,
 	}
 }
 
@@ -223,6 +228,7 @@ func aetherCoreInitGenesisOrder() []string {
 		identityroottypes.ModuleName,
 		bridgehubtypes.ModuleName,
 		crosschainregistrytypes.ModuleName,
+		shardingcoordinatortypes.ModuleName,
 		feestypes.ModuleName,
 		tokenfactorytypes.ModuleName,
 		dextypes.ModuleName,
@@ -266,6 +272,7 @@ func aetherCoreExportGenesisOrder() []string {
 		identityroottypes.ModuleName,
 		bridgehubtypes.ModuleName,
 		crosschainregistrytypes.ModuleName,
+		shardingcoordinatortypes.ModuleName,
 		feestypes.ModuleName,
 		tokenfactorytypes.ModuleName,
 		dextypes.ModuleName,

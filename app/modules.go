@@ -48,6 +48,7 @@ import (
 	paymentsmodule "github.com/sovereign-l1/l1/x/payments"
 	routingmodule "github.com/sovereign-l1/l1/x/routing"
 	schedulermodule "github.com/sovereign-l1/l1/x/scheduler"
+	shardingcoordinatormodule "github.com/sovereign-l1/l1/x/sharding-coordinator"
 	storagerentmodule "github.com/sovereign-l1/l1/x/storage-rent"
 	systemregistrymodule "github.com/sovereign-l1/l1/x/system-registry"
 	tokenfactorymodule "github.com/sovereign-l1/l1/x/tokenfactory"
@@ -98,6 +99,7 @@ func (app *L1App) initModules(
 		identityrootmodule.NewAppModule(&app.IdentityRootKeeper),
 		bridgehubmodule.NewAppModule(&app.BridgeHubKeeper),
 		crosschainregistrymodule.NewAppModule(&app.CrossChainRegistryKeeper),
+		shardingcoordinatormodule.NewAppModule(&app.ShardingCoordinatorKeeper),
 		tokenfactorymodule.NewAppModule(appCodec, app.TokenFactoryKeeper),
 		dexmodule.NewAppModule(appCodec, app.DexKeeper),
 		feesmodule.NewAppModule(appCodec, app.FeesKeeper),

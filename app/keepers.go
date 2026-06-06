@@ -78,6 +78,8 @@ import (
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
 	schedulerkeeper "github.com/sovereign-l1/l1/x/scheduler/keeper"
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
+	shardingcoordinatorkeeper "github.com/sovereign-l1/l1/x/sharding-coordinator/keeper"
+	shardingcoordinatortypes "github.com/sovereign-l1/l1/x/sharding-coordinator/types"
 	storagerentkeeper "github.com/sovereign-l1/l1/x/storage-rent/keeper"
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
 	systemregistrykeeper "github.com/sovereign-l1/l1/x/system-registry/keeper"
@@ -284,5 +286,6 @@ func (app *L1App) initKeepers(
 	app.IdentityRootKeeper = identityrootkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[identityroottypes.StoreKey]))
 	app.BridgeHubKeeper = bridgehubkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[bridgehubtypes.StoreKey]))
 	app.CrossChainRegistryKeeper = crosschainregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[crosschainregistrytypes.StoreKey]))
+	app.ShardingCoordinatorKeeper = shardingcoordinatorkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[shardingcoordinatortypes.StoreKey]))
 	return txConfig
 }

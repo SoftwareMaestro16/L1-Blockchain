@@ -1,0 +1,52 @@
+syntax = "proto3";
+package l1.shardingcoordinator.v1;
+
+import "l1/shardingcoordinator/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/sharding-coordinator/types";
+
+message QueryShardRequest {
+  string shard_id = 1;
+}
+
+message QueryShardResponse {
+  Shard shard = 1;
+}
+
+message QueryShardsRequest {}
+
+message QueryShardsResponse {
+  repeated Shard shards = 1;
+}
+
+message QueryShardValidatorsRequest {
+  string shard_id = 1;
+}
+
+message QueryShardValidatorsResponse {
+  repeated string validators = 1;
+}
+
+message QueryShardLoadRequest {
+  string shard_id = 1;
+}
+
+message QueryShardLoadResponse {
+  repeated ShardLoadMetric load_metrics = 1;
+}
+
+message QueryRebalanceProposalRequest {
+  string proposal_id = 1;
+}
+
+message QueryRebalanceProposalResponse {
+  RebalanceProposal proposal = 1;
+}
+
+service Query {
+  rpc Shard(QueryShardRequest) returns (QueryShardResponse);
+  rpc Shards(QueryShardsRequest) returns (QueryShardsResponse);
+  rpc ShardValidators(QueryShardValidatorsRequest) returns (QueryShardValidatorsResponse);
+  rpc ShardLoad(QueryShardLoadRequest) returns (QueryShardLoadResponse);
+  rpc RebalanceProposal(QueryRebalanceProposalRequest) returns (QueryRebalanceProposalResponse);
+}

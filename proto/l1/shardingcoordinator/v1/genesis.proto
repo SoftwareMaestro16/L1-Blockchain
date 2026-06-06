@@ -1,0 +1,103 @@
+syntax = "proto3";
+package l1.shardingcoordinator.v1;
+
+option go_package = "github.com/sovereign-l1/l1/x/sharding-coordinator/types";
+
+message ShardingCoordinatorParams {
+  uint32 max_shards = 1;
+  uint32 max_validators_per_shard = 2;
+  uint32 min_validator_coverage = 3;
+  uint32 max_shard_assignments_per_validator = 4;
+  uint32 max_load_metrics = 5;
+  uint32 max_rebalance_proposals = 6;
+  uint32 max_cross_shard_routes = 7;
+  uint32 max_state_root_references = 8;
+  uint64 max_route_timeout_blocks = 9;
+  uint32 max_route_in_flight = 10;
+  uint64 max_load_transactions_per_block = 11;
+  uint64 max_load_gas_per_block = 12;
+  uint64 max_load_pending_messages = 13;
+}
+
+message CrossShardRoutingParams {
+  bool allow_inbound = 1;
+  bool allow_outbound = 2;
+  uint32 max_message_bytes = 3;
+  uint64 max_timeout_blocks = 4;
+  uint32 default_route_limit = 5;
+}
+
+message Shard {
+  string shard_id = 1;
+  string status = 2;
+  string security_level = 3;
+  uint32 required_validator_count = 4;
+  CrossShardRoutingParams cross_shard_routing_params = 5;
+  uint64 registered_height = 6;
+  uint64 updated_height = 7;
+}
+
+message ShardValidatorAssignment {
+  string shard_id = 1;
+  repeated string validators = 2;
+  uint64 assigned_height = 3;
+  uint64 assignment_epoch = 4;
+}
+
+message ShardLoadMetric {
+  string shard_id = 1;
+  uint64 transactions_per_block = 2;
+  uint64 gas_per_block = 3;
+  uint64 state_bytes = 4;
+  uint64 pending_messages = 5;
+  uint64 reported_height = 6;
+}
+
+message ValidatorMove {
+  string validator_id = 1;
+  string from_shard_id = 2;
+  string to_shard_id = 3;
+  uint32 weight = 4;
+  uint64 sequence = 5;
+}
+
+message RebalanceProposal {
+  string proposal_id = 1;
+  string source_shard_id = 2;
+  string target_shard_id = 3;
+  repeated ValidatorMove validator_moves = 4;
+  string reason = 5;
+  string status = 6;
+  uint64 proposed_height = 7;
+  uint64 executed_height = 8;
+}
+
+message CrossShardRoute {
+  string route_id = 1;
+  string source_shard_id = 2;
+  string target_shard_id = 3;
+  bool enabled = 4;
+  uint32 max_in_flight = 5;
+  uint64 timeout_blocks = 6;
+}
+
+message ShardStateRootReference {
+  string shard_id = 1;
+  uint64 height = 2;
+  string root_hex = 3;
+}
+
+message ShardingCoordinatorState {
+  repeated Shard shards = 1;
+  repeated ShardValidatorAssignment assignments = 2;
+  repeated ShardLoadMetric load_metrics = 3;
+  repeated RebalanceProposal rebalance_proposals = 4;
+  repeated CrossShardRoute cross_shard_routes = 5;
+  repeated ShardStateRootReference state_root_references = 6;
+}
+
+message GenesisState {
+  uint64 version = 1;
+  ShardingCoordinatorParams shard_params = 2;
+  ShardingCoordinatorState state = 3;
+}

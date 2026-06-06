@@ -4,400 +4,394 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-	"strings"
 )
+
+const AcceptanceCriteriaSpecVersion = uint64(1)
 
 type AcceptanceCriterionID string
 
 const (
-	AcceptanceAEKCoordinatesDefaultZone             AcceptanceCriterionID = "aek-coordinates-default-zone"
-	AcceptanceFourCanonicalZonesSpecified           AcceptanceCriterionID = "four-canonical-zones-specified"
-	AcceptanceCrossZoneMessagingSemantics           AcceptanceCriterionID = "cross-zone-messaging-semantics"
-	AcceptanceServiceRegistryProofLookup            AcceptanceCriterionID = "service-registry-proof-backed-lookup"
-	AcceptanceIdentityResolverBindings              AcceptanceCriterionID = "identity-resolver-bindings"
-	AcceptanceStorageCommitmentsChunkProofs         AcceptanceCriterionID = "storage-commitments-chunk-proofs"
-	AcceptanceRoutingCommittedDeterministicTables   AcceptanceCriterionID = "routing-committed-deterministic-tables"
-	AcceptancePaymentFinancialConditionalSettlement AcceptanceCriterionID = "payment-financial-conditional-settlement"
-	AcceptanceContractMessageDrivenIsolation        AcceptanceCriterionID = "contract-message-driven-isolation"
-	AcceptanceGlobalRootExposesAllRoots             AcceptanceCriterionID = "global-root-exposes-all-roots"
-	AcceptanceModulesExportImportInvariantsTests    AcceptanceCriterionID = "modules-export-import-invariants-tests-typed-queries"
+	AcceptanceCoreCommitsRoots           AcceptanceCriterionID = "aether-core-commits-zone-and-message-roots"
+	AcceptanceZoneAdapterExecution       AcceptanceCriterionID = "zone-executes-through-zone-adapter"
+	AcceptanceMessageRoutingProofs       AcceptanceCriterionID = "messages-routing-inclusion-proofs-receipts"
+	AcceptanceStoreV2ProofLayout         AcceptanceCriterionID = "store-v2-zone-shard-proof-layout"
+	AcceptanceBlockSTMParallelShards     AcceptanceCriterionID = "blockstm-independent-shard-parallelism"
+	AcceptanceShardSplitMergeDeterminism AcceptanceCriterionID = "shard-split-merge-deterministic-from-committed-state"
+	AcceptanceAVMInstructionGasSpec      AcceptanceCriterionID = "avm-2.0-instruction-set-gas-table-specified"
+	AcceptanceIdentityProofCrossZone     AcceptanceCriterionID = "identity-proof-backed-cross-zone-callable"
+	AcceptancePaymentTrustlessProof      AcceptanceCriterionID = "payment-settlement-trustless-proof-verifiable"
+	AcceptanceMigrationPreservesState    AcceptanceCriterionID = "migration-preserves-module-state-invariants"
 )
 
 type AcceptanceCriterion struct {
-	ID            AcceptanceCriterionID
-	PhaseID       ImplementationRoadmapPhaseID
-	Modules       []CosmosSDKModuleName
-	RootTypes     []RootType
-	PlanningReady bool
-	Evidence      []string
-	CriterionHash string
+	CriterionID    AcceptanceCriterionID
+	Criterion      string
+	Target         string
+	Evidence       string
+	DescriptorHash string
 }
 
-type AcceptanceCriteriaManifest struct {
-	Criteria     []AcceptanceCriterion
-	ManifestHash string
+type AcceptanceCriteriaSpec struct {
+	Version  uint64
+	Criteria []AcceptanceCriterion
+	Root     string
 }
 
-func DefaultAcceptanceCriteriaManifest() (AcceptanceCriteriaManifest, error) {
-	allModules := RequiredCosmosSDKModules()
-	criteria := []AcceptanceCriterion{
-		acceptanceCriterion(
-			AcceptanceAEKCoordinatesDefaultZone,
-			RoadmapPhaseKernelRootModel,
-			[]CosmosSDKModuleName{CosmosModuleAetherCore, CosmosModuleZones},
-			[]RootType{RootType("zones")},
-			"AEK can register and coordinate a default execution zone",
-			"default zone root contributes to global root metadata",
-		),
-		acceptanceCriterion(
-			AcceptanceFourCanonicalZonesSpecified,
-			RoadmapPhaseCanonicalZones,
-			[]CosmosSDKModuleName{CosmosModuleContracts, CosmosModuleIdentity, CosmosModulePayments, CosmosModuleZones},
-			[]RootType{RootType("application"), RootType("contracts"), RootType("financial"), RootType("identity")},
-			"application contract financial and identity zones define state messages queries and roots",
-			"canonical zone surfaces include keeper MsgServer QueryServer and message queue",
-		),
-		acceptanceCriterion(
-			AcceptanceCrossZoneMessagingSemantics,
-			RoadmapPhaseCrossZoneMessages,
-			[]CosmosSDKModuleName{CosmosModuleMessages},
-			[]RootType{MessageProofRootType, ReceiptProofRootType},
-			"messages preserve FIFO order per sender",
-			"replay protection bounce handling and receipts are mandatory",
-		),
-		acceptanceCriterion(
-			AcceptanceServiceRegistryProofLookup,
-			RoadmapPhaseServiceStorageRouting,
-			[]CosmosSDKModuleName{CosmosModuleServices},
-			[]RootType{RootType("services")},
-			"service registry supports deterministic lookup indexes",
-			"descriptor verification is proof backed",
-		),
-		acceptanceCriterion(
-			AcceptanceIdentityResolverBindings,
-			RoadmapPhaseIdentityPaymentIntegration,
-			[]CosmosSDKModuleName{CosmosModuleIdentity},
-			[]RootType{RootType("identity")},
-			"identity zone supports account zone service contract and composite resolver outputs",
-			"cross-zone identity bindings are explicit and proofable",
-		),
-		acceptanceCriterion(
-			AcceptanceStorageCommitmentsChunkProofs,
-			RoadmapPhaseServiceStorageRouting,
-			[]CosmosSDKModuleName{CosmosModuleStorage},
-			[]RootType{RootType("storage")},
-			"storage objects are content addressed and commitment backed",
-			"chunk inclusion proofs verify against object roots",
-		),
-		acceptanceCriterion(
-			AcceptanceRoutingCommittedDeterministicTables,
-			RoadmapPhaseServiceStorageRouting,
-			[]CosmosSDKModuleName{CosmosModuleRouting},
-			[]RootType{RoutingTableRootType},
-			"routing uses committed route table epochs",
-			"route selection is deterministic and proof queryable",
-		),
-		acceptanceCriterion(
-			AcceptancePaymentFinancialConditionalSettlement,
-			RoadmapPhaseIdentityPaymentIntegration,
-			[]CosmosSDKModuleName{CosmosModuleMessages, CosmosModulePayments},
-			[]RootType{RootType("payments"), ReceiptProofRootType},
-			"payment layer supports conditional transfers",
-			"final settlement is routed through the Financial Zone",
-		),
-		acceptanceCriterion(
-			AcceptanceContractMessageDrivenIsolation,
-			RoadmapPhaseVMRuntime,
-			[]CosmosSDKModuleName{CosmosModuleContracts, CosmosModuleMessages},
-			[]RootType{RootType("contracts"), MessageProofRootType, ReceiptProofRootType},
-			"contract execution emits cross-zone messages instead of direct writes",
-			"contract zone storage remains isolated and proof verifiable",
-		),
-		acceptanceCriterion(
-			AcceptanceGlobalRootExposesAllRoots,
-			RoadmapPhaseKernelRootModel,
-			[]CosmosSDKModuleName{CosmosModuleAetherCore},
-			[]RootType{RootType("contracts"), RootType("identity"), MessageProofRootType, RootType("payments"), ReceiptProofRootType, RoutingTableRootType, RootType("services"), RootType("storage"), RootType("zones")},
-			"global root exposes zones services identity storage messages receipts routing payments and contracts",
-			"unified root set is commitment backed and queryable",
-		),
-		acceptanceCriterion(
-			AcceptanceModulesExportImportInvariantsTests,
-			RoadmapPhasePerformanceHardening,
-			allModules,
-			[]RootType{RootType("aethercore"), RootType("contracts"), RootType("identity"), MessageProofRootType, RootType("payments"), RoutingTableRootType, RootType("services"), RootType("storage"), RootType("zones")},
-			"all modules have export import invariants and tests",
-			"all modules expose typed query interfaces",
-		),
+type AcceptanceCriteriaEvidence struct {
+	AcceptanceRoot          string
+	CoreRootEvidence        string
+	ZoneAdapterEvidence     string
+	MessageEvidence         string
+	StoreV2Evidence         string
+	BlockSTMEvidence        string
+	ShardMigrationEvidence  string
+	AVMEvidence             string
+	IdentityEvidence        string
+	PaymentEvidence         string
+	MigrationEvidence       string
+	CoreRootsCommitted      bool
+	ZoneAdapterExecutable   bool
+	MessagesProofable       bool
+	StoreV2Proofable        bool
+	BlockSTMParallel        bool
+	ShardRulesDeterministic bool
+	AVMSpecified            bool
+	IdentityProofBacked     bool
+	PaymentTrustless        bool
+	MigrationPreservesState bool
+	EvidenceHash            string
+}
+
+func DefaultAcceptanceCriteriaSpec() (AcceptanceCriteriaSpec, error) {
+	return BuildAcceptanceCriteriaSpec(AcceptanceCriteria())
+}
+
+func BuildAcceptanceCriteriaSpec(criteria []AcceptanceCriterion) (AcceptanceCriteriaSpec, error) {
+	spec := AcceptanceCriteriaSpec{
+		Version:  AcceptanceCriteriaSpecVersion,
+		Criteria: normalizeAcceptanceCriteria(criteria),
 	}
-	return NewAcceptanceCriteriaManifest(criteria)
+	if err := spec.ValidateFormat(); err != nil {
+		return AcceptanceCriteriaSpec{}, err
+	}
+	spec.Root = ComputeAcceptanceCriteriaRoot(spec.Criteria)
+	return spec, spec.Validate()
 }
 
-func NewAcceptanceCriteriaManifest(criteria []AcceptanceCriterion) (AcceptanceCriteriaManifest, error) {
-	manifest := AcceptanceCriteriaManifest{Criteria: normalizeAcceptanceCriteria(criteria)}
-	if err := manifest.ValidateFormat(); err != nil {
-		return AcceptanceCriteriaManifest{}, err
-	}
-	for i := range manifest.Criteria {
-		manifest.Criteria[i].CriterionHash = ComputeAcceptanceCriterionHash(manifest.Criteria[i])
-	}
-	manifest.ManifestHash = ComputeAcceptanceCriteriaManifestHash(manifest)
-	return manifest, manifest.Validate()
-}
-
-func RequiredAcceptanceCriterionIDs() []AcceptanceCriterionID {
-	return []AcceptanceCriterionID{
-		AcceptanceAEKCoordinatesDefaultZone,
-		AcceptanceFourCanonicalZonesSpecified,
-		AcceptanceCrossZoneMessagingSemantics,
-		AcceptanceServiceRegistryProofLookup,
-		AcceptanceIdentityResolverBindings,
-		AcceptanceStorageCommitmentsChunkProofs,
-		AcceptanceRoutingCommittedDeterministicTables,
-		AcceptancePaymentFinancialConditionalSettlement,
-		AcceptanceContractMessageDrivenIsolation,
-		AcceptanceGlobalRootExposesAllRoots,
-		AcceptanceModulesExportImportInvariantsTests,
+func AcceptanceCriteria() []AcceptanceCriterion {
+	return []AcceptanceCriterion{
+		acceptanceCriterion(AcceptanceCoreCommitsRoots, "Aether Core can commit zone roots and message roots.", "x/aethercore root aggregation", "ZoneCommitment, GlobalMessageRoot, RootSnapshot, and app hash root evidence."),
+		acceptanceCriterion(AcceptanceZoneAdapterExecution, "At least one zone can execute through the zone adapter.", "x/zones adapter", "ExecuteZoneBatch, ApplyInboundMessage, ZoneExecutionSummary, export, and import evidence."),
+		acceptanceCriterion(AcceptanceMessageRoutingProofs, "Messages have deterministic routing, inclusion proofs, and receipts.", "x/msgbus and routing", "Route commitment, outbox inclusion proof, destination receipt, and bounce or pending evidence."),
+		acceptanceCriterion(AcceptanceStoreV2ProofLayout, "Store v2 key layout supports zone and shard proof generation.", "Store v2 prefix layout", "Core, zone, shard, message, identity, payment, and contract proof prefix evidence."),
+		acceptanceCriterion(AcceptanceBlockSTMParallelShards, "BlockSTM conflict tests show independent shard execution can run in parallel.", "BlockSTM conflict tests", "Disjoint shard workload evidence, conflict profile root, and parallel execution metrics."),
+		acceptanceCriterion(AcceptanceShardSplitMergeDeterminism, "Shard split and merge rules are deterministic from committed state.", "x/shards split merge scheduler", "Committed metrics, future layout epoch, migration root, and in-flight message delivery epoch evidence."),
+		acceptanceCriterion(AcceptanceAVMInstructionGasSpec, "AVM 2.0 instruction set and gas table are specified.", "x/avm specification", "Bytecode format, opcode table, gas table, storage adapter, message syscall, proof syscall, and ABI registry evidence."),
+		acceptanceCriterion(AcceptanceIdentityProofCrossZone, "Identity resolution is proof-backed and cross-zone callable.", "Identity Zone integration", ".aet resolver proof, reverse proof, MsgResolveIdentity, result receipt, and expiry evidence."),
+		acceptanceCriterion(AcceptancePaymentTrustlessProof, "Payment settlement is trustless and proof-verifiable.", "Financial Zone payments", "Channel collateral, conditional payment, dispute, settlement proof, and payment receipt root evidence."),
+		acceptanceCriterion(AcceptanceMigrationPreservesState, "Migration preserves current Aetheris module state and invariants.", "migration path evidence", "Export manifest, deterministic genesis import, legacy invariant coverage, and prefix migration evidence."),
 	}
 }
 
-func (manifest AcceptanceCriteriaManifest) ValidateFormat() error {
-	manifest.Criteria = normalizeAcceptanceCriteria(manifest.Criteria)
-	required := requiredAcceptanceCriterionIDStrings()
-	if len(manifest.Criteria) != len(required) {
-		return fmt.Errorf("aethercore acceptance criteria manifest must include %d required criteria", len(required))
+func (s AcceptanceCriteriaSpec) Normalize() AcceptanceCriteriaSpec {
+	if s.Version == 0 {
+		s.Version = AcceptanceCriteriaSpecVersion
 	}
-	seen := make(map[AcceptanceCriterionID]struct{}, len(manifest.Criteria))
+	s.Criteria = normalizeAcceptanceCriteria(s.Criteria)
+	s.Root = normalizePerformanceHash(s.Root)
+	return s
+}
+
+func (s AcceptanceCriteriaSpec) ValidateFormat() error {
+	s = s.Normalize()
+	if s.Version != AcceptanceCriteriaSpecVersion {
+		return fmt.Errorf("aethercore acceptance criteria spec version must be %d", AcceptanceCriteriaSpecVersion)
+	}
+	if len(s.Criteria) == 0 {
+		return errors.New("aethercore acceptance criteria spec requires criteria")
+	}
+	seen := make(map[AcceptanceCriterionID]struct{}, len(s.Criteria))
 	var previous AcceptanceCriterionID
-	for i, criterion := range manifest.Criteria {
-		if err := criterion.ValidateFormat(); err != nil {
-			return err
-		}
-		if _, found := seen[criterion.ID]; found {
-			return fmt.Errorf("duplicate aethercore acceptance criterion %s", criterion.ID)
-		}
-		seen[criterion.ID] = struct{}{}
-		if i > 0 && previous >= criterion.ID {
-			return errors.New("aethercore acceptance criteria must be sorted canonically")
-		}
-		previous = criterion.ID
-	}
-	for _, id := range required {
-		if _, found := seen[AcceptanceCriterionID(id)]; !found {
-			return fmt.Errorf("missing aethercore acceptance criterion %s", id)
-		}
-	}
-	if manifest.ManifestHash != "" {
-		return ValidateHash("aethercore acceptance criteria manifest hash", manifest.ManifestHash)
-	}
-	return nil
-}
-
-func (manifest AcceptanceCriteriaManifest) Validate() error {
-	manifest.Criteria = normalizeAcceptanceCriteria(manifest.Criteria)
-	if err := manifest.ValidateFormat(); err != nil {
-		return err
-	}
-	for _, criterion := range manifest.Criteria {
+	for i, criterion := range s.Criteria {
 		if err := criterion.Validate(); err != nil {
 			return err
 		}
-	}
-	if manifest.ManifestHash != ComputeAcceptanceCriteriaManifestHash(manifest) {
-		return errors.New("aethercore acceptance criteria manifest hash mismatch")
-	}
-	return nil
-}
-
-func (criterion AcceptanceCriterion) ValidateFormat() error {
-	criterion = normalizeAcceptanceCriterion(criterion)
-	if !IsRequiredAcceptanceCriterionID(criterion.ID) {
-		return fmt.Errorf("unknown aethercore acceptance criterion %q", criterion.ID)
-	}
-	if !IsImplementationRoadmapPhaseID(criterion.PhaseID) {
-		return fmt.Errorf("aethercore acceptance criterion %s references unknown roadmap phase %s", criterion.ID, criterion.PhaseID)
-	}
-	if len(criterion.Modules) == 0 {
-		return fmt.Errorf("aethercore acceptance criterion %s must name at least one module", criterion.ID)
-	}
-	var previousModule CosmosSDKModuleName
-	seenModules := make(map[CosmosSDKModuleName]struct{}, len(criterion.Modules))
-	for i, moduleName := range criterion.Modules {
-		if !IsRequiredCosmosSDKModule(moduleName) {
-			return fmt.Errorf("aethercore acceptance criterion %s references unknown module %s", criterion.ID, moduleName)
+		if _, found := seen[criterion.CriterionID]; found {
+			return fmt.Errorf("duplicate aethercore acceptance criterion %s", criterion.CriterionID)
 		}
-		if _, found := seenModules[moduleName]; found {
-			return fmt.Errorf("duplicate aethercore acceptance criterion module %s", moduleName)
+		seen[criterion.CriterionID] = struct{}{}
+		if i > 0 && previous >= criterion.CriterionID {
+			return errors.New("aethercore acceptance criteria must be sorted canonically")
 		}
-		seenModules[moduleName] = struct{}{}
-		if i > 0 && previousModule >= moduleName {
-			return fmt.Errorf("aethercore acceptance criterion %s modules must be sorted canonically", criterion.ID)
-		}
-		previousModule = moduleName
+		previous = criterion.CriterionID
 	}
-	if len(criterion.RootTypes) == 0 {
-		return fmt.Errorf("aethercore acceptance criterion %s must name at least one root type", criterion.ID)
-	}
-	var previousRoot RootType
-	seenRoots := make(map[RootType]struct{}, len(criterion.RootTypes))
-	for i, rootType := range criterion.RootTypes {
-		if err := validatePolicyID("aethercore acceptance criterion root type", string(rootType)); err != nil {
+	if s.Root != "" {
+		if err := ValidateHash("aethercore acceptance criteria root", s.Root); err != nil {
 			return err
 		}
-		if _, found := seenRoots[rootType]; found {
-			return fmt.Errorf("duplicate aethercore acceptance criterion root type %s", rootType)
-		}
-		seenRoots[rootType] = struct{}{}
-		if i > 0 && previousRoot >= rootType {
-			return fmt.Errorf("aethercore acceptance criterion %s root types must be sorted canonically", criterion.ID)
-		}
-		previousRoot = rootType
-	}
-	if !criterion.PlanningReady {
-		return fmt.Errorf("aethercore acceptance criterion %s must be planning ready", criterion.ID)
-	}
-	if err := validateAcceptanceEvidence(criterion.ID, criterion.Evidence); err != nil {
-		return err
-	}
-	if criterion.CriterionHash != "" {
-		return ValidateHash("aethercore acceptance criterion hash", criterion.CriterionHash)
 	}
 	return nil
 }
 
-func (criterion AcceptanceCriterion) Validate() error {
-	criterion = normalizeAcceptanceCriterion(criterion)
-	if err := criterion.ValidateFormat(); err != nil {
+func (s AcceptanceCriteriaSpec) Validate() error {
+	s = s.Normalize()
+	if err := s.ValidateFormat(); err != nil {
 		return err
 	}
-	if criterion.CriterionHash != ComputeAcceptanceCriterionHash(criterion) {
-		return errors.New("aethercore acceptance criterion hash mismatch")
+	if s.Root == "" {
+		return errors.New("aethercore acceptance criteria root is required")
+	}
+	expected := ComputeAcceptanceCriteriaRoot(s.Criteria)
+	if s.Root != expected {
+		return fmt.Errorf("aethercore acceptance criteria root mismatch: expected %s", expected)
 	}
 	return nil
 }
 
-func AcceptanceCriterionByID(manifest AcceptanceCriteriaManifest, id AcceptanceCriterionID) (AcceptanceCriterion, bool) {
-	for _, criterion := range manifest.Criteria {
-		if criterion.ID == id {
-			return criterion, true
-		}
-	}
-	return AcceptanceCriterion{}, false
+func (c AcceptanceCriterion) Normalize() AcceptanceCriterion {
+	c.Criterion = compactPerformanceText(c.Criterion)
+	c.Target = compactPerformanceText(c.Target)
+	c.Evidence = compactPerformanceText(c.Evidence)
+	c.DescriptorHash = normalizePerformanceHash(c.DescriptorHash)
+	return c
 }
 
-func IsRequiredAcceptanceCriterionID(id AcceptanceCriterionID) bool {
-	for _, required := range RequiredAcceptanceCriterionIDs() {
-		if required == id {
-			return true
+func (c AcceptanceCriterion) ValidateFormat() error {
+	c = c.Normalize()
+	if !IsAcceptanceCriterionID(c.CriterionID) {
+		return fmt.Errorf("unknown aethercore acceptance criterion %q", c.CriterionID)
+	}
+	if c.Criterion == "" || c.Target == "" || c.Evidence == "" {
+		return errors.New("aethercore acceptance criterion requires criterion, target, and evidence")
+	}
+	if c.DescriptorHash != "" {
+		if err := ValidateHash("aethercore acceptance criterion descriptor hash", c.DescriptorHash); err != nil {
+			return err
 		}
 	}
-	return false
+	return nil
+}
+
+func (c AcceptanceCriterion) Validate() error {
+	c = c.Normalize()
+	if err := c.ValidateFormat(); err != nil {
+		return err
+	}
+	if c.DescriptorHash == "" {
+		return errors.New("aethercore acceptance criterion descriptor hash is required")
+	}
+	expected := ComputeAcceptanceCriterionHash(c)
+	if c.DescriptorHash != expected {
+		return fmt.Errorf("aethercore acceptance criterion descriptor hash mismatch: expected %s", expected)
+	}
+	return nil
+}
+
+func (e AcceptanceCriteriaEvidence) Normalize() AcceptanceCriteriaEvidence {
+	e.AcceptanceRoot = normalizePerformanceHash(e.AcceptanceRoot)
+	e.CoreRootEvidence = normalizePerformanceHash(e.CoreRootEvidence)
+	e.ZoneAdapterEvidence = normalizePerformanceHash(e.ZoneAdapterEvidence)
+	e.MessageEvidence = normalizePerformanceHash(e.MessageEvidence)
+	e.StoreV2Evidence = normalizePerformanceHash(e.StoreV2Evidence)
+	e.BlockSTMEvidence = normalizePerformanceHash(e.BlockSTMEvidence)
+	e.ShardMigrationEvidence = normalizePerformanceHash(e.ShardMigrationEvidence)
+	e.AVMEvidence = normalizePerformanceHash(e.AVMEvidence)
+	e.IdentityEvidence = normalizePerformanceHash(e.IdentityEvidence)
+	e.PaymentEvidence = normalizePerformanceHash(e.PaymentEvidence)
+	e.MigrationEvidence = normalizePerformanceHash(e.MigrationEvidence)
+	e.EvidenceHash = normalizePerformanceHash(e.EvidenceHash)
+	return e
+}
+
+func (e AcceptanceCriteriaEvidence) ValidateFormat() error {
+	e = e.Normalize()
+	hashes := []struct {
+		name  string
+		value string
+	}{
+		{"aethercore acceptance root", e.AcceptanceRoot},
+		{"aethercore acceptance core root evidence", e.CoreRootEvidence},
+		{"aethercore acceptance zone adapter evidence", e.ZoneAdapterEvidence},
+		{"aethercore acceptance message evidence", e.MessageEvidence},
+		{"aethercore acceptance Store v2 evidence", e.StoreV2Evidence},
+		{"aethercore acceptance BlockSTM evidence", e.BlockSTMEvidence},
+		{"aethercore acceptance shard migration evidence", e.ShardMigrationEvidence},
+		{"aethercore acceptance AVM evidence", e.AVMEvidence},
+		{"aethercore acceptance identity evidence", e.IdentityEvidence},
+		{"aethercore acceptance payment evidence", e.PaymentEvidence},
+		{"aethercore acceptance migration evidence", e.MigrationEvidence},
+	}
+	for _, item := range hashes {
+		if err := ValidateHash(item.name, item.value); err != nil {
+			return err
+		}
+	}
+	if !e.CoreRootsCommitted {
+		return errors.New("aethercore acceptance evidence requires committed zone and message roots")
+	}
+	if !e.ZoneAdapterExecutable {
+		return errors.New("aethercore acceptance evidence requires zone adapter execution")
+	}
+	if !e.MessagesProofable {
+		return errors.New("aethercore acceptance evidence requires deterministic messages, proofs, and receipts")
+	}
+	if !e.StoreV2Proofable {
+		return errors.New("aethercore acceptance evidence requires Store v2 zone and shard proof layout")
+	}
+	if !e.BlockSTMParallel {
+		return errors.New("aethercore acceptance evidence requires BlockSTM independent shard parallelism")
+	}
+	if !e.ShardRulesDeterministic {
+		return errors.New("aethercore acceptance evidence requires deterministic shard split and merge rules")
+	}
+	if !e.AVMSpecified {
+		return errors.New("aethercore acceptance evidence requires AVM instruction set and gas table")
+	}
+	if !e.IdentityProofBacked {
+		return errors.New("aethercore acceptance evidence requires proof-backed cross-zone identity")
+	}
+	if !e.PaymentTrustless {
+		return errors.New("aethercore acceptance evidence requires trustless proof-verifiable payments")
+	}
+	if !e.MigrationPreservesState {
+		return errors.New("aethercore acceptance evidence requires migration state and invariant preservation")
+	}
+	if e.EvidenceHash != "" {
+		if err := ValidateHash("aethercore acceptance criteria evidence hash", e.EvidenceHash); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (e AcceptanceCriteriaEvidence) Validate() error {
+	e = e.Normalize()
+	if err := e.ValidateFormat(); err != nil {
+		return err
+	}
+	if e.EvidenceHash == "" {
+		return errors.New("aethercore acceptance criteria evidence hash is required")
+	}
+	expected := ComputeAcceptanceCriteriaEvidenceHash(e)
+	if e.EvidenceHash != expected {
+		return fmt.Errorf("aethercore acceptance criteria evidence hash mismatch: expected %s", expected)
+	}
+	return nil
+}
+
+func ValidateAcceptanceCriteriaCoverage() error {
+	spec, err := DefaultAcceptanceCriteriaSpec()
+	if err != nil {
+		return err
+	}
+	required := []AcceptanceCriterionID{
+		AcceptanceCoreCommitsRoots,
+		AcceptanceZoneAdapterExecution,
+		AcceptanceMessageRoutingProofs,
+		AcceptanceStoreV2ProofLayout,
+		AcceptanceBlockSTMParallelShards,
+		AcceptanceShardSplitMergeDeterminism,
+		AcceptanceAVMInstructionGasSpec,
+		AcceptanceIdentityProofCrossZone,
+		AcceptancePaymentTrustlessProof,
+		AcceptanceMigrationPreservesState,
+	}
+	seen := make(map[AcceptanceCriterionID]struct{}, len(spec.Criteria))
+	for _, criterion := range spec.Criteria {
+		seen[criterion.CriterionID] = struct{}{}
+	}
+	for _, id := range required {
+		if _, found := seen[id]; !found {
+			return fmt.Errorf("aethercore acceptance criteria coverage missing %s", id)
+		}
+	}
+	return nil
+}
+
+func ComputeAcceptanceCriteriaRoot(criteria []AcceptanceCriterion) string {
+	criteria = normalizeAcceptanceCriteria(criteria)
+	return hashRoot("aetheris-aek-acceptance-criteria-v1", func(w byteWriter) {
+		writeUint64(w, uint64(len(criteria)))
+		for _, criterion := range criteria {
+			writePart(w, string(criterion.CriterionID))
+			writePart(w, criterion.DescriptorHash)
+		}
+	})
 }
 
 func ComputeAcceptanceCriterionHash(criterion AcceptanceCriterion) string {
-	criterion = normalizeAcceptanceCriterion(criterion)
+	criterion = criterion.Normalize()
 	return hashRoot("aetheris-aek-acceptance-criterion-v1", func(w byteWriter) {
-		writePart(w, string(criterion.ID))
-		writePart(w, string(criterion.PhaseID))
-		writeUint64(w, uint64(len(criterion.Modules)))
-		for _, moduleName := range criterion.Modules {
-			writePart(w, string(moduleName))
-		}
-		writeUint64(w, uint64(len(criterion.RootTypes)))
-		for _, rootType := range criterion.RootTypes {
-			writePart(w, string(rootType))
-		}
-		writePart(w, fmt.Sprint(criterion.PlanningReady))
-		writeStringParts(w, criterion.Evidence)
+		writePart(w, string(criterion.CriterionID))
+		writePart(w, criterion.Criterion)
+		writePart(w, criterion.Target)
+		writePart(w, criterion.Evidence)
 	})
 }
 
-func ComputeAcceptanceCriteriaManifestHash(manifest AcceptanceCriteriaManifest) string {
-	manifest.Criteria = normalizeAcceptanceCriteria(manifest.Criteria)
-	return hashRoot("aetheris-aek-acceptance-criteria-manifest-v1", func(w byteWriter) {
-		writeUint64(w, uint64(len(manifest.Criteria)))
-		for _, criterion := range manifest.Criteria {
-			writePart(w, criterion.CriterionHash)
-		}
+func ComputeAcceptanceCriteriaEvidenceHash(e AcceptanceCriteriaEvidence) string {
+	e = e.Normalize()
+	return hashRoot("aetheris-aek-acceptance-criteria-evidence-v1", func(w byteWriter) {
+		writePart(w, e.AcceptanceRoot)
+		writePart(w, e.CoreRootEvidence)
+		writePart(w, e.ZoneAdapterEvidence)
+		writePart(w, e.MessageEvidence)
+		writePart(w, e.StoreV2Evidence)
+		writePart(w, e.BlockSTMEvidence)
+		writePart(w, e.ShardMigrationEvidence)
+		writePart(w, e.AVMEvidence)
+		writePart(w, e.IdentityEvidence)
+		writePart(w, e.PaymentEvidence)
+		writePart(w, e.MigrationEvidence)
+		writeBoolPart(w, e.CoreRootsCommitted)
+		writeBoolPart(w, e.ZoneAdapterExecutable)
+		writeBoolPart(w, e.MessagesProofable)
+		writeBoolPart(w, e.StoreV2Proofable)
+		writeBoolPart(w, e.BlockSTMParallel)
+		writeBoolPart(w, e.ShardRulesDeterministic)
+		writeBoolPart(w, e.AVMSpecified)
+		writeBoolPart(w, e.IdentityProofBacked)
+		writeBoolPart(w, e.PaymentTrustless)
+		writeBoolPart(w, e.MigrationPreservesState)
 	})
 }
 
-func acceptanceCriterion(id AcceptanceCriterionID, phaseID ImplementationRoadmapPhaseID, modules []CosmosSDKModuleName, rootTypes []RootType, evidence ...string) AcceptanceCriterion {
-	return AcceptanceCriterion{
-		ID:            id,
-		PhaseID:       phaseID,
-		Modules:       modules,
-		RootTypes:     rootTypes,
-		PlanningReady: true,
-		Evidence:      evidence,
+func IsAcceptanceCriterionID(id AcceptanceCriterionID) bool {
+	switch id {
+	case AcceptanceCoreCommitsRoots,
+		AcceptanceZoneAdapterExecution,
+		AcceptanceMessageRoutingProofs,
+		AcceptanceStoreV2ProofLayout,
+		AcceptanceBlockSTMParallelShards,
+		AcceptanceShardSplitMergeDeterminism,
+		AcceptanceAVMInstructionGasSpec,
+		AcceptanceIdentityProofCrossZone,
+		AcceptancePaymentTrustlessProof,
+		AcceptanceMigrationPreservesState:
+		return true
+	default:
+		return false
 	}
 }
 
-func normalizeAcceptanceCriterion(criterion AcceptanceCriterion) AcceptanceCriterion {
-	criterion.ID = AcceptanceCriterionID(strings.TrimSpace(string(criterion.ID)))
-	criterion.PhaseID = ImplementationRoadmapPhaseID(strings.TrimSpace(string(criterion.PhaseID)))
-	criterion.Modules = append([]CosmosSDKModuleName(nil), criterion.Modules...)
-	for i, moduleName := range criterion.Modules {
-		criterion.Modules[i] = CosmosSDKModuleName(strings.TrimSpace(string(moduleName)))
+func acceptanceCriterion(id AcceptanceCriterionID, criterion, target, evidence string) AcceptanceCriterion {
+	item := AcceptanceCriterion{
+		CriterionID: id,
+		Criterion:   criterion,
+		Target:      target,
+		Evidence:    evidence,
 	}
-	sort.SliceStable(criterion.Modules, func(i, j int) bool {
-		return criterion.Modules[i] < criterion.Modules[j]
-	})
-	criterion.RootTypes = append([]RootType(nil), criterion.RootTypes...)
-	for i, rootType := range criterion.RootTypes {
-		criterion.RootTypes[i] = RootType(strings.TrimSpace(string(rootType)))
-	}
-	sort.SliceStable(criterion.RootTypes, func(i, j int) bool {
-		return criterion.RootTypes[i] < criterion.RootTypes[j]
-	})
-	criterion.Evidence = normalizeRoadmapStringSet(criterion.Evidence)
-	criterion.CriterionHash = strings.ToLower(strings.TrimSpace(criterion.CriterionHash))
-	return criterion
+	item.DescriptorHash = ComputeAcceptanceCriterionHash(item)
+	return item
 }
 
 func normalizeAcceptanceCriteria(criteria []AcceptanceCriterion) []AcceptanceCriterion {
-	out := make([]AcceptanceCriterion, len(criteria))
+	normalized := make([]AcceptanceCriterion, len(criteria))
 	for i, criterion := range criteria {
-		criterion = normalizeAcceptanceCriterion(criterion)
-		if criterion.CriterionHash == "" {
-			criterion.CriterionHash = ComputeAcceptanceCriterionHash(criterion)
-		}
-		out[i] = criterion
+		normalized[i] = criterion.Normalize()
 	}
-	sort.SliceStable(out, func(i, j int) bool {
-		return out[i].ID < out[j].ID
+	sort.Slice(normalized, func(i, j int) bool {
+		return normalized[i].CriterionID < normalized[j].CriterionID
 	})
-	return out
-}
-
-func validateAcceptanceEvidence(id AcceptanceCriterionID, evidence []string) error {
-	if len(evidence) == 0 {
-		return fmt.Errorf("aethercore acceptance criterion %s evidence is required", id)
-	}
-	seen := make(map[string]struct{}, len(evidence))
-	var previous string
-	for i, item := range evidence {
-		if err := validateRoadmapText("aethercore acceptance criterion evidence", item); err != nil {
-			return err
-		}
-		if _, found := seen[item]; found {
-			return fmt.Errorf("duplicate aethercore acceptance criterion evidence %s", item)
-		}
-		seen[item] = struct{}{}
-		if i > 0 && previous >= item {
-			return fmt.Errorf("aethercore acceptance criterion %s evidence must be sorted canonically", id)
-		}
-		previous = item
-	}
-	return nil
-}
-
-func requiredAcceptanceCriterionIDStrings() []string {
-	ids := RequiredAcceptanceCriterionIDs()
-	out := make([]string, len(ids))
-	for i, id := range ids {
-		out[i] = string(id)
-	}
-	sort.Strings(out)
-	return out
+	return normalized
 }
