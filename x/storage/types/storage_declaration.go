@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
 )
 
 const (
@@ -84,6 +86,44 @@ func NewHybridStorageDeclaration(object StorageObject, stateRoot, contentLocatio
 		AccessReceiptOptional:   accessReceipt,
 		MaxPayloadBytes:         maxPayloadBytes,
 	})
+}
+
+func NewStorageDeclarationFromServiceDescriptor(descriptor coretypes.ServiceStorageDescriptor) (StorageDeclaration, error) {
+	declaration := StorageDeclaration{
+		StorageModel:        storageModelFromServiceDescriptor(descriptor.Model),
+		ContentHashOptional: descriptor.ContentHash,
+		StateRootOptional:   descriptor.StateRoot,
+		RetrievalMethod:     descriptor.RetrievalMethod,
+		VerificationMethod:  descriptor.VerificationMethod,
+		RetentionPolicy:     descriptor.RetentionPolicy,
+		AccessPolicy:        descriptor.AccessPolicy,
+		MaxPayloadBytes:     descriptor.MaxPayloadBytes,
+	}
+	if declaration.ContentHashOptional == "" && descriptor.Model != coretypes.ServiceStorageOnChain {
+		declaration.ContentHashOptional = descriptor.CommitmentHash
+	}
+	if declaration.StateRootOptional == "" && (descriptor.Model == coretypes.ServiceStorageOnChain || descriptor.Model == coretypes.ServiceStorageHybridCommitment) {
+		declaration.StateRootOptional = descriptor.CommitmentHash
+	}
+	if declaration.RetrievalMethod == "" {
+		declaration.RetrievalMethod = defaultStorageRetrievalForModel(declaration.StorageModel)
+	}
+	if declaration.VerificationMethod == "" {
+		declaration.VerificationMethod = defaultStorageVerificationForModel(declaration.StorageModel, descriptor.ProofRequired)
+	}
+	if declaration.RetentionPolicy == "" {
+		declaration.RetentionPolicy = defaultStorageRetentionForModel(declaration.StorageModel)
+	}
+	if declaration.AccessPolicy == "" {
+		declaration.AccessPolicy = AccessPolicyPermissioned
+	}
+	if declaration.MaxPayloadBytes == 0 {
+		declaration.MaxPayloadBytes = DefaultMaxStateBytes
+	}
+	if descriptor.Model == coretypes.ServiceStorageHybridCommitment && declaration.ContentLocationOptional == "" {
+		declaration.ContentLocationOptional = "descriptor/" + descriptor.CommitmentHash
+	}
+	return NewStorageDeclaration(declaration)
 }
 
 func (declaration StorageDeclaration) ValidateFormat() error {
@@ -264,6 +304,61 @@ func IsStorageRetentionPolicy(policy string) bool {
 		return true
 	default:
 		return false
+	}
+}
+
+func storageModelFromServiceDescriptor(model coretypes.ServiceStorageModel) string {
+	switch model {
+	case coretypes.ServiceStorageEphemeral, coretypes.ServiceStorageNone:
+		return StorageModelEphemeral
+	case coretypes.ServiceStorageOnChain:
+		return StorageModelPersistentOnChain
+	case coretypes.ServiceStorageDistributedOffChain:
+		return StorageModelDistributedOffChain
+	case coretypes.ServiceStorageHybridCommitment:
+		return StorageModelHybrid
+	default:
+		return string(model)
+	}
+}
+
+func defaultStorageRetrievalForModel(model string) string {
+	switch model {
+	case StorageModelPersistentOnChain:
+		return StorageRetrievalOnChainState
+	case StorageModelDistributedOffChain:
+		return StorageRetrievalContentAddressed
+	case StorageModelHybrid:
+		return StorageRetrievalHybridEndpoint
+	default:
+		return StorageRetrievalInline
+	}
+}
+
+func defaultStorageVerificationForModel(model string, proofRequired bool) string {
+	switch model {
+	case StorageModelPersistentOnChain:
+		return StorageVerificationStateRoot
+	case StorageModelDistributedOffChain:
+		if proofRequired {
+			return StorageVerificationChunkProof
+		}
+		return StorageVerificationContentHash
+	case StorageModelHybrid:
+		return StorageVerificationHybridCommitment
+	default:
+		return StorageVerificationNone
+	}
+}
+
+func defaultStorageRetentionForModel(model string) string {
+	switch model {
+	case StorageModelEphemeral:
+		return StorageRetentionNone
+	case StorageModelPersistentOnChain:
+		return StorageRetentionPermanent
+	default:
+		return StorageRetentionExpiry
 	}
 }
 

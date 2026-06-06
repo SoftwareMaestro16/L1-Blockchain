@@ -208,11 +208,18 @@ type ServicePaymentDescriptor struct {
 }
 
 type ServiceStorageDescriptor struct {
-	Model           ServiceStorageModel
-	StateRootType   RootType
-	CommitmentHash  string
-	RetentionHeight uint64
-	ProofRequired   bool
+	Model              ServiceStorageModel
+	StateRootType      RootType
+	CommitmentHash     string
+	ContentHash        string
+	StateRoot          string
+	RetrievalMethod    string
+	VerificationMethod string
+	RetentionHeight    uint64
+	RetentionPolicy    string
+	AccessPolicy       string
+	MaxPayloadBytes    uint64
+	ProofRequired      bool
 }
 
 type ServiceVerificationDescriptor struct {
@@ -800,6 +807,35 @@ func (d ServiceStorageDescriptor) Validate() error {
 	if err := validateOptionalHash("aethercore service storage commitment hash", d.CommitmentHash); err != nil {
 		return err
 	}
+	if err := validateOptionalHash("aethercore service storage content hash", d.ContentHash); err != nil {
+		return err
+	}
+	if err := validateOptionalHash("aethercore service storage state root", d.StateRoot); err != nil {
+		return err
+	}
+	if d.RetrievalMethod != "" {
+		if err := validatePolicyID("aethercore service storage retrieval method", d.RetrievalMethod); err != nil {
+			return err
+		}
+	}
+	if d.VerificationMethod != "" {
+		if err := validatePolicyID("aethercore service storage verification method", d.VerificationMethod); err != nil {
+			return err
+		}
+	}
+	if d.RetentionPolicy != "" {
+		if err := validatePolicyID("aethercore service storage retention policy", d.RetentionPolicy); err != nil {
+			return err
+		}
+	}
+	if d.AccessPolicy != "" {
+		if err := validatePolicyID("aethercore service storage access policy", d.AccessPolicy); err != nil {
+			return err
+		}
+	}
+	if d.MaxPayloadBytes > 1<<40 {
+		return errors.New("aethercore service storage max payload bytes exceeds protocol maximum")
+	}
 	if d.Model == ServiceStorageOnChain && d.StateRootType == "" {
 		return errors.New("aethercore on-chain service storage requires state root type")
 	}
@@ -1049,7 +1085,14 @@ func ComputeServiceDescriptorHash(d ServiceDescriptor) string {
 		string(d.Storage.Model),
 		string(d.Storage.StateRootType),
 		d.Storage.CommitmentHash,
+		d.Storage.ContentHash,
+		d.Storage.StateRoot,
+		d.Storage.RetrievalMethod,
+		d.Storage.VerificationMethod,
 		fmt.Sprint(d.Storage.RetentionHeight),
+		d.Storage.RetentionPolicy,
+		d.Storage.AccessPolicy,
+		fmt.Sprint(d.Storage.MaxPayloadBytes),
 		fmt.Sprint(d.Storage.ProofRequired),
 		string(d.Verification.TrustModel),
 		string(d.Verification.Model),

@@ -41,6 +41,7 @@ const (
 	ZoneIDAetherCore  = "AETHER_CORE"
 	ZoneIDFinancial   = "FINANCIAL_ZONE"
 	ZoneIDIdentity    = "IDENTITY_ZONE"
+	ZoneIDPayment     = "PAYMENT_ZONE"
 	ZoneIDApplication = "APPLICATION_ZONE"
 	ZoneIDContract    = "CONTRACT_ZONE"
 )
