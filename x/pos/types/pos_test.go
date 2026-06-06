@@ -91,6 +91,30 @@ func TestStakeDecayReducesInactiveWeightOnly(t *testing.T) {
 	require.Equal(t, sdkmath.ZeroInt(), ApplyStakeDecay(stake, 200, params))
 }
 
+func TestScoreCandidateUsesSaturatedCompositeIntegerModel(t *testing.T) {
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	params.StakeSaturationNaet = sdkmath.NewInt(1_000)
+	candidate := candidate("val-score-model", 10_000, 0)
+	candidate.PerformanceScoreBps = 9_000
+	candidate.UptimeFactorBps = 9_500
+	candidate.LatencyFactorBps = 8_000
+	candidate.ReliabilityIndexBps = 7_000
+
+	scored, err := ScoreCandidate(params, candidate)
+	require.NoError(t, err)
+	require.Equal(t, sdkmath.NewInt(1_000), scored.EffectiveStakeNaet)
+	require.Equal(t, sdkmath.NewInt(478), scored.Score)
+	require.Equal(t, ValidatorScoreComponents{
+		StakeWeightNaet:      sdkmath.NewInt(1_000),
+		PerformanceFactorBps: 9_000,
+		UptimeFactorBps:      9_500,
+		LatencyFactorBps:     8_000,
+		ReliabilityIndexBps:  7_000,
+		Score:                sdkmath.NewInt(478),
+	}, scored.ScoreComponents)
+}
+
 func TestPerformanceScoreUsesUptimeLatencyAndCorrectness(t *testing.T) {
 	params := DefaultParams()
 	score, err := ComputePerformanceScore(params.PerformanceWeights, PerformanceSignals{

@@ -200,6 +200,38 @@ type WorkloadRewardSettlement struct {
 	CompletedUnits uint64
 }
 
+type PerformanceFactorInput struct {
+	CompletedTasks         uint64
+	MissedTasks            uint64
+	CorrectVerifications   uint64
+	IncorrectVerifications uint64
+	AvailableWindows       uint64
+	CommittedWindows       uint64
+}
+
+type UptimeFactorInput struct {
+	SignedBlocks             uint64
+	TotalBlocks              uint64
+	TaskParticipations       uint64
+	MissedTaskParticipations uint64
+}
+
+type LatencyFactorInput struct {
+	CommittedWindow bool
+	AdvisoryOnly    bool
+	TargetMillis    uint64
+	P95Millis       uint64
+}
+
+type ReliabilityIndexInput struct {
+	PriorIndexBps    uint32
+	SlashEvents      uint64
+	DowntimeEpochs   uint64
+	MissedTasks      uint64
+	RejectedEvidence uint64
+	RecoveryEpochs   uint64
+}
+
 type PosLayer string
 
 const (
@@ -475,6 +507,124 @@ func MaxValidatorSetChanges(params Params, activeValidatorCount uint32) (uint32,
 		return activeValidatorCount, nil
 	}
 	return uint32(changes), nil
+}
+
+func BuildElectionCandidates(params Params, electionEpoch uint64, candidates []Candidate, intents []DelegationIntent) ([]Candidate, []RejectedDelegationIntent, error) {
+	if err := params.Validate(); err != nil {
+		return nil, nil, err
+	}
+	out := make([]Candidate, len(candidates))
+	indexByID := make(map[string]int, len(candidates))
+	for i, candidate := range candidates {
+		cloned := cloneCandidate(candidate)
+		if err := cloned.Validate(params); err != nil {
+			return nil, nil, err
+		}
+		if _, found := indexByID[cloned.ValidatorID]; found {
+			return nil, nil, fmt.Errorf("duplicate candidate %q", cloned.ValidatorID)
+		}
+		indexByID[cloned.ValidatorID] = i
+		out[i] = cloned
+	}
+	activations, rejected, err := ActivateDelegationIntents(params, electionEpoch, out, intents)
+	if err != nil {
+		return nil, nil, err
+	}
+	for _, activation := range activations {
+		idx, found := indexByID[activation.ValidatorID]
+		if !found {
+			continue
+		}
+		out[idx].Nominations = mergeNominations(out[idx].Nominations, activation.Nominations)
+		out[idx].DelegatedStakeNaet = sumNominations(out[idx].Nominations)
+	}
+	return out, rejected, nil
+}
+
+func ComputePerformanceFactor(input PerformanceFactorInput) (uint32, error) {
+	completionDenom := input.CompletedTasks + input.MissedTasks
+	if completionDenom < input.CompletedTasks {
+		return 0, errors.New("performance task count overflow")
+	}
+	correctnessDenom := input.CorrectVerifications + input.IncorrectVerifications
+	if correctnessDenom < input.CorrectVerifications {
+		return 0, errors.New("performance verification count overflow")
+	}
+	if input.CommittedWindows < input.AvailableWindows {
+		return 0, errors.New("available windows cannot exceed committed windows")
+	}
+	completion := ratioBps(input.CompletedTasks, completionDenom)
+	correctness := ratioBps(input.CorrectVerifications, correctnessDenom)
+	availability := ratioBps(input.AvailableWindows, input.CommittedWindows)
+	score := uint64(4_000)*uint64(completion) +
+		uint64(4_000)*uint64(correctness) +
+		uint64(2_000)*uint64(availability)
+	return uint32(score / uint64(BasisPoints)), nil
+}
+
+func ComputeUptimeFactor(input UptimeFactorInput) (uint32, error) {
+	if input.TotalBlocks < input.SignedBlocks {
+		return 0, errors.New("signed blocks cannot exceed total blocks")
+	}
+	totalTaskParticipations := input.TaskParticipations + input.MissedTaskParticipations
+	if totalTaskParticipations < input.TaskParticipations {
+		return 0, errors.New("task participation count overflow")
+	}
+	blocks := ratioBps(input.SignedBlocks, input.TotalBlocks)
+	tasks := ratioBps(input.TaskParticipations, totalTaskParticipations)
+	score := uint64(7_000)*uint64(blocks) + uint64(3_000)*uint64(tasks)
+	return uint32(score / uint64(BasisPoints)), nil
+}
+
+func ComputeLatencyFactor(input LatencyFactorInput) (uint32, error) {
+	if !input.CommittedWindow {
+		return 0, errors.New("latency factor requires committed measurement window")
+	}
+	if input.AdvisoryOnly {
+		return BasisPoints, nil
+	}
+	if input.TargetMillis == 0 {
+		return 0, errors.New("latency target must be positive")
+	}
+	if input.P95Millis == 0 || input.P95Millis <= input.TargetMillis {
+		return BasisPoints, nil
+	}
+	return uint32(sdkmath.NewIntFromUint64(input.TargetMillis).MulRaw(int64(BasisPoints)).Quo(sdkmath.NewIntFromUint64(input.P95Millis)).Uint64()), nil
+}
+
+func ComputeReliabilityIndex(input ReliabilityIndexInput) (uint32, error) {
+	if input.PriorIndexBps > BasisPoints {
+		return 0, fmt.Errorf("prior reliability index must be <= %d bps", BasisPoints)
+	}
+	index := input.PriorIndexBps
+	if index == 0 {
+		index = BasisPoints
+	}
+	penalty, err := reliabilityPenalty(input)
+	if err != nil {
+		return 0, err
+	}
+	if penalty >= uint64(index) {
+		index = 0
+	} else {
+		index -= uint32(penalty)
+	}
+	recovery := input.RecoveryEpochs * 100
+	if recovery > uint64(BasisPoints-index) {
+		return BasisPoints, nil
+	}
+	return index + uint32(recovery), nil
+}
+
+func reliabilityPenalty(input ReliabilityIndexInput) (uint64, error) {
+	penalty := sdkmath.NewIntFromUint64(input.SlashEvents).MulRaw(2_000)
+	penalty = penalty.Add(sdkmath.NewIntFromUint64(input.DowntimeEpochs).MulRaw(500))
+	penalty = penalty.Add(sdkmath.NewIntFromUint64(input.MissedTasks).MulRaw(100))
+	penalty = penalty.Add(sdkmath.NewIntFromUint64(input.RejectedEvidence).MulRaw(250))
+	if !penalty.LTE(sdkmath.NewIntFromUint64(uint64(BasisPoints))) {
+		return uint64(BasisPoints), nil
+	}
+	return penalty.Uint64(), nil
 }
 
 func EpochRecordFieldNames() []string {
@@ -1536,6 +1686,40 @@ func sortedStringKeys[V any](values map[string]V) []string {
 	}
 	sort.Strings(keys)
 	return keys
+}
+
+func mergeNominations(existing []Nomination, activated []Nomination) []Nomination {
+	byNominator := make(map[string]sdkmath.Int, len(existing)+len(activated))
+	for _, nomination := range existing {
+		current, found := byNominator[nomination.NominatorID]
+		if !found {
+			current = sdkmath.ZeroInt()
+		}
+		byNominator[nomination.NominatorID] = current.Add(nomination.StakeNaet)
+	}
+	for _, nomination := range activated {
+		current, found := byNominator[nomination.NominatorID]
+		if !found {
+			current = sdkmath.ZeroInt()
+		}
+		byNominator[nomination.NominatorID] = current.Add(nomination.StakeNaet)
+	}
+	nominatorIDs := sortedStringKeys(byNominator)
+	out := make([]Nomination, 0, len(nominatorIDs))
+	for _, nominatorID := range nominatorIDs {
+		out = append(out, Nomination{NominatorID: nominatorID, StakeNaet: byNominator[nominatorID]})
+	}
+	return out
+}
+
+func ratioBps(numerator uint64, denominator uint64) uint32 {
+	if denominator == 0 {
+		return BasisPoints
+	}
+	if numerator >= denominator {
+		return BasisPoints
+	}
+	return uint32((uint64(BasisPoints) * numerator) / denominator)
 }
 
 func validatePosToken(fieldName string, value string) error {

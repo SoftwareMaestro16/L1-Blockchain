@@ -24,6 +24,7 @@ const (
 	DefaultMinUptimeBps        = uint32(9_500)
 	DefaultInactiveAfterEpochs = uint64(2)
 	DefaultStakeDecayBps       = uint32(100)
+	DefaultStakeSaturationNaet = int64(100_000_000_000)
 	DefaultUnbondingSeconds    = uint64(1_209_600)
 	MinUnbondingSeconds        = uint64(604_800)
 	MaxUnbondingSeconds        = uint64(1_814_400)
@@ -56,6 +57,7 @@ type Params struct {
 	MinUptimeBps                 uint32
 	InactiveAfterEpochs          uint64
 	StakeDecayBps                uint32
+	StakeSaturationNaet          sdkmath.Int
 	UnbondingSeconds             uint64
 	TargetCommitMillis           uint32
 	MinTaskGroupValidators       uint32
@@ -97,12 +99,22 @@ type Nomination struct {
 	StakeNaet   sdkmath.Int
 }
 
+type ValidatorScoreComponents struct {
+	StakeWeightNaet      sdkmath.Int
+	PerformanceFactorBps uint32
+	UptimeFactorBps      uint32
+	LatencyFactorBps     uint32
+	ReliabilityIndexBps  uint32
+	Score                sdkmath.Int
+}
+
 type ScoredValidator struct {
 	Candidate
 	TotalStakeNaet     sdkmath.Int
 	EffectiveStakeNaet sdkmath.Int
 	Score              sdkmath.Int
 	VotingPowerNaet    sdkmath.Int
+	ScoreComponents    ValidatorScoreComponents
 }
 
 type Selection struct {
@@ -180,6 +192,7 @@ func DefaultParams() Params {
 		MinUptimeBps:                 DefaultMinUptimeBps,
 		InactiveAfterEpochs:          DefaultInactiveAfterEpochs,
 		StakeDecayBps:                DefaultStakeDecayBps,
+		StakeSaturationNaet:          sdkmath.NewInt(DefaultStakeSaturationNaet),
 		UnbondingSeconds:             DefaultUnbondingSeconds,
 		TargetCommitMillis:           DefaultTargetCommitMillis,
 		MinTaskGroupValidators:       DefaultMinTaskGroupValidators,
@@ -238,6 +251,9 @@ func (p Params) Validate() error {
 	}
 	if p.StakeDecayBps > BasisPoints {
 		return fmt.Errorf("stake decay must be <= %d bps", BasisPoints)
+	}
+	if !p.StakeSaturationNaet.IsPositive() {
+		return errors.New("stake saturation must be positive")
 	}
 	if p.UnbondingSeconds < MinUnbondingSeconds || p.UnbondingSeconds > MaxUnbondingSeconds {
 		return fmt.Errorf("unbonding period must be within %d..%d seconds", MinUnbondingSeconds, MaxUnbondingSeconds)
@@ -402,18 +418,33 @@ func ScoreCandidate(params Params, candidate Candidate) (ScoredValidator, error)
 	if candidate.UptimeFactorBps < params.MinUptimeBps {
 		return ScoredValidator{}, errors.New("validator uptime below threshold")
 	}
-	effectiveStake := ApplyStakeDecay(totalStake, candidate.InactiveEpochs, params)
-	score := mulIntBps(effectiveStake, candidate.PerformanceScoreBps)
-	score = mulIntBps(score, candidate.UptimeFactorBps)
-	score = mulIntBps(score, normalizeOptionalFactorBps(candidate.LatencyFactorBps))
-	score = mulIntBps(score, normalizeOptionalFactorBps(candidate.ReliabilityIndexBps))
+	components := ComputeValidatorScoreComponents(params, totalStake, candidate)
 	return ScoredValidator{
 		Candidate:          cloneCandidate(candidate),
 		TotalStakeNaet:     totalStake,
-		EffectiveStakeNaet: effectiveStake,
-		Score:              score,
-		VotingPowerNaet:    effectiveStake,
+		EffectiveStakeNaet: components.StakeWeightNaet,
+		Score:              components.Score,
+		VotingPowerNaet:    components.StakeWeightNaet,
+		ScoreComponents:    components,
 	}, nil
+}
+
+func ComputeValidatorScoreComponents(params Params, totalStake sdkmath.Int, candidate Candidate) ValidatorScoreComponents {
+	stakeWeight := ApplyStakeSaturation(ApplyStakeDecay(totalStake, candidate.InactiveEpochs, params), params)
+	score := mulIntBps(stakeWeight, candidate.PerformanceScoreBps)
+	score = mulIntBps(score, candidate.UptimeFactorBps)
+	latencyFactor := normalizeOptionalFactorBps(candidate.LatencyFactorBps)
+	reliabilityIndex := normalizeOptionalFactorBps(candidate.ReliabilityIndexBps)
+	score = mulIntBps(score, latencyFactor)
+	score = mulIntBps(score, reliabilityIndex)
+	return ValidatorScoreComponents{
+		StakeWeightNaet:      stakeWeight,
+		PerformanceFactorBps: candidate.PerformanceScoreBps,
+		UptimeFactorBps:      candidate.UptimeFactorBps,
+		LatencyFactorBps:     latencyFactor,
+		ReliabilityIndexBps:  reliabilityIndex,
+		Score:                score,
+	}
 }
 
 func ApplyStakeDecay(stake sdkmath.Int, inactiveEpochs uint64, params Params) sdkmath.Int {
@@ -426,6 +457,16 @@ func ApplyStakeDecay(stake sdkmath.Int, inactiveEpochs uint64, params Params) sd
 		return sdkmath.ZeroInt()
 	}
 	return mulIntBps(stake, uint32(uint64(BasisPoints)-decayBps))
+}
+
+func ApplyStakeSaturation(stake sdkmath.Int, params Params) sdkmath.Int {
+	if !stake.IsPositive() {
+		return sdkmath.ZeroInt()
+	}
+	if params.StakeSaturationNaet.IsPositive() && stake.GT(params.StakeSaturationNaet) {
+		return params.StakeSaturationNaet
+	}
+	return stake
 }
 
 func DistributeRewards(input RewardInput) (RewardDistribution, error) {

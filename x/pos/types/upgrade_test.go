@@ -266,6 +266,95 @@ func TestMaxValidatorSetChangesUsesConfiguredRate(t *testing.T) {
 	require.ErrorContains(t, err, "active validator count")
 }
 
+func TestBuildElectionCandidatesAppliesDelayedDelegationsToStakeWeight(t *testing.T) {
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	candidates := []Candidate{candidate("val-market", 1_000, 0)}
+	intents := []DelegationIntent{{
+		NominatorID:            "nom-a",
+		ValidatorID:            "val-market",
+		StakeNaet:              sdkmath.NewInt(2_000),
+		RequestedEpoch:         10,
+		MaxCommissionBps:       500,
+		MinPerformanceScoreBps: 9_000,
+	}}
+
+	early, rejected, err := BuildElectionCandidates(params, 10, candidates, intents)
+	require.NoError(t, err)
+	require.Len(t, rejected, 1)
+	require.True(t, early[0].DelegatedStakeNaet.IsZero())
+
+	ready, rejected, err := BuildElectionCandidates(params, 11, candidates, intents)
+	require.NoError(t, err)
+	require.Empty(t, rejected)
+	require.Equal(t, sdkmath.NewInt(2_000), ready[0].DelegatedStakeNaet)
+	require.Equal(t, []Nomination{{NominatorID: "nom-a", StakeNaet: sdkmath.NewInt(2_000)}}, ready[0].Nominations)
+
+	scored, err := ScoreCandidate(params, ready[0])
+	require.NoError(t, err)
+	require.Equal(t, sdkmath.NewInt(3_000), scored.TotalStakeNaet)
+	require.Equal(t, sdkmath.NewInt(3_000), scored.ScoreComponents.StakeWeightNaet)
+}
+
+func TestValidatorElectionFactorCalculatorsUseDeterministicBps(t *testing.T) {
+	performance, err := ComputePerformanceFactor(PerformanceFactorInput{
+		CompletedTasks:         8,
+		MissedTasks:            2,
+		CorrectVerifications:   9,
+		IncorrectVerifications: 1,
+		AvailableWindows:       4,
+		CommittedWindows:       5,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint32(8_400), performance)
+
+	uptime, err := ComputeUptimeFactor(UptimeFactorInput{
+		SignedBlocks:             90,
+		TotalBlocks:              100,
+		TaskParticipations:       8,
+		MissedTaskParticipations: 2,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint32(8_700), uptime)
+
+	latency, err := ComputeLatencyFactor(LatencyFactorInput{
+		CommittedWindow: true,
+		TargetMillis:    1_000,
+		P95Millis:       2_000,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint32(5_000), latency)
+
+	latency, err = ComputeLatencyFactor(LatencyFactorInput{CommittedWindow: true, AdvisoryOnly: true})
+	require.NoError(t, err)
+	require.Equal(t, uint32(BasisPoints), latency)
+
+	reliability, err := ComputeReliabilityIndex(ReliabilityIndexInput{
+		PriorIndexBps:    9_000,
+		SlashEvents:      1,
+		DowntimeEpochs:   2,
+		MissedTasks:      3,
+		RejectedEvidence: 2,
+		RecoveryEpochs:   5,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint32(5_700), reliability)
+}
+
+func TestValidatorElectionFactorCalculatorsRejectUnsafeInputs(t *testing.T) {
+	_, err := ComputePerformanceFactor(PerformanceFactorInput{AvailableWindows: 2, CommittedWindows: 1})
+	require.ErrorContains(t, err, "available windows")
+
+	_, err = ComputeUptimeFactor(UptimeFactorInput{SignedBlocks: 2, TotalBlocks: 1})
+	require.ErrorContains(t, err, "signed blocks")
+
+	_, err = ComputeLatencyFactor(LatencyFactorInput{CommittedWindow: false, TargetMillis: 1, P95Millis: 1})
+	require.ErrorContains(t, err, "committed measurement")
+
+	_, err = ComputeReliabilityIndex(ReliabilityIndexInput{PriorIndexBps: BasisPoints + 1})
+	require.ErrorContains(t, err, "prior reliability")
+}
+
 func TestEpochLifecycleValidationRejectsReorderedOrDuplicatePhases(t *testing.T) {
 	lifecycle := DefaultEpochLifecycle()
 	slices.Reverse(lifecycle)
