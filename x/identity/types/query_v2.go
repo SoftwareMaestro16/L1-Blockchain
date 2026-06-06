@@ -61,6 +61,7 @@ type IdentityQueryResponseV2 struct {
 	Target         *NamedExecutionTarget
 	ContractTarget *ContractTargetV2
 	Service        *ServiceEndpointV2
+	Services       []ServiceEndpointV2
 	Interface      *InterfaceDescriptorV2
 	Route          *RoutingMetadataV2
 	Reverse        *ReverseResolutionRecordV2
@@ -219,6 +220,10 @@ func (q IdentityQueryServiceV2) QueryResolveContractTarget(name string, targetID
 }
 
 func (q IdentityQueryServiceV2) QueryResolveService(name string, service string) IdentityQueryResponseV2 {
+	return q.QueryResolveServiceRecord(name, service, false)
+}
+
+func (q IdentityQueryServiceV2) QueryResolveServiceRecord(name string, service string, includeFallbacks bool) IdentityQueryResponseV2 {
 	record, err := BuildUnifiedResolutionRecordV2(q.ctx.State, name, q.ctx.Height, q.ctx.DefaultTTL)
 	if err != nil {
 		return q.failure(queryCodeForResolutionErrorV2(err), err)
@@ -228,6 +233,9 @@ func (q IdentityQueryServiceV2) QueryResolveService(name string, service string)
 		if serviceEndpointIDV2(endpoint) == service {
 			resp := q.ok()
 			resp.Service = &endpoint
+			if includeFallbacks {
+				resp.Services = compatibleServiceEndpointsV2(record.ServiceEndpoints, IdentityServiceDiscoveryRequestV2{SupportedServiceTypes: []string{endpoint.ServiceType}})
+			}
 			resp.RecordVersion = record.RecordVersion
 			return resp
 		}
