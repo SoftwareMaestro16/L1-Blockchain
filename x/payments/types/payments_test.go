@@ -541,7 +541,8 @@ func TestRequiredPaymentTestCoverageMatrixCoversUnitAndIntegrationSpecs(t *testi
 	require.Equal(t, uint64(9), report.IntegrationCount)
 	require.Equal(t, uint64(10), report.InvariantCount)
 	require.Equal(t, uint64(9), report.FuzzCount)
-	require.Len(t, report.Entries, 42)
+	require.Equal(t, uint64(9), report.PerformanceCount)
+	require.Len(t, report.Entries, 51)
 
 	seen := map[RequiredTestCoverageID]RequiredTestCoverageEntry{}
 	for _, entry := range report.Entries {
@@ -558,6 +559,8 @@ func TestRequiredPaymentTestCoverageMatrixCoversUnitAndIntegrationSpecs(t *testi
 	require.Contains(t, seen["invariant_same_channel_writes_conflict"].TestNames, "TestBlockSTMConflictProfileDetectsSameChannelConflicts")
 	require.Equal(t, RequiredTestCoverageFuzz, seen["fuzz_async_delta_aggregation"].Kind)
 	require.Contains(t, seen["fuzz_async_delta_aggregation"].TestNames, "FuzzPaymentRequiredFuzzVectors")
+	require.Equal(t, RequiredTestCoveragePerformance, seen["performance_blockstm_conflict_rate_mix"].Kind)
+	require.Contains(t, seen["performance_blockstm_conflict_rate_mix"].TestNames, "TestPaymentPerformanceCoverageProfilesPerBlockWorkloads")
 
 	duplicate := report
 	duplicate.Entries = append(duplicate.Entries, report.Entries[0])
@@ -569,9 +572,142 @@ func TestRequiredPaymentTestCoverageMatrixCoversUnitAndIntegrationSpecs(t *testi
 	missing.UnitCount = 14
 	missing.IntegrationCount = 9
 	missing.InvariantCount = 10
-	missing.FuzzCount = 8
+	missing.FuzzCount = 9
+	missing.PerformanceCount = 8
 	missing.ReportHash = ComputeRequiredTestCoverageReportHash(missing)
 	require.ErrorContains(t, ValidateRequiredTestCoverageReport(missing), "missing payments required test coverage")
+}
+
+func TestPaymentPerformanceCoverageProfilesPerBlockWorkloads(t *testing.T) {
+	alice := testAddress(0xba)
+	router := testAddress(0xbb)
+	bob := testAddress(0xbc)
+	const blockHeight uint64 = 64
+	const opsPerBlock = 4
+
+	openMessages := make([]PaymentChannelModuleMessage, 0, opsPerBlock)
+	for i := 0; i < opsPerBlock; i++ {
+		opener := testAddress(byte(0xc0 + i*2))
+		counterparty := testAddress(byte(0xc1 + i*2))
+		openMessages = append(openMessages, MsgOpenChannel{
+			Signer: opener,
+			Request: ChannelOpenRequest{
+				ChainID:         "aetheris-test-1",
+				Participants:    []string{opener, counterparty},
+				InitialBalances: []Balance{{Participant: opener, Amount: "100"}, {Participant: counterparty, Amount: "0"}},
+				ChannelType:     ChannelTypeBidirectional,
+				Collateral:      "100",
+				CloseDelay:      8,
+				ChallengePeriod: 8,
+				FeePolicyID:     NativeDenom,
+				OpeningFeeDenom: NativeDenom,
+				OpeningFeePaid:  DefaultOpeningFee,
+				OpenHeight:      10 + uint64(i),
+			},
+		})
+	}
+	openProfile, err := PaymentChannelMessagesConflictProfile(openMessages, blockHeight)
+	require.NoError(t, err)
+	require.True(t, openProfile.ConflictFree)
+	require.Len(t, openProfile.Plans, opsPerBlock)
+
+	state := EmptyState()
+	closeMessages := make([]PaymentChannelModuleMessage, 0, opsPerBlock)
+	disputeMessages := make([]PaymentChannelModuleMessage, 0, opsPerBlock)
+	conditionPlans := make([]BlockSTMAccessPlan, 0, opsPerBlock)
+	for i := 0; i < opsPerBlock; i++ {
+		channel := signedChannel(t, fmt.Sprintf("perf-channel-%d", i), "1000", alice, bob)
+		var openErr error
+		state, openErr = OpenChannel(state, channel)
+		require.NoError(t, openErr)
+		closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{{Participant: alice, Amount: "900"}, {Participant: bob, Amount: "100"}})
+		newerState := signedState(t, channel, 3, closeState.StateHash, []Balance{{Participant: alice, Amount: "850"}, {Participant: bob, Amount: "150"}})
+		closeMessages = append(closeMessages, MsgUnilateralClose{Signer: alice, Request: ChannelCloseRequest{ChannelID: channel.ChannelID, ClosingState: closeState, Submitter: alice, CurrentHeight: blockHeight, SettlementFee: "0"}})
+		disputeMessages = append(disputeMessages, MsgDisputeClose{Signer: bob, Request: ChannelDisputeRequest{ChannelID: channel.ChannelID, ClosingStateReference: closeState.StateHash, NewerState: newerState, Submitter: bob, CurrentHeight: blockHeight + 1}})
+		conditionPlan, planErr := AccessPlanForConditionResolution(channel.ChannelID, []string{HashParts("perf-condition", channel.ChannelID)}, blockHeight)
+		require.NoError(t, planErr)
+		conditionPlans = append(conditionPlans, conditionPlan)
+	}
+	closeProfile, err := PaymentChannelMessagesConflictProfile(closeMessages, blockHeight)
+	require.NoError(t, err)
+	require.True(t, closeProfile.ConflictFree)
+	require.Len(t, closeProfile.Plans, opsPerBlock)
+	disputeProfile, err := PaymentChannelMessagesConflictProfile(disputeMessages, blockHeight+1)
+	require.NoError(t, err)
+	require.True(t, disputeProfile.ConflictFree)
+	require.Len(t, disputeProfile.Plans, opsPerBlock)
+	conditionProfile := ProfileBlockSTMConflicts(conditionPlans)
+	require.True(t, conditionProfile.ConflictFree)
+	require.Len(t, conditionProfile.Plans, opsPerBlock)
+
+	cooperativeSettles := 0
+	coopState := EmptyState()
+	for i := 0; i < opsPerBlock; i++ {
+		channel := signedChannel(t, fmt.Sprintf("perf-coop-%d", i), "1000", alice, bob)
+		var err error
+		coopState, err = OpenChannel(coopState, channel)
+		require.NoError(t, err)
+		closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{{Participant: alice, Amount: "500"}, {Participant: bob, Amount: "500"}})
+		coopState, _, err = CooperativeClose(coopState, channel.ChannelID, closeState, alice, blockHeight, "0")
+		require.NoError(t, err)
+		cooperativeSettles++
+	}
+	require.Equal(t, opsPerBlock, cooperativeSettles)
+
+	virtualState, _, activation := virtualChannelFixture(t, "perf-virtual", alice, router, bob, "100", 40)
+	virtualDisputes := 0
+	virtualDisputeHeight := uint64(32)
+	for i := 0; i < opsPerBlock; i++ {
+		currentVirtual := virtualState.VirtualChannels[0]
+		update := signedVirtualEndpointUpdate(t, currentVirtual, currentVirtual.Nonce+uint64(i+1), fmt.Sprintf("%d", 90-i), fmt.Sprintf("%d", 10+i))
+		proof, err := BuildVirtualChannelDisputeProof(update, virtualReserveCommitments(activation), router)
+		require.NoError(t, err)
+		if i == 0 {
+			virtualState, err = SubmitVirtualChannelDispute(virtualState, proof, virtualDisputeHeight)
+			require.NoError(t, err)
+		} else {
+			require.NoError(t, ValidateVirtualChannelDisputeProof(proof, virtualState.VirtualChannels[0]))
+		}
+		virtualDisputes++
+	}
+	require.Equal(t, opsPerBlock, virtualDisputes)
+
+	mixedPlans := append([]BlockSTMAccessPlan{}, closeProfile.Plans...)
+	mixedPlans = append(mixedPlans, disputeProfile.Plans...)
+	mixedProfile := ProfileBlockSTMConflicts(mixedPlans)
+	require.False(t, mixedProfile.ConflictFree)
+	require.NotEmpty(t, mixedProfile.Conflicts)
+	conflictRateBps := uint64(len(mixedProfile.Conflicts)) * 10_000 / uint64(len(mixedPlans)*(len(mixedPlans)-1)/2)
+	require.Greater(t, conflictRateBps, uint64(0))
+	require.LessOrEqual(t, conflictRateBps, uint64(10_000))
+
+	layout, err := BuildStoreV2Layout(state)
+	require.NoError(t, err)
+	require.Len(t, layout.Channels, opsPerBlock)
+	require.Len(t, layout.ParticipantChannels, opsPerBlock*2)
+	page, err := QueryStoreV2ParticipantChannels(layout, ParticipantChannelPageRequest{Address: alice, Limit: opsPerBlock})
+	require.NoError(t, err)
+	require.Equal(t, uint64(opsPerBlock), page.Total)
+	storeIndexFootprint := len(layout.Channels) + len(layout.ChannelStates) + len(layout.ParticipantChannels)
+	require.GreaterOrEqual(t, storeIndexFootprint, opsPerBlock*4)
+
+	disputeState := EmptyState()
+	disputeChannel := signedChannel(t, "perf-snapshot-dispute", "1000", alice, bob)
+	disputeState, err = OpenChannel(disputeState, disputeChannel)
+	require.NoError(t, err)
+	closeState := signedConditionalState(t, disputeChannel, 2, disputeChannel.OpeningStateHash, "25", []Balance{{Participant: alice, Amount: "975"}, {Participant: bob, Amount: "0"}})
+	disputeState, err = SubmitClose(disputeState, disputeChannel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+	newer := signedConditionalState(t, disputeChannel, 3, closeState.StateHash, "25", []Balance{{Participant: alice, Amount: "950"}, {Participant: bob, Amount: "25"}})
+	disputeState, err = DisputeClose(disputeState, disputeChannel.ChannelID, newer, bob, 21)
+	require.NoError(t, err)
+	snapshot, err := BuildAdaptiveSyncSnapshot(disputeState, 22)
+	require.NoError(t, err)
+	recovered, err := RecoverAdaptiveSyncSafety(snapshot)
+	require.NoError(t, err)
+	require.Len(t, snapshot.ActiveDisputes, 1)
+	require.Contains(t, recovered.ActiveDisputeChannelIDs, disputeChannel.ChannelID)
+	require.NotEmpty(t, recovered.WatcherReplayEventIDs)
 }
 
 func TestSettlementArbitrationBoundaryRejectsNonDeterministicInputs(t *testing.T) {

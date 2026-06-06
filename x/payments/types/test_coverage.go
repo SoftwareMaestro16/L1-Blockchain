@@ -15,6 +15,7 @@ const (
 	RequiredTestCoverageIntegration RequiredTestCoverageKind = "INTEGRATION"
 	RequiredTestCoverageInvariant   RequiredTestCoverageKind = "INVARIANT"
 	RequiredTestCoverageFuzz        RequiredTestCoverageKind = "FUZZ"
+	RequiredTestCoveragePerformance RequiredTestCoverageKind = "PERFORMANCE"
 )
 
 type RequiredTestCoverageEntry struct {
@@ -31,6 +32,7 @@ type RequiredTestCoverageReport struct {
 	IntegrationCount uint64
 	InvariantCount   uint64
 	FuzzCount        uint64
+	PerformanceCount uint64
 	Entries          []RequiredTestCoverageEntry
 	ReportHash       string
 }
@@ -79,6 +81,15 @@ func BuildRequiredTestCoverageReport() RequiredTestCoverageReport {
 		requiredFuzzCoverage("fuzz_fraud_proof_duplicate_encodings", "Fraud proof duplicate encodings.", []string{"FuzzPaymentRequiredFuzzVectors", "TestFraudProofVerificationModuleDedupGasPenaltyAndRewardClaim"}, "ComputeCanonicalFraudEvidenceHash", "FraudProofVerificationState.HasEvidence"),
 		requiredFuzzCoverage("fuzz_route_failure_classifications", "Route failure classifications.", []string{"FuzzPaymentRequiredFuzzVectors", "TestRouteFailureScoringReducesLocalRoutingScore"}, "ClassifyRouteFailure", "BuildRouteFailureScore"),
 		requiredFuzzCoverage("fuzz_async_delta_aggregation", "Async delta aggregation.", []string{"FuzzPaymentRequiredFuzzVectors", "TestAsyncCheckpointAggregationExposureExpiryAndProof"}, "BuildAsyncCheckpointState", "ComputeAsyncDeltaRootForChannel"),
+		requiredPerformanceCoverage("performance_channel_opens_per_block", "Channel opens per block.", []string{"TestPaymentPerformanceCoverageProfilesPerBlockWorkloads", "TestPaymentChannelModuleMessagesDispatchAnteAndInvariants"}, "MsgOpenChannel", "BlockSTMClassOpenChannel"),
+		requiredPerformanceCoverage("performance_cooperative_closes_per_block", "Cooperative closes per block.", []string{"TestPaymentPerformanceCoverageProfilesPerBlockWorkloads", "TestPaymentChannelCloseDisputeFraudAndSettlement"}, "CooperativeClose", "PaymentFeeClassCooperativeClose"),
+		requiredPerformanceCoverage("performance_unilateral_closes_per_block", "Unilateral closes per block.", []string{"TestPaymentPerformanceCoverageProfilesPerBlockWorkloads", "TestUnilateralCloseRequestStoresReasonAndDetachedSignatures"}, "SubmitCloseWithRequest", "BlockSTMClassCloseChannel"),
+		requiredPerformanceCoverage("performance_disputes_per_block", "Disputes per block.", []string{"TestPaymentPerformanceCoverageProfilesPerBlockWorkloads", "TestDisputeRequestEmitsEventAndAppliesOptionalFraudProof"}, "DisputeChannel", "BlockSTMClassDisputeChannel"),
+		requiredPerformanceCoverage("performance_promise_resolutions_per_block", "Promise resolutions per block.", []string{"TestPaymentPerformanceCoverageProfilesPerBlockWorkloads", "TestBatchConditionSettlementAtomicallyResolvesChainedPromises"}, "RevealPromisePreimage", "AccessPlanForConditionResolution"),
+		requiredPerformanceCoverage("performance_virtual_channel_disputes_per_block", "Virtual channel disputes per block.", []string{"TestPaymentPerformanceCoverageProfilesPerBlockWorkloads", "TestVirtualChannelEndpointUpdatesAndDisputeProof"}, "BuildVirtualChannelDisputeProof", "SubmitVirtualChannelDispute"),
+		requiredPerformanceCoverage("performance_blockstm_conflict_rate_mix", "BlockSTM conflict rate by transaction mix.", []string{"TestPaymentPerformanceCoverageProfilesPerBlockWorkloads", "TestPaymentChannelModuleBlockSTMProfilesMessageConflicts"}, "ProfileBlockSTMConflicts", "BlockSTMConflictProfile"),
+		requiredPerformanceCoverage("performance_store_v2_index_latency", "Store v2 read/write latency for channel indexes.", []string{"TestPaymentPerformanceCoverageProfilesPerBlockWorkloads", "TestStoreV2ParticipantIndexPagination"}, "BuildStoreV2Layout", "QueryStoreV2ParticipantChannels"),
+		requiredPerformanceCoverage("performance_snapshot_recovery_active_disputes", "Snapshot recovery time with active disputes.", []string{"TestPaymentPerformanceCoverageProfilesPerBlockWorkloads", "TestAdaptiveSyncSnapshotRecoversNodeDuringActiveDispute"}, "BuildAdaptiveSyncSnapshot", "RecoverAdaptiveSyncSafety"),
 	}
 	report := RequiredTestCoverageReport{Entries: normalizeRequiredTestCoverageEntries(entries)}
 	for _, entry := range report.Entries {
@@ -91,6 +102,8 @@ func BuildRequiredTestCoverageReport() RequiredTestCoverageReport {
 			report.InvariantCount++
 		case RequiredTestCoverageFuzz:
 			report.FuzzCount++
+		case RequiredTestCoveragePerformance:
+			report.PerformanceCount++
 		}
 	}
 	report.ReportHash = ComputeRequiredTestCoverageReportHash(report)
@@ -105,6 +118,7 @@ func ValidateRequiredTestCoverageReport(report RequiredTestCoverageReport) error
 	integrationCount := uint64(0)
 	invariantCount := uint64(0)
 	fuzzCount := uint64(0)
+	performanceCount := uint64(0)
 	for _, entry := range report.Entries {
 		entry = entry.Normalize()
 		if !isRequiredTestCoverageID(entry.CoverageID) {
@@ -114,7 +128,7 @@ func ValidateRequiredTestCoverageReport(report RequiredTestCoverageReport) error
 			return fmt.Errorf("duplicate payments required test coverage %q", entry.CoverageID)
 		}
 		seen[entry.CoverageID] = struct{}{}
-		if entry.Kind != RequiredTestCoverageUnit && entry.Kind != RequiredTestCoverageIntegration && entry.Kind != RequiredTestCoverageInvariant && entry.Kind != RequiredTestCoverageFuzz {
+		if entry.Kind != RequiredTestCoverageUnit && entry.Kind != RequiredTestCoverageIntegration && entry.Kind != RequiredTestCoverageInvariant && entry.Kind != RequiredTestCoverageFuzz && entry.Kind != RequiredTestCoveragePerformance {
 			return fmt.Errorf("unknown payments required test coverage kind %q", entry.Kind)
 		}
 		switch entry.Kind {
@@ -126,6 +140,8 @@ func ValidateRequiredTestCoverageReport(report RequiredTestCoverageReport) error
 			invariantCount++
 		case RequiredTestCoverageFuzz:
 			fuzzCount++
+		case RequiredTestCoveragePerformance:
+			performanceCount++
 		}
 		if entry.Description == "" || len(entry.TestNames) == 0 || len(entry.Evidence) == 0 {
 			return fmt.Errorf("payments required test coverage %q lacks description, test names, or evidence", entry.CoverageID)
@@ -142,10 +158,10 @@ func ValidateRequiredTestCoverageReport(report RequiredTestCoverageReport) error
 			return fmt.Errorf("missing payments required test coverage %q", id)
 		}
 	}
-	if unitCount != 14 || integrationCount != 9 || invariantCount != 10 || fuzzCount != 9 {
-		return errors.New("payments required test coverage counts must match section 16.1 through 16.4")
+	if unitCount != 14 || integrationCount != 9 || invariantCount != 10 || fuzzCount != 9 || performanceCount != 9 {
+		return errors.New("payments required test coverage counts must match section 16.1 through 16.5")
 	}
-	if report.UnitCount != unitCount || report.IntegrationCount != integrationCount || report.InvariantCount != invariantCount || report.FuzzCount != fuzzCount {
+	if report.UnitCount != unitCount || report.IntegrationCount != integrationCount || report.InvariantCount != invariantCount || report.FuzzCount != fuzzCount || report.PerformanceCount != performanceCount {
 		return errors.New("payments required test coverage counters are invalid")
 	}
 	if err := ValidateHash("payments required test coverage report hash", report.ReportHash); err != nil {
@@ -159,7 +175,7 @@ func ValidateRequiredTestCoverageReport(report RequiredTestCoverageReport) error
 
 func ComputeRequiredTestCoverageReportHash(report RequiredTestCoverageReport) string {
 	report.Entries = normalizeRequiredTestCoverageEntries(report.Entries)
-	parts := []string{"payments-required-test-coverage-v1", fmt.Sprintf("%020d", report.UnitCount), fmt.Sprintf("%020d", report.IntegrationCount), fmt.Sprintf("%020d", report.InvariantCount), fmt.Sprintf("%020d", report.FuzzCount)}
+	parts := []string{"payments-required-test-coverage-v1", fmt.Sprintf("%020d", report.UnitCount), fmt.Sprintf("%020d", report.IntegrationCount), fmt.Sprintf("%020d", report.InvariantCount), fmt.Sprintf("%020d", report.FuzzCount), fmt.Sprintf("%020d", report.PerformanceCount)}
 	for _, entry := range report.Entries {
 		entry = entry.Normalize()
 		parts = append(parts, string(entry.CoverageID), string(entry.Kind), entry.Description, entry.EvidenceHash)
@@ -199,6 +215,10 @@ func requiredInvariantCoverage(id RequiredTestCoverageID, description string, te
 
 func requiredFuzzCoverage(id RequiredTestCoverageID, description string, tests []string, evidence ...string) RequiredTestCoverageEntry {
 	return requiredTestCoverage(id, RequiredTestCoverageFuzz, description, tests, evidence...)
+}
+
+func requiredPerformanceCoverage(id RequiredTestCoverageID, description string, tests []string, evidence ...string) RequiredTestCoverageEntry {
+	return requiredTestCoverage(id, RequiredTestCoveragePerformance, description, tests, evidence...)
 }
 
 func requiredTestCoverage(id RequiredTestCoverageID, kind RequiredTestCoverageKind, description string, tests []string, evidence ...string) RequiredTestCoverageEntry {
@@ -284,6 +304,15 @@ func requiredTestCoverageIDs() []RequiredTestCoverageID {
 		"fuzz_fraud_proof_duplicate_encodings",
 		"fuzz_route_failure_classifications",
 		"fuzz_async_delta_aggregation",
+		"performance_channel_opens_per_block",
+		"performance_cooperative_closes_per_block",
+		"performance_unilateral_closes_per_block",
+		"performance_disputes_per_block",
+		"performance_promise_resolutions_per_block",
+		"performance_virtual_channel_disputes_per_block",
+		"performance_blockstm_conflict_rate_mix",
+		"performance_store_v2_index_latency",
+		"performance_snapshot_recovery_active_disputes",
 	}
 }
 
