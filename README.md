@@ -14,21 +14,47 @@ Local Aetra validator/full nodes do not require Redis or PostgreSQL for consensu
 
 ## Current Surface
 
+Aetra is already more than a minimal Cosmos SDK chain. The current codebase has a working base chain, PoS staking, native fee admission, protocol economy modules, reserved system addresses, system module-account wiring, localnet tooling, and many native Aetra modules wired into genesis and block ordering. Some of those modules are live runtime modules; some are prepared system surfaces that are intentionally gated until testnet/audit readiness.
+
 ```mermaid
 flowchart TD
-  USER["CLI / REST / gRPC clients"] --> RPC["CometBFT RPC and app query servers"]
-  RPC --> CONSENSUS["CometBFT consensus, mempool, CheckTx, DeliverTx"]
-  CONSENSUS --> ANTE["Aetra ante admission: signatures, fees, reserved-address policy"]
-  ANTE --> CORE["Cosmos SDK core: auth, bank, staking, slashing, distribution, gov, mint"]
-  CORE --> ECON["Native economy: fees, fee collector, treasury, burn, emissions, mint authority"]
-  CORE --> POS["Validator surface: staking, validator registry/election, insurance, protection, reputation"]
-  CORE --> SYS["System entities: config, constitution, system registry, scheduler, storage rent, identity root"]
-  CORE --> EXEC["Execution apps: tokenfactory, DEX, AVM/actor scheduling surfaces"]
-  ECON --> STATE["Deterministic stores, genesis validation, export/import"]
-  POS --> STATE
-  SYS --> STATE
-  EXEC --> STATE
+  CLIENT["Clients: aetherisd CLI, REST, gRPC, CometBFT RPC"]
+  CLIENT --> CONSENSUS["CometBFT: mempool, proposal, consensus, block execution"]
+  CONSENSUS --> PREBLOCK["PreBlock: upgrade/auth preparation"]
+  PREBLOCK --> ANTE["Ante admission: signatures, sequences, native fees, reserved address rules"]
+  ANTE --> ROUTER["Message router and module keepers"]
+
+  ROUTER --> BASE["Base chain: auth, bank, staking, slashing, distribution, gov, mint, evidence"]
+  ROUTER --> ECON["Economy: fees, fee collector, treasury, burn, emissions, mint authority"]
+  ROUTER --> VALIDATORS["Validator layer: registry, election, insurance, protection, reputation, performance"]
+  ROUTER --> SYSTEM["System layer: config, constitution, system registry, scheduler, storage rent, identity root"]
+  ROUTER --> EXECUTION["Execution/assets: tokenfactory, DEX, AVM scheduler, actor registry"]
+  ROUTER --> NETWORK["Future coordination: bridge hub, cross-chain registry, sharding coordinator"]
+
+  BASE --> BLOCK["BeginBlock / Msg execution / EndBlock"]
+  ECON --> BLOCK
+  VALIDATORS --> BLOCK
+  SYSTEM --> BLOCK
+  EXECUTION --> BLOCK
+  NETWORK --> BLOCK
+  BLOCK --> STATE["Deterministic state, genesis validation, export/import, localnet restart tests"]
 ```
+
+### Runtime Layers
+
+The implemented and wired surface is split across several layers:
+
+| Layer | Current status | What it does |
+| --- | --- | --- |
+| Node and consensus | Implemented | `aetherisd`, CometBFT consensus, mempool admission, block execution, localnet scripts, RPC/gRPC/REST query surface. |
+| Core accounts and money movement | Implemented | `auth`, `bank`, custom address codec, zero-address policy, reserved system address policy, blocked-address policy. |
+| PoS base | Implemented | Cosmos SDK staking with `naet`, validator creation, delegation, unbonding, redelegation, slashing, distribution, mint rewards. |
+| Native fee admission | Implemented | `x/fees` enforces `naet` fees, minimum fee, hard cap, congestion-aware fee checks, sender/block spam controls. |
+| Protocol economy | Implemented/wired | Fee collector, treasury, burn, emissions, mint authority, validator insurance, delegator protection, reporter rewards, storage-rent reserve surfaces. |
+| Validator system layer | Implemented/wired | Validator registry, validator election, nominator pools, insurance, protection, reputation, performance oracle, dynamic commission, stake concentration. |
+| System entity layer | Implemented/wired | Config, config voting, constitution, system registry, scheduler, actor registry, storage rent, identity root, bridge hub, cross-chain registry, sharding coordinator. |
+| User asset layer | Implemented | Tokenfactory assets and constant-product DEX pools, liquidity, swaps, and LP-token surface. |
+| AVM direction | Prototype/gated | AVM, async execution specs, actor registry, AVM scheduler, conflict/read-write scheduling surfaces. Production state mutation remains gated. |
 
 ### Transaction Path
 
@@ -36,21 +62,79 @@ A normal transaction follows this path:
 
 1. The user signs and broadcasts through `aetherisd`, REST, gRPC, or CometBFT RPC.
 2. CometBFT admits it into mempool and later proposes it in a block.
-3. Aetra ante validation runs before message execution.
-4. The fee decorator enforces native `naet` fee policy, bounded dynamic fees, signer policy, fee payer policy, and reserved system address restrictions.
-5. Cosmos SDK auth verifies signatures and account sequence.
-6. Messages route to module keepers such as `bank`, `staking`, `gov`, `tokenfactory`, `dex`, `burn`, `treasury`, `fees`, and the Aetra native modules.
-7. BeginBlocker and EndBlocker ordering is explicit in `app/aether_core_wiring.go`.
-8. State is committed through deterministic stores and can be exported/imported for restart testing.
+3. PreBlock prepares core upgrade/auth flow.
+4. Aetra ante validation runs before message execution.
+5. The fee decorator enforces native `naet` fee policy, bounded dynamic fees, signer policy, fee payer policy, and reserved system address restrictions.
+6. Cosmos SDK auth verifies signatures and account sequence.
+7. Messages route to module keepers such as `bank`, `staking`, `gov`, `tokenfactory`, `dex`, `burn`, `treasury`, `fees`, and the Aetra native modules.
+8. BeginBlocker and EndBlocker ordering is explicit in `app/aether_core_wiring.go`.
+9. State is committed through deterministic stores and can be exported/imported for restart testing.
 
-Important admission rules:
+Admission rules that are already enforced:
 
 - protocol fees are paid in `naet`;
+- fee checks run before custom messages can mutate state;
 - malformed, zero, and unsupported addresses are rejected;
 - reserved system addresses cannot sign user transactions;
 - user sends to non-receivable system addresses are rejected;
 - `AETBurn` can receive user funds when burn-by-send policy allows it;
-- core `-7:` protocol addresses do not receive user funds.
+- core `-7:` protocol addresses do not receive user funds;
+- system module-account permissions and blocked-address policy are validated at startup.
+
+### Economy And Accounting Surface
+
+The chain already has dedicated modules for protocol money flows:
+
+- `x/fees` controls transaction fee admission.
+- `x/fee-collector` is the protocol income hub and bucket-accounting surface.
+- `x/treasury` manages controlled treasury allocations and spend lifecycle.
+- `x/burn` records user and protocol burns.
+- `x/mint-authority` controls base-denom mint authority.
+- `x/emissions` holds emission policy surface.
+- `x/delegator-protection` and `x/validator-insurance` provide safety reserve surfaces.
+- `x/reporter` supports reporter reward accounting.
+- `x/storage-rent` prepares rent accounting for persistent AVM state.
+
+The intended distribution model routes protocol income through deterministic buckets: validator rewards, treasury, delegator protection, validator insurance, ecosystem grants, storage rent reserve, burn, and reporter rewards. Required accounting tests compare module accounting with bank balances.
+
+### Validator And PoS Surface
+
+The live PoS base is Cosmos SDK staking with `naet`:
+
+- validators can be created and bonded;
+- delegators can delegate, unbond, and redelegate;
+- distribution handles validator and delegator rewards;
+- slashing/evidence protect the validator set;
+- minting supports uncapped PoS reward issuance;
+- validator transitions and restart/export behavior are covered by app tests.
+
+Aetra adds native validator modules around that base:
+
+- `x/validator-registry` for native validator metadata and status;
+- `x/validator-election` for future validator set coordination;
+- `x/nominator-pool` and `x/single-nominator-pool`;
+- `x/validator-insurance`;
+- `x/delegator-protection`;
+- `x/reputation`;
+- `x/performance`;
+- `x/dynamic-commission`;
+- `x/stake-concentration`.
+
+### System And Execution Surface
+
+The app wires a broad native system layer:
+
+- governance-adjacent system modules: `x/config`, `x/config-voting`, `x/constitution`, `x/system-registry`;
+- automation and execution coordination: `x/scheduler`, `x/avm-scheduler`, `x/actor-registry`;
+- persistence and identity: `x/storage-rent`, `x/identity-root`;
+- external/future coordination: `x/bridge-hub`, `x/cross-chain-registry`, `x/sharding-coordinator`;
+- asset/application modules: `x/tokenfactory`, `x/dex`, `x/burn`, `x/treasury`.
+
+Reserved system addresses and module accounts are part of this surface. They give native entities stable addresses for authority, accounting, and events without private keys.
+
+### Gated Surface
+
+The README separates implemented wiring from production activation. AVM state mutation, cross-chain bridge finalization, sharding, and full storage-rent enforcement are still gated until the required module tests, invariants, long-run localnet runs, migrations, and security audits are complete.
 
 ## Implemented Runtime
 
