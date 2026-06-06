@@ -13,6 +13,7 @@ import (
 
 type PaymentAPIMessageName string
 type PaymentAPIQueryName string
+type PaymentAPIEventName string
 
 const (
 	PaymentAPIMsgOpenChannel                  PaymentAPIMessageName = "MsgOpenChannel"
@@ -46,6 +47,26 @@ const (
 	PaymentAPIQueryFraudProof            PaymentAPIQueryName = "QueryFraudProof"
 	PaymentAPIQueryActiveDisputes        PaymentAPIQueryName = "QueryActiveDisputes"
 	PaymentAPIQueryPendingFinalizations  PaymentAPIQueryName = "QueryPendingFinalizations"
+)
+
+const (
+	PaymentAPIEventChannelOpened                  PaymentAPIEventName = "channel_opened"
+	PaymentAPIEventChannelCheckpointed            PaymentAPIEventName = "channel_checkpointed"
+	PaymentAPIEventChannelCloseStarted            PaymentAPIEventName = "channel_close_started"
+	PaymentAPIEventChannelDisputed                PaymentAPIEventName = "channel_disputed"
+	PaymentAPIEventChannelFinalized               PaymentAPIEventName = "channel_finalized"
+	PaymentAPIEventChannelSettled                 PaymentAPIEventName = "channel_settled"
+	PaymentAPIEventChannelPenalized               PaymentAPIEventName = "channel_penalized"
+	PaymentAPIEventPromiseRegistered              PaymentAPIEventName = "promise_registered"
+	PaymentAPIEventPromiseResolved                PaymentAPIEventName = "promise_resolved"
+	PaymentAPIEventPromiseExpired                 PaymentAPIEventName = "promise_expired"
+	PaymentAPIEventVirtualChannelOpened           PaymentAPIEventName = "virtual_channel_opened"
+	PaymentAPIEventVirtualChannelClosed           PaymentAPIEventName = "virtual_channel_closed"
+	PaymentAPIEventVirtualChannelDisputed         PaymentAPIEventName = "virtual_channel_disputed"
+	PaymentAPIEventFraudProofAccepted             PaymentAPIEventName = "fraud_proof_accepted"
+	PaymentAPIEventFraudProofRejected             PaymentAPIEventName = "fraud_proof_rejected"
+	PaymentAPIEventRoutingAdvertisementRegistered PaymentAPIEventName = "routing_advertisement_registered"
+	PaymentAPIEventSettlementFeeCharged           PaymentAPIEventName = "settlement_fee_charged"
 )
 
 type MsgResolvePromise = MsgResolveWithPreimage
@@ -144,6 +165,28 @@ func RequiredPaymentQueries() []PaymentAPIQueryName {
 	}
 }
 
+func RequiredPaymentEvents() []PaymentAPIEventName {
+	return []PaymentAPIEventName{
+		PaymentAPIEventChannelOpened,
+		PaymentAPIEventChannelCheckpointed,
+		PaymentAPIEventChannelCloseStarted,
+		PaymentAPIEventChannelDisputed,
+		PaymentAPIEventChannelFinalized,
+		PaymentAPIEventChannelSettled,
+		PaymentAPIEventChannelPenalized,
+		PaymentAPIEventPromiseRegistered,
+		PaymentAPIEventPromiseResolved,
+		PaymentAPIEventPromiseExpired,
+		PaymentAPIEventVirtualChannelOpened,
+		PaymentAPIEventVirtualChannelClosed,
+		PaymentAPIEventVirtualChannelDisputed,
+		PaymentAPIEventFraudProofAccepted,
+		PaymentAPIEventFraudProofRejected,
+		PaymentAPIEventRoutingAdvertisementRegistered,
+		PaymentAPIEventSettlementFeeCharged,
+	}
+}
+
 func ValidatePaymentAPISurface() error {
 	seenMessages := map[PaymentAPIMessageName]struct{}{}
 	for _, name := range RequiredPaymentOnChainMessages() {
@@ -165,6 +208,16 @@ func ValidatePaymentAPISurface() error {
 		}
 		seenQueries[name] = struct{}{}
 	}
+	seenEvents := map[PaymentAPIEventName]struct{}{}
+	for _, name := range RequiredPaymentEvents() {
+		if strings.TrimSpace(string(name)) == "" {
+			return errors.New("payments api event name is empty")
+		}
+		if _, found := seenEvents[name]; found {
+			return fmt.Errorf("payments api duplicate event %q", name)
+		}
+		seenEvents[name] = struct{}{}
+	}
 	return nil
 }
 
@@ -180,19 +233,29 @@ func ApplyPaymentAPISurfaceMessage(chain PaymentsState, fraud FraudProofVerifica
 		if err != nil {
 			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
 		}
-		return next, fraud, PaymentAPISurfaceResult{
+		apiResult := PaymentAPISurfaceResult{
 			MsgName:       paymentAPINameForChannelMessage(m),
 			ChannelResult: result,
-		}, nil
+		}
+		next, err = appendPaymentAPIEvents(next, paymentAPIEventsForChannelMessage(chain, next, m, apiResult)...)
+		if err != nil {
+			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
+		}
+		return next, fraud, apiResult, nil
 	case ConditionalPaymentMessage:
 		next, snapshot, err := ApplyConditionalPaymentMessage(chain, m)
 		if err != nil {
 			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
 		}
-		return next, fraud, PaymentAPISurfaceResult{
+		apiResult := PaymentAPISurfaceResult{
 			MsgName:             paymentAPINameForConditionalMessage(m),
 			ConditionalSnapshot: snapshot,
-		}, nil
+		}
+		next, err = appendPaymentAPIEvents(next, paymentAPIEventsForConditionalMessage(chain, next, m)...)
+		if err != nil {
+			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
+		}
+		return next, fraud, apiResult, nil
 	case MsgOpenVirtualChannel:
 		msg := m.Normalize()
 		if err := msg.ValidateBasic(); err != nil {
@@ -210,7 +273,16 @@ func ApplyPaymentAPISurfaceMessage(chain PaymentsState, fraud FraudProofVerifica
 		if err != nil {
 			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
 		}
-		return next, fraud, PaymentAPISurfaceResult{MsgName: PaymentAPIMsgOpenVirtualChannel, VirtualChannelID: vc.VirtualChannelID}, nil
+		apiResult := PaymentAPISurfaceResult{MsgName: PaymentAPIMsgOpenVirtualChannel, VirtualChannelID: vc.VirtualChannelID}
+		next, err = appendPaymentAPIEvents(next, paymentAPIEventForVirtualChannel(PaymentAPIEventVirtualChannelOpened, vc, msg.Signer, virtualEventHeight(vc, msg.ActivationProof.RouteTimeoutHeight))...)
+		if err != nil {
+			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
+		}
+		next, err = appendPaymentAPIEvents(next, settlementFeeChargedEvents(chain, next)...)
+		if err != nil {
+			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
+		}
+		return next, fraud, apiResult, nil
 	case MsgCloseVirtualChannel:
 		msg := m.Normalize()
 		if err := msg.ValidateBasic(); err != nil {
@@ -221,13 +293,23 @@ func ApplyPaymentAPISurfaceMessage(chain PaymentsState, fraud FraudProofVerifica
 			if err != nil {
 				return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
 			}
-			return next, fraud, PaymentAPISurfaceResult{MsgName: PaymentAPIMsgCloseVirtualChannel, VirtualChannelID: closed.VirtualChannelID, ClosedVirtual: closed, VirtualReleases: releases}, nil
+			apiResult := PaymentAPISurfaceResult{MsgName: PaymentAPIMsgCloseVirtualChannel, VirtualChannelID: closed.VirtualChannelID, ClosedVirtual: closed, VirtualReleases: releases}
+			next, err = appendPaymentAPIEvents(next, paymentAPIEventForVirtualChannel(PaymentAPIEventVirtualChannelClosed, closed, msg.Signer, msg.CurrentHeight)...)
+			if err != nil {
+				return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
+			}
+			return next, fraud, apiResult, nil
 		}
 		next, closed, err := CloseVirtualChannel(chain, msg.VirtualChannelID, msg.CurrentHeight)
 		if err != nil {
 			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
 		}
-		return next, fraud, PaymentAPISurfaceResult{MsgName: PaymentAPIMsgCloseVirtualChannel, VirtualChannelID: closed.VirtualChannelID, ClosedVirtual: closed}, nil
+		apiResult := PaymentAPISurfaceResult{MsgName: PaymentAPIMsgCloseVirtualChannel, VirtualChannelID: closed.VirtualChannelID, ClosedVirtual: closed}
+		next, err = appendPaymentAPIEvents(next, paymentAPIEventForVirtualChannel(PaymentAPIEventVirtualChannelClosed, closed, msg.Signer, msg.CurrentHeight)...)
+		if err != nil {
+			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
+		}
+		return next, fraud, apiResult, nil
 	case MsgDisputeVirtualChannel:
 		msg := m.Normalize()
 		if err := msg.ValidateBasic(); err != nil {
@@ -237,7 +319,12 @@ func ApplyPaymentAPISurfaceMessage(chain PaymentsState, fraud FraudProofVerifica
 		if err != nil {
 			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
 		}
-		return next, fraud, PaymentAPISurfaceResult{MsgName: PaymentAPIMsgDisputeVirtualChannel, VirtualChannelID: msg.Proof.VirtualChannelID}, nil
+		apiResult := PaymentAPISurfaceResult{MsgName: PaymentAPIMsgDisputeVirtualChannel, VirtualChannelID: msg.Proof.VirtualChannelID}
+		next, err = appendPaymentAPIEvents(next, paymentAPIEventForVirtualChannel(PaymentAPIEventVirtualChannelDisputed, msg.Proof.LatestState, msg.Signer, msg.CurrentHeight)...)
+		if err != nil {
+			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
+		}
+		return next, fraud, apiResult, nil
 	case MsgSubmitFraudProof:
 		msg := m.Normalize()
 		if err := msg.ValidateBasic(); err != nil {
@@ -247,7 +334,12 @@ func ApplyPaymentAPISurfaceMessage(chain PaymentsState, fraud FraudProofVerifica
 		if err != nil {
 			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
 		}
-		return nextChain, nextFraud, PaymentAPISurfaceResult{MsgName: PaymentAPIMsgSubmitFraudProof, FraudSnapshot: nextFraud}, nil
+		apiResult := PaymentAPISurfaceResult{MsgName: PaymentAPIMsgSubmitFraudProof, FraudSnapshot: nextFraud}
+		nextChain, err = appendPaymentAPIEvents(nextChain, paymentAPIEventsForFraudProof(chain, nextChain, msg.Submission)...)
+		if err != nil {
+			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
+		}
+		return nextChain, nextFraud, apiResult, nil
 	default:
 		return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, errors.New("payments api message type is unsupported")
 	}
@@ -654,4 +746,233 @@ func activeReservedCapacityForChannel(state LiquidityOptimizationState, channelI
 		total = total.Add(amount)
 	}
 	return total, nil
+}
+
+func appendPaymentAPIEvents(state PaymentsState, events ...PaymentEvent) (PaymentsState, error) {
+	if len(events) == 0 {
+		return state, nil
+	}
+	next := state.Clone()
+	for _, event := range events {
+		event = event.Normalize()
+		if event.EventID == "" {
+			continue
+		}
+		next.Events = append(next.Events, event)
+	}
+	return next, next.Validate()
+}
+
+func paymentAPIEventsForChannelMessage(before, after PaymentsState, msg PaymentChannelModuleMessage, result PaymentAPISurfaceResult) []PaymentEvent {
+	events := []PaymentEvent{}
+	switch m := msg.(type) {
+	case MsgOpenChannel:
+		req := m.Normalize().Request
+		events = append(events, newPaymentAPIEvent(PaymentAPIEventChannelOpened, req.ChannelID, req.OpenHeight,
+			PaymentEventAttribute{Key: "channel_type", Value: string(req.ChannelType)},
+			PaymentEventAttribute{Key: "collateral", Value: req.Collateral},
+			PaymentEventAttribute{Key: "denom", Value: req.OpeningFeeDenom},
+		))
+	case MsgCooperativeClose:
+		req := m.Normalize().Request
+		events = append(events,
+			newPaymentAPIEvent(PaymentAPIEventChannelFinalized, req.ChannelID, req.CurrentHeight, PaymentEventAttribute{Key: "mode", Value: string(CloseReasonCooperative)}),
+			newPaymentAPIEvent(PaymentAPIEventChannelSettled, req.ChannelID, req.CurrentHeight, PaymentEventAttribute{Key: "settlement_hash", Value: result.ChannelResult.Settlement.SettlementHash}),
+		)
+	case MsgUnilateralClose:
+		req := m.Normalize().Request
+		events = append(events, newPaymentAPIEvent(PaymentAPIEventChannelCloseStarted, req.ChannelID, req.CurrentHeight,
+			PaymentEventAttribute{Key: "close_reason", Value: string(req.CloseReason)},
+			PaymentEventAttribute{Key: "state_hash", Value: req.ClosingStateWithSignatures().StateHash},
+		))
+	case MsgDisputeClose:
+		req := m.Normalize().Request
+		events = append(events, newPaymentAPIEvent(PaymentAPIEventChannelDisputed, req.ChannelID, req.CurrentHeight,
+			PaymentEventAttribute{Key: "submitter", Value: req.Submitter},
+			PaymentEventAttribute{Key: "state_hash", Value: req.NewerState.StateHash},
+		))
+	case MsgFinalizeClose:
+		req := m.Normalize().Request
+		events = append(events,
+			newPaymentAPIEvent(PaymentAPIEventChannelFinalized, req.ChannelID, req.CurrentHeight, PaymentEventAttribute{Key: "mode", Value: "unilateral"}),
+			newPaymentAPIEvent(PaymentAPIEventChannelSettled, req.ChannelID, req.CurrentHeight, PaymentEventAttribute{Key: "settlement_hash", Value: result.ChannelResult.Settlement.SettlementHash}),
+		)
+	case MsgSubmitCheckpoint:
+		req := m.Normalize().Request
+		events = append(events, newPaymentAPIEvent(PaymentAPIEventChannelCheckpointed, req.ChannelID, req.CurrentHeight,
+			PaymentEventAttribute{Key: "state_hash", Value: req.State.StateHash},
+			PaymentEventAttribute{Key: "nonce", Value: fmt.Sprintf("%d", req.State.Nonce)},
+		))
+	case MsgRegisterChannelAdvertisement:
+		msg := m.Normalize()
+		events = append(events, newPaymentAPIEvent(PaymentAPIEventRoutingAdvertisementRegistered, msg.Advertisement.ChannelID, msg.CurrentHeight,
+			PaymentEventAttribute{Key: "advertisement_id", Value: msg.Advertisement.AdvertisementID},
+			PaymentEventAttribute{Key: "advertiser", Value: msg.Advertisement.Advertiser},
+		))
+	}
+	events = append(events, settlementFeeChargedEvents(before, after)...)
+	return events
+}
+
+func paymentAPIEventsForConditionalMessage(before, after PaymentsState, msg ConditionalPaymentMessage) []PaymentEvent {
+	_ = before
+	_ = after
+	events := []PaymentEvent{}
+	switch m := msg.(type) {
+	case MsgRegisterPromise:
+		msg := m.Normalize()
+		for _, promise := range msg.Promises {
+			events = append(events, newPaymentAPIEvent(PaymentAPIEventPromiseRegistered, msg.ChannelID, msg.CurrentHeight,
+				PaymentEventAttribute{Key: "promise_id", Value: promise.PromiseID},
+				PaymentEventAttribute{Key: "amount", Value: promise.Amount},
+			))
+		}
+	case MsgResolveWithPreimage:
+		req := m.Normalize().Request
+		for _, promise := range req.Promises {
+			events = append(events, newPaymentAPIEvent(PaymentAPIEventPromiseResolved, req.ChannelID, req.CurrentHeight,
+				PaymentEventAttribute{Key: "promise_id", Value: promise.PromiseID},
+				PaymentEventAttribute{Key: "revealer", Value: req.Revealer},
+			))
+		}
+	case MsgExpirePromise:
+		req := m.Normalize().Request
+		for _, promise := range req.Promises {
+			events = append(events, newPaymentAPIEvent(PaymentAPIEventPromiseExpired, req.ChannelID, req.CurrentHeight,
+				PaymentEventAttribute{Key: "promise_id", Value: promise.PromiseID},
+				PaymentEventAttribute{Key: "resolver", Value: req.Resolver},
+			))
+		}
+	case MsgBatchResolvePromises:
+		req := m.Normalize().Request
+		eventName := PaymentAPIEventPromiseResolved
+		if req.Mode == ConditionSettlementModeExpiry {
+			eventName = PaymentAPIEventPromiseExpired
+		}
+		for _, promise := range req.LinkageProof.Promises {
+			events = append(events, newPaymentAPIEvent(eventName, promise.ChannelID, req.CurrentHeight,
+				PaymentEventAttribute{Key: "promise_id", Value: promise.PromiseID},
+				PaymentEventAttribute{Key: "route_id", Value: req.LinkageProof.RouteID},
+			))
+		}
+	}
+	return events
+}
+
+func paymentAPIEventsForFraudProof(before, after PaymentsState, submission FraudProofSubmission) []PaymentEvent {
+	submission = submission.Normalize()
+	events := []PaymentEvent{
+		newPaymentAPIEvent(PaymentAPIEventFraudProofAccepted, submission.ChannelID, submission.CurrentHeight,
+			PaymentEventAttribute{Key: "proof_id", Value: submission.Proof.ProofID},
+			PaymentEventAttribute{Key: "proof_type", Value: string(submission.Proof.ProofType)},
+			PaymentEventAttribute{Key: "submitted_by", Value: submission.Proof.SubmittedBy},
+		),
+		newPaymentAPIEvent(PaymentAPIEventChannelPenalized, submission.ChannelID, submission.CurrentHeight,
+			PaymentEventAttribute{Key: "proof_id", Value: submission.Proof.ProofID},
+			PaymentEventAttribute{Key: "offending_signer", Value: submission.Proof.OffendingSigner},
+			PaymentEventAttribute{Key: "penalty_amount", Value: submission.Proof.PenaltyAmount},
+		),
+	}
+	events = append(events, settlementFeeChargedEvents(before, after)...)
+	return events
+}
+
+func paymentAPIEventForVirtualChannel(name PaymentAPIEventName, vc VirtualChannel, signer string, height uint64) []PaymentEvent {
+	vc = vc.Normalize()
+	channelID := virtualEventChannelID(vc)
+	if channelID == "" || height == 0 {
+		return nil
+	}
+	return []PaymentEvent{newPaymentAPIEvent(name, channelID, height,
+		PaymentEventAttribute{Key: "virtual_channel_id", Value: vc.VirtualChannelID},
+		PaymentEventAttribute{Key: "signer", Value: strings.TrimSpace(signer)},
+		PaymentEventAttribute{Key: "capacity", Value: vc.Capacity},
+	)}
+}
+
+func PaymentAPIFraudProofRejectedEvent(submission FraudProofSubmission, reason string) (PaymentEvent, error) {
+	submission = submission.Normalize()
+	if err := ValidateHash("payments rejected fraud proof channel", submission.ChannelID); err != nil {
+		return PaymentEvent{}, err
+	}
+	if submission.CurrentHeight == 0 {
+		return PaymentEvent{}, errors.New("payments rejected fraud proof height must be positive")
+	}
+	event := newPaymentAPIEvent(PaymentAPIEventFraudProofRejected, submission.ChannelID, submission.CurrentHeight,
+		PaymentEventAttribute{Key: "proof_id", Value: submission.Proof.ProofID},
+		PaymentEventAttribute{Key: "proof_type", Value: string(submission.Proof.ProofType)},
+		PaymentEventAttribute{Key: "reason_hash", Value: HashParts("fraud-proof-rejected", reason)},
+	)
+	return event, event.Validate()
+}
+
+func settlementFeeChargedEvents(before, after PaymentsState) []PaymentEvent {
+	beforeByID := map[string]struct{}{}
+	for _, charge := range before.Export().FeeCharges {
+		beforeByID[charge.Normalize().FeeID] = struct{}{}
+	}
+	events := []PaymentEvent{}
+	after = after.Export()
+	for _, charge := range after.FeeCharges {
+		charge = charge.Normalize()
+		if _, found := beforeByID[charge.FeeID]; found {
+			continue
+		}
+		channelID := paymentAPIEventChannelID(after, charge.ChannelID)
+		events = append(events, newPaymentAPIEvent(PaymentAPIEventSettlementFeeCharged, channelID, charge.Height,
+			PaymentEventAttribute{Key: "fee_id", Value: charge.FeeID},
+			PaymentEventAttribute{Key: "fee_class", Value: string(charge.FeeClass)},
+			PaymentEventAttribute{Key: "payer", Value: charge.Payer},
+			PaymentEventAttribute{Key: "amount", Value: charge.Amount},
+			PaymentEventAttribute{Key: "required_amount", Value: charge.RequiredAmount},
+			PaymentEventAttribute{Key: "object_id", Value: charge.ObjectID},
+		))
+	}
+	return events
+}
+
+func newPaymentAPIEvent(name PaymentAPIEventName, channelID string, height uint64, attrs ...PaymentEventAttribute) PaymentEvent {
+	channelID = normalizeHash(channelID)
+	normalizedAttrs := normalizePaymentEventAttributes(attrs)
+	parts := []string{"payment-api-event", string(name), channelID, fmt.Sprintf("%020d", height)}
+	for _, attr := range normalizedAttrs {
+		parts = append(parts, attr.Key, attr.Value)
+	}
+	return PaymentEvent{
+		EventID:    HashParts(parts...),
+		EventType:  string(name),
+		ChannelID:  channelID,
+		Height:     height,
+		Attributes: normalizedAttrs,
+	}.Normalize()
+}
+
+func virtualEventChannelID(vc VirtualChannel) string {
+	vc = vc.Normalize()
+	for _, channelID := range vc.ParentChannelIDs {
+		if channelID != "" {
+			return channelID
+		}
+	}
+	return ""
+}
+
+func virtualEventHeight(vc VirtualChannel, routeTimeoutHeight uint64) uint64 {
+	if routeTimeoutHeight != 0 {
+		return routeTimeoutHeight
+	}
+	return vc.Normalize().ExpiresHeight
+}
+
+func paymentAPIEventChannelID(state PaymentsState, objectID string) string {
+	objectID = normalizeHash(objectID)
+	if _, found := state.ChannelByID(objectID); found {
+		return objectID
+	}
+	if vc, found := state.VirtualChannelByID(objectID); found {
+		if channelID := virtualEventChannelID(vc); channelID != "" {
+			return channelID
+		}
+	}
+	return objectID
 }

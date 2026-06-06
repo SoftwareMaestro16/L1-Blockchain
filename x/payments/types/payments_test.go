@@ -96,6 +96,25 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 		PaymentAPIQueryActiveDisputes,
 		PaymentAPIQueryPendingFinalizations,
 	}, RequiredPaymentQueries())
+	require.ElementsMatch(t, []PaymentAPIEventName{
+		PaymentAPIEventChannelOpened,
+		PaymentAPIEventChannelCheckpointed,
+		PaymentAPIEventChannelCloseStarted,
+		PaymentAPIEventChannelDisputed,
+		PaymentAPIEventChannelFinalized,
+		PaymentAPIEventChannelSettled,
+		PaymentAPIEventChannelPenalized,
+		PaymentAPIEventPromiseRegistered,
+		PaymentAPIEventPromiseResolved,
+		PaymentAPIEventPromiseExpired,
+		PaymentAPIEventVirtualChannelOpened,
+		PaymentAPIEventVirtualChannelClosed,
+		PaymentAPIEventVirtualChannelDisputed,
+		PaymentAPIEventFraudProofAccepted,
+		PaymentAPIEventFraudProofRejected,
+		PaymentAPIEventRoutingAdvertisementRegistered,
+		PaymentAPIEventSettlementFeeCharged,
+	}, RequiredPaymentEvents())
 
 	alice := testAddress(0x41)
 	bob := testAddress(0x42)
@@ -117,6 +136,8 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgOpenChannel, result.MsgName)
 	require.Len(t, state.Channels, 1)
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventChannelOpened))
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventSettlementFeeCharged))
 	channel := state.Channels[0]
 
 	foundChannel, found, err := QueryChannel(state, channel.ChannelID)
@@ -149,6 +170,7 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgRegisterPromise, result.MsgName)
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventPromiseRegistered))
 	condition, found, err := QueryCondition(state, channel.ChannelID, promise.PromiseID)
 	require.NoError(t, err)
 	require.True(t, found)
@@ -167,6 +189,7 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	}})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgResolvePromise, result.MsgName)
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventPromiseResolved))
 	conditions, err := QueryConditionsByChannel(state, channel.ChannelID)
 	require.NoError(t, err)
 	require.Empty(t, conditions)
@@ -184,6 +207,7 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	}})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgUnilateralClose, result.MsgName)
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventChannelCloseStarted))
 	pending, found, err := QueryPendingClose(state, channel.ChannelID)
 	require.NoError(t, err)
 	require.True(t, found)
@@ -209,6 +233,7 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	}})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgDisputeClose, result.MsgName)
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventChannelDisputed))
 	activeDisputes, err := QueryActiveDisputes(state, 33)
 	require.NoError(t, err)
 	require.Len(t, activeDisputes, 1)
@@ -237,6 +262,8 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	}})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgSubmitFraudProof, result.MsgName)
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventFraudProofAccepted))
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventChannelPenalized))
 	queriedProof, found, err := QueryFraudProof(state, fraud, proofID)
 	require.NoError(t, err)
 	require.True(t, found)
@@ -249,6 +276,8 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	}})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgFinalizeClose, result.MsgName)
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventChannelFinalized))
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventChannelSettled))
 	tombstone, found, err := QuerySettlementTombstone(state, channel.ChannelID)
 	require.NoError(t, err)
 	require.True(t, found)
@@ -259,14 +288,24 @@ func TestPaymentAPISurfaceVirtualChannelMessagesAndQueries(t *testing.T) {
 	alice := testAddress(0x43)
 	router := testAddress(0x44)
 	bob := testAddress(0x45)
-	state, vc, _ := virtualChannelFixture(t, "api-surface-virtual", alice, router, bob, "100", 60)
+	state, vc, proof := virtualChannelFixture(t, "api-surface-virtual", alice, router, bob, "100", 60)
+	base := state.Clone()
+	base.VirtualChannels = nil
+	base.FeeCharges = nil
+
+	state, fraud, result, err := ApplyPaymentAPISurfaceMessage(base, EmptyFraudProofVerificationState(), MsgOpenVirtualChannel{Signer: alice, ActivationProof: proof})
+	require.NoError(t, err)
+	require.Empty(t, fraud.EvidenceRecords)
+	require.Equal(t, PaymentAPIMsgOpenVirtualChannel, result.MsgName)
+	require.Contains(t, paymentEventTypes(state.Events), string(PaymentAPIEventVirtualChannelOpened))
 
 	queried, found, err := QueryVirtualChannel(state, vc.VirtualChannelID)
 	require.NoError(t, err)
 	require.True(t, found)
 	require.Equal(t, vc.VirtualChannelID, queried.VirtualChannelID)
 
-	next, fraud, result, err := ApplyPaymentAPISurfaceMessage(state, EmptyFraudProofVerificationState(), MsgCloseVirtualChannel{
+	next, fraud, result := PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}
+	next, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, EmptyFraudProofVerificationState(), MsgCloseVirtualChannel{
 		Signer:           alice,
 		VirtualChannelID: vc.VirtualChannelID,
 		CurrentHeight:    40,
@@ -275,9 +314,21 @@ func TestPaymentAPISurfaceVirtualChannelMessagesAndQueries(t *testing.T) {
 	require.Empty(t, fraud.EvidenceRecords)
 	require.Equal(t, PaymentAPIMsgCloseVirtualChannel, result.MsgName)
 	require.Equal(t, vc.VirtualChannelID, result.VirtualChannelID)
+	require.Contains(t, paymentEventTypes(next.Events), string(PaymentAPIEventVirtualChannelClosed))
 	_, found, err = QueryVirtualChannel(next, vc.VirtualChannelID)
 	require.NoError(t, err)
 	require.False(t, found)
+
+	rejected, err := PaymentAPIFraudProofRejectedEvent(FraudProofSubmission{
+		ChannelID:     state.Channels[0].ChannelID,
+		CurrentHeight: 41,
+		Proof: FraudProof{
+			ProofID:   HashParts("api-surface-rejected-fraud", state.Channels[0].ChannelID),
+			ProofType: FraudProofTypeDoubleSign,
+		},
+	}, "malformed evidence")
+	require.NoError(t, err)
+	require.Equal(t, string(PaymentAPIEventFraudProofRejected), rejected.EventType)
 }
 
 func TestSettlementArbitrationBoundaryRejectsNonDeterministicInputs(t *testing.T) {
