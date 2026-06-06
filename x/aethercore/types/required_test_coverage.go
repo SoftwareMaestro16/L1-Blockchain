@@ -12,12 +12,14 @@ type RequiredUnitTestCoverageID string
 type RequiredIntegrationTestCoverageID string
 type RequiredInvariantTestCoverageID string
 type RequiredSimulationTestCoverageID string
+type RequiredPerformanceTestCoverageID string
 
 const (
 	TestCoverageKindUnit        RequiredTestCoverageKind = "unit"
 	TestCoverageKindIntegration RequiredTestCoverageKind = "integration"
 	TestCoverageKindInvariant   RequiredTestCoverageKind = "invariant"
 	TestCoverageKindSimulation  RequiredTestCoverageKind = "simulation"
+	TestCoverageKindPerformance RequiredTestCoverageKind = "performance"
 
 	UnitCoverageMessageIDDerivation              RequiredUnitTestCoverageID = "message-id-derivation"
 	UnitCoverageMessageNonceValidation           RequiredUnitTestCoverageID = "message-nonce-validation"
@@ -59,6 +61,16 @@ const (
 	SimulationCoveragePaymentConditionTimeout         RequiredSimulationTestCoverageID = "payment-condition-timeout"
 	SimulationCoverageIdentityResolverChurn           RequiredSimulationTestCoverageID = "identity-resolver-churn"
 	SimulationCoverageMixedZoneExecutionUnderBlockSTM RequiredSimulationTestCoverageID = "mixed-zone-execution-under-blockstm"
+
+	PerformanceCoverageMessageEnqueueThroughput      RequiredPerformanceTestCoverageID = "message-enqueue-throughput"
+	PerformanceCoverageMessageDequeueThroughput      RequiredPerformanceTestCoverageID = "message-dequeue-throughput"
+	PerformanceCoverageReceiptProofGenerationLatency RequiredPerformanceTestCoverageID = "receipt-proof-generation-latency"
+	PerformanceCoverageServiceLookupLatency          RequiredPerformanceTestCoverageID = "service-lookup-latency"
+	PerformanceCoverageIdentityResolutionLatency     RequiredPerformanceTestCoverageID = "identity-resolution-latency"
+	PerformanceCoverageStorageProofGenerationLatency RequiredPerformanceTestCoverageID = "storage-proof-generation-latency"
+	PerformanceCoveragePaymentSettlementThroughput   RequiredPerformanceTestCoverageID = "payment-settlement-throughput"
+	PerformanceCoverageRootAggregationCostPerZone    RequiredPerformanceTestCoverageID = "root-aggregation-cost-per-zone"
+	PerformanceCoverageExportImportTime              RequiredPerformanceTestCoverageID = "export-import-time"
 )
 
 type RequiredTestCoverageSpec struct {
@@ -76,6 +88,7 @@ type RequiredTestCoverageManifest struct {
 	IntegrationTests []RequiredTestCoverageSpec
 	InvariantTests   []RequiredTestCoverageSpec
 	SimulationTests  []RequiredTestCoverageSpec
+	PerformanceTests []RequiredTestCoverageSpec
 	ManifestHash     string
 }
 
@@ -126,16 +139,28 @@ func DefaultRequiredTestCoverageManifest() (RequiredTestCoverageManifest, error)
 			testCoverageSpec(string(SimulationCoverageIdentityResolverChurn), TestCoverageKindSimulation, CosmosModuleIdentity, RoadmapPhasePerformanceHardening, "identity resolver churn", "rapid resolver updates produce deterministic identity root", "stale resolver proof is rejected after update"),
 			testCoverageSpec(string(SimulationCoverageMixedZoneExecutionUnderBlockSTM), TestCoverageKindSimulation, CosmosModuleZones, RoadmapPhasePerformanceHardening, "mixed zone execution under BlockSTM", "independent zone workloads keep identical roots with BlockSTM grouping", "conflicting workloads fall back to deterministic serial order"),
 		},
+		PerformanceTests: []RequiredTestCoverageSpec{
+			testCoverageSpec(string(PerformanceCoverageMessageEnqueueThroughput), TestCoverageKindPerformance, CosmosModuleMessages, RoadmapPhasePerformanceHardening, "message enqueue throughput", "enqueue benchmark reports messages per second", "enqueue remains bounded by configured gas and queue limits"),
+			testCoverageSpec(string(PerformanceCoverageMessageDequeueThroughput), TestCoverageKindPerformance, CosmosModuleMessages, RoadmapPhasePerformanceHardening, "message dequeue throughput", "dequeue benchmark reports receipts per block", "dequeue respects bounded per-sender draining"),
+			testCoverageSpec(string(PerformanceCoverageReceiptProofGenerationLatency), TestCoverageKindPerformance, CosmosModuleMessages, RoadmapPhasePerformanceHardening, "receipt proof generation latency", "receipt proof benchmark records p50 and p99 latency", "proof generation uses finalized receipt root"),
+			testCoverageSpec(string(PerformanceCoverageServiceLookupLatency), TestCoverageKindPerformance, CosmosModuleServices, RoadmapPhasePerformanceHardening, "service lookup latency", "service lookup benchmark records deterministic index latency", "lookup latency includes proof attachment cost"),
+			testCoverageSpec(string(PerformanceCoverageIdentityResolutionLatency), TestCoverageKindPerformance, CosmosModuleIdentity, RoadmapPhasePerformanceHardening, "identity resolution latency", "resolver benchmark records graph traversal latency", "resolution remains bounded by configured graph depth"),
+			testCoverageSpec(string(PerformanceCoverageStorageProofGenerationLatency), TestCoverageKindPerformance, CosmosModuleStorage, RoadmapPhasePerformanceHardening, "storage proof generation latency", "storage proof benchmark records chunk proof latency", "proof generation uses committed object root"),
+			testCoverageSpec(string(PerformanceCoveragePaymentSettlementThroughput), TestCoverageKindPerformance, CosmosModulePayments, RoadmapPhasePerformanceHardening, "payment settlement throughput", "settlement benchmark reports completed payments per block", "settlement throughput respects escrow and dispute constraints"),
+			testCoverageSpec(string(PerformanceCoverageRootAggregationCostPerZone), TestCoverageKindPerformance, CosmosModuleAetherCore, RoadmapPhasePerformanceHardening, "root aggregation cost per zone", "aggregation benchmark records cost per enabled zone", "cost scales with enabled zone count and root size"),
+			testCoverageSpec(string(PerformanceCoverageExportImportTime), TestCoverageKindPerformance, CosmosModuleAetherCore, RoadmapPhasePerformanceHardening, "export import time", "export benchmark records manifest generation time", "import benchmark verifies reproducible root metadata"),
+		},
 	}
-	return NewRequiredTestCoverageManifest(manifest.UnitTests, manifest.IntegrationTests, manifest.InvariantTests, manifest.SimulationTests)
+	return NewRequiredTestCoverageManifest(manifest.UnitTests, manifest.IntegrationTests, manifest.InvariantTests, manifest.SimulationTests, manifest.PerformanceTests)
 }
 
-func NewRequiredTestCoverageManifest(unitTests, integrationTests, invariantTests, simulationTests []RequiredTestCoverageSpec) (RequiredTestCoverageManifest, error) {
+func NewRequiredTestCoverageManifest(unitTests, integrationTests, invariantTests, simulationTests, performanceTests []RequiredTestCoverageSpec) (RequiredTestCoverageManifest, error) {
 	manifest := RequiredTestCoverageManifest{
 		UnitTests:        normalizeTestCoverageSpecs(unitTests, TestCoverageKindUnit),
 		IntegrationTests: normalizeTestCoverageSpecs(integrationTests, TestCoverageKindIntegration),
 		InvariantTests:   normalizeTestCoverageSpecs(invariantTests, TestCoverageKindInvariant),
 		SimulationTests:  normalizeTestCoverageSpecs(simulationTests, TestCoverageKindSimulation),
+		PerformanceTests: normalizeTestCoverageSpecs(performanceTests, TestCoverageKindPerformance),
 	}
 	if err := manifest.ValidateFormat(); err != nil {
 		return RequiredTestCoverageManifest{}, err
@@ -151,6 +176,9 @@ func NewRequiredTestCoverageManifest(unitTests, integrationTests, invariantTests
 	}
 	for i := range manifest.SimulationTests {
 		manifest.SimulationTests[i].SpecHash = ComputeRequiredTestCoverageSpecHash(manifest.SimulationTests[i])
+	}
+	for i := range manifest.PerformanceTests {
+		manifest.PerformanceTests[i].SpecHash = ComputeRequiredTestCoverageSpecHash(manifest.PerformanceTests[i])
 	}
 	manifest.ManifestHash = ComputeRequiredTestCoverageManifestHash(manifest)
 	return manifest, manifest.Validate()
@@ -213,11 +241,26 @@ func RequiredSimulationTestCoverageIDs() []RequiredSimulationTestCoverageID {
 	}
 }
 
+func RequiredPerformanceTestCoverageIDs() []RequiredPerformanceTestCoverageID {
+	return []RequiredPerformanceTestCoverageID{
+		PerformanceCoverageMessageEnqueueThroughput,
+		PerformanceCoverageMessageDequeueThroughput,
+		PerformanceCoverageReceiptProofGenerationLatency,
+		PerformanceCoverageServiceLookupLatency,
+		PerformanceCoverageIdentityResolutionLatency,
+		PerformanceCoverageStorageProofGenerationLatency,
+		PerformanceCoveragePaymentSettlementThroughput,
+		PerformanceCoverageRootAggregationCostPerZone,
+		PerformanceCoverageExportImportTime,
+	}
+}
+
 func (manifest RequiredTestCoverageManifest) ValidateFormat() error {
 	manifest.UnitTests = normalizeTestCoverageSpecs(manifest.UnitTests, TestCoverageKindUnit)
 	manifest.IntegrationTests = normalizeTestCoverageSpecs(manifest.IntegrationTests, TestCoverageKindIntegration)
 	manifest.InvariantTests = normalizeTestCoverageSpecs(manifest.InvariantTests, TestCoverageKindInvariant)
 	manifest.SimulationTests = normalizeTestCoverageSpecs(manifest.SimulationTests, TestCoverageKindSimulation)
+	manifest.PerformanceTests = normalizeTestCoverageSpecs(manifest.PerformanceTests, TestCoverageKindPerformance)
 	if err := validateCoverageSpecSet("aethercore unit test coverage", manifest.UnitTests, requiredUnitCoverageIDStrings(), TestCoverageKindUnit); err != nil {
 		return err
 	}
@@ -228,6 +271,9 @@ func (manifest RequiredTestCoverageManifest) ValidateFormat() error {
 		return err
 	}
 	if err := validateCoverageSpecSet("aethercore simulation test coverage", manifest.SimulationTests, requiredSimulationCoverageIDStrings(), TestCoverageKindSimulation); err != nil {
+		return err
+	}
+	if err := validateCoverageSpecSet("aethercore performance test coverage", manifest.PerformanceTests, requiredPerformanceCoverageIDStrings(), TestCoverageKindPerformance); err != nil {
 		return err
 	}
 	if manifest.ManifestHash != "" {
@@ -241,6 +287,7 @@ func (manifest RequiredTestCoverageManifest) Validate() error {
 	manifest.IntegrationTests = normalizeTestCoverageSpecs(manifest.IntegrationTests, TestCoverageKindIntegration)
 	manifest.InvariantTests = normalizeTestCoverageSpecs(manifest.InvariantTests, TestCoverageKindInvariant)
 	manifest.SimulationTests = normalizeTestCoverageSpecs(manifest.SimulationTests, TestCoverageKindSimulation)
+	manifest.PerformanceTests = normalizeTestCoverageSpecs(manifest.PerformanceTests, TestCoverageKindPerformance)
 	if err := manifest.ValidateFormat(); err != nil {
 		return err
 	}
@@ -264,6 +311,11 @@ func (manifest RequiredTestCoverageManifest) Validate() error {
 			return err
 		}
 	}
+	for _, spec := range manifest.PerformanceTests {
+		if err := spec.Validate(); err != nil {
+			return err
+		}
+	}
 	if manifest.ManifestHash != ComputeRequiredTestCoverageManifestHash(manifest) {
 		return errors.New("aethercore required test coverage manifest hash mismatch")
 	}
@@ -272,7 +324,7 @@ func (manifest RequiredTestCoverageManifest) Validate() error {
 
 func (spec RequiredTestCoverageSpec) ValidateFormat() error {
 	spec = normalizeTestCoverageSpec(spec, spec.Kind)
-	if spec.Kind != TestCoverageKindUnit && spec.Kind != TestCoverageKindIntegration && spec.Kind != TestCoverageKindInvariant && spec.Kind != TestCoverageKindSimulation {
+	if spec.Kind != TestCoverageKindUnit && spec.Kind != TestCoverageKindIntegration && spec.Kind != TestCoverageKindInvariant && spec.Kind != TestCoverageKindSimulation && spec.Kind != TestCoverageKindPerformance {
 		return fmt.Errorf("unknown aethercore required test coverage kind %q", spec.Kind)
 	}
 	if err := validatePolicyID("aethercore required test coverage id", spec.ID); err != nil {
@@ -323,6 +375,10 @@ func RequiredSimulationTestCoverageByID(manifest RequiredTestCoverageManifest, i
 	return requiredTestCoverageByID(manifest.SimulationTests, string(id))
 }
 
+func RequiredPerformanceTestCoverageByID(manifest RequiredTestCoverageManifest, id RequiredPerformanceTestCoverageID) (RequiredTestCoverageSpec, bool) {
+	return requiredTestCoverageByID(manifest.PerformanceTests, string(id))
+}
+
 func ComputeRequiredTestCoverageSpecHash(spec RequiredTestCoverageSpec) string {
 	spec = normalizeTestCoverageSpec(spec, spec.Kind)
 	return hashRoot("aetheris-aek-required-test-coverage-spec-v1", func(w byteWriter) {
@@ -340,7 +396,8 @@ func ComputeRequiredTestCoverageManifestHash(manifest RequiredTestCoverageManife
 	manifest.IntegrationTests = normalizeTestCoverageSpecs(manifest.IntegrationTests, TestCoverageKindIntegration)
 	manifest.InvariantTests = normalizeTestCoverageSpecs(manifest.InvariantTests, TestCoverageKindInvariant)
 	manifest.SimulationTests = normalizeTestCoverageSpecs(manifest.SimulationTests, TestCoverageKindSimulation)
-	return hashRoot("aetheris-aek-required-test-coverage-manifest-v2", func(w byteWriter) {
+	manifest.PerformanceTests = normalizeTestCoverageSpecs(manifest.PerformanceTests, TestCoverageKindPerformance)
+	return hashRoot("aetheris-aek-required-test-coverage-manifest-v3", func(w byteWriter) {
 		writeUint64(w, uint64(len(manifest.UnitTests)))
 		for _, spec := range manifest.UnitTests {
 			writePart(w, spec.SpecHash)
@@ -355,6 +412,10 @@ func ComputeRequiredTestCoverageManifestHash(manifest RequiredTestCoverageManife
 		}
 		writeUint64(w, uint64(len(manifest.SimulationTests)))
 		for _, spec := range manifest.SimulationTests {
+			writePart(w, spec.SpecHash)
+		}
+		writeUint64(w, uint64(len(manifest.PerformanceTests)))
+		for _, spec := range manifest.PerformanceTests {
 			writePart(w, spec.SpecHash)
 		}
 	})
@@ -493,6 +554,16 @@ func requiredInvariantCoverageIDStrings() []string {
 
 func requiredSimulationCoverageIDStrings() []string {
 	ids := RequiredSimulationTestCoverageIDs()
+	out := make([]string, len(ids))
+	for i, id := range ids {
+		out[i] = string(id)
+	}
+	sort.Strings(out)
+	return out
+}
+
+func requiredPerformanceCoverageIDStrings() []string {
+	ids := RequiredPerformanceTestCoverageIDs()
 	out := make([]string, len(ids))
 	for i, id := range ids {
 		out[i] = string(id)

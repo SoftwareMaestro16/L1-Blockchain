@@ -14,6 +14,7 @@ func TestRequiredTestCoverageManifestCoversSection16(t *testing.T) {
 	require.Len(t, manifest.IntegrationTests, 8)
 	require.Len(t, manifest.InvariantTests, 9)
 	require.Len(t, manifest.SimulationTests, 8)
+	require.Len(t, manifest.PerformanceTests, 9)
 	require.Equal(t, ComputeRequiredTestCoverageManifestHash(manifest), manifest.ManifestHash)
 
 	for _, id := range RequiredUnitTestCoverageIDs() {
@@ -60,6 +61,17 @@ func TestRequiredTestCoverageManifestCoversSection16(t *testing.T) {
 		require.Equal(t, ComputeRequiredTestCoverageSpecHash(spec), spec.SpecHash)
 	}
 
+	for _, id := range RequiredPerformanceTestCoverageIDs() {
+		spec, found := RequiredPerformanceTestCoverageByID(manifest, id)
+		require.True(t, found, id)
+		require.Equal(t, TestCoverageKindPerformance, spec.Kind)
+		require.True(t, IsRequiredCosmosSDKModule(spec.ModuleName), id)
+		require.True(t, IsImplementationRoadmapPhaseID(spec.PhaseID), id)
+		require.NotEmpty(t, spec.CoverageTarget, id)
+		require.NotEmpty(t, spec.Assertions, id)
+		require.Equal(t, ComputeRequiredTestCoverageSpecHash(spec), spec.SpecHash)
+	}
+
 	messageID, found := RequiredUnitTestCoverageByID(manifest, UnitCoverageMessageIDDerivation)
 	require.True(t, found)
 	require.Equal(t, CosmosModuleMessages, messageID.ModuleName)
@@ -94,6 +106,16 @@ func TestRequiredTestCoverageManifestCoversSection16(t *testing.T) {
 	require.True(t, found)
 	require.Equal(t, CosmosModuleZones, blockSTMSimulation.ModuleName)
 	require.Equal(t, RoadmapPhasePerformanceHardening, blockSTMSimulation.PhaseID)
+
+	rootAggregationPerf, found := RequiredPerformanceTestCoverageByID(manifest, PerformanceCoverageRootAggregationCostPerZone)
+	require.True(t, found)
+	require.Equal(t, CosmosModuleAetherCore, rootAggregationPerf.ModuleName)
+	require.Equal(t, RoadmapPhasePerformanceHardening, rootAggregationPerf.PhaseID)
+
+	serviceLookupPerf, found := RequiredPerformanceTestCoverageByID(manifest, PerformanceCoverageServiceLookupLatency)
+	require.True(t, found)
+	require.Equal(t, CosmosModuleServices, serviceLookupPerf.ModuleName)
+	require.Equal(t, RoadmapPhasePerformanceHardening, serviceLookupPerf.PhaseID)
 }
 
 func TestRequiredTestCoverageManifestRejectsMissingDuplicateAndMalformedCoverage(t *testing.T) {
@@ -136,6 +158,11 @@ func TestRequiredTestCoverageManifestRejectsMissingDuplicateAndMalformedCoverage
 	duplicateSimulation.ManifestHash = ComputeRequiredTestCoverageManifestHash(duplicateSimulation)
 	require.ErrorContains(t, duplicateSimulation.Validate(), "duplicate")
 
+	missingPerformance := manifest
+	missingPerformance.PerformanceTests = append([]RequiredTestCoverageSpec(nil), manifest.PerformanceTests[1:]...)
+	missingPerformance.ManifestHash = ComputeRequiredTestCoverageManifestHash(missingPerformance)
+	require.ErrorContains(t, missingPerformance.Validate(), "must include 9 required coverage areas")
+
 	noAssertions := manifest
 	noAssertions.UnitTests = append([]RequiredTestCoverageSpec(nil), manifest.UnitTests...)
 	noAssertions.UnitTests[0].Assertions = nil
@@ -159,13 +186,15 @@ func TestRequiredTestCoverageManifestHashIsCanonical(t *testing.T) {
 	reversedIntegration := reverseCoverageSpecs(manifest.IntegrationTests)
 	reversedInvariants := reverseCoverageSpecs(manifest.InvariantTests)
 	reversedSimulations := reverseCoverageSpecs(manifest.SimulationTests)
-	reordered, err := NewRequiredTestCoverageManifest(reversedUnits, reversedIntegration, reversedInvariants, reversedSimulations)
+	reversedPerformance := reverseCoverageSpecs(manifest.PerformanceTests)
+	reordered, err := NewRequiredTestCoverageManifest(reversedUnits, reversedIntegration, reversedInvariants, reversedSimulations, reversedPerformance)
 	require.NoError(t, err)
 	require.Equal(t, manifest.ManifestHash, reordered.ManifestHash)
 	require.Equal(t, manifest.UnitTests, reordered.UnitTests)
 	require.Equal(t, manifest.IntegrationTests, reordered.IntegrationTests)
 	require.Equal(t, manifest.InvariantTests, reordered.InvariantTests)
 	require.Equal(t, manifest.SimulationTests, reordered.SimulationTests)
+	require.Equal(t, manifest.PerformanceTests, reordered.PerformanceTests)
 
 	tampered := manifest
 	tampered.IntegrationTests = append([]RequiredTestCoverageSpec(nil), manifest.IntegrationTests...)
