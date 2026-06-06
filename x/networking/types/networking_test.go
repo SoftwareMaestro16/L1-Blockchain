@@ -2364,6 +2364,126 @@ func TestDiscoveryResponseRejectsExpiredForgedAndReplayedRecords(t *testing.T) {
 	require.ErrorContains(t, forgedRecord.Validate(source.NodePubKey, salt, 20), "signature")
 }
 
+func TestBroadcastMessageSignsDeduplicatesAndRejectsForgedOrExpired(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	originKey := deterministicPrivateKey(0x66)
+	origin := signedNodeRecord(t, 0x66, salt, 100, NodeRoleRouting)
+	desc := defaultOverlayByType(t, OverlayTypeRouting)
+
+	msg, err := SignBroadcastMessage(BroadcastMessage{
+		OverlayID:   desc.OverlayID,
+		PayloadHash: HashParts("broadcast", "payload"),
+		PayloadType: BroadcastPayloadRouting,
+		Height:      10,
+		TTL:         8,
+		Priority:    PriorityForChannel(ChannelRouting),
+		FanoutPolicy: BroadcastFanoutPolicy{
+			TreeFanout:   2,
+			GossipFanout: 3,
+			OverlayBound: true,
+		},
+	}, originKey, salt)
+	require.NoError(t, err)
+	require.Equal(t, origin.NodeID, msg.OriginNode)
+	require.NoError(t, VerifyBroadcastMessageSignature(msg, origin.NodePubKey, salt, 12))
+
+	deduper := BroadcastDeduper{}
+	deduper, accepted, err := deduper.Accept(msg)
+	require.NoError(t, err)
+	require.True(t, accepted)
+	deduper, accepted, err = deduper.Accept(msg)
+	require.NoError(t, err)
+	require.False(t, accepted)
+	require.Len(t, deduper.SeenKeys, 1)
+
+	forged := msg
+	forged.Signature = cloneBytes(msg.Signature)
+	forged.Signature[0] ^= 0xff
+	require.ErrorContains(t, VerifyBroadcastMessageSignature(forged, origin.NodePubKey, salt, 12), "signature")
+	require.ErrorContains(t, msg.ValidateBasic(19), "expired")
+}
+
+func TestBroadcastForwardingUsesTreeThenGossipFallbackAndOverlayFanout(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	originKey := deterministicPrivateKey(0x67)
+	origin := signedNodeRecord(t, 0x67, salt, 100, NodeRoleRouting)
+	local := signedNodeRecord(t, 0x68, salt, 100, NodeRoleRouting)
+	peerA := signedNodeRecord(t, 0x69, salt, 100, NodeRoleRouting)
+	peerB := signedNodeRecord(t, 0x6a, salt, 100, NodeRoleRouting)
+	peerC := signedNodeRecord(t, 0x6b, salt, 100, NodeRoleRouting)
+	peerD := signedNodeRecord(t, 0x6c, salt, 100, NodeRoleRouting)
+	desc := defaultOverlayByType(t, OverlayTypeRouting)
+
+	msg, err := SignBroadcastMessage(BroadcastMessage{
+		OverlayID:   desc.OverlayID,
+		PayloadHash: HashParts("broadcast", "tree"),
+		PayloadType: BroadcastPayloadRouting,
+		Height:      20,
+		TTL:         5,
+		Priority:    1,
+		FanoutPolicy: BroadcastFanoutPolicy{
+			TreeFanout:   desc.Fanout + 10,
+			GossipFanout: desc.Fanout + 10,
+			OverlayBound: true,
+		},
+	}, originKey, salt)
+	require.NoError(t, err)
+
+	graph := RoutingGraph{
+		OverlayID: desc.OverlayID,
+		Version:   1,
+		Edges: []RoutingEdge{
+			{FromNodeID: local.NodeID, ToNodeID: peerB.NodeID, LatencyMillis: 50, Weight: 7_000, Priority: 2},
+			{FromNodeID: local.NodeID, ToNodeID: peerA.NodeID, LatencyMillis: 10, Weight: 9_000, Priority: 1},
+		},
+	}
+	graph.GraphHash = ComputeRoutingGraphHash(graph)
+	candidates := []string{origin.NodeID, local.NodeID, peerA.NodeID, peerB.NodeID, peerC.NodeID, peerD.NodeID}
+	deduper, plan, err := PlanBroadcastForwarding(msg, desc, graph, local.NodeID, candidates, BroadcastDeduper{}, 20)
+	require.NoError(t, err)
+	require.Equal(t, []string{peerA.NodeID, peerB.NodeID}, plan.TreeTargets)
+	require.ElementsMatch(t, []string{peerC.NodeID, peerD.NodeID}, plan.GossipTargets)
+	require.True(t, plan.FallbackUsed)
+	require.Equal(t, uint32(4), plan.TTLRemaining)
+	require.Len(t, deduper.SeenKeys, 1)
+
+	_, duplicate, err := PlanBroadcastForwarding(msg, desc, graph, local.NodeID, candidates, deduper, 20)
+	require.NoError(t, err)
+	require.Empty(t, duplicate.TreeTargets)
+	require.Empty(t, duplicate.GossipTargets)
+	require.Equal(t, msg.BroadcastID, duplicate.BroadcastID)
+}
+
+func TestBroadcastPriorityOrderingAndOverlayMismatch(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	key := deterministicPrivateKey(0x6d)
+	serviceDesc := defaultOverlayByType(t, OverlayTypeService)
+	routingDesc := defaultOverlayByType(t, OverlayTypeRouting)
+	low, err := SignBroadcastMessage(BroadcastMessage{
+		OverlayID:   serviceDesc.OverlayID,
+		PayloadHash: HashParts("broadcast", "low"),
+		PayloadType: BroadcastPayloadService,
+		Height:      30,
+		TTL:         5,
+		Priority:    5,
+	}, key, salt)
+	require.NoError(t, err)
+	high, err := SignBroadcastMessage(BroadcastMessage{
+		OverlayID:   serviceDesc.OverlayID,
+		PayloadHash: HashParts("broadcast", "high"),
+		PayloadType: BroadcastPayloadService,
+		Height:      31,
+		TTL:         5,
+		Priority:    1,
+	}, key, salt)
+	require.NoError(t, err)
+
+	ordered := SortBroadcastMessages([]BroadcastMessage{low, high})
+	require.Equal(t, high.BroadcastID, ordered[0].BroadcastID)
+	_, _, err = PlanBroadcastForwarding(high, routingDesc, RoutingGraph{OverlayID: routingDesc.OverlayID, Version: 1}, HashParts("local"), nil, BroadcastDeduper{}, 31)
+	require.ErrorContains(t, err, "overlay mismatch")
+}
+
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 	metrics := PeerMetrics{LatencyMillis: 25, ReliabilityBps: 9_900, ThroughputBytesPerSec: 32 << 20}
 	score, err := ComputePeerScore(metrics)
