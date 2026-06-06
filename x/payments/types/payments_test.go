@@ -62,6 +62,224 @@ func TestPaymentChannelCloseDisputeFraudAndSettlement(t *testing.T) {
 	require.Empty(t, state.CustodyLocks)
 }
 
+func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
+	require.NoError(t, ValidatePaymentAPISurface())
+	require.ElementsMatch(t, []PaymentAPIMessageName{
+		PaymentAPIMsgOpenChannel,
+		PaymentAPIMsgCooperativeClose,
+		PaymentAPIMsgUnilateralClose,
+		PaymentAPIMsgDisputeClose,
+		PaymentAPIMsgFinalizeClose,
+		PaymentAPIMsgSubmitCheckpoint,
+		PaymentAPIMsgRegisterPromise,
+		PaymentAPIMsgResolvePromise,
+		PaymentAPIMsgExpirePromise,
+		PaymentAPIMsgBatchResolvePromises,
+		PaymentAPIMsgOpenVirtualChannel,
+		PaymentAPIMsgCloseVirtualChannel,
+		PaymentAPIMsgDisputeVirtualChannel,
+		PaymentAPIMsgSubmitFraudProof,
+		PaymentAPIMsgRegisterRoutingAdvertisement,
+	}, RequiredPaymentOnChainMessages())
+	require.ElementsMatch(t, []PaymentAPIQueryName{
+		PaymentAPIQueryChannel,
+		PaymentAPIQueryChannelsByParticipant,
+		PaymentAPIQueryPendingClose,
+		PaymentAPIQueryFinalizationHeight,
+		PaymentAPIQueryCondition,
+		PaymentAPIQueryConditionsByChannel,
+		PaymentAPIQueryVirtualChannel,
+		PaymentAPIQueryChannelCapacity,
+		PaymentAPIQueryFeeSchedule,
+		PaymentAPIQuerySettlementTombstone,
+		PaymentAPIQueryFraudProof,
+		PaymentAPIQueryActiveDisputes,
+		PaymentAPIQueryPendingFinalizations,
+	}, RequiredPaymentQueries())
+
+	alice := testAddress(0x41)
+	bob := testAddress(0x42)
+	openReq := ChannelOpenRequest{
+		ChainID:                      "aetheris-test-1",
+		Participants:                 []string{alice, bob},
+		InitialBalances:              []Balance{{Participant: alice, Amount: "1000"}, {Participant: bob, Amount: "0"}},
+		ChannelType:                  ChannelTypeBidirectional,
+		Collateral:                   "1000",
+		CloseDelay:                   8,
+		ChallengePeriod:              8,
+		FeePolicyID:                  NativeDenom,
+		OpeningFeeDenom:              NativeDenom,
+		OpeningFeePaid:               DefaultOpeningFee,
+		ConditionalPaymentsSupported: true,
+		OpenHeight:                   10,
+	}
+	state, fraud, result, err := ApplyPaymentAPISurfaceMessage(EmptyState(), EmptyFraudProofVerificationState(), MsgOpenChannel{Signer: alice, Request: openReq})
+	require.NoError(t, err)
+	require.Equal(t, PaymentAPIMsgOpenChannel, result.MsgName)
+	require.Len(t, state.Channels, 1)
+	channel := state.Channels[0]
+
+	foundChannel, found, err := QueryChannel(state, channel.ChannelID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, channel.ChannelID, foundChannel.ChannelID)
+	byParticipant, err := QueryChannelsByParticipant(state, alice)
+	require.NoError(t, err)
+	require.Len(t, byParticipant, 1)
+	schedule, err := QueryFeeSchedule(state)
+	require.NoError(t, err)
+	require.Equal(t, NativeDenom, schedule.Denom)
+
+	base := signedReserveState(t, channel, 2, channel.OpeningStateHash, "40", "0", []Balance{
+		{Participant: alice, Amount: "940"},
+		{Participant: bob, Amount: "20"},
+	})
+	state, err = AcceptSignedState(state, channel.ChannelID, base, 19)
+	require.NoError(t, err)
+	promiseChannel := channel
+	promiseChannel.LatestState = base
+	preimage := "api-surface-preimage"
+	promise := signedPromiseWithHashLock(t, promiseChannel, "api-surface-promise", alice, bob, "20", "1", 2, 40, HashParts(preimage))
+	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgRegisterPromise{
+		Signer:        alice,
+		ChannelID:     channel.ChannelID,
+		BaseState:     base,
+		Promises:      []ConditionalPromise{promise},
+		CurrentHeight: 20,
+	})
+	require.NoError(t, err)
+	require.Equal(t, PaymentAPIMsgRegisterPromise, result.MsgName)
+	condition, found, err := QueryCondition(state, channel.ChannelID, promise.PromiseID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, promise.Amount, condition.Amount)
+	capacity, err := QueryChannelCapacity(state, EmptyLiquidityOptimizationState(), channel.ChannelID, 21)
+	require.NoError(t, err)
+	require.Equal(t, "20", capacity.PendingConditionAmount)
+	require.Equal(t, "980", capacity.AvailableCapacity)
+
+	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgResolvePromise{Request: PreimageRevealRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []ConditionalPromise{promise},
+		Preimage:      preimage,
+		Revealer:      bob,
+		CurrentHeight: 30,
+	}})
+	require.NoError(t, err)
+	require.Equal(t, PaymentAPIMsgResolvePromise, result.MsgName)
+	conditions, err := QueryConditionsByChannel(state, channel.ChannelID)
+	require.NoError(t, err)
+	require.Empty(t, conditions)
+
+	channel = state.Channels[0]
+	closeState := signedState(t, channel, 3, channel.LatestState.StateHash, []Balance{
+		{Participant: alice, Amount: "500"},
+		{Participant: bob, Amount: "500"},
+	})
+	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgUnilateralClose{Signer: alice, Request: ChannelCloseRequest{
+		ChannelID:     channel.ChannelID,
+		ClosingState:  closeState,
+		CurrentHeight: 31,
+		SettlementFee: "0",
+	}})
+	require.NoError(t, err)
+	require.Equal(t, PaymentAPIMsgUnilateralClose, result.MsgName)
+	pending, found, err := QueryPendingClose(state, channel.ChannelID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, closeState.StateHash, pending.State.StateHash)
+	height, found, err := QueryFinalizationHeight(state, channel.ChannelID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, uint64(39), height)
+	pendingFinalizations, err := QueryPendingFinalizations(state, 32)
+	require.NoError(t, err)
+	require.Len(t, pendingFinalizations, 1)
+
+	newerState := signedState(t, channel, 4, closeState.StateHash, []Balance{
+		{Participant: alice, Amount: "490"},
+		{Participant: bob, Amount: "510"},
+	})
+	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgDisputeClose{Signer: bob, Request: ChannelDisputeRequest{
+		ChannelID:             channel.ChannelID,
+		ClosingStateReference: closeState.StateHash,
+		NewerState:            newerState,
+		CurrentHeight:         32,
+		DisputeFeePaid:        "0",
+	}})
+	require.NoError(t, err)
+	require.Equal(t, PaymentAPIMsgDisputeClose, result.MsgName)
+	activeDisputes, err := QueryActiveDisputes(state, 33)
+	require.NoError(t, err)
+	require.Len(t, activeDisputes, 1)
+
+	conflicting := signedState(t, channel, 4, closeState.StateHash, []Balance{
+		{Participant: alice, Amount: "510"},
+		{Participant: bob, Amount: "490"},
+	})
+	proofID := HashParts("api-surface-fraud", channel.ChannelID)
+	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgSubmitFraudProof{Signer: bob, Submission: FraudProofSubmission{
+		ChannelID: channel.ChannelID,
+		Proof: FraudProof{
+			ProofID:         proofID,
+			ProofType:       FraudProofTypeDoubleSign,
+			SubmittedBy:     bob,
+			OffendingSigner: alice,
+			StateA:          newerState,
+			StateB:          conflicting,
+			PenaltyDenom:    NativeDenom,
+			PenaltyAmount:   "20",
+			EvidenceHash:    HashParts("api-surface-fraud-evidence", newerState.StateHash, conflicting.StateHash),
+		},
+		CurrentHeight: 33,
+		Policy:        FraudPenaltyPolicy{ReporterRewardCap: "3", BurnShareBps: MaxPenaltyRouteBps},
+		GasLimit:      100_000_000,
+	}})
+	require.NoError(t, err)
+	require.Equal(t, PaymentAPIMsgSubmitFraudProof, result.MsgName)
+	queriedProof, found, err := QueryFraudProof(state, fraud, proofID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, proofID, queriedProof.Evidence.ProofID)
+	require.Equal(t, "3", queriedProof.Reward.Amount)
+
+	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgFinalizeClose{Signer: alice, Request: FinalSettlementRequest{
+		ChannelID:     channel.ChannelID,
+		CurrentHeight: 50,
+	}})
+	require.NoError(t, err)
+	require.Equal(t, PaymentAPIMsgFinalizeClose, result.MsgName)
+	tombstone, found, err := QuerySettlementTombstone(state, channel.ChannelID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, channel.ChannelID, tombstone.ChannelID)
+}
+
+func TestPaymentAPISurfaceVirtualChannelMessagesAndQueries(t *testing.T) {
+	alice := testAddress(0x43)
+	router := testAddress(0x44)
+	bob := testAddress(0x45)
+	state, vc, _ := virtualChannelFixture(t, "api-surface-virtual", alice, router, bob, "100", 60)
+
+	queried, found, err := QueryVirtualChannel(state, vc.VirtualChannelID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, vc.VirtualChannelID, queried.VirtualChannelID)
+
+	next, fraud, result, err := ApplyPaymentAPISurfaceMessage(state, EmptyFraudProofVerificationState(), MsgCloseVirtualChannel{
+		Signer:           alice,
+		VirtualChannelID: vc.VirtualChannelID,
+		CurrentHeight:    40,
+	})
+	require.NoError(t, err)
+	require.Empty(t, fraud.EvidenceRecords)
+	require.Equal(t, PaymentAPIMsgCloseVirtualChannel, result.MsgName)
+	require.Equal(t, vc.VirtualChannelID, result.VirtualChannelID)
+	_, found, err = QueryVirtualChannel(next, vc.VirtualChannelID)
+	require.NoError(t, err)
+	require.False(t, found)
+}
+
 func TestSettlementArbitrationBoundaryRejectsNonDeterministicInputs(t *testing.T) {
 	alice := testAddress(0x12)
 	bob := testAddress(0x13)

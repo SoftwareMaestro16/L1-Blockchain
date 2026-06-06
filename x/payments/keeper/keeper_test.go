@@ -163,6 +163,76 @@ func TestKeeperPaymentChannelModuleMessagesAndReplayGuards(t *testing.T) {
 	require.Len(t, accs, 1)
 }
 
+func TestKeeperPaymentAPISurfaceMessagesAndQueries(t *testing.T) {
+	k := NewKeeper()
+	gs := DefaultGenesis()
+	gs.Params = prototype.TestnetParams()
+	require.NoError(t, k.InitGenesis(gs))
+
+	alice := keeperAddress(0x81)
+	bob := keeperAddress(0x82)
+	openReq := paymentstypes.ChannelOpenRequest{
+		ChainID:         "aetheris-test-1",
+		Participants:    []string{alice, bob},
+		InitialBalances: []paymentstypes.Balance{{Participant: alice, Amount: "200"}, {Participant: bob, Amount: "0"}},
+		ChannelType:     paymentstypes.ChannelTypeBidirectional,
+		Collateral:      "200",
+		CloseDelay:      8,
+		ChallengePeriod: 8,
+		FeePolicyID:     paymentstypes.NativeDenom,
+		OpeningFeeDenom: paymentstypes.NativeDenom,
+		OpeningFeePaid:  paymentstypes.DefaultOpeningFee,
+		OpenHeight:      10,
+	}
+	result, err := k.HandlePaymentAPIMessage(paymentstypes.MsgOpenChannel{Signer: alice, Request: openReq})
+	require.NoError(t, err)
+	require.Equal(t, paymentstypes.PaymentAPIMsgOpenChannel, result.MsgName)
+	exported := k.ExportGenesis()
+	require.Len(t, exported.State.Channels, 1)
+	channelID := exported.State.Channels[0].ChannelID
+
+	channel, found, err := k.QueryChannel(channelID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, channelID, channel.ChannelID)
+	channels, err := k.QueryChannelsByParticipant(alice)
+	require.NoError(t, err)
+	require.Len(t, channels, 1)
+	feeSchedule, err := k.QueryFeeSchedule()
+	require.NoError(t, err)
+	require.Equal(t, paymentstypes.NativeDenom, feeSchedule.Denom)
+	capacity, err := k.QueryChannelCapacity(channelID, 11)
+	require.NoError(t, err)
+	require.Equal(t, "200", capacity.AvailableCapacity)
+
+	closeState := keeperSignedState(t, channel, 2, channel.OpeningStateHash, []paymentstypes.Balance{
+		{Participant: alice, Amount: "120"},
+		{Participant: bob, Amount: "80"},
+	})
+	result, err = k.HandlePaymentAPIMessage(paymentstypes.MsgUnilateralClose{Signer: alice, Request: paymentstypes.ChannelCloseRequest{
+		ChannelID:     channelID,
+		ClosingState:  closeState,
+		CurrentHeight: 20,
+		SettlementFee: "0",
+	}})
+	require.NoError(t, err)
+	require.Equal(t, paymentstypes.PaymentAPIMsgUnilateralClose, result.MsgName)
+	pending, found, err := k.QueryPendingClose(channelID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, closeState.StateHash, pending.State.StateHash)
+	height, found, err := k.QueryFinalizationHeight(channelID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, uint64(28), height)
+	finalizations, err := k.QueryPendingFinalizations(21)
+	require.NoError(t, err)
+	require.Len(t, finalizations, 1)
+	disputes, err := k.QueryActiveDisputes(21)
+	require.NoError(t, err)
+	require.Empty(t, disputes)
+}
+
 func TestKeeperStoreV2ParticipantChannelPagination(t *testing.T) {
 	k := NewKeeper()
 	gs := DefaultGenesis()
