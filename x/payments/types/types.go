@@ -56,6 +56,19 @@ const (
 	ChannelStatusSettled      ChannelStatus = "SETTLED"
 )
 
+type ChannelFinality string
+
+const (
+	ChannelFinalityOpen                       ChannelFinality = "OPEN"
+	ChannelFinalityPendingClose               ChannelFinality = "PENDING_CLOSE"
+	ChannelFinalityInDispute                  ChannelFinality = "IN_DISPUTE"
+	ChannelFinalityPendingConditionResolution ChannelFinality = "PENDING_CONDITION_RESOLUTION"
+	ChannelFinalityFinalizable                ChannelFinality = "FINALIZABLE"
+	ChannelFinalitySettled                    ChannelFinality = "SETTLED"
+	ChannelFinalityPenalized                  ChannelFinality = "PENALIZED"
+	ChannelFinalityExpired                    ChannelFinality = "EXPIRED"
+)
+
 func CanonicalStateRequiredFields() []string {
 	return []string{
 		"chain_id",
@@ -572,6 +585,7 @@ type ChannelRecord struct {
 	CustodyDenom        string
 	CustodyAmount       string
 	Status              ChannelStatus
+	Finality            ChannelFinality
 	OpeningStateHash    string
 	FinalizedNonce      uint64
 	DisputedNonce       uint64
@@ -2083,7 +2097,60 @@ func (c ChannelRecord) Normalize() ChannelRecord {
 	c.LatestState = c.LatestState.Normalize()
 	c.LatestClaim = c.LatestClaim.Normalize()
 	c.PendingClose = c.PendingClose.Normalize()
+	if c.Finality == "" {
+		c.Finality = DerivedChannelFinality(c)
+	}
 	return c
+}
+
+func DerivedChannelFinality(channel ChannelRecord) ChannelFinality {
+	channel.Status = ChannelStatus(strings.TrimSpace(string(channel.Status)))
+	channel.PendingClose = channel.PendingClose.Normalize()
+	switch channel.Status {
+	case ChannelStatusSettled:
+		if len(channel.PendingClose.Penalties) > 0 || len(channel.PendingClose.PenaltyAllocations) > 0 {
+			return ChannelFinalityPenalized
+		}
+		return ChannelFinalitySettled
+	case ChannelStatusPendingClose:
+		if len(channel.PendingClose.Penalties) > 0 || len(channel.PendingClose.PenaltyAllocations) > 0 {
+			return ChannelFinalityPenalized
+		}
+		if len(channel.PendingClose.ConditionProofs) > 0 || len(channel.PendingClose.State.Conditions) > 0 {
+			return ChannelFinalityPendingConditionResolution
+		}
+		if channel.PendingClose.DisputeCount > 0 {
+			return ChannelFinalityInDispute
+		}
+		if channel.PendingClose.CloseReason == CloseReasonTimeout {
+			return ChannelFinalityExpired
+		}
+		return ChannelFinalityPendingClose
+	default:
+		return ChannelFinalityOpen
+	}
+}
+
+func FinalityAfterPendingClose(channel ChannelRecord, currentHeight uint64) ChannelFinality {
+	channel = channel.Normalize()
+	if channel.Status != ChannelStatusPendingClose {
+		return channel.Finality
+	}
+	if channel.Finality == ChannelFinalityPenalized || channel.Finality == ChannelFinalityExpired {
+		return channel.Finality
+	}
+	if currentHeight >= channel.PendingClose.SettleAfterHeight {
+		return ChannelFinalityFinalizable
+	}
+	return channel.Finality
+}
+
+func PendingFinalizationHeightForChannel(channel ChannelRecord) (uint64, bool) {
+	channel = channel.Normalize()
+	if channel.Status != ChannelStatusPendingClose || channel.PendingClose.SettleAfterHeight == 0 {
+		return 0, false
+	}
+	return channel.PendingClose.SettleAfterHeight, true
 }
 
 func (c ChannelRecord) ValidateCore() error {
@@ -2131,6 +2198,12 @@ func (c ChannelRecord) ValidateCore() error {
 	}
 	if !IsChannelStatus(c.Status) {
 		return fmt.Errorf("unknown payments channel status %q", c.Status)
+	}
+	if !IsChannelFinality(c.Finality) {
+		return fmt.Errorf("unknown payments channel finality %q", c.Finality)
+	}
+	if err := validateChannelFinalityForStatus(c); err != nil {
+		return err
 	}
 	if err := validateAddressSet("payments channel participant", c.Participants, 2, MaxParticipants); err != nil {
 		return err
@@ -2693,6 +2766,26 @@ func ChannelDisputeEvent(channel ChannelRecord, submitter string, height uint64)
 	return event.Normalize()
 }
 
+func ChannelFinalityTransitionEvent(channel ChannelRecord, previous, next ChannelFinality, height uint64) PaymentEvent {
+	channel = channel.Normalize()
+	attrs := []PaymentEventAttribute{
+		{Key: "from_finality", Value: string(previous)},
+		{Key: "to_finality", Value: string(next)},
+		{Key: "status", Value: string(channel.Status)},
+	}
+	if pendingHeight, ok := PendingFinalizationHeightForChannel(channel); ok {
+		attrs = append(attrs, PaymentEventAttribute{Key: "pending_finalization_height", Value: fmt.Sprintf("%d", pendingHeight)})
+	}
+	event := PaymentEvent{
+		EventID:    HashParts("channel-finality", channel.ChannelID, string(previous), string(next), fmt.Sprintf("%d", height)),
+		EventType:  "channel-finality-transition",
+		ChannelID:  channel.ChannelID,
+		Height:     height,
+		Attributes: attrs,
+	}
+	return event.Normalize()
+}
+
 func (e ChannelEdge) Normalize() ChannelEdge {
 	e.ChannelID = normalizeHash(e.ChannelID)
 	e.From = strings.TrimSpace(e.From)
@@ -2897,6 +2990,22 @@ func IsChannelType(value ChannelType) bool {
 func IsChannelStatus(value ChannelStatus) bool {
 	switch value {
 	case ChannelStatusOpen, ChannelStatusPendingClose, ChannelStatusSettled:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsChannelFinality(value ChannelFinality) bool {
+	switch value {
+	case ChannelFinalityOpen,
+		ChannelFinalityPendingClose,
+		ChannelFinalityInDispute,
+		ChannelFinalityPendingConditionResolution,
+		ChannelFinalityFinalizable,
+		ChannelFinalitySettled,
+		ChannelFinalityPenalized,
+		ChannelFinalityExpired:
 		return true
 	default:
 		return false
@@ -3291,6 +3400,32 @@ func validateUnidirectionalChannelCore(channel ChannelRecord) error {
 func validateCloseReason(reason CloseReason) error {
 	if !IsCloseReason(reason) {
 		return fmt.Errorf("unknown payments close reason %q", reason)
+	}
+	return nil
+}
+
+func validateChannelFinalityForStatus(channel ChannelRecord) error {
+	switch channel.Status {
+	case ChannelStatusOpen:
+		if channel.Finality != ChannelFinalityOpen && channel.Finality != ChannelFinalityExpired {
+			return errors.New("payments open channel finality must be open or expired")
+		}
+	case ChannelStatusPendingClose:
+		switch channel.Finality {
+		case ChannelFinalityPendingClose,
+			ChannelFinalityInDispute,
+			ChannelFinalityPendingConditionResolution,
+			ChannelFinalityFinalizable,
+			ChannelFinalityPenalized,
+			ChannelFinalityExpired:
+			return nil
+		default:
+			return errors.New("payments pending close channel has invalid finality")
+		}
+	case ChannelStatusSettled:
+		if channel.Finality != ChannelFinalitySettled && channel.Finality != ChannelFinalityPenalized {
+			return errors.New("payments settled channel finality must be settled or penalized")
+		}
 	}
 	return nil
 }

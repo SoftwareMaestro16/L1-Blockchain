@@ -34,6 +34,40 @@ func EmptyState() PaymentsState {
 	}
 }
 
+func setChannelFinality(channel ChannelRecord, finality ChannelFinality, height uint64, events *[]PaymentEvent) (ChannelRecord, error) {
+	channel = channel.Normalize()
+	if height == 0 {
+		return ChannelRecord{}, errors.New("payments finality transition height must be positive")
+	}
+	if !IsChannelFinality(finality) {
+		return ChannelRecord{}, fmt.Errorf("unknown payments channel finality %q", finality)
+	}
+	previous := channel.Finality
+	if previous == finality {
+		return channel, nil
+	}
+	channel.Finality = finality
+	if err := validateChannelFinalityForStatus(channel); err != nil {
+		return ChannelRecord{}, err
+	}
+	if events != nil {
+		*events = append(*events, ChannelFinalityTransitionEvent(channel, previous, finality, height))
+	}
+	return channel.Normalize(), nil
+}
+
+func finalityForPendingClose(channel ChannelRecord) ChannelFinality {
+	return DerivedChannelFinality(channel)
+}
+
+func finalityForSettledChannel(channel ChannelRecord) ChannelFinality {
+	channel = channel.Normalize()
+	if len(channel.PendingClose.Penalties) > 0 || len(channel.PendingClose.PenaltyAllocations) > 0 {
+		return ChannelFinalityPenalized
+	}
+	return ChannelFinalitySettled
+}
+
 func OpenChannelFromRequest(state PaymentsState, req ChannelOpenRequest) (PaymentsState, PaymentEvent, error) {
 	channel, err := BuildChannelFromOpenRequest(req)
 	if err != nil {
@@ -76,6 +110,7 @@ func openChannelRecord(state PaymentsState, channel ChannelRecord) (PaymentsStat
 		return PaymentsState{}, PaymentEvent{}, errors.New("payments opening state hash mismatch")
 	}
 	channel.FinalizedNonce = 0
+	channel.Finality = ChannelFinalityOpen
 	if err := channel.Validate(); err != nil {
 		return PaymentsState{}, PaymentEvent{}, err
 	}
@@ -91,6 +126,7 @@ func openChannelRecord(state PaymentsState, channel ChannelRecord) (PaymentsStat
 	next.Channels = append(next.Channels, channel)
 	next.CustodyLocks = append(next.CustodyLocks, lock)
 	next.Events = append(next.Events, event)
+	next.Events = append(next.Events, ChannelFinalityTransitionEvent(channel, "", ChannelFinalityOpen, channel.OpenHeight))
 	sortChannels(next.Channels)
 	sortCustodyLocks(next.CustodyLocks)
 	return next, event, next.Validate()
@@ -282,6 +318,11 @@ func SubmitCloseWithRequest(state PaymentsState, req ChannelCloseRequest) (Payme
 		nextChannel.DisputedNonce = pending.State.Nonce
 	}
 	next := state.Clone()
+	var err error
+	nextChannel, err = setChannelFinality(nextChannel, finalityForPendingClose(nextChannel), req.CurrentHeight, &next.Events)
+	if err != nil {
+		return PaymentsState{}, err
+	}
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
 	sortChannels(next.Channels)
@@ -332,6 +373,11 @@ func ForcedClose(state PaymentsState, channelID string, submitter string, curren
 		nextChannel.DisputedNonce = pending.State.Nonce
 	}
 	next := state.Clone()
+	var err error
+	nextChannel, err = setChannelFinality(nextChannel, finalityForPendingClose(nextChannel), currentHeight, &next.Events)
+	if err != nil {
+		return PaymentsState{}, err
+	}
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
 	sortChannels(next.Channels)
@@ -392,6 +438,8 @@ func CooperativeClose(state PaymentsState, channelID string, closingState Channe
 	nextChannel.LatestState = closingState
 	nextChannel.PendingClose = PendingClose{}
 	next := state.Clone()
+	nextChannel.Finality = ChannelFinalitySettled
+	next.Events = append(next.Events, ChannelFinalityTransitionEvent(nextChannel, channel.Finality, ChannelFinalitySettled, currentHeight))
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
 	next.CustodyLocks = filterCustodyLocksForSettledChannel(next.CustodyLocks, channel.ChannelID)
@@ -464,6 +512,8 @@ func ReceiverClose(state PaymentsState, channelID string, claim UnidirectionalCl
 	nextChannel.LatestClaim = claim
 	nextChannel.PendingClose = PendingClose{}
 	next := state.Clone()
+	nextChannel.Finality = ChannelFinalitySettled
+	next.Events = append(next.Events, ChannelFinalityTransitionEvent(nextChannel, channel.Finality, ChannelFinalitySettled, currentHeight))
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
 	next.CustodyLocks = filterCustodyLocksForSettledChannel(next.CustodyLocks, channel.ChannelID)
@@ -534,10 +584,17 @@ func PayerReclaim(state PaymentsState, channelID string, payer string, currentHe
 		return PaymentsState{}, SettlementRecord{}, err
 	}
 	nextChannel := channel
+	next := state.Clone()
+	var transitionErr error
+	nextChannel, transitionErr = setChannelFinality(nextChannel, ChannelFinalityExpired, currentHeight, &next.Events)
+	if transitionErr != nil {
+		return PaymentsState{}, SettlementRecord{}, transitionErr
+	}
 	nextChannel.Status = ChannelStatusSettled
 	nextChannel.FinalizedNonce = settlement.Nonce
 	nextChannel.PendingClose = PendingClose{}
-	next := state.Clone()
+	nextChannel.Finality = ChannelFinalitySettled
+	next.Events = append(next.Events, ChannelFinalityTransitionEvent(nextChannel, ChannelFinalityExpired, ChannelFinalitySettled, currentHeight))
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
 	next.CustodyLocks = filterCustodyLocksForSettledChannel(next.CustodyLocks, channel.ChannelID)
@@ -631,6 +688,11 @@ func DisputeChannel(state PaymentsState, req ChannelDisputeRequest) (PaymentsSta
 	}
 	nextChannel.LatestState = req.NewerState
 	next := state.Clone()
+	var err error
+	nextChannel, err = setChannelFinality(nextChannel, finalityForPendingClose(nextChannel), req.CurrentHeight, &next.Events)
+	if err != nil {
+		return PaymentsState{}, err
+	}
 	next.Channels[index] = nextChannel.Normalize()
 	next.Events = append(next.Events, ChannelDisputeEvent(nextChannel, req.Submitter, req.CurrentHeight))
 	sortChannels(next.Channels)
@@ -701,6 +763,10 @@ func SubmitFraudProofWithPolicy(state PaymentsState, channelID string, proof Fra
 	nextChannel.PendingClose.Penalties = append(nextChannel.PendingClose.Penalties, penalties...)
 	nextChannel.PendingClose.PenaltyAllocations = append(nextChannel.PendingClose.PenaltyAllocations, allocations...)
 	next := state.Clone()
+	nextChannel, err = setChannelFinality(nextChannel, ChannelFinalityPenalized, currentHeight, &next.Events)
+	if err != nil {
+		return PaymentsState{}, err
+	}
 	next.Channels[index] = nextChannel.Normalize()
 	sortChannels(next.Channels)
 	return next, next.Validate()
@@ -754,10 +820,17 @@ func FraudClose(state PaymentsState, channelID string, currentHeight uint64) (Pa
 		return PaymentsState{}, SettlementRecord{}, err
 	}
 	nextChannel := channel
+	next := state.Clone()
+	nextChannel, err = setChannelFinality(nextChannel, ChannelFinalityFinalizable, currentHeight, &next.Events)
+	if err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
 	nextChannel.Status = ChannelStatusSettled
 	nextChannel.FinalizedNonce = settlement.Nonce
+	settledFinality := finalityForSettledChannel(nextChannel)
+	nextChannel.Finality = settledFinality
+	next.Events = append(next.Events, ChannelFinalityTransitionEvent(nextChannel, ChannelFinalityFinalizable, settledFinality, currentHeight))
 	nextChannel.PendingClose = PendingClose{}
-	next := state.Clone()
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
 	next.CustodyLocks = filterCustodyLocksForSettledChannel(next.CustodyLocks, channel.ChannelID)
@@ -831,10 +904,17 @@ func FinalizeSettlementWithRequest(state PaymentsState, req FinalSettlementReque
 		return PaymentsState{}, SettlementRecord{}, err
 	}
 	nextChannel := channel
+	next := state.Clone()
+	nextChannel, err = setChannelFinality(nextChannel, ChannelFinalityFinalizable, req.CurrentHeight, &next.Events)
+	if err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
 	nextChannel.Status = ChannelStatusSettled
 	nextChannel.FinalizedNonce = settlement.Nonce
+	settledFinality := finalityForSettledChannel(nextChannel)
+	nextChannel.Finality = settledFinality
+	next.Events = append(next.Events, ChannelFinalityTransitionEvent(nextChannel, ChannelFinalityFinalizable, settledFinality, req.CurrentHeight))
 	nextChannel.PendingClose = PendingClose{}
-	next := state.Clone()
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
 	next.CustodyLocks = filterCustodyLocksForSettledChannel(next.CustodyLocks, channel.ChannelID)
@@ -1059,6 +1139,9 @@ func (s PaymentsState) Validate() error {
 	if err := validateCustodyLocks(s.Channels, s.CustodyLocks); err != nil {
 		return err
 	}
+	if err := ValidateLockedCollateralForFinality(s); err != nil {
+		return err
+	}
 	if err := validateClosedChannelTombstones(s.Channels, s.ClosedChannels); err != nil {
 		return err
 	}
@@ -1137,6 +1220,68 @@ func (s PaymentsState) CustodyLockByChannel(channelID string) (CustodyLock, bool
 		}
 	}
 	return CustodyLock{}, false
+}
+
+func (s PaymentsState) PendingFinalizationHeight(channelID string) (uint64, bool, error) {
+	state := s.Export()
+	channel, found := state.ChannelByID(channelID)
+	if !found {
+		return 0, false, errors.New("payments channel not found")
+	}
+	height, ok := PendingFinalizationHeightForChannel(channel)
+	return height, ok, nil
+}
+
+func AdvanceChannelFinality(state PaymentsState, channelID string, currentHeight uint64) (PaymentsState, error) {
+	state = state.Export()
+	if currentHeight == 0 {
+		return PaymentsState{}, errors.New("payments finality advance height must be positive")
+	}
+	index, channel, found := state.ChannelIndex(channelID)
+	if !found {
+		return PaymentsState{}, errors.New("payments channel not found")
+	}
+	nextFinality := FinalityAfterPendingClose(channel, currentHeight)
+	if nextFinality == channel.Finality {
+		return state, nil
+	}
+	next := state.Clone()
+	nextChannel, err := setChannelFinality(channel, nextFinality, currentHeight, &next.Events)
+	if err != nil {
+		return PaymentsState{}, err
+	}
+	next.Channels[index] = nextChannel.Normalize()
+	sortChannels(next.Channels)
+	return next, next.Validate()
+}
+
+func ValidateLockedCollateralForFinality(state PaymentsState) error {
+	state = state.Export()
+	lockByChannel := make(map[string]CustodyLock, len(state.CustodyLocks))
+	for _, lock := range state.CustodyLocks {
+		lock = lock.Normalize()
+		lockByChannel[lock.ChannelID] = lock
+	}
+	for _, channel := range state.Channels {
+		channel = channel.Normalize()
+		lock, locked := lockByChannel[channel.ChannelID]
+		switch channel.Finality {
+		case ChannelFinalitySettled, ChannelFinalityPenalized:
+			if channel.Status == ChannelStatusSettled {
+				if locked {
+					return errors.New("payments settled finality must not retain custody lock")
+				}
+				continue
+			}
+		}
+		if !locked {
+			return errors.New("payments unsettled finality must retain custody lock")
+		}
+		if err := lock.ValidateForChannel(channel); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func validateChannels(channels []ChannelRecord) error {

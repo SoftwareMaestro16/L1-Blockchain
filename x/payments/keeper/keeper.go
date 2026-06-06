@@ -367,6 +367,25 @@ func (k Keeper) QueryStateHash(channelID string) (paymentstypes.StateHashDebug, 
 	return k.genesis.State.StateHashDebug(channelID)
 }
 
+func (k Keeper) QueryPendingFinalizationHeight(channelID string) (uint64, bool, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return 0, false, err
+	}
+	return k.genesis.State.PendingFinalizationHeight(channelID)
+}
+
+func (k *Keeper) AdvanceChannelFinality(channelID string, currentHeight uint64) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.AdvanceChannelFinality(k.genesis.State, channelID, currentHeight)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
 func (k Keeper) Channels(req *prototype.PageRequest) ([]paymentstypes.ChannelRecord, prototype.PageResponse, error) {
 	channels := k.genesis.State.Export().Channels
 	start, end, res, err := prototype.NormalizePage(req, k.genesis.Params, len(channels))

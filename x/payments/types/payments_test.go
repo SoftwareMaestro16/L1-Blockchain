@@ -210,6 +210,143 @@ func TestFraudProofInvalidBalanceRoutesPenaltyRemainder(t *testing.T) {
 	require.NoError(t, settlement.ValidateForChannel(state.Channels[0]))
 }
 
+func TestSettlementFinalityTransitionsPendingHeightAndEvents(t *testing.T) {
+	alice := testAddress(0x1c)
+	bob := testAddress(0x1d)
+	channel := signedChannel(t, "settlement-finality", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+	require.Equal(t, ChannelFinalityOpen, state.Channels[0].Finality)
+	require.Equal(t, "channel-finality-transition", state.Events[len(state.Events)-1].EventType)
+
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "410"},
+		{Participant: bob, Amount: "590"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+	require.Equal(t, ChannelFinalityPendingClose, state.Channels[0].Finality)
+	require.NoError(t, ValidateLockedCollateralForFinality(state))
+
+	height, found, err := state.PendingFinalizationHeight(channel.ChannelID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, uint64(28), height)
+
+	state, err = AdvanceChannelFinality(state, channel.ChannelID, 27)
+	require.NoError(t, err)
+	require.Equal(t, ChannelFinalityPendingClose, state.Channels[0].Finality)
+
+	state, err = AdvanceChannelFinality(state, channel.ChannelID, 28)
+	require.NoError(t, err)
+	require.Equal(t, ChannelFinalityFinalizable, state.Channels[0].Finality)
+	require.Equal(t, "channel-finality-transition", state.Events[len(state.Events)-1].EventType)
+	require.NoError(t, ValidateLockedCollateralForFinality(state))
+
+	state, settlement, err := FinalizeSettlement(state, channel.ChannelID, 28)
+	require.NoError(t, err)
+	require.NoError(t, settlement.ValidateForChannel(state.Channels[0]))
+	require.Equal(t, ChannelFinalitySettled, state.Channels[0].Finality)
+	require.Empty(t, state.CustodyLocks)
+	require.NoError(t, ValidateLockedCollateralForFinality(state))
+}
+
+func TestDisputeAndPenaltyFinalityTransitionsRetainCollateralUntilSettlement(t *testing.T) {
+	alice := testAddress(0x1e)
+	bob := testAddress(0x1f)
+	channel := signedChannel(t, "dispute-penalty-finality", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "400"},
+		{Participant: bob, Amount: "600"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+
+	newerState := signedState(t, channel, 3, closeState.StateHash, []Balance{
+		{Participant: alice, Amount: "350"},
+		{Participant: bob, Amount: "650"},
+	})
+	state, err = DisputeClose(state, channel.ChannelID, newerState, bob, 21)
+	require.NoError(t, err)
+	require.Equal(t, ChannelFinalityInDispute, state.Channels[0].Finality)
+	require.NoError(t, ValidateLockedCollateralForFinality(state))
+
+	conflicting := signedState(t, channel, 3, closeState.StateHash, []Balance{
+		{Participant: alice, Amount: "500"},
+		{Participant: bob, Amount: "500"},
+	})
+	proof := FraudProof{
+		ProofID:         HashParts("finality-proof", channel.ChannelID),
+		ProofType:       FraudProofTypeDoubleSign,
+		SubmittedBy:     bob,
+		OffendingSigner: alice,
+		StateA:          newerState,
+		StateB:          conflicting,
+		PenaltyAmount:   "20",
+		EvidenceHash:    HashParts("evidence", newerState.StateHash, conflicting.StateHash),
+	}
+	state, err = SubmitFraudProof(state, channel.ChannelID, proof, 22)
+	require.NoError(t, err)
+	require.Equal(t, ChannelFinalityPenalized, state.Channels[0].Finality)
+	require.NotEmpty(t, state.CustodyLocks)
+	require.NoError(t, ValidateLockedCollateralForFinality(state))
+
+	state, _, err = FraudClose(state, channel.ChannelID, 23)
+	require.NoError(t, err)
+	require.Equal(t, ChannelFinalityPenalized, state.Channels[0].Finality)
+	require.Empty(t, state.CustodyLocks)
+	require.NoError(t, ValidateLockedCollateralForFinality(state))
+}
+
+func TestLockedCollateralInvariantForEveryFinalityState(t *testing.T) {
+	alice := testAddress(0x20)
+	bob := testAddress(0x21)
+	base := signedChannel(t, "finality-invariant", "1000", alice, bob)
+	lock := CustodyLock{ChannelID: base.ChannelID, Denom: NativeDenom, Amount: base.Collateral}
+
+	cases := []struct {
+		name     string
+		finality ChannelFinality
+		status   ChannelStatus
+		locks    []CustodyLock
+	}{
+		{"open", ChannelFinalityOpen, ChannelStatusOpen, []CustodyLock{lock}},
+		{"pending-close", ChannelFinalityPendingClose, ChannelStatusPendingClose, []CustodyLock{lock}},
+		{"in-dispute", ChannelFinalityInDispute, ChannelStatusPendingClose, []CustodyLock{lock}},
+		{"pending-condition", ChannelFinalityPendingConditionResolution, ChannelStatusPendingClose, []CustodyLock{lock}},
+		{"finalizable", ChannelFinalityFinalizable, ChannelStatusPendingClose, []CustodyLock{lock}},
+		{"pending-penalized", ChannelFinalityPenalized, ChannelStatusPendingClose, []CustodyLock{lock}},
+		{"expired", ChannelFinalityExpired, ChannelStatusOpen, []CustodyLock{lock}},
+		{"settled", ChannelFinalitySettled, ChannelStatusSettled, nil},
+		{"settled-penalized", ChannelFinalityPenalized, ChannelStatusSettled, nil},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			channel := base
+			channel.Status = tc.status
+			channel.Finality = tc.finality
+			require.NoError(t, ValidateLockedCollateralForFinality(PaymentsState{
+				Channels:     []ChannelRecord{channel},
+				CustodyLocks: tc.locks,
+			}))
+		})
+	}
+
+	missing := base
+	missing.Finality = ChannelFinalityFinalizable
+	missing.Status = ChannelStatusPendingClose
+	require.ErrorContains(t, ValidateLockedCollateralForFinality(PaymentsState{Channels: []ChannelRecord{missing}}), "retain custody")
+}
+
 func TestDisputeRequestEmitsEventAndAppliesOptionalFraudProof(t *testing.T) {
 	alice := testAddress(0x14)
 	bob := testAddress(0x15)
@@ -329,9 +466,11 @@ func TestChannelOpenLifecycleLocksFeeAndEmitsEvent(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, state.Channels, 1)
 	require.Len(t, state.CustodyLocks, 1)
-	require.Len(t, state.Events, 1)
+	require.Len(t, state.Events, 2)
 	require.Equal(t, event, state.Events[0])
 	require.Equal(t, "channel-open", event.EventType)
+	require.Equal(t, "channel-finality-transition", state.Events[1].EventType)
+	require.Equal(t, ChannelFinalityOpen, state.Channels[0].Finality)
 	require.Equal(t, req.ChannelID, state.CustodyLocks[0].ChannelID)
 	require.Equal(t, "1000", state.CustodyLocks[0].Amount)
 	require.Equal(t, DefaultOpeningFee, state.Channels[0].OpeningFeePaid)
