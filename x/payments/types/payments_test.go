@@ -710,6 +710,107 @@ func TestPaymentPerformanceCoverageProfilesPerBlockWorkloads(t *testing.T) {
 	require.NotEmpty(t, recovered.WatcherReplayEventIDs)
 }
 
+func TestPaymentObservabilityMetricsCoverOperationalSignals(t *testing.T) {
+	alice := testAddress(0xd0)
+	router := testAddress(0xd1)
+	bob := testAddress(0xd2)
+	currentHeight := uint64(29)
+
+	state, _, _ := virtualChannelFixture(t, "observability-virtual", alice, router, bob, "100", 40)
+	state.Channels[0].RoutingAdvertised = true
+	conditionChannel := state.Channels[0]
+	activePromise := signedPromiseWithHashLock(t, conditionChannel, "observability-active", alice, router, "5", "0", 3, 40, HashParts("observability-active-preimage"))
+	conditioned, _, err := BuildConditionRootUpdateFromPromises(conditionChannel, conditionChannel.LatestState, []ConditionalPromise{activePromise}, nil)
+	require.NoError(t, err)
+	conditioned.Nonce = conditionChannel.LatestState.Nonce + 1
+	conditioned.PreviousStateHash = conditionChannel.LatestState.StateHash
+	conditioned, err = BuildState(conditioned)
+	require.NoError(t, err)
+	conditioned = resignState(t, conditionChannel, conditioned)
+	state, err = AcceptSignedState(state, conditionChannel.ChannelID, conditioned, 24)
+	require.NoError(t, err)
+
+	disputeChannel := signedChannel(t, "observability-dispute", "1000", alice, bob)
+	state, err = OpenChannel(state, disputeChannel)
+	require.NoError(t, err)
+	disputeClose := signedState(t, disputeChannel, 2, disputeChannel.OpeningStateHash, []Balance{{Participant: alice, Amount: "900"}, {Participant: bob, Amount: "100"}})
+	state, err = SubmitClose(state, disputeChannel.ChannelID, disputeClose, alice, 20, "0")
+	require.NoError(t, err)
+	newer := signedState(t, disputeChannel, 3, disputeClose.StateHash, []Balance{{Participant: alice, Amount: "850"}, {Participant: bob, Amount: "150"}})
+	state, err = DisputeClose(state, disputeChannel.ChannelID, newer, bob, 21)
+	require.NoError(t, err)
+
+	settledChannel := signedChannel(t, "observability-settled", "1000", alice, bob)
+	state, err = OpenChannel(state, settledChannel)
+	require.NoError(t, err)
+	settledClose := signedState(t, settledChannel, 2, settledChannel.OpeningStateHash, []Balance{{Participant: alice, Amount: "500"}, {Participant: bob, Amount: "500"}})
+	state, _, err = CooperativeClose(state, settledChannel.ChannelID, settledClose, alice, currentHeight, "2")
+	require.NoError(t, err)
+	state, _, err = RecordSettlementInclusionLatency(state, HashParts("observability-latency"), disputeChannel.ChannelID, SettlementArbitrationDispute, 20, currentHeight, 4)
+	require.NoError(t, err)
+
+	state.ConditionClaims = append(state.ConditionClaims,
+		ConditionClaimRecord{ChainID: conditionChannel.ChainID, ChannelID: conditionChannel.ChannelID, ConditionID: HashParts("observability-resolved"), EvidenceHash: HashParts("promise-preimage", "observability-resolved"), PreimageHash: HashParts("observability-preimage"), ResolvedHeight: 25, ExpiresHeight: 25 + DefaultReplayHorizon}.Normalize(),
+		ConditionClaimRecord{ChainID: conditionChannel.ChainID, ChannelID: conditionChannel.ChannelID, ConditionID: HashParts("observability-expired"), EvidenceHash: HashParts("promise-expiry", "observability-expired"), ResolvedHeight: 26, ExpiresHeight: 26 + DefaultReplayHorizon}.Normalize(),
+	)
+	rejected, err := PaymentAPIFraudProofRejectedEvent(FraudProofSubmission{
+		ChannelID:     disputeChannel.ChannelID,
+		CurrentHeight: 27,
+		Proof:         FraudProof{ProofID: HashParts("observability-rejected-proof"), ProofType: FraudProofTypeDoubleSign},
+	}, "observability rejected")
+	require.NoError(t, err)
+	state.Events = append(state.Events, rejected)
+	require.NoError(t, state.Validate())
+
+	evidenceID := HashParts("observability-evidence")
+	proofID := HashParts("observability-proof")
+	canonical := HashParts("observability-canonical")
+	evidence := EvidenceRecord{EvidenceID: evidenceID, ChannelID: disputeChannel.ChannelID, ProofID: proofID, ProofType: FraudProofTypeDoubleSign, CanonicalHash: canonical, SubmittedBy: bob, OffendingSigner: alice, SubmittedHeight: 21, ExpiresHeight: 40, GasUsed: 10}.WithHash()
+	penalty := PenaltyRecord{PenaltyID: HashParts("observability-penalty"), EvidenceID: evidenceID, ChannelID: disputeChannel.ChannelID, ProofID: proofID, Offender: alice, TotalPenalty: "10", ReporterReward: "3", CounterpartyComp: "2", RecordedHeight: 22}.WithHash()
+	reward := ReporterReward{RewardID: HashParts("observability-reward"), EvidenceID: evidenceID, ChannelID: disputeChannel.ChannelID, ProofID: proofID, Reporter: bob, Denom: NativeDenom, Amount: "3", Claimed: true, ClaimedHeight: 23}.WithHash()
+	fraud := FraudProofVerificationState{EvidenceRecords: []EvidenceRecord{evidence}, PenaltyRecords: []PenaltyRecord{penalty}, ReporterRewards: []ReporterReward{reward}}
+	require.NoError(t, fraud.Validate())
+
+	closeOp := SettlementOperation{OperationID: HashParts("observability-close-op"), OperationType: BatchOperationClose, ChannelID: disputeChannel.ChannelID, Nonce: 2, StateHash: disputeClose.StateHash}
+	disputeOp := SettlementOperation{OperationID: HashParts("observability-dispute-op"), OperationType: BatchOperationDispute, ChannelID: disputeChannel.ChannelID, Nonce: 3, StateHash: newer.StateHash}
+	closePlan, err := AccessPlanForSettlementOperation(closeOp, currentHeight)
+	require.NoError(t, err)
+	disputePlan, err := AccessPlanForSettlementOperation(disputeOp, currentHeight)
+	require.NoError(t, err)
+	profile := ProfileBlockSTMConflicts([]BlockSTMAccessPlan{closePlan, disputePlan})
+	require.False(t, profile.ConflictFree)
+
+	metrics, err := BuildPaymentObservabilityMetrics(state, fraud, profile, currentHeight, 1)
+	require.NoError(t, err)
+	require.NoError(t, metrics.Validate())
+	require.Equal(t, uint64(2), metrics.ActiveChannels)
+	require.Equal(t, uint64(1), metrics.PendingCloses)
+	require.Equal(t, uint64(1), metrics.ActiveDisputes)
+	require.Equal(t, uint64(1), metrics.FinalizableChannels)
+	require.Equal(t, uint64(1), metrics.SettledChannelsPerBlock)
+	require.Equal(t, uint64(19), metrics.AverageChannelLifetime)
+	require.Equal(t, "2800", metrics.TotalLockedNaet)
+	require.Equal(t, "2800", lockedAmountForType(metrics.LockedNaetByChannelType, ChannelTypeBidirectional))
+	require.Equal(t, uint64(1), metrics.ConditionalPromisesActive)
+	require.Equal(t, uint64(1), metrics.ConditionalPromisesExpired)
+	require.Equal(t, uint64(1), metrics.ConditionalPromisesResolved)
+	require.Equal(t, uint64(1), metrics.VirtualChannelsActive)
+	require.Equal(t, uint64(1), metrics.RoutingAdvertisementsActive)
+	require.Equal(t, uint64(2), metrics.FraudProofsSubmitted)
+	require.Equal(t, uint64(1), metrics.FraudProofsAccepted)
+	require.Equal(t, uint64(1), metrics.FraudProofsRejected)
+	require.Equal(t, uint64(1), metrics.PenaltiesApplied)
+	require.Equal(t, uint64(1), metrics.ReporterRewardsPaid)
+	require.Equal(t, "6", metrics.SettlementFeesCollected)
+	require.Equal(t, DefaultOpeningFee, metrics.ChannelOpenFeeAverage)
+	require.Equal(t, uint64(9), metrics.DisputeInclusionLatency)
+	require.Equal(t, uint64(1), metrics.ChallengePeriodNearExpiryCount)
+	require.Equal(t, uint64(10000), metrics.BlockSTMConflictRateBps)
+	require.Greater(t, metrics.StoreV2PaymentModuleReadLatencyOps, uint64(0))
+	require.GreaterOrEqual(t, metrics.StoreV2PaymentModuleWriteLatencyOps, metrics.StoreV2PaymentModuleReadLatencyOps)
+	require.NoError(t, ValidateHash("observability metrics hash", metrics.MetricsHash))
+}
+
 func TestSettlementArbitrationBoundaryRejectsNonDeterministicInputs(t *testing.T) {
 	alice := testAddress(0x12)
 	bob := testAddress(0x13)
@@ -6740,6 +6841,15 @@ func amountFor(balances []Balance, participant string) string {
 		}
 	}
 	return ""
+}
+
+func lockedAmountForType(values []PaymentLockedByChannelType, channelType ChannelType) string {
+	for _, value := range values {
+		if value.ChannelType == channelType {
+			return value.Amount
+		}
+	}
+	return "0"
 }
 
 func absInt64(value int64) int64 {
