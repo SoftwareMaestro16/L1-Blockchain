@@ -2053,6 +2053,78 @@ func TestCongestionAwareRetryPolicySelectsAlternateRoute(t *testing.T) {
 	require.Contains(t, exhausted.Reason, "attempts exhausted")
 }
 
+func TestForwardingPacketsExposeOnlyPerHopMetadata(t *testing.T) {
+	alice := testAddress(0x67)
+	router1 := testAddress(0x68)
+	router2 := testAddress(0x69)
+	bob := testAddress(0x6a)
+	route := ScoredRoute{
+		Edges: []ChannelEdge{
+			{ChannelID: HashParts("privacy-channel-1"), From: alice, To: router1, Capacity: "500", FeeAmount: "1", Active: true},
+			{ChannelID: HashParts("privacy-channel-2"), From: router1, To: router2, Capacity: "500", FeeAmount: "2", Active: true},
+			{ChannelID: HashParts("privacy-channel-3"), From: router2, To: bob, Capacity: "500", FeeAmount: "3", Active: true},
+		},
+		Amount:      "100",
+		TotalFee:    "6",
+		TotalCost:   "9",
+		MinCapacity: "500",
+		ScoreHash:   HashParts("privacy-score"),
+	}
+	packets, err := BuildForwardingPackets(route, "payment-seed", 7, 100)
+	require.NoError(t, err)
+	require.Len(t, packets, 3)
+	require.Equal(t, alice, packets[0].ForwardingNode)
+	require.Equal(t, router1, packets[0].NextNode)
+	require.Equal(t, router1, packets[1].ForwardingNode)
+	require.Equal(t, router2, packets[1].NextNode)
+	require.NotEqual(t, packets[0].RouteID, packets[1].RouteID)
+	require.NotEqual(t, packets[1].RouteID, packets[2].RouteID)
+	require.NotEqual(t, packets[0].HopPaymentID, packets[1].HopPaymentID)
+	require.Equal(t, packets[1].PacketHash, packets[0].NextPacketHash)
+	require.Equal(t, packets[2].PacketHash, packets[1].NextPacketHash)
+	require.Empty(t, packets[2].NextPacketHash)
+
+	logRecord, err := PrivacySafeForwardingLog(packets[1], 50)
+	require.NoError(t, err)
+	require.Equal(t, packets[1].PacketID, logRecord.PacketID)
+	require.NotEqual(t, packets[1].NextNode, logRecord.NextNodeHash)
+	require.NotEqual(t, packets[1].Amount, logRecord.AmountHash)
+	require.Equal(t, router1, logRecord.ForwardingNode)
+}
+
+func TestForwardingPacketReplayProtectionRejectsReusedIdentifiers(t *testing.T) {
+	alice := testAddress(0x6b)
+	bob := testAddress(0x6c)
+	route := ScoredRoute{
+		Edges:       []ChannelEdge{{ChannelID: HashParts("privacy-replay-channel"), From: alice, To: bob, Capacity: "500", FeeAmount: "1", Active: true}},
+		Amount:      "50",
+		TotalFee:    "1",
+		TotalCost:   "2",
+		MinCapacity: "500",
+		ScoreHash:   HashParts("privacy-replay-score"),
+	}
+	_, err := DeriveRouteID("seed", 0)
+	require.ErrorContains(t, err, "nonce")
+	packets, err := BuildForwardingPackets(route, "seed", 1, 80)
+	require.NoError(t, err)
+	var records []ForwardingPacketReplayRecord
+	records, err = RecordForwardingPacket(records, packets[0], 40)
+	require.NoError(t, err)
+	require.Len(t, records, 1)
+	require.ErrorContains(t, ValidateForwardingPacket(packets[0], alice, records, 41), "replay")
+
+	reusedRoute := packets[0]
+	reusedRoute.HopPaymentID = HashParts("new-hop-payment")
+	reusedRoute.NextPacketHash = ""
+	reusedRoute.PacketHash = ComputeForwardingPacketHash(reusedRoute)
+	reusedRoute.PacketID = HashParts("forwarding-packet-id", reusedRoute.PacketHash)
+	require.ErrorContains(t, ValidateForwardingPacket(reusedRoute, alice, records, 41), "route id replay")
+
+	pruned := PruneForwardingReplayRecords(records, 40+DefaultReplayHorizon+1)
+	require.Empty(t, pruned)
+	require.NoError(t, ValidateForwardingPacket(packets[0], alice, pruned, 41))
+}
+
 func TestUntrustedTopologyIsRejectedBeforeRouteUse(t *testing.T) {
 	alice := testAddress(0x49)
 	router := testAddress(0x4a)

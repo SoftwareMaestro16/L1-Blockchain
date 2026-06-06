@@ -1557,6 +1557,132 @@ func SplitPaymentRoute(state PaymentsState, store TopologyStore, req RouteSelect
 	return buildMultiPathRoute(parts)
 }
 
+func BuildForwardingPackets(route ScoredRoute, routeSeed string, routeNonce uint64, timeoutHeight uint64) ([]ForwardingPacket, error) {
+	route = route.Normalize()
+	if err := route.Validate(); err != nil {
+		return nil, err
+	}
+	if timeoutHeight == 0 {
+		return nil, errors.New("payments forwarding timeout height must be positive")
+	}
+	rootRouteID, err := DeriveRouteID(routeSeed, routeNonce)
+	if err != nil {
+		return nil, err
+	}
+	packets := make([]ForwardingPacket, len(route.Edges))
+	nextHash := ""
+	for i := len(route.Edges) - 1; i >= 0; i-- {
+		edge := route.Edges[i].Normalize()
+		hopRouteID, err := DeriveHopRouteID(rootRouteID, i, edge.ChannelID)
+		if err != nil {
+			return nil, err
+		}
+		hopPaymentID, err := DeriveHopPaymentID(rootRouteID, i, edge.ChannelID)
+		if err != nil {
+			return nil, err
+		}
+		packet := ForwardingPacket{
+			RouteID:        hopRouteID,
+			HopPaymentID:   hopPaymentID,
+			ChannelID:      edge.ChannelID,
+			ForwardingNode: edge.From,
+			NextNode:       edge.To,
+			Amount:         route.Amount,
+			FeeAmount:      edge.FeeAmount,
+			TimeoutHeight:  timeoutHeight,
+			NextPacketHash: nextHash,
+		}.Normalize()
+		packet.PacketHash = ComputeForwardingPacketHash(packet)
+		packet.PacketID = HashParts("forwarding-packet-id", packet.PacketHash)
+		packet = packet.Normalize()
+		if err := packet.Validate(); err != nil {
+			return nil, err
+		}
+		packets[i] = packet
+		nextHash = packet.PacketHash
+	}
+	return packets, nil
+}
+
+func ValidateForwardingPacket(packet ForwardingPacket, expectedForwarder string, replayRecords []ForwardingPacketReplayRecord, currentHeight uint64) error {
+	packet = packet.Normalize()
+	if err := packet.Validate(); err != nil {
+		return err
+	}
+	expectedForwarder = strings.TrimSpace(expectedForwarder)
+	if expectedForwarder != "" && packet.ForwardingNode != expectedForwarder {
+		return errors.New("payments forwarding packet forwarder mismatch")
+	}
+	if currentHeight == 0 {
+		return errors.New("payments forwarding packet validation height must be positive")
+	}
+	if currentHeight > packet.TimeoutHeight {
+		return errors.New("payments forwarding packet is expired")
+	}
+	for _, record := range normalizeForwardingReplayRecords(replayRecords) {
+		if currentHeight > record.ExpiresHeight {
+			continue
+		}
+		if record.PacketID == packet.PacketID {
+			return errors.New("payments forwarding packet replay detected")
+		}
+		if record.RouteID == packet.RouteID {
+			return errors.New("payments forwarding route id replay detected")
+		}
+		if record.HopPaymentID == packet.HopPaymentID {
+			return errors.New("payments forwarding payment id replay detected")
+		}
+	}
+	return nil
+}
+
+func RecordForwardingPacket(replayRecords []ForwardingPacketReplayRecord, packet ForwardingPacket, currentHeight uint64) ([]ForwardingPacketReplayRecord, error) {
+	if err := ValidateForwardingPacket(packet, packet.ForwardingNode, replayRecords, currentHeight); err != nil {
+		return nil, err
+	}
+	records := append(normalizeForwardingReplayRecords(replayRecords), ForwardingPacketReplayRecord{
+		PacketID:       packet.PacketID,
+		RouteID:        packet.RouteID,
+		HopPaymentID:   packet.HopPaymentID,
+		RecordedHeight: currentHeight,
+		ExpiresHeight:  currentHeight + DefaultReplayHorizon,
+	}.Normalize())
+	sortForwardingReplayRecords(records)
+	return records, nil
+}
+
+func PruneForwardingReplayRecords(replayRecords []ForwardingPacketReplayRecord, currentHeight uint64) []ForwardingPacketReplayRecord {
+	out := make([]ForwardingPacketReplayRecord, 0, len(replayRecords))
+	for _, record := range normalizeForwardingReplayRecords(replayRecords) {
+		if currentHeight <= record.ExpiresHeight {
+			out = append(out, record)
+		}
+	}
+	sortForwardingReplayRecords(out)
+	return out
+}
+
+func PrivacySafeForwardingLog(packet ForwardingPacket, currentHeight uint64) (ForwardingLogRecord, error) {
+	packet = packet.Normalize()
+	if err := packet.Validate(); err != nil {
+		return ForwardingLogRecord{}, err
+	}
+	if currentHeight == 0 {
+		return ForwardingLogRecord{}, errors.New("payments forwarding log height must be positive")
+	}
+	record := ForwardingLogRecord{
+		PacketID:       packet.PacketID,
+		RouteID:        packet.RouteID,
+		HopPaymentID:   packet.HopPaymentID,
+		ChannelID:      packet.ChannelID,
+		ForwardingNode: packet.ForwardingNode,
+		NextNodeHash:   HashParts("forwarding-next-node", packet.NextNode),
+		AmountHash:     HashParts("forwarding-amount", packet.Amount, packet.FeeAmount),
+		RecordedHeight: currentHeight,
+	}.Normalize()
+	return record, record.Validate()
+}
+
 func ImportState(state PaymentsState) (PaymentsState, error) {
 	state = state.Export()
 	if err := state.Validate(); err != nil {
@@ -2884,6 +3010,26 @@ func sortGossipReputation(reputation []GossipReputation) {
 	sort.SliceStable(reputation, func(i, j int) bool {
 		return reputation[i].Normalize().NodeID < reputation[j].Normalize().NodeID
 	})
+}
+
+func sortForwardingReplayRecords(records []ForwardingPacketReplayRecord) {
+	sort.SliceStable(records, func(i, j int) bool {
+		left := records[i].Normalize()
+		right := records[j].Normalize()
+		if left.RouteID == right.RouteID {
+			return left.PacketID < right.PacketID
+		}
+		return left.RouteID < right.RouteID
+	})
+}
+
+func normalizeForwardingReplayRecords(records []ForwardingPacketReplayRecord) []ForwardingPacketReplayRecord {
+	out := make([]ForwardingPacketReplayRecord, len(records))
+	for i, record := range records {
+		out[i] = record.Normalize()
+	}
+	sortForwardingReplayRecords(out)
+	return out
 }
 
 func normalizeGossipReputation(reputation []GossipReputation) []GossipReputation {

@@ -568,6 +568,39 @@ type MultiPathRoute struct {
 	ScoreHash   string
 }
 
+type ForwardingPacket struct {
+	PacketID       string
+	RouteID        string
+	HopPaymentID   string
+	ChannelID      string
+	ForwardingNode string
+	NextNode       string
+	Amount         string
+	FeeAmount      string
+	TimeoutHeight  uint64
+	NextPacketHash string
+	PacketHash     string
+}
+
+type ForwardingPacketReplayRecord struct {
+	PacketID       string
+	RouteID        string
+	HopPaymentID   string
+	RecordedHeight uint64
+	ExpiresHeight  uint64
+}
+
+type ForwardingLogRecord struct {
+	PacketID       string
+	RouteID        string
+	HopPaymentID   string
+	ChannelID      string
+	ForwardingNode string
+	NextNodeHash   string
+	AmountHash     string
+	RecordedHeight uint64
+}
+
 type ChannelCloseRequest struct {
 	ChannelID     string
 	ClosingState  ChannelState
@@ -2335,6 +2368,180 @@ func (r ScoredRoute) Validate() error {
 	}
 	if route.ScoreHash != "" {
 		return ValidateHash("payments scored route hash", route.ScoreHash)
+	}
+	return nil
+}
+
+func DeriveRouteID(seed string, nonce uint64) (string, error) {
+	seed = strings.TrimSpace(seed)
+	if seed == "" {
+		return "", errors.New("payments route id seed is required")
+	}
+	if nonce == 0 {
+		return "", errors.New("payments route id nonce must be positive")
+	}
+	return HashParts("route-id", seed, fmt.Sprintf("%020d", nonce)), nil
+}
+
+func DeriveHopRouteID(routeID string, hopIndex int, channelID string) (string, error) {
+	routeID = normalizeHash(routeID)
+	channelID = normalizeHash(channelID)
+	if err := ValidateHash("payments root route id", routeID); err != nil {
+		return "", err
+	}
+	if hopIndex < 0 {
+		return "", errors.New("payments hop index must be non-negative")
+	}
+	if err := ValidateHash("payments hop route channel id", channelID); err != nil {
+		return "", err
+	}
+	return HashParts("hop-route-id", routeID, fmt.Sprintf("%020d", uint64(hopIndex)), channelID), nil
+}
+
+func DeriveHopPaymentID(routeID string, hopIndex int, channelID string) (string, error) {
+	hopRouteID, err := DeriveHopRouteID(routeID, hopIndex, channelID)
+	if err != nil {
+		return "", err
+	}
+	return HashParts("hop-payment-id", hopRouteID), nil
+}
+
+func ComputeForwardingPacketHash(packet ForwardingPacket) string {
+	packet = packet.Normalize()
+	return HashParts(
+		"forwarding-packet",
+		packet.RouteID,
+		packet.HopPaymentID,
+		packet.ChannelID,
+		packet.ForwardingNode,
+		packet.NextNode,
+		packet.Amount,
+		packet.FeeAmount,
+		fmt.Sprintf("%020d", packet.TimeoutHeight),
+		packet.NextPacketHash,
+	)
+}
+
+func (p ForwardingPacket) Normalize() ForwardingPacket {
+	p.PacketID = normalizeOptionalHash(p.PacketID)
+	p.RouteID = normalizeHash(p.RouteID)
+	p.HopPaymentID = normalizeHash(p.HopPaymentID)
+	p.ChannelID = normalizeHash(p.ChannelID)
+	p.ForwardingNode = strings.TrimSpace(p.ForwardingNode)
+	p.NextNode = strings.TrimSpace(p.NextNode)
+	p.Amount = strings.TrimSpace(p.Amount)
+	p.FeeAmount = strings.TrimSpace(p.FeeAmount)
+	p.NextPacketHash = normalizeOptionalHash(p.NextPacketHash)
+	p.PacketHash = normalizeOptionalHash(p.PacketHash)
+	return p
+}
+
+func (p ForwardingPacket) Validate() error {
+	packet := p.Normalize()
+	if err := ValidateHash("payments forwarding packet id", packet.PacketID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments forwarding route id", packet.RouteID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments forwarding payment id", packet.HopPaymentID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments forwarding channel id", packet.ChannelID); err != nil {
+		return err
+	}
+	if err := addressing.ValidateUserAddress("payments forwarding node", packet.ForwardingNode); err != nil {
+		return err
+	}
+	if err := addressing.ValidateUserAddress("payments forwarding next node", packet.NextNode); err != nil {
+		return err
+	}
+	if packet.ForwardingNode == packet.NextNode {
+		return errors.New("payments forwarding packet nodes must differ")
+	}
+	if _, err := parsePositiveInt("payments forwarding amount", packet.Amount); err != nil {
+		return err
+	}
+	if err := validateNonNegativeInt("payments forwarding fee", packet.FeeAmount); err != nil {
+		return err
+	}
+	if packet.TimeoutHeight == 0 {
+		return errors.New("payments forwarding timeout height must be positive")
+	}
+	if packet.NextPacketHash != "" {
+		if err := ValidateHash("payments forwarding next packet hash", packet.NextPacketHash); err != nil {
+			return err
+		}
+	}
+	if packet.PacketHash != ComputeForwardingPacketHash(packet) {
+		return errors.New("payments forwarding packet hash mismatch")
+	}
+	return nil
+}
+
+func (r ForwardingPacketReplayRecord) Normalize() ForwardingPacketReplayRecord {
+	r.PacketID = normalizeHash(r.PacketID)
+	r.RouteID = normalizeHash(r.RouteID)
+	r.HopPaymentID = normalizeHash(r.HopPaymentID)
+	return r
+}
+
+func (r ForwardingPacketReplayRecord) Validate() error {
+	record := r.Normalize()
+	if err := ValidateHash("payments forwarding replay packet id", record.PacketID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments forwarding replay route id", record.RouteID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments forwarding replay payment id", record.HopPaymentID); err != nil {
+		return err
+	}
+	if record.RecordedHeight == 0 {
+		return errors.New("payments forwarding replay recorded height must be positive")
+	}
+	if record.ExpiresHeight <= record.RecordedHeight {
+		return errors.New("payments forwarding replay expiry must exceed recorded height")
+	}
+	return nil
+}
+
+func (r ForwardingLogRecord) Normalize() ForwardingLogRecord {
+	r.PacketID = normalizeHash(r.PacketID)
+	r.RouteID = normalizeHash(r.RouteID)
+	r.HopPaymentID = normalizeHash(r.HopPaymentID)
+	r.ChannelID = normalizeHash(r.ChannelID)
+	r.ForwardingNode = strings.TrimSpace(r.ForwardingNode)
+	r.NextNodeHash = normalizeHash(r.NextNodeHash)
+	r.AmountHash = normalizeHash(r.AmountHash)
+	return r
+}
+
+func (r ForwardingLogRecord) Validate() error {
+	record := r.Normalize()
+	if err := ValidateHash("payments forwarding log packet id", record.PacketID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments forwarding log route id", record.RouteID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments forwarding log payment id", record.HopPaymentID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments forwarding log channel id", record.ChannelID); err != nil {
+		return err
+	}
+	if err := addressing.ValidateUserAddress("payments forwarding log node", record.ForwardingNode); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments forwarding log next node hash", record.NextNodeHash); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments forwarding log amount hash", record.AmountHash); err != nil {
+		return err
+	}
+	if record.RecordedHeight == 0 {
+		return errors.New("payments forwarding log height must be positive")
 	}
 	return nil
 }
