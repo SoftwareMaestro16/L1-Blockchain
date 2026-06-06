@@ -2095,6 +2095,117 @@ func TestDiscoveryRecordMustBeSignedExpiringAndProofChecked(t *testing.T) {
 	require.ErrorContains(t, discovery.Validate(salt, 95), "signature")
 }
 
+func TestDistributedRoutingTableIndexesLeaseBasedDiscoveryObjects(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	overlay := defaultOverlayByType(t, OverlayTypeService)
+	serviceLow := signedNodeRecordWithCapabilities(t, 0x52, salt, 100, []NodeRole{NodeRoleService}, nil, []string{"svc.payments"})
+	serviceHigh := signedNodeRecordWithCapabilities(t, 0x53, salt, 100, []NodeRole{NodeRoleService}, nil, []string{"svc.payments"})
+	zone := signedNodeRecordWithCapabilities(t, 0x54, salt, 100, []NodeRole{NodeRoleZoneExecution}, []string{"zone-a"}, nil)
+	storage := signedNodeRecord(t, 0x55, salt, 100, NodeRoleStorageProvider)
+	routing := signedNodeRecord(t, 0x56, salt, 100, NodeRoleRouting)
+	full := signedNodeRecord(t, 0x57, salt, 100, NodeRoleFull)
+
+	table := EmptyDistributedRoutingTable()
+	ads := []DRTAdvertisement{
+		testDRTAdvertisement(DRTObjectNode, full, "", "", "", "", 1, 5_000, 10, 90),
+		testDRTAdvertisement(DRTObjectExecutionZone, zone, "", "zone-a", "", "", 10, 7_000, 10, 90),
+		testDRTAdvertisement(DRTObjectServiceEndpoint, serviceLow, overlay.OverlayID, "", "svc.payments", HashParts("endpoint", "svc-low"), 100, 8_000, 10, 90),
+		testDRTAdvertisement(DRTObjectServiceEndpoint, serviceHigh, overlay.OverlayID, "", "svc.payments", HashParts("endpoint", "svc-high"), 1_000, 7_000, 10, 90),
+		testDRTAdvertisement(DRTObjectRPCEndpoint, full, "", "", "", HashParts("endpoint", "rpc"), 50, 6_000, 10, 90),
+		testDRTAdvertisement(DRTObjectStorageProvider, storage, "", "", "", HashParts("endpoint", "storage"), 500, 8_500, 10, 90),
+		testDRTAdvertisement(DRTObjectRoutingEntryPoint, routing, "", "", "", HashParts("endpoint", "routing"), 250, 9_000, 10, 90),
+		testDRTAdvertisement(DRTObjectOverlayMembershipRecord, serviceHigh, overlay.OverlayID, "", "svc.payments", "", 1_000, 7_000, 10, 90),
+		testDRTAdvertisement(DRTObjectStreamProvider, full, "", "", "", HashParts("endpoint", "stream"), 25, 5_000, 10, 90),
+	}
+
+	var err error
+	for _, ad := range ads {
+		table, err = table.Add(ad, salt, 20)
+		require.NoError(t, err)
+	}
+	require.Len(t, table.Advertisements, len(ads))
+	require.NoError(t, table.Validate(salt, 20))
+
+	serviceResults := table.Query(DRTQuery{
+		ObjectType:    DRTObjectServiceEndpoint,
+		OverlayID:     overlay.OverlayID,
+		ServiceID:     "svc.payments",
+		CurrentHeight: 20,
+	})
+	require.Len(t, serviceResults, 2)
+	require.Equal(t, serviceHigh.NodeID, serviceResults[0].Discovery.Record.NodeID)
+	require.Greater(t, serviceResults[0].StakeWeight, serviceResults[1].StakeWeight)
+
+	require.Len(t, table.Query(DRTQuery{ObjectType: DRTObjectExecutionZone, ZoneID: "zone-a", CurrentHeight: 20}), 1)
+	require.Len(t, table.Query(DRTQuery{ObjectType: DRTObjectStorageProvider, MinStakeWeight: 100, CurrentHeight: 20}), 1)
+	require.Len(t, table.Query(DRTQuery{ObjectType: DRTObjectStreamProvider, CurrentHeight: 20}), 1)
+
+	root, err := ComputeDRTIndexRoot(table.Advertisements)
+	require.NoError(t, err)
+	require.NoError(t, ValidateHash("networking DRT test root", root))
+
+	pruned := table.Prune(91)
+	require.Empty(t, pruned.Advertisements)
+}
+
+func TestDRTRejectsExpiredTamperedAndRoleMismatchedAdvertisements(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	service := signedNodeRecordWithCapabilities(t, 0x58, salt, 100, []NodeRole{NodeRoleService}, nil, []string{"svc.search"})
+	full := signedNodeRecord(t, 0x59, salt, 100, NodeRoleFull)
+	table := EmptyDistributedRoutingTable()
+
+	expired := testDRTAdvertisement(DRTObjectServiceEndpoint, service, "", "", "svc.search", HashParts("endpoint", "expired"), 1, 1_000, 10, 20)
+	_, err := table.Add(expired, salt, 21)
+	require.ErrorContains(t, err, "expired")
+
+	outliving := testDRTAdvertisement(DRTObjectServiceEndpoint, service, "", "", "svc.search", HashParts("endpoint", "outlive"), 1, 1_000, 10, 101)
+	_, err = table.Add(outliving, salt, 20)
+	require.ErrorContains(t, err, "outlive")
+
+	tampered := testDRTAdvertisement(DRTObjectServiceEndpoint, service, "", "", "svc.search", HashParts("endpoint", "tamper"), 1, 1_000, 10, 90)
+	tampered.Discovery.Record.Signature[0] ^= 0xff
+	_, err = table.Add(tampered, salt, 20)
+	require.ErrorContains(t, err, "signature")
+
+	wrongRole := testDRTAdvertisement(DRTObjectStorageProvider, full, "", "", "", HashParts("endpoint", "storage"), 1, 1_000, 10, 90)
+	_, err = table.Add(wrongRole, salt, 20)
+	require.ErrorContains(t, err, "storage provider role")
+
+	missingEndpoint := testDRTAdvertisement(DRTObjectServiceEndpoint, service, "", "", "svc.search", "", 1, 1_000, 10, 90)
+	_, err = table.Add(missingEndpoint, salt, 20)
+	require.ErrorContains(t, err, "endpoint hash")
+}
+
+func TestDRTBucketsAndOverlayNativeDiscoveryAreDeterministic(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	overlay := defaultOverlayByType(t, OverlayTypeRouting)
+	local := signedNodeRecord(t, 0x5a, salt, 100, NodeRoleFull)
+	left := signedNodeRecord(t, 0x5b, salt, 100, NodeRoleRouting)
+	right := signedNodeRecord(t, 0x5c, salt, 100, NodeRoleRouting)
+	table := EmptyDistributedRoutingTable()
+
+	var err error
+	for _, record := range []NodeRecord{left, right} {
+		table, err = table.Add(testDRTAdvertisement(DRTObjectRoutingEntryPoint, record, overlay.OverlayID, "", "", HashParts("endpoint", record.NodeID), 1_000, 8_000, 10, 90), salt, 20)
+		require.NoError(t, err)
+	}
+
+	overlayResults := table.Query(DRTQuery{ObjectType: DRTObjectRoutingEntryPoint, OverlayID: overlay.OverlayID, CurrentHeight: 20})
+	require.Len(t, overlayResults, 2)
+
+	buckets, err := table.Buckets(local.NodeID, DRTObjectRoutingEntryPoint, 8, 20)
+	require.NoError(t, err)
+	sameBuckets, err := table.Buckets(local.NodeID, DRTObjectRoutingEntryPoint, 8, 20)
+	require.NoError(t, err)
+	require.Equal(t, buckets, sameBuckets)
+
+	total := 0
+	for _, bucket := range buckets {
+		total += len(bucket.Advertisements)
+	}
+	require.Equal(t, 2, total)
+}
+
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 	metrics := PeerMetrics{LatencyMillis: 25, ReliabilityBps: 9_900, ThroughputBytesPerSec: 32 << 20}
 	score, err := ComputePeerScore(metrics)
@@ -2446,6 +2557,41 @@ func signedNodeRecord(t *testing.T, seed byte, salt []byte, expiresHeight uint64
 	}, privateKey, salt)
 	require.NoError(t, err)
 	return record
+}
+
+func signedNodeRecordWithCapabilities(t *testing.T, seed byte, salt []byte, expiresHeight uint64, roles []NodeRole, zones []string, services []string) NodeRecord {
+	t.Helper()
+
+	privateKey := deterministicPrivateKey(seed)
+	addressHash, err := HashNetworkAddresses([]string{fmt.Sprintf("tcp://127.0.0.%d:26656", seed)})
+	require.NoError(t, err)
+	record, err := SignNodeRecord(NodeRecord{
+		Roles:                roles,
+		NetworkAddressesHash: addressHash,
+		ZonesSupported:       zones,
+		ServicesSupported:    services,
+		ProtocolVersions:     []string{DefaultProtocolVersion},
+		ExpiresHeight:        expiresHeight,
+	}, privateKey, salt)
+	require.NoError(t, err)
+	return record
+}
+
+func testDRTAdvertisement(objectType DRTObjectType, record NodeRecord, overlayID, zoneID, serviceID, endpointHash string, stakeWeight uint64, peerScoreBps uint32, leaseStart, leaseExpires uint64) DRTAdvertisement {
+	return DRTAdvertisement{
+		ObjectType: objectType,
+		Discovery: DiscoveryRecord{
+			Record: record,
+		},
+		OverlayID:         overlayID,
+		ZoneID:            zoneID,
+		ServiceID:         serviceID,
+		EndpointHash:      endpointHash,
+		StakeWeight:       stakeWeight,
+		PeerScoreBps:      peerScoreBps,
+		LeaseStartHeight:  leaseStart,
+		LeaseExpireHeight: leaseExpires,
+	}
 }
 
 func deterministicPrivateKey(fill byte) ed25519.PrivateKey {
