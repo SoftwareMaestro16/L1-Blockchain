@@ -312,6 +312,7 @@ func requireCoverageReferencesExistV2(t *testing.T, refs []string) {
 		require.Len(t, parts, 2, ref)
 		content, err := os.ReadFile(filepath.Join(repoRoot, filepath.FromSlash(parts[0])))
 		require.NoError(t, err, ref)
-		require.Contains(t, string(content), "func "+parts[1]+"(", ref)
+		fileContent := string(content)
+		require.True(t, strings.Contains(fileContent, "func "+parts[1]+"(") || strings.Contains(fileContent, ") "+parts[1]+"("), ref)
 	}
 }

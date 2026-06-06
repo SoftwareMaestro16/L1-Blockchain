@@ -9,7 +9,7 @@ import (
 func TestIdentityImplementationRoadmapV2CoversPhases0To2(t *testing.T) {
 	roadmap := DefaultIdentityImplementationRoadmapV2()
 	require.NoError(t, ValidateIdentityImplementationRoadmapV2(roadmap))
-	require.Len(t, roadmap.Phases, 3)
+	require.Len(t, roadmap.Phases, 5)
 	require.NotEmpty(t, roadmap.RoadmapHash)
 
 	phase0 := roadmap.Phases[0]
@@ -61,6 +61,38 @@ func TestIdentityImplementationRoadmapV2CoversPhases0To2(t *testing.T) {
 		IdentityRoadmapExitUnifiedTargetsV2,
 		IdentityRoadmapExitReverseConsistencyV2,
 		IdentityRoadmapExitVersionedSizeBoundedV2,
+	})
+
+	phase3 := roadmap.Phases[3]
+	require.Equal(t, IdentityRoadmapPhase3SubdomainsZonesV2, phase3.ID)
+	requireRoadmapTasksV2(t, phase3, []IdentityImplementationRoadmapTaskIDV2{
+		IdentityRoadmapTaskSubdomainModuleV2,
+		IdentityRoadmapTaskDelegatedSubdomainCreationV2,
+		IdentityRoadmapTaskPartialDelegationV2,
+		IdentityRoadmapTaskDetachedSubdomainsV2,
+		IdentityRoadmapTaskZonePoliciesV2,
+		IdentityRoadmapTaskRecursivePathQueriesV2,
+	})
+	requireRoadmapExitsV2(t, phase3, []IdentityImplementationRoadmapExitIDV2{
+		IdentityRoadmapExitRecursiveScopedDelegationV2,
+		IdentityRoadmapExitParentChildExpiryRulesV2,
+		IdentityRoadmapExitZonePolicyProofQueryableV2,
+	})
+
+	phase4 := roadmap.Phases[4]
+	require.Equal(t, IdentityRoadmapPhase4ProofResolutionV2, phase4.ID)
+	requireRoadmapTasksV2(t, phase4, []IdentityImplementationRoadmapTaskIDV2{
+		IdentityRoadmapTaskProofVerificationModuleV2,
+		IdentityRoadmapTaskDirectResolutionProofQueryV2,
+		IdentityRoadmapTaskRecursiveResolutionProofQueryV2,
+		IdentityRoadmapTaskReverseProofQueryV2,
+		IdentityRoadmapTaskNonExistenceProofQueryV2,
+		IdentityRoadmapTaskLightClientVerificationSDKV2,
+	})
+	requireRoadmapExitsV2(t, phase4, []IdentityImplementationRoadmapExitIDV2{
+		IdentityRoadmapExitLightClientAllTargetsV2,
+		IdentityRoadmapExitExplicitProofFailuresV2,
+		IdentityRoadmapExitProofVectorsModuleVersionsV2,
 	})
 
 	requireCoverageReferencesExistV2(t, identityRoadmapEvidenceReferencesV2(roadmap))

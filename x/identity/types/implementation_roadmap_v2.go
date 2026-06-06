@@ -15,6 +15,8 @@ const (
 	IdentityRoadmapPhase0SpecVectorsV2     IdentityImplementationRoadmapPhaseIDV2 = "phase_0_specification_and_test_vectors"
 	IdentityRoadmapPhase1CoreActivationV2  IdentityImplementationRoadmapPhaseIDV2 = "phase_1_core_registry_activation"
 	IdentityRoadmapPhase2UnifiedResolverV2 IdentityImplementationRoadmapPhaseIDV2 = "phase_2_unified_resolver"
+	IdentityRoadmapPhase3SubdomainsZonesV2 IdentityImplementationRoadmapPhaseIDV2 = "phase_3_subdomains_and_zone_control"
+	IdentityRoadmapPhase4ProofResolutionV2 IdentityImplementationRoadmapPhaseIDV2 = "phase_4_proof_based_resolution"
 
 	IdentityRoadmapTaskCanonicalNameNormalizationV2 IdentityImplementationRoadmapTaskIDV2 = "define_canonical_name_normalization"
 	IdentityRoadmapTaskDomainProofHashFormatsV2     IdentityImplementationRoadmapTaskIDV2 = "define_domain_hash_and_proof_hash_formats"
@@ -40,6 +42,20 @@ const (
 	IdentityRoadmapTaskReverseResolutionV2    IdentityImplementationRoadmapTaskIDV2 = "implement_reverse_resolution"
 	IdentityRoadmapTaskBatchResolverUpdatesV2 IdentityImplementationRoadmapTaskIDV2 = "implement_batch_resolver_updates"
 
+	IdentityRoadmapTaskSubdomainModuleV2            IdentityImplementationRoadmapTaskIDV2 = "implement_subdomain_module"
+	IdentityRoadmapTaskDelegatedSubdomainCreationV2 IdentityImplementationRoadmapTaskIDV2 = "implement_delegated_subdomain_creation"
+	IdentityRoadmapTaskPartialDelegationV2          IdentityImplementationRoadmapTaskIDV2 = "implement_partial_delegation"
+	IdentityRoadmapTaskDetachedSubdomainsV2         IdentityImplementationRoadmapTaskIDV2 = "implement_detached_subdomains"
+	IdentityRoadmapTaskZonePoliciesV2               IdentityImplementationRoadmapTaskIDV2 = "implement_zone_policies"
+	IdentityRoadmapTaskRecursivePathQueriesV2       IdentityImplementationRoadmapTaskIDV2 = "implement_recursive_path_queries"
+
+	IdentityRoadmapTaskProofVerificationModuleV2       IdentityImplementationRoadmapTaskIDV2 = "implement_proof_verification_module"
+	IdentityRoadmapTaskDirectResolutionProofQueryV2    IdentityImplementationRoadmapTaskIDV2 = "implement_direct_resolution_proof_query"
+	IdentityRoadmapTaskRecursiveResolutionProofQueryV2 IdentityImplementationRoadmapTaskIDV2 = "implement_recursive_resolution_proof_query"
+	IdentityRoadmapTaskReverseProofQueryV2             IdentityImplementationRoadmapTaskIDV2 = "implement_reverse_proof_query"
+	IdentityRoadmapTaskNonExistenceProofQueryV2        IdentityImplementationRoadmapTaskIDV2 = "implement_non_existence_proof_query"
+	IdentityRoadmapTaskLightClientVerificationSDKV2    IdentityImplementationRoadmapTaskIDV2 = "add_light_client_verification_sdk"
+
 	IdentityRoadmapExitSignableHashableVectorsV2 IdentityImplementationRoadmapExitIDV2 = "all_signable_and_hashable_identity_objects_have_test_vectors"
 	IdentityRoadmapExitLifecycleDeterminismV2    IdentityImplementationRoadmapExitIDV2 = "all_lifecycle_states_have_deterministic_transition_tests"
 	IdentityRoadmapExitStorePrefixesFinalizedV2  IdentityImplementationRoadmapExitIDV2 = "store_key_prefixes_are_finalized"
@@ -51,6 +67,14 @@ const (
 	IdentityRoadmapExitUnifiedTargetsV2       IdentityImplementationRoadmapExitIDV2 = "unified_resolver_supports_wallet_contract_service_interface_routing_targets"
 	IdentityRoadmapExitReverseConsistencyV2   IdentityImplementationRoadmapExitIDV2 = "reverse_resolution_verifies_forward_consistency"
 	IdentityRoadmapExitVersionedSizeBoundedV2 IdentityImplementationRoadmapExitIDV2 = "resolver_updates_are_versioned_and_size_bounded"
+
+	IdentityRoadmapExitRecursiveScopedDelegationV2 IdentityImplementationRoadmapExitIDV2 = "recursive_hierarchy_supports_scoped_delegation"
+	IdentityRoadmapExitParentChildExpiryRulesV2    IdentityImplementationRoadmapExitIDV2 = "parent_and_child_expiry_rules_are_enforced"
+	IdentityRoadmapExitZonePolicyProofQueryableV2  IdentityImplementationRoadmapExitIDV2 = "zone_policy_is_proof_queryable"
+
+	IdentityRoadmapExitLightClientAllTargetsV2      IdentityImplementationRoadmapExitIDV2 = "light_clients_can_verify_address_contract_service_interface_reverse_resolution"
+	IdentityRoadmapExitExplicitProofFailuresV2      IdentityImplementationRoadmapExitIDV2 = "proof_failure_modes_are_explicit"
+	IdentityRoadmapExitProofVectorsModuleVersionsV2 IdentityImplementationRoadmapExitIDV2 = "proof_test_vectors_pass_across_module_versions"
 )
 
 type IdentityRoadmapTaskV2 struct {
@@ -131,6 +155,40 @@ func DefaultIdentityImplementationRoadmapV2() IdentityImplementationRoadmapV2 {
 				{ID: IdentityRoadmapExitVersionedSizeBoundedV2, Evidence: []string{"x/identity/types/batch_resolver_v2.go:ExecuteBatchResolverUpdatesV2", "x/identity/types/resolution_v2.go:ValidateUnifiedResolutionRecordV2"}},
 			},
 		},
+		{
+			ID:    IdentityRoadmapPhase3SubdomainsZonesV2,
+			Title: "Subdomains and Zone Control",
+			Tasks: []IdentityRoadmapTaskV2{
+				{ID: IdentityRoadmapTaskSubdomainModuleV2, Evidence: []string{"x/identity/types/resolver_subdomain_module_breakdown_v2.go:DefaultSubdomainModuleBreakdownV2", "x/identity/types/resolver_subdomain_module_breakdown_v2_test.go:TestSubdomainModuleBreakdownV2CoversSection133"}},
+				{ID: IdentityRoadmapTaskDelegatedSubdomainCreationV2, Evidence: []string{"x/identity/types/hierarchy_v2.go:IssueSubdomainV2", "x/identity/types/hierarchy_v2.go:ValidateSubdomainCreationV2", "x/identity/types/validation_v2.go:ValidateSubdomainCreationAuthorizationV2"}},
+				{ID: IdentityRoadmapTaskPartialDelegationV2, Evidence: []string{"x/identity/types/delegation_auction_v2.go:ValidateDelegationDoesNotEscalateV2", "x/identity/types/delegation_auction_v2.go:ValidateDelegationRecordV2Use", "x/identity/types/delegation_auction_v2.go:ValidatePartialDelegationAuthorizationV2"}},
+				{ID: IdentityRoadmapTaskDetachedSubdomainsV2, Evidence: []string{"x/identity/types/cost_models_v2.go:QuoteIdentitySubdomainCreationFeeV2", "x/identity/types/hierarchy_v2.go:IssueSubdomainV2"}},
+				{ID: IdentityRoadmapTaskZonePoliciesV2, Evidence: []string{"x/identity/types/hierarchy_v2.go:ApplyZonePolicyChangeV2", "x/identity/types/hierarchy_v2.go:NewZonePolicyV2", "x/identity/types/hierarchy_v2.go:ValidateZonePolicyV2"}},
+				{ID: IdentityRoadmapTaskRecursivePathQueriesV2, Evidence: []string{"x/identity/types/query_v2.go:QueryOptimizedRecursiveResolutionProof", "x/identity/types/query_v2.go:QueryRecursiveResolutionProof", "x/identity/types/resolver_subdomain_module_breakdown_v2.go:ValidateSubdomainModulePathPolicyV2"}},
+			},
+			ExitCriteria: []IdentityRoadmapExitCriterionV2{
+				{ID: IdentityRoadmapExitRecursiveScopedDelegationV2, Evidence: []string{"x/identity/types/delegation_auction_v2.go:ValidateDelegationRecordV2Use", "x/identity/types/resolution_path_v2.go:VerifyDeterministicResolutionPathV2"}},
+				{ID: IdentityRoadmapExitParentChildExpiryRulesV2, Evidence: []string{"x/identity/types/cost_models_v2_test.go:TestIdentitySubdomainCreationCostModelV2ExpiryConstraints", "x/identity/types/hierarchy_v2.go:ValidateSubdomainCreationV2"}},
+				{ID: IdentityRoadmapExitZonePolicyProofQueryableV2, Evidence: []string{"x/identity/types/hierarchy_v2.go:BuildRecursivePolicyProofV2", "x/identity/types/hierarchy_v2.go:ValidateRecursivePolicyProofV2"}},
+			},
+		},
+		{
+			ID:    IdentityRoadmapPhase4ProofResolutionV2,
+			Title: "Proof-Based Resolution",
+			Tasks: []IdentityRoadmapTaskV2{
+				{ID: IdentityRoadmapTaskProofVerificationModuleV2, Evidence: []string{"x/identity/types/auction_proof_module_breakdown_v2.go:DefaultProofVerificationModuleBreakdownV2", "x/identity/types/auction_proof_module_breakdown_v2_test.go:TestProofVerificationModuleBreakdownV2CoversSection135"}},
+				{ID: IdentityRoadmapTaskDirectResolutionProofQueryV2, Evidence: []string{"x/identity/types/auction_proof_module_breakdown_v2.go:BuildProofModuleResolutionProofV2", "x/identity/types/query_v2.go:QueryResolutionProof"}},
+				{ID: IdentityRoadmapTaskRecursiveResolutionProofQueryV2, Evidence: []string{"x/identity/types/proof_format_v2.go:BuildRecursiveResolutionProofV2", "x/identity/types/query_v2.go:QueryRecursiveResolutionProof"}},
+				{ID: IdentityRoadmapTaskReverseProofQueryV2, Evidence: []string{"x/identity/types/auction_proof_module_breakdown_v2.go:BuildProofModuleReverseResolutionProofV2", "x/identity/types/reverse_safety_v2.go:BuildVerifiedReverseResolutionProofV2"}},
+				{ID: IdentityRoadmapTaskNonExistenceProofQueryV2, Evidence: []string{"x/identity/types/auction_proof_module_breakdown_v2.go:BuildProofModuleNonExistenceProofV2", "x/identity/types/proof_format_v2_test.go:TestIdentityResolutionProofFormatV2NonExistenceProof"}},
+				{ID: IdentityRoadmapTaskLightClientVerificationSDKV2, Evidence: []string{"x/identity/types/api_sdk_requirements_v2.go:IdentityWalletSDKVerifyResolutionProofV2", "x/identity/types/light_client_verifier_v2.go:VerifyIdentityResolutionProofLightClientV2"}},
+			},
+			ExitCriteria: []IdentityRoadmapExitCriterionV2{
+				{ID: IdentityRoadmapExitLightClientAllTargetsV2, Evidence: []string{"x/identity/types/light_client_verifier_v2.go:VerifyIdentityResolutionProofLightClientV2", "x/identity/types/proof_v2_test.go:TestIdentityLightClientProofV2VerifiesAllResolutionObjectives"}},
+				{ID: IdentityRoadmapExitExplicitProofFailuresV2, Evidence: []string{"x/identity/types/failure_handling_v2.go:HandleIdentityLightClientFailureV2", "x/identity/types/light_client_verifier_v2.go:IdentityLightClientFailureCodeFromErrorV2"}},
+				{ID: IdentityRoadmapExitProofVectorsModuleVersionsV2, Evidence: []string{"x/identity/types/proof_format_v2.go:ValidateIdentityResolutionProofFormatV2", "x/identity/types/proof_format_v2_test.go:TestIdentityResolutionProofFormatV2FieldsEncodingAndCommitment"}},
+			},
+		},
 	}}
 	roadmap.RoadmapHash = ComputeIdentityImplementationRoadmapHashV2(roadmap)
 	return roadmap
@@ -176,6 +234,8 @@ func requiredIdentityRoadmapPhaseIDsV2() []IdentityImplementationRoadmapPhaseIDV
 		IdentityRoadmapPhase0SpecVectorsV2,
 		IdentityRoadmapPhase1CoreActivationV2,
 		IdentityRoadmapPhase2UnifiedResolverV2,
+		IdentityRoadmapPhase3SubdomainsZonesV2,
+		IdentityRoadmapPhase4ProofResolutionV2,
 	}
 }
 
@@ -210,6 +270,10 @@ func requiredIdentityRoadmapTasksV2(phase IdentityImplementationRoadmapPhaseIDV2
 		return []IdentityImplementationRoadmapTaskIDV2{IdentityRoadmapTaskIdentityCoreModuleV2, IdentityRoadmapTaskCoreLifecycleV2, IdentityRoadmapTaskNFTBindingV2, IdentityRoadmapTaskOwnerExpiryIndexesV2, IdentityRoadmapTaskCoreQueriesV2, IdentityRoadmapTaskInvariantChecksV2}
 	case IdentityRoadmapPhase2UnifiedResolverV2:
 		return []IdentityImplementationRoadmapTaskIDV2{IdentityRoadmapTaskResolverModuleV2, IdentityRoadmapTaskPrimaryResolutionV2, IdentityRoadmapTaskContractTargetsV2, IdentityRoadmapTaskServiceEndpointsV2, IdentityRoadmapTaskInterfaceDescriptorsV2, IdentityRoadmapTaskRoutingMetadataV2, IdentityRoadmapTaskReverseResolutionV2, IdentityRoadmapTaskBatchResolverUpdatesV2}
+	case IdentityRoadmapPhase3SubdomainsZonesV2:
+		return []IdentityImplementationRoadmapTaskIDV2{IdentityRoadmapTaskSubdomainModuleV2, IdentityRoadmapTaskDelegatedSubdomainCreationV2, IdentityRoadmapTaskPartialDelegationV2, IdentityRoadmapTaskDetachedSubdomainsV2, IdentityRoadmapTaskZonePoliciesV2, IdentityRoadmapTaskRecursivePathQueriesV2}
+	case IdentityRoadmapPhase4ProofResolutionV2:
+		return []IdentityImplementationRoadmapTaskIDV2{IdentityRoadmapTaskProofVerificationModuleV2, IdentityRoadmapTaskDirectResolutionProofQueryV2, IdentityRoadmapTaskRecursiveResolutionProofQueryV2, IdentityRoadmapTaskReverseProofQueryV2, IdentityRoadmapTaskNonExistenceProofQueryV2, IdentityRoadmapTaskLightClientVerificationSDKV2}
 	default:
 		return nil
 	}
@@ -223,6 +287,10 @@ func requiredIdentityRoadmapExitsV2(phase IdentityImplementationRoadmapPhaseIDV2
 		return []IdentityImplementationRoadmapExitIDV2{IdentityRoadmapExitOnChainOwnershipV2, IdentityRoadmapExitAtomicNFTOwnershipV2, IdentityRoadmapExitExportImportRegistryV2}
 	case IdentityRoadmapPhase2UnifiedResolverV2:
 		return []IdentityImplementationRoadmapExitIDV2{IdentityRoadmapExitUnifiedTargetsV2, IdentityRoadmapExitReverseConsistencyV2, IdentityRoadmapExitVersionedSizeBoundedV2}
+	case IdentityRoadmapPhase3SubdomainsZonesV2:
+		return []IdentityImplementationRoadmapExitIDV2{IdentityRoadmapExitRecursiveScopedDelegationV2, IdentityRoadmapExitParentChildExpiryRulesV2, IdentityRoadmapExitZonePolicyProofQueryableV2}
+	case IdentityRoadmapPhase4ProofResolutionV2:
+		return []IdentityImplementationRoadmapExitIDV2{IdentityRoadmapExitLightClientAllTargetsV2, IdentityRoadmapExitExplicitProofFailuresV2, IdentityRoadmapExitProofVectorsModuleVersionsV2}
 	default:
 		return nil
 	}
