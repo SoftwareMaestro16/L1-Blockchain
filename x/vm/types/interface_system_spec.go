@@ -28,6 +28,17 @@ const (
 	AVMInterfaceSchemaTLB        AVMInterfaceSchemaEncoding = "tlb"
 	AVMInterfaceSchemaBinary     AVMInterfaceSchemaEncoding = "binary"
 
+	AVMInterfaceUseUIGeneration        AVMInterfaceUseCase = "ui_generation"
+	AVMInterfaceUseWalletForms         AVMInterfaceUseCase = "wallet_forms"
+	AVMInterfaceUseCLIAutoBinding      AVMInterfaceUseCase = "cli_auto_binding"
+	AVMInterfaceUseRPCIntrospection    AVMInterfaceUseCase = "rpc_introspection"
+	AVMInterfaceUseSDKCallBuilders     AVMInterfaceUseCase = "sdk_call_builders"
+	AVMInterfaceUseCapabilityDiscovery AVMInterfaceUseCase = "capability_discovery"
+
+	AVMInterfaceSDKGo         AVMInterfaceSDKCodegenFormat = "go"
+	AVMInterfaceSDKTypeScript AVMInterfaceSDKCodegenFormat = "typescript"
+	AVMInterfaceSDKJSON       AVMInterfaceSDKCodegenFormat = "json"
+
 	MaxAVMInterfaceTokenLength   = 128
 	MaxAVMInterfaceVersionLength = 32
 	MaxAVMInterfaceDescriptors   = 512
@@ -36,6 +47,8 @@ const (
 type AVMInterfaceExecutionMode string
 type AVMInterfaceTargetType string
 type AVMInterfaceSchemaEncoding string
+type AVMInterfaceUseCase string
+type AVMInterfaceSDKCodegenFormat string
 
 type AVMMethodDescriptor struct {
 	MethodID                   string
@@ -61,6 +74,8 @@ type AVMAsyncHandlerDescriptor struct {
 	OutputSchemaHash    string
 	GasHint             uint64
 	RetryPolicyOptional string
+	CallbackBehavior    string
+	TimeoutHeight       uint64
 }
 
 type AVMGetMethodDescriptor struct {
@@ -69,6 +84,7 @@ type AVMGetMethodDescriptor struct {
 	InputSchemaHash  string
 	OutputSchemaHash string
 	GasHint          uint64
+	ReadOnly         bool
 }
 
 type AVMInterfaceDescriptor struct {
@@ -82,10 +98,37 @@ type AVMInterfaceDescriptor struct {
 	GetMethodDescriptors    []AVMGetMethodDescriptor
 	SchemaEncoding          AVMInterfaceSchemaEncoding
 	MetadataHashOptional    string
+	MetadataGrantsAuth      bool
+}
+
+type AVMInterfaceSchema struct {
+	InterfaceHash  string
+	SchemaEncoding AVMInterfaceSchemaEncoding
+	DescriptorRoot string
+	UseCases       []AVMInterfaceUseCase
+	SchemaHash     string
+}
+
+type AVMInterfaceBinding struct {
+	TargetID      string
+	TargetType    AVMInterfaceTargetType
+	InterfaceHash string
+	BindingHash   string
+}
+
+type AVMSDKCodeGenerationFormat struct {
+	InterfaceHash     string
+	Format            AVMInterfaceSDKCodegenFormat
+	PackageName       string
+	MethodBindings    []string
+	GetMethodBindings []string
+	GenerationHash    string
 }
 
 type AVMInterfaceRegistry struct {
 	Interfaces []AVMInterfaceDescriptor
+	Schemas    []AVMInterfaceSchema
+	Bindings   []AVMInterfaceBinding
 	Root       string
 }
 
@@ -99,6 +142,24 @@ func NewAVMInterfaceRegistry(registry AVMInterfaceRegistry) (AVMInterfaceRegistr
 	registry = canonicalAVMInterfaceRegistry(registry)
 	registry.Root = ComputeAVMInterfaceRegistryRoot(registry)
 	return registry, registry.Validate()
+}
+
+func NewAVMInterfaceSchema(schema AVMInterfaceSchema) (AVMInterfaceSchema, error) {
+	schema = canonicalAVMInterfaceSchema(schema)
+	schema.SchemaHash = ComputeAVMInterfaceSchemaHash(schema)
+	return schema, schema.Validate()
+}
+
+func NewAVMInterfaceBinding(binding AVMInterfaceBinding) (AVMInterfaceBinding, error) {
+	binding = canonicalAVMInterfaceBinding(binding)
+	binding.BindingHash = ComputeAVMInterfaceBindingHash(binding)
+	return binding, binding.Validate()
+}
+
+func NewAVMSDKCodeGenerationFormat(format AVMSDKCodeGenerationFormat) (AVMSDKCodeGenerationFormat, error) {
+	format = canonicalAVMSDKCodeGenerationFormat(format)
+	format.GenerationHash = ComputeAVMSDKCodeGenerationHash(format)
+	return format, format.Validate()
 }
 
 func (d AVMMethodDescriptor) Validate() error {
@@ -155,7 +216,16 @@ func (d AVMAsyncHandlerDescriptor) Validate() error {
 	if d.GasHint == 0 {
 		return errors.New("AVM async handler gas hint must be positive")
 	}
-	return validateRouterOptionalToken("AVM async handler retry policy", d.RetryPolicyOptional, MaxAVMInterfaceTokenLength)
+	if err := validateRouterOptionalToken("AVM async handler retry policy", d.RetryPolicyOptional, MaxAVMInterfaceTokenLength); err != nil {
+		return err
+	}
+	if err := validateInterfaceToken("AVM async handler callback behavior", d.CallbackBehavior); err != nil {
+		return err
+	}
+	if d.TimeoutHeight == 0 {
+		return errors.New("AVM async handler timeout height must be positive")
+	}
+	return nil
 }
 
 func (d AVMGetMethodDescriptor) Validate() error {
@@ -174,6 +244,9 @@ func (d AVMGetMethodDescriptor) Validate() error {
 	}
 	if d.GasHint == 0 {
 		return errors.New("AVM get method gas hint must be positive")
+	}
+	if !d.ReadOnly {
+		return errors.New("AVM get methods must be read-only")
 	}
 	return nil
 }
@@ -202,6 +275,9 @@ func (d AVMInterfaceDescriptor) Validate() error {
 		if err := zonestypes.ValidateHash("AVM interface metadata hash", d.MetadataHashOptional); err != nil {
 			return err
 		}
+	}
+	if d.MetadataGrantsAuth {
+		return errors.New("AVM interface metadata cannot grant authorization")
 	}
 	total := len(d.MethodDescriptors) + len(d.EventDescriptors) + len(d.AsyncHandlerDescriptors) + len(d.GetMethodDescriptors)
 	if total == 0 {
@@ -246,6 +322,12 @@ func (r AVMInterfaceRegistry) Validate() error {
 			return errors.New("AVM interface registry entries must be sorted canonically")
 		}
 	}
+	if err := validateAVMInterfaceSchemas(r.Schemas, seen); err != nil {
+		return err
+	}
+	if err := validateAVMInterfaceBindings(r.Bindings, seen); err != nil {
+		return err
+	}
 	if err := zonestypes.ValidateHash("AVM interface registry root", r.Root); err != nil {
 		return err
 	}
@@ -253,6 +335,73 @@ func (r AVMInterfaceRegistry) Validate() error {
 		return errors.New("AVM interface registry root mismatch")
 	}
 	return nil
+}
+
+func (s AVMInterfaceSchema) Validate() error {
+	s = canonicalAVMInterfaceSchema(s)
+	if err := zonestypes.ValidateHash("AVM interface schema interface hash", s.InterfaceHash); err != nil {
+		return err
+	}
+	if !IsAVMInterfaceSchemaEncoding(s.SchemaEncoding) {
+		return fmt.Errorf("invalid AVM interface schema encoding %q", s.SchemaEncoding)
+	}
+	if err := zonestypes.ValidateHash("AVM interface descriptor root", s.DescriptorRoot); err != nil {
+		return err
+	}
+	if len(s.UseCases) == 0 {
+		return errors.New("AVM interface schema must declare use cases")
+	}
+	seen := make(map[AVMInterfaceUseCase]struct{}, len(s.UseCases))
+	for i, useCase := range s.UseCases {
+		if !IsAVMInterfaceUseCase(useCase) {
+			return fmt.Errorf("invalid AVM interface use case %q", useCase)
+		}
+		if _, found := seen[useCase]; found {
+			return fmt.Errorf("duplicate AVM interface use case %q", useCase)
+		}
+		seen[useCase] = struct{}{}
+		if i > 0 && s.UseCases[i-1] >= useCase {
+			return errors.New("AVM interface use cases must be sorted canonically")
+		}
+	}
+	return validateAdapterHash("AVM interface schema", s.SchemaHash, ComputeAVMInterfaceSchemaHash(s))
+}
+
+func (b AVMInterfaceBinding) Validate() error {
+	b = canonicalAVMInterfaceBinding(b)
+	if err := validateInterfaceToken("AVM interface binding target id", b.TargetID); err != nil {
+		return err
+	}
+	if !IsAVMInterfaceTargetType(b.TargetType) {
+		return fmt.Errorf("invalid AVM interface binding target type %q", b.TargetType)
+	}
+	if err := zonestypes.ValidateHash("AVM interface binding interface hash", b.InterfaceHash); err != nil {
+		return err
+	}
+	return validateAdapterHash("AVM interface binding", b.BindingHash, ComputeAVMInterfaceBindingHash(b))
+}
+
+func (f AVMSDKCodeGenerationFormat) Validate() error {
+	f = canonicalAVMSDKCodeGenerationFormat(f)
+	if err := zonestypes.ValidateHash("AVM SDK codegen interface hash", f.InterfaceHash); err != nil {
+		return err
+	}
+	if !IsAVMInterfaceSDKCodegenFormat(f.Format) {
+		return fmt.Errorf("invalid AVM SDK code generation format %q", f.Format)
+	}
+	if err := validateInterfaceToken("AVM SDK codegen package name", f.PackageName); err != nil {
+		return err
+	}
+	if len(f.MethodBindings)+len(f.GetMethodBindings) == 0 {
+		return errors.New("AVM SDK code generation must expose bindings")
+	}
+	if err := validateInterfaceBindingNames("AVM SDK method binding", f.MethodBindings); err != nil {
+		return err
+	}
+	if err := validateInterfaceBindingNames("AVM SDK get method binding", f.GetMethodBindings); err != nil {
+		return err
+	}
+	return validateAdapterHash("AVM SDK code generation", f.GenerationHash, ComputeAVMSDKCodeGenerationHash(f))
 }
 
 func IsAVMInterfaceExecutionMode(mode AVMInterfaceExecutionMode) bool {
@@ -282,6 +431,91 @@ func IsAVMInterfaceSchemaEncoding(encoding AVMInterfaceSchemaEncoding) bool {
 	}
 }
 
+func IsAVMInterfaceUseCase(useCase AVMInterfaceUseCase) bool {
+	switch useCase {
+	case AVMInterfaceUseUIGeneration,
+		AVMInterfaceUseWalletForms,
+		AVMInterfaceUseCLIAutoBinding,
+		AVMInterfaceUseRPCIntrospection,
+		AVMInterfaceUseSDKCallBuilders,
+		AVMInterfaceUseCapabilityDiscovery:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsAVMInterfaceSDKCodegenFormat(format AVMInterfaceSDKCodegenFormat) bool {
+	switch format {
+	case AVMInterfaceSDKGo, AVMInterfaceSDKTypeScript, AVMInterfaceSDKJSON:
+		return true
+	default:
+		return false
+	}
+}
+
+func VerifyAVMInterfaceHash(descriptor AVMInterfaceDescriptor, expectedHash string) error {
+	descriptor = canonicalAVMInterfaceDescriptor(descriptor)
+	if err := zonestypes.ValidateHash("expected AVM interface hash", expectedHash); err != nil {
+		return err
+	}
+	if err := descriptor.Validate(); err != nil {
+		return err
+	}
+	if descriptor.InterfaceHash != expectedHash || ComputeAVMInterfaceHash(descriptor) != expectedHash {
+		return errors.New("AVM interface hash verification failed")
+	}
+	return nil
+}
+
+func VerifyAVMInterfaceSchema(descriptor AVMInterfaceDescriptor, schema AVMInterfaceSchema) error {
+	descriptor = canonicalAVMInterfaceDescriptor(descriptor)
+	schema = canonicalAVMInterfaceSchema(schema)
+	if err := descriptor.Validate(); err != nil {
+		return err
+	}
+	if err := schema.Validate(); err != nil {
+		return err
+	}
+	if schema.InterfaceHash != descriptor.InterfaceHash {
+		return errors.New("AVM interface schema interface hash mismatch")
+	}
+	if schema.SchemaEncoding != descriptor.SchemaEncoding {
+		return errors.New("AVM interface schema encoding mismatch")
+	}
+	if schema.DescriptorRoot != ComputeAVMInterfaceDescriptorRoot(descriptor) {
+		return errors.New("AVM interface schema descriptor root mismatch")
+	}
+	return nil
+}
+
+func QueryAVMInterfaceByTarget(registry AVMInterfaceRegistry, targetType AVMInterfaceTargetType, targetID string) (AVMInterfaceDescriptor, AVMInterfaceBinding, error) {
+	registry = canonicalAVMInterfaceRegistry(registry)
+	if err := registry.Validate(); err != nil {
+		return AVMInterfaceDescriptor{}, AVMInterfaceBinding{}, err
+	}
+	targetID = strings.TrimSpace(targetID)
+	for _, binding := range registry.Bindings {
+		if binding.TargetType == targetType && binding.TargetID == targetID {
+			for _, descriptor := range registry.Interfaces {
+				if descriptor.InterfaceHash == binding.InterfaceHash {
+					return descriptor, binding, nil
+				}
+			}
+			return AVMInterfaceDescriptor{}, AVMInterfaceBinding{}, errors.New("AVM interface binding points to missing descriptor")
+		}
+	}
+	return AVMInterfaceDescriptor{}, AVMInterfaceBinding{}, errors.New("AVM interface binding not found")
+}
+
+func QueryAVMInterfaceByContract(registry AVMInterfaceRegistry, contractID string) (AVMInterfaceDescriptor, AVMInterfaceBinding, error) {
+	return QueryAVMInterfaceByTarget(registry, AVMInterfaceTargetContract, contractID)
+}
+
+func QueryAVMInterfaceByService(registry AVMInterfaceRegistry, serviceID string) (AVMInterfaceDescriptor, AVMInterfaceBinding, error) {
+	return QueryAVMInterfaceByTarget(registry, AVMInterfaceTargetService, serviceID)
+}
+
 func ComputeAVMInterfaceHash(descriptor AVMInterfaceDescriptor) string {
 	descriptor = canonicalAVMInterfaceDescriptor(descriptor)
 	h := sha256.New()
@@ -307,6 +541,8 @@ func ComputeAVMInterfaceHash(descriptor AVMInterfaceDescriptor) string {
 		writeEnginePart(h, handler.OutputSchemaHash)
 		writeEngineUint64(h, handler.GasHint)
 		writeEnginePart(h, handler.RetryPolicyOptional)
+		writeEnginePart(h, handler.CallbackBehavior)
+		writeEngineUint64(h, handler.TimeoutHeight)
 	}
 	writeEngineUint64(h, uint64(len(descriptor.GetMethodDescriptors)))
 	for _, method := range descriptor.GetMethodDescriptors {
@@ -315,9 +551,11 @@ func ComputeAVMInterfaceHash(descriptor AVMInterfaceDescriptor) string {
 		writeEnginePart(h, method.InputSchemaHash)
 		writeEnginePart(h, method.OutputSchemaHash)
 		writeEngineUint64(h, method.GasHint)
+		writeEngineBool(h, method.ReadOnly)
 	}
 	writeEnginePart(h, string(descriptor.SchemaEncoding))
 	writeEnginePart(h, descriptor.MetadataHashOptional)
+	writeEngineBool(h, descriptor.MetadataGrantsAuth)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
@@ -328,6 +566,84 @@ func ComputeAVMInterfaceRegistryRoot(registry AVMInterfaceRegistry) string {
 	writeEngineUint64(h, uint64(len(registry.Interfaces)))
 	for _, descriptor := range registry.Interfaces {
 		writeEnginePart(h, descriptor.InterfaceHash)
+	}
+	writeEngineUint64(h, uint64(len(registry.Schemas)))
+	for _, schema := range registry.Schemas {
+		writeEnginePart(h, schema.SchemaHash)
+	}
+	writeEngineUint64(h, uint64(len(registry.Bindings)))
+	for _, binding := range registry.Bindings {
+		writeEnginePart(h, binding.BindingHash)
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func ComputeAVMInterfaceDescriptorRoot(descriptor AVMInterfaceDescriptor) string {
+	descriptor = canonicalAVMInterfaceDescriptor(descriptor)
+	h := sha256.New()
+	writeEnginePart(h, "aetheris-avm-interface-descriptor-root-v1")
+	writeEngineUint64(h, uint64(len(descriptor.MethodDescriptors)))
+	for _, method := range descriptor.MethodDescriptors {
+		writeAVMMethodDescriptor(h, method)
+	}
+	writeEngineUint64(h, uint64(len(descriptor.EventDescriptors)))
+	for _, event := range descriptor.EventDescriptors {
+		writeEnginePart(h, event.EventID)
+		writeEnginePart(h, event.SchemaHash)
+	}
+	writeEngineUint64(h, uint64(len(descriptor.AsyncHandlerDescriptors)))
+	for _, handler := range descriptor.AsyncHandlerDescriptors {
+		writeEnginePart(h, handler.HandlerID)
+		writeEnginePart(h, handler.InputSchemaHash)
+		writeEnginePart(h, handler.OutputSchemaHash)
+	}
+	writeEngineUint64(h, uint64(len(descriptor.GetMethodDescriptors)))
+	for _, method := range descriptor.GetMethodDescriptors {
+		writeEnginePart(h, method.MethodID)
+		writeEnginePart(h, method.InputSchemaHash)
+		writeEnginePart(h, method.OutputSchemaHash)
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func ComputeAVMInterfaceSchemaHash(schema AVMInterfaceSchema) string {
+	schema = canonicalAVMInterfaceSchema(schema)
+	h := sha256.New()
+	writeEnginePart(h, "aetheris-avm-interface-schema-v1")
+	writeEnginePart(h, schema.InterfaceHash)
+	writeEnginePart(h, string(schema.SchemaEncoding))
+	writeEnginePart(h, schema.DescriptorRoot)
+	writeEngineUint64(h, uint64(len(schema.UseCases)))
+	for _, useCase := range schema.UseCases {
+		writeEnginePart(h, string(useCase))
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func ComputeAVMInterfaceBindingHash(binding AVMInterfaceBinding) string {
+	binding = canonicalAVMInterfaceBinding(binding)
+	h := sha256.New()
+	writeEnginePart(h, "aetheris-avm-interface-binding-v1")
+	writeEnginePart(h, binding.TargetID)
+	writeEnginePart(h, string(binding.TargetType))
+	writeEnginePart(h, binding.InterfaceHash)
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func ComputeAVMSDKCodeGenerationHash(format AVMSDKCodeGenerationFormat) string {
+	format = canonicalAVMSDKCodeGenerationFormat(format)
+	h := sha256.New()
+	writeEnginePart(h, "aetheris-avm-interface-sdk-codegen-v1")
+	writeEnginePart(h, format.InterfaceHash)
+	writeEnginePart(h, string(format.Format))
+	writeEnginePart(h, format.PackageName)
+	writeEngineUint64(h, uint64(len(format.MethodBindings)))
+	for _, binding := range format.MethodBindings {
+		writeEnginePart(h, binding)
+	}
+	writeEngineUint64(h, uint64(len(format.GetMethodBindings)))
+	for _, binding := range format.GetMethodBindings {
+		writeEnginePart(h, binding)
 	}
 	return hex.EncodeToString(h.Sum(nil))
 }
@@ -391,6 +707,7 @@ func canonicalAVMAsyncHandlerDescriptor(descriptor AVMAsyncHandlerDescriptor) AV
 	descriptor.InputSchemaHash = strings.TrimSpace(descriptor.InputSchemaHash)
 	descriptor.OutputSchemaHash = strings.TrimSpace(descriptor.OutputSchemaHash)
 	descriptor.RetryPolicyOptional = strings.TrimSpace(descriptor.RetryPolicyOptional)
+	descriptor.CallbackBehavior = strings.TrimSpace(descriptor.CallbackBehavior)
 	return descriptor
 }
 
@@ -411,7 +728,49 @@ func canonicalAVMInterfaceRegistry(registry AVMInterfaceRegistry) AVMInterfaceRe
 	sort.SliceStable(registry.Interfaces, func(i, j int) bool {
 		return registry.Interfaces[i].InterfaceHash < registry.Interfaces[j].InterfaceHash
 	})
+	registry.Schemas = append([]AVMInterfaceSchema(nil), registry.Schemas...)
+	for i := range registry.Schemas {
+		registry.Schemas[i] = canonicalAVMInterfaceSchema(registry.Schemas[i])
+	}
+	sort.SliceStable(registry.Schemas, func(i, j int) bool {
+		return registry.Schemas[i].InterfaceHash < registry.Schemas[j].InterfaceHash
+	})
+	registry.Bindings = append([]AVMInterfaceBinding(nil), registry.Bindings...)
+	for i := range registry.Bindings {
+		registry.Bindings[i] = canonicalAVMInterfaceBinding(registry.Bindings[i])
+	}
+	sort.SliceStable(registry.Bindings, func(i, j int) bool {
+		if registry.Bindings[i].TargetType != registry.Bindings[j].TargetType {
+			return registry.Bindings[i].TargetType < registry.Bindings[j].TargetType
+		}
+		return registry.Bindings[i].TargetID < registry.Bindings[j].TargetID
+	})
 	return registry
+}
+
+func canonicalAVMInterfaceSchema(schema AVMInterfaceSchema) AVMInterfaceSchema {
+	schema.InterfaceHash = strings.TrimSpace(schema.InterfaceHash)
+	schema.DescriptorRoot = strings.TrimSpace(schema.DescriptorRoot)
+	schema.SchemaHash = strings.TrimSpace(schema.SchemaHash)
+	schema.UseCases = append([]AVMInterfaceUseCase(nil), schema.UseCases...)
+	sort.SliceStable(schema.UseCases, func(i, j int) bool { return schema.UseCases[i] < schema.UseCases[j] })
+	return schema
+}
+
+func canonicalAVMInterfaceBinding(binding AVMInterfaceBinding) AVMInterfaceBinding {
+	binding.TargetID = strings.TrimSpace(binding.TargetID)
+	binding.InterfaceHash = strings.TrimSpace(binding.InterfaceHash)
+	binding.BindingHash = strings.TrimSpace(binding.BindingHash)
+	return binding
+}
+
+func canonicalAVMSDKCodeGenerationFormat(format AVMSDKCodeGenerationFormat) AVMSDKCodeGenerationFormat {
+	format.InterfaceHash = strings.TrimSpace(format.InterfaceHash)
+	format.PackageName = strings.TrimSpace(format.PackageName)
+	format.GenerationHash = strings.TrimSpace(format.GenerationHash)
+	format.MethodBindings = cloneSortedNativeModuleStrings(format.MethodBindings)
+	format.GetMethodBindings = cloneSortedNativeModuleStrings(format.GetMethodBindings)
+	return format
 }
 
 func validateAVMMethods(methods []AVMMethodDescriptor) error {
@@ -477,6 +836,67 @@ func validateAVMGetMethods(methods []AVMGetMethodDescriptor) error {
 		seen[method.MethodID] = struct{}{}
 		if i > 0 && methods[i-1].MethodID >= method.MethodID {
 			return errors.New("AVM get method descriptors must be sorted canonically")
+		}
+	}
+	return nil
+}
+
+func validateAVMInterfaceSchemas(schemas []AVMInterfaceSchema, interfaceHashes map[string]struct{}) error {
+	seen := make(map[string]struct{}, len(schemas))
+	for i, schema := range schemas {
+		if err := schema.Validate(); err != nil {
+			return err
+		}
+		if _, found := interfaceHashes[schema.InterfaceHash]; !found {
+			return fmt.Errorf("AVM interface schema references missing interface %q", schema.InterfaceHash)
+		}
+		if _, found := seen[schema.InterfaceHash]; found {
+			return fmt.Errorf("duplicate AVM interface schema %q", schema.InterfaceHash)
+		}
+		seen[schema.InterfaceHash] = struct{}{}
+		if i > 0 && schemas[i-1].InterfaceHash >= schema.InterfaceHash {
+			return errors.New("AVM interface schemas must be sorted canonically")
+		}
+	}
+	return nil
+}
+
+func validateAVMInterfaceBindings(bindings []AVMInterfaceBinding, interfaceHashes map[string]struct{}) error {
+	seen := make(map[string]struct{}, len(bindings))
+	for i, binding := range bindings {
+		if err := binding.Validate(); err != nil {
+			return err
+		}
+		if _, found := interfaceHashes[binding.InterfaceHash]; !found {
+			return fmt.Errorf("AVM interface binding references missing interface %q", binding.InterfaceHash)
+		}
+		key := string(binding.TargetType) + "/" + binding.TargetID
+		if _, found := seen[key]; found {
+			return fmt.Errorf("duplicate AVM interface binding %q", key)
+		}
+		seen[key] = struct{}{}
+		if i > 0 {
+			prev := string(bindings[i-1].TargetType) + "/" + bindings[i-1].TargetID
+			if prev >= key {
+				return errors.New("AVM interface bindings must be sorted canonically")
+			}
+		}
+	}
+	return nil
+}
+
+func validateInterfaceBindingNames(fieldName string, values []string) error {
+	seen := make(map[string]struct{}, len(values))
+	for i, value := range values {
+		if err := validateInterfaceToken(fieldName, value); err != nil {
+			return err
+		}
+		if _, found := seen[value]; found {
+			return fmt.Errorf("duplicate %s %q", fieldName, value)
+		}
+		seen[value] = struct{}{}
+		if i > 0 && values[i-1] >= value {
+			return fmt.Errorf("%s values must be sorted canonically", fieldName)
 		}
 	}
 	return nil

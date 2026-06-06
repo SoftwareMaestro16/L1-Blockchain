@@ -93,6 +93,89 @@ func TestAVMInterfaceRegistryRootAndDuplicateRejection(t *testing.T) {
 	require.ErrorContains(t, duplicate.Validate(), "duplicate")
 }
 
+func TestAVMInterfaceSchemaBindingsQueriesAndSDKCodegen(t *testing.T) {
+	contractDescriptor := testAVMInterfaceDescriptor(t)
+	serviceDescriptor, err := NewAVMInterfaceDescriptor(AVMInterfaceDescriptor{
+		InterfaceVersion: "v2.0.0",
+		Owner:            "rpc-service",
+		TargetType:       AVMInterfaceTargetService,
+		MethodDescriptors: []AVMMethodDescriptor{{
+			MethodID:         "rpc.submit",
+			Name:             "submit",
+			InputSchemaHash:  engineHash("rpc-submit-input"),
+			OutputSchemaHash: engineHash("rpc-submit-output"),
+			ExecutionMode:    AVMInterfaceExecutionSync,
+			GasHint:          11,
+		}},
+		SchemaEncoding: AVMInterfaceSchemaProtobuf,
+	})
+	require.NoError(t, err)
+	contractSchema := testAVMInterfaceSchema(t, contractDescriptor)
+	serviceSchema := testAVMInterfaceSchema(t, serviceDescriptor)
+	contractBinding, err := NewAVMInterfaceBinding(AVMInterfaceBinding{
+		TargetID:      "contract-actor-1",
+		TargetType:    AVMInterfaceTargetContract,
+		InterfaceHash: contractDescriptor.InterfaceHash,
+	})
+	require.NoError(t, err)
+	serviceBinding, err := NewAVMInterfaceBinding(AVMInterfaceBinding{
+		TargetID:      "rpc-service",
+		TargetType:    AVMInterfaceTargetService,
+		InterfaceHash: serviceDescriptor.InterfaceHash,
+	})
+	require.NoError(t, err)
+	registry, err := NewAVMInterfaceRegistry(AVMInterfaceRegistry{
+		Interfaces: []AVMInterfaceDescriptor{serviceDescriptor, contractDescriptor},
+		Schemas:    []AVMInterfaceSchema{serviceSchema, contractSchema},
+		Bindings:   []AVMInterfaceBinding{serviceBinding, contractBinding},
+	})
+	require.NoError(t, err)
+
+	queriedContract, binding, err := QueryAVMInterfaceByContract(registry, "contract-actor-1")
+	require.NoError(t, err)
+	require.Equal(t, contractDescriptor.InterfaceHash, queriedContract.InterfaceHash)
+	require.Equal(t, contractBinding.BindingHash, binding.BindingHash)
+	queriedService, _, err := QueryAVMInterfaceByService(registry, "rpc-service")
+	require.NoError(t, err)
+	require.Equal(t, serviceDescriptor.InterfaceHash, queriedService.InterfaceHash)
+
+	codegen, err := NewAVMSDKCodeGenerationFormat(AVMSDKCodeGenerationFormat{
+		InterfaceHash:     contractDescriptor.InterfaceHash,
+		Format:            AVMInterfaceSDKTypeScript,
+		PackageName:       "aetheris_actor",
+		MethodBindings:    []string{"execute", "schedule"},
+		GetMethodBindings: []string{"balance"},
+	})
+	require.NoError(t, err)
+	require.NoError(t, codegen.Validate())
+}
+
+func TestAVMInterfaceHashVerificationSchemaMismatchAndVersionChanges(t *testing.T) {
+	descriptor := testAVMInterfaceDescriptor(t)
+	require.NoError(t, VerifyAVMInterfaceHash(descriptor, descriptor.InterfaceHash))
+
+	versioned := descriptor
+	versioned.InterfaceVersion = "v1.0.1"
+	versioned.InterfaceHash = ComputeAVMInterfaceHash(versioned)
+	require.NotEqual(t, descriptor.InterfaceHash, versioned.InterfaceHash)
+	require.ErrorContains(t, VerifyAVMInterfaceHash(versioned, descriptor.InterfaceHash), "verification failed")
+
+	schema := testAVMInterfaceSchema(t, descriptor)
+	require.NoError(t, VerifyAVMInterfaceSchema(descriptor, schema))
+	schema.DescriptorRoot = engineHash("wrong-descriptor-root")
+	schema.SchemaHash = ComputeAVMInterfaceSchemaHash(schema)
+	require.NotEqual(t, ComputeAVMInterfaceDescriptorRoot(descriptor), schema.DescriptorRoot)
+	require.NoError(t, schema.Validate())
+	require.ErrorContains(t, VerifyAVMInterfaceSchema(descriptor, schema), "descriptor root mismatch")
+
+	registry, err := NewAVMInterfaceRegistry(AVMInterfaceRegistry{
+		Interfaces: []AVMInterfaceDescriptor{descriptor},
+		Schemas:    []AVMInterfaceSchema{schema},
+	})
+	require.NoError(t, err)
+	require.Equal(t, schema.SchemaHash, registry.Schemas[0].SchemaHash)
+}
+
 func TestAVMInterfaceDescriptorRejectsMalformedDescriptorSets(t *testing.T) {
 	descriptor := testAVMInterfaceDescriptor(t)
 
@@ -119,6 +202,23 @@ func TestAVMInterfaceDescriptorRejectsMalformedDescriptorSets(t *testing.T) {
 	badEncoding.SchemaEncoding = AVMInterfaceSchemaEncoding("yaml")
 	badEncoding.InterfaceHash = ComputeAVMInterfaceHash(badEncoding)
 	require.ErrorContains(t, badEncoding.Validate(), "schema encoding")
+
+	authMetadata := descriptor
+	authMetadata.MetadataGrantsAuth = true
+	authMetadata.InterfaceHash = ComputeAVMInterfaceHash(authMetadata)
+	require.ErrorContains(t, authMetadata.Validate(), "authorization")
+
+	getWrites := descriptor
+	getWrites.GetMethodDescriptors = append([]AVMGetMethodDescriptor(nil), descriptor.GetMethodDescriptors...)
+	getWrites.GetMethodDescriptors[0].ReadOnly = false
+	getWrites.InterfaceHash = ComputeAVMInterfaceHash(getWrites)
+	require.ErrorContains(t, getWrites.Validate(), "read-only")
+
+	missingCallback := descriptor
+	missingCallback.AsyncHandlerDescriptors = append([]AVMAsyncHandlerDescriptor(nil), descriptor.AsyncHandlerDescriptors...)
+	missingCallback.AsyncHandlerDescriptors[0].CallbackBehavior = ""
+	missingCallback.InterfaceHash = ComputeAVMInterfaceHash(missingCallback)
+	require.ErrorContains(t, missingCallback.Validate(), "callback")
 }
 
 func testAVMInterfaceDescriptor(t *testing.T) AVMInterfaceDescriptor {
@@ -159,6 +259,8 @@ func testAVMInterfaceDescriptor(t *testing.T) AVMInterfaceDescriptor {
 			OutputSchemaHash:    engineHash("handler-output"),
 			GasHint:             80,
 			RetryPolicyOptional: "bounded",
+			CallbackBehavior:    "emit_receipt",
+			TimeoutHeight:       10,
 		}},
 		GetMethodDescriptors: []AVMGetMethodDescriptor{{
 			MethodID:         "actor.balance",
@@ -166,10 +268,30 @@ func testAVMInterfaceDescriptor(t *testing.T) AVMInterfaceDescriptor {
 			InputSchemaHash:  engineHash("get-input"),
 			OutputSchemaHash: engineHash("get-output"),
 			GasHint:          5,
+			ReadOnly:         true,
 		}},
 		SchemaEncoding:       AVMInterfaceSchemaJSONSchema,
 		MetadataHashOptional: engineHash("interface-metadata"),
 	})
 	require.NoError(t, err)
 	return descriptor
+}
+
+func testAVMInterfaceSchema(t *testing.T, descriptor AVMInterfaceDescriptor) AVMInterfaceSchema {
+	t.Helper()
+	schema, err := NewAVMInterfaceSchema(AVMInterfaceSchema{
+		InterfaceHash:  descriptor.InterfaceHash,
+		SchemaEncoding: descriptor.SchemaEncoding,
+		DescriptorRoot: ComputeAVMInterfaceDescriptorRoot(descriptor),
+		UseCases: []AVMInterfaceUseCase{
+			AVMInterfaceUseUIGeneration,
+			AVMInterfaceUseWalletForms,
+			AVMInterfaceUseCLIAutoBinding,
+			AVMInterfaceUseRPCIntrospection,
+			AVMInterfaceUseSDKCallBuilders,
+			AVMInterfaceUseCapabilityDiscovery,
+		},
+	})
+	require.NoError(t, err)
+	return schema
 }
