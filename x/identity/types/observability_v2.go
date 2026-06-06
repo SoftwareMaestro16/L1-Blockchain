@@ -9,6 +9,8 @@ import (
 
 type IdentityObservabilityEventTypeV2 string
 type IdentityObservabilityMetricNameV2 string
+type IdentityObservabilityAlertTypeV2 string
+type IdentityObservabilityAlertSeverityV2 string
 
 const (
 	IdentityEventDomainCommitted    IdentityObservabilityEventTypeV2 = "identity_domain_committed"
@@ -63,9 +65,28 @@ const (
 	IdentityMetricUnitBasisPoints  = "bps"
 )
 
+const (
+	IdentityAlertNFTBindingMismatch          IdentityObservabilityAlertTypeV2 = "identity_alert_nft_binding_mismatch"
+	IdentityAlertResolverPayloadNearMaximum  IdentityObservabilityAlertTypeV2 = "identity_alert_resolver_payload_near_maximum"
+	IdentityAlertExpiryBacklogAboveThreshold IdentityObservabilityAlertTypeV2 = "identity_alert_expiry_processing_backlog_above_threshold"
+	IdentityAlertProofQueryFailureSpike      IdentityObservabilityAlertTypeV2 = "identity_alert_proof_query_failure_spike"
+	IdentityAlertRegistrationSpamSpike       IdentityObservabilityAlertTypeV2 = "identity_alert_registration_spam_spike"
+	IdentityAlertResolverUpdateSpamSpike     IdentityObservabilityAlertTypeV2 = "identity_alert_resolver_update_spam_spike"
+	IdentityAlertAuctionFinalizationBacklog  IdentityObservabilityAlertTypeV2 = "identity_alert_auction_finalization_backlog"
+	IdentityAlertBlockSTMConflictRateHigh    IdentityObservabilityAlertTypeV2 = "identity_alert_blockstm_conflict_rate_above_threshold"
+	IdentityAlertStoreV2ReadLatencyHigh      IdentityObservabilityAlertTypeV2 = "identity_alert_store_v2_identity_read_latency_above_threshold"
+	IdentityAlertReverseMismatchSpike        IdentityObservabilityAlertTypeV2 = "identity_alert_reverse_verification_mismatch_spike"
+)
+
+const (
+	IdentityAlertSeverityWarning  IdentityObservabilityAlertSeverityV2 = "warning"
+	IdentityAlertSeverityCritical IdentityObservabilityAlertSeverityV2 = "critical"
+)
+
 type IdentityObservabilitySpecV2 struct {
 	Events   []IdentityObservabilityEventTypeV2
 	Metrics  []IdentityObservabilityMetricNameV2
+	Alerts   []IdentityObservabilityAlertTypeV2
 	SpecHash string
 }
 
@@ -109,10 +130,46 @@ type IdentityObservabilityMetricsSnapshotV2 struct {
 	SnapshotHash string
 }
 
+type IdentityObservabilityAlertThresholdsV2 struct {
+	ResolverPayloadNearMaxBps           uint64
+	ExpiryBacklogThreshold              uint64
+	ProofFailureSpikeThreshold          uint64
+	RegistrationSpamSpikeThreshold      uint64
+	ResolverUpdateSpamSpikeThreshold    uint64
+	AuctionFinalizationBacklogThreshold uint64
+	BlockSTMConflictRateBpsThreshold    uint64
+	StoreV2ReadLatencyMicrosThreshold   uint64
+	ReverseMismatchSpikeThreshold       uint64
+}
+
+type IdentityObservabilityAlertInputV2 struct {
+	State                        IdentityState
+	Snapshot                     IdentityObservabilityMetricsSnapshotV2
+	Height                       uint64
+	Thresholds                   IdentityObservabilityAlertThresholdsV2
+	RegistrationAttemptsInWindow uint64
+	ResolverUpdatesInWindow      uint64
+	ReverseMismatchesInWindow    uint64
+}
+
+type IdentityObservabilityAlertV2 struct {
+	Type          IdentityObservabilityAlertTypeV2
+	Severity      IdentityObservabilityAlertSeverityV2
+	Height        uint64
+	ObservedValue uint64
+	Threshold     uint64
+	Name          string
+	NameHash      string
+	Metric        IdentityObservabilityMetricNameV2
+	Details       string
+	AlertHash     string
+}
+
 func DefaultIdentityObservabilitySpecV2() (IdentityObservabilitySpecV2, error) {
 	spec := IdentityObservabilitySpecV2{
 		Events:  requiredIdentityObservabilityEventsV2(),
 		Metrics: requiredIdentityObservabilityMetricsV2(),
+		Alerts:  requiredIdentityObservabilityAlertsV2(),
 	}
 	spec.SpecHash = ComputeIdentityObservabilitySpecHashV2(spec)
 	return spec, ValidateIdentityObservabilitySpecV2(spec)
@@ -123,6 +180,9 @@ func ValidateIdentityObservabilitySpecV2(spec IdentityObservabilitySpecV2) error
 		return err
 	}
 	if err := validateRequiredTypedSetV2("identity observability metric", spec.Metrics, requiredIdentityObservabilityMetricsV2(), IsIdentityObservabilityMetricNameV2); err != nil {
+		return err
+	}
+	if err := validateRequiredTypedSetV2("identity observability alert", spec.Alerts, requiredIdentityObservabilityAlertsV2(), IsIdentityObservabilityAlertTypeV2); err != nil {
 		return err
 	}
 	if spec.SpecHash == "" || spec.SpecHash != ComputeIdentityObservabilitySpecHashV2(spec) {
@@ -382,6 +442,178 @@ func ValidateIdentityObservabilityMetricsSnapshotV2(snapshot IdentityObservabili
 	return nil
 }
 
+func DefaultIdentityObservabilityAlertThresholdsV2() IdentityObservabilityAlertThresholdsV2 {
+	return IdentityObservabilityAlertThresholdsV2{
+		ResolverPayloadNearMaxBps:           8_000,
+		ExpiryBacklogThreshold:              100,
+		ProofFailureSpikeThreshold:          10,
+		RegistrationSpamSpikeThreshold:      100,
+		ResolverUpdateSpamSpikeThreshold:    100,
+		AuctionFinalizationBacklogThreshold: 10,
+		BlockSTMConflictRateBpsThreshold:    2_000,
+		StoreV2ReadLatencyMicrosThreshold:   50_000,
+		ReverseMismatchSpikeThreshold:       10,
+	}
+}
+
+func EvaluateIdentityObservabilityAlertsV2(input IdentityObservabilityAlertInputV2) ([]IdentityObservabilityAlertV2, error) {
+	if input.Height == 0 {
+		return nil, errors.New("identity observability alert height is required")
+	}
+	state := input.State.Export()
+	if input.Snapshot.Height != 0 {
+		if err := ValidateIdentityObservabilityMetricsSnapshotV2(input.Snapshot); err != nil {
+			return nil, err
+		}
+	}
+	thresholds := normalizeIdentityObservabilityAlertThresholdsV2(input.Thresholds)
+	alerts := make([]IdentityObservabilityAlertV2, 0)
+	for _, domain := range state.Domains {
+		nft, found := findDomainNFTByID(state, domain.NFTID)
+		if !found || !addressesEqual(nft.Owner, domain.Owner) {
+			alert, err := NewIdentityObservabilityAlertV2(IdentityObservabilityAlertV2{
+				Type:          IdentityAlertNFTBindingMismatch,
+				Severity:      IdentityAlertSeverityCritical,
+				Height:        input.Height,
+				ObservedValue: 1,
+				Threshold:     0,
+				Name:          domain.Name,
+				Details:       "registry owner and nft owner diverged",
+			})
+			if err != nil {
+				return nil, err
+			}
+			alerts = append(alerts, alert)
+		}
+	}
+	for _, resolver := range state.Resolvers {
+		payloadBytes := estimateResolverRecordPayloadBytesV2(resolver)
+		payloadBps := payloadBytes * 10_000 / MaxUnifiedPayloadBytesV2
+		if payloadBps >= thresholds.ResolverPayloadNearMaxBps {
+			alert, err := NewIdentityObservabilityAlertV2(IdentityObservabilityAlertV2{
+				Type:          IdentityAlertResolverPayloadNearMaximum,
+				Severity:      IdentityAlertSeverityWarning,
+				Height:        input.Height,
+				ObservedValue: payloadBps,
+				Threshold:     thresholds.ResolverPayloadNearMaxBps,
+				Name:          resolver.Domain,
+				Metric:        IdentityMetricAverageResolverPayloadSize,
+				Details:       "resolver payload is near maximum",
+			})
+			if err != nil {
+				return nil, err
+			}
+			alerts = append(alerts, alert)
+		}
+	}
+	metricValues := identityObservabilityMetricValuesV2(input.Snapshot)
+	var err error
+	if alerts, err = appendThresholdAlertV2(alerts, input.Height, IdentityAlertExpiryBacklogAboveThreshold, IdentityAlertSeverityWarning, IdentityMetricExpiryProcessingBacklog, metricValues[IdentityMetricExpiryProcessingBacklog], thresholds.ExpiryBacklogThreshold, "expiry processing backlog above threshold"); err != nil {
+		return nil, err
+	}
+	if alerts, err = appendThresholdAlertV2(alerts, input.Height, IdentityAlertProofQueryFailureSpike, IdentityAlertSeverityWarning, IdentityMetricProofVerificationFailureCount, metricValues[IdentityMetricProofVerificationFailureCount], thresholds.ProofFailureSpikeThreshold, "proof query failure spike"); err != nil {
+		return nil, err
+	}
+	if alerts, err = appendThresholdAlertV2(alerts, input.Height, IdentityAlertBlockSTMConflictRateHigh, IdentityAlertSeverityWarning, IdentityMetricBlockSTMConflictRate, metricValues[IdentityMetricBlockSTMConflictRate], thresholds.BlockSTMConflictRateBpsThreshold, "BlockSTM identity conflict rate above threshold"); err != nil {
+		return nil, err
+	}
+	maxReadLatency := metricValues[IdentityMetricStoreV2DirectReadLatency]
+	if recursive := metricValues[IdentityMetricStoreV2RecursiveReadLatency]; recursive > maxReadLatency {
+		maxReadLatency = recursive
+	}
+	if alerts, err = appendThresholdAlertV2(alerts, input.Height, IdentityAlertStoreV2ReadLatencyHigh, IdentityAlertSeverityWarning, IdentityMetricStoreV2DirectReadLatency, maxReadLatency, thresholds.StoreV2ReadLatencyMicrosThreshold, "Store v2 identity read latency above threshold"); err != nil {
+		return nil, err
+	}
+	if alerts, err = appendThresholdAlertV2(alerts, input.Height, IdentityAlertRegistrationSpamSpike, IdentityAlertSeverityWarning, "", input.RegistrationAttemptsInWindow, thresholds.RegistrationSpamSpikeThreshold, "registration spam spike"); err != nil {
+		return nil, err
+	}
+	if alerts, err = appendThresholdAlertV2(alerts, input.Height, IdentityAlertResolverUpdateSpamSpike, IdentityAlertSeverityWarning, "", input.ResolverUpdatesInWindow, thresholds.ResolverUpdateSpamSpikeThreshold, "resolver update spam spike"); err != nil {
+		return nil, err
+	}
+	if alerts, err = appendThresholdAlertV2(alerts, input.Height, IdentityAlertReverseMismatchSpike, IdentityAlertSeverityWarning, "", input.ReverseMismatchesInWindow, thresholds.ReverseMismatchSpikeThreshold, "reverse verification mismatch spike"); err != nil {
+		return nil, err
+	}
+	auctionBacklog := auctionFinalizationBacklogV2(state, input.Height)
+	if alerts, err = appendThresholdAlertV2(alerts, input.Height, IdentityAlertAuctionFinalizationBacklog, IdentityAlertSeverityWarning, IdentityMetricAuctionsActive, auctionBacklog, thresholds.AuctionFinalizationBacklogThreshold, "auction finalization backlog"); err != nil {
+		return nil, err
+	}
+	sort.Slice(alerts, func(i, j int) bool {
+		if alerts[i].Type != alerts[j].Type {
+			return alerts[i].Type < alerts[j].Type
+		}
+		if alerts[i].NameHash != alerts[j].NameHash {
+			return alerts[i].NameHash < alerts[j].NameHash
+		}
+		return alerts[i].AlertHash < alerts[j].AlertHash
+	})
+	return alerts, nil
+}
+
+func NewIdentityObservabilityAlertV2(alert IdentityObservabilityAlertV2) (IdentityObservabilityAlertV2, error) {
+	if alert.AlertHash != "" {
+		return IdentityObservabilityAlertV2{}, errors.New("identity observability alert hash must be empty before construction")
+	}
+	if alert.Name != "" {
+		normalized, err := NormalizeAETDomain(alert.Name)
+		if err != nil {
+			return IdentityObservabilityAlertV2{}, err
+		}
+		alert.Name = normalized
+		nameHash, err := DomainRecordV2NameHash(normalized)
+		if err != nil {
+			return IdentityObservabilityAlertV2{}, err
+		}
+		if alert.NameHash != "" && alert.NameHash != nameHash {
+			return IdentityObservabilityAlertV2{}, errors.New("identity observability alert name_hash mismatch")
+		}
+		alert.NameHash = nameHash
+	}
+	alert.AlertHash = ComputeIdentityObservabilityAlertHashV2(alert)
+	return alert, ValidateIdentityObservabilityAlertV2(alert)
+}
+
+func ValidateIdentityObservabilityAlertV2(alert IdentityObservabilityAlertV2) error {
+	if !IsIdentityObservabilityAlertTypeV2(alert.Type) {
+		return fmt.Errorf("unsupported identity observability alert type %q", alert.Type)
+	}
+	switch alert.Severity {
+	case IdentityAlertSeverityWarning, IdentityAlertSeverityCritical:
+	default:
+		return fmt.Errorf("unsupported identity observability alert severity %q", alert.Severity)
+	}
+	if alert.Height == 0 {
+		return errors.New("identity observability alert height is required")
+	}
+	if alert.NameHash != "" {
+		if err := validateHexHash("identity observability alert name_hash", alert.NameHash); err != nil {
+			return err
+		}
+	}
+	if alert.Name != "" {
+		normalized, err := NormalizeAETDomain(alert.Name)
+		if err != nil {
+			return err
+		}
+		nameHash, err := DomainRecordV2NameHash(normalized)
+		if err != nil {
+			return err
+		}
+		if alert.NameHash != nameHash {
+			return errors.New("identity observability alert name_hash mismatch")
+		}
+	}
+	if alert.Metric != "" && !IsIdentityObservabilityMetricNameV2(alert.Metric) {
+		return fmt.Errorf("unsupported identity observability alert metric %q", alert.Metric)
+	}
+	if alert.Details == "" || !isASCIIStringV2(alert.Details) {
+		return errors.New("identity observability alert details are required ASCII")
+	}
+	if alert.AlertHash == "" || alert.AlertHash != ComputeIdentityObservabilityAlertHashV2(alert) {
+		return errors.New("identity observability alert hash mismatch")
+	}
+	return nil
+}
+
 func ComputeIdentityObservabilitySpecHashV2(spec IdentityObservabilitySpecV2) string {
 	parts := []string{"identity-observability-spec-v2"}
 	for _, event := range sortedIdentityObservabilityEventsV2(spec.Events) {
@@ -389,6 +621,9 @@ func ComputeIdentityObservabilitySpecHashV2(spec IdentityObservabilitySpecV2) st
 	}
 	for _, metric := range sortedIdentityObservabilityMetricsV2(spec.Metrics) {
 		parts = append(parts, "metric", string(metric))
+	}
+	for _, alert := range sortedIdentityObservabilityAlertsV2(spec.Alerts) {
+		parts = append(parts, "alert", string(alert))
 	}
 	return identityHash(parts...)
 }
@@ -424,6 +659,10 @@ func ComputeIdentityObservabilityMetricsSnapshotHashV2(snapshot IdentityObservab
 	return identityHash(parts...)
 }
 
+func ComputeIdentityObservabilityAlertHashV2(alert IdentityObservabilityAlertV2) string {
+	return identityHash("identity-observability-alert-v2", string(alert.Type), string(alert.Severity), fmt.Sprint(alert.Height), fmt.Sprint(alert.ObservedValue), fmt.Sprint(alert.Threshold), alert.Name, alert.NameHash, string(alert.Metric), alert.Details)
+}
+
 func IsIdentityObservabilityEventTypeV2(eventType IdentityObservabilityEventTypeV2) bool {
 	switch eventType {
 	case IdentityEventDomainCommitted, IdentityEventDomainRegistered, IdentityEventDomainRenewed,
@@ -448,6 +687,18 @@ func IsIdentityObservabilityMetricNameV2(metric IdentityObservabilityMetricNameV
 		IdentityMetricBatchResolverUpdateSize, IdentityMetricBlockSTMConflictRate, IdentityMetricStoreV2DirectReadLatency,
 		IdentityMetricStoreV2RecursiveReadLatency, IdentityMetricStoreV2ResolverWriteLatency, IdentityMetricProofQueryLatency,
 		IdentityMetricProofVerificationFailureCount, IdentityMetricExpiryProcessingBacklog:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsIdentityObservabilityAlertTypeV2(alertType IdentityObservabilityAlertTypeV2) bool {
+	switch alertType {
+	case IdentityAlertNFTBindingMismatch, IdentityAlertResolverPayloadNearMaximum, IdentityAlertExpiryBacklogAboveThreshold,
+		IdentityAlertProofQueryFailureSpike, IdentityAlertRegistrationSpamSpike, IdentityAlertResolverUpdateSpamSpike,
+		IdentityAlertAuctionFinalizationBacklog, IdentityAlertBlockSTMConflictRateHigh, IdentityAlertStoreV2ReadLatencyHigh,
+		IdentityAlertReverseMismatchSpike:
 		return true
 	default:
 		return false
@@ -501,6 +752,21 @@ func requiredIdentityObservabilityMetricsV2() []IdentityObservabilityMetricNameV
 		IdentityMetricStoreV2RecursiveReadLatency,
 		IdentityMetricStoreV2ResolverWriteLatency,
 		IdentityMetricSubdomainsByDepth,
+	}
+}
+
+func requiredIdentityObservabilityAlertsV2() []IdentityObservabilityAlertTypeV2 {
+	return []IdentityObservabilityAlertTypeV2{
+		IdentityAlertAuctionFinalizationBacklog,
+		IdentityAlertBlockSTMConflictRateHigh,
+		IdentityAlertExpiryBacklogAboveThreshold,
+		IdentityAlertNFTBindingMismatch,
+		IdentityAlertProofQueryFailureSpike,
+		IdentityAlertRegistrationSpamSpike,
+		IdentityAlertResolverPayloadNearMaximum,
+		IdentityAlertResolverUpdateSpamSpike,
+		IdentityAlertReverseMismatchSpike,
+		IdentityAlertStoreV2ReadLatencyHigh,
 	}
 }
 
@@ -574,4 +840,81 @@ func sortedIdentityObservabilityMetricsV2(values []IdentityObservabilityMetricNa
 	out := append([]IdentityObservabilityMetricNameV2(nil), values...)
 	sort.Slice(out, func(i, j int) bool { return out[i] < out[j] })
 	return out
+}
+
+func sortedIdentityObservabilityAlertsV2(values []IdentityObservabilityAlertTypeV2) []IdentityObservabilityAlertTypeV2 {
+	out := append([]IdentityObservabilityAlertTypeV2(nil), values...)
+	sort.Slice(out, func(i, j int) bool { return out[i] < out[j] })
+	return out
+}
+
+func normalizeIdentityObservabilityAlertThresholdsV2(thresholds IdentityObservabilityAlertThresholdsV2) IdentityObservabilityAlertThresholdsV2 {
+	defaults := DefaultIdentityObservabilityAlertThresholdsV2()
+	if thresholds.ResolverPayloadNearMaxBps == 0 {
+		thresholds.ResolverPayloadNearMaxBps = defaults.ResolverPayloadNearMaxBps
+	}
+	if thresholds.ExpiryBacklogThreshold == 0 {
+		thresholds.ExpiryBacklogThreshold = defaults.ExpiryBacklogThreshold
+	}
+	if thresholds.ProofFailureSpikeThreshold == 0 {
+		thresholds.ProofFailureSpikeThreshold = defaults.ProofFailureSpikeThreshold
+	}
+	if thresholds.RegistrationSpamSpikeThreshold == 0 {
+		thresholds.RegistrationSpamSpikeThreshold = defaults.RegistrationSpamSpikeThreshold
+	}
+	if thresholds.ResolverUpdateSpamSpikeThreshold == 0 {
+		thresholds.ResolverUpdateSpamSpikeThreshold = defaults.ResolverUpdateSpamSpikeThreshold
+	}
+	if thresholds.AuctionFinalizationBacklogThreshold == 0 {
+		thresholds.AuctionFinalizationBacklogThreshold = defaults.AuctionFinalizationBacklogThreshold
+	}
+	if thresholds.BlockSTMConflictRateBpsThreshold == 0 {
+		thresholds.BlockSTMConflictRateBpsThreshold = defaults.BlockSTMConflictRateBpsThreshold
+	}
+	if thresholds.StoreV2ReadLatencyMicrosThreshold == 0 {
+		thresholds.StoreV2ReadLatencyMicrosThreshold = defaults.StoreV2ReadLatencyMicrosThreshold
+	}
+	if thresholds.ReverseMismatchSpikeThreshold == 0 {
+		thresholds.ReverseMismatchSpikeThreshold = defaults.ReverseMismatchSpikeThreshold
+	}
+	return thresholds
+}
+
+func identityObservabilityMetricValuesV2(snapshot IdentityObservabilityMetricsSnapshotV2) map[IdentityObservabilityMetricNameV2]uint64 {
+	out := map[IdentityObservabilityMetricNameV2]uint64{}
+	for _, sample := range snapshot.Metrics {
+		if sample.Value > out[sample.Name] {
+			out[sample.Name] = sample.Value
+		}
+	}
+	return out
+}
+
+func appendThresholdAlertV2(alerts []IdentityObservabilityAlertV2, height uint64, alertType IdentityObservabilityAlertTypeV2, severity IdentityObservabilityAlertSeverityV2, metric IdentityObservabilityMetricNameV2, observed uint64, threshold uint64, details string) ([]IdentityObservabilityAlertV2, error) {
+	if observed < threshold {
+		return alerts, nil
+	}
+	alert, err := NewIdentityObservabilityAlertV2(IdentityObservabilityAlertV2{
+		Type:          alertType,
+		Severity:      severity,
+		Height:        height,
+		ObservedValue: observed,
+		Threshold:     threshold,
+		Metric:        metric,
+		Details:       details,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return append(alerts, alert), nil
+}
+
+func auctionFinalizationBacklogV2(state IdentityState, height uint64) uint64 {
+	var backlog uint64
+	for _, auction := range state.Auctions {
+		if auction.Phase != AuctionPhaseFinalized && auction.RevealEndHeight != 0 && auction.RevealEndHeight <= height {
+			backlog++
+		}
+	}
+	return backlog
 }

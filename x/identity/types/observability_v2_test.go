@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/hex"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -14,6 +15,7 @@ func TestIdentityObservabilitySpecV2CoversSection15(t *testing.T) {
 
 	require.ElementsMatch(t, requiredIdentityObservabilityEventsV2(), spec.Events)
 	require.ElementsMatch(t, requiredIdentityObservabilityMetricsV2(), spec.Metrics)
+	require.ElementsMatch(t, requiredIdentityObservabilityAlertsV2(), spec.Alerts)
 
 	for _, eventType := range []IdentityObservabilityEventTypeV2{
 		IdentityEventDomainCommitted,
@@ -63,6 +65,21 @@ func TestIdentityObservabilitySpecV2CoversSection15(t *testing.T) {
 		IdentityMetricExpiryProcessingBacklog,
 	} {
 		require.Contains(t, spec.Metrics, metric)
+	}
+
+	for _, alertType := range []IdentityObservabilityAlertTypeV2{
+		IdentityAlertNFTBindingMismatch,
+		IdentityAlertResolverPayloadNearMaximum,
+		IdentityAlertExpiryBacklogAboveThreshold,
+		IdentityAlertProofQueryFailureSpike,
+		IdentityAlertRegistrationSpamSpike,
+		IdentityAlertResolverUpdateSpamSpike,
+		IdentityAlertAuctionFinalizationBacklog,
+		IdentityAlertBlockSTMConflictRateHigh,
+		IdentityAlertStoreV2ReadLatencyHigh,
+		IdentityAlertReverseMismatchSpike,
+	} {
+		require.Contains(t, spec.Alerts, alertType)
 	}
 }
 
@@ -163,6 +180,90 @@ func TestIdentityObservabilityMetricsRejectMissingAndBadUnitsV2(t *testing.T) {
 	require.ErrorContains(t, ValidateIdentityObservabilityMetricsSnapshotV2(snapshot), "missing required metrics")
 }
 
+func TestIdentityObservabilityAlertsV2EvaluateRequiredAlerts(t *testing.T) {
+	validState := observabilityState(t)
+	snapshot, err := BuildIdentityObservabilityMetricsSnapshotV2(IdentityObservabilityMetricsInputV2{
+		State:                             validState,
+		Height:                            70,
+		BlockSTMIdentityMessages:          10,
+		BlockSTMConflicts:                 5,
+		StoreV2DirectReadLatencyMicros:    200,
+		StoreV2RecursiveReadLatencyMicros: 300,
+		ProofQueryLatencyMicros:           400,
+		ProofVerificationFailureCount:     6,
+	})
+	require.NoError(t, err)
+
+	broken := validState.Clone()
+	require.NotEmpty(t, broken.DomainNFTs)
+	broken.DomainNFTs[0].Owner = addr(99)
+	require.NotEmpty(t, broken.Resolvers)
+	broken.Resolvers[0].Metadata = []byte(strings.Repeat("a", MaxUnifiedPayloadBytesV2))
+
+	alerts, err := EvaluateIdentityObservabilityAlertsV2(IdentityObservabilityAlertInputV2{
+		State:                        broken,
+		Snapshot:                     snapshot,
+		Height:                       70,
+		RegistrationAttemptsInWindow: 2,
+		ResolverUpdatesInWindow:      2,
+		ReverseMismatchesInWindow:    2,
+		Thresholds: IdentityObservabilityAlertThresholdsV2{
+			ResolverPayloadNearMaxBps:           8_000,
+			ExpiryBacklogThreshold:              1,
+			ProofFailureSpikeThreshold:          1,
+			RegistrationSpamSpikeThreshold:      1,
+			ResolverUpdateSpamSpikeThreshold:    1,
+			AuctionFinalizationBacklogThreshold: 1,
+			BlockSTMConflictRateBpsThreshold:    1,
+			StoreV2ReadLatencyMicrosThreshold:   1,
+			ReverseMismatchSpikeThreshold:       1,
+		},
+	})
+	require.NoError(t, err)
+	byType := alertTypesV2(alerts)
+	for _, alertType := range requiredIdentityObservabilityAlertsV2() {
+		require.Contains(t, byType, alertType)
+	}
+	require.Equal(t, IdentityAlertSeverityCritical, byType[IdentityAlertNFTBindingMismatch].Severity)
+	require.Equal(t, IdentityAlertSeverityWarning, byType[IdentityAlertResolverPayloadNearMaximum].Severity)
+	require.Equal(t, uint64(5_000), byType[IdentityAlertBlockSTMConflictRateHigh].ObservedValue)
+	require.Equal(t, uint64(300), byType[IdentityAlertStoreV2ReadLatencyHigh].ObservedValue)
+	for _, alert := range alerts {
+		require.NoError(t, ValidateIdentityObservabilityAlertV2(alert))
+		require.NotEmpty(t, alert.AlertHash)
+	}
+}
+
+func TestIdentityObservabilityAlertsV2StayQuietBelowThresholds(t *testing.T) {
+	state := observabilityState(t)
+	snapshot, err := BuildIdentityObservabilityMetricsSnapshotV2(IdentityObservabilityMetricsInputV2{
+		State:                    state,
+		Height:                   50,
+		BlockSTMIdentityMessages: 100,
+		BlockSTMConflicts:        1,
+	})
+	require.NoError(t, err)
+
+	alerts, err := EvaluateIdentityObservabilityAlertsV2(IdentityObservabilityAlertInputV2{
+		State:    state,
+		Snapshot: snapshot,
+		Height:   50,
+		Thresholds: IdentityObservabilityAlertThresholdsV2{
+			ResolverPayloadNearMaxBps:           10_000,
+			ExpiryBacklogThreshold:              100,
+			ProofFailureSpikeThreshold:          100,
+			RegistrationSpamSpikeThreshold:      100,
+			ResolverUpdateSpamSpikeThreshold:    100,
+			AuctionFinalizationBacklogThreshold: 100,
+			BlockSTMConflictRateBpsThreshold:    1_000,
+			StoreV2ReadLatencyMicrosThreshold:   100,
+			ReverseMismatchSpikeThreshold:       100,
+		},
+	})
+	require.NoError(t, err)
+	require.Empty(t, alerts)
+}
+
 func observabilityState(t *testing.T) IdentityState {
 	t.Helper()
 	state := routingIntegrationState(t)
@@ -205,6 +306,14 @@ func metricSamplesByNameV2(snapshot IdentityObservabilityMetricsSnapshotV2) map[
 	out := map[IdentityObservabilityMetricNameV2][]IdentityMetricSampleV2{}
 	for _, sample := range snapshot.Metrics {
 		out[sample.Name] = append(out[sample.Name], sample)
+	}
+	return out
+}
+
+func alertTypesV2(alerts []IdentityObservabilityAlertV2) map[IdentityObservabilityAlertTypeV2]IdentityObservabilityAlertV2 {
+	out := map[IdentityObservabilityAlertTypeV2]IdentityObservabilityAlertV2{}
+	for _, alert := range alerts {
+		out[alert.Type] = alert
 	}
 	return out
 }
