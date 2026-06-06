@@ -42,6 +42,11 @@ func TestMetricNamesSnapshot(t *testing.T) {
 		MetricEconomyFailedConditions,
 		MetricEconomyInvariantsSatisfied,
 		MetricEconomyInvariantFailures,
+		MetricEconomyWeaknessControlsReady,
+		MetricEconomyMissingControls,
+		MetricEconomyInflationRiskCount,
+		MetricEconomyCircuitBreakerActive,
+		MetricEconomyCircuitBreakerReasons,
 		MetricLocalnetHealth,
 		MetricProcessUptimeSeconds,
 		MetricProcessMemoryBytes,
@@ -134,6 +139,11 @@ func (r *Registry) RecordTestSamples() {
 	r.SetGauge(MetricEconomyFailedConditions, nil, 0)
 	r.SetGauge(MetricEconomyInvariantsSatisfied, nil, 1)
 	r.SetGauge(MetricEconomyInvariantFailures, nil, 0)
+	r.SetGauge(MetricEconomyWeaknessControlsReady, nil, 1)
+	r.SetGauge(MetricEconomyMissingControls, nil, 0)
+	r.SetGauge(MetricEconomyInflationRiskCount, nil, 0)
+	r.SetGauge(MetricEconomyCircuitBreakerActive, nil, 0)
+	r.SetGauge(MetricEconomyCircuitBreakerReasons, nil, 0)
 }
 
 func renderRegistry(t *testing.T, reg *Registry) string {

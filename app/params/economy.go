@@ -40,6 +40,12 @@ const (
 	MinStorageCostCoverageBps         = BasisPoints
 	MinSlashingPenaltyCoverageBps     = BasisPoints
 	MinTreasuryFundingCoverageBps     = BasisPoints
+
+	DefaultCircuitBreakerFeeSpikeBps        = int64(20_000)
+	DefaultCircuitBreakerControllerDriftBps = int64(1_000)
+	DefaultCircuitBreakerFailedTxRateBps    = int64(2_000)
+	DefaultInflationNoiseToleranceBps       = int64(500)
+	DefaultCleanupRewardBps                 = int64(2_000)
 )
 
 type ValidatorIncomeInput struct {
@@ -179,6 +185,101 @@ type EconomicInvariantReport struct {
 	FailedInvariants []string
 }
 
+type EconomicWeaknessControlInput struct {
+	BurnControllerWired               bool
+	InflationUsesNetworkActivity      bool
+	DeflationGuardEnforced            bool
+	SlashingFlowIntegrated            bool
+	EpochValidatorSelectionProduction bool
+	AVMFeesInGlobalFeeMarket          bool
+	StateRentOrCleanupIncentive       bool
+	ValidatorReputationInDelegation   bool
+	StakeConcentrationDampening       bool
+	EconomicCircuitBreakerEnabled     bool
+}
+
+type EconomicWeaknessControlReport struct {
+	ProductionReady bool
+	MissingControls []string
+}
+
+type InflationRiskInput struct {
+	CirculatingSupply              sdkmath.Int
+	AnnualMint                     sdkmath.Int
+	AnnualBurn                     sdkmath.Int
+	ValidatorRewardPoolNaet        sdkmath.Int
+	ValidatorOperatingCostNaet     sdkmath.Int
+	CurrentInflationBps            int64
+	StakeRatioBps                  int64
+	TopValidatorStakeBps           int64
+	DelegatorRiskSignalCoverageBps int64
+	ActivitySamplesBps             []int64
+	BurnIntegratedWithIssuance     bool
+	NetIssuanceTargetConfigured    bool
+	MaxNetIssuanceBps              int64
+	ActivityNoiseToleranceBps      int64
+}
+
+type InflationRiskReport struct {
+	Stable                bool
+	NetIssuanceBps        int64
+	RewardCoverageBps     int64
+	ActivityVolatilityBps int64
+	Risks                 []string
+}
+
+type EconomicCircuitBreakerParams struct {
+	MaxBlockLoadBps       int64
+	MaxFeeSpikeBps        int64
+	MaxControllerDriftBps int64
+	MaxFailedTxRateBps    int64
+	MaxBurnToMintBps      int64
+	MinCooldownBlocks     uint64
+}
+
+type EconomicCircuitBreakerInput struct {
+	BlockLoadBps       int64
+	FeeSpikeBps        int64
+	ControllerDriftBps int64
+	FailedTxRateBps    int64
+	BurnToMintBps      int64
+}
+
+type EconomicCircuitBreakerOutput struct {
+	Active         bool
+	Reasons        []string
+	CooldownBlocks uint64
+}
+
+type SlashingEconomyFlowInput struct {
+	PenaltyNaet       sdkmath.Int
+	BurnRatioBps      int64
+	TreasuryRatioBps  int64
+	ReporterRewardBps int64
+}
+
+type SlashingEconomyFlowOutput struct {
+	PenaltyNaet        sdkmath.Int
+	BurnNaet           sdkmath.Int
+	TreasuryNaet       sdkmath.Int
+	ReporterRewardNaet sdkmath.Int
+	ValidatorPoolNaet  sdkmath.Int
+}
+
+type StateRentInput struct {
+	StorageBytes          int64
+	RetentionPeriods      int64
+	FeePerByteNaet        sdkmath.Int
+	CleanupRewardRatioBps int64
+	CleanupEligible       bool
+}
+
+type StateRentOutput struct {
+	RentNaet          sdkmath.Int
+	CleanupRewardNaet sdkmath.Int
+	BurnableRentNaet  sdkmath.Int
+}
+
 func DefaultBalanceControllerParams() BalanceControllerParams {
 	return BalanceControllerParams{
 		MinInflationBps:              MinInflationBps,
@@ -197,6 +298,276 @@ func DefaultBalanceControllerParams() BalanceControllerParams {
 		DeflationGuardStepBps:        DeflationGuardStepBps,
 		RateLimitFailedTxBps:         RateLimitFailedTxBps,
 	}
+}
+
+func DefaultEconomicCircuitBreakerParams() EconomicCircuitBreakerParams {
+	return EconomicCircuitBreakerParams{
+		MaxBlockLoadBps:       HighCongestionLoadBps,
+		MaxFeeSpikeBps:        DefaultCircuitBreakerFeeSpikeBps,
+		MaxControllerDriftBps: DefaultCircuitBreakerControllerDriftBps,
+		MaxFailedTxRateBps:    DefaultCircuitBreakerFailedTxRateBps,
+		MaxBurnToMintBps:      DeflationGuardBurnToMintBps,
+		MinCooldownBlocks:     1,
+	}
+}
+
+func EvaluateEconomicWeaknessControls(input EconomicWeaknessControlInput) EconomicWeaknessControlReport {
+	failed := make([]string, 0, 10)
+	for _, item := range []struct {
+		name string
+		ok   bool
+	}{
+		{name: "burn_controller_not_wired_to_fee_reward_flow", ok: input.BurnControllerWired},
+		{name: "inflation_controller_not_activity_coupled", ok: input.InflationUsesNetworkActivity},
+		{name: "deflation_guard_not_enforced", ok: input.DeflationGuardEnforced},
+		{name: "slashing_flow_not_integrated", ok: input.SlashingFlowIntegrated},
+		{name: "epoch_validator_selection_not_productionized", ok: input.EpochValidatorSelectionProduction},
+		{name: "avm_fees_not_in_global_market", ok: input.AVMFeesInGlobalFeeMarket},
+		{name: "state_rent_or_cleanup_missing", ok: input.StateRentOrCleanupIncentive},
+		{name: "validator_reputation_not_in_delegation", ok: input.ValidatorReputationInDelegation},
+		{name: "stake_concentration_dampening_missing", ok: input.StakeConcentrationDampening},
+		{name: "economic_circuit_breaker_missing", ok: input.EconomicCircuitBreakerEnabled},
+	} {
+		if !item.ok {
+			failed = append(failed, item.name)
+		}
+	}
+	return EconomicWeaknessControlReport{
+		ProductionReady: len(failed) == 0,
+		MissingControls: failed,
+	}
+}
+
+func EvaluateInflationRisks(input InflationRiskInput) (InflationRiskReport, error) {
+	if input.MaxNetIssuanceBps == 0 {
+		input.MaxNetIssuanceBps = MaxInflationBps
+	}
+	if input.ActivityNoiseToleranceBps == 0 {
+		input.ActivityNoiseToleranceBps = DefaultInflationNoiseToleranceBps
+	}
+	if err := validateBps("current_inflation_bps", input.CurrentInflationBps, MinInflationBps, MaxInflationBps); err != nil {
+		return InflationRiskReport{}, err
+	}
+	if err := validateBps("stake_ratio_bps", input.StakeRatioBps, 0, BasisPoints); err != nil {
+		return InflationRiskReport{}, err
+	}
+	if err := validateBps("top_validator_stake_bps", input.TopValidatorStakeBps, 0, BasisPoints); err != nil {
+		return InflationRiskReport{}, err
+	}
+	if err := validateBps("delegator_risk_signal_coverage_bps", input.DelegatorRiskSignalCoverageBps, 0, DefaultMaxLoadMultiplierBps); err != nil {
+		return InflationRiskReport{}, err
+	}
+	if err := validateBps("max_net_issuance_bps", input.MaxNetIssuanceBps, 0, DefaultMaxLoadMultiplierBps); err != nil {
+		return InflationRiskReport{}, err
+	}
+	if err := validateBps("activity_noise_tolerance_bps", input.ActivityNoiseToleranceBps, 0, DefaultMaxLoadMultiplierBps); err != nil {
+		return InflationRiskReport{}, err
+	}
+	for i, sample := range input.ActivitySamplesBps {
+		if err := validateBps(fmt.Sprintf("activity_samples_bps[%d]", i), sample, 0, BasisPoints); err != nil {
+			return InflationRiskReport{}, err
+		}
+	}
+	for _, item := range []struct {
+		name  string
+		value sdkmath.Int
+	}{
+		{name: "circulating_supply", value: input.CirculatingSupply},
+		{name: "annual_mint", value: input.AnnualMint},
+		{name: "annual_burn", value: input.AnnualBurn},
+		{name: "validator_reward_pool_naet", value: input.ValidatorRewardPoolNaet},
+		{name: "validator_operating_cost_naet", value: input.ValidatorOperatingCostNaet},
+	} {
+		if normalizeInt(item.value).IsNegative() {
+			return InflationRiskReport{}, fmt.Errorf("%s must not be negative", item.name)
+		}
+	}
+
+	supply := normalizeInt(input.CirculatingSupply)
+	annualMint := normalizeInt(input.AnnualMint)
+	annualBurn := normalizeInt(input.AnnualBurn)
+	rewardPool := normalizeInt(input.ValidatorRewardPoolNaet)
+	operatingCost := normalizeInt(input.ValidatorOperatingCostNaet)
+
+	netIssuanceBps := int64(0)
+	if supply.IsPositive() {
+		net := annualMint.Sub(annualBurn)
+		if net.IsPositive() {
+			netIssuanceBps = net.MulRaw(BasisPoints).Quo(supply).Int64()
+		}
+	} else if annualMint.IsPositive() || annualBurn.IsPositive() {
+		return InflationRiskReport{}, fmt.Errorf("circulating_supply is required when mint or burn is positive")
+	}
+
+	rewardCoverageBps := int64(0)
+	if operatingCost.IsPositive() {
+		rewardCoverageBps = rewardPool.MulRaw(BasisPoints).Quo(operatingCost).Int64()
+	}
+	volatility := activityVolatilityBps(input.ActivitySamplesBps)
+
+	risks := make([]string, 0, 7)
+	if !input.NetIssuanceTargetConfigured {
+		risks = append(risks, "net_issuance_target_missing")
+	} else if netIssuanceBps > input.MaxNetIssuanceBps {
+		risks = append(risks, "net_issuance_outside_target")
+	}
+	if averageBps(input.ActivitySamplesBps) < DefaultTargetLoadBps/2 &&
+		input.StakeRatioBps >= DefaultTargetStakeBps &&
+		input.CurrentInflationBps >= DefaultTargetInflationBps {
+		risks = append(risks, "security_overpaid_during_low_activity")
+	}
+	if operatingCost.IsPositive() && rewardCoverageBps < BasisPoints {
+		risks = append(risks, "validator_security_underpaid")
+	}
+	if input.TopValidatorStakeBps > MaxTopValidatorConcentrationBps || input.DelegatorRiskSignalCoverageBps < MinDelegatorRiskSignalCoverageBps {
+		risks = append(risks, "stake_target_risk_not_priced")
+	}
+	if volatility > input.ActivityNoiseToleranceBps {
+		risks = append(risks, "inflation_activity_signal_noisy")
+	}
+	if !input.BurnIntegratedWithIssuance {
+		risks = append(risks, "burn_not_integrated_with_issuance")
+	}
+
+	return InflationRiskReport{
+		Stable:                len(risks) == 0,
+		NetIssuanceBps:        netIssuanceBps,
+		RewardCoverageBps:     rewardCoverageBps,
+		ActivityVolatilityBps: volatility,
+		Risks:                 risks,
+	}, nil
+}
+
+func EvaluateEconomicCircuitBreaker(input EconomicCircuitBreakerInput, params EconomicCircuitBreakerParams) (EconomicCircuitBreakerOutput, error) {
+	if params == (EconomicCircuitBreakerParams{}) {
+		params = DefaultEconomicCircuitBreakerParams()
+	}
+	if err := params.Validate(); err != nil {
+		return EconomicCircuitBreakerOutput{}, err
+	}
+	for _, item := range []struct {
+		name  string
+		value int64
+	}{
+		{name: "block_load_bps", value: input.BlockLoadBps},
+		{name: "failed_tx_rate_bps", value: input.FailedTxRateBps},
+		{name: "burn_to_mint_bps", value: input.BurnToMintBps},
+	} {
+		if err := validateBps(item.name, item.value, 0, DefaultMaxLoadMultiplierBps); err != nil {
+			return EconomicCircuitBreakerOutput{}, err
+		}
+	}
+	if input.FeeSpikeBps < 0 {
+		return EconomicCircuitBreakerOutput{}, fmt.Errorf("fee_spike_bps must not be negative")
+	}
+	if input.ControllerDriftBps < 0 {
+		return EconomicCircuitBreakerOutput{}, fmt.Errorf("controller_drift_bps must not be negative")
+	}
+
+	reasons := make([]string, 0, 5)
+	if input.BlockLoadBps >= params.MaxBlockLoadBps {
+		reasons = append(reasons, "block_load_abnormal")
+	}
+	if input.FeeSpikeBps > params.MaxFeeSpikeBps {
+		reasons = append(reasons, "fee_spike_abnormal")
+	}
+	if input.ControllerDriftBps > params.MaxControllerDriftBps {
+		reasons = append(reasons, "controller_drift_abnormal")
+	}
+	if input.FailedTxRateBps > params.MaxFailedTxRateBps {
+		reasons = append(reasons, "failed_tx_rate_abnormal")
+	}
+	if input.BurnToMintBps > params.MaxBurnToMintBps {
+		reasons = append(reasons, "burn_pressure_abnormal")
+	}
+	return EconomicCircuitBreakerOutput{
+		Active:         len(reasons) > 0,
+		Reasons:        reasons,
+		CooldownBlocks: params.MinCooldownBlocks,
+	}, nil
+}
+
+func (p EconomicCircuitBreakerParams) Validate() error {
+	if err := validateBps("max_block_load_bps", p.MaxBlockLoadBps, 1, BasisPoints); err != nil {
+		return err
+	}
+	if p.MaxFeeSpikeBps < 0 {
+		return fmt.Errorf("max_fee_spike_bps must not be negative")
+	}
+	if p.MaxControllerDriftBps < 0 {
+		return fmt.Errorf("max_controller_drift_bps must not be negative")
+	}
+	if err := validateBps("max_failed_tx_rate_bps", p.MaxFailedTxRateBps, 0, BasisPoints); err != nil {
+		return err
+	}
+	if err := validateBps("max_burn_to_mint_bps", p.MaxBurnToMintBps, BasisPoints, DefaultMaxLoadMultiplierBps); err != nil {
+		return err
+	}
+	if p.MinCooldownBlocks == 0 {
+		return fmt.Errorf("min_cooldown_blocks must be positive")
+	}
+	return nil
+}
+
+func ComputeSlashingEconomyFlow(input SlashingEconomyFlowInput) (SlashingEconomyFlowOutput, error) {
+	penalty := normalizeInt(input.PenaltyNaet)
+	if penalty.IsNegative() {
+		return SlashingEconomyFlowOutput{}, fmt.Errorf("penalty_naet must not be negative")
+	}
+	for _, item := range []struct {
+		name  string
+		value int64
+	}{
+		{name: "burn_ratio_bps", value: input.BurnRatioBps},
+		{name: "treasury_ratio_bps", value: input.TreasuryRatioBps},
+		{name: "reporter_reward_bps", value: input.ReporterRewardBps},
+	} {
+		if err := validateBps(item.name, item.value, 0, BasisPoints); err != nil {
+			return SlashingEconomyFlowOutput{}, err
+		}
+	}
+	if input.BurnRatioBps+input.TreasuryRatioBps+input.ReporterRewardBps > BasisPoints {
+		return SlashingEconomyFlowOutput{}, fmt.Errorf("slashing output ratios exceed 100%%")
+	}
+	burn := ApplyBps(penalty, input.BurnRatioBps)
+	treasury := ApplyBps(penalty, input.TreasuryRatioBps)
+	reporter := ApplyBps(penalty, input.ReporterRewardBps)
+	return SlashingEconomyFlowOutput{
+		PenaltyNaet:        penalty,
+		BurnNaet:           burn,
+		TreasuryNaet:       treasury,
+		ReporterRewardNaet: reporter,
+		ValidatorPoolNaet:  penalty.Sub(burn).Sub(treasury).Sub(reporter),
+	}, nil
+}
+
+func ComputeStateRent(input StateRentInput) (StateRentOutput, error) {
+	if input.StorageBytes < 0 {
+		return StateRentOutput{}, fmt.Errorf("storage_bytes must not be negative")
+	}
+	if input.RetentionPeriods < 0 {
+		return StateRentOutput{}, fmt.Errorf("retention_periods must not be negative")
+	}
+	if input.CleanupRewardRatioBps == 0 {
+		input.CleanupRewardRatioBps = DefaultCleanupRewardBps
+	}
+	if err := validateBps("cleanup_reward_ratio_bps", input.CleanupRewardRatioBps, 0, BasisPoints); err != nil {
+		return StateRentOutput{}, err
+	}
+	fee := normalizeInt(input.FeePerByteNaet)
+	if fee.IsNegative() {
+		return StateRentOutput{}, fmt.Errorf("fee_per_byte_naet must not be negative")
+	}
+	rent := fee.MulRaw(input.StorageBytes).MulRaw(input.RetentionPeriods)
+	cleanupReward := sdkmath.ZeroInt()
+	if input.CleanupEligible {
+		cleanupReward = ApplyBps(rent, input.CleanupRewardRatioBps)
+	}
+	return StateRentOutput{
+		RentNaet:          rent,
+		CleanupRewardNaet: cleanupReward,
+		BurnableRentNaet:  rent.Sub(cleanupReward),
+	}, nil
 }
 
 func EvaluateEconomicInvariants(input EconomicInvariantInput) (EconomicInvariantReport, error) {
@@ -667,6 +1038,34 @@ func ApplyBps(amount sdkmath.Int, bps int64) sdkmath.Int {
 		return sdkmath.ZeroInt()
 	}
 	return amount.MulRaw(bps).QuoRaw(BasisPoints)
+}
+
+func averageBps(values []int64) int64 {
+	if len(values) == 0 {
+		return DefaultTargetLoadBps
+	}
+	sum := int64(0)
+	for _, value := range values {
+		sum += value
+	}
+	return sum / int64(len(values))
+}
+
+func activityVolatilityBps(values []int64) int64 {
+	if len(values) < 2 {
+		return 0
+	}
+	minValue := values[0]
+	maxValue := values[0]
+	for _, value := range values[1:] {
+		if value < minValue {
+			minValue = value
+		}
+		if value > maxValue {
+			maxValue = value
+		}
+	}
+	return maxValue - minValue
 }
 
 func normalizeInt(value sdkmath.Int) sdkmath.Int {

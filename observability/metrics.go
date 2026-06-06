@@ -6,35 +6,40 @@ import (
 )
 
 const (
-	MetricTelemetryEnabled            = "aetheris_telemetry_enabled"
-	MetricBlockHeight                 = "aetheris_block_height"
-	MetricBlockTimeSeconds            = "aetheris_block_time_seconds"
-	MetricBlockProcessing             = "aetheris_block_processing_seconds"
-	MetricTxLatency                   = "aetheris_tx_latency_seconds"
-	MetricModuleErrors                = "aetheris_module_errors_total"
-	MetricDexPoolCount                = "aetheris_dex_pool_count"
-	MetricDexLiquidityNaet            = "aetheris_dex_liquidity_naet"
-	MetricDexSwaps                    = "aetheris_dex_swaps_total"
-	MetricFeesAccepted                = "aetheris_fees_accepted_total"
-	MetricFeesRejected                = "aetheris_fees_rejected_total"
-	MetricEconomyInflationBps         = "aetheris_economy_inflation_bps"
-	MetricEconomyBurnRatioBps         = "aetheris_economy_burn_ratio_bps"
-	MetricEconomyValidatorFeeRatioBps = "aetheris_economy_validator_fee_ratio_bps"
-	MetricEconomyDeflationGuard       = "aetheris_economy_deflation_guard"
-	MetricEconomyQueueLimited         = "aetheris_economy_queue_limited"
-	MetricEconomyRateLimited          = "aetheris_economy_rate_limited"
-	MetricEconomyTotalChargesNaet     = "aetheris_economy_total_charges_naet"
-	MetricEconomyBurnNaet             = "aetheris_economy_burn_naet"
-	MetricEconomyTreasuryNaet         = "aetheris_economy_treasury_naet"
-	MetricEconomyValidatorRewardsNaet = "aetheris_economy_validator_rewards_naet"
-	MetricEconomyOptimalState         = "aetheris_economy_optimal_state"
-	MetricEconomyFailedConditions     = "aetheris_economy_failed_conditions"
-	MetricEconomyInvariantsSatisfied  = "aetheris_economy_invariants_satisfied"
-	MetricEconomyInvariantFailures    = "aetheris_economy_invariant_failures"
-	MetricLocalnetHealth              = "aetheris_localnet_health"
-	MetricProcessUptimeSeconds        = "aetheris_process_uptime_seconds"
-	MetricProcessMemoryBytes          = "aetheris_process_memory_bytes"
-	MetricProcessGoroutines           = "aetheris_process_goroutines"
+	MetricTelemetryEnabled             = "aetheris_telemetry_enabled"
+	MetricBlockHeight                  = "aetheris_block_height"
+	MetricBlockTimeSeconds             = "aetheris_block_time_seconds"
+	MetricBlockProcessing              = "aetheris_block_processing_seconds"
+	MetricTxLatency                    = "aetheris_tx_latency_seconds"
+	MetricModuleErrors                 = "aetheris_module_errors_total"
+	MetricDexPoolCount                 = "aetheris_dex_pool_count"
+	MetricDexLiquidityNaet             = "aetheris_dex_liquidity_naet"
+	MetricDexSwaps                     = "aetheris_dex_swaps_total"
+	MetricFeesAccepted                 = "aetheris_fees_accepted_total"
+	MetricFeesRejected                 = "aetheris_fees_rejected_total"
+	MetricEconomyInflationBps          = "aetheris_economy_inflation_bps"
+	MetricEconomyBurnRatioBps          = "aetheris_economy_burn_ratio_bps"
+	MetricEconomyValidatorFeeRatioBps  = "aetheris_economy_validator_fee_ratio_bps"
+	MetricEconomyDeflationGuard        = "aetheris_economy_deflation_guard"
+	MetricEconomyQueueLimited          = "aetheris_economy_queue_limited"
+	MetricEconomyRateLimited           = "aetheris_economy_rate_limited"
+	MetricEconomyTotalChargesNaet      = "aetheris_economy_total_charges_naet"
+	MetricEconomyBurnNaet              = "aetheris_economy_burn_naet"
+	MetricEconomyTreasuryNaet          = "aetheris_economy_treasury_naet"
+	MetricEconomyValidatorRewardsNaet  = "aetheris_economy_validator_rewards_naet"
+	MetricEconomyOptimalState          = "aetheris_economy_optimal_state"
+	MetricEconomyFailedConditions      = "aetheris_economy_failed_conditions"
+	MetricEconomyInvariantsSatisfied   = "aetheris_economy_invariants_satisfied"
+	MetricEconomyInvariantFailures     = "aetheris_economy_invariant_failures"
+	MetricEconomyWeaknessControlsReady = "aetheris_economy_weakness_controls_ready"
+	MetricEconomyMissingControls       = "aetheris_economy_missing_controls"
+	MetricEconomyInflationRiskCount    = "aetheris_economy_inflation_risk_count"
+	MetricEconomyCircuitBreakerActive  = "aetheris_economy_circuit_breaker_active"
+	MetricEconomyCircuitBreakerReasons = "aetheris_economy_circuit_breaker_reasons"
+	MetricLocalnetHealth               = "aetheris_localnet_health"
+	MetricProcessUptimeSeconds         = "aetheris_process_uptime_seconds"
+	MetricProcessMemoryBytes           = "aetheris_process_memory_bytes"
+	MetricProcessGoroutines            = "aetheris_process_goroutines"
 )
 
 const (
@@ -75,6 +80,11 @@ var Definitions = []Definition{
 	{MetricEconomyFailedConditions, "Number of failed optimal economic state conditions in the last evaluation.", kindGauge},
 	{MetricEconomyInvariantsSatisfied, "Whether the last evaluated economic invariant set passed.", kindGauge},
 	{MetricEconomyInvariantFailures, "Number of failed economic invariants in the last evaluation.", kindGauge},
+	{MetricEconomyWeaknessControlsReady, "Whether all known economic weakness controls are production ready.", kindGauge},
+	{MetricEconomyMissingControls, "Number of missing economic weakness controls in the last evaluation.", kindGauge},
+	{MetricEconomyInflationRiskCount, "Number of inflation model risks in the last evaluation.", kindGauge},
+	{MetricEconomyCircuitBreakerActive, "Whether the economic circuit breaker is active.", kindGauge},
+	{MetricEconomyCircuitBreakerReasons, "Number of active economic circuit breaker reasons.", kindGauge},
 	{MetricLocalnetHealth, "Localnet metrics endpoint health marker.", kindGauge},
 	{MetricProcessUptimeSeconds, "Aetheris process uptime in seconds.", kindGauge},
 	{MetricProcessMemoryBytes, "Go runtime memory allocation bytes.", kindGauge},

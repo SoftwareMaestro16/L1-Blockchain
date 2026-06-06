@@ -76,6 +76,23 @@ func RecordEconomicInvariants(satisfied bool, failedInvariantCount int) {
 	SetGauge(MetricEconomyInvariantFailures, nil, float64(failedInvariantCount))
 }
 
+func RecordEconomicRiskControls(weaknessControlsReady bool, missingControlCount, inflationRiskCount, circuitBreakerReasonCount int, circuitBreakerActive bool) {
+	if missingControlCount < 0 {
+		missingControlCount = 0
+	}
+	if inflationRiskCount < 0 {
+		inflationRiskCount = 0
+	}
+	if circuitBreakerReasonCount < 0 {
+		circuitBreakerReasonCount = 0
+	}
+	SetGauge(MetricEconomyWeaknessControlsReady, nil, boolFloat(weaknessControlsReady))
+	SetGauge(MetricEconomyMissingControls, nil, float64(missingControlCount))
+	SetGauge(MetricEconomyInflationRiskCount, nil, float64(inflationRiskCount))
+	SetGauge(MetricEconomyCircuitBreakerActive, nil, boolFloat(circuitBreakerActive))
+	SetGauge(MetricEconomyCircuitBreakerReasons, nil, float64(circuitBreakerReasonCount))
+}
+
 func (r *Registry) collectRuntime() {
 	var mem runtime.MemStats
 	runtime.ReadMemStats(&mem)
