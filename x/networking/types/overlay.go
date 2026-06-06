@@ -44,6 +44,13 @@ const (
 	RoutingStrategyBroadcast               RoutingStrategy = "BROADCAST"
 	RoutingStrategyLowLatencyAdvisory      RoutingStrategy = "LOW_LATENCY_ADVISORY"
 	RoutingStrategyRandomWalkAdvisory      RoutingStrategy = "RANDOM_WALK_ADVISORY"
+	RoutingStrategyShortestLatencyPath     RoutingStrategy = "SHORTEST_LATENCY_PATH"
+	RoutingStrategyZoneLocal               RoutingStrategy = "ZONE_LOCAL"
+	RoutingStrategyProbabilisticGossip     RoutingStrategy = "PROBABILISTIC_GOSSIP_FALLBACK"
+	RoutingStrategyDeterministicShard      RoutingStrategy = "DETERMINISTIC_SHARD"
+	RoutingStrategyPriorityBroadcastTree   RoutingStrategy = "PRIORITY_BROADCAST_TREE"
+	RoutingStrategyServiceProvider         RoutingStrategy = "SERVICE_PROVIDER"
+	RoutingStrategyStorageProvider         RoutingStrategy = "STORAGE_PROVIDER"
 )
 
 type OverlayDescriptor struct {
@@ -255,7 +262,19 @@ func IsOverlayMembershipRule(rule OverlayMembershipRule) bool {
 
 func IsRoutingStrategy(strategy RoutingStrategy) bool {
 	switch strategy {
-	case RoutingStrategyDeterministicRoundRobin, RoutingStrategyKBucket, RoutingStrategyFanoutGossip, RoutingStrategyBroadcast, RoutingStrategyLowLatencyAdvisory, RoutingStrategyRandomWalkAdvisory:
+	case RoutingStrategyDeterministicRoundRobin,
+		RoutingStrategyKBucket,
+		RoutingStrategyFanoutGossip,
+		RoutingStrategyBroadcast,
+		RoutingStrategyLowLatencyAdvisory,
+		RoutingStrategyRandomWalkAdvisory,
+		RoutingStrategyShortestLatencyPath,
+		RoutingStrategyZoneLocal,
+		RoutingStrategyProbabilisticGossip,
+		RoutingStrategyDeterministicShard,
+		RoutingStrategyPriorityBroadcastTree,
+		RoutingStrategyServiceProvider,
+		RoutingStrategyStorageProvider:
 		return true
 	default:
 		return false
@@ -350,7 +369,9 @@ func overlayCompatibility(overlayType OverlayType) (OverlayMembershipRule, QoSCl
 }
 
 func isAdvisoryRoutingStrategy(strategy RoutingStrategy) bool {
-	return strategy == RoutingStrategyLowLatencyAdvisory || strategy == RoutingStrategyRandomWalkAdvisory
+	return strategy == RoutingStrategyLowLatencyAdvisory ||
+		strategy == RoutingStrategyRandomWalkAdvisory ||
+		strategy == RoutingStrategyShortestLatencyPath
 }
 
 func cloneOverlayDescriptors(descriptors []OverlayDescriptor) []OverlayDescriptor {

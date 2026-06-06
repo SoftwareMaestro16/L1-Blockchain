@@ -650,6 +650,145 @@ func TestOverlayRoutingFanoutClampsToEligiblePeers(t *testing.T) {
 	require.ErrorContains(t, err, "insufficient")
 }
 
+func TestOverlayMembershipProofAuthorizesServiceStakeAndSignedRecords(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	service := signedNodeRecord(t, 0x38, salt, 100, NodeRoleService)
+	serviceDesc := defaultOverlayByType(t, OverlayTypeService)
+	serviceProof := testOverlayMembershipProof(t, service, serviceDesc, MembershipProofServiceRegistration, OverlayMembershipModeServiceRegistry, 80)
+
+	membership, err := AuthorizeOverlayMembership(service, serviceDesc, serviceProof, 20)
+	require.NoError(t, err)
+	require.Equal(t, service.NodeID, membership.NodeID)
+	require.Equal(t, serviceDesc.OverlayID, membership.OverlayID)
+
+	storage := signedNodeRecord(t, 0x39, salt, 100, NodeRoleStorageProvider)
+	storageDesc := defaultOverlayByType(t, OverlayTypeStorage)
+	stakeProof := testOverlayMembershipProof(t, storage, storageDesc, MembershipProofProviderStake, OverlayMembershipModeStakeBased, 80)
+	_, err = AuthorizeOverlayMembership(storage, storageDesc, stakeProof, 20)
+	require.NoError(t, err)
+
+	routing := signedNodeRecord(t, 0x3a, salt, 100, NodeRoleRouting)
+	routingDesc := defaultOverlayByType(t, OverlayTypeRouting)
+	authProof := testOverlayMembershipProof(t, routing, routingDesc, MembershipProofSignedAuthorization, OverlayMembershipModeCryptographicAuth, 80)
+	_, err = AuthorizeOverlayMembership(routing, routingDesc, authProof, 20)
+	require.NoError(t, err)
+
+	tampered := authProof
+	tampered.Signature[0] ^= 0xff
+	_, err = AuthorizeOverlayMembership(routing, routingDesc, tampered, 20)
+	require.ErrorContains(t, err, "signature")
+}
+
+func TestOverlayRoutingPipelineClassifiesAndSelectsServiceProviders(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	source := signedNodeRecord(t, 0x3b, salt, 100, NodeRoleFull)
+	left := signedNodeRecord(t, 0x3c, salt, 100, NodeRoleService)
+	right := signedNodeRecord(t, 0x3d, salt, 100, NodeRoleService)
+	left.ServicesSupported = []string{"state-sync"}
+	right.ServicesSupported = []string{"execution-stream"}
+	desc, err := NewOverlayDescriptor(OverlayDescriptor{
+		OverlayType: OverlayTypeService,
+		PolicyHash:  HashParts("service-provider-routing"),
+		Membership:  OverlayMembershipServiceAdvertisement,
+		Routing:     RoutingStrategyServiceProvider,
+		MinPeers:    2,
+		MaxPeers:    8,
+		Fanout:      2,
+		QoSClass:    QoSClassServiceCall,
+		Version:     1,
+	})
+	require.NoError(t, err)
+	proofs := []OverlayMembershipProof{
+		testOverlayMembershipProof(t, left, desc, MembershipProofServiceRegistration, OverlayMembershipModeServiceRegistry, 80),
+		testOverlayMembershipProof(t, right, desc, MembershipProofServiceRegistration, OverlayMembershipModeServiceRegistry, 80),
+	}
+	msg, err := NewNetworkMessage(NetworkMessage{
+		Layer:            LayerL3Application,
+		Channel:          ChannelService,
+		PayloadHash:      HashParts("service-route-payload"),
+		PayloadSizeBytes: 512,
+	})
+	require.NoError(t, err)
+
+	plan, err := BuildOverlayRoute(OverlayRoutingRequest{
+		Message:          msg,
+		SourceNodeID:     source.NodeID,
+		CandidatePeers:   []NodeRecord{left, right},
+		MembershipProofs: proofs,
+		Graph:            RoutingGraph{OverlayID: desc.OverlayID, Version: 1},
+		Hint:             RouteHint{ServiceID: "execution-stream"},
+		CurrentHeight:    20,
+	}, []OverlayDescriptor{desc})
+	require.NoError(t, err)
+	require.Equal(t, OverlayTypeService, plan.OverlayType)
+	require.Equal(t, RoutingStrategyServiceProvider, plan.Strategy)
+	require.Equal(t, right.NodeID, plan.TargetNodeIDs[0])
+}
+
+func TestOverlayRoutingConsensusSafetyRequiresCommittedRoutingTable(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	source := signedNodeRecord(t, 0x3e, salt, 100, NodeRoleZoneExecution)
+	slow := signedNodeRecord(t, 0x3f, salt, 100, NodeRoleZoneExecution)
+	fast := signedNodeRecord(t, 0x40, salt, 100, NodeRoleZoneExecution)
+	desc, err := NewOverlayDescriptor(OverlayDescriptor{
+		OverlayType: OverlayTypeExecution,
+		PolicyHash:  HashParts("committed-latency-routing"),
+		Membership:  OverlayMembershipExecutionRole,
+		Routing:     RoutingStrategyShortestLatencyPath,
+		MinPeers:    2,
+		MaxPeers:    8,
+		Fanout:      2,
+		QoSClass:    QoSClassExecutionMessage,
+		Version:     1,
+	})
+	require.NoError(t, err)
+	proofs := []OverlayMembershipProof{
+		testOverlayMembershipProof(t, slow, desc, MembershipProofZoneAssignment, OverlayMembershipModeZoneAssignment, 80),
+		testOverlayMembershipProof(t, fast, desc, MembershipProofZoneAssignment, OverlayMembershipModeZoneAssignment, 80),
+	}
+	msg, err := NewNetworkMessage(NetworkMessage{
+		Layer:             LayerL2Overlay,
+		Channel:           ChannelExecution,
+		ConsensusEffect:   true,
+		DeterminismSource: DeterminismCommittedState,
+		PayloadHash:       HashParts("execution-route-payload"),
+		PayloadSizeBytes:  512,
+	})
+	require.NoError(t, err)
+	graph := RoutingGraph{
+		OverlayID: desc.OverlayID,
+		Version:   1,
+		Edges: []RoutingEdge{
+			{FromNodeID: source.NodeID, ToNodeID: slow.NodeID, LatencyMillis: 90, Priority: 2},
+			{FromNodeID: source.NodeID, ToNodeID: fast.NodeID, LatencyMillis: 10, Priority: 1},
+		},
+	}
+
+	_, err = BuildOverlayRoute(OverlayRoutingRequest{
+		Message:          msg,
+		SourceNodeID:     source.NodeID,
+		CandidatePeers:   []NodeRecord{slow, fast},
+		MembershipProofs: proofs,
+		Graph:            graph,
+		CurrentHeight:    20,
+	}, []OverlayDescriptor{desc})
+	require.ErrorContains(t, err, "committed routing")
+
+	graph.Committed = true
+	plan, err := BuildOverlayRoute(OverlayRoutingRequest{
+		Message:          msg,
+		SourceNodeID:     source.NodeID,
+		CandidatePeers:   []NodeRecord{slow, fast},
+		MembershipProofs: proofs,
+		Graph:            graph,
+		CurrentHeight:    20,
+	}, []OverlayDescriptor{desc})
+	require.NoError(t, err)
+	require.True(t, plan.UsesCommittedRoutingTable)
+	require.False(t, plan.UsesNodeLocalAdaptation)
+	require.Equal(t, fast.NodeID, plan.TargetNodeIDs[0])
+}
+
 func TestLayerStackPreservesCometBFTBaselineAndExtensionOrder(t *testing.T) {
 	stack := DefaultLayerStack()
 	require.NoError(t, ValidateLayerStack(stack))
@@ -1051,6 +1190,45 @@ func overlayIDs(descriptors []OverlayDescriptor) []string {
 		out[i] = NormalizeOverlayDescriptor(desc).OverlayID
 	}
 	return out
+}
+
+func testOverlayMembershipProof(t *testing.T, record NodeRecord, desc OverlayDescriptor, proofType MembershipProofType, mode OverlayMembershipMode, expiresHeight uint64) OverlayMembershipProof {
+	t.Helper()
+
+	record = NormalizeNodeRecord(record)
+	desc = NormalizeOverlayDescriptor(desc)
+	proof := OverlayMembershipProof{
+		OverlayID:     desc.OverlayID,
+		NodeID:        record.NodeID,
+		ProofType:     proofType,
+		Mode:          mode,
+		Membership:    desc.Membership,
+		ProofHash:     HashParts("overlay-membership-proof", record.NodeID, desc.OverlayID, string(proofType)),
+		AuthorityHash: HashParts("overlay-membership-authority", desc.OverlayID),
+		ExpiresHeight: expiresHeight,
+	}
+	if len(record.ZonesSupported) > 0 {
+		proof.ZoneID = record.ZonesSupported[0]
+	}
+	if len(record.ServicesSupported) > 0 {
+		proof.ServiceID = record.ServicesSupported[0]
+	}
+	if proofType == MembershipProofProviderStake {
+		proof.StakeAmount = 1_000
+		proof.Committed = true
+	}
+	if proofType == MembershipProofValidatorSet {
+		proof.Committed = true
+		proof.Deterministic = true
+	}
+	if proofType == MembershipProofSignedAuthorization {
+		signed, err := SignOverlayMembershipProof(proof, deterministicPrivateKey(0x7a))
+		require.NoError(t, err)
+		return signed
+	}
+	created, err := NewOverlayMembershipProof(proof)
+	require.NoError(t, err)
+	return created
 }
 
 func testSessionRequest(local, remote NodeRecord, openedHeight, expiresHeight uint64, nonce string, channels []ChannelClass) SessionRequest {
