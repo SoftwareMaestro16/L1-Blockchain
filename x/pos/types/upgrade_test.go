@@ -176,6 +176,87 @@ func TestPoSModuleBoundariesRejectOverlapMissingAndUnknownReferences(t *testing.
 	require.ErrorContains(t, unknown.Validate(compatibility), "unknown module")
 }
 
+func TestPosMessageQueryManifestCoversMessagesAndBoundaryQueries(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	boundaries := DefaultPoSModuleBoundaryManifest()
+	manifest := DefaultPosMessageQueryManifest()
+	require.NoError(t, manifest.Validate(compatibility, boundaries))
+	require.Equal(t, ComputePosMessageQueryRoot(manifest), manifest.Root)
+
+	require.Len(t, manifest.Messages, len(RequiredPosMessageNames()))
+	for _, messageName := range RequiredPosMessageNames() {
+		_, found := PosMessageByName(manifest, messageName)
+		require.True(t, found, messageName)
+	}
+
+	startEpoch, found := PosMessageByName(manifest, "MsgStartEpoch")
+	require.True(t, found)
+	require.Equal(t, "epoch", startEpoch.ModuleName)
+	require.Equal(t, "authority", startEpoch.SignerRole)
+	require.Equal(t, "any", startEpoch.RequiredPhase)
+
+	assign, found := PosMessageByName(manifest, "MsgAssignTaskGroups")
+	require.True(t, found)
+	require.Equal(t, "taskgroups", assign.ModuleName)
+	require.Equal(t, string(EpochPhaseAssignment), assign.RequiredPhase)
+
+	collator, found := PosMessageByName(manifest, "MsgSubmitCollatorOutput")
+	require.True(t, found)
+	require.Equal(t, "collators", collator.ModuleName)
+	require.Equal(t, string(EpochPhaseActive), collator.RequiredPhase)
+
+	for _, boundary := range boundaries.Boundaries {
+		for _, endpoint := range boundary.QueryEndpoints {
+			_, found := PosQueryByName(manifest, boundary.ModuleName, endpoint)
+			require.True(t, found, "%s/%s", boundary.ModuleName, endpoint)
+		}
+	}
+	_, found = PosQueryByName(manifest, "delegation_market", "QueryDelegationRiskExposure")
+	require.True(t, found)
+	_, found = PosQueryByName(manifest, "security_metrics", "QueryCentralizationDashboard")
+	require.True(t, found)
+}
+
+func TestPosMessageQueryManifestRejectsMissingDuplicateAndUnknownEntries(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	boundaries := DefaultPoSModuleBoundaryManifest()
+	manifest := DefaultPosMessageQueryManifest()
+
+	missingMessage := manifest
+	missingMessage.Messages = append([]PosMessageSpec{}, manifest.Messages...)
+	missingMessage.Messages = missingMessage.Messages[:len(missingMessage.Messages)-1]
+	missingMessage.Root = ComputePosMessageQueryRoot(missingMessage)
+	require.ErrorContains(t, missingMessage.Validate(compatibility, boundaries), "MsgSubmitFraudProof")
+
+	duplicateMessage := manifest
+	duplicateMessage.Messages = append([]PosMessageSpec{}, manifest.Messages...)
+	duplicateMessage.Messages = append(duplicateMessage.Messages, manifest.Messages[0])
+	duplicateMessage.Root = ComputePosMessageQueryRoot(duplicateMessage)
+	require.ErrorContains(t, duplicateMessage.Validate(compatibility, boundaries), "duplicate pos message")
+
+	unknownModule := manifest
+	unknownModule.Messages = append([]PosMessageSpec{}, manifest.Messages...)
+	unknownModule.Messages[0].ModuleName = "unknown_module"
+	unknownModule.Root = ComputePosMessageQueryRoot(unknownModule)
+	require.ErrorContains(t, unknownModule.Validate(compatibility, boundaries), "unknown module")
+
+	missingBoundaryQuery := manifest
+	missingBoundaryQuery.Queries = append([]PosQuerySpec{}, manifest.Queries...)
+	missingBoundaryQuery.Queries = missingBoundaryQuery.Queries[1:]
+	missingBoundaryQuery.Root = ComputePosMessageQueryRoot(missingBoundaryQuery)
+	require.ErrorContains(t, missingBoundaryQuery.Validate(compatibility, boundaries), "QueryCurrentEpoch")
+
+	badPhase := manifest
+	badPhase.Messages = append([]PosMessageSpec{}, manifest.Messages...)
+	badPhase.Messages[0].RequiredPhase = "bad_phase"
+	badPhase.Root = ComputePosMessageQueryRoot(badPhase)
+	require.ErrorContains(t, badPhase.Validate(compatibility, boundaries), "valid epoch phase")
+
+	rootMismatch := manifest
+	rootMismatch.Root = PosEmptyRootHash
+	require.ErrorContains(t, rootMismatch.Validate(compatibility, boundaries), "root mismatch")
+}
+
 func TestKeeperIntegrationManifestCoversSDKKeepersHooksAndExportImport(t *testing.T) {
 	compatibility := DefaultCosmosSDKCompatibilityManifest()
 	boundaries := DefaultPoSModuleBoundaryManifest()

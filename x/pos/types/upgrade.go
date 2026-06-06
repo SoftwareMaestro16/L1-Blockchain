@@ -935,6 +935,28 @@ type PosModuleBoundaryManifest struct {
 	Root       string
 }
 
+type PosMessageSpec struct {
+	ModuleName     string
+	MessageName    string
+	SignerRole     string
+	StateScope     string
+	RequiredPhase  string
+	IdempotencyKey string
+}
+
+type PosQuerySpec struct {
+	ModuleName       string
+	QueryName        string
+	ResponseScope    string
+	ConsistencyModel string
+}
+
+type PosMessageQueryManifest struct {
+	Messages []PosMessageSpec
+	Queries  []PosQuerySpec
+	Root     string
+}
+
 type KeeperInterfaceSpec struct {
 	KeeperName       string
 	ModuleName       string
@@ -1235,6 +1257,17 @@ func OptionalPoSModuleNames(manifest CosmosSDKCompatibilityManifest) []string {
 		}
 	}
 	return out
+}
+
+func knownPoSModuleNames(manifest CosmosSDKCompatibilityManifest) map[string]struct{} {
+	known := make(map[string]struct{}, len(manifest.Extensions)+len(manifest.Modules))
+	for _, extension := range manifest.Extensions {
+		known[extension.ModuleName] = struct{}{}
+	}
+	for _, module := range manifest.Modules {
+		known[module.ModuleName] = struct{}{}
+	}
+	return known
 }
 
 func (m CosmosSDKCompatibilityManifest) Validate() error {
@@ -1559,6 +1592,244 @@ func ComputePoSModuleBoundaryRoot(manifest PosModuleBoundaryManifest) string {
 			posWriteStringSlice(w, boundary.QueryEndpoints)
 		}
 	})
+}
+
+func DefaultPosMessageQueryManifest() PosMessageQueryManifest {
+	manifest := PosMessageQueryManifest{
+		Messages: []PosMessageSpec{
+			{ModuleName: "epoch", MessageName: "MsgStartEpoch", SignerRole: "authority", StateScope: "start epoch lifecycle", RequiredPhase: "any", IdempotencyKey: "epoch_id"},
+			{ModuleName: "epoch", MessageName: "MsgAdvanceEpochPhase", SignerRole: "authority", StateScope: "advance epoch phase", RequiredPhase: "any", IdempotencyKey: "epoch_id_phase"},
+			{ModuleName: "epoch", MessageName: "MsgFinalizeEpochSettlement", SignerRole: "authority", StateScope: "finalize settlement rewards penalties and roots", RequiredPhase: string(EpochPhaseSettlement), IdempotencyKey: "epoch_id"},
+			{ModuleName: "validator_economy", MessageName: "MsgDeclareValidatorCapacity", SignerRole: "validator", StateScope: "declare workload capacity", RequiredPhase: string(EpochPhaseDelegation), IdempotencyKey: "validator_epoch"},
+			{ModuleName: "validator_economy", MessageName: "MsgUpdateValidatorMetadata", SignerRole: "validator", StateScope: "update validator marketplace metadata", RequiredPhase: "any", IdempotencyKey: "validator_height"},
+			{ModuleName: "delegation_market", MessageName: "MsgSetDelegationRiskProfile", SignerRole: "delegator", StateScope: "set delegation risk profile", RequiredPhase: string(EpochPhaseDelegation), IdempotencyKey: "delegator_validator_epoch"},
+			{ModuleName: "delegation_market", MessageName: "MsgUpdateCommissionTolerance", SignerRole: "delegator", StateScope: "update commission tolerance", RequiredPhase: "any", IdempotencyKey: "delegator_validator"},
+			{ModuleName: "taskgroups", MessageName: "MsgRegisterWorkload", SignerRole: "operator", StateScope: "register workload definition", RequiredPhase: "any", IdempotencyKey: "workload_id"},
+			{ModuleName: "taskgroups", MessageName: "MsgAssignTaskGroups", SignerRole: "authority", StateScope: "assign deterministic task groups", RequiredPhase: string(EpochPhaseAssignment), IdempotencyKey: "epoch_id_seed"},
+			{ModuleName: "taskgroups", MessageName: "MsgSubmitVerificationReceipt", SignerRole: "validator", StateScope: "submit verification receipt", RequiredPhase: string(EpochPhaseActive), IdempotencyKey: "epoch_task_validator_object"},
+			{ModuleName: "taskgroups", MessageName: "MsgReportMissedTask", SignerRole: "validator", StateScope: "report missed task", RequiredPhase: string(EpochPhaseActive), IdempotencyKey: "epoch_task_validator"},
+			{ModuleName: "evidence", MessageName: "MsgSubmitEvidence", SignerRole: "reporter", StateScope: "submit structured evidence with deposit", RequiredPhase: "any", IdempotencyKey: "evidence_id"},
+			{ModuleName: "evidence", MessageName: "MsgVoteEvidenceDecision", SignerRole: "validator", StateScope: "vote evidence decision", RequiredPhase: "any", IdempotencyKey: "evidence_id_validator"},
+			{ModuleName: "evidence", MessageName: "MsgFinalizeEvidence", SignerRole: "authority", StateScope: "finalize evidence decision and penalty linkage", RequiredPhase: "any", IdempotencyKey: "evidence_id"},
+			{ModuleName: "evidence", MessageName: "MsgClaimReporterReward", SignerRole: "reporter", StateScope: "claim reporter reward", RequiredPhase: "any", IdempotencyKey: "evidence_id_reporter"},
+			{ModuleName: "performance", MessageName: "MsgSubmitPerformanceReport", SignerRole: "validator", StateScope: "submit committed performance report", RequiredPhase: string(EpochPhaseActive), IdempotencyKey: "epoch_operator_role"},
+			{ModuleName: "performance", MessageName: "MsgFinalizePerformanceEpoch", SignerRole: "authority", StateScope: "finalize performance epoch multipliers", RequiredPhase: string(EpochPhaseSettlement), IdempotencyKey: "epoch_id"},
+			{ModuleName: "collators", MessageName: "MsgRegisterCollator", SignerRole: "collator", StateScope: "register collator operator", RequiredPhase: "any", IdempotencyKey: "collator_id"},
+			{ModuleName: "collators", MessageName: "MsgSubmitCollatorOutput", SignerRole: "collator", StateScope: "submit candidate collator output", RequiredPhase: string(EpochPhaseActive), IdempotencyKey: "collator_workload_object"},
+			{ModuleName: "fishermen", MessageName: "MsgRegisterFisherman", SignerRole: "fisherman", StateScope: "register fisherman operator", RequiredPhase: "any", IdempotencyKey: "fisherman_id"},
+			{ModuleName: "fishermen", MessageName: "MsgSubmitFraudProof", SignerRole: "fisherman", StateScope: "submit fraud proof with deposit", RequiredPhase: "any", IdempotencyKey: "fraud_proof_id"},
+		},
+		Queries: []PosQuerySpec{
+			{ModuleName: "epoch", QueryName: "QueryCurrentEpoch", ResponseScope: "current epoch record", ConsistencyModel: "committed_state"},
+			{ModuleName: "epoch", QueryName: "QueryEpochHistory", ResponseScope: "historical epoch records", ConsistencyModel: "committed_state"},
+			{ModuleName: "validator_economy", QueryName: "QueryValidatorScore", ResponseScope: "validator score record", ConsistencyModel: "committed_state"},
+			{ModuleName: "validator_economy", QueryName: "QueryElectionRanking", ResponseScope: "epoch election ranking", ConsistencyModel: "committed_state"},
+			{ModuleName: "validator_economy", QueryName: "QueryValidatorSaturation", ResponseScope: "stake saturation status", ConsistencyModel: "committed_state"},
+			{ModuleName: "validator_economy", QueryName: "QueryRoleEligibility", ResponseScope: "role eligibility state", ConsistencyModel: "committed_state"},
+			{ModuleName: "taskgroups", QueryName: "QueryWorkloadRegistry", ResponseScope: "registered workloads", ConsistencyModel: "committed_state"},
+			{ModuleName: "taskgroups", QueryName: "QueryTaskGroup", ResponseScope: "task group record", ConsistencyModel: "committed_state"},
+			{ModuleName: "taskgroups", QueryName: "QueryProposerRotation", ResponseScope: "proposer priority and fallback order", ConsistencyModel: "committed_state"},
+			{ModuleName: "taskgroups", QueryName: "QueryVerificationGroup", ResponseScope: "task or evidence verification group", ConsistencyModel: "committed_state"},
+			{ModuleName: "taskgroups", QueryName: "QueryAssignmentProof", ResponseScope: "deterministic assignment proof", ConsistencyModel: "committed_state"},
+			{ModuleName: "taskgroups", QueryName: "QueryVerificationReceipt", ResponseScope: "verification receipt aggregation", ConsistencyModel: "committed_state"},
+			{ModuleName: "evidence", QueryName: "QueryEvidenceRecord", ResponseScope: "structured evidence record", ConsistencyModel: "committed_state"},
+			{ModuleName: "evidence", QueryName: "QueryEvidenceDeposit", ResponseScope: "evidence deposit accounting", ConsistencyModel: "committed_state"},
+			{ModuleName: "evidence", QueryName: "QueryEvidenceDecision", ResponseScope: "evidence decision votes", ConsistencyModel: "committed_state"},
+			{ModuleName: "evidence", QueryName: "QueryReporterRewards", ResponseScope: "reporter reward claims", ConsistencyModel: "committed_state"},
+			{ModuleName: "evidence", QueryName: "QueryEvidenceVerificationGroup", ResponseScope: "evidence verification group assignment", ConsistencyModel: "committed_state"},
+			{ModuleName: "performance", QueryName: "QueryPerformanceRecord", ResponseScope: "performance record", ConsistencyModel: "committed_state"},
+			{ModuleName: "performance", QueryName: "QueryOperatorPerformanceHistory", ResponseScope: "operator performance history", ConsistencyModel: "committed_state"},
+			{ModuleName: "performance", QueryName: "QueryRolePerformance", ResponseScope: "role performance metrics", ConsistencyModel: "committed_state"},
+			{ModuleName: "performance", QueryName: "QueryRewardMultiplier", ResponseScope: "reward multiplier", ConsistencyModel: "committed_state"},
+			{ModuleName: "delegation_market", QueryName: "QueryValidatorRisk", ResponseScope: "validator risk profile", ConsistencyModel: "committed_state"},
+			{ModuleName: "delegation_market", QueryName: "QueryValidatorEffectiveYield", ResponseScope: "effective yield estimate", ConsistencyModel: "committed_state"},
+			{ModuleName: "delegation_market", QueryName: "QueryDelegationRiskExposure", ResponseScope: "delegator slash exposure", ConsistencyModel: "committed_state"},
+			{ModuleName: "delegation_market", QueryName: "QueryDelegationActivationEpoch", ResponseScope: "delegation activation epoch", ConsistencyModel: "committed_state"},
+			{ModuleName: "delegation_market", QueryName: "QueryValidatorCommissionHistory", ResponseScope: "validator commission history", ConsistencyModel: "committed_state"},
+			{ModuleName: "delegation_market", QueryName: "QueryValidatorSlashHistory", ResponseScope: "validator slash history", ConsistencyModel: "committed_state"},
+			{ModuleName: "delegation_market", QueryName: "QueryValidatorPerformanceHistory", ResponseScope: "validator performance history", ConsistencyModel: "committed_state"},
+			{ModuleName: "collators", QueryName: "QueryCollatorRegistry", ResponseScope: "collator registry", ConsistencyModel: "committed_state"},
+			{ModuleName: "collators", QueryName: "QueryCollatorOutput", ResponseScope: "candidate collator output", ConsistencyModel: "committed_state"},
+			{ModuleName: "fishermen", QueryName: "QueryFishermanRegistry", ResponseScope: "fisherman registry", ConsistencyModel: "committed_state"},
+			{ModuleName: "fishermen", QueryName: "QueryFraudProof", ResponseScope: "fraud proof record", ConsistencyModel: "committed_state"},
+			{ModuleName: "security_metrics", QueryName: "QuerySecurityMetrics", ResponseScope: "economic security metrics", ConsistencyModel: "committed_state"},
+			{ModuleName: "security_metrics", QueryName: "QueryCentralizationDashboard", ResponseScope: "centralization dashboard data", ConsistencyModel: "committed_state"},
+			{ModuleName: "security_metrics", QueryName: "QueryConcentrationAlerts", ResponseScope: "concentration invariant alerts", ConsistencyModel: "committed_state"},
+		},
+	}
+	manifest.Root = ComputePosMessageQueryRoot(manifest)
+	return manifest
+}
+
+func RequiredPosMessageNames() []string {
+	return []string{
+		"MsgStartEpoch",
+		"MsgAdvanceEpochPhase",
+		"MsgFinalizeEpochSettlement",
+		"MsgDeclareValidatorCapacity",
+		"MsgUpdateValidatorMetadata",
+		"MsgSetDelegationRiskProfile",
+		"MsgUpdateCommissionTolerance",
+		"MsgRegisterWorkload",
+		"MsgAssignTaskGroups",
+		"MsgSubmitVerificationReceipt",
+		"MsgReportMissedTask",
+		"MsgSubmitEvidence",
+		"MsgVoteEvidenceDecision",
+		"MsgFinalizeEvidence",
+		"MsgClaimReporterReward",
+		"MsgSubmitPerformanceReport",
+		"MsgFinalizePerformanceEpoch",
+		"MsgRegisterCollator",
+		"MsgSubmitCollatorOutput",
+		"MsgRegisterFisherman",
+		"MsgSubmitFraudProof",
+	}
+}
+
+func (m PosMessageQueryManifest) Validate(compatibility CosmosSDKCompatibilityManifest, boundaries PosModuleBoundaryManifest) error {
+	if err := compatibility.Validate(); err != nil {
+		return err
+	}
+	if err := boundaries.Validate(compatibility); err != nil {
+		return err
+	}
+	knownModules := knownPoSModuleNames(compatibility)
+	if len(m.Messages) == 0 {
+		return errors.New("pos messages are required")
+	}
+	seenMessages := make(map[string]struct{}, len(m.Messages))
+	for _, message := range m.Messages {
+		if err := message.Validate(knownModules); err != nil {
+			return err
+		}
+		if _, found := seenMessages[message.MessageName]; found {
+			return fmt.Errorf("duplicate pos message %s", message.MessageName)
+		}
+		seenMessages[message.MessageName] = struct{}{}
+	}
+	for _, required := range RequiredPosMessageNames() {
+		if _, found := seenMessages[required]; !found {
+			return fmt.Errorf("required pos message %s is missing", required)
+		}
+	}
+	if len(m.Queries) == 0 {
+		return errors.New("pos queries are required")
+	}
+	seenQueries := make(map[string]struct{}, len(m.Queries))
+	queriesByModule := make(map[string]map[string]struct{})
+	for _, query := range m.Queries {
+		if err := query.Validate(knownModules); err != nil {
+			return err
+		}
+		key := query.ModuleName + "/" + query.QueryName
+		if _, found := seenQueries[key]; found {
+			return fmt.Errorf("duplicate pos query %s", key)
+		}
+		seenQueries[key] = struct{}{}
+		if queriesByModule[query.ModuleName] == nil {
+			queriesByModule[query.ModuleName] = make(map[string]struct{})
+		}
+		queriesByModule[query.ModuleName][query.QueryName] = struct{}{}
+	}
+	for _, boundary := range boundaries.Boundaries {
+		moduleQueries := queriesByModule[boundary.ModuleName]
+		for _, endpoint := range boundary.QueryEndpoints {
+			if _, found := moduleQueries[endpoint]; !found {
+				return fmt.Errorf("boundary query endpoint %s/%s is missing from pos message query manifest", boundary.ModuleName, endpoint)
+			}
+		}
+	}
+	if err := validatePosHash("pos message query root", m.Root); err != nil {
+		return err
+	}
+	if expected := ComputePosMessageQueryRoot(m); expected != m.Root {
+		return errors.New("pos message query root mismatch")
+	}
+	return nil
+}
+
+func (m PosMessageSpec) Validate(knownModules map[string]struct{}) error {
+	if err := validatePosToken("pos message module", m.ModuleName); err != nil {
+		return err
+	}
+	if _, found := knownModules[m.ModuleName]; !found {
+		return fmt.Errorf("pos message %s references unknown module %s", m.MessageName, m.ModuleName)
+	}
+	if err := validatePosToken("pos message name", m.MessageName); err != nil {
+		return err
+	}
+	if !strings.HasPrefix(m.MessageName, "Msg") {
+		return fmt.Errorf("pos message %s must use Msg prefix", m.MessageName)
+	}
+	if err := validatePosToken("pos message signer role", m.SignerRole); err != nil {
+		return err
+	}
+	if err := validatePosResponsibility("pos message state scope", m.StateScope); err != nil {
+		return err
+	}
+	if err := validatePosPhaseSelector("pos message required phase", m.RequiredPhase); err != nil {
+		return err
+	}
+	return validatePosToken("pos message idempotency key", m.IdempotencyKey)
+}
+
+func (q PosQuerySpec) Validate(knownModules map[string]struct{}) error {
+	if err := validatePosToken("pos query module", q.ModuleName); err != nil {
+		return err
+	}
+	if _, found := knownModules[q.ModuleName]; !found {
+		return fmt.Errorf("pos query %s references unknown module %s", q.QueryName, q.ModuleName)
+	}
+	if err := validatePosToken("pos query name", q.QueryName); err != nil {
+		return err
+	}
+	if !strings.HasPrefix(q.QueryName, "Query") {
+		return fmt.Errorf("pos query %s must use Query prefix", q.QueryName)
+	}
+	if err := validatePosResponsibility("pos query response scope", q.ResponseScope); err != nil {
+		return err
+	}
+	return validatePosToken("pos query consistency model", q.ConsistencyModel)
+}
+
+func ComputePosMessageQueryRoot(manifest PosMessageQueryManifest) string {
+	return posHashRoot("aetheris-pos-messages-queries-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(manifest.Messages)))
+		for _, message := range manifest.Messages {
+			posWritePart(w, message.ModuleName)
+			posWritePart(w, message.MessageName)
+			posWritePart(w, message.SignerRole)
+			posWritePart(w, message.StateScope)
+			posWritePart(w, message.RequiredPhase)
+			posWritePart(w, message.IdempotencyKey)
+		}
+		posWriteUint64(w, uint64(len(manifest.Queries)))
+		for _, query := range manifest.Queries {
+			posWritePart(w, query.ModuleName)
+			posWritePart(w, query.QueryName)
+			posWritePart(w, query.ResponseScope)
+			posWritePart(w, query.ConsistencyModel)
+		}
+	})
+}
+
+func PosMessageByName(manifest PosMessageQueryManifest, messageName string) (PosMessageSpec, bool) {
+	for _, message := range manifest.Messages {
+		if message.MessageName == messageName {
+			return message, true
+		}
+	}
+	return PosMessageSpec{}, false
+}
+
+func PosQueryByName(manifest PosMessageQueryManifest, moduleName string, queryName string) (PosQuerySpec, bool) {
+	for _, query := range manifest.Queries {
+		if query.ModuleName == moduleName && query.QueryName == queryName {
+			return query, true
+		}
+	}
+	return PosQuerySpec{}, false
 }
 
 func DefaultKeeperIntegrationManifest() KeeperIntegrationManifest {
@@ -7382,6 +7653,18 @@ func validatePosResponsibility(fieldName string, value string) error {
 		return fmt.Errorf("%s contains invalid character", fieldName)
 	}
 	return nil
+}
+
+func validatePosPhaseSelector(fieldName string, value string) error {
+	if value == "any" {
+		return nil
+	}
+	switch EpochPhase(value) {
+	case EpochPhaseDelegation, EpochPhaseElection, EpochPhaseAssignment, EpochPhaseActive, EpochPhaseSettlement, EpochPhaseClosed:
+		return nil
+	default:
+		return fmt.Errorf("%s must be any or a valid epoch phase", fieldName)
+	}
 }
 
 func validatePosHash(fieldName string, value string) error {
