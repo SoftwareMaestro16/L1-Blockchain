@@ -10,6 +10,15 @@ import (
 )
 
 const (
+	SlashSeverityMinorLivenessFault     = "minor_liveness_fault"
+	SlashSeverityMajorLivenessFault     = "major_liveness_fault"
+	SlashSeverityRepeatedLivenessFault  = "repeated_liveness_fault"
+	SlashSeverityInvalidTaskExecution   = "invalid_task_execution"
+	SlashSeverityInvalidStateTransition = "invalid_state_transition"
+	SlashSeverityEquivocation           = "equivocation"
+	SlashSeverityDoubleSign             = "double_sign"
+	SlashSeverityEvidenceFraud          = "evidence_fraud"
+
 	SlashSeverityLow      = "low"
 	SlashSeverityMedium   = "medium"
 	SlashSeverityHigh     = "high"
@@ -17,6 +26,11 @@ const (
 
 	DefaultSlashRepeatMultiplierBps = uint32(BasisPoints)
 	DefaultSlashImpactBps           = uint32(BasisPoints)
+
+	DefaultPenaltyBurnBps         = uint32(4_000)
+	DefaultPenaltyReporterBps     = uint32(1_000)
+	DefaultPenaltyTreasuryBps     = uint32(4_000)
+	DefaultPenaltyCompensationBps = uint32(1_000)
 )
 
 type SlashingPenaltyInput struct {
@@ -67,15 +81,74 @@ type SlashingPenalty struct {
 	PenaltyHash                   string
 }
 
+type SlashingPenaltyRoutingInput struct {
+	Penalty                SlashingPenalty
+	ReporterID             string
+	AffectedPoolIDOptional string
+	BurnBps                uint32
+	ReporterRewardBps      uint32
+	ProtocolTreasuryBps    uint32
+	CompensationBps        uint32
+	ReporterRewardCapBps   uint32
+}
+
+type SlashingPenaltyRouting struct {
+	PenaltyID              string
+	ValidatorID            string
+	ReporterID             string
+	AffectedPoolIDOptional string
+	TotalPenaltyNaet       sdkmath.Int
+	BurnNaet               sdkmath.Int
+	ReporterRewardNaet     sdkmath.Int
+	ProtocolTreasuryNaet   sdkmath.Int
+	CompensationNaet       sdkmath.Int
+	ResidualNaet           sdkmath.Int
+	BurnBps                uint32
+	ReporterRewardBps      uint32
+	ProtocolTreasuryBps    uint32
+	CompensationBps        uint32
+	ReporterRewardCapBps   uint32
+	RoutingHash            string
+}
+
+func SlashSeverityClasses() []string {
+	return []string{
+		SlashSeverityMinorLivenessFault,
+		SlashSeverityMajorLivenessFault,
+		SlashSeverityRepeatedLivenessFault,
+		SlashSeverityInvalidTaskExecution,
+		SlashSeverityInvalidStateTransition,
+		SlashSeverityEquivocation,
+		SlashSeverityDoubleSign,
+		SlashSeverityEvidenceFraud,
+	}
+}
+
 func DefaultSeverityBps(severityLevel string) (uint32, error) {
 	switch severityLevel {
-	case SlashSeverityLow:
-		return 250, nil
-	case SlashSeverityMedium:
+	case SlashSeverityMinorLivenessFault:
+		return 100, nil
+	case SlashSeverityMajorLivenessFault:
+		return 500, nil
+	case SlashSeverityRepeatedLivenessFault:
 		return 1_000, nil
-	case SlashSeverityHigh:
+	case SlashSeverityInvalidTaskExecution:
+		return 750, nil
+	case SlashSeverityInvalidStateTransition:
+		return 1_500, nil
+	case SlashSeverityEquivocation:
+		return 2_000, nil
+	case SlashSeverityDoubleSign:
+		return 5_000, nil
+	case SlashSeverityEvidenceFraud:
+		return 7_500, nil
+	case "low":
+		return 250, nil
+	case "medium":
+		return 1_000, nil
+	case "high":
 		return 3_000, nil
-	case SlashSeverityCritical:
+	case "critical":
 		return 7_500, nil
 	default:
 		return 0, fmt.Errorf("unsupported slash severity level %q", severityLevel)
@@ -249,6 +322,109 @@ func ApplySlashingPenaltyToCandidate(candidate Candidate, penalty SlashingPenalt
 	return next, nil
 }
 
+func RouteSlashingPenalty(input SlashingPenaltyRoutingInput) (SlashingPenaltyRouting, error) {
+	input = normalizeSlashingPenaltyRoutingInput(input)
+	if err := input.Validate(); err != nil {
+		return SlashingPenaltyRouting{}, err
+	}
+	total := input.Penalty.StakeSlashNaet.Add(input.Penalty.RewardConfiscationNaet)
+	reporterReward := mulIntBps(total, input.ReporterRewardBps)
+	capAmount := mulIntBps(total, input.ReporterRewardCapBps)
+	if reporterReward.GT(capAmount) {
+		reporterReward = capAmount
+	}
+	burn := mulIntBps(total, input.BurnBps)
+	treasury := mulIntBps(total, input.ProtocolTreasuryBps)
+	compensation := mulIntBps(total, input.CompensationBps)
+	residual := total.Sub(burn).Sub(reporterReward).Sub(treasury).Sub(compensation)
+	if residual.IsNegative() {
+		return SlashingPenaltyRouting{}, errors.New("slashing penalty routing exceeds total penalty")
+	}
+	routing := SlashingPenaltyRouting{
+		PenaltyID:              input.Penalty.PenaltyID,
+		ValidatorID:            input.Penalty.ValidatorID,
+		ReporterID:             input.ReporterID,
+		AffectedPoolIDOptional: input.AffectedPoolIDOptional,
+		TotalPenaltyNaet:       total,
+		BurnNaet:               burn,
+		ReporterRewardNaet:     reporterReward,
+		ProtocolTreasuryNaet:   treasury,
+		CompensationNaet:       compensation,
+		ResidualNaet:           residual,
+		BurnBps:                input.BurnBps,
+		ReporterRewardBps:      input.ReporterRewardBps,
+		ProtocolTreasuryBps:    input.ProtocolTreasuryBps,
+		CompensationBps:        input.CompensationBps,
+		ReporterRewardCapBps:   input.ReporterRewardCapBps,
+	}
+	routing.RoutingHash = computeSlashingPenaltyRoutingHash(routing)
+	return routing, routing.Validate()
+}
+
+func (i SlashingPenaltyRoutingInput) Validate() error {
+	if err := i.Penalty.Validate(); err != nil {
+		return err
+	}
+	if i.ReporterID != "" {
+		if err := validatePosToken("slashing penalty reporter id", i.ReporterID); err != nil {
+			return err
+		}
+	}
+	if i.AffectedPoolIDOptional != "" {
+		if err := validatePosToken("slashing affected pool id", i.AffectedPoolIDOptional); err != nil {
+			return err
+		}
+	}
+	if i.ReporterRewardBps > 0 && i.ReporterID == "" {
+		return errors.New("slashing reporter reward requires reporter id")
+	}
+	if i.CompensationBps > 0 && i.AffectedPoolIDOptional == "" {
+		return errors.New("slashing compensation requires affected pool id")
+	}
+	for _, item := range []struct {
+		name  string
+		value uint32
+	}{
+		{name: "burn bps", value: i.BurnBps},
+		{name: "reporter reward bps", value: i.ReporterRewardBps},
+		{name: "protocol treasury bps", value: i.ProtocolTreasuryBps},
+		{name: "compensation bps", value: i.CompensationBps},
+		{name: "reporter reward cap bps", value: i.ReporterRewardCapBps},
+	} {
+		if item.value > BasisPoints {
+			return fmt.Errorf("slashing %s must be <= %d", item.name, BasisPoints)
+		}
+	}
+	totalBps := uint64(i.BurnBps) + uint64(i.ReporterRewardBps) + uint64(i.ProtocolTreasuryBps) + uint64(i.CompensationBps)
+	if totalBps > uint64(BasisPoints) {
+		return fmt.Errorf("slashing penalty routing bps must be <= %d", BasisPoints)
+	}
+	return nil
+}
+
+func (r SlashingPenaltyRouting) Validate() error {
+	if err := validatePosToken("slashing routing penalty id", r.PenaltyID); err != nil {
+		return err
+	}
+	if err := validatePosToken("slashing routing validator id", r.ValidatorID); err != nil {
+		return err
+	}
+	if r.TotalPenaltyNaet.IsNil() || r.TotalPenaltyNaet.IsNegative() {
+		return errors.New("slashing routing total penalty cannot be negative")
+	}
+	if r.BurnNaet.IsNil() || r.ReporterRewardNaet.IsNil() || r.ProtocolTreasuryNaet.IsNil() || r.CompensationNaet.IsNil() || r.ResidualNaet.IsNil() {
+		return errors.New("slashing routing amounts must not be nil")
+	}
+	sum := r.BurnNaet.Add(r.ReporterRewardNaet).Add(r.ProtocolTreasuryNaet).Add(r.CompensationNaet).Add(r.ResidualNaet)
+	if !sum.Equal(r.TotalPenaltyNaet) {
+		return errors.New("slashing routing amounts must sum to total penalty")
+	}
+	if r.RoutingHash != computeSlashingPenaltyRoutingHash(r) {
+		return errors.New("slashing routing hash mismatch")
+	}
+	return nil
+}
+
 func normalizeSlashingPenaltyInput(input SlashingPenaltyInput) SlashingPenaltyInput {
 	input.PenaltyID = strings.TrimSpace(input.PenaltyID)
 	input.ValidatorID = strings.TrimSpace(input.ValidatorID)
@@ -276,6 +452,21 @@ func normalizeSlashingPenaltyInput(input SlashingPenaltyInput) SlashingPenaltyIn
 	}
 	if input.RewardConfiscationNaet.IsNil() {
 		input.RewardConfiscationNaet = sdkmath.ZeroInt()
+	}
+	return input
+}
+
+func normalizeSlashingPenaltyRoutingInput(input SlashingPenaltyRoutingInput) SlashingPenaltyRoutingInput {
+	input.ReporterID = strings.TrimSpace(input.ReporterID)
+	input.AffectedPoolIDOptional = strings.TrimSpace(input.AffectedPoolIDOptional)
+	if input.BurnBps == 0 && input.ReporterRewardBps == 0 && input.ProtocolTreasuryBps == 0 && input.CompensationBps == 0 {
+		input.BurnBps = DefaultPenaltyBurnBps
+		input.ReporterRewardBps = DefaultPenaltyReporterBps
+		input.ProtocolTreasuryBps = DefaultPenaltyTreasuryBps
+		input.CompensationBps = DefaultPenaltyCompensationBps
+	}
+	if input.ReporterRewardCapBps == 0 {
+		input.ReporterRewardCapBps = input.ReporterRewardBps
 	}
 	return input
 }
@@ -335,6 +526,26 @@ func computeSlashingPenaltyHash(penalty SlashingPenalty) string {
 			posWritePart(w, slash.NominatorID)
 			posWritePart(w, slash.SlashedNaet.String())
 		}
+	})
+}
+
+func computeSlashingPenaltyRoutingHash(routing SlashingPenaltyRouting) string {
+	return posHashRoot("aetheris-pos-slashing-penalty-routing-v1", func(w posByteWriter) {
+		posWritePart(w, routing.PenaltyID)
+		posWritePart(w, routing.ValidatorID)
+		posWritePart(w, routing.ReporterID)
+		posWritePart(w, routing.AffectedPoolIDOptional)
+		posWritePart(w, routing.TotalPenaltyNaet.String())
+		posWritePart(w, routing.BurnNaet.String())
+		posWritePart(w, routing.ReporterRewardNaet.String())
+		posWritePart(w, routing.ProtocolTreasuryNaet.String())
+		posWritePart(w, routing.CompensationNaet.String())
+		posWritePart(w, routing.ResidualNaet.String())
+		posWriteUint64(w, uint64(routing.BurnBps))
+		posWriteUint64(w, uint64(routing.ReporterRewardBps))
+		posWriteUint64(w, uint64(routing.ProtocolTreasuryBps))
+		posWriteUint64(w, uint64(routing.CompensationBps))
+		posWriteUint64(w, uint64(routing.ReporterRewardCapBps))
 	})
 }
 

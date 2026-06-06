@@ -39,6 +39,35 @@ func TestComputeSlashingPenaltyScalesStakeExposureBySeverityRoleAndImpact(t *tes
 	require.NoError(t, penalty.Validate())
 }
 
+func TestSlashSeverityClassesUseProtocolNames(t *testing.T) {
+	require.Equal(t, []string{
+		SlashSeverityMinorLivenessFault,
+		SlashSeverityMajorLivenessFault,
+		SlashSeverityRepeatedLivenessFault,
+		SlashSeverityInvalidTaskExecution,
+		SlashSeverityInvalidStateTransition,
+		SlashSeverityEquivocation,
+		SlashSeverityDoubleSign,
+		SlashSeverityEvidenceFraud,
+	}, SlashSeverityClasses())
+
+	expected := map[string]uint32{
+		SlashSeverityMinorLivenessFault:     100,
+		SlashSeverityMajorLivenessFault:     500,
+		SlashSeverityRepeatedLivenessFault:  1_000,
+		SlashSeverityInvalidTaskExecution:   750,
+		SlashSeverityInvalidStateTransition: 1_500,
+		SlashSeverityEquivocation:           2_000,
+		SlashSeverityDoubleSign:             5_000,
+		SlashSeverityEvidenceFraud:          7_500,
+	}
+	for severity, bps := range expected {
+		actual, err := DefaultSeverityBps(severity)
+		require.NoError(t, err)
+		require.Equal(t, bps, actual)
+	}
+}
+
 func TestComputeSlashingPenaltyCapsAtStakeExposureAndAppliesTombstoneIdentityInvalidation(t *testing.T) {
 	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
 		PenaltyID:                     "penalty-critical",
@@ -70,6 +99,65 @@ func TestComputeSlashingPenaltyCapsAtStakeExposureAndAppliesTombstoneIdentityInv
 	require.True(t, applied.Tombstoned)
 	require.Equal(t, uint32(0), applied.ReliabilityIndexBps)
 	require.Equal(t, sdkmath.NewInt(999_999_100), applied.SelfStakeNaet)
+}
+
+func TestRouteSlashingPenaltySplitsBurnReporterTreasuryAndCompensation(t *testing.T) {
+	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
+		PenaltyID:              "penalty-routing",
+		ValidatorID:            "val-a",
+		SeverityLevel:          SlashSeverityDoubleSign,
+		StakeExposureNaet:      sdkmath.NewInt(10_000),
+		SelfStakeNaet:          sdkmath.NewInt(10_000),
+		RewardConfiscationNaet: sdkmath.NewInt(1_000),
+		EvidenceHeight:         70,
+	})
+	require.NoError(t, err)
+	routing, err := RouteSlashingPenalty(SlashingPenaltyRoutingInput{
+		Penalty:                penalty,
+		ReporterID:             "reporter-a",
+		AffectedPoolIDOptional: "pool-a",
+		BurnBps:                3_000,
+		ReporterRewardBps:      2_000,
+		ProtocolTreasuryBps:    4_000,
+		CompensationBps:        1_000,
+		ReporterRewardCapBps:   1_000,
+	})
+	require.NoError(t, err)
+	require.Equal(t, sdkmath.NewInt(6_000), routing.TotalPenaltyNaet)
+	require.Equal(t, sdkmath.NewInt(1_800), routing.BurnNaet)
+	require.Equal(t, sdkmath.NewInt(600), routing.ReporterRewardNaet)
+	require.Equal(t, sdkmath.NewInt(2_400), routing.ProtocolTreasuryNaet)
+	require.Equal(t, sdkmath.NewInt(600), routing.CompensationNaet)
+	require.Equal(t, sdkmath.NewInt(600), routing.ResidualNaet)
+	require.Equal(t, routing.TotalPenaltyNaet, routing.BurnNaet.Add(routing.ReporterRewardNaet).Add(routing.ProtocolTreasuryNaet).Add(routing.CompensationNaet).Add(routing.ResidualNaet))
+	require.Len(t, routing.RoutingHash, PosHashHexLength)
+}
+
+func TestRouteSlashingPenaltyRejectsMissingPoolsAndInvalidBps(t *testing.T) {
+	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
+		PenaltyID:         "penalty-routing-bad",
+		ValidatorID:       "val-a",
+		SeverityLevel:     SlashSeverityMinorLivenessFault,
+		StakeExposureNaet: sdkmath.NewInt(10_000),
+		SelfStakeNaet:     sdkmath.NewInt(10_000),
+		EvidenceHeight:    70,
+	})
+	require.NoError(t, err)
+	_, err = RouteSlashingPenalty(SlashingPenaltyRoutingInput{
+		Penalty:         penalty,
+		ReporterID:      "reporter-a",
+		CompensationBps: 1_000,
+	})
+	require.ErrorContains(t, err, "affected pool")
+
+	_, err = RouteSlashingPenalty(SlashingPenaltyRoutingInput{
+		Penalty:                penalty,
+		ReporterID:             "reporter-a",
+		AffectedPoolIDOptional: "pool-a",
+		BurnBps:                9_000,
+		ReporterRewardBps:      2_000,
+	})
+	require.ErrorContains(t, err, "routing bps")
 }
 
 func TestApplySlashingPenaltyJailsSuspendsRolesAndReducesElectionReliability(t *testing.T) {
