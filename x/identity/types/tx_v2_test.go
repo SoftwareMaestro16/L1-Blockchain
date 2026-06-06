@@ -131,11 +131,12 @@ func TestIdentityTxV2RejectsNameHashMismatchAndDuplicateBatches(t *testing.T) {
 
 func txAuth(scope IdentitySignerScopeV2, nonce uint64) IdentityTxAuthV2 {
 	return IdentityTxAuthV2{
-		ChainID:     "aetheris-local-1",
-		Signer:      addr(byte(nonce + 10)),
-		Scope:       scope,
-		Nonce:       nonce,
-		Fee:         1,
-		StorageCost: 1,
+		ChainID:                  "aetheris-local-1",
+		Signer:                   addr(byte(nonce + 10)),
+		Scope:                    scope,
+		NameNormalizationVersion: NameNormalizationVersionV2,
+		Nonce:                    nonce,
+		Fee:                      1,
+		StorageCost:              1,
 	}
 }

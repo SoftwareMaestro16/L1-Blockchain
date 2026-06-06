@@ -32,12 +32,13 @@ const (
 )
 
 type IdentityTxAuthV2 struct {
-	ChainID     string
-	Signer      sdk.AccAddress
-	Scope       IdentitySignerScopeV2
-	Nonce       uint64
-	Fee         uint64
-	StorageCost uint64
+	ChainID                  string
+	Signer                   sdk.AccAddress
+	Scope                    IdentitySignerScopeV2
+	NameNormalizationVersion uint64
+	Nonce                    uint64
+	Fee                      uint64
+	StorageCost              uint64
 }
 
 type IdentityMsgV2 interface {
@@ -617,6 +618,9 @@ func validateIdentityTxAuthV2(auth IdentityTxAuthV2, expectedScope IdentitySigne
 	}
 	if auth.Scope != expectedScope {
 		return fmt.Errorf("identity v2 tx signer scope must be %q", expectedScope)
+	}
+	if err := ValidateNameNormalizationVersionV2(auth.NameNormalizationVersion); err != nil {
+		return err
 	}
 	if requireNonce && auth.Nonce == 0 {
 		return errors.New("identity v2 tx nonce is required")
