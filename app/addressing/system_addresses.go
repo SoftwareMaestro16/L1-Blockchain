@@ -103,29 +103,39 @@ func SystemAddressByUserFriendly(uf string) (SystemAddress, bool) {
 	return SystemAddress{}, false
 }
 
-func IsReservedSystemAddressBytes(bz []byte) bool {
+func SystemAddressByBytes(bz []byte) (SystemAddress, bool) {
 	key, err := addressBytesKey(bz)
 	if err != nil {
-		return false
+		return SystemAddress{}, false
 	}
 	for _, address := range reservedSystemAddresses {
 		addressKey, err := addressTextKey(address.Raw)
 		if err != nil {
-			return false
+			return SystemAddress{}, false
 		}
 		if addressKey == key {
-			return true
+			return address, true
 		}
 	}
-	return false
+	return SystemAddress{}, false
+}
+
+func SystemAddressByText(text string) (SystemAddress, bool) {
+	bz, err := Parse(text)
+	if err != nil {
+		return SystemAddress{}, false
+	}
+	return SystemAddressByBytes(bz)
+}
+
+func IsReservedSystemAddressBytes(bz []byte) bool {
+	_, found := SystemAddressByBytes(bz)
+	return found
 }
 
 func IsReservedSystemAddressText(text string) bool {
-	bz, err := Parse(text)
-	if err != nil {
-		return false
-	}
-	return IsReservedSystemAddressBytes(bz)
+	_, found := SystemAddressByText(text)
+	return found
 }
 
 func ValidateNoUserControlledSystemAddresses(userAccounts []string) error {

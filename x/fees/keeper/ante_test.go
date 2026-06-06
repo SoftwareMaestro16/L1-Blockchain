@@ -88,9 +88,27 @@ func validRawAddress(fill byte) string {
 	})
 }
 
+func reservedAddress(t *testing.T, name string) aetherisaddress.SystemAddress {
+	t.Helper()
+	address, found := aetherisaddress.SystemAddressByName(name)
+	require.True(t, found)
+	return address
+}
+
+func reservedBytes(t *testing.T, name string) []byte {
+	t.Helper()
+	address := reservedAddress(t, name)
+	bz, err := aetherisaddress.Parse(address.Raw)
+	require.NoError(t, err)
+	return bz
+}
+
 func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 	validSender := validRawAddress(1)
+	validRecipient := validRawAddress(2)
+	burn := reservedAddress(t, "AETBurn")
 	fee := sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 1))
+	require.True(t, burn.CanReceiveUserFunds)
 
 	tests := []struct {
 		name         string
@@ -114,6 +132,21 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 			wantErr: "signer 0 must not be zero address",
 		},
 		{
+			name:    "rejects reserved core signer",
+			tx:      sigFeeTx{feeTx: feeTx{fees: fee}, signers: [][]byte{reservedBytes(t, "AETElector")}},
+			wantErr: "signer 0 is reserved system address AETElector",
+		},
+		{
+			name:    "rejects reserved module signer",
+			tx:      sigFeeTx{feeTx: feeTx{fees: fee}, signers: [][]byte{reservedBytes(t, "AETMint")}},
+			wantErr: "signer 0 is reserved system address AETMint",
+		},
+		{
+			name:    "rejects reserved fee payer",
+			tx:      feeTx{fees: fee, payer: reservedBytes(t, "AETTreasury")},
+			wantErr: "fee payer is reserved system address AETTreasury",
+		},
+		{
 			name: "rejects zero bank send recipient",
 			tx: feeTx{
 				fees: fee,
@@ -124,6 +157,78 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				}},
 			},
 			wantErr: "bank send recipient must not be zero address",
+		},
+		{
+			name: "rejects bank send to mint system address",
+			tx: feeTx{
+				fees: fee,
+				msgs: []sdk.Msg{&banktypes.MsgSend{
+					FromAddress: validSender,
+					ToAddress:   reservedAddress(t, "AETMint").Raw,
+					Amount:      fee,
+				}},
+			},
+			wantErr: "bank send recipient is reserved system address AETMint and cannot receive user funds",
+		},
+		{
+			name: "rejects bank send to core system address",
+			tx: feeTx{
+				fees: fee,
+				msgs: []sdk.Msg{&banktypes.MsgSend{
+					FromAddress: validSender,
+					ToAddress:   reservedAddress(t, "AETConfig").Raw,
+					Amount:      fee,
+				}},
+			},
+			wantErr: "bank send recipient is reserved system address AETConfig and cannot receive user funds",
+		},
+		{
+			name: "rejects direct user funds to treasury",
+			tx: feeTx{
+				fees: fee,
+				msgs: []sdk.Msg{&banktypes.MsgSend{
+					FromAddress: validSender,
+					ToAddress:   reservedAddress(t, "AETTreasury").Raw,
+					Amount:      fee,
+				}},
+			},
+			wantErr: "bank send recipient is reserved system address AETTreasury and cannot receive user funds",
+		},
+		{
+			name: "rejects direct user funds to fee collector",
+			tx: feeTx{
+				fees: fee,
+				msgs: []sdk.Msg{&banktypes.MsgSend{
+					FromAddress: validSender,
+					ToAddress:   reservedAddress(t, "AETFeeCollector").Raw,
+					Amount:      fee,
+				}},
+			},
+			wantErr: "bank send recipient is reserved system address AETFeeCollector and cannot receive user funds",
+		},
+		{
+			name: "allows bank send to burn when policy permits",
+			tx: feeTx{
+				fees: fee,
+				msgs: []sdk.Msg{&banktypes.MsgSend{
+					FromAddress: validSender,
+					ToAddress:   burn.Raw,
+					Amount:      fee,
+				}},
+			},
+			wantNextCall: true,
+		},
+		{
+			name: "accepts bank send between user addresses",
+			tx: feeTx{
+				fees: fee,
+				msgs: []sdk.Msg{&banktypes.MsgSend{
+					FromAddress: validSender,
+					ToAddress:   validRecipient,
+					Amount:      fee,
+				}},
+			},
+			wantNextCall: true,
 		},
 		{
 			name: "rejects zero bank multisend output",
