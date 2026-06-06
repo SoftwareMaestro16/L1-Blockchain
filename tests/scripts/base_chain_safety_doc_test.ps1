@@ -53,7 +53,7 @@ foreach ($term in @(
     "signed transaction replay test using identical signed bytes",
     "wrong chain-id signing test",
     "malformed protobuf transaction test",
-    "invalid signer tests for bank, staking, gov, fees, tokenfactory, DEX, AVM",
+    "invalid signer tests for bank, staking, gov, fees, contract-assets, DEX, AVM",
     "consensus panic tests for every custom module message and genesis type",
     "deterministic event contract tests",
     "go test ./...",

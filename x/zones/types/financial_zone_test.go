@@ -28,11 +28,11 @@ func TestFinancialZoneBoundaryRoutesStateUnderSpecPrefixes(t *testing.T) {
 
 	denomKey, err := FinancialFactoryDenomKey("factory/alice/token")
 	require.NoError(t, err)
-	require.Contains(t, denomKey, FinancialTokenFactoryDenomPrefix+"/")
+	require.Contains(t, denomKey, FinancialContractAssetDenomPrefix+"/")
 
 	authorityKey, err := FinancialTokenAuthorityKey("factory/alice/token")
 	require.NoError(t, err)
-	require.Contains(t, authorityKey, FinancialTokenFactoryAuthorityPrefix+"/")
+	require.Contains(t, authorityKey, FinancialContractAssetAuthorityPrefix+"/")
 
 	poolKey, err := FinancialDEXPoolKey(42)
 	require.NoError(t, err)

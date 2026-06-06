@@ -61,7 +61,7 @@ foreach ($blocker in @(
     'Critical/High',
     'not an accepted limitation',
     'wrong fee denom',
-    'unauthorized tokenfactory',
+    'unauthorized contract-assets',
     'DEX invariant',
     'nondeterminism',
     'unbounded tx/list',

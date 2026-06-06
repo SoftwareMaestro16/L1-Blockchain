@@ -2,7 +2,7 @@ param(
   [string]$OutputDir = "",
   [string]$Binary = "",
   [string]$ChainId = "aetheris-local-1",
-  [ValidateSet("bank", "tokenfactory", "dex", "mixed")]
+  [ValidateSet("bank", "contract-assets", "dex", "mixed")]
   [string]$Scenario = "mixed",
   [int]$Count = 12,
   [decimal]$RatePerSecond = 2,
@@ -135,21 +135,21 @@ function Test-QuerySucceeds {
   }
 }
 
-function Ensure-TokenfactoryAsset {
-  if (-not (Test-QuerySucceeds -Arguments @("query", "tokenfactory", "denom", $factoryDenom))) {
-    $res = Send-ProfileTx -Operation "setup_tokenfactory_create" -ActionArgs @("tx", "tokenfactory", "create-denom", $FactorySubdenom)
+function Ensure-Contract assetsAsset {
+  if (-not (Test-QuerySucceeds -Arguments @("query", "contract-assets", "denom", $factoryDenom))) {
+    $res = Send-ProfileTx -Operation "setup_contract-assets_create" -ActionArgs @("tx", "contract-assets", "create-denom", $FactorySubdenom)
     if (-not $res.ok) {
-      throw "failed to create load tokenfactory denom: $($res.error)"
+      throw "failed to create load contract-assets denom: $($res.error)"
     }
   }
-  $mint = Send-ProfileTx -Operation "setup_tokenfactory_mint" -ActionArgs @("tx", "tokenfactory", "mint", "100000000$factoryDenom", $node0)
+  $mint = Send-ProfileTx -Operation "setup_contract-assets_mint" -ActionArgs @("tx", "contract-assets", "mint", "100000000$factoryDenom", $node0)
   if (-not $mint.ok) {
-    throw "failed to mint load tokenfactory denom: $($mint.error)"
+    throw "failed to mint load contract-assets denom: $($mint.error)"
   }
 }
 
 function Ensure-DexPool {
-  Ensure-TokenfactoryAsset
+  Ensure-Contract assetsAsset
   try {
     $pool = Invoke-QueryCliJson -Arguments @("query", "dex", "pool", "$poolId")
     if ($pool.pool.denom0 -eq $factoryDenom -and $pool.pool.denom1 -eq "naet") {
@@ -167,17 +167,17 @@ function Get-ScenarioOperation {
   param([int]$Index)
 
   if ($Scenario -eq "bank") { return "bank" }
-  if ($Scenario -eq "tokenfactory") { return "tokenfactory" }
+  if ($Scenario -eq "contract-assets") { return "contract-assets" }
   if ($Scenario -eq "dex") { return "dex" }
   switch ($Index % 3) {
     0 { return "bank" }
-    1 { return "tokenfactory" }
+    1 { return "contract-assets" }
     default { return "dex" }
   }
 }
 
-if ($Scenario -eq "tokenfactory" -or $Scenario -eq "mixed") {
-  Ensure-TokenfactoryAsset
+if ($Scenario -eq "contract-assets" -or $Scenario -eq "mixed") {
+  Ensure-Contract assetsAsset
 }
 if ($Scenario -eq "dex" -or $Scenario -eq "mixed") {
   Ensure-DexPool
@@ -195,8 +195,8 @@ for ($i = 0; $i -lt $Count; $i++) {
     "bank" {
       $result = Send-ProfileTx -Operation "bank_send" -ActionArgs @("tx", "bank", "send", "node0", $node1, "1naet")
     }
-    "tokenfactory" {
-      $result = Send-ProfileTx -Operation "tokenfactory_mint" -ActionArgs @("tx", "tokenfactory", "mint", "10$factoryDenom", $node0)
+    "contract-assets" {
+      $result = Send-ProfileTx -Operation "contract-assets_mint" -ActionArgs @("tx", "contract-assets", "mint", "10$factoryDenom", $node0)
     }
     "dex" {
       $result = Send-ProfileTx -Operation "dex_swap" -ActionArgs @("tx", "dex", "swap-exact-in", "$poolId", "1000naet", $factoryDenom, "1")

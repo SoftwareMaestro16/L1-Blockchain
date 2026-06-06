@@ -62,7 +62,7 @@ foreach ($failure in @(
     "Insufficient funds",
     "Sequence mismatch",
     "DEX slippage",
-    "Unauthorized tokenfactory",
+    "Unauthorized contract-assets",
     "REST down"
   )) {
   Assert-Contains -Text $runbookText -Pattern $failure -Message "runbook missing common failure: $failure"
@@ -79,7 +79,7 @@ foreach ($command in @(
     'build\\aetherisd\.exe query bank balance',
     'build\\aetherisd\.exe query auth account',
     'build\\aetherisd\.exe query dex pool',
-    'build\\aetherisd\.exe query tokenfactory denom',
+    'build\\aetherisd\.exe query contract-assets denom',
     'Invoke-RestMethod'
   )) {
   Assert-Contains -Text $runbookText -Pattern $command -Message "runbook missing troubleshooting command: $command"

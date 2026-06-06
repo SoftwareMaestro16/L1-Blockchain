@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Adversarial And E2E Coverage
 
 This suite is split into fast PR gates and heavier localnet checks. The attacker model for custom modules lives in `tests/adversarial/ATTACKER_MODEL.md`.

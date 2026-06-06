@@ -100,7 +100,7 @@ func TestMigrationPhase3ReadinessPassesZoneExtraction(t *testing.T) {
 func TestMigrationPhase3ReadinessFailsIncompleteExtractionAndUncommittedRoots(t *testing.T) {
 	input := validMigrationPhase3Input()
 	input.FinancialZone.Extracted = false
-	input.BankFeesTokenfactoryDEXInFinancial = false
+	input.BankFeesContractAssetsAVMAMMInFinancial = false
 	input.IdentityIsolatedActivation = false
 	input.ZoneRootsCommittedPerBlock = false
 
@@ -313,13 +313,13 @@ func validMigrationPhase2Input() MigrationPhase2Input {
 
 func validMigrationPhase3Input() MigrationPhase3Input {
 	return MigrationPhase3Input{
-		FinancialZone:                      zoneExtraction("financial", []string{"bank", "fees", "tokenfactory", "dex"}),
-		IdentityZone:                       zoneExtraction("identity", []string{"identity"}),
-		ApplicationZone:                    zoneExtraction("application", []string{"scheduler", "workflow"}),
-		BankFeesTokenfactoryDEXInFinancial: true,
-		IdentityIsolatedActivation:         true,
-		ZoneRootsCommittedPerBlock:         true,
-		ZoneCommitmentRoot:                 hashStrings("zone-commitments-per-block"),
+		FinancialZone:                           zoneExtraction("financial", []string{"bank", "fees", "contract-assets", "avm-dex-contract"}),
+		IdentityZone:                            zoneExtraction("identity", []string{"identity"}),
+		ApplicationZone:                         zoneExtraction("application", []string{"scheduler", "workflow"}),
+		BankFeesContractAssetsAVMAMMInFinancial: true,
+		IdentityIsolatedActivation:              true,
+		ZoneRootsCommittedPerBlock:              true,
+		ZoneCommitmentRoot:                      hashStrings("zone-commitments-per-block"),
 	}
 }
 

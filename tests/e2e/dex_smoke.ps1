@@ -190,11 +190,11 @@ try {
   $node0 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node0Home -KeyName "node0"
   $factoryDenom = "factory/$node0/$FactorySubdenom"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
-  Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "tokenfactory", "denom", $factoryDenom, "--node", $rpcNode, "--output", "json") | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
+  Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "contract-assets", "denom", $factoryDenom, "--node", $rpcNode, "--output", "json") | Out-Null
   Write-Host "created factory denom $factoryDenom"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
   $factoryBalance = Get-BalanceAmount -Address $node0 -Denom $factoryDenom
   if ($factoryBalance -lt 100000000) {
     throw "factory balance after mint must be at least 100000000, got $factoryBalance"

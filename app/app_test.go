@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	appparams "github.com/sovereign-l1/l1/app/params"
-	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
 	loadkeeper "github.com/sovereign-l1/l1/x/load/keeper"
 	loadtypes "github.com/sovereign-l1/l1/x/load/types"
@@ -21,7 +20,6 @@ import (
 	meshtypes "github.com/sovereign-l1/l1/x/mesh/types"
 	routingkeeper "github.com/sovereign-l1/l1/x/routing/keeper"
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
-	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 	zoneskeeper "github.com/sovereign-l1/l1/x/zones/keeper"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
@@ -36,7 +34,7 @@ func TestAetraChainConstants(t *testing.T) {
 	require.Equal(t, appparams.BaseDenom, BondDenom)
 	require.Equal(t, appparams.BaseDenom, sdk.DefaultBondDenom)
 	require.Equal(t, int64(1_000_000_000), appparams.BaseUnitsPerDisplay)
-	require.True(t, strings.HasSuffix(DefaultNodeHome, ".aetheris"), DefaultNodeHome)
+	require.True(t, strings.HasSuffix(DefaultNodeHome, ".aetra"), DefaultNodeHome)
 }
 
 func TestDefaultGenesisIncludesNativeTokenMetadata(t *testing.T) {
@@ -79,15 +77,6 @@ func TestDefaultGenesisValidatesAndSetsCustomModuleDefaults(t *testing.T) {
 	require.Equal(t, appparams.BpsToLegacyDec(appparams.MaxInflationBps), mintGenState.Params.InflationMax)
 	require.Equal(t, appparams.BpsToLegacyDec(appparams.DefaultTargetStakeBps), mintGenState.Params.GoalBonded)
 	require.True(t, mintGenState.Params.MaxSupply.IsZero())
-
-	var tokenfactoryGenState tokenfactorytypes.GenesisState
-	app.AppCodec().MustUnmarshalJSON(genesis[tokenfactorytypes.ModuleName], &tokenfactoryGenState)
-	require.Empty(t, tokenfactoryGenState.Denoms)
-
-	var dexGenState dextypes.GenesisState
-	app.AppCodec().MustUnmarshalJSON(genesis[dextypes.ModuleName], &dexGenState)
-	require.Equal(t, dextypes.DefaultNextPoolID, dexGenState.NextPoolId)
-	require.Empty(t, dexGenState.Pools)
 
 	var loadGenState loadkeeper.GenesisState
 	require.NoError(t, json.Unmarshal(genesis[loadtypes.ModuleName], &loadGenState))
@@ -143,17 +132,6 @@ func TestCustomModuleGenesisInitExportRoundTrip(t *testing.T) {
 	var feesGenState feestypes.GenesisState
 	app.AppCodec().MustUnmarshalJSON(exportedGenesis[feestypes.ModuleName], &feesGenState)
 	require.Equal(t, feestypes.DefaultGenesisState(), &feesGenState)
-
-	var tokenfactoryGenState tokenfactorytypes.GenesisState
-	app.AppCodec().MustUnmarshalJSON(exportedGenesis[tokenfactorytypes.ModuleName], &tokenfactoryGenState)
-	require.Empty(t, tokenfactoryGenState.Denoms)
-	require.NoError(t, tokenfactoryGenState.Validate())
-
-	var dexGenState dextypes.GenesisState
-	app.AppCodec().MustUnmarshalJSON(exportedGenesis[dextypes.ModuleName], &dexGenState)
-	require.Equal(t, dextypes.DefaultNextPoolID, dexGenState.NextPoolId)
-	require.Empty(t, dexGenState.Pools)
-	require.NoError(t, dexGenState.Validate())
 
 	var loadGenState loadkeeper.GenesisState
 	require.NoError(t, json.Unmarshal(exportedGenesis[loadtypes.ModuleName], &loadGenState))

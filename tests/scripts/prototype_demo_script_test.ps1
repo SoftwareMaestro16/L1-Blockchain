@@ -34,7 +34,7 @@ $scriptText = Get-Content -Raw -LiteralPath $scriptPath
 Assert-Contains -Text $scriptText -Pattern '\[switch\]\$Check' -Message "demo script must expose -Check mode"
 Assert-Contains -Text $scriptText -Pattern 'keyring-backend", "test"' -Message "demo script must use local test keyring"
 Assert-Contains -Text $scriptText -Pattern "ChainId must contain 'local'" -Message "demo script must enforce local chain id"
-Assert-Contains -Text $scriptText -Pattern 'tokenfactory' -Message "demo script must include tokenfactory flow"
+Assert-Contains -Text $scriptText -Pattern 'contract-assets' -Message "demo script must include contract-assets flow"
 Assert-Contains -Text $scriptText -Pattern 'dex", "swap-exact-in' -Message "demo script must include DEX swap flow"
 Assert-Contains -Text $scriptText -Pattern 'REST pool 1' -Message "demo script must show REST query"
 Assert-Contains -Text $scriptText -Pattern 'stop\.ps1' -Message "demo script must stop localnet by default"
@@ -50,7 +50,7 @@ foreach ($needle in @(
     "build aetherisd",
     "start 3-validator localnet",
     "send bank tx",
-    "create and mint tokenfactory denom",
+    "create and mint contract-assets denom",
     "create DEX pool and swap",
     "stop localnet"
   )) {

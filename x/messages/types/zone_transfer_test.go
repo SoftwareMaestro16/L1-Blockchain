@@ -146,7 +146,7 @@ func testZoneTransferAdmission(transfer MsgZoneTransfer) ZoneTransferAdmission {
 			Denom:             transfer.Denom,
 			SourceZoneID:      transfer.SourceZoneID,
 			DestinationZoneID: transfer.DestinationZoneID,
-			AuthorityPath:     "financial/tokenfactory",
+			AuthorityPath:     "financial/contract-assets",
 		}},
 		MinimumRouteFees: []ZoneTransferRouteFee{{
 			SourceZoneID:      transfer.SourceZoneID,

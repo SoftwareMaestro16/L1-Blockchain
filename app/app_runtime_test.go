@@ -13,12 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/sovereign-l1/l1/observability"
-	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
 	loadtypes "github.com/sovereign-l1/l1/x/load/types"
 	meshtypes "github.com/sovereign-l1/l1/x/mesh/types"
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
-	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -129,8 +127,6 @@ func TestCustomModuleMigrationsFromV1ToCurrent(t *testing.T) {
 	ctx := app.NewContext(false)
 	fromVM := app.ModuleManager.GetVersionMap()
 	fromVM[feestypes.ModuleName] = 1
-	fromVM[tokenfactorytypes.ModuleName] = 1
-	fromVM[dextypes.ModuleName] = 1
 	fromVM[loadtypes.ModuleName] = 1
 	fromVM[routingtypes.ModuleName] = 1
 	fromVM[zonestypes.ModuleName] = 1
@@ -139,8 +135,6 @@ func TestCustomModuleMigrationsFromV1ToCurrent(t *testing.T) {
 	updated, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 	require.NoError(t, err)
 	require.Equal(t, uint64(2), updated[feestypes.ModuleName])
-	require.Equal(t, uint64(2), updated[tokenfactorytypes.ModuleName])
-	require.Equal(t, uint64(2), updated[dextypes.ModuleName])
 	require.Equal(t, uint64(2), updated[loadtypes.ModuleName])
 	require.Equal(t, uint64(2), updated[routingtypes.ModuleName])
 	require.Equal(t, uint64(2), updated[zonestypes.ModuleName])

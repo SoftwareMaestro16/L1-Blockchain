@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Testnet Incident Response
 
 Use this runbook for public testnet incidents. It does not replace chain governance or mainnet incident policy.

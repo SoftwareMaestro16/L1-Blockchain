@@ -224,12 +224,12 @@ try {
   }
   Write-Host "CLI/gRPC queries returned block, bank, staking, and fees data"
 
-  $emptyDenoms = Invoke-QueryGrpcJson -Arguments @("query", "tokenfactory", "denoms")
+  $emptyDenoms = Invoke-QueryGrpcJson -Arguments @("query", "contract-assets", "denoms")
   if (@($emptyDenoms.denoms).Count -ne 0) {
-    throw "fresh localnet tokenfactory denoms must be empty"
+    throw "fresh localnet contract-assets denoms must be empty"
   }
   if (-not $emptyDenoms.pagination) {
-    throw "fresh localnet tokenfactory denoms must include pagination"
+    throw "fresh localnet contract-assets denoms must include pagination"
   }
 
   $emptyPools = Invoke-QueryGrpcJson -Arguments @("query", "dex", "pools")
@@ -265,12 +265,12 @@ try {
   if (@($restFees.params.allowed_fee_denoms) -notcontains "naet") {
     throw "REST fees params must include naet"
   }
-  $restDenoms = Invoke-RestJson -Path "/l1/tokenfactory/v1/denoms"
+  $restDenoms = Invoke-RestJson -Path "/l1/contract-assets/v1/denoms"
   if (@($restDenoms.denoms).Count -ne 0) {
-    throw "REST tokenfactory denoms must be empty on fresh localnet"
+    throw "REST contract-assets denoms must be empty on fresh localnet"
   }
   if (-not $restDenoms.pagination) {
-    throw "REST tokenfactory denoms must include pagination"
+    throw "REST contract-assets denoms must include pagination"
   }
   $restPools = Invoke-RestJson -Path "/l1/dex/v1/pools"
   if (@($restPools.pools).Count -ne 0) {
@@ -279,37 +279,37 @@ try {
   if (-not $restPools.pagination) {
     throw "REST dex pools must include pagination"
   }
-  Write-Host "REST base, bank, staking, fees, tokenfactory, and dex list queries passed"
+  Write-Host "REST base, bank, staking, fees, contract-assets, and dex list queries passed"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
   $factoryDenom = "factory/$node0/$FactorySubdenom"
   $factorySubdenom2 = "$FactorySubdenom-page"
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "create-denom", $factorySubdenom2) -FromHome $node0Home | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", $factorySubdenom2) -FromHome $node0Home | Out-Null
   $factoryDenom2 = "factory/$node0/$factorySubdenom2"
 
-  $tfPageCli = Invoke-QueryGrpcJson -Arguments @("query", "tokenfactory", "denoms", "--limit", "1")
+  $tfPageCli = Invoke-QueryGrpcJson -Arguments @("query", "contract-assets", "denoms", "--limit", "1")
   if (@($tfPageCli.denoms).Count -ne 1 -or -not (Test-HasNextKey -Response $tfPageCli)) {
-    throw "gRPC tokenfactory denoms --limit 1 must return one denom and next_key"
+    throw "gRPC contract-assets denoms --limit 1 must return one denom and next_key"
   }
-  $tfPageRest = Invoke-RestJson -Path "/l1/tokenfactory/v1/denoms?pagination.limit=1"
+  $tfPageRest = Invoke-RestJson -Path "/l1/contract-assets/v1/denoms?pagination.limit=1"
   if (@($tfPageRest.denoms).Count -ne 1 -or -not (Test-HasNextKey -Response $tfPageRest)) {
-    throw "REST tokenfactory denoms pagination.limit=1 must return one denom and next_key"
+    throw "REST contract-assets denoms pagination.limit=1 must return one denom and next_key"
   }
 
-  $tfCli = Invoke-QueryGrpcJson -Arguments @("query", "tokenfactory", "denom", $factoryDenom)
+  $tfCli = Invoke-QueryGrpcJson -Arguments @("query", "contract-assets", "denom", $factoryDenom)
   if ($tfCli.metadata.admin -ne $node0) {
-    throw "tokenfactory denom admin mismatch"
+    throw "contract-assets denom admin mismatch"
   }
 
-  $tfRest = Invoke-RestJson -Path "/l1/tokenfactory/v1/denom/$factoryDenom"
+  $tfRest = Invoke-RestJson -Path "/l1/contract-assets/v1/denom/$factoryDenom"
   if ($tfRest.metadata.admin -ne $node0) {
-    throw "REST tokenfactory denom admin mismatch"
+    throw "REST contract-assets denom admin mismatch"
   }
-  Assert-RestError -Path "/l1/tokenfactory/v1/denom/factory/$node0/missing" -ExpectedStatus 404
-  Write-Host "tokenfactory gRPC/REST denom queries passed"
+  Assert-RestError -Path "/l1/contract-assets/v1/denom/factory/$node0/missing" -ExpectedStatus 404
+  Write-Host "contract-assets gRPC/REST denom queries passed"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "mint", "100000000$factoryDenom2", $node0) -FromHome $node0Home | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "mint", "100000000$factoryDenom2", $node0) -FromHome $node0Home | Out-Null
   Send-SignedTx -ActionArgs @("tx", "dex", "create-pool", "10000000naet", "10000000$factoryDenom") -FromHome $node0Home | Out-Null
   Send-SignedTx -ActionArgs @("tx", "dex", "create-pool", "10000000naet", "10000000$factoryDenom2") -FromHome $node0Home | Out-Null
 

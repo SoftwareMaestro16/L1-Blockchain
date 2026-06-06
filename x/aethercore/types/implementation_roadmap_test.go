@@ -89,7 +89,7 @@ func TestDefaultImplementationRoadmapCoversPhaseZeroThroughSeven(t *testing.T) {
 	require.True(t, phase2.Evidence.ReplayAttemptsRejected)
 
 	phase3 := roadmap.Phases[3]
-	requireRoadmapTask(t, phase3, "move-bank-fees-tokenfactory-dex-into-financial-zone-boundary")
+	requireRoadmapTask(t, phase3, "move-bank-fees-contract-assets-dex-into-financial-zone-boundary")
 	requireRoadmapTask(t, phase3, "activate-identity-zone")
 	requireRoadmapTask(t, phase3, "add-application-zone-scheduler-boundary")
 	requireRoadmapTask(t, phase3, "add-contract-zone-skeleton")

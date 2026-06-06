@@ -19,7 +19,7 @@ $boundariesText = Get-Content -Raw -LiteralPath $BoundariesPath
 
 foreach ($term in @(
     'Application Module Architecture',
-    '`x/dex` remains the native DEX module',
+    '`avm-dex-contract` remains the native DEX module',
     'pool creator, liquidity provider, withdrawer, swap trader, and swap recipient',
     'native denom spoofing',
     'reserves match the DEX module account balances',

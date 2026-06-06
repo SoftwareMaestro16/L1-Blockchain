@@ -18,7 +18,6 @@ import (
 
 	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
 	appparams "github.com/sovereign-l1/l1/app/params"
-	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
 	loadkeeper "github.com/sovereign-l1/l1/x/load/keeper"
 	loadtypes "github.com/sovereign-l1/l1/x/load/types"
@@ -26,7 +25,6 @@ import (
 	meshtypes "github.com/sovereign-l1/l1/x/mesh/types"
 	routingkeeper "github.com/sovereign-l1/l1/x/routing/keeper"
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
-	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 	zoneskeeper "github.com/sovereign-l1/l1/x/zones/keeper"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
@@ -34,7 +32,6 @@ import (
 func TestDefaultGenesisRejectsCorruptedPrototypeModuleState(t *testing.T) {
 	app, baseGenesis := setup(true, 5)
 	cdc := app.AppCodec()
-	admin := sdk.AccAddress(bytes.Repeat([]byte{1}, 20)).String()
 
 	tests := map[string]func(GenesisState){
 		"invalid native metadata": func(genesis GenesisState) {
@@ -53,20 +50,6 @@ func TestDefaultGenesisRejectsCorruptedPrototypeModuleState(t *testing.T) {
 			cdc.MustUnmarshalJSON(genesis[feestypes.ModuleName], &feesGenState)
 			feesGenState.Params.AllowedFeeDenoms = []string{fixtureTestAssetDenom}
 			genesis[feestypes.ModuleName] = cdc.MustMarshalJSON(&feesGenState)
-		},
-		"invalid tokenfactory metadata": func(genesis GenesisState) {
-			tokenfactoryGenState := tokenfactorytypes.GenesisState{Denoms: []tokenfactorytypes.DenomAuthorityMetadata{{
-				Denom: "factory/" + admin + "/" + appparams.BaseDenom,
-				Admin: admin,
-			}}}
-			genesis[tokenfactorytypes.ModuleName] = cdc.MustMarshalJSON(&tokenfactoryGenState)
-		},
-		"duplicate dex pool pair": func(genesis GenesisState) {
-			dexGenState := dextypes.GenesisState{NextPoolId: 3, Pools: []dextypes.Pool{
-				{Id: 1, Denom0: "aaa", Denom1: appparams.BaseDenom, Reserve0: "1", Reserve1: "1", TotalShares: "1", LpDenom: "lp/1"},
-				{Id: 2, Denom0: "aaa", Denom1: appparams.BaseDenom, Reserve0: "1", Reserve1: "1", TotalShares: "1", LpDenom: "lp/2"},
-			}}
-			genesis[dextypes.ModuleName] = cdc.MustMarshalJSON(&dexGenState)
 		},
 		"invalid load history ordering": func(genesis GenesisState) {
 			loadGenState := loadkeeper.DefaultGenesis()
@@ -266,58 +249,6 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 				genesis[feestypes.ModuleName] = app.AppCodec().MustMarshalJSON(&feesGenesis)
 			},
 			errMatch: "v1 only accepts fee denom naet",
-		},
-		"dex reserve module balance mismatch": {
-			mutate: func(app *L1App, genesis GenesisState) {
-				dexGenesis := dextypes.GenesisState{
-					NextPoolId: 2,
-					Params:     dextypes.DefaultParams(),
-					Pools: []dextypes.Pool{{
-						Id:          1,
-						Denom0:      appparams.BaseDenom,
-						Denom1:      "uatom",
-						Reserve0:    "100",
-						Reserve1:    "200",
-						TotalShares: "100",
-						LpDenom:     "lp/1",
-					}},
-				}
-				genesis[dextypes.ModuleName] = app.AppCodec().MustMarshalJSON(&dexGenesis)
-			},
-			errMatch: "dex genesis reserve mismatch",
-		},
-		"dex LP supply mismatch": {
-			mutate: func(app *L1App, genesis GenesisState) {
-				dexGenesis := dextypes.GenesisState{
-					NextPoolId: 2,
-					Params:     dextypes.DefaultParams(),
-					Pools: []dextypes.Pool{{
-						Id:          1,
-						Denom0:      appparams.BaseDenom,
-						Denom1:      "uatom",
-						Reserve0:    "100",
-						Reserve1:    "200",
-						TotalShares: "100",
-						LpDenom:     "lp/1",
-					}},
-				}
-				genesis[dextypes.ModuleName] = app.AppCodec().MustMarshalJSON(&dexGenesis)
-
-				bankGenesis := banktypes.GetGenesisStateFromAppState(app.AppCodec(), genesis)
-				bankGenesis.Balances = append(bankGenesis.Balances, banktypes.Balance{
-					Address: authtypes.NewModuleAddress(dextypes.ModuleName).String(),
-					Coins: sdk.NewCoins(
-						sdk.NewInt64Coin(appparams.BaseDenom, 100),
-						sdk.NewInt64Coin("uatom", 200),
-					),
-				})
-				bankGenesis.Supply = bankGenesis.Supply.Add(
-					sdk.NewInt64Coin(appparams.BaseDenom, 100),
-					sdk.NewInt64Coin("uatom", 200),
-				)
-				genesis[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
-			},
-			errMatch: "dex genesis LP supply mismatch",
 		},
 	}
 

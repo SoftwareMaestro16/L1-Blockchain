@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Public Testnet Preparation
 
 This runbook is the Phase 16 gate before opening Aetra to external validators. It is not mainnet readiness.

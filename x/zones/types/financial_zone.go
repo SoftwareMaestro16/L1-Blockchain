@@ -10,18 +10,18 @@ import (
 const (
 	FinancialZonePrefix = "zone/financial"
 
-	FinancialAccountsPrefix              = FinancialZonePrefix + "/accounts"
-	FinancialBalancesPrefix              = FinancialZonePrefix + "/balances"
-	FinancialFeeBucketPrefix             = FinancialZonePrefix + "/fees/buckets"
-	FinancialShardFeeBucketPrefix        = FinancialZonePrefix + "/fees/shards"
-	FinancialTokenFactoryDenomPrefix     = FinancialZonePrefix + "/tokenfactory/denoms"
-	FinancialTokenFactoryAuthorityPrefix = FinancialZonePrefix + "/tokenfactory/authority"
-	FinancialDEXPoolPrefix               = FinancialZonePrefix + "/dex/pools"
-	FinancialDEXOrderPrefix              = FinancialZonePrefix + "/dex/orders"
-	FinancialPaymentChannelPrefix        = FinancialZonePrefix + "/payments/channels"
-	FinancialPaymentConditionPrefix      = FinancialZonePrefix + "/payments/conditions"
-	FinancialTransferEscrowPrefix        = FinancialZonePrefix + "/payments/escrow"
-	FinancialMessageHandlerRoute         = FinancialZonePrefix + "/handler"
+	FinancialAccountsPrefix               = FinancialZonePrefix + "/accounts"
+	FinancialBalancesPrefix               = FinancialZonePrefix + "/balances"
+	FinancialFeeBucketPrefix              = FinancialZonePrefix + "/fees/buckets"
+	FinancialShardFeeBucketPrefix         = FinancialZonePrefix + "/fees/shards"
+	FinancialContractAssetDenomPrefix     = FinancialZonePrefix + "/contract-assets/denoms"
+	FinancialContractAssetAuthorityPrefix = FinancialZonePrefix + "/contract-assets/authority"
+	FinancialDEXPoolPrefix                = FinancialZonePrefix + "/dex/pools"
+	FinancialDEXOrderPrefix               = FinancialZonePrefix + "/dex/orders"
+	FinancialPaymentChannelPrefix         = FinancialZonePrefix + "/payments/channels"
+	FinancialPaymentConditionPrefix       = FinancialZonePrefix + "/payments/conditions"
+	FinancialTransferEscrowPrefix         = FinancialZonePrefix + "/payments/escrow"
+	FinancialMessageHandlerRoute          = FinancialZonePrefix + "/handler"
 )
 
 type FinancialZoneComponent string
@@ -31,13 +31,13 @@ type FinancialShardRoutingMode string
 type FinancialTransferEscrowStatus string
 
 const (
-	FinancialComponentBank          FinancialZoneComponent = "bank"
-	FinancialComponentFees          FinancialZoneComponent = "fees"
-	FinancialComponentDEX           FinancialZoneComponent = "dex"
-	FinancialComponentTokenFactory  FinancialZoneComponent = "tokenfactory"
-	FinancialComponentPayment       FinancialZoneComponent = "payments"
-	FinancialComponentMessageRouter FinancialZoneComponent = "message_router"
-	FinancialComponentProofs        FinancialZoneComponent = "proofs"
+	FinancialComponentBank           FinancialZoneComponent = "bank"
+	FinancialComponentFees           FinancialZoneComponent = "fees"
+	FinancialComponentDEX            FinancialZoneComponent = "dex"
+	FinancialComponentContractAssets FinancialZoneComponent = "contract_assets"
+	FinancialComponentPayment        FinancialZoneComponent = "payments"
+	FinancialComponentMessageRouter  FinancialZoneComponent = "message_router"
+	FinancialComponentProofs         FinancialZoneComponent = "proofs"
 
 	FinancialMessageTransfer         FinancialMessageKind = "MsgFinancialTransfer"
 	FinancialMessageMintFactoryDenom FinancialMessageKind = "MsgMintFactoryDenom"
@@ -199,7 +199,7 @@ type FinancialZoneRoots struct {
 	AccountRoot              string
 	BalanceRoot              string
 	FeeBucketRoot            string
-	TokenFactoryRoot         string
+	ContractAssetRoot        string
 	DEXRoot                  string
 	PaymentRoot              string
 	InboxRoot                string
@@ -226,14 +226,14 @@ func DefaultFinancialZoneKeeperBoundary() FinancialZoneKeeperBoundary {
 			FinancialPaymentChannelPrefix,
 			FinancialPaymentConditionPrefix,
 			FinancialTransferEscrowPrefix,
-			FinancialTokenFactoryAuthorityPrefix,
-			FinancialTokenFactoryDenomPrefix,
+			FinancialContractAssetAuthorityPrefix,
+			FinancialContractAssetDenomPrefix,
 		},
 		Components: []FinancialZoneComponent{
 			FinancialComponentBank,
 			FinancialComponentFees,
 			FinancialComponentDEX,
-			FinancialComponentTokenFactory,
+			FinancialComponentContractAssets,
 			FinancialComponentPayment,
 			FinancialComponentMessageRouter,
 			FinancialComponentProofs,
@@ -331,17 +331,17 @@ func FinancialFeeBucketKey(bucketID string) (string, error) {
 }
 
 func FinancialFactoryDenomKey(denom string) (string, error) {
-	if err := validateRuntimeToken("financial tokenfactory denom", denom, MaxZoneNamespaceLength); err != nil {
+	if err := validateRuntimeToken("financial contract asset denom", denom, MaxZoneNamespaceLength); err != nil {
 		return "", err
 	}
-	return FinancialTokenFactoryDenomPrefix + "/" + hashRuntimeParts("financial-denom", denom), nil
+	return FinancialContractAssetDenomPrefix + "/" + hashRuntimeParts("financial-denom", denom), nil
 }
 
 func FinancialTokenAuthorityKey(denom string) (string, error) {
-	if err := validateRuntimeToken("financial tokenfactory denom", denom, MaxZoneNamespaceLength); err != nil {
+	if err := validateRuntimeToken("financial contract asset denom", denom, MaxZoneNamespaceLength); err != nil {
 		return "", err
 	}
-	return FinancialTokenFactoryAuthorityPrefix + "/" + hashRuntimeParts("financial-denom-authority", denom), nil
+	return FinancialContractAssetAuthorityPrefix + "/" + hashRuntimeParts("financial-denom-authority", denom), nil
 }
 
 func FinancialDEXPoolKey(poolID uint64) (string, error) {
@@ -788,7 +788,7 @@ func BuildFinancialZoneRoot(roots FinancialZoneRoots) (ZoneRoot, error) {
 			roots.AccountRoot,
 			roots.BalanceRoot,
 			roots.FeeBucketRoot,
-			roots.TokenFactoryRoot,
+			roots.ContractAssetRoot,
 			roots.DEXRoot,
 			roots.PaymentRoot,
 		)
@@ -824,7 +824,7 @@ func BuildFinancialZoneRootFromState(height uint64, state FinancialZoneState, qu
 		AccountRoot:        ComputeFinancialAccountsRoot(normalized.Accounts),
 		BalanceRoot:        ComputeFinancialBalancesRoot(normalized.Balances),
 		FeeBucketRoot:      ComputeFinancialFeeBucketRoot(normalized.FeeBuckets),
-		TokenFactoryRoot:   ComputeFinancialTokenFactoryRoot(normalized.FactoryDenoms),
+		ContractAssetRoot:  ComputeFinancialContractAssetRoot(normalized.FactoryDenoms),
 		DEXRoot:            ComputeFinancialDEXRoot(normalized.DEXPools, normalized.DEXOrders),
 		PaymentRoot:        ComputeFinancialPaymentRoot(normalized.PaymentChannels, normalized.PaymentConditions, normalized.TransferEscrows),
 		InboxRoot:          queues.InboxRoot(),
@@ -857,7 +857,7 @@ func (r FinancialZoneRoots) Validate() error {
 		{name: "financial account root", value: r.AccountRoot},
 		{name: "financial balance root", value: r.BalanceRoot},
 		{name: "financial fee bucket root", value: r.FeeBucketRoot},
-		{name: "financial tokenfactory root", value: r.TokenFactoryRoot},
+		{name: "financial contract asset root", value: r.ContractAssetRoot},
 		{name: "financial dex root", value: r.DEXRoot},
 		{name: "financial payment root", value: r.PaymentRoot},
 		{name: "financial inbox root", value: r.InboxRoot},
@@ -978,7 +978,7 @@ func (d FinancialFactoryDenom) Validate() error {
 	if _, err := FinancialFactoryDenomKey(d.Denom); err != nil {
 		return err
 	}
-	return validateRuntimeToken("financial tokenfactory authority", d.Authority, MaxZoneEndpointLength)
+	return validateRuntimeToken("financial contract asset authority", d.Authority, MaxZoneEndpointLength)
 }
 
 func (p FinancialDEXPool) Validate() error {
@@ -1105,7 +1105,7 @@ func ComputeFinancialZoneStateRoot(state FinancialZoneState) string {
 		ComputeFinancialAccountsRoot(normalized.Accounts),
 		ComputeFinancialBalancesRoot(normalized.Balances),
 		ComputeFinancialFeeBucketRoot(normalized.FeeBuckets),
-		ComputeFinancialTokenFactoryRoot(normalized.FactoryDenoms),
+		ComputeFinancialContractAssetRoot(normalized.FactoryDenoms),
 		ComputeFinancialDEXRoot(normalized.DEXPools, normalized.DEXOrders),
 		ComputeFinancialPaymentRoot(normalized.PaymentChannels, normalized.PaymentConditions, normalized.TransferEscrows),
 	)
@@ -1136,9 +1136,9 @@ func ComputeFinancialFeeBucketRoot(buckets []FinancialFeeBucket) string {
 	return hashRuntimeParts(parts...)
 }
 
-func ComputeFinancialTokenFactoryRoot(denoms []FinancialFactoryDenom) string {
+func ComputeFinancialContractAssetRoot(denoms []FinancialFactoryDenom) string {
 	ordered := normalizeFinancialFactoryDenoms(denoms)
-	parts := []string{"aetheris-financial-tokenfactory-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-financial-contract-asset-root-v1", fmt.Sprint(len(ordered))}
 	for _, denom := range ordered {
 		parts = append(parts, denom.Denom, denom.Authority, fmt.Sprint(denom.Supply))
 	}
@@ -1282,7 +1282,7 @@ func applyFinancialTransfer(state FinancialZoneState, from, to, denom string, am
 
 func mintFinancialFactoryDenom(state FinancialZoneState, denom, authority, receiver string, amount uint64) (FinancialZoneState, error) {
 	if authority == "" {
-		return FinancialZoneState{}, errors.New("financial tokenfactory authority is required")
+		return FinancialZoneState{}, errors.New("financial contract asset authority is required")
 	}
 	next := state.Normalize()
 	found := false
@@ -1291,9 +1291,9 @@ func mintFinancialFactoryDenom(state FinancialZoneState, denom, authority, recei
 			continue
 		}
 		if item.Authority != authority {
-			return FinancialZoneState{}, errors.New("financial tokenfactory authority mismatch")
+			return FinancialZoneState{}, errors.New("financial contract asset authority mismatch")
 		}
-		supply, err := checkedAdd(item.Supply, amount, "financial tokenfactory supply")
+		supply, err := checkedAdd(item.Supply, amount, "financial contract asset supply")
 		if err != nil {
 			return FinancialZoneState{}, err
 		}
@@ -1317,12 +1317,12 @@ func burnFinancialFactoryDenom(state FinancialZoneState, denom, owner string, am
 			continue
 		}
 		if item.Supply < amount {
-			return FinancialZoneState{}, errors.New("financial tokenfactory burn exceeds supply")
+			return FinancialZoneState{}, errors.New("financial contract asset burn exceeds supply")
 		}
 		next.FactoryDenoms[i].Supply -= amount
 		return next.Normalize(), nil
 	}
-	return FinancialZoneState{}, errors.New("financial tokenfactory denom not found")
+	return FinancialZoneState{}, errors.New("financial contract asset denom not found")
 }
 
 func applyFinancialDEXSwap(state FinancialZoneState, msg FinancialZoneMessage) (FinancialZoneState, error) {

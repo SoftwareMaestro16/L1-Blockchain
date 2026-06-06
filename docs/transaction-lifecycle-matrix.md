@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Prototype Transaction Lifecycle Matrix
 
 This matrix traces every prototype transaction from operator CLI input to final state query. It is the transaction-level companion to [Prototype Contract](prototype-contract.md), [Operator Commands](operator-commands.md), [Prototype Tx Event Contract](event-contract.md), [Prototype Test Pyramid](test-pyramid.md), and the module flow docs.

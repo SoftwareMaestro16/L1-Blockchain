@@ -533,7 +533,7 @@ function Get-AexsAtomicTaskOverride {
       expected_behavior   = "fee state integrity holds across rejected ante paths and export/import"
       expected_events     = "no module message, fee split, burn, treasury, or validator reward success event after failed ante"
       expected_error_path = "failed fee ante path returns before message server execution and before persistent fee accounting"
-      mutation_inputs     = "bad fee followed by state-changing msg, non-naet fee with tokenfactory mint msg, malformed fee with bank send"
+      mutation_inputs     = "bad fee followed by state-changing msg, non-naet fee with contract-assets mint msg, malformed fee with bank send"
       expected_rejection  = "failed ante fee checks must preserve message state, account state, and fee accounting snapshots"
     }
     "FEES-05" = [ordered]@{
@@ -550,57 +550,57 @@ function Get-AexsAtomicTaskOverride {
     "TF-01" = [ordered]@{
       flow                = "create denom, mint, burn, change admin, metadata query"
       state               = "denom records, admin metadata, bank supply, and metadata query output update deterministically"
-      attack              = "valid tokenfactory lifecycle baseline plus unauthorized admin control sample"
-      invariant           = "tokenfactory lifecycle mutates denom state only under current admin authority"
+      attack              = "valid contract-assets lifecycle baseline plus unauthorized admin control sample"
+      invariant           = "contract-assets lifecycle mutates denom state only under current admin authority"
       expected_behavior   = "valid create, mint, burn, admin change, and metadata query update denom state and supply exactly once"
-      expected_events     = "tokenfactory events match denom creation, mint, burn, admin change, and metadata deltas"
+      expected_events     = "contract-assets events match denom creation, mint, burn, admin change, and metadata deltas"
       expected_error_path = "unauthorized admin control sample is rejected before denom, supply, or metadata mutation"
       mutation_inputs     = "valid create denom, valid mint, valid burn, valid change admin, valid metadata query, unauthorized admin control"
-      expected_rejection  = "unauthorized tokenfactory lifecycle variants must fail without denom, supply, or admin mutation"
+      expected_rejection  = "unauthorized contract-assets lifecycle variants must fail without denom, supply, or admin mutation"
     }
     "TF-02" = [ordered]@{
       flow                = "invalid subdenom, duplicate denom, zero admin, native denom spoof, max metadata size"
-      state               = "invalid tokenfactory edge cases leave denom records, admin metadata, supply, and bank metadata unchanged"
+      state               = "invalid contract-assets edge cases leave denom records, admin metadata, supply, and bank metadata unchanged"
       attack              = "invalid subdenom, duplicate denom, zero admin, native denom spoof, oversized metadata"
-      invariant           = "tokenfactory accepts only canonical denoms, non-zero admins, unique denoms, and bounded metadata"
-      expected_behavior   = "valid tokenfactory boundaries execute deterministically; invalid boundaries reject before state mutation"
-      expected_events     = "accepted boundary tokenfactory events match state deltas; rejected edge cases emit no success events"
-      expected_error_path = "tokenfactory validation rejects invalid subdenom, duplicate denom, zero admin, native spoof, or oversized metadata"
+      invariant           = "contract-assets accepts only canonical denoms, non-zero admins, unique denoms, and bounded metadata"
+      expected_behavior   = "valid contract-assets boundaries execute deterministically; invalid boundaries reject before state mutation"
+      expected_events     = "accepted boundary contract-assets events match state deltas; rejected edge cases emit no success events"
+      expected_error_path = "contract-assets validation rejects invalid subdenom, duplicate denom, zero admin, native spoof, or oversized metadata"
       mutation_inputs     = "empty subdenom, invalid subdenom chars, duplicate denom, zero admin, naet-like denom, max metadata size plus one"
-      expected_rejection  = "invalid tokenfactory edge cases must not alter denom records, supply, admin metadata, or native metadata"
+      expected_rejection  = "invalid contract-assets edge cases must not alter denom records, supply, admin metadata, or native metadata"
     }
     "TF-03" = [ordered]@{
       flow                = "unauthorized mint, unauthorized burn, admin takeover, metadata spoofing, burn-from mismatch"
-      state               = "adversarial tokenfactory attempts cannot mint, burn, take admin, spoof metadata, or burn from another account"
+      state               = "adversarial contract-assets attempts cannot mint, burn, take admin, spoof metadata, or burn from another account"
       attack              = "unauthorized mint, unauthorized burn, admin takeover, metadata spoofing, burn-from mismatch"
-      invariant           = "tokenfactory authority, metadata, and burn source checks cannot be bypassed"
-      expected_behavior   = "adversarial tokenfactory mutations fail deterministically before supply or authority mutation"
-      expected_events     = "failed tokenfactory attacks emit no mint, burn, metadata, or admin success events"
-      expected_error_path = "tokenfactory msg server rejects unauthorized mint/burn/admin/metadata/burn-from paths before bank movement"
+      invariant           = "contract-assets authority, metadata, and burn source checks cannot be bypassed"
+      expected_behavior   = "adversarial contract-assets mutations fail deterministically before supply or authority mutation"
+      expected_events     = "failed contract-assets attacks emit no mint, burn, metadata, or admin success events"
+      expected_error_path = "contract-assets msg server rejects unauthorized mint/burn/admin/metadata/burn-from paths before bank movement"
       mutation_inputs     = "non-admin mint, non-admin burn, forged change admin, spoofed metadata update, burn from different holder"
-      expected_rejection  = "tokenfactory attacks must not mint, burn, change admin, spoof metadata, or burn from mismatched accounts"
+      expected_rejection  = "contract-assets attacks must not mint, burn, change admin, spoof metadata, or burn from mismatched accounts"
     }
     "TF-04" = [ordered]@{
       flow                = "supply delta exactness and authority metadata consistency"
       state               = "supply changes exactly by minted or burned amount and authority metadata remains consistent"
-      attack              = "state drift attempt through mixed accepted and rejected tokenfactory mint, burn, and admin operations"
-      invariant           = "tokenfactory supply delta is exact and authority metadata remains consistent"
-      expected_behavior   = "tokenfactory state integrity holds across lifecycle sequences and export/import"
-      expected_events     = "tokenfactory events reconcile to final supply, admin, metadata, and bank balance deltas"
-      expected_error_path = "failed tokenfactory operations preserve pre-failure supply, admin, metadata, and balances"
+      attack              = "state drift attempt through mixed accepted and rejected contract-assets mint, burn, and admin operations"
+      invariant           = "contract-assets supply delta is exact and authority metadata remains consistent"
+      expected_behavior   = "contract-assets state integrity holds across lifecycle sequences and export/import"
+      expected_events     = "contract-assets events reconcile to final supply, admin, metadata, and bank balance deltas"
+      expected_error_path = "failed contract-assets operations preserve pre-failure supply, admin, metadata, and balances"
       mutation_inputs     = "accepted mint followed by failed mint, accepted burn followed by failed burn-from mismatch, change admin then old-admin mint, export/import after supply changes"
-      expected_rejection  = "rejected tokenfactory operations must preserve supply delta exactness and authority metadata consistency"
+      expected_rejection  = "rejected contract-assets operations must preserve supply delta exactness and authority metadata consistency"
     }
     "TF-05" = [ordered]@{
-      flow                = "tokenfactory economic abuse around protocol fees, AET spoofing, and native supply inflation"
-      state               = "tokenfactory assets cannot pay protocol fees, spoof AET, or inflate native supply"
+      flow                = "contract-assets economic abuse around protocol fees, AET spoofing, and native supply inflation"
+      state               = "contract-assets assets cannot pay protocol fees, spoof AET, or inflate native supply"
       attack              = "factory asset fee payment, AET spoof, native supply inflation, native metadata collision"
-      invariant           = "tokenfactory assets cannot pay protocol fees, spoof AET, or inflate native supply"
-      expected_behavior   = "tokenfactory economic rules keep factory denoms separate from native fee and native supply authority"
-      expected_events     = "no protocol fee acceptance, native mint, or native metadata spoof event appears for rejected tokenfactory abuse paths"
+      invariant           = "contract-assets assets cannot pay protocol fees, spoof AET, or inflate native supply"
+      expected_behavior   = "contract-assets economic rules keep factory denoms separate from native fee and native supply authority"
+      expected_events     = "no protocol fee acceptance, native mint, or native metadata spoof event appears for rejected contract-assets abuse paths"
       expected_error_path = "economic abuse rejects before fee acceptance, native supply mutation, or native metadata mutation"
       mutation_inputs     = "factory denom as fee, factory denom named AET, factory denom named naet, mint shaped as native supply, native metadata spoof"
-      expected_rejection  = "tokenfactory economic abuse must not pay protocol fees, spoof AET, or inflate native supply"
+      expected_rejection  = "contract-assets economic abuse must not pay protocol fees, spoof AET, or inflate native supply"
     }
     "DEX-01" = [ordered]@{
       flow                = "pool creation, add liquidity, remove liquidity, swap, LP mint, LP burn"
@@ -1559,7 +1559,7 @@ function Get-AexsInvariantChecklistScope {
   switch -Regex ($Category) {
     '^Economic Invariants$' { return "global/economics" }
     '^Consensus And State Invariants$' { return "app/consensus-state" }
-    '^DEX Invariants$' { return "x/dex" }
+    '^DEX Invariants$' { return "avm-dex-contract" }
     '^Load, Routing, And Sharding Invariants$' { return "x/sharding/sim" }
     '^Identity And Resolver Invariants$' { return "x/identity" }
     '^Execution, AVM, And Queue Invariants$' { return "x/vm+x/queue" }
@@ -1591,17 +1591,17 @@ function Get-AexsInvariantChecklistOverride {
       expected_rejection  = "negative balance attempts must fail without mutating state"
     }
     "ECON-03" = [ordered]@{
-      flow                = "mint authority boundaries for native, module, and tokenfactory supply"
+      flow                = "mint authority boundaries for native, module, and contract-assets supply"
       state               = "only explicitly authorized mint paths can increase supply"
-      attack              = "unauthorized mint, module account spoofing, tokenfactory admin bypass, governance authority spoofing"
+      attack              = "unauthorized mint, module account spoofing, contract-assets admin bypass, governance authority spoofing"
       expected_behavior   = "minting requires the module-specific authority and denom-specific permission before any supply increase"
       expected_events     = "no mint event is emitted from an unauthorized signer or unauthorized module account"
       expected_error_path = "unauthorized mint rejects before bank supply or denom metadata mutation"
-      mutation_inputs     = "wrong admin, zero admin, wrong module account, forged authority, native denom mint through tokenfactory"
+      mutation_inputs     = "wrong admin, zero admin, wrong module account, forged authority, native denom mint through contract-assets"
       expected_rejection  = "unauthorized mint attempts cannot increase supply"
     }
     "ECON-04" = [ordered]@{
-      flow                = "burn authority boundaries for user, module, and tokenfactory supply"
+      flow                = "burn authority boundaries for user, module, and contract-assets supply"
       state               = "only explicitly authorized burn paths can decrease supply or burn from a source account"
       attack              = "unauthorized burn, burn-from mismatch, module account burn spoofing, native-denom burn abuse"
       expected_behavior   = "burning requires owner/module/admin authorization and exact source-account control"
@@ -1613,7 +1613,7 @@ function Get-AexsInvariantChecklistOverride {
     "ECON-05" = [ordered]@{
       flow                = "protocol fee denom admission policy"
       state               = "ante fee checks accept no fee denom other than naet"
-      attack              = "fee denom spoofing, multi-denom fee bypass, tokenfactory asset fee payment, missing fee bypass"
+      attack              = "fee denom spoofing, multi-denom fee bypass, contract-assets asset fee payment, missing fee bypass"
       expected_behavior   = "the fee policy rejects every transaction whose protocol fee set contains a non-naet denom"
       expected_events     = "no fee-collected event exists for non-naet denoms"
       expected_error_path = "non-naet fee rejects in ante before message execution"
@@ -1773,11 +1773,11 @@ function Get-AexsInvariantChecklistOverride {
     "DEXINV-04" = [ordered]@{
       flow                = "DEX LP denom authenticity"
       state               = "No fake LP token"
-      attack              = "wrong LP denom burn, forged LP token, pool id collision, tokenfactory spoofed lp/{pool_id} denom"
+      attack              = "wrong LP denom burn, forged LP token, pool id collision, contract-assets spoofed lp/{pool_id} denom"
       expected_behavior   = "remove liquidity accepts only the canonical LP denom derived from the exact pool id"
       expected_events     = "LP burn events always reference the canonical pool LP denom"
       expected_error_path = "fake LP token rejects before reserves, shares, or module balances mutate"
-      mutation_inputs     = "wrong lp denom, duplicate pool id, forged lp/{pool_id}, non-LP denom, tokenfactory-created LP-like denom"
+      mutation_inputs     = "wrong lp denom, duplicate pool id, forged lp/{pool_id}, non-LP denom, contract-assets-created LP-like denom"
       expected_rejection  = "fake LP tokens cannot redeem reserves or mutate pool state"
     }
     "DEXINV-05" = [ordered]@{
@@ -2530,14 +2530,14 @@ function Get-AexsTxAuthBankExploitOverrides {
     "TXEXP-10" = [ordered]@{
       path            = "replay a state transition that fails after partial writes and attempt rollback bypass or cache context leakage"
       expected_state  = "failed state transition rolls back all writes and replay observes the original pre-failure state"
-      affected        = @("app cache context", "x/bank", "x/fees", "x/tokenfactory", "x/dex")
+      affected        = @("app cache context", "x/bank", "x/fees", "x/aetherisvm/standards/aft", "avm-dex-contract")
       severity        = "High"
-      fix             = "add replayed failure rollback tests across bank, fees, tokenfactory, and DEX handlers"
+      fix             = "add replayed failure rollback tests across bank, fees, contract-assets, and DEX handlers"
     }
     "TXEXP-11" = [ordered]@{
       path            = "inject zero address as signer, recipient, admin, authority, or bank transfer endpoint"
       expected_state  = "zero-address signer or recipient path rejects before account, balance, authority, resolver, or module state mutation"
-      affected        = @("x/auth", "x/bank", "x/tokenfactory", "x/fees", "app address validation")
+      affected        = @("x/auth", "x/bank", "x/aetherisvm/standards/aft", "x/fees", "app address validation")
       severity        = "Critical"
       fix             = "add zero-address adversarial tests for signer, recipient, admin, authority, and fee/bank paths"
     }
@@ -2548,16 +2548,16 @@ function Get-AexsTxAuthBankExploitOverrides {
 function Get-AexsTokenEconomyExploitOverrides {
   $overrides = @{
     "TOKENEXP-01" = [ordered]@{
-      path            = "attempt tokenfactory admin takeover by spoofing denom admin, changing admin out of order, or replaying stale authority"
+      path            = "attempt contract-assets admin takeover by spoofing denom admin, changing admin out of order, or replaying stale authority"
       expected_state  = "factory denom admin cannot be changed or used for mint authority unless the current canonical admin authorizes it"
-      affected        = @("x/tokenfactory", "x/bank", "app auth")
+      affected        = @("x/aetherisvm/standards/aft", "x/bank", "app auth")
       severity        = "Critical"
       fix             = "add admin takeover regression tests for create denom, change admin, mint, stale admin replay, and zero-admin boundaries"
     }
     "TOKENEXP-02" = [ordered]@{
-      path            = "attempt unauthorized burn from another account, module account, or native denom through tokenfactory burn paths"
+      path            = "attempt unauthorized burn from another account, module account, or native denom through contract-assets burn paths"
       expected_state  = "burn requires exact authority and source ownership; unauthorized burn cannot debit balances or reduce supply"
-      affected        = @("x/tokenfactory", "x/bank")
+      affected        = @("x/aetherisvm/standards/aft", "x/bank")
       severity        = "Critical"
       fix             = "add burn-from mismatch, wrong admin, module account, native denom, and supply delta tests"
     }
@@ -2599,16 +2599,16 @@ function Get-AexsTokenEconomyExploitOverrides {
     "TOKENEXP-08" = [ordered]@{
       path            = "manipulate supply through edge-case mint amount, metadata, duplicate denom, zero admin, max amount, or export/import paths"
       expected_state  = "mint amount and denom validation reject edge cases and accepted mints change supply by exactly the requested amount"
-      affected        = @("x/tokenfactory", "x/bank", "genesis export/import")
+      affected        = @("x/aetherisvm/standards/aft", "x/bank", "genesis export/import")
       severity        = "Critical"
       fix             = "add edge-case mint tests for zero/max amounts, duplicate denom, invalid metadata, export/import, and exact supply delta"
     }
     "TOKENEXP-09" = [ordered]@{
-      path            = "spoof native denom through tokenfactory subdenom, bank metadata, display denom, LP denom, or fee denom aliases"
+      path            = "spoof native denom through contract-assets subdenom, bank metadata, display denom, LP denom, or fee denom aliases"
       expected_state  = "factory assets cannot spoof native denom, native metadata, protocol fee denom, staking denom, or LP denom namespace"
-      affected        = @("x/tokenfactory", "x/bank", "x/fees", "x/staking")
+      affected        = @("x/aetherisvm/standards/aft", "x/bank", "x/fees", "x/staking")
       severity        = "Critical"
-      fix             = "add native denom spoof tests for metadata, base/display denom, tokenfactory subdenom, fee denom, staking denom, and LP namespace"
+      fix             = "add native denom spoof tests for metadata, base/display denom, contract-assets subdenom, fee denom, staking denom, and LP namespace"
     }
     "TOKENEXP-10" = [ordered]@{
       path            = "exploit display/base decimal mismatch between ORB display, naet base units, bank metadata, fees, and localnet genesis balances"
@@ -2626,70 +2626,70 @@ function Get-AexsDexExploitOverrides {
     "DEXEXP-01" = [ordered]@{
       path            = "execute swaps against crafted reserves to reduce the fee-adjusted constant product or violate canonical reserve ordering"
       expected_state  = "fee-adjusted constant-product invariant holds after every accepted swap and violation attempts reject before reserve mutation"
-      affected        = @("x/dex", "x/bank")
+      affected        = @("avm-dex-contract", "x/bank")
       severity        = "Critical"
       fix             = "add constant-product invariant tests for reserve ordering, fee-adjusted math, extreme ratios, and repeated tiny swaps"
     }
     "DEXEXP-02" = [ordered]@{
       path            = "drain pool liquidity through repeated swaps, rounded outputs, stale quotes, and fee edge cases"
       expected_state  = "swap math, slippage checks, and module balances prevent liquidity drain beyond deterministic AMM rules"
-      affected        = @("x/dex", "x/bank")
+      affected        = @("avm-dex-contract", "x/bank")
       severity        = "Critical"
       fix             = "add multi-step liquidity drain simulations with reserve/module balance and slippage assertions"
     }
     "DEXEXP-03" = [ordered]@{
       path            = "initialize pool with same denoms, duplicate pair, tiny reserves, wrong canonical order, or invalid initial LP shares"
       expected_state  = "pool creation rejects malformed pairs and creates canonical pair index, reserves, and LP supply atomically"
-      affected        = @("x/dex", "x/bank")
+      affected        = @("avm-dex-contract", "x/bank")
       severity        = "High"
       fix             = "add pool initialization tests for duplicate pairs, same denom, zero/tiny liquidity, canonical order, and LP genesis"
     }
     "DEXEXP-04" = [ordered]@{
       path            = "inflate LP tokens by forged LP denom, duplicate pool id, add-liquidity rounding, or LP mint without matching reserves"
       expected_state  = "LP supply equals pool total shares and cannot be minted without matching reserve deposits"
-      affected        = @("x/dex", "x/bank", "x/tokenfactory")
+      affected        = @("avm-dex-contract", "x/bank", "x/aetherisvm/standards/aft")
       severity        = "Critical"
       fix             = "add LP inflation tests for forged LP denom, duplicate pool id, share rounding, and reserve/share reconciliation"
     }
     "DEXEXP-05" = [ordered]@{
       path            = "race liquidity removal against swaps, LP burns, pool updates, and failed bank movement to extract extra reserves"
       expected_state  = "remove liquidity is atomic and deterministic; races cannot burn shares twice or withdraw more than owned"
-      affected        = @("x/dex", "x/bank", "app cache context")
+      affected        = @("avm-dex-contract", "x/bank", "app cache context")
       severity        = "High"
       fix             = "add stateful remove-liquidity race tests with LP supply, reserve, and rollback snapshots"
     }
     "DEXEXP-06" = [ordered]@{
       path            = "swap or add/remove liquidity against zero-liquidity or insolvent pools to trigger divide-by-zero or impossible output"
       expected_state  = "zero-liquidity and insolvent pools reject before arithmetic panic, bank movement, or pool mutation"
-      affected        = @("x/dex", "x/bank")
+      affected        = @("avm-dex-contract", "x/bank")
       severity        = "Critical"
       fix             = "add zero-liquidity, insolvent pool, divide-by-zero, and panic-safety tests"
     }
     "DEXEXP-07" = [ordered]@{
       path            = "desynchronize pool reserves from module account balances through corrupted state, partial bank moves, or export/import drift"
       expected_state  = "pool reserves reconcile with module balances and any mismatch rejects or records a critical invariant failure"
-      affected        = @("x/dex", "x/bank", "genesis export/import")
+      affected        = @("avm-dex-contract", "x/bank", "genesis export/import")
       severity        = "Critical"
       fix             = "add reserve/module balance reconciliation tests for every DEX operation and export/import round trip"
     }
     "DEXEXP-08" = [ordered]@{
       path            = "force bank movement failure after DEX state update attempt and check for partial reserve, share, or LP mutation"
       expected_state  = "failed bank movement rolls back all DEX state changes in the cached context"
-      affected        = @("x/dex", "x/bank", "app cache context")
+      affected        = @("avm-dex-contract", "x/bank", "app cache context")
       severity        = "Critical"
       fix             = "add failed bank movement simulations for create pool, add liquidity, remove liquidity, swap, and LP mint/burn"
     }
     "DEXEXP-09" = [ordered]@{
       path            = "bypass slippage with stale quote, min-output off-by-one, rounded output, route manipulation, or denom order confusion"
       expected_state  = "swap rejects before state mutation whenever deterministic output is below user slippage constraints"
-      affected        = @("x/dex", "x/routing", "x/bank")
+      affected        = @("avm-dex-contract", "x/routing", "x/bank")
       severity        = "High"
       fix             = "add slippage bypass tests for stale quotes, min-output boundaries, rounding, route hints, and denom ordering"
     }
     "DEXEXP-10" = [ordered]@{
       path            = "exploit AMM rounding through tiny repeated swaps, asymmetric reserves, fee rounding, or LP share truncation"
       expected_state  = "rounding rules are deterministic, bounded, and cannot drain value or violate reserve/share invariants"
-      affected        = @("x/dex", "x/bank")
+      affected        = @("avm-dex-contract", "x/bank")
       severity        = "High"
       fix             = "add property and fuzz tests for swap rounding, LP rounding, tiny amounts, and asymmetric reserve sequences"
     }
@@ -3048,7 +3048,7 @@ function Get-AexsMeshCrossZoneExploitOverrides {
     "MESHEXP-04" = [ordered]@{
       path            = "duplicate asset commitments across source and destination zones during transfer, bounce, or refund processing"
       expected_state  = "asset commitments are consumed exactly once and destination mint/release cannot exceed finalized source lock/burn"
-      affected        = @("x/mesh", "x/bank", "x/tokenfactory", "x/queue")
+      affected        = @("x/mesh", "x/bank", "x/aetherisvm/standards/aft", "x/queue")
       severity        = "Critical"
       fix             = "add cross-zone asset conservation tests for lock/burn, release/mint, bounce, refund, and replay markers"
     }
@@ -3248,7 +3248,7 @@ function Get-AexsGenesisUpgradeStateExploitOverrides {
     "STATEEXP-01" = [ordered]@{
       path            = "inject malformed genesis accounts, balances, params, module state, zone roots, or custom module records"
       expected_state  = "genesis validation rejects malformed state before node start and never panics on corrupt but parseable input"
-      affected        = @("app", "x/bank", "x/fees", "x/tokenfactory", "x/dex")
+      affected        = @("app", "x/bank", "x/fees", "x/aetherisvm/standards/aft", "avm-dex-contract")
       severity        = "Critical"
       fix             = "add malformed genesis fixtures for accounts, balances, params, custom modules, roots, and panic-free validation"
     }
@@ -3283,14 +3283,14 @@ function Get-AexsGenesisUpgradeStateExploitOverrides {
     "STATEEXP-06" = [ordered]@{
       path            = "inject hidden privileged account, module account, authority, admin, or mint permission into genesis/export state"
       expected_state  = "privileged accounts and module permissions are explicitly validated and unauthorized hidden authorities are rejected"
-      affected        = @("app", "x/auth", "x/bank", "x/tokenfactory", "x/fees")
+      affected        = @("app", "x/auth", "x/bank", "x/aetherisvm/standards/aft", "x/fees")
       severity        = "Critical"
       fix             = "add privileged account injection tests for module accounts, authority fields, admin state, mint permissions, and export/import"
     }
     "STATEEXP-07" = [ordered]@{
       path            = "bypass InitGenesis validation with duplicate ids, duplicate denoms, invalid reserves, invalid params, or nil-like records"
       expected_state  = "InitGenesis validates duplicates, params, reserves, denoms, and nil-like records before state writes"
-      affected        = @("app", "x/dex", "x/tokenfactory", "x/fees", "x/identity")
+      affected        = @("app", "avm-dex-contract", "x/aetherisvm/standards/aft", "x/fees", "x/identity")
       severity        = "Critical"
       fix             = "add InitGenesis bypass tests for duplicates, invalid params, reserves, denoms, nil records, and panic-free errors"
     }
@@ -3414,7 +3414,7 @@ function Get-AexsCombinedFullStackExploitOverrides {
     "FULLSTACKEXP-03" = [ordered]@{
       path            = "combine DEX swaps, mempool reordering, fee priority, and routing locality to drain liquidity or desync reserves"
       expected_state  = "DEX accounting and routing remain deterministic and failed or reordered txs cannot violate pool invariants"
-      affected        = @("x/dex", "mempool", "x/routing", "x/fees", "x/bank")
+      affected        = @("avm-dex-contract", "mempool", "x/routing", "x/fees", "x/bank")
       severity        = "Critical"
       fix             = "add DEX-mempool-routing scenarios for swap ordering, fee priority, reserve checks, slippage, and failed bank movement"
     }
@@ -3428,7 +3428,7 @@ function Get-AexsCombinedFullStackExploitOverrides {
     "FULLSTACKEXP-05" = [ordered]@{
       path            = "coordinate cross-zone value extraction through mesh replay, stale receipt, proof forgery, and queue refund timing"
       expected_state  = "cross-zone value remains conserved and replay, receipt, proof, bounce, and refund paths cannot extract extra funds"
-      affected        = @("x/mesh", "x/queue", "x/messaging", "x/bank", "x/tokenfactory")
+      affected        = @("x/mesh", "x/queue", "x/messaging", "x/bank", "x/aetherisvm/standards/aft")
       severity        = "Critical"
       fix             = "add cross-zone value extraction tests for replay markers, receipts, proofs, bounce/refund, and asset conservation"
     }
@@ -3463,7 +3463,7 @@ function Get-AexsCombinedFullStackExploitOverrides {
     "FULLSTACKEXP-10" = [ordered]@{
       path            = "destabilize the full stack with combined governance, load, routing, mesh, identity, DEX, VM, and network faults"
       expected_state  = "full-stack destabilization fails closed with deterministic state, no unauthorized value movement, and triaged exploit evidence"
-      affected        = @("app", "x/gov", "x/load", "x/routing", "x/mesh", "x/identity", "x/dex", "x/vm")
+      affected        = @("app", "x/gov", "x/load", "x/routing", "x/mesh", "x/identity", "avm-dex-contract", "x/vm")
       severity        = "Critical"
       fix             = "add full-stack chaos scenarios with deterministic seeds, invariant registry, state diffs, minimized exploits, and rollback checks"
     }
@@ -3671,8 +3671,8 @@ $moduleCatalog = @(
   [ordered]@{ Module = "x/distribution"; Label = '`x/distribution`'; Prefix = "DIST"; Value = $true; EvidenceRoots = @("app", "docs\security\pos-staking-correctness.md", "tests\integration"); EvidenceTerms = @("distribution", "reward", "commission", "community pool") },
   [ordered]@{ Module = "app"; Label = '`app` / BaseApp'; Prefix = "APP"; Value = $true; EvidenceRoots = @("app", "tests\integration", "docs\genesis-migrations.md", "docs\state-export-import.md"); EvidenceTerms = @("BaseApp", "app hash", "genesis", "export", "determinism") },
   [ordered]@{ Module = "x/fees"; Label = '`x/fees`'; Prefix = "FEES"; Value = $true; EvidenceRoots = @("x\fees", "tests\adversarial", "tests\integration", "docs\fees-ante-policy.md"); EvidenceTerms = @("fees", "fee", "naet", "ante") },
-  [ordered]@{ Module = "x/tokenfactory"; Label = '`x/tokenfactory`'; Prefix = "TF"; Value = $true; EvidenceRoots = @("x\tokenfactory", "tests\adversarial", "tests\e2e", "docs\security\module-bank-movement-audit.md"); EvidenceTerms = @("tokenfactory", "mint", "burn", "admin") },
-  [ordered]@{ Module = "x/dex"; Label = '`x/dex`'; Prefix = "DEX"; Value = $true; EvidenceRoots = @("x\dex", "tests\adversarial", "tests\e2e", "docs\architecture\dex-direction.md"); EvidenceTerms = @("dex", "pool", "swap", "liquidity", "reserve") },
+  [ordered]@{ Module = "x/aetherisvm/standards/aft"; Label = '`x/aetherisvm/standards/aft`'; Prefix = "TF"; Value = $true; EvidenceRoots = @("x\aetherisvm\standards\aft", "tests\adversarial", "tests\e2e", "docs\security\module-bank-movement-audit.md"); EvidenceTerms = @("contract-assets", "mint", "burn", "admin") },
+  [ordered]@{ Module = "avm-dex-contract"; Label = '`avm-dex-contract`'; Prefix = "DEX"; Value = $true; EvidenceRoots = @("avm-dex-contract", "tests\adversarial", "tests\e2e", "docs\architecture\dex-direction.md"); EvidenceTerms = @("dex", "pool", "swap", "liquidity", "reserve") },
   [ordered]@{ Module = "x/identity"; Label = '`x/identity`'; Prefix = "ID"; Value = $true; EvidenceRoots = @("x\identity", "tests\adversarial", "docs\architecture\aetheris-modular-execution-os.md"); EvidenceTerms = @("identity", ".aet", "domain", "resolver") },
   [ordered]@{ Module = "x/reputation"; Label = '`x/reputation`'; Prefix = "REP"; Value = $true; EvidenceRoots = @("x\reputation", "docs\module-boundaries.md", "docs\test-production-gates.md"); EvidenceTerms = @("reputation", "score", "rate limit", "priority") },
   [ordered]@{ Module = "x/execution"; Label = '`x/execution`'; Prefix = "EXEC"; Value = $true; EvidenceRoots = @("x\execution", "docs\architecture\execution-os.md", "docs\module-boundaries.md"); EvidenceTerms = @("execution", "dispatch", "route", "receipt") },
@@ -3733,7 +3733,7 @@ $requiredScenarioTerms = @(
   "Generate random staking, delegation, unbonding, redelegation, and reward",
   "Generate random validator lifecycle and slashing evidence sequences.",
   "Generate random fee and spam bursts.",
-  "Generate random tokenfactory create, mint, burn, and admin sequences.",
+  "Generate random contract-assets create, mint, burn, and admin sequences.",
   "Generate random DEX create-pool, add-liquidity, remove-liquidity, and swap",
   "Generate random governance proposal, vote, and parameter update sequences.",
   "Generate random identity domain registration, auction, renewal, resolver",
@@ -3869,7 +3869,7 @@ $requiredTransactionExploitTerms = @(
 
 $requiredTokenEconomyExploitTerms = @(
   "Token And Economy Exploits",
-  "Attempt tokenfactory mint authority takeover.",
+  "Attempt contract-assets mint authority takeover.",
   "Attempt unauthorized burn bypass.",
   "Attempt inflation manipulation through governance timing.",
   "Attempt fee routing manipulation.",
@@ -4221,14 +4221,14 @@ foreach ($record in $txAuthBankExploitRecords) {
   $record["invalid_reasons"] = $invalidReasons
 }
 $invalidTxAuthBankExploitRecords = @($txAuthBankExploitRecords | Where-Object { -not $_["valid"] })
-$tokenEconomyExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 4 -SectionTitle "Token And Economy Exploits" -IdPrefix "TOKENEXP" -SeedNamespace "token-economy-exploit" -Overrides (Get-AexsTokenEconomyExploitOverrides) -DefaultAffectedModules @("x/tokenfactory", "x/fees", "x/bank", "x/gov", "x/staking", "x/distribution") -DefaultSeverity "High")
+$tokenEconomyExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 4 -SectionTitle "Token And Economy Exploits" -IdPrefix "TOKENEXP" -SeedNamespace "token-economy-exploit" -Overrides (Get-AexsTokenEconomyExploitOverrides) -DefaultAffectedModules @("x/aetherisvm/standards/aft", "x/fees", "x/bank", "x/gov", "x/staking", "x/distribution") -DefaultSeverity "High")
 foreach ($record in $tokenEconomyExploitRecords) {
   $invalidReasons = @(Test-AexsExploitRecord -Record $record)
   $record["valid"] = $invalidReasons.Count -eq 0
   $record["invalid_reasons"] = $invalidReasons
 }
 $invalidTokenEconomyExploitRecords = @($tokenEconomyExploitRecords | Where-Object { -not $_["valid"] })
-$dexExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 5 -SectionTitle "DEX Exploits" -IdPrefix "DEXEXP" -SeedNamespace "dex-exploit" -Overrides (Get-AexsDexExploitOverrides) -DefaultAffectedModules @("x/dex", "x/bank", "app cache context") -DefaultSeverity "High")
+$dexExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 5 -SectionTitle "DEX Exploits" -IdPrefix "DEXEXP" -SeedNamespace "dex-exploit" -Overrides (Get-AexsDexExploitOverrides) -DefaultAffectedModules @("avm-dex-contract", "x/bank", "app cache context") -DefaultSeverity "High")
 foreach ($record in $dexExploitRecords) {
   $invalidReasons = @(Test-AexsExploitRecord -Record $record)
   $record["valid"] = $invalidReasons.Count -eq 0
@@ -4328,7 +4328,7 @@ $simulatorModes = @(
 $fuzzSeeds = @(
   "aexs-auth-replay-0001",
   "aexs-fee-denom-spoof-0002",
-  "aexs-tokenfactory-admin-0003",
+  "aexs-contract-assets-admin-0003",
   "aexs-dex-reserve-desync-0004",
   "aexs-identity-resolver-hijack-0005",
   "aexs-avm-malformed-bytecode-0006",
@@ -4397,8 +4397,8 @@ $scenarioGenerators = @(
     status             = "planned_not_executed"
   },
   [ordered]@{
-    id                 = "tokenfactory_admin_sequences"
-    name               = "random tokenfactory create, mint, burn, and admin sequences"
+    id                 = "contract-assets_admin_sequences"
+    name               = "random contract-assets create, mint, burn, and admin sequences"
     flow_covered       = "create denom, mint, burn, change admin, metadata query"
     state_transitions  = "denom state, supply, admin authority, bank metadata"
     attack_surfaces    = "unauthorized mint/burn, admin takeover, native denom spoof, burn-from mismatch"
@@ -4564,7 +4564,7 @@ $transactionMutators = @(
     id                = "malformed_addresses"
     name              = "inject malformed addresses"
     mutation_type     = "address_corruption"
-    target_modules    = @("x/auth", "x/bank", "x/tokenfactory", "x/dex", "x/identity")
+    target_modules    = @("x/auth", "x/bank", "x/aetherisvm/standards/aft", "avm-dex-contract", "x/identity")
     flow_covered      = "address parsing, signer checks, recipient/admin/resolver validation"
     state_transitions = "malformed address rejection before state mutation"
     attack_surfaces   = "bad bech32, wrong prefix, truncated bytes, overlong bytes"
@@ -4578,7 +4578,7 @@ $transactionMutators = @(
     id                = "zero_address_fields"
     name              = "inject zero address in signer, recipient, admin, authority, resolver, and DEX actor fields"
     mutation_type     = "zero_address"
-    target_modules    = @("x/auth", "x/bank", "x/tokenfactory", "x/dex", "x/identity", "x/vm")
+    target_modules    = @("x/auth", "x/bank", "x/aetherisvm/standards/aft", "avm-dex-contract", "x/identity", "x/vm")
     flow_covered      = "zero address validation across value-bearing actor fields"
     state_transitions = "zero address input fails before ownership or balance mutation"
     attack_surfaces   = "zero signer, recipient, admin, authority, resolver, DEX actor"
@@ -4690,7 +4690,7 @@ $transactionMutators = @(
     id                = "malformed_genesis_fragments"
     name              = "inject malformed genesis fragments for simulator startup tests"
     mutation_type     = "genesis_corruption"
-    target_modules    = @("app", "x/auth", "x/bank", "x/staking", "x/fees", "x/tokenfactory", "x/dex")
+    target_modules    = @("app", "x/auth", "x/bank", "x/staking", "x/fees", "x/aetherisvm/standards/aft", "avm-dex-contract")
     flow_covered      = "genesis validation, InitGenesis, export/import startup path"
     state_transitions = "invalid genesis rejected before app startup state commit"
     attack_surfaces   = "duplicate accounts, duplicate denoms, invalid params, hidden privileged account"

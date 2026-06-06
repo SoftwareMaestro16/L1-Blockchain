@@ -163,8 +163,8 @@ function Get-SupplyAmount {
   return [int64]$supply.amount
 }
 
-function Get-TokenfactoryDenomCount {
-  $res = Invoke-QueryCliJson -Arguments @("query", "tokenfactory", "denoms", "--limit", "50")
+function Get-Contract assetsDenomCount {
+  $res = Invoke-QueryCliJson -Arguments @("query", "contract-assets", "denoms", "--limit", "50")
   return @($res.denoms).Count
 }
 
@@ -293,10 +293,10 @@ try {
   $node1 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node1Home -KeyName "node1"
   $factoryDenom = "factory/$node0/negasset"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "create-denom", "negasset") -FromHome $node0Home | Out-Null
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", "negasset") -FromHome $node0Home | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
   Send-SignedTx -ActionArgs @("tx", "dex", "create-pool", "10000000naet", "10000000$factoryDenom") -FromHome $node0Home | Out-Null
-  Write-Host "baseline tokenfactory denom and DEX pool created"
+  Write-Host "baseline contract-assets denom and DEX pool created"
 
   $node1Before = Get-BalanceAmount -Address $node1 -Denom "naet"
   $wrongFee = Invoke-NegativeTx `
@@ -336,20 +336,20 @@ try {
   $factorySupplyBefore = Get-SupplyAmount -Denom $factoryDenom
   $node1FactoryBefore = Get-BalanceAmount -Address $node1 -Denom $factoryDenom
   Invoke-NegativeTx `
-    -Name "unauthorized tokenfactory mint" `
-    -Arguments (New-SignedTxArgs -ActionArgs @("tx", "tokenfactory", "mint", "1$factoryDenom", $node1) -FromHome $node1Home -FromKey "node1") `
+    -Name "unauthorized contract-assets mint" `
+    -Arguments (New-SignedTxArgs -ActionArgs @("tx", "contract-assets", "mint", "1$factoryDenom", $node1) -FromHome $node1Home -FromKey "node1") `
     -ExpectedText "only denom admin can mint" `
     -AllowedPhases @("DeliverTx") | Out-Null
   Assert-True ((Get-SupplyAmount -Denom $factoryDenom) -eq $factorySupplyBefore) "unauthorized mint changed supply"
   Assert-True ((Get-BalanceAmount -Address $node1 -Denom $factoryDenom) -eq $node1FactoryBefore) "unauthorized mint changed node1 factory balance"
 
-  $denomCountBefore = Get-TokenfactoryDenomCount
+  $denomCountBefore = Get-Contract assetsDenomCount
   Invoke-NegativeTx `
-    -Name "malformed tokenfactory subdenom" `
-    -Arguments (New-SignedTxArgs -ActionArgs @("tx", "tokenfactory", "create-denom", "!") -FromHome $node0Home) `
+    -Name "malformed contract-assets subdenom" `
+    -Arguments (New-SignedTxArgs -ActionArgs @("tx", "contract-assets", "create-denom", "!") -FromHome $node0Home) `
     -ExpectedText "subdenom|invalid|3-64" `
     -AllowedPhases @("CLI", "DeliverTx") | Out-Null
-  Assert-True ((Get-TokenfactoryDenomCount) -eq $denomCountBefore) "malformed subdenom changed tokenfactory denom count"
+  Assert-True ((Get-Contract assetsDenomCount) -eq $denomCountBefore) "malformed subdenom changed contract-assets denom count"
 
   $poolCountBefore = Get-DexPoolCount
   $poolBefore = (Invoke-QueryCliJson -Arguments @("query", "dex", "pool", "1")).pool | ConvertTo-Json -Depth 20 -Compress

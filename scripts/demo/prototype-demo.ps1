@@ -167,7 +167,7 @@ function Invoke-DemoCheck {
       "stop/init/validate/start 3-validator localnet",
       "show height and REST node info",
       "send bank tx in naet",
-      "create and mint tokenfactory denom",
+      "create and mint contract-assets denom",
       "create DEX pool and swap naet for factory token",
       "show REST DEX pool and final balances",
       "stop localnet unless -KeepLocalnet"
@@ -232,14 +232,14 @@ try {
   }
   Write-DemoNote "node1 naet balance: $node1Before -> $node1After"
 
-  Write-DemoStep "Tokenfactory create and mint"
-  Send-DemoTx -Label "create factory denom $FactorySubdenom" -ActionArgs @("tx", "tokenfactory", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
+  Write-DemoStep "Contract assets create and mint"
+  Send-DemoTx -Label "create factory denom $FactorySubdenom" -ActionArgs @("tx", "contract-assets", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
   $factoryDenom = "factory/$node0/$FactorySubdenom"
-  $tfQuery = Invoke-DemoQueryCliJson -Arguments @("query", "tokenfactory", "denom", $factoryDenom)
+  $tfQuery = Invoke-DemoQueryCliJson -Arguments @("query", "contract-assets", "denom", $factoryDenom)
   if ($tfQuery.metadata.admin -ne $node0) {
-    throw "tokenfactory admin mismatch"
+    throw "contract-assets admin mismatch"
   }
-  Send-DemoTx -Label "mint 100000000$factoryDenom to node0" -ActionArgs @("tx", "tokenfactory", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
+  Send-DemoTx -Label "mint 100000000$factoryDenom to node0" -ActionArgs @("tx", "contract-assets", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
   $factoryBalance = Get-DemoBalanceAmount -Address $node0 -Denom $factoryDenom
   Write-DemoNote "factory denom=$factoryDenom balance=$factoryBalance"
 
@@ -269,7 +269,7 @@ try {
   Write-DemoNote "node0 lp/1=$node0Lp"
 
   Write-DemoStep "Demo complete"
-  Write-DemoNote "Aetra local prototype produced blocks, accepted bank/tokenfactory/DEX txs, served REST queries, and updated final state."
+  Write-DemoNote "Aetra local prototype produced blocks, accepted bank/contract-assets/DEX txs, served REST queries, and updated final state."
 } finally {
   if (-not $KeepLocalnet) {
     Write-DemoStep "Stop localnet"

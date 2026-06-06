@@ -820,7 +820,7 @@ func defaultServiceSignableObjectVectors() []ServiceSignableObjectVector {
 func defaultAetraModuleServiceMappings() []AetraModuleServiceMapping {
 	return []AetraModuleServiceMapping{
 		newAetraModuleServiceMapping("aethercore", "x/aethercore", "aethercore-service", true),
-		newAetraModuleServiceMapping("dex", "x/dex", "dex-service", true),
+		newAetraModuleServiceMapping("avm-dex-contract", "avm-dex-contract", "avm-dex-contract-service", true),
 		newAetraModuleServiceMapping("fees", "x/fees", "fees-service", true),
 		newAetraModuleServiceMapping("identity", "x/identity", "identity-service", true),
 		newAetraModuleServiceMapping("payments", "x/payments", "payments-service", true),

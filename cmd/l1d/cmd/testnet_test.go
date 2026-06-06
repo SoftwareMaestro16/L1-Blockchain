@@ -31,9 +31,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	l1app "github.com/sovereign-l1/l1/app"
 	appparams "github.com/sovereign-l1/l1/app/params"
-	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
-	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 )
 
 func Test_TestnetCmd(t *testing.T) {
@@ -154,17 +152,6 @@ func assertPrototypeGenesisProfile(
 	var feesGenState feestypes.GenesisState
 	cdc.MustUnmarshalJSON(appState[feestypes.ModuleName], &feesGenState)
 	require.Equal(t, feestypes.DefaultGenesisState(), &feesGenState)
-
-	var tokenfactoryGenState tokenfactorytypes.GenesisState
-	cdc.MustUnmarshalJSON(appState[tokenfactorytypes.ModuleName], &tokenfactoryGenState)
-	require.Empty(t, tokenfactoryGenState.Denoms)
-	require.NoError(t, tokenfactoryGenState.Validate())
-
-	var dexGenState dextypes.GenesisState
-	cdc.MustUnmarshalJSON(appState[dextypes.ModuleName], &dexGenState)
-	require.Equal(t, dextypes.DefaultNextPoolID, dexGenState.NextPoolId)
-	require.Empty(t, dexGenState.Pools)
-	require.NoError(t, dexGenState.Validate())
 
 	genutilGenState := genutiltypes.GetGenesisStateFromAppState(cdc, appState)
 	require.Len(t, genutilGenState.GenTxs, validatorCount)

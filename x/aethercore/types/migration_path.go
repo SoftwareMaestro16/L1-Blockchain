@@ -320,7 +320,7 @@ func MigrationPhase2Tasks() []MigrationTaskDescriptor {
 
 func MigrationPhase3Tasks() []MigrationTaskDescriptor {
 	return []MigrationTaskDescriptor{
-		migrationTask(MigrationPhaseZoneExtraction, MigrationTaskExtractFinancialZone, "Extract Financial Zone.", "Financial Zone adapter", "bank;fees;tokenfactory;dex prefixes and roots"),
+		migrationTask(MigrationPhaseZoneExtraction, MigrationTaskExtractFinancialZone, "Extract Financial Zone.", "Financial Zone adapter", "bank;fees;contract-assets;dex prefixes and roots"),
 		migrationTask(MigrationPhaseZoneExtraction, MigrationTaskExtractIdentityZone, "Extract Identity Zone.", "Identity Zone adapter", "identity resolver;reverse lookup;delegation roots"),
 		migrationTask(MigrationPhaseZoneExtraction, MigrationTaskExtractApplicationZone, "Extract Application Zone.", "Application Zone adapter", "workflows;scheduler;app queues;permission roots"),
 		migrationTask(MigrationPhaseZoneExtraction, MigrationTaskZoneSpecificKeepers, "Add zone-specific keepers and state prefixes.", "zone keeper wiring", "keeper scopes;state prefixes;zone export manifests"),
@@ -368,7 +368,7 @@ func MigrationPhase7Tasks() []MigrationTaskDescriptor {
 	return []MigrationTaskDescriptor{
 		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskBlockSTMZoneShardWorkloads, "Enable BlockSTM workloads for zone and shard batches.", "BlockSTM execution planner", "disjoint zone and shard batches;conflict keys;parallel execution metrics"),
 		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskConflictProfiling, "Add conflict profiling.", "conflict profiler", "state access conflicts;hot object counters;committed conflict profile root"),
-		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskStoreV2Benchmarks, "Add Store v2 benchmarks.", "Store v2 benchmark suite", "balance;identity;contract;message;payment;DEX;proof generation benchmarks"),
+		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskStoreV2Benchmarks, "Add Store v2 benchmarks.", "Store v2 benchmark suite", "balance;identity;contract;message;payment;AVM AMM;proof generation benchmarks"),
 		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskMempoolLanes, "Add mempool lanes.", "zonemempool lanes", "zone lanes;shard sublanes;message class priority;DoS limits"),
 		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskCongestionAwareRouting, "Add congestion-aware routing.", "routing cost model", "committed congestion metrics;deterministic scoring;bounded fairness"),
 		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskAdaptiveSyncRecoveryTests, "Add AdaptiveSync recovery tests.", "state sync recovery", "zone and shard commitment replay;root snapshot recovery"),
@@ -402,7 +402,7 @@ func MigrationPhase2ExitCriteria() []MigrationExitCriterion {
 
 func MigrationPhase3ExitCriteria() []MigrationExitCriterion {
 	return []MigrationExitCriterion{
-		migrationExitCriterion(MigrationPhaseZoneExtraction, MigrationExitFinancialZoneExecution, "Existing bank, fees, tokenfactory, and DEX execute in Financial Zone.", "financial zone roots include bank, fee, tokenfactory, and DEX state transitions"),
+		migrationExitCriterion(MigrationPhaseZoneExtraction, MigrationExitFinancialZoneExecution, "Existing bank, fees, contract-assets, and AVM AMM contracts execute in Financial Zone.", "financial zone roots include bank, fee, contract-assets, and AVM AMM state transitions"),
 		migrationExitCriterion(MigrationPhaseZoneExtraction, MigrationExitIdentityZoneIsolated, "Identity module can activate as isolated Identity Zone.", "identity state writes are restricted to identity zone prefixes and roots"),
 		migrationExitCriterion(MigrationPhaseZoneExtraction, MigrationExitZoneRootsPerBlock, "Zone roots are committed per block.", "each finalized height commits zone roots, summaries, inbox, outbox, receipt, and event roots"),
 	}

@@ -28,7 +28,6 @@ import (
 	constitutiontypes "github.com/sovereign-l1/l1/x/constitution/types"
 	crosschainregistrytypes "github.com/sovereign-l1/l1/x/cross-chain-registry/types"
 	delegatorprotectiontypes "github.com/sovereign-l1/l1/x/delegator-protection/types"
-	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	dynamiccommissiontypes "github.com/sovereign-l1/l1/x/dynamic-commission/types"
 	emissionstypes "github.com/sovereign-l1/l1/x/emissions/types"
 	nativeevidencetypes "github.com/sovereign-l1/l1/x/evidence/types"
@@ -51,7 +50,6 @@ import (
 	stakeconcentrationtypes "github.com/sovereign-l1/l1/x/stake-concentration/types"
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
 	systemregistrytypes "github.com/sovereign-l1/l1/x/system-registry/types"
-	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 	treasurytypes "github.com/sovereign-l1/l1/x/treasury/types"
 	validatorelectiontypes "github.com/sovereign-l1/l1/x/validator-election/types"
 	validatorinsurancetypes "github.com/sovereign-l1/l1/x/validator-insurance/types"
@@ -195,8 +193,6 @@ func InitGenesisOrder() []string {
 		stakeconcentrationtypes.ModuleName,
 		feecollectortypes.ModuleName,
 		feestypes.ModuleName,
-		tokenfactorytypes.ModuleName,
-		dextypes.ModuleName,
 	}
 }
 
@@ -255,7 +251,5 @@ func ExportGenesisOrder() []string {
 		stakeconcentrationtypes.ModuleName,
 		feecollectortypes.ModuleName,
 		feestypes.ModuleName,
-		tokenfactorytypes.ModuleName,
-		dextypes.ModuleName,
 	}
 }

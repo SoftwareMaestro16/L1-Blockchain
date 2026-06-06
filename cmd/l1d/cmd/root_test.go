@@ -121,18 +121,8 @@ func TestPrototypeCommandsAreRegistered(t *testing.T) {
 		{"query", "staking", "validators"},
 		{"query", "slashing", "params"},
 		{"query", "fees", "params"},
-		{"query", "tokenfactory", "denom"},
-		{"query", "dex", "pool"},
 		{"tx", "bank", "send"},
 		{"tx", "staking", "delegate"},
-		{"tx", "tokenfactory", "create-denom"},
-		{"tx", "tokenfactory", "mint"},
-		{"tx", "tokenfactory", "burn"},
-		{"tx", "tokenfactory", "change-admin"},
-		{"tx", "dex", "create-pool"},
-		{"tx", "dex", "add-liquidity"},
-		{"tx", "dex", "swap-exact-in"},
-		{"tx", "dex", "remove-liquidity"},
 		{"testnet", "init-files"},
 		{"testnet", "start"},
 	} {
@@ -168,14 +158,6 @@ func TestOperatorTxCommandsExposeCommonFlags(t *testing.T) {
 	for _, path := range [][]string{
 		{"tx", "bank", "send"},
 		{"tx", "staking", "delegate"},
-		{"tx", "tokenfactory", "create-denom"},
-		{"tx", "tokenfactory", "mint"},
-		{"tx", "tokenfactory", "burn"},
-		{"tx", "tokenfactory", "change-admin"},
-		{"tx", "dex", "create-pool"},
-		{"tx", "dex", "add-liquidity"},
-		{"tx", "dex", "swap-exact-in"},
-		{"tx", "dex", "remove-liquidity"},
 	} {
 		t.Run(strings.Join(path, " "), func(t *testing.T) {
 			command := requireCommand(t, rootCmd, path...)
@@ -203,59 +185,6 @@ func TestPrototypeCommandArgsValidation(t *testing.T) {
 			name:    "fees params rejects extra arg",
 			path:    []string{"query", "fees", "params"},
 			args:    []string{"extra"},
-			wantErr: true,
-		},
-		{
-			name: "tokenfactory create-denom accepts subdenom",
-			path: []string{"tx", "tokenfactory", "create-denom"},
-			args: []string{"gold"},
-		},
-		{
-			name:    "tokenfactory create-denom rejects missing subdenom",
-			path:    []string{"tx", "tokenfactory", "create-denom"},
-			wantErr: true,
-		},
-		{
-			name: "dex create-pool accepts two coins",
-			path: []string{"tx", "dex", "create-pool"},
-			args: []string{"100naet", "100factory/ae1addr/gold"},
-		},
-		{
-			name:    "dex create-pool rejects one coin",
-			path:    []string{"tx", "dex", "create-pool"},
-			args:    []string{"100naet"},
-			wantErr: true,
-		},
-		{
-			name: "dex add-liquidity accepts pool coins and min shares",
-			path: []string{"tx", "dex", "add-liquidity"},
-			args: []string{"1", "100naet", "100factory/ae1addr/gold", "1"},
-		},
-		{
-			name:    "dex add-liquidity rejects missing min shares",
-			path:    []string{"tx", "dex", "add-liquidity"},
-			args:    []string{"1", "100naet", "100factory/ae1addr/gold"},
-			wantErr: true,
-		},
-		{
-			name: "dex swap accepts exact-in shape",
-			path: []string{"tx", "dex", "swap-exact-in"},
-			args: []string{"1", "100naet", "factory/ae1addr/gold", "1"},
-		},
-		{
-			name:    "dex swap rejects missing min out",
-			path:    []string{"tx", "dex", "swap-exact-in"},
-			args:    []string{"1", "100naet", "factory/ae1addr/gold"},
-			wantErr: true,
-		},
-		{
-			name: "dex pool query accepts pool id",
-			path: []string{"query", "dex", "pool"},
-			args: []string{"1"},
-		},
-		{
-			name:    "dex pool query rejects missing pool id",
-			path:    []string{"query", "dex", "pool"},
 			wantErr: true,
 		},
 	}

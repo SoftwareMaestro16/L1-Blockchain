@@ -132,13 +132,13 @@ type ZoneExtractionCheck struct {
 }
 
 type MigrationPhase3Input struct {
-	FinancialZone                      ZoneExtractionCheck
-	IdentityZone                       ZoneExtractionCheck
-	ApplicationZone                    ZoneExtractionCheck
-	BankFeesTokenfactoryDEXInFinancial bool
-	IdentityIsolatedActivation         bool
-	ZoneRootsCommittedPerBlock         bool
-	ZoneCommitmentRoot                 string
+	FinancialZone                           ZoneExtractionCheck
+	IdentityZone                            ZoneExtractionCheck
+	ApplicationZone                         ZoneExtractionCheck
+	BankFeesContractAssetsAVMAMMInFinancial bool
+	IdentityIsolatedActivation              bool
+	ZoneRootsCommittedPerBlock              bool
+	ZoneCommitmentRoot                      string
 }
 
 type ShardRuntimeDescriptorCheck struct {
@@ -455,7 +455,7 @@ func BuildMigrationPhase3Readiness(input MigrationPhase3Input) MigrationReadines
 			evidence = append(evidence, "zone_extraction:"+zone.ZoneID+":"+zone.CommittedRoot)
 		}
 	}
-	if !input.BankFeesTokenfactoryDEXInFinancial {
+	if !input.BankFeesContractAssetsAVMAMMInFinancial {
 		failed = append(failed, "financial_zone_modules")
 	}
 	if !input.IdentityIsolatedActivation {

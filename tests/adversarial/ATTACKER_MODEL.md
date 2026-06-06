@@ -1,6 +1,6 @@
 # Aetra Custom Module Attacker Model
 
-## Tokenfactory
+## Contract assets
 
 - Attacker-controlled input: creator/admin Bech32 strings, subdenoms, mint/burn amounts, mint recipient, burn source, admin-change target, query denoms, genesis fixtures.
 - Assets at risk: factory token supply, holder balances, denom admin authority, bank metadata integrity.
@@ -74,5 +74,5 @@
 
 - Attacker-controlled input: signed tx bytes, malformed protobuf, sequence/account-number reuse, invalid signer pubkeys, repeated tx broadcasts, multi-module tx order, localnet RPC submissions.
 - Assets at risk: account balances, nonce replay protection, app liveness, deterministic state execution.
-- Main abuse cases: replaying committed tx bytes, signer mismatch, malformed tx decoder panics, mempool spam, governance abuse of custom params, tokenfactory assets used in DEX with broken accounting.
-- Required invariants: malformed tx bytes fail safely, invalid signer txs fail before state mutation, replayed tx bytes fail after sequence increment, cross-module happy path keeps bank, DEX, tokenfactory, and fees state queryable and consistent.
+- Main abuse cases: replaying committed tx bytes, signer mismatch, malformed tx decoder panics, mempool spam, governance abuse of custom params, contract-assets assets used in DEX with broken accounting.
+- Required invariants: malformed tx bytes fail safely, invalid signer txs fail before state mutation, replayed tx bytes fail after sequence increment, cross-module happy path keeps bank, DEX, contract-assets, and fees state queryable and consistent.

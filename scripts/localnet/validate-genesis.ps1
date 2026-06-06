@@ -167,8 +167,8 @@ foreach ($node in $nodes) {
     throw "fees module does not restrict fees to naet"
   }
 
-  if (@($appState.tokenfactory.denoms).Count -ne 0) {
-    throw "tokenfactory genesis is expected to start with no factory denoms"
+  if (@($appState.contract-assets.denoms).Count -ne 0) {
+    throw "contract-assets genesis is expected to start with no factory denoms"
   }
 
   if ([int64]$appState.dex.next_pool_id -ne 1 -or @($appState.dex.pools).Count -ne 0) {

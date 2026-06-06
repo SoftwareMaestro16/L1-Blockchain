@@ -32,9 +32,9 @@ func TestCosmosModuleBoundarySpecCoversSectionsTenTwoAndTenThree(t *testing.T) {
 	require.Contains(t, byModule["slashing"].Boundary, "payment dispute penalties")
 	require.Contains(t, byModule["mint/distribution"].Boundary, "committed fee roots")
 	require.Contains(t, byModule["fees"].RequiredModification, "forwarding fee escrow")
-	require.Contains(t, byModule["tokenfactory"].Boundary, "Financial Zone state")
-	require.Contains(t, byModule["dex"].RequiredModification, "pool shard placement")
-	require.Contains(t, byModule["dex"].Boundary, "settle through receipts")
+	require.Contains(t, byModule["contract-assets"].Boundary, "Financial Zone state")
+	require.Contains(t, byModule["avm-dex-contract"].RequiredModification, "pool shard placement")
+	require.Contains(t, byModule["avm-dex-contract"].Boundary, "settle through receipts")
 
 	byRule := map[string]CosmosModuleBoundaryRule{}
 	for _, rule := range spec.BoundaryRules {

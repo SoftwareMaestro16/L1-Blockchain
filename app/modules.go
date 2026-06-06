@@ -42,7 +42,6 @@ import (
 	constitutionmodule "github.com/sovereign-l1/l1/x/constitution"
 	crosschainregistrymodule "github.com/sovereign-l1/l1/x/cross-chain-registry"
 	delegatorprotectionmodule "github.com/sovereign-l1/l1/x/delegator-protection"
-	dexmodule "github.com/sovereign-l1/l1/x/dex"
 	dynamiccommissionmodule "github.com/sovereign-l1/l1/x/dynamic-commission"
 	emissionsmodule "github.com/sovereign-l1/l1/x/emissions"
 	nativeevidencemodule "github.com/sovereign-l1/l1/x/evidence"
@@ -65,7 +64,6 @@ import (
 	stakeconcentrationmodule "github.com/sovereign-l1/l1/x/stake-concentration"
 	storagerentmodule "github.com/sovereign-l1/l1/x/storage-rent"
 	systemregistrymodule "github.com/sovereign-l1/l1/x/system-registry"
-	tokenfactorymodule "github.com/sovereign-l1/l1/x/tokenfactory"
 	treasurymodule "github.com/sovereign-l1/l1/x/treasury"
 	validatorelectionmodule "github.com/sovereign-l1/l1/x/validator-election"
 	validatorinsurancemodule "github.com/sovereign-l1/l1/x/validator-insurance"
@@ -122,8 +120,6 @@ func (app *L1App) initModules(
 		bridgehubmodule.NewAppModule(&app.BridgeHubKeeper),
 		crosschainregistrymodule.NewAppModule(&app.CrossChainRegistryKeeper),
 		shardingcoordinatormodule.NewAppModule(&app.ShardingCoordinatorKeeper),
-		tokenfactorymodule.NewAppModule(appCodec, app.TokenFactoryKeeper),
-		dexmodule.NewAppModule(appCodec, app.DexKeeper),
 		burnmodule.NewAppModule(appCodec, app.BurnKeeper),
 		treasurymodule.NewAppModule(appCodec, app.TreasuryKeeper),
 		emissionsmodule.NewAppModule(appCodec, app.EmissionsKeeper),

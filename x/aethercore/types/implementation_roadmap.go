@@ -694,7 +694,7 @@ func roadmapPhaseThree(inventory []RoadmapModuleInventoryEntry) ImplementationRo
 		PhaseNumber: 3,
 		Name:        "Canonical Zones",
 		Tasks: roadmapChecklist(
-			"move-bank-fees-tokenfactory-dex-into-financial-zone-boundary",
+			"move-bank-fees-contract-assets-dex-into-financial-zone-boundary",
 			"activate-identity-zone",
 			"add-application-zone-scheduler-boundary",
 			"add-contract-zone-skeleton",

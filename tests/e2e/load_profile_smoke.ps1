@@ -103,7 +103,7 @@ try {
   Assert-True ([int]$summary.blocks_progressed -ge 1) "load profile must observe block progress"
   Assert-True ([int64]$summary.latency_ms.max -gt 0) "load profile must record tx latency"
   Assert-True ($summary.operations.bank_send.success -eq 1) "mixed profile must include one bank send"
-  Assert-True ($summary.operations.tokenfactory_mint.success -eq 1) "mixed profile must include one tokenfactory mint"
+  Assert-True ($summary.operations.contract-assets_mint.success -eq 1) "mixed profile must include one contract-assets mint"
   Assert-True ($summary.operations.dex_swap.success -eq 1) "mixed profile must include one DEX swap"
 
   Write-Host "load profile smoke passed: successes=$($summary.successes) latency_avg_ms=$($summary.latency_ms.avg) blocks=$($summary.blocks_progressed)"

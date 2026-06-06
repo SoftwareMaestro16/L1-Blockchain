@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Operator Troubleshooting Runbook
 
 This runbook is for local Aetra prototype operation. It uses localnet homes, local endpoints, and `--keyring-backend test` only. Never paste mnemonics, validator keys, node keys, or keyring files into tickets, chats, logs, or diagnostic bundles.

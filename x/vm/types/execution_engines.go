@@ -22,13 +22,13 @@ const (
 	SyncStageEvents    SyncExecutionStage = "events"
 	SyncStageReceipt   SyncExecutionStage = "receipt"
 
-	SyncModuleBank         SyncModule = "bank"
-	SyncModuleStaking      SyncModule = "staking"
-	SyncModuleGovernance   SyncModule = "governance"
-	SyncModuleTokenFactory SyncModule = "tokenfactory"
-	SyncModuleDEX          SyncModule = "dex"
-	SyncModuleIdentity     SyncModule = "identity"
-	SyncModulePayments     SyncModule = "payments"
+	SyncModuleBank           SyncModule = "bank"
+	SyncModuleStaking        SyncModule = "staking"
+	SyncModuleGovernance     SyncModule = "governance"
+	SyncModuleContractAssets SyncModule = "contract_assets"
+	SyncModuleDEX            SyncModule = "dex"
+	SyncModuleIdentity       SyncModule = "identity"
+	SyncModulePayments       SyncModule = "payments"
 
 	SyncReceiptCommitted SyncReceiptPolicy = "committed"
 	SyncReceiptDisabled  SyncReceiptPolicy = "disabled"
@@ -304,7 +304,7 @@ func IsSyncModule(module SyncModule) bool {
 	case SyncModuleBank,
 		SyncModuleStaking,
 		SyncModuleGovernance,
-		SyncModuleTokenFactory,
+		SyncModuleContractAssets,
 		SyncModuleDEX,
 		SyncModuleIdentity,
 		SyncModulePayments:

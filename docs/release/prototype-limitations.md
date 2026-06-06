@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Prototype Non-Goals And Limitations
 
 Version scope: current Aetra working prototype prerelease line. Update this file for every prototype release decision that changes scope, risk acceptance, or blocker status.

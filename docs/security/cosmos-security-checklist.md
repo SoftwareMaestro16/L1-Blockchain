@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Cosmos Security Audit Checklist
 
 Use this checklist for every prototype change that touches app wiring, custom modules, proto/query surface, localnet tooling, or release artifacts. It is Cosmos-specific review, not a replacement for `go test`, `go vet`, `buf lint`, the runnable gate in [Prototype Security And Determinism Audit Gate](prototype-audit-gate.md), or the merge policy in [Security Triage Policy](security-triage-policy.md).

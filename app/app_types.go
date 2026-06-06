@@ -34,7 +34,6 @@ import (
 	constitutionkeeper "github.com/sovereign-l1/l1/x/constitution/keeper"
 	crosschainregistrykeeper "github.com/sovereign-l1/l1/x/cross-chain-registry/keeper"
 	delegatorprotectionkeeper "github.com/sovereign-l1/l1/x/delegator-protection/keeper"
-	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
 	dynamiccommissionkeeper "github.com/sovereign-l1/l1/x/dynamic-commission/keeper"
 	emissionskeeper "github.com/sovereign-l1/l1/x/emissions/keeper"
 	nativeevidencekeeper "github.com/sovereign-l1/l1/x/evidence/keeper"
@@ -57,7 +56,6 @@ import (
 	stakeconcentrationkeeper "github.com/sovereign-l1/l1/x/stake-concentration/keeper"
 	storagerentkeeper "github.com/sovereign-l1/l1/x/storage-rent/keeper"
 	systemregistrykeeper "github.com/sovereign-l1/l1/x/system-registry/keeper"
-	tokenfactorykeeper "github.com/sovereign-l1/l1/x/tokenfactory/keeper"
 	treasurykeeper "github.com/sovereign-l1/l1/x/treasury/keeper"
 	validatorelectionkeeper "github.com/sovereign-l1/l1/x/validator-election/keeper"
 	validatorinsurancekeeper "github.com/sovereign-l1/l1/x/validator-insurance/keeper"
@@ -103,8 +101,6 @@ type L1App struct {
 	ConfigKeeper              configkeeper.Keeper
 	ConfigVotingKeeper        configvotingkeeper.Keeper
 	ConstitutionKeeper        constitutionkeeper.Keeper
-	TokenFactoryKeeper        tokenfactorykeeper.Keeper
-	DexKeeper                 dexkeeper.Keeper
 	BurnKeeper                burnkeeper.Keeper
 	TreasuryKeeper            treasurykeeper.Keeper
 	EmissionsKeeper           emissionskeeper.Keeper

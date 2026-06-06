@@ -21,7 +21,7 @@ var DefaultNodeHome string
 
 func init() {
 	var err error
-	DefaultNodeHome, err = clienthelpers.GetNodeHomeDirectory(".aetheris")
+	DefaultNodeHome, err = clienthelpers.GetNodeHomeDirectory(".aetra")
 	if err != nil {
 		panic(err)
 	}

@@ -142,7 +142,7 @@ function Get-AcceptanceFactoryDenom {
     [string]$Subdenom
   )
 
-  $denoms = Invoke-AcceptanceQueryGrpcJson -Context $Context -Arguments @("query", "tokenfactory", "denoms", "--limit", "100")
+  $denoms = Invoke-AcceptanceQueryGrpcJson -Context $Context -Arguments @("query", "contract-assets", "denoms", "--limit", "100")
   $matches = @($denoms.denoms | Where-Object { [string]$_.denom -like "factory/*/$Subdenom" })
   if ($matches.Count -ne 1) {
     throw "expected exactly one factory denom for subdenom $Subdenom, got $($matches.Count)"

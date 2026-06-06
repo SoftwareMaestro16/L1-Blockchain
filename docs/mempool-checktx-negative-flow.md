@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Mempool And CheckTx Negative Flow
 
 Malformed or underfunded transactions must fail without panic and without unintended state writes. This gate documents the expected rejection phase and state invariant for common prototype failures.

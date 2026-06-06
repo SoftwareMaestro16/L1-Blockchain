@@ -36,8 +36,8 @@ func ExistingCosmosModuleModifications() []ExistingCosmosModuleModification {
 		existingCosmosModuleModification("slashing", "Preserve consensus slashing in core and keep payment fraud penalties separate from validator slashing.", "Validator safety penalties cannot be conflated with payment dispute penalties."),
 		existingCosmosModuleModification("mint/distribution", "Aggregate zone fees into distribution flow and preserve deterministic reward accounting.", "Rewards derive from committed fee roots, not live zone-local observations."),
 		existingCosmosModuleModification("fees", "Add zone-local fee policies, forwarding fee escrow, and congestion metrics by zone and shard.", "Fee policy remains deterministic and proof-backed."),
-		existingCosmosModuleModification("tokenfactory", "Add zone-aware denom authority and token routing rules for cross-zone messages.", "Denom authority is Financial Zone state and cross-zone mint/burn effects require messages."),
-		existingCosmosModuleModification("dex", "Add pool shard placement, async swap flow for cross-shard routes, and pool proof queries.", "Pool state routes by committed pool ID and cross-shard swaps settle through receipts."),
+		existingCosmosModuleModification("contract-assets", "Add zone-aware denom authority and token routing rules for cross-zone messages.", "Denom authority is Financial Zone state and cross-zone mint/burn effects require messages."),
+		existingCosmosModuleModification("avm-dex-contract", "Add pool shard placement, async swap flow for cross-shard routes, and pool proof queries.", "Pool state routes by committed pool ID and cross-shard swaps settle through receipts."),
 	}
 }
 
@@ -285,7 +285,7 @@ func ValidateCosmosModuleBoundarySpec() error {
 	if err != nil {
 		return err
 	}
-	requiredModules := []string{"bank", "staking", "slashing", "mint/distribution", "fees", "tokenfactory", "dex"}
+	requiredModules := []string{"bank", "staking", "slashing", "mint/distribution", "fees", "contract-assets", "avm-dex-contract"}
 	byModule := make(map[string]ExistingCosmosModuleModification, len(spec.Modifications))
 	for _, modification := range spec.Modifications {
 		byModule[modification.Module] = modification

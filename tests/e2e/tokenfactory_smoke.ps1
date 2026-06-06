@@ -23,7 +23,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 if ($ValidatorCount -lt 2) {
-  throw "ValidatorCount must be at least 2 for tokenfactory smoke"
+  throw "ValidatorCount must be at least 2 for contract-assets smoke"
 }
 
 $RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
@@ -105,7 +105,7 @@ function Send-SignedTx {
 function Get-FactoryDenomMetadata {
   param([string]$Denom)
 
-  $result = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "tokenfactory", "denom", $Denom, "--node", $rpcNode, "--output", "json")
+  $result = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "contract-assets", "denom", $Denom, "--node", $rpcNode, "--output", "json")
   return $result.metadata
 }
 
@@ -169,13 +169,13 @@ try {
   $node1 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node1Home -KeyName "node1"
   $factoryDenom = "factory/$node0/$FactorySubdenom"
 
-  $emptyDenoms = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "tokenfactory", "denoms", "--node", $rpcNode, "--output", "json")
+  $emptyDenoms = Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "contract-assets", "denoms", "--node", $rpcNode, "--output", "json")
   if (@($emptyDenoms.denoms).Count -ne 0) {
-    throw "fresh localnet tokenfactory denoms must be empty"
+    throw "fresh localnet contract-assets denoms must be empty"
   }
 
-  $createTx = Send-SignedTx -ActionArgs @("tx", "tokenfactory", "create-denom", $FactorySubdenom) -FromHome $node0Home
-  Assert-LocalnetTxEvent -Tx $createTx -Type "tokenfactory_create_denom" -Attributes @{
+  $createTx = Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", $FactorySubdenom) -FromHome $node0Home
+  Assert-LocalnetTxEvent -Tx $createTx -Type "contract-assets_create_denom" -Attributes @{
     denom   = $factoryDenom
     creator = $node0
     admin   = $node0
@@ -185,7 +185,7 @@ try {
   Write-Host "factory denom created with node0 admin"
 
   if ($EnableAPI) {
-    $rest = Invoke-RestMethod -Uri "$restBase/l1/tokenfactory/v1/denom/$factoryDenom" -TimeoutSec 5
+    $rest = Invoke-RestMethod -Uri "$restBase/l1/contract-assets/v1/denom/$factoryDenom" -TimeoutSec 5
     Assert-FactoryMetadata -Metadata $rest.metadata -Denom $factoryDenom -Admin $node0
     Write-Host "REST denom query returned matching admin"
   }
@@ -195,12 +195,12 @@ try {
     throw "factory metadata must not spoof native AET/naet"
   }
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "create-denom", $FactorySubdenom) -FromHome $node0Home -ExpectFailure -ExpectedLog "denom already exists" | Out-Null
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "create-denom", "naet") -FromHome $node0Home -ExpectFailure -ExpectedLog "native AET/naet" | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", $FactorySubdenom) -FromHome $node0Home -ExpectFailure -ExpectedLog "denom already exists" | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", "naet") -FromHome $node0Home -ExpectFailure -ExpectedLog "native AET/naet" | Out-Null
   Write-Host "duplicate and native-spoof denom creation rejected"
 
-  $mintTx = Send-SignedTx -ActionArgs @("tx", "tokenfactory", "mint", "1000000$factoryDenom", $node0) -FromHome $node0Home
-  Assert-LocalnetTxEvent -Tx $mintTx -Type "tokenfactory_mint" -Attributes @{
+  $mintTx = Send-SignedTx -ActionArgs @("tx", "contract-assets", "mint", "1000000$factoryDenom", $node0) -FromHome $node0Home
+  Assert-LocalnetTxEvent -Tx $mintTx -Type "contract-assets_mint" -Attributes @{
     denom           = $factoryDenom
     sender          = $node0
     amount          = "1000000"
@@ -214,9 +214,9 @@ try {
   }
   Write-Host "mint updated node0 balance and bank supply"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "burn", "1$factoryDenom", $node1) -FromHome $node0Home -ExpectFailure -ExpectedLog "burn_from_address must match sender" | Out-Null
-  $burnTx = Send-SignedTx -ActionArgs @("tx", "tokenfactory", "burn", "250000$factoryDenom", $node0) -FromHome $node0Home
-  Assert-LocalnetTxEvent -Tx $burnTx -Type "tokenfactory_burn" -Attributes @{
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "burn", "1$factoryDenom", $node1) -FromHome $node0Home -ExpectFailure -ExpectedLog "burn_from_address must match sender" | Out-Null
+  $burnTx = Send-SignedTx -ActionArgs @("tx", "contract-assets", "burn", "250000$factoryDenom", $node0) -FromHome $node0Home
+  Assert-LocalnetTxEvent -Tx $burnTx -Type "contract-assets_burn" -Attributes @{
     denom             = $factoryDenom
     sender            = $node0
     amount            = "250000"
@@ -230,9 +230,9 @@ try {
   }
   Write-Host "burn reduced node0 balance and bank supply"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "change-admin", $factoryDenom, "not-an-address") -FromHome $node0Home -ExpectFailure | Out-Null
-  $changeAdminTx = Send-SignedTx -ActionArgs @("tx", "tokenfactory", "change-admin", $factoryDenom, $node1) -FromHome $node0Home
-  Assert-LocalnetTxEvent -Tx $changeAdminTx -Type "tokenfactory_change_admin" -Attributes @{
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "change-admin", $factoryDenom, "not-an-address") -FromHome $node0Home -ExpectFailure | Out-Null
+  $changeAdminTx = Send-SignedTx -ActionArgs @("tx", "contract-assets", "change-admin", $factoryDenom, $node1) -FromHome $node0Home
+  Assert-LocalnetTxEvent -Tx $changeAdminTx -Type "contract-assets_change_admin" -Attributes @{
     denom     = $factoryDenom
     sender    = $node0
     new_admin = $node1
@@ -241,9 +241,9 @@ try {
   Assert-FactoryMetadata -Metadata $metadata -Denom $factoryDenom -Admin $node1
   Write-Host "admin transferred to node1"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "mint", "1$factoryDenom", $node0) -FromHome $node0Home -ExpectFailure -ExpectedLog "only denom admin can mint" | Out-Null
-  $newAdminMintTx = Send-SignedTx -ActionArgs @("tx", "tokenfactory", "mint", "100$factoryDenom", $node1) -FromHome $node1Home -FromKey "node1"
-  Assert-LocalnetTxEvent -Tx $newAdminMintTx -Type "tokenfactory_mint" -Attributes @{
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "mint", "1$factoryDenom", $node0) -FromHome $node0Home -ExpectFailure -ExpectedLog "only denom admin can mint" | Out-Null
+  $newAdminMintTx = Send-SignedTx -ActionArgs @("tx", "contract-assets", "mint", "100$factoryDenom", $node1) -FromHome $node1Home -FromKey "node1"
+  Assert-LocalnetTxEvent -Tx $newAdminMintTx -Type "contract-assets_mint" -Attributes @{
     denom           = $factoryDenom
     sender          = $node1
     amount          = "100"
@@ -258,7 +258,7 @@ try {
   Write-Host "old admin rejected and new admin minted successfully"
 
   $height = Wait-LocalnetHeight -TargetHeight ([int64]$height + 1) -RPCPort $node0Ports.RPC -TimeoutSeconds $TimeoutSeconds
-  Write-Host "tokenfactory smoke flow completed at height $height"
+  Write-Host "contract-assets smoke flow completed at height $height"
 } finally {
   & .\scripts\localnet\stop.ps1 -OutputDir $OutputDir
   Pop-Location

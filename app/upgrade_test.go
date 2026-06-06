@@ -7,9 +7,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/stretchr/testify/require"
 
-	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
-	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 )
 
 func TestModuleVersionMapIncludesPrototypeModules(t *testing.T) {
@@ -24,8 +22,6 @@ func TestModuleVersionMapIncludesPrototypeModules(t *testing.T) {
 		require.NotZero(t, version, moduleName)
 		require.Equal(t, version, stored[moduleName], moduleName)
 	}
-	require.Equal(t, uint64(2), stored[tokenfactorytypes.ModuleName])
-	require.Equal(t, uint64(2), stored[dextypes.ModuleName])
 	require.Equal(t, uint64(2), stored[feestypes.ModuleName])
 }
 
@@ -45,8 +41,6 @@ func TestNoOpUpgradeDryRunAndExport(t *testing.T) {
 	after, err := app.UpgradeKeeper.GetModuleVersionMap(ctx)
 	require.NoError(t, err)
 	require.Equal(t, app.ModuleManager.GetVersionMap(), after)
-	require.Equal(t, before[tokenfactorytypes.ModuleName], after[tokenfactorytypes.ModuleName])
-	require.Equal(t, before[dextypes.ModuleName], after[dextypes.ModuleName])
 	require.Equal(t, before[feestypes.ModuleName], after[feestypes.ModuleName])
 
 	exported, err := app.ExportAppStateAndValidators(false, nil, nil)
@@ -61,11 +55,11 @@ func TestUpgradeVersionMapValidationRejectsMissingOrFutureModuleVersion(t *testi
 	current := app.ModuleManager.GetVersionMap()
 
 	missing := cloneVersionMap(current)
-	delete(missing, tokenfactorytypes.ModuleName)
+	delete(missing, feestypes.ModuleName)
 	require.ErrorContains(t, ValidateUpgradeVersionMap(missing, current), "missing module version")
 
 	future := cloneVersionMap(current)
-	future[dextypes.ModuleName] = current[dextypes.ModuleName] + 1
+	future[feestypes.ModuleName] = current[feestypes.ModuleName] + 1
 	require.ErrorContains(t, ValidateUpgradeVersionMap(future, current), "newer than current version")
 
 	allowedNew := cloneVersionMap(current)

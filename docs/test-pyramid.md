@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Prototype Test Pyramid
 
 This matrix makes the working L1 flows observable across unit, integration, adversarial, e2e, determinism, and benchmark layers. It is the coverage companion to [Security And Testing Strategy](security-testing.md), [Prototype Transaction Lifecycle Matrix](transaction-lifecycle-matrix.md), [Prototype Tx Event Contract](event-contract.md), [Cosmos Security Audit Checklist](security/cosmos-security-checklist.md), and [Prototype Security And Determinism Audit Gate](security/prototype-audit-gate.md).

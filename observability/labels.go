@@ -82,7 +82,7 @@ var allowedLabelValues = map[string]map[string]struct{}{
 	},
 	"component": {"metrics": {}},
 	"denom":     {"naet": {}},
-	"module":    {"app": {}, "dex": {}, "fees": {}, "tokenfactory": {}},
+	"module":    {"app": {}, "dex": {}, "fees": {}, "contract-assets": {}},
 	"reason": {
 		"error":                           {},
 		"evidence_manipulation":           {},

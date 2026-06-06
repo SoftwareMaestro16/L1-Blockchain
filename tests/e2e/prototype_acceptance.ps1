@@ -170,22 +170,22 @@ try {
     -ExpectedLog "fee denom testtoken not accepted; use naet" | Out-Null
   Write-Host "wrong fee denom rejected"
 
-  Write-AcceptanceStep "tokenfactory create/mint/query"
-  Send-AcceptanceTx -Context $ctx -ActionArgs @("tx", "tokenfactory", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
+  Write-AcceptanceStep "contract-assets create/mint/query"
+  Send-AcceptanceTx -Context $ctx -ActionArgs @("tx", "contract-assets", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
   $factoryDenom = Get-AcceptanceFactoryDenom -Context $ctx -Subdenom $FactorySubdenom
-  $tfMeta = Invoke-AcceptanceQueryGrpcJson -Context $ctx -Arguments @("query", "tokenfactory", "denom", $factoryDenom)
+  $tfMeta = Invoke-AcceptanceQueryGrpcJson -Context $ctx -Arguments @("query", "contract-assets", "denom", $factoryDenom)
   if ([string]::IsNullOrWhiteSpace($tfMeta.metadata.admin)) {
-    throw "tokenfactory admin must not be empty"
+    throw "contract-assets admin must not be empty"
   }
-  Send-AcceptanceTx -Context $ctx -ActionArgs @("tx", "tokenfactory", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
+  Send-AcceptanceTx -Context $ctx -ActionArgs @("tx", "contract-assets", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
   $factoryBalance = Get-AcceptanceBalanceAmount -Context $ctx -Address $node0 -Denom $factoryDenom
   if ($factoryBalance -lt 100000000) {
     throw "factory balance after mint too low: $factoryBalance"
   }
   if ($EnableAPI) {
-    $tfRest = Invoke-AcceptanceRestJson -Context $ctx -Path "/l1/tokenfactory/v1/denom/$factoryDenom"
+    $tfRest = Invoke-AcceptanceRestJson -Context $ctx -Path "/l1/contract-assets/v1/denom/$factoryDenom"
     if ($tfRest.metadata.admin -ne $tfMeta.metadata.admin) {
-      throw "REST tokenfactory admin mismatch"
+      throw "REST contract-assets admin mismatch"
     }
   }
   Write-Host "factory denom $factoryDenom minted to node0"

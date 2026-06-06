@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Prototype Tx Event Contract
 
 Events are supporting evidence for e2e, CLI debugging, and future indexers. They do not replace final state queries. Every e2e assertion that checks a custom event must also verify committed state through a query or keeper/bank state in tests.

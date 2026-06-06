@@ -42,14 +42,6 @@ const (
 
 	MsgTypeBankSend      = "/cosmos.bank.v1beta1.MsgSend"
 	MsgTypeBankMultiSend = "/cosmos.bank.v1beta1.MsgMultiSend"
-	MsgTypeTFCreateDenom = "/l1.tokenfactory.v1.MsgCreateDenom"
-	MsgTypeTFMint        = "/l1.tokenfactory.v1.MsgMint"
-	MsgTypeTFBurn        = "/l1.tokenfactory.v1.MsgBurn"
-	MsgTypeTFChangeAdmin = "/l1.tokenfactory.v1.MsgChangeAdmin"
-	MsgTypeDexCreatePool = "/l1.dex.v1.MsgCreatePool"
-	MsgTypeDexAddLiq     = "/l1.dex.v1.MsgAddLiquidity"
-	MsgTypeDexRemoveLiq  = "/l1.dex.v1.MsgRemoveLiquidity"
-	MsgTypeDexSwapExact  = "/l1.dex.v1.MsgSwapExactAmountIn"
 
 	MsgTypeIdentityRegister = "/l1.identity.v1.MsgRegisterDomain"
 	MsgTypeIdentityRenew    = "/l1.identity.v1.MsgRenewDomain"
@@ -162,15 +154,7 @@ func ClassifyTx(msgType string) (TxClass, error) {
 		MsgTypeDistributionWithdrawV:
 		return TxClassStakingGovSecurity, nil
 	case MsgTypeBankSend,
-		MsgTypeBankMultiSend,
-		MsgTypeTFCreateDenom,
-		MsgTypeTFMint,
-		MsgTypeTFBurn,
-		MsgTypeTFChangeAdmin,
-		MsgTypeDexCreatePool,
-		MsgTypeDexAddLiq,
-		MsgTypeDexRemoveLiq,
-		MsgTypeDexSwapExact:
+		MsgTypeBankMultiSend:
 		return TxClassFinancial, nil
 	case MsgTypeIdentityRegister, MsgTypeIdentityRenew, MsgTypeIdentityResolver, MsgTypeIdentityReverse:
 		return TxClassIdentity, nil

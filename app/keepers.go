@@ -61,8 +61,6 @@ import (
 	crosschainregistrytypes "github.com/sovereign-l1/l1/x/cross-chain-registry/types"
 	delegatorprotectionkeeper "github.com/sovereign-l1/l1/x/delegator-protection/keeper"
 	delegatorprotectiontypes "github.com/sovereign-l1/l1/x/delegator-protection/types"
-	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
-	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	dynamiccommissionkeeper "github.com/sovereign-l1/l1/x/dynamic-commission/keeper"
 	dynamiccommissiontypes "github.com/sovereign-l1/l1/x/dynamic-commission/types"
 	emissionskeeper "github.com/sovereign-l1/l1/x/emissions/keeper"
@@ -107,8 +105,6 @@ import (
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
 	systemregistrykeeper "github.com/sovereign-l1/l1/x/system-registry/keeper"
 	systemregistrytypes "github.com/sovereign-l1/l1/x/system-registry/types"
-	tokenfactorykeeper "github.com/sovereign-l1/l1/x/tokenfactory/keeper"
-	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 	treasurykeeper "github.com/sovereign-l1/l1/x/treasury/keeper"
 	treasurytypes "github.com/sovereign-l1/l1/x/treasury/types"
 	validatorelectionkeeper "github.com/sovereign-l1/l1/x/validator-election/keeper"
@@ -269,18 +265,6 @@ func (app *L1App) initKeepers(
 	app.ValidatorElectionKeeper = validatorelectionkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorelectiontypes.StoreKey]))
 	app.ValidatorInsuranceKeeper = validatorinsurancekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorinsurancetypes.StoreKey]))
 	app.ValidatorRegistryKeeper = validatorregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorregistrytypes.StoreKey]))
-	app.TokenFactoryKeeper = tokenfactorykeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[tokenfactorytypes.StoreKey]),
-		app.BankKeeper,
-		govAuthority,
-	)
-	app.DexKeeper = dexkeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[dextypes.StoreKey]),
-		app.BankKeeper,
-		govAuthority,
-	)
 	app.BurnKeeper = burnkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[burntypes.StoreKey]),

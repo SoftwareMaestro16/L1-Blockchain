@@ -186,13 +186,13 @@ try {
   Send-SignedTx -ActionArgs @("tx", "bank", "send", "node0", $node1, "1naet") -FromHome $node0Home -Fees "" | Out-Null
   Write-Host "bank send with empty fee list is accepted by prototype localnet min-gas-prices"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "create-denom", "gold") -FromHome $node0Home -Fees $AcceptedFees | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", "gold") -FromHome $node0Home -Fees $AcceptedFees | Out-Null
   $factoryDenom = "factory/$node0/gold"
-  Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "tokenfactory", "denom", $factoryDenom, "--node", $rpcNode, "--output", "json") | Out-Null
-  Write-Host "tokenfactory create-denom with naet fee succeeded"
+  Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "contract-assets", "denom", $factoryDenom, "--node", $rpcNode, "--output", "json") | Out-Null
+  Write-Host "contract-assets create-denom with naet fee succeeded"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "create-denom", "badfee") -FromHome $node0Home -Fees $WrongFees -ExpectFailure -ExpectedLog $wrongFeeError | Out-Null
-  Write-Host "tokenfactory tx with wrong fee denom is rejected"
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", "badfee") -FromHome $node0Home -Fees $WrongFees -ExpectFailure -ExpectedLog $wrongFeeError | Out-Null
+  Write-Host "contract-assets tx with wrong fee denom is rejected"
 
   Send-SignedTx -ActionArgs @("tx", "dex", "create-pool", "1000naet", "1000testtoken") -FromHome $node0Home -Fees $AcceptedFees | Out-Null
   Invoke-LocalnetCliJson -Binary $Binary -Arguments @("query", "dex", "pool", "1", "--node", $rpcNode, "--output", "json") | Out-Null

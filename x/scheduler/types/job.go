@@ -113,7 +113,7 @@ func DefaultSchedulerParams() SchedulerParams {
 		HistoryRetention: 200,
 		AuthorizedModules: []string{
 			"aethercore",
-			"dex",
+			"avm-dex-contract",
 			"epoch",
 			"fees",
 			"load",
@@ -121,7 +121,7 @@ func DefaultSchedulerParams() SchedulerParams {
 			"networking",
 			"payments",
 			"routing",
-			"tokenfactory",
+			"contract-assets",
 			"zones",
 		},
 	}

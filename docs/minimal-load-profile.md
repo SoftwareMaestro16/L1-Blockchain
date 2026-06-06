@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Minimal Local Load Profile
 
 This profile records prototype baseline behavior under small, controlled local load. It is local/test-only evidence, not a production throughput claim.

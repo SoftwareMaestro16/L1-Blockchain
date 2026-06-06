@@ -1,3 +1,4 @@
+> Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # State Export/Import Acceptance
 
 Prototype state export/import is consensus-critical. The acceptance target is: after local prototype flows, exported genesis validates, contains no local secrets, preserves custom module state, and rejects corrupted import data with a clear validation error.

@@ -29,7 +29,7 @@ foreach ($column in @("Unit", "Integration", "Adversarial", "E2E Smoke", "Determ
 foreach ($flow in @(
     "App genesis/export/module accounts",
     "Fees ante and params",
-    "Tokenfactory denom lifecycle",
+    "Contract assets denom lifecycle",
     "DEX pool and swap lifecycle",
     "Query surface CLI/gRPC/REST",
     "PoS and bank native flow",
@@ -54,8 +54,8 @@ foreach ($risk in @(
 
 foreach ($testRef in @(
     "x/fees/keeper/ante_test.go",
-    "x/tokenfactory/keeper/msg_server_test.go",
-    "x/dex/keeper/msg_server_test.go",
+    "x/aetherisvm/standards/aft/keeper/msg_server_test.go",
+    "avm-dex-contract/keeper/msg_server_test.go",
     "x/*/keeper/query_server_test.go",
     "app/determinism_test.go",
     "tests/e2e/dex_smoke.ps1",

@@ -98,7 +98,7 @@ func HighPriorityBacklogItems() []BacklogItem {
 
 func MediumPriorityBacklogItems() []BacklogItem {
 	return []BacklogItem{
-		backlogItem(BacklogPriorityMedium, BacklogItemExtractFinancialZone, "Extract Financial Zone.", "Financial Zone adapter", []string{"bank routing", "fees routing", "tokenfactory routing", "DEX routing"}),
+		backlogItem(BacklogPriorityMedium, BacklogItemExtractFinancialZone, "Extract Financial Zone.", "Financial Zone adapter", []string{"bank routing", "fees routing", "contract-assets routing", "AVM AMM routing"}),
 		backlogItem(BacklogPriorityMedium, BacklogItemActivateIdentityZone, "Activate Identity Zone.", "Identity Zone adapter", []string{".aet registry", "resolver roots", "reverse lookup", "delegation state"}),
 		backlogItem(BacklogPriorityMedium, BacklogItemPerZoneMempoolLanes, "Implement per-zone mempool lanes.", "zonemempool", []string{"zone lane key", "shard sublane key", "message priority class"}),
 		backlogItem(BacklogPriorityMedium, BacklogItemPerShardFeeAccumulators, "Implement per-shard fee accumulators.", "zonefees", []string{"shard fee bucket", "end-block aggregation", "zone fee root"}),

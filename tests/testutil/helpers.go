@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
-	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 )
 
 func NewInitializedApp(t *testing.T, chainID string) *l1app.L1App {
@@ -131,21 +130,6 @@ func Commit(t *testing.T, app *l1app.L1App) {
 	t.Helper()
 	_, err := app.Commit()
 	require.NoError(t, err)
-}
-
-func AssertPoolAccounting(t *testing.T, app *l1app.L1App, ctx sdk.Context, pool dextypes.Pool) {
-	t.Helper()
-	reserve0, ok := sdkmath.NewIntFromString(pool.Reserve0)
-	require.True(t, ok)
-	reserve1, ok := sdkmath.NewIntFromString(pool.Reserve1)
-	require.True(t, ok)
-	totalShares, ok := sdkmath.NewIntFromString(pool.TotalShares)
-	require.True(t, ok)
-	moduleAddr := app.AccountKeeper.GetModuleAddress(dextypes.ModuleName)
-	require.NotNil(t, moduleAddr)
-	require.Equal(t, sdk.NewCoin(pool.Denom0, reserve0), app.BankKeeper.GetBalance(ctx, moduleAddr, pool.Denom0))
-	require.Equal(t, sdk.NewCoin(pool.Denom1, reserve1), app.BankKeeper.GetBalance(ctx, moduleAddr, pool.Denom1))
-	require.Equal(t, sdk.NewCoin(pool.LpDenom, totalShares), app.BankKeeper.GetSupply(ctx, pool.LpDenom))
 }
 
 func AccountNumberAndSequence(t *testing.T, app *l1app.L1App, ctx sdk.Context, addr sdk.AccAddress) (uint64, uint64) {

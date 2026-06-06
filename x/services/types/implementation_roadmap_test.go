@@ -223,7 +223,7 @@ func TestServiceRoadmapCanonicalHashesDetectTampering(t *testing.T) {
 	vector.CanonicalEncoding = "amino"
 	require.ErrorContains(t, vector.Validate(), "hash mismatch")
 
-	mapping := newAetraModuleServiceMapping("dex", "x/dex", "dex-service", true)
+	mapping := newAetraModuleServiceMapping("avm-dex-contract", "avm-dex-contract", "avm-dex-contract-service", true)
 	mapping.ServiceID = "other-service"
 	require.ErrorContains(t, mapping.Validate(), "hash mismatch")
 }

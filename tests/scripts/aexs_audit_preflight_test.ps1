@@ -97,8 +97,8 @@ try {
   foreach ($module in @(
       "app",
       "x/fees",
-      "x/tokenfactory",
-      "x/dex",
+      "x/aetherisvm/standards/aft",
+      "avm-dex-contract",
       "x/aetherisvm",
       "x/execution",
       "x/vm",
@@ -479,7 +479,7 @@ try {
   Assert-True ($exploitById["TXEXP-08"].exploit_path -match "multi-send") "TXEXP-08 must record multi-send partial failure"
   Assert-True ($exploitById["TXEXP-09"].exploit_path -match "double spend") "TXEXP-09 must record race-condition double spend"
   Assert-True ($exploitById["TXEXP-11"].exploit_path -match "zero address") "TXEXP-11 must record zero-address path"
-  Assert-True ($exploitById["TOKENEXP-01"].exploit_path -match "admin takeover") "TOKENEXP-01 must record tokenfactory admin takeover"
+  Assert-True ($exploitById["TOKENEXP-01"].exploit_path -match "admin takeover") "TOKENEXP-01 must record contract-assets admin takeover"
   Assert-True ($exploitById["TOKENEXP-02"].exploit_path -match "unauthorized burn") "TOKENEXP-02 must record unauthorized burn"
   Assert-True ($exploitById["TOKENEXP-03"].exploit_path -match "governance parameter changes") "TOKENEXP-03 must record governance inflation timing"
   Assert-True ($exploitById["TOKENEXP-04"].exploit_path -match "fee routing") "TOKENEXP-04 must record fee routing manipulation"
@@ -853,7 +853,7 @@ try {
   Assert-True ($atomicTaskById["FEES-03"].adversarial_simulation_result.attack_attempt -match "non-FeeTx bypass") "FEES-03 must record non-FeeTx bypass attack"
   Assert-True ($atomicTaskById["FEES-04"].invariant_tested -match "failed fee ante checks") "FEES-04 must record failed ante integrity invariant"
   Assert-True ($atomicTaskById["FEES-05"].adversarial_simulation_result.expected_rejection -match "validator reward accounting") "FEES-05 must record fee accounting manipulation rejection"
-  Assert-True ($atomicTaskById["TF-01"].function_or_flow_covered -match "create denom") "TF-01 must record tokenfactory lifecycle flow"
+  Assert-True ($atomicTaskById["TF-01"].function_or_flow_covered -match "create denom") "TF-01 must record contract-assets lifecycle flow"
   Assert-True ($atomicTaskById["TF-02"].adversarial_simulation_result.mutation_inputs -match "zero admin") "TF-02 must record zero admin mutation"
   Assert-True ($atomicTaskById["TF-03"].adversarial_simulation_result.attack_attempt -match "burn-from mismatch") "TF-03 must record burn-from mismatch attack"
   Assert-True ($atomicTaskById["TF-04"].invariant_tested -match "supply delta") "TF-04 must record exact supply delta invariant"

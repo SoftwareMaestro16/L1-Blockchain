@@ -32,10 +32,10 @@ function Assert-NotContains {
 $text = Get-Content -Raw -LiteralPath $EventContractPath
 
 foreach ($eventType in @(
-    'tokenfactory_create_denom',
-    'tokenfactory_mint',
-    'tokenfactory_burn',
-    'tokenfactory_change_admin',
+    'contract-assets_create_denom',
+    'contract-assets_mint',
+    'contract-assets_burn',
+    'contract-assets_change_admin',
     'dex_create_pool',
     'dex_add_liquidity',
     'dex_remove_liquidity',

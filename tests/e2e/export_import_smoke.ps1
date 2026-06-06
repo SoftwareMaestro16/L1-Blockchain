@@ -186,11 +186,11 @@ try {
   Assert-True ([int64]$delegation.delegation_response.balance.amount -eq 5000000) "staking delegation query did not preserve expected amount"
   Write-Host "staking delegate flow committed"
 
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
-  Send-SignedTx -ActionArgs @("tx", "tokenfactory", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
-  $tfQuery = Invoke-QueryCliJson -Arguments @("query", "tokenfactory", "denom", $factoryDenom)
-  Assert-True ($tfQuery.metadata.admin -eq $node0) "tokenfactory admin query mismatch"
-  Write-Host "tokenfactory create/mint flow committed for $factoryDenom"
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
+  Send-SignedTx -ActionArgs @("tx", "contract-assets", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
+  $tfQuery = Invoke-QueryCliJson -Arguments @("query", "contract-assets", "denom", $factoryDenom)
+  Assert-True ($tfQuery.metadata.admin -eq $node0) "contract-assets admin query mismatch"
+  Write-Host "contract-assets create/mint flow committed for $factoryDenom"
 
   Send-SignedTx -ActionArgs @("tx", "dex", "create-pool", "10000000naet", "10000000$factoryDenom") -FromHome $node0Home | Out-Null
   $poolQuery = Invoke-QueryCliJson -Arguments @("query", "dex", "pool", "1")
@@ -216,9 +216,9 @@ try {
   Assert-True (@($genesis.app_state.fees.params.allowed_fee_denoms).Count -eq 1) "exported fees allowed denoms count mismatch"
   Assert-True (@($genesis.app_state.fees.params.allowed_fee_denoms) -contains "naet") "exported fees params missing naet"
 
-  $exportedDenom = @($genesis.app_state.tokenfactory.denoms | Where-Object { $_.denom -eq $factoryDenom } | Select-Object -First 1)
-  Assert-True ($exportedDenom.Count -eq 1) "exported tokenfactory denom missing"
-  Assert-True ($exportedDenom[0].admin -eq $node0) "exported tokenfactory admin mismatch"
+  $exportedDenom = @($genesis.app_state.contract-assets.denoms | Where-Object { $_.denom -eq $factoryDenom } | Select-Object -First 1)
+  Assert-True ($exportedDenom.Count -eq 1) "exported contract-assets denom missing"
+  Assert-True ($exportedDenom[0].admin -eq $node0) "exported contract-assets admin mismatch"
 
   $exportedPool = @($genesis.app_state.dex.pools | Where-Object { [int64]$_.id -eq 1 } | Select-Object -First 1)
   Assert-True ($exportedPool.Count -eq 1) "exported DEX pool 1 missing"
@@ -236,7 +236,7 @@ try {
   $exportedDelegation = @($genesis.app_state.staking.delegations | Where-Object { $_.delegator_address -eq $node0 -and $_.validator_address -eq $validator.operator_address } | Select-Object -First 1)
   Assert-True ($exportedDelegation.Count -eq 1) "exported staking delegation missing"
   Assert-True ($exportedDelegation[0].shares -match '^5000000(\.0+)?$') "exported staking delegation shares mismatch"
-  Write-Host "exported genesis preserves bank, staking, fees, tokenfactory, and DEX state"
+  Write-Host "exported genesis preserves bank, staking, fees, contract-assets, and DEX state"
 
   $corruptPath = Join-Path $ExportDir "node0-export-corrupt.json"
   $genesis.app_state.dex.pools[0].reserve0 = "not-an-int"

@@ -27,7 +27,7 @@ Assert-Contains -Text $scriptText -Pattern 'non-local chain-id' -Message "fundin
 Assert-Contains -Text $scriptText -Pattern 'Wait-LocalnetRpc' -Message "funding script must verify local RPC status"
 Assert-Contains -Text $scriptText -Pattern 'Send-LocalnetBankTx' -Message "funding script must use normal bank send helper"
 Assert-Contains -Text $helperText -Pattern '"--keyring-backend",\s*"test"' -Message "funding path helper must use local test keyring"
-Assert-NotContains -Text $scriptText -Pattern 'MintCoins|tokenfactory mint|add-genesis-account|gentx|mnemonic|private_key' -Message "funding script must not mint, edit genesis, or expose secrets"
+Assert-NotContains -Text $scriptText -Pattern 'MintCoins|contract-assets mint|add-genesis-account|gentx|mnemonic|private_key' -Message "funding script must not mint, edit genesis, or expose secrets"
 
 foreach ($term in @(
     "local-only",
