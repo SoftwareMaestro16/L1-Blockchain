@@ -9,19 +9,31 @@ import (
 func TestDefaultEconomicGovernanceSurfaceIsComplete(t *testing.T) {
 	report := BuildEconomicGovernanceSurfaceReport(nil)
 	require.True(t, report.Passed, report.Failed)
-	require.Len(t, report.Parameters, 21)
+	require.Len(t, report.Parameters, 46)
 	require.Equal(t, 8, report.RequiredInflation)
 	require.Equal(t, 5, report.RequiredBurn)
 	require.Equal(t, 8, report.RequiredFee)
+	require.Equal(t, 10, report.RequiredValidator)
+	require.Equal(t, 8, report.RequiredStorage)
+	require.Equal(t, 7, report.RequiredSecurity)
 	require.Equal(t, 8, report.CoveredInflation)
 	require.Equal(t, 5, report.CoveredBurn)
 	require.Equal(t, 8, report.CoveredFee)
+	require.Equal(t, 10, report.CoveredValidator)
+	require.Equal(t, 8, report.CoveredStorage)
+	require.Equal(t, 7, report.CoveredSecurity)
 	require.Equal(t, BasisPoints, report.InflationCoverageBps)
 	require.Equal(t, BasisPoints, report.BurnCoverageBps)
 	require.Equal(t, BasisPoints, report.FeeCoverageBps)
+	require.Equal(t, BasisPoints, report.ValidatorCoverageBps)
+	require.Equal(t, BasisPoints, report.StorageCoverageBps)
+	require.Equal(t, BasisPoints, report.SecurityCoverageBps)
 	require.Contains(t, report.GovernanceSummary, "inflation=8/8")
 	require.Contains(t, report.GovernanceSummary, "burn=5/5")
 	require.Contains(t, report.GovernanceSummary, "fee=8/8")
+	require.Contains(t, report.GovernanceSummary, "validator=10/10")
+	require.Contains(t, report.GovernanceSummary, "storage=8/8")
+	require.Contains(t, report.GovernanceSummary, "security=7/7")
 
 	for _, param := range report.Parameters {
 		require.True(t, param.Required)
@@ -106,4 +118,26 @@ func TestEconomicGovernanceSurfaceRejectsUnknownCategoryAndBlankID(t *testing.T)
 	require.False(t, report.Passed)
 	require.Contains(t, report.Failed, "unknown:unknown_governance_category")
 	require.Contains(t, report.Failed, "governance_parameter_id_required")
+}
+
+func TestEconomicGovernanceSurfaceCoversValidatorStorageAndSecurityParameters(t *testing.T) {
+	params := DefaultEconomicGovernanceParameters()
+	filtered := make([]EconomicGovernanceParameter, 0, len(params)-3)
+	for _, param := range params {
+		switch param.ID {
+		case GovernanceParamEpochLength, GovernanceParamRentRate, GovernanceParamCircuitBreakerThresholds:
+			continue
+		default:
+			filtered = append(filtered, param)
+		}
+	}
+
+	report := BuildEconomicGovernanceSurfaceReport(filtered)
+	require.False(t, report.Passed)
+	require.Contains(t, report.Failed, GovernanceParamEpochLength+":missing_required_governance_parameter")
+	require.Contains(t, report.Failed, GovernanceParamRentRate+":missing_required_governance_parameter")
+	require.Contains(t, report.Failed, GovernanceParamCircuitBreakerThresholds+":missing_required_governance_parameter")
+	require.Less(t, report.ValidatorCoverageBps, BasisPoints)
+	require.Less(t, report.StorageCoverageBps, BasisPoints)
+	require.Less(t, report.SecurityCoverageBps, BasisPoints)
 }

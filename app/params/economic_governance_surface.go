@@ -10,28 +10,56 @@ const (
 	EconomicGovernanceCategoryInflation = "inflation"
 	EconomicGovernanceCategoryBurn      = "burn"
 	EconomicGovernanceCategoryFee       = "fee"
+	EconomicGovernanceCategoryValidator = "validator"
+	EconomicGovernanceCategoryStorage   = "storage"
+	EconomicGovernanceCategorySecurity  = "security"
 
-	GovernanceParamMinimumInflation            = "minimum_inflation"
-	GovernanceParamTargetInflation             = "target_inflation"
-	GovernanceParamMaximumInflation            = "maximum_inflation"
-	GovernanceParamPerWindowAdjustmentLimit    = "per_window_adjustment_limit"
-	GovernanceParamSmoothingWindow             = "smoothing_window"
-	GovernanceParamTargetStakeRatio            = "target_stake_ratio"
-	GovernanceParamValidatorRewardFloor        = "validator_reward_floor"
-	GovernanceParamNetIssuanceFloor            = "net_issuance_floor"
-	GovernanceParamFeeBurnAllocation           = "fee_burn_allocation"
-	GovernanceParamSlashingBurnAllocation      = "slashing_burn_allocation"
-	GovernanceParamBurnCapPerEpoch             = "burn_cap_per_epoch"
-	GovernanceParamBurnActivationThreshold     = "burn_activation_threshold"
-	GovernanceParamDeflationGuardThreshold     = "deflation_guard_threshold"
-	GovernanceParamMinimumBaseFee              = "minimum_base_fee"
-	GovernanceParamMaximumBaseFee              = "maximum_base_fee"
-	GovernanceParamTargetBlockUtilization      = "target_block_utilization"
-	GovernanceParamMaxFeeAdjustmentPerWindow   = "maximum_fee_adjustment_per_window"
-	GovernanceParamCongestionMultiplierBounds  = "congestion_multiplier_bounds"
-	GovernanceParamSenderLocalSurcharge        = "sender_local_surcharge_parameters"
-	GovernanceParamResourceSpecificMultipliers = "resource_specific_multipliers"
-	GovernanceParamFeeAllocationBucketWeights  = "fee_allocation_bucket_weights"
+	GovernanceParamMinimumInflation                  = "minimum_inflation"
+	GovernanceParamTargetInflation                   = "target_inflation"
+	GovernanceParamMaximumInflation                  = "maximum_inflation"
+	GovernanceParamPerWindowAdjustmentLimit          = "per_window_adjustment_limit"
+	GovernanceParamSmoothingWindow                   = "smoothing_window"
+	GovernanceParamTargetStakeRatio                  = "target_stake_ratio"
+	GovernanceParamValidatorRewardFloor              = "validator_reward_floor"
+	GovernanceParamNetIssuanceFloor                  = "net_issuance_floor"
+	GovernanceParamFeeBurnAllocation                 = "fee_burn_allocation"
+	GovernanceParamSlashingBurnAllocation            = "slashing_burn_allocation"
+	GovernanceParamBurnCapPerEpoch                   = "burn_cap_per_epoch"
+	GovernanceParamBurnActivationThreshold           = "burn_activation_threshold"
+	GovernanceParamDeflationGuardThreshold           = "deflation_guard_threshold"
+	GovernanceParamMinimumBaseFee                    = "minimum_base_fee"
+	GovernanceParamMaximumBaseFee                    = "maximum_base_fee"
+	GovernanceParamTargetBlockUtilization            = "target_block_utilization"
+	GovernanceParamMaxFeeAdjustmentPerWindow         = "maximum_fee_adjustment_per_window"
+	GovernanceParamCongestionMultiplierBounds        = "congestion_multiplier_bounds"
+	GovernanceParamSenderLocalSurcharge              = "sender_local_surcharge_parameters"
+	GovernanceParamResourceSpecificMultipliers       = "resource_specific_multipliers"
+	GovernanceParamFeeAllocationBucketWeights        = "fee_allocation_bucket_weights"
+	GovernanceParamMinimumSelfDelegation             = "minimum_self_delegation"
+	GovernanceParamMaximumValidatorCommission        = "maximum_validator_commission"
+	GovernanceParamMaxCommissionChangeInterval       = "maximum_commission_change_per_interval"
+	GovernanceParamActiveValidatorTarget             = "active_validator_target"
+	GovernanceParamActiveValidatorMaximum            = "active_validator_maximum"
+	GovernanceParamEpochLength                       = "epoch_length"
+	GovernanceParamValidatorScoreWeights             = "validator_score_weights"
+	GovernanceParamConcentrationSoftCap              = "concentration_soft_cap"
+	GovernanceParamRewardDampeningCurve              = "reward_dampening_curve"
+	GovernanceParamBootstrapEligibility              = "bootstrap_eligibility_parameters"
+	GovernanceParamStateWriteFeePerByte              = "state_write_fee_per_byte"
+	GovernanceParamStateUpdateFeePerByte             = "state_update_fee_per_byte"
+	GovernanceParamDeleteRefundCap                   = "delete_refund_cap"
+	GovernanceParamDeleteRefundDecay                 = "delete_refund_decay"
+	GovernanceParamRentRate                          = "rent_rate"
+	GovernanceParamRentGracePeriod                   = "rent_grace_period"
+	GovernanceParamStateGrowthSurchargeThreshold     = "state_growth_surcharge_threshold"
+	GovernanceParamStateMaintenanceReserveAllocation = "state_maintenance_reserve_allocation"
+	GovernanceParamSlashingSeverityRates             = "slashing_severity_rates"
+	GovernanceParamRepeatOffenseMultiplier           = "repeat_offense_multiplier"
+	GovernanceParamRepeatOffenseDecay                = "repeat_offense_decay"
+	GovernanceParamReporterRewardAllocation          = "reporter_reward_allocation"
+	GovernanceParamReporterRewardCap                 = "reporter_reward_cap"
+	GovernanceParamSecurityReserveAllocation         = "security_reserve_allocation"
+	GovernanceParamCircuitBreakerThresholds          = "circuit_breaker_thresholds"
 )
 
 type EconomicGovernanceParameter struct {
@@ -54,12 +82,21 @@ type EconomicGovernanceSurfaceReport struct {
 	RequiredInflation    int
 	RequiredBurn         int
 	RequiredFee          int
+	RequiredValidator    int
+	RequiredStorage      int
+	RequiredSecurity     int
 	CoveredInflation     int
 	CoveredBurn          int
 	CoveredFee           int
+	CoveredValidator     int
+	CoveredStorage       int
+	CoveredSecurity      int
 	InflationCoverageBps int64
 	BurnCoverageBps      int64
 	FeeCoverageBps       int64
+	ValidatorCoverageBps int64
+	StorageCoverageBps   int64
+	SecurityCoverageBps  int64
 	Passed               bool
 	Failed               []string
 	GovernanceSummary    string
@@ -88,6 +125,31 @@ func DefaultEconomicGovernanceParameters() []EconomicGovernanceParameter {
 		governanceParam(EconomicGovernanceCategoryFee, GovernanceParamSenderLocalSurcharge, "fee_market.sender_local_surcharge_bps", 0, DefaultMaxLoadMultiplierBps, "bps"),
 		governanceParam(EconomicGovernanceCategoryFee, GovernanceParamResourceSpecificMultipliers, "fee_market.resource_specific_multipliers_bps", 0, DefaultMaxLoadMultiplierBps, "bps"),
 		governanceParam(EconomicGovernanceCategoryFee, GovernanceParamFeeAllocationBucketWeights, "fee_market.bucket_weights_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategoryValidator, GovernanceParamMinimumSelfDelegation, "staking_enhancements.min_self_delegation", 0, 0, "naet"),
+		governanceParam(EconomicGovernanceCategoryValidator, GovernanceParamMaximumValidatorCommission, "staking_enhancements.max_validator_commission_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategoryValidator, GovernanceParamMaxCommissionChangeInterval, "validator_reputation.max_commission_change_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategoryValidator, GovernanceParamActiveValidatorTarget, "staking_enhancements.active_validator_target", 1, 10_000, "validators"),
+		governanceParam(EconomicGovernanceCategoryValidator, GovernanceParamActiveValidatorMaximum, "staking_enhancements.active_validator_maximum", 1, 10_000, "validators"),
+		governanceParam(EconomicGovernanceCategoryValidator, GovernanceParamEpochLength, "staking_enhancements.epoch_length_blocks", 1, 0, "blocks"),
+		governanceParam(EconomicGovernanceCategoryValidator, GovernanceParamValidatorScoreWeights, "staking_enhancements.score_weights_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategoryValidator, GovernanceParamConcentrationSoftCap, "staking_enhancements.concentration_soft_cap_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategoryValidator, GovernanceParamRewardDampeningCurve, "staking_enhancements.reward_dampening_curve_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategoryValidator, GovernanceParamBootstrapEligibility, "staking_enhancements.bootstrap_eligibility", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategoryStorage, GovernanceParamStateWriteFeePerByte, "storage_economy.state_write_fee_per_byte_naet", 0, 0, "naet_per_byte"),
+		governanceParam(EconomicGovernanceCategoryStorage, GovernanceParamStateUpdateFeePerByte, "storage_economy.state_update_fee_per_byte_naet", 0, 0, "naet_per_byte"),
+		governanceParam(EconomicGovernanceCategoryStorage, GovernanceParamDeleteRefundCap, "storage_economy.delete_refund_cap_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategoryStorage, GovernanceParamDeleteRefundDecay, "storage_economy.delete_refund_decay_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategoryStorage, GovernanceParamRentRate, "storage_economy.rent_rate_naet", 0, 0, "naet_per_byte_epoch"),
+		governanceParam(EconomicGovernanceCategoryStorage, GovernanceParamRentGracePeriod, "storage_economy.rent_grace_period_epochs", 0, 0, "epochs"),
+		governanceParam(EconomicGovernanceCategoryStorage, GovernanceParamStateGrowthSurchargeThreshold, "execution_state_economy.state_growth_surcharge_threshold_bytes", 0, 0, "bytes"),
+		governanceParam(EconomicGovernanceCategoryStorage, GovernanceParamStateMaintenanceReserveAllocation, "fee_market.state_maintenance_reserve_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategorySecurity, GovernanceParamSlashingSeverityRates, "economic_security.slashing_severity_rates_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategorySecurity, GovernanceParamRepeatOffenseMultiplier, "economic_security.repeat_offense_multiplier_bps", 0, DefaultMaxLoadMultiplierBps, "bps"),
+		governanceParam(EconomicGovernanceCategorySecurity, GovernanceParamRepeatOffenseDecay, "economic_security.repeat_offense_decay_epochs", 0, 0, "epochs"),
+		governanceParam(EconomicGovernanceCategorySecurity, GovernanceParamReporterRewardAllocation, "economic_security.reporter_reward_allocation_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategorySecurity, GovernanceParamReporterRewardCap, "economic_security.reporter_reward_cap_naet", 0, 0, "naet"),
+		governanceParam(EconomicGovernanceCategorySecurity, GovernanceParamSecurityReserveAllocation, "economic_security.security_reserve_allocation_bps", 0, BasisPoints, "bps"),
+		governanceParam(EconomicGovernanceCategorySecurity, GovernanceParamCircuitBreakerThresholds, "economic_security.circuit_breaker_thresholds_bps", 0, DefaultMaxLoadMultiplierBps, "bps"),
 	}
 }
 
@@ -100,20 +162,32 @@ func BuildEconomicGovernanceSurfaceReport(parameters []EconomicGovernanceParamet
 	inflationCoverage := coverageBps(covered[EconomicGovernanceCategoryInflation], required[EconomicGovernanceCategoryInflation])
 	burnCoverage := coverageBps(covered[EconomicGovernanceCategoryBurn], required[EconomicGovernanceCategoryBurn])
 	feeCoverage := coverageBps(covered[EconomicGovernanceCategoryFee], required[EconomicGovernanceCategoryFee])
+	validatorCoverage := coverageBps(covered[EconomicGovernanceCategoryValidator], required[EconomicGovernanceCategoryValidator])
+	storageCoverage := coverageBps(covered[EconomicGovernanceCategoryStorage], required[EconomicGovernanceCategoryStorage])
+	securityCoverage := coverageBps(covered[EconomicGovernanceCategorySecurity], required[EconomicGovernanceCategorySecurity])
 	return EconomicGovernanceSurfaceReport{
 		Parameters:           params,
 		RequiredInflation:    required[EconomicGovernanceCategoryInflation],
 		RequiredBurn:         required[EconomicGovernanceCategoryBurn],
 		RequiredFee:          required[EconomicGovernanceCategoryFee],
+		RequiredValidator:    required[EconomicGovernanceCategoryValidator],
+		RequiredStorage:      required[EconomicGovernanceCategoryStorage],
+		RequiredSecurity:     required[EconomicGovernanceCategorySecurity],
 		CoveredInflation:     covered[EconomicGovernanceCategoryInflation],
 		CoveredBurn:          covered[EconomicGovernanceCategoryBurn],
 		CoveredFee:           covered[EconomicGovernanceCategoryFee],
+		CoveredValidator:     covered[EconomicGovernanceCategoryValidator],
+		CoveredStorage:       covered[EconomicGovernanceCategoryStorage],
+		CoveredSecurity:      covered[EconomicGovernanceCategorySecurity],
 		InflationCoverageBps: inflationCoverage,
 		BurnCoverageBps:      burnCoverage,
 		FeeCoverageBps:       feeCoverage,
-		Passed:               len(failed) == 0 && inflationCoverage == BasisPoints && burnCoverage == BasisPoints && feeCoverage == BasisPoints,
+		ValidatorCoverageBps: validatorCoverage,
+		StorageCoverageBps:   storageCoverage,
+		SecurityCoverageBps:  securityCoverage,
+		Passed:               len(failed) == 0 && inflationCoverage == BasisPoints && burnCoverage == BasisPoints && feeCoverage == BasisPoints && validatorCoverage == BasisPoints && storageCoverage == BasisPoints && securityCoverage == BasisPoints,
 		Failed:               failed,
-		GovernanceSummary:    fmt.Sprintf("inflation=%d/%d burn=%d/%d fee=%d/%d coverage_bps=%d/%d/%d", covered[EconomicGovernanceCategoryInflation], required[EconomicGovernanceCategoryInflation], covered[EconomicGovernanceCategoryBurn], required[EconomicGovernanceCategoryBurn], covered[EconomicGovernanceCategoryFee], required[EconomicGovernanceCategoryFee], inflationCoverage, burnCoverage, feeCoverage),
+		GovernanceSummary:    fmt.Sprintf("inflation=%d/%d burn=%d/%d fee=%d/%d validator=%d/%d storage=%d/%d security=%d/%d coverage_bps=%d/%d/%d/%d/%d/%d", covered[EconomicGovernanceCategoryInflation], required[EconomicGovernanceCategoryInflation], covered[EconomicGovernanceCategoryBurn], required[EconomicGovernanceCategoryBurn], covered[EconomicGovernanceCategoryFee], required[EconomicGovernanceCategoryFee], covered[EconomicGovernanceCategoryValidator], required[EconomicGovernanceCategoryValidator], covered[EconomicGovernanceCategoryStorage], required[EconomicGovernanceCategoryStorage], covered[EconomicGovernanceCategorySecurity], required[EconomicGovernanceCategorySecurity], inflationCoverage, burnCoverage, feeCoverage, validatorCoverage, storageCoverage, securityCoverage),
 	}
 }
 
@@ -246,6 +320,37 @@ func requiredEconomicGovernanceParameterIDs() map[string][]string {
 			GovernanceParamSenderLocalSurcharge,
 			GovernanceParamResourceSpecificMultipliers,
 			GovernanceParamFeeAllocationBucketWeights,
+		},
+		EconomicGovernanceCategoryValidator: {
+			GovernanceParamMinimumSelfDelegation,
+			GovernanceParamMaximumValidatorCommission,
+			GovernanceParamMaxCommissionChangeInterval,
+			GovernanceParamActiveValidatorTarget,
+			GovernanceParamActiveValidatorMaximum,
+			GovernanceParamEpochLength,
+			GovernanceParamValidatorScoreWeights,
+			GovernanceParamConcentrationSoftCap,
+			GovernanceParamRewardDampeningCurve,
+			GovernanceParamBootstrapEligibility,
+		},
+		EconomicGovernanceCategoryStorage: {
+			GovernanceParamStateWriteFeePerByte,
+			GovernanceParamStateUpdateFeePerByte,
+			GovernanceParamDeleteRefundCap,
+			GovernanceParamDeleteRefundDecay,
+			GovernanceParamRentRate,
+			GovernanceParamRentGracePeriod,
+			GovernanceParamStateGrowthSurchargeThreshold,
+			GovernanceParamStateMaintenanceReserveAllocation,
+		},
+		EconomicGovernanceCategorySecurity: {
+			GovernanceParamSlashingSeverityRates,
+			GovernanceParamRepeatOffenseMultiplier,
+			GovernanceParamRepeatOffenseDecay,
+			GovernanceParamReporterRewardAllocation,
+			GovernanceParamReporterRewardCap,
+			GovernanceParamSecurityReserveAllocation,
+			GovernanceParamCircuitBreakerThresholds,
 		},
 	}
 }
