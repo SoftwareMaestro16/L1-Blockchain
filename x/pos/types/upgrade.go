@@ -1449,7 +1449,7 @@ func DefaultPoSModuleBoundaryManifest() PosModuleBoundaryManifest {
 				Owns:           []string{"epoch lifecycle", "phase transitions", "epoch seed", "epoch queries"},
 				ReadsModules:   []string{"staking"},
 				WritesModules:  []string{"epoch"},
-				QueryEndpoints: []string{"QueryCurrentEpoch", "QueryEpochHistory"},
+				QueryEndpoints: []string{"QueryCurrentEpoch", "QueryEpoch"},
 			},
 			{
 				ModuleName:     "validator_economy",
@@ -1457,7 +1457,7 @@ func DefaultPoSModuleBoundaryManifest() PosModuleBoundaryManifest {
 				Owns:           []string{"validator score", "effective stake", "stake saturation", "election ranking", "role eligibility"},
 				ReadsModules:   []string{"staking", "slashing", "performance"},
 				WritesModules:  []string{"validator_economy"},
-				QueryEndpoints: []string{"QueryValidatorScore", "QueryElectionRanking", "QueryValidatorSaturation", "QueryRoleEligibility"},
+				QueryEndpoints: []string{"QueryValidatorScore", "QueryValidatorEffectiveStake", "QueryValidatorSaturation", "QueryElectionRanking", "QueryValidatorRoleEligibility"},
 			},
 			{
 				ModuleName:     "taskgroups",
@@ -1465,7 +1465,7 @@ func DefaultPoSModuleBoundaryManifest() PosModuleBoundaryManifest {
 				Owns:           []string{"workload registry", "task group assignment", "proposer rotation", "verification groups"},
 				ReadsModules:   []string{"epoch", "validator_economy", "staking"},
 				WritesModules:  []string{"taskgroups"},
-				QueryEndpoints: []string{"QueryWorkloadRegistry", "QueryTaskGroup", "QueryProposerRotation", "QueryVerificationGroup"},
+				QueryEndpoints: []string{"QueryTaskGroup", "QueryTaskGroupsByValidator", "QueryProposerForSlot", "QueryWorkloadRegistry", "QueryVerificationGroup"},
 			},
 			{
 				ModuleName:     "evidence",
@@ -1473,7 +1473,7 @@ func DefaultPoSModuleBoundaryManifest() PosModuleBoundaryManifest {
 				Owns:           []string{"structured evidence records", "evidence deposits", "verification group decisions", "reporter rewards"},
 				ReadsModules:   []string{"taskgroups", "staking", "slashing"},
 				WritesModules:  []string{"evidence", "slashing", "distribution"},
-				QueryEndpoints: []string{"QueryEvidenceRecord", "QueryEvidenceDeposit", "QueryEvidenceDecision", "QueryReporterRewards"},
+				QueryEndpoints: []string{"QueryEvidence", "QueryEvidenceByValidator", "QueryEvidenceDeposit", "QueryEvidenceDecision", "QueryReporterRewards"},
 			},
 			{
 				ModuleName:     "performance",
@@ -1621,17 +1621,24 @@ func DefaultPosMessageQueryManifest() PosMessageQueryManifest {
 		},
 		Queries: []PosQuerySpec{
 			{ModuleName: "epoch", QueryName: "QueryCurrentEpoch", ResponseScope: "current epoch record", ConsistencyModel: "committed_state"},
+			{ModuleName: "epoch", QueryName: "QueryEpoch", ResponseScope: "epoch record by id", ConsistencyModel: "committed_state"},
 			{ModuleName: "epoch", QueryName: "QueryEpochHistory", ResponseScope: "historical epoch records", ConsistencyModel: "committed_state"},
 			{ModuleName: "validator_economy", QueryName: "QueryValidatorScore", ResponseScope: "validator score record", ConsistencyModel: "committed_state"},
+			{ModuleName: "validator_economy", QueryName: "QueryValidatorEffectiveStake", ResponseScope: "validator effective stake", ConsistencyModel: "committed_state"},
 			{ModuleName: "validator_economy", QueryName: "QueryElectionRanking", ResponseScope: "epoch election ranking", ConsistencyModel: "committed_state"},
 			{ModuleName: "validator_economy", QueryName: "QueryValidatorSaturation", ResponseScope: "stake saturation status", ConsistencyModel: "committed_state"},
+			{ModuleName: "validator_economy", QueryName: "QueryValidatorRoleEligibility", ResponseScope: "validator role eligibility state", ConsistencyModel: "committed_state"},
 			{ModuleName: "validator_economy", QueryName: "QueryRoleEligibility", ResponseScope: "role eligibility state", ConsistencyModel: "committed_state"},
 			{ModuleName: "taskgroups", QueryName: "QueryWorkloadRegistry", ResponseScope: "registered workloads", ConsistencyModel: "committed_state"},
 			{ModuleName: "taskgroups", QueryName: "QueryTaskGroup", ResponseScope: "task group record", ConsistencyModel: "committed_state"},
+			{ModuleName: "taskgroups", QueryName: "QueryTaskGroupsByValidator", ResponseScope: "task groups assigned to validator", ConsistencyModel: "committed_state"},
+			{ModuleName: "taskgroups", QueryName: "QueryProposerForSlot", ResponseScope: "canonical proposer for slot", ConsistencyModel: "committed_state"},
 			{ModuleName: "taskgroups", QueryName: "QueryProposerRotation", ResponseScope: "proposer priority and fallback order", ConsistencyModel: "committed_state"},
 			{ModuleName: "taskgroups", QueryName: "QueryVerificationGroup", ResponseScope: "task or evidence verification group", ConsistencyModel: "committed_state"},
 			{ModuleName: "taskgroups", QueryName: "QueryAssignmentProof", ResponseScope: "deterministic assignment proof", ConsistencyModel: "committed_state"},
 			{ModuleName: "taskgroups", QueryName: "QueryVerificationReceipt", ResponseScope: "verification receipt aggregation", ConsistencyModel: "committed_state"},
+			{ModuleName: "evidence", QueryName: "QueryEvidence", ResponseScope: "structured evidence record", ConsistencyModel: "committed_state"},
+			{ModuleName: "evidence", QueryName: "QueryEvidenceByValidator", ResponseScope: "evidence records by accused validator", ConsistencyModel: "committed_state"},
 			{ModuleName: "evidence", QueryName: "QueryEvidenceRecord", ResponseScope: "structured evidence record", ConsistencyModel: "committed_state"},
 			{ModuleName: "evidence", QueryName: "QueryEvidenceDeposit", ResponseScope: "evidence deposit accounting", ConsistencyModel: "committed_state"},
 			{ModuleName: "evidence", QueryName: "QueryEvidenceDecision", ResponseScope: "evidence decision votes", ConsistencyModel: "committed_state"},
@@ -1648,6 +1655,7 @@ func DefaultPosMessageQueryManifest() PosMessageQueryManifest {
 			{ModuleName: "delegation_market", QueryName: "QueryValidatorCommissionHistory", ResponseScope: "validator commission history", ConsistencyModel: "committed_state"},
 			{ModuleName: "delegation_market", QueryName: "QueryValidatorSlashHistory", ResponseScope: "validator slash history", ConsistencyModel: "committed_state"},
 			{ModuleName: "delegation_market", QueryName: "QueryValidatorPerformanceHistory", ResponseScope: "validator performance history", ConsistencyModel: "committed_state"},
+			{ModuleName: "delegation_market", QueryName: "QuerySlashableWindow", ResponseScope: "delegation slashable window", ConsistencyModel: "committed_state"},
 			{ModuleName: "collators", QueryName: "QueryCollatorRegistry", ResponseScope: "collator registry", ConsistencyModel: "committed_state"},
 			{ModuleName: "collators", QueryName: "QueryCollatorOutput", ResponseScope: "candidate collator output", ConsistencyModel: "committed_state"},
 			{ModuleName: "fishermen", QueryName: "QueryFishermanRegistry", ResponseScope: "fisherman registry", ConsistencyModel: "committed_state"},
@@ -1684,6 +1692,48 @@ func RequiredPosMessageNames() []string {
 		"MsgSubmitCollatorOutput",
 		"MsgRegisterFisherman",
 		"MsgSubmitFraudProof",
+	}
+}
+
+func RequiredPosQueryNames() []string {
+	return []string{
+		"QueryCurrentEpoch",
+		"QueryEpoch",
+		"QueryValidatorScore",
+		"QueryValidatorEffectiveStake",
+		"QueryValidatorSaturation",
+		"QueryElectionRanking",
+		"QueryTaskGroup",
+		"QueryTaskGroupsByValidator",
+		"QueryProposerForSlot",
+		"QueryEvidence",
+		"QueryEvidenceByValidator",
+		"QueryPerformanceRecord",
+		"QueryDelegationRiskExposure",
+		"QuerySlashableWindow",
+		"QuerySecurityMetrics",
+		"QueryValidatorRoleEligibility",
+	}
+}
+
+func requiredPosQueryKey(queryName string) string {
+	switch queryName {
+	case "QueryCurrentEpoch", "QueryEpoch":
+		return "epoch/" + queryName
+	case "QueryValidatorScore", "QueryValidatorEffectiveStake", "QueryValidatorSaturation", "QueryElectionRanking", "QueryValidatorRoleEligibility":
+		return "validator_economy/" + queryName
+	case "QueryTaskGroup", "QueryTaskGroupsByValidator", "QueryProposerForSlot":
+		return "taskgroups/" + queryName
+	case "QueryEvidence", "QueryEvidenceByValidator":
+		return "evidence/" + queryName
+	case "QueryPerformanceRecord":
+		return "performance/" + queryName
+	case "QueryDelegationRiskExposure", "QuerySlashableWindow":
+		return "delegation_market/" + queryName
+	case "QuerySecurityMetrics":
+		return "security_metrics/" + queryName
+	default:
+		return "/" + queryName
 	}
 }
 
@@ -1731,6 +1781,11 @@ func (m PosMessageQueryManifest) Validate(compatibility CosmosSDKCompatibilityMa
 			queriesByModule[query.ModuleName] = make(map[string]struct{})
 		}
 		queriesByModule[query.ModuleName][query.QueryName] = struct{}{}
+	}
+	for _, required := range RequiredPosQueryNames() {
+		if _, found := seenQueries[requiredPosQueryKey(required)]; !found {
+			return fmt.Errorf("required pos query %s is missing", required)
+		}
 	}
 	for _, boundary := range boundaries.Boundaries {
 		moduleQueries := queriesByModule[boundary.ModuleName]

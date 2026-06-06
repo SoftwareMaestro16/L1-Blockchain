@@ -134,17 +134,24 @@ func TestPoSModuleBoundariesMatchRequiredCompatibilityModules(t *testing.T) {
 	epoch, found := PoSModuleBoundaryByName(boundaries, "epoch")
 	require.True(t, found)
 	require.Equal(t, []string{"epoch lifecycle", "phase transitions", "epoch seed", "epoch queries"}, epoch.Owns)
+	require.Equal(t, []string{"QueryCurrentEpoch", "QueryEpoch"}, epoch.QueryEndpoints)
 	validatorEconomy, found := PoSModuleBoundaryByName(boundaries, "validator_economy")
 	require.True(t, found)
 	require.Equal(t, []string{"validator score", "effective stake", "stake saturation", "election ranking", "role eligibility"}, validatorEconomy.Owns)
+	require.Contains(t, validatorEconomy.QueryEndpoints, "QueryValidatorEffectiveStake")
+	require.Contains(t, validatorEconomy.QueryEndpoints, "QueryValidatorRoleEligibility")
 	taskgroups, found := PoSModuleBoundaryByName(boundaries, "taskgroups")
 	require.True(t, found)
 	require.Equal(t, []string{"workload registry", "task group assignment", "proposer rotation", "verification groups"}, taskgroups.Owns)
+	require.Contains(t, taskgroups.QueryEndpoints, "QueryTaskGroupsByValidator")
+	require.Contains(t, taskgroups.QueryEndpoints, "QueryProposerForSlot")
 	evidence, found := PoSModuleBoundaryByName(boundaries, "evidence")
 	require.True(t, found)
 	require.Equal(t, []string{"structured evidence records", "evidence deposits", "verification group decisions", "reporter rewards"}, evidence.Owns)
 	require.Contains(t, evidence.WritesModules, "slashing")
 	require.Contains(t, evidence.WritesModules, "distribution")
+	require.Contains(t, evidence.QueryEndpoints, "QueryEvidence")
+	require.Contains(t, evidence.QueryEndpoints, "QueryEvidenceByValidator")
 	performance, found := PoSModuleBoundaryByName(boundaries, "performance")
 	require.True(t, found)
 	require.Equal(t, []string{"uptime", "latency", "correctness", "task completion", "reward multipliers"}, performance.Owns)
@@ -188,6 +195,11 @@ func TestPosMessageQueryManifestCoversMessagesAndBoundaryQueries(t *testing.T) {
 		_, found := PosMessageByName(manifest, messageName)
 		require.True(t, found, messageName)
 	}
+	for _, queryName := range RequiredPosQueryNames() {
+		query, found := PosQueryByName(manifest, requiredPosQueryModule(queryName), queryName)
+		require.True(t, found, queryName)
+		require.Equal(t, "committed_state", query.ConsistencyModel)
+	}
 
 	startEpoch, found := PosMessageByName(manifest, "MsgStartEpoch")
 	require.True(t, found)
@@ -212,6 +224,8 @@ func TestPosMessageQueryManifestCoversMessagesAndBoundaryQueries(t *testing.T) {
 		}
 	}
 	_, found = PosQueryByName(manifest, "delegation_market", "QueryDelegationRiskExposure")
+	require.True(t, found)
+	_, found = PosQueryByName(manifest, "delegation_market", "QuerySlashableWindow")
 	require.True(t, found)
 	_, found = PosQueryByName(manifest, "security_metrics", "QueryCentralizationDashboard")
 	require.True(t, found)
@@ -245,6 +259,17 @@ func TestPosMessageQueryManifestRejectsMissingDuplicateAndUnknownEntries(t *test
 	missingBoundaryQuery.Queries = missingBoundaryQuery.Queries[1:]
 	missingBoundaryQuery.Root = ComputePosMessageQueryRoot(missingBoundaryQuery)
 	require.ErrorContains(t, missingBoundaryQuery.Validate(compatibility, boundaries), "QueryCurrentEpoch")
+
+	missingRequiredQuery := manifest
+	missingRequiredQuery.Queries = append([]PosQuerySpec{}, manifest.Queries...)
+	for i, query := range missingRequiredQuery.Queries {
+		if query.QueryName == "QuerySlashableWindow" {
+			missingRequiredQuery.Queries = append(missingRequiredQuery.Queries[:i], missingRequiredQuery.Queries[i+1:]...)
+			break
+		}
+	}
+	missingRequiredQuery.Root = ComputePosMessageQueryRoot(missingRequiredQuery)
+	require.ErrorContains(t, missingRequiredQuery.Validate(compatibility, boundaries), "QuerySlashableWindow")
 
 	badPhase := manifest
 	badPhase.Messages = append([]PosMessageSpec{}, manifest.Messages...)
@@ -2458,6 +2483,10 @@ func posBoundaryModuleNames(manifest PosModuleBoundaryManifest) []string {
 		out[i] = boundary.ModuleName
 	}
 	return out
+}
+
+func requiredPosQueryModule(queryName string) string {
+	return strings.Split(requiredPosQueryKey(queryName), "/")[0]
 }
 
 func keeperInterfacesByName(manifest KeeperIntegrationManifest) map[string]KeeperInterfaceSpec {
