@@ -1199,6 +1199,187 @@ func TestAetherMeshRouteUsesOverlayAndServicePeers(t *testing.T) {
 	require.NotEmpty(t, delivery.Route.TargetNodeIDs)
 }
 
+func TestExecutionZoneMessageRequiresCommittedScheduleForConsensusOrder(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	origin := signedNodeRecord(t, 0x63, salt, 100, NodeRoleZoneExecution)
+	destination := signedNodeRecord(t, 0x64, salt, 100, NodeRoleZoneExecution)
+	desc := defaultOverlayByType(t, OverlayTypeExecution)
+	mesh, err := NewAetherMeshMessage(AetherMeshMessage{
+		Type:              MeshMessageExecution,
+		Payload:           []byte("execution-zone-payload"),
+		Origin:            origin.NodeID,
+		Destination:       destination.NodeID,
+		Priority:          PriorityForChannel(ChannelExecution),
+		TTL:               40,
+		OverlayID:         desc.OverlayID,
+		DestinationZone:   "APPLICATION_ZONE",
+		Sequence:          7,
+		ConsensusEffect:   true,
+		DeterminismSource: DeterminismCommittedState,
+		Proof: AetherMeshProof{
+			ProofType:   "committed-schedule",
+			ProofHash:   HashParts("execution-proof"),
+			ProofHeight: 30,
+		},
+	})
+	require.NoError(t, err)
+	uncommitted, err := NewExecutionMessageSchedule(ExecutionMessageSchedule{
+		ZoneID:            "APPLICATION_ZONE",
+		ShardID:           "shard-1",
+		RoutingClass:      ExecutionRoutingExecutionOverlay,
+		Ordered:           true,
+		MessageIDs:        []string{mesh.MessageID},
+		FirstZoneSequence: 7,
+		LastZoneSequence:  7,
+	})
+	require.NoError(t, err)
+
+	_, err = NewExecutionZoneMessage(ExecutionZoneMessage{
+		Message:                mesh,
+		RoutingClass:           ExecutionRoutingExecutionOverlay,
+		ZoneID:                 "APPLICATION_ZONE",
+		ShardID:                "shard-1",
+		ExecutionOverlayID:     desc.OverlayID,
+		ZoneSequence:           7,
+		NetworkDeliveryOrdinal: 99,
+		ConsensusScheduleOrder: 1,
+	}, uncommitted)
+	require.ErrorContains(t, err, "committed schedule")
+
+	committed, err := NewExecutionMessageSchedule(ExecutionMessageSchedule{
+		ZoneID:            "APPLICATION_ZONE",
+		ShardID:           "shard-1",
+		RoutingClass:      ExecutionRoutingExecutionOverlay,
+		Committed:         true,
+		Ordered:           true,
+		MessageIDs:        []string{mesh.MessageID},
+		FirstZoneSequence: 7,
+		LastZoneSequence:  7,
+	})
+	require.NoError(t, err)
+	executionMsg, err := NewExecutionZoneMessage(ExecutionZoneMessage{
+		Message:                mesh,
+		RoutingClass:           ExecutionRoutingExecutionOverlay,
+		ZoneID:                 "APPLICATION_ZONE",
+		ShardID:                "shard-1",
+		ExecutionOverlayID:     desc.OverlayID,
+		ZoneSequence:           7,
+		NetworkDeliveryOrdinal: 99,
+		ConsensusScheduleOrder: 1,
+	}, committed)
+	require.NoError(t, err)
+	require.NotEqual(t, executionMsg.NetworkDeliveryOrdinal, executionMsg.ConsensusScheduleOrder)
+	require.Equal(t, committed.ScheduleID, executionMsg.ConsensusScheduleID)
+}
+
+func TestExecutionZoneMessageSupportsAsyncParallelBlockSTMGroups(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	origin := signedNodeRecord(t, 0x65, salt, 100, NodeRoleZoneExecution)
+	destination := signedNodeRecord(t, 0x66, salt, 100, NodeRoleZoneExecution)
+	desc := defaultOverlayByType(t, OverlayTypeExecution)
+	mesh, err := NewAetherMeshMessage(AetherMeshMessage{
+		Type:            MeshMessageExecution,
+		Payload:         []byte("async-execution"),
+		Origin:          origin.NodeID,
+		Destination:     destination.NodeID,
+		Priority:        PriorityForChannel(ChannelExecution),
+		TTL:             40,
+		OverlayID:       desc.OverlayID,
+		DestinationZone: "APPLICATION_ZONE",
+		Sequence:        8,
+	})
+	require.NoError(t, err)
+
+	_, err = NewExecutionZoneMessage(ExecutionZoneMessage{
+		Message:               mesh,
+		RoutingClass:          ExecutionRoutingShard,
+		ZoneID:                "APPLICATION_ZONE",
+		ShardID:               "shard-2",
+		ExecutionOverlayID:    desc.OverlayID,
+		ExecutionGroupID:      HashParts("async-group"),
+		ZoneSequence:          8,
+		Async:                 true,
+		ParallelZoneExecution: true,
+	}, ExecutionMessageSchedule{})
+	require.ErrorContains(t, err, "BlockSTM")
+
+	executionMsg, err := NewExecutionZoneMessage(ExecutionZoneMessage{
+		Message:               mesh,
+		RoutingClass:          ExecutionRoutingShard,
+		ZoneID:                "APPLICATION_ZONE",
+		ShardID:               "shard-2",
+		ExecutionOverlayID:    desc.OverlayID,
+		ExecutionGroupID:      HashParts("async-group"),
+		BlockSTMGroupID:       HashParts("blockstm-group"),
+		ZoneSequence:          8,
+		Async:                 true,
+		ParallelZoneExecution: true,
+	}, ExecutionMessageSchedule{})
+	require.NoError(t, err)
+	require.True(t, executionMsg.Async)
+	require.True(t, executionMsg.ParallelZoneExecution)
+}
+
+func TestCrossZoneMessageRequiresSequenceExpiryAndReplayProtection(t *testing.T) {
+	msg := CrossZoneMessage{
+		SourceZone:      "APPLICATION_ZONE",
+		DestinationZone: "FINANCIAL_ZONE",
+		MessageHash:     HashParts("cross-zone-message"),
+		ExpiryHeight:    90,
+		ReceiptPolicy:   ReceiptPolicyOnExecution,
+		ProofRequired:   true,
+	}
+	_, err := NewCrossZoneMessage(msg)
+	require.ErrorContains(t, err, "source sequence")
+
+	msg.SourceSequence = 11
+	created, err := NewCrossZoneMessage(msg)
+	require.NoError(t, err)
+	require.NotEmpty(t, ComputeCrossZoneExecutionKey(created))
+
+	guard := CrossZoneReplayGuard{}
+	guard, err = guard.Accept(created, 20)
+	require.NoError(t, err)
+	require.Len(t, guard.ExecutedKeys, 1)
+	_, err = guard.Accept(created, 21)
+	require.ErrorContains(t, err, "already executed")
+
+	_, err = guard.Accept(created, 91)
+	require.ErrorContains(t, err, "expired")
+}
+
+func TestCrossZoneReceiptIsRollbackSafeAndProofQueryable(t *testing.T) {
+	receipt := CrossZoneReceipt{
+		SourceZone:      "APPLICATION_ZONE",
+		DestinationZone: "FINANCIAL_ZONE",
+		SourceSequence:  11,
+		MessageHash:     HashParts("cross-zone-message"),
+		Status:          CrossZoneReceiptExecuted,
+		ReceiptPolicy:   ReceiptPolicyAlways,
+		ProofHash:       HashParts("cross-zone-receipt-proof"),
+		ReceiptHeight:   35,
+		RollbackSafe:    true,
+		ProofQueryable:  true,
+	}
+	created, err := NewCrossZoneReceipt(receipt)
+	require.NoError(t, err)
+	require.Equal(t, ComputeCrossZoneReceiptID(created), created.ReceiptID)
+
+	broken := created
+	broken.RollbackSafe = false
+	broken.ReceiptID = ComputeCrossZoneReceiptID(broken)
+	require.ErrorContains(t, broken.Validate(), "rollback-safe")
+
+	bounced := receipt
+	bounced.Status = CrossZoneReceiptBounced
+	_, err = NewCrossZoneReceipt(bounced)
+	require.ErrorContains(t, err, "bounced")
+
+	bounced.Bounced = true
+	_, err = NewCrossZoneReceipt(bounced)
+	require.NoError(t, err)
+}
+
 func TestLayerStackPreservesCometBFTBaselineAndExtensionOrder(t *testing.T) {
 	stack := DefaultLayerStack()
 	require.NoError(t, ValidateLayerStack(stack))
