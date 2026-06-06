@@ -1,8 +1,8 @@
-# Aetheris Blockchain
+# Aetra Blockchain
 
-Aetheris is a sovereign Cosmos SDK Layer 1 blockchain implemented in Go. The repository lives at [SoftwareMaestro16/Aetra-Blockchain](https://github.com/SoftwareMaestro16/Aetra-Blockchain).
+Aetra is a sovereign Cosmos SDK Layer 1 blockchain implemented in Go. The repository lives at [SoftwareMaestro16/Aetra-Blockchain](https://github.com/SoftwareMaestro16/Aetra-Blockchain).
 
-The native asset is **Aetheris (`AET`)**. On chain it is represented as the base denomination `naet`, where:
+The native asset is **Aetra (`AET`)**. On chain it is represented as the base denomination `naet`, where:
 
 ```text
 1 AET = 1,000,000,000 naet
@@ -10,7 +10,7 @@ The native asset is **Aetheris (`AET`)**. On chain it is represented as the base
 
 This codebase is a fast-moving prototype and testnet-preparation chain. It already boots as a Cosmos SDK application with PoS, native fees, staking, governance, custom modules, system entities, genesis validation, export/import tests, and localnet scripts. It is not mainnet-ready yet.
 
-Local Aetheris validator/full nodes do not require Redis or PostgreSQL for consensus, mempool, or application state.
+Local Aetra validator/full nodes do not require Redis or PostgreSQL for consensus, mempool, or application state.
 
 ## Current Surface
 
@@ -18,7 +18,7 @@ Local Aetheris validator/full nodes do not require Redis or PostgreSQL for conse
 flowchart TD
   USER["CLI / REST / gRPC clients"] --> RPC["CometBFT RPC and app query servers"]
   RPC --> CONSENSUS["CometBFT consensus, mempool, CheckTx, DeliverTx"]
-  CONSENSUS --> ANTE["Aetheris ante admission: signatures, fees, reserved-address policy"]
+  CONSENSUS --> ANTE["Aetra ante admission: signatures, fees, reserved-address policy"]
   ANTE --> CORE["Cosmos SDK core: auth, bank, staking, slashing, distribution, gov, mint"]
   CORE --> ECON["Native economy: fees, fee collector, treasury, burn, emissions, mint authority"]
   CORE --> POS["Validator surface: staking, validator registry/election, insurance, protection, reputation"]
@@ -36,10 +36,10 @@ A normal transaction follows this path:
 
 1. The user signs and broadcasts through `aetherisd`, REST, gRPC, or CometBFT RPC.
 2. CometBFT admits it into mempool and later proposes it in a block.
-3. Aetheris ante validation runs before message execution.
+3. Aetra ante validation runs before message execution.
 4. The fee decorator enforces native `naet` fee policy, bounded dynamic fees, signer policy, fee payer policy, and reserved system address restrictions.
 5. Cosmos SDK auth verifies signatures and account sequence.
-6. Messages route to module keepers such as `bank`, `staking`, `gov`, `tokenfactory`, `dex`, `burn`, `treasury`, `fees`, and the Aetheris native modules.
+6. Messages route to module keepers such as `bank`, `staking`, `gov`, `tokenfactory`, `dex`, `burn`, `treasury`, `fees`, and the Aetra native modules.
 7. BeginBlocker and EndBlocker ordering is explicit in `app/aether_core_wiring.go`.
 8. State is committed through deterministic stores and can be exported/imported for restart testing.
 
@@ -65,7 +65,7 @@ Important admission rules:
 
 ### Addresses And System Accounts
 
-Aetheris uses a custom address codec:
+Aetra uses a custom address codec:
 
 - user raw address: `4:<64 lowercase hex>`;
 - protocol-core raw address: `-7:<64 lowercase hex>`;
@@ -116,7 +116,7 @@ Protocol income is designed to route through configurable buckets such as valida
 
 ### Proof Of Stake And Validators
 
-Aetheris uses Cosmos SDK staking as the live PoS base:
+Aetra uses Cosmos SDK staking as the live PoS base:
 
 - validators are created through staking transactions;
 - delegators can delegate, unbond, and redelegate `naet`;
@@ -141,7 +141,7 @@ Some of these modules are already wired with genesis, keeper state, tests, and q
 
 ### Native System Entity Layer
 
-Aetheris has a native system-entity direction beyond standard Cosmos modules:
+Aetra has a native system-entity direction beyond standard Cosmos modules:
 
 - `x/config`: protocol configuration state.
 - `x/config-voting`: controlled voting path for critical configuration changes.
@@ -209,7 +209,7 @@ Default local endpoints:
 - node1: P2P `26666`, RPC `26667`, gRPC `9100`, REST `1327`;
 - node2: P2P `26676`, RPC `26677`, gRPC `9110`, REST `1337`.
 
-Each init writes `.localnet*\localnet.json` with node homes, RPC, REST, gRPC, CometBFT metrics, and Aetheris app metrics URLs. Logs are under `.localnet*\logs`.
+Each init writes `.localnet*\localnet.json` with node homes, RPC, REST, gRPC, CometBFT metrics, and Aetra app metrics URLs. Logs are under `.localnet*\logs`.
 
 ## Common Commands
 
@@ -241,7 +241,7 @@ build\aetherisd.exe tx bank send node0 $node1 1000naet `
 
 ## Token Summary
 
-- Name: `Aetheris`
+- Name: `Aetra`
 - Symbol/display denom: `AET`
 - Base denom: `naet`
 - Conversion: `1 AET = 1,000,000,000 naet`
@@ -292,7 +292,7 @@ Useful docs:
 
 ## Public Testnet Status
 
-Before public testnet, Aetheris still needs the full readiness gate:
+Before public testnet, Aetra still needs the full readiness gate:
 
 - all module params documented;
 - every native module covered by genesis, export/import, authority, invariant, malformed message, and migration tests;
