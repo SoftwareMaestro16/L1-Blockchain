@@ -13,21 +13,24 @@ import (
 )
 
 const (
-	RawPrefix            = "4:"
-	RawAddressLength     = 66
-	UserFriendlyLength   = 48
-	UserFriendlyPrefix   = "AE"
-	ZeroRawAddress       = "4:0000000000000000000000000000000000000000000000000000000000000000"
-	ZeroUserFriendly     = "AEAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-	rawPayloadLength     = 32
-	shortAddressLength   = 20
-	longAddressPadLength = rawPayloadLength - shortAddressLength
-	userFriendlyVersion  = byte(1)
+	RawPrefix              = "4:"
+	SystemRawPrefix        = "-7:"
+	RawAddressLength       = 66
+	SystemRawAddressLength = 67
+	UserFriendlyLength     = 48
+	UserFriendlyPrefix     = "AE"
+	ZeroRawAddress         = "4:0000000000000000000000000000000000000000000000000000000000000000"
+	ZeroUserFriendly       = "AEAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+	rawPayloadLength       = 32
+	shortAddressLength     = 20
+	longAddressPadLength   = rawPayloadLength - shortAddressLength
+	userFriendlyVersion    = byte(1)
 )
 
 var (
-	userFriendlyMagic = [3]byte{0x00, 0x40, 0x00}
-	rawAddressRe      = regexp.MustCompile(`^4:[0-9a-f]{64}$`)
+	userFriendlyMagic  = [3]byte{0x00, 0x40, 0x00}
+	rawAddressRe       = regexp.MustCompile(`^4:[0-9a-f]{64}$`)
+	systemRawAddressRe = regexp.MustCompile(`^-7:[0-9a-f]{64}$`)
 )
 
 type Codec struct{}
@@ -55,6 +58,30 @@ func Format(bz []byte) string {
 		panic(err)
 	}
 	return text
+}
+
+func IsSystemRawAddress(text string) bool {
+	return systemRawAddressRe.MatchString(strings.TrimSpace(text))
+}
+
+func ParseSystemRawAddress(text string) ([]byte, error) {
+	text = strings.TrimSpace(text)
+	if !systemRawAddressRe.MatchString(text) {
+		return nil, fmt.Errorf("invalid system raw address format: expected -7:<64 lowercase hex>")
+	}
+	raw, err := hex.DecodeString(text[len(SystemRawPrefix):])
+	if err != nil {
+		return nil, err
+	}
+	return FromRawPayload(raw), nil
+}
+
+func FormatSystemRawAddress(raw []byte) string {
+	payload, err := ToRawPayload(raw)
+	if err != nil {
+		panic(err)
+	}
+	return SystemRawPrefix + hex.EncodeToString(payload)
 }
 
 func FormatAccAddress(addr sdk.AccAddress) string {
@@ -114,6 +141,9 @@ func Parse(text string) ([]byte, error) {
 		}
 		return FromRawPayload(raw), nil
 	}
+	if systemRawAddressRe.MatchString(text) {
+		return ParseSystemRawAddress(text)
+	}
 	if len(text) == UserFriendlyLength && strings.HasPrefix(text, UserFriendlyPrefix) {
 		payload, err := base64.RawURLEncoding.DecodeString(text)
 		if err != nil {
@@ -144,7 +174,7 @@ func Parse(text string) ([]byte, error) {
 			return bz, nil
 		}
 	}
-	return nil, fmt.Errorf("invalid address format: expected 4:<64 lowercase hex> or 48-char AE userfriendly address")
+	return nil, fmt.Errorf("invalid address format: expected 4:<64 lowercase hex>, -7:<64 lowercase hex>, or 48-char AE userfriendly address")
 }
 
 func ToRawPayload(bz []byte) ([]byte, error) {

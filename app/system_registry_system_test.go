@@ -38,7 +38,7 @@ func TestSystemRegistrySystemStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	genesis := GenesisStateWithSingleValidator(t, source)
 	registryGenesis := systemregistrykeeper.DefaultGenesis()
 	registryGenesis.State.Entities = append(registryGenesis.State.Entities, systemregistrytypes.SystemEntity{
-		ModuleName:           "storage-rent",
+		ModuleName:           "state-metering",
 		ModuleAccountAddress: "4:0000000000000000000000005555555555555555555555555555555555555555",
 		AuthorityAddress:     registryGenesis.Params.Authority,
 		Status:               systemregistrytypes.StatusActive,
@@ -72,7 +72,7 @@ func TestSystemRegistrySystemStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	restartedCtx := restarted.NewUncachedContext(false, cmtproto.Header{Height: restarted.LastBlockHeight()})
 	exported, err := restarted.SystemRegistryKeeper.ExportGenesisState(restartedCtx)
 	require.NoError(t, err)
-	entity, found := exported.State.Entity("storage-rent")
+	entity, found := exported.State.Entity("state-metering")
 	require.True(t, found)
 	require.Equal(t, systemregistrytypes.StatusActive, entity.Status)
 }

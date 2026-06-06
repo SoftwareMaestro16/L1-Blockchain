@@ -46,10 +46,17 @@ type Params struct {
 }
 
 type SystemEntity struct {
+	Name                              string
 	ModuleName                        string
 	ModuleAccountAddress              string
+	RawAddress                        string
+	UserFriendlyAddress               string
 	AuthorityAddress                  string
 	Status                            string
+	Core                              bool
+	CanHoldFunds                      bool
+	CanReceiveUserFunds               bool
+	CanSendFunds                      bool
 	Capabilities                      []string
 	Version                           uint64
 	Dependencies                      []string
@@ -58,7 +65,8 @@ type SystemEntity struct {
 }
 
 type State struct {
-	Entities []SystemEntity
+	Entities               []SystemEntity
+	UserControlledAccounts []string
 }
 
 type DependencyEdge struct {
@@ -103,6 +111,11 @@ type MsgDeprecateSystemEntity struct {
 }
 
 func DefaultParams() Params {
+	requiredModules := make([]string, 0, len(addressing.AllSystemAddresses()))
+	for _, address := range addressing.AllSystemAddresses() {
+		requiredModules = append(requiredModules, address.ModuleName)
+	}
+	sort.Strings(requiredModules)
 	return Params{
 		Authority:          prototype.DefaultAuthority,
 		MaxEntities:        MaxEntitiesV1,
@@ -111,47 +124,31 @@ func DefaultParams() Params {
 		MaxModuleNameBytes: MaxModuleNameBytesV1,
 		MaxCapabilityBytes: MaxCapabilityBytesV1,
 		MaxDependencyEdges: MaxDependencyEdgesV1,
-		RequiredModules: []string{
-			ModuleConfig,
-			ModuleConstitution,
-			ModuleName,
-		},
+		RequiredModules:    requiredModules,
 	}
 }
 
 func DefaultState() State {
 	authority := prototype.DefaultAuthority
-	return State{Entities: SortEntities([]SystemEntity{
-		{
-			ModuleName:           ModuleConstitution,
-			ModuleAccountAddress: moduleAccount(ModuleConstitution),
+	entities := make([]SystemEntity, 0, len(addressing.AllSystemAddresses()))
+	for _, address := range addressing.AllSystemAddresses() {
+		entities = append(entities, SystemEntity{
+			Name:                 address.Name,
+			ModuleName:           address.ModuleName,
+			ModuleAccountAddress: address.Raw,
+			RawAddress:           address.Raw,
+			UserFriendlyAddress:  address.UserFriendly,
 			AuthorityAddress:     authority,
 			Status:               StatusActive,
-			Capabilities:         []string{"constitutional-bounds", "protected-modules"},
+			Core:                 address.Core,
+			CanHoldFunds:         address.CanHoldFunds,
+			CanReceiveUserFunds:  address.CanReceiveUserFunds,
+			CanSendFunds:         address.CanSendFunds,
 			Version:              DefaultModuleVersion,
 			Required:             true,
-		},
-		{
-			ModuleName:           ModuleName,
-			ModuleAccountAddress: moduleAccount(ModuleName),
-			AuthorityAddress:     authority,
-			Status:               StatusActive,
-			Capabilities:         []string{"dependency-graph", "system-accounts"},
-			Version:              DefaultModuleVersion,
-			Dependencies:         []string{ModuleConstitution},
-			Required:             true,
-		},
-		{
-			ModuleName:           ModuleConfig,
-			ModuleAccountAddress: moduleAccount(ModuleConfig),
-			AuthorityAddress:     authority,
-			Status:               StatusActive,
-			Capabilities:         []string{"protocol-config"},
-			Version:              DefaultModuleVersion,
-			Dependencies:         []string{ModuleConstitution, ModuleName},
-			Required:             true,
-		},
-	})}
+		})
+	}
+	return State{Entities: SortEntities(entities)}
 }
 
 func (p Params) Validate() error {
@@ -217,11 +214,15 @@ func (s State) Validate(params Params) error {
 		if _, found := byName[normalized.ModuleName]; found {
 			return fmt.Errorf("system registry duplicate module %q", normalized.ModuleName)
 		}
-		if other, found := byAccount[normalized.ModuleAccountAddress]; found {
+		accountKey, err := addressing.AddressTextBytesKey(normalized.ModuleAccountAddress)
+		if err != nil {
+			return fmt.Errorf("system registry module account bytes invalid for %q: %w", normalized.ModuleName, err)
+		}
+		if other, found := byAccount[accountKey]; found {
 			return fmt.Errorf("system registry duplicate module account %q used by %s and %s", normalized.ModuleAccountAddress, other, normalized.ModuleName)
 		}
 		byName[normalized.ModuleName] = normalized
-		byAccount[normalized.ModuleAccountAddress] = normalized.ModuleName
+		byAccount[accountKey] = normalized.ModuleName
 		edgeCount += uint32(len(normalized.Dependencies))
 	}
 	if edgeCount > params.MaxDependencyEdges {
@@ -246,15 +247,35 @@ func (s State) Validate(params Params) error {
 			}
 		}
 	}
-	return validateAcyclic(byName)
+	if err := validateAcyclic(byName); err != nil {
+		return err
+	}
+	if err := ValidateReservedSystemRegistryState(s.Normalize(params)); err != nil {
+		return err
+	}
+	return addressing.ValidateNoUserControlledSystemAddresses(s.UserControlledAccounts)
 }
 
 func (e SystemEntity) Validate(params Params) error {
+	e.Name = strings.TrimSpace(e.Name)
+	if e.Name != "" && len(e.Name) > int(params.MaxModuleNameBytes) {
+		return fmt.Errorf("system registry entity name exceeds %d bytes", params.MaxModuleNameBytes)
+	}
 	if err := validateToken("system registry module name", e.ModuleName, params.MaxModuleNameBytes); err != nil {
 		return err
 	}
 	if err := addressing.ValidateAuthorityAddress("system registry module account", e.ModuleAccountAddress); err != nil {
 		return err
+	}
+	if strings.TrimSpace(e.RawAddress) != "" {
+		if err := addressing.ValidateAuthorityAddress("system registry raw address", e.RawAddress); err != nil {
+			return err
+		}
+	}
+	if strings.TrimSpace(e.UserFriendlyAddress) != "" {
+		if err := addressing.ValidateAuthorityAddress("system registry user-friendly address", e.UserFriendlyAddress); err != nil {
+			return err
+		}
 	}
 	if err := addressing.ValidateAuthorityAddress("system registry entity authority", e.AuthorityAddress); err != nil {
 		return err
@@ -284,8 +305,11 @@ func (e SystemEntity) Validate(params Params) error {
 }
 
 func (e SystemEntity) Normalize(params Params) SystemEntity {
+	e.Name = strings.TrimSpace(e.Name)
 	e.ModuleName = strings.TrimSpace(e.ModuleName)
 	e.ModuleAccountAddress = strings.TrimSpace(e.ModuleAccountAddress)
+	e.RawAddress = strings.TrimSpace(e.RawAddress)
+	e.UserFriendlyAddress = strings.TrimSpace(e.UserFriendlyAddress)
 	e.AuthorityAddress = strings.TrimSpace(e.AuthorityAddress)
 	e.Status = strings.TrimSpace(e.Status)
 	if e.Status == "" {
@@ -306,7 +330,10 @@ func (e SystemEntity) Normalize(params Params) SystemEntity {
 }
 
 func (s State) Normalize(params Params) State {
-	out := State{Entities: make([]SystemEntity, 0, len(s.Entities))}
+	out := State{
+		Entities:               make([]SystemEntity, 0, len(s.Entities)),
+		UserControlledAccounts: append([]string(nil), s.UserControlledAccounts...),
+	}
 	for _, entity := range s.Entities {
 		out.Entities = append(out.Entities, entity.Normalize(params))
 	}
@@ -338,6 +365,100 @@ func (s State) DependencyGraph() []DependencyEdge {
 		return edges[i].ModuleName < edges[j].ModuleName
 	})
 	return edges
+}
+
+func ValidateReservedSystemRegistryState(state State) error {
+	byReservedName := make(map[string]SystemEntity, len(state.Entities))
+	for _, entity := range state.Entities {
+		if entity.Name != "" {
+			byReservedName[entity.Name] = entity
+		}
+	}
+
+	seenBytes := map[string]string{}
+	for _, expected := range addressing.AllSystemAddresses() {
+		entity, found := byReservedName[expected.Name]
+		if !found {
+			return fmt.Errorf("system registry required system entity %q is missing", expected.Name)
+		}
+		if err := validateReservedSystemEntity(entity, expected); err != nil {
+			return err
+		}
+		key, err := addressing.SystemAddressBytesKey(expected)
+		if err != nil {
+			return fmt.Errorf("system registry reserved address %q is invalid: %w", expected.Name, err)
+		}
+		if other, found := seenBytes[key]; found {
+			return fmt.Errorf("system registry duplicate reserved address bytes for %q and %q", other, expected.Name)
+		}
+		seenBytes[key] = expected.Name
+	}
+
+	for _, entity := range state.Entities {
+		if entity.RawAddress == "" {
+			continue
+		}
+		key, err := addressing.AddressTextBytesKey(entity.RawAddress)
+		if err != nil {
+			return fmt.Errorf("system registry raw address for %q is invalid: %w", entity.ModuleName, err)
+		}
+		if expectedName, found := seenBytes[key]; found && entity.Name != expectedName {
+			return fmt.Errorf("system registry duplicate reserved address bytes for %q and %q", expectedName, entity.Name)
+		}
+	}
+	return nil
+}
+
+func validateReservedSystemEntity(entity SystemEntity, expected addressing.SystemAddress) error {
+	if entity.ModuleName != expected.ModuleName {
+		return fmt.Errorf("system registry entity %q module_name mismatch: expected %q got %q", expected.Name, expected.ModuleName, entity.ModuleName)
+	}
+	if entity.ModuleAccountAddress != expected.Raw {
+		return fmt.Errorf("system registry entity %q module account mismatch: expected %q got %q", expected.Name, expected.Raw, entity.ModuleAccountAddress)
+	}
+	if entity.RawAddress != expected.Raw {
+		return fmt.Errorf("system registry entity %q raw mismatch: expected %q got %q", expected.Name, expected.Raw, entity.RawAddress)
+	}
+	if entity.UserFriendlyAddress != expected.UserFriendly {
+		return fmt.Errorf("system registry entity %q user_friendly mismatch: expected %q got %q", expected.Name, expected.UserFriendly, entity.UserFriendlyAddress)
+	}
+	if entity.Core != expected.Core {
+		return fmt.Errorf("system registry entity %q core policy mismatch", expected.Name)
+	}
+	if entity.CanHoldFunds != expected.CanHoldFunds {
+		return fmt.Errorf("system registry entity %q can_hold_funds policy mismatch", expected.Name)
+	}
+	if entity.CanReceiveUserFunds != expected.CanReceiveUserFunds {
+		return fmt.Errorf("system registry entity %q can_receive_user_funds policy mismatch", expected.Name)
+	}
+	if entity.CanSendFunds != expected.CanSendFunds {
+		return fmt.Errorf("system registry entity %q can_send_funds policy mismatch", expected.Name)
+	}
+	if entity.Status != StatusActive || entity.Status != expected.Status {
+		return fmt.Errorf("system registry entity %q status must be active", expected.Name)
+	}
+	if !entity.Required {
+		return fmt.Errorf("system registry entity %q must be required", expected.Name)
+	}
+	rawKey, err := addressing.AddressTextBytesKey(entity.RawAddress)
+	if err != nil {
+		return fmt.Errorf("system registry entity %q raw invalid: %w", expected.Name, err)
+	}
+	ufKey, err := addressing.AddressTextBytesKey(entity.UserFriendlyAddress)
+	if err != nil {
+		return fmt.Errorf("system registry entity %q user_friendly invalid: %w", expected.Name, err)
+	}
+	if rawKey != ufKey {
+		return fmt.Errorf("system registry entity %q raw and user_friendly bytes mismatch", expected.Name)
+	}
+	rawBytes, err := addressing.Parse(entity.RawAddress)
+	if err != nil {
+		return fmt.Errorf("system registry entity %q raw invalid: %w", expected.Name, err)
+	}
+	if addressing.IsZero(rawBytes) {
+		return fmt.Errorf("system registry entity %q must not use zero address", expected.Name)
+	}
+	return nil
 }
 
 func SortEntities(entities []SystemEntity) []SystemEntity {

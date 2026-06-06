@@ -53,6 +53,23 @@ func TestRawLongAddressRoundTrip(t *testing.T) {
 	require.Equal(t, raw, parsed)
 }
 
+func TestSystemRawAddressRoundTrip(t *testing.T) {
+	raw, err := hex.DecodeString("01041041041041041041041041041041041041041041041041041042c4093391")
+	require.NoError(t, err)
+
+	text := addressing.FormatSystemRawAddress(raw)
+	require.Equal(t, "-7:01041041041041041041041041041041041041041041041041041042c4093391", text)
+	require.True(t, addressing.IsSystemRawAddress(text))
+
+	parsed, err := addressing.ParseSystemRawAddress(text)
+	require.NoError(t, err)
+	require.Equal(t, raw, parsed)
+
+	parsedGeneric, err := addressing.Parse(text)
+	require.NoError(t, err)
+	require.Equal(t, raw, parsedGeneric)
+}
+
 func TestZeroAddressFormats(t *testing.T) {
 	zero := sdk.AccAddress(bytes20(0))
 
@@ -101,17 +118,19 @@ func TestAddressValidationRejectsEmptyMalformedAndLegacyFormats(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := map[string]string{
-		"empty":                         "",
-		"blank":                         "   ",
-		"malformed bech32":              "ae1notvalid",
-		"foreign bech32":                "cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp2n8k9",
-		"old raw prefix":                "0:0000000000000000000000000000000000000000000000000000000000000000",
-		"mixed case raw":                "4:ABCDEFabcdef0000000000000000000000000000000000000000000000000000",
-		"wrong length raw":              "4:00000000000000000000000000000000000000000000000000000000000000",
-		"old userfriendly prefix":       "ORBAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-		"wrong userfriendly prefix":     "AF" + validFriendly[2:],
-		"non base64url userfriendly":    "AE+/" + validFriendly[4:],
-		"old bech32 account prefix":     validLegacy,
+		"empty":                      "",
+		"blank":                      "   ",
+		"malformed bech32":           "ae1notvalid",
+		"foreign bech32":             "cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp2n8k9",
+		"old raw prefix":             "0:0000000000000000000000000000000000000000000000000000000000000000",
+		"mixed case raw":             "4:ABCDEFabcdef0000000000000000000000000000000000000000000000000000",
+		"mixed case system raw":      "-7:ABCDEFabcdef0000000000000000000000000000000000000000000000000000",
+		"wrong system raw length":    "-7:00000000000000000000000000000000000000000000000000000000000000",
+		"wrong length raw":           "4:00000000000000000000000000000000000000000000000000000000000000",
+		"old userfriendly prefix":    "ORBAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+		"wrong userfriendly prefix":  "AF" + validFriendly[2:],
+		"non base64url userfriendly": "AE+/" + validFriendly[4:],
+		"old bech32 account prefix":  validLegacy,
 	}
 	for name, text := range tests {
 		t.Run(name, func(t *testing.T) {

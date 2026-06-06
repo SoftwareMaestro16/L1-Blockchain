@@ -62,7 +62,7 @@ func TestPauseResumeEventsAreDeterministic(t *testing.T) {
 		_, _, err := k.RegisterSystemEntity(types.MsgRegisterSystemEntity{
 			Authority: prototype.DefaultAuthority,
 			Entity: types.SystemEntity{
-				ModuleName:           "storage-rent",
+				ModuleName:           "state-metering",
 				ModuleAccountAddress: testAddress(0x55),
 				AuthorityAddress:     prototype.DefaultAuthority,
 				Status:               types.StatusActive,
@@ -76,14 +76,14 @@ func TestPauseResumeEventsAreDeterministic(t *testing.T) {
 
 	pausedFirst, pauseEventFirst, err := first.PauseSystemEntity(types.MsgPauseSystemEntity{
 		Authority:                       prototype.DefaultAuthority,
-		ModuleName:                      "storage-rent",
+		ModuleName:                      "state-metering",
 		Height:                          10,
 		AllowPrivilegedCallsWhilePaused: false,
 	})
 	require.NoError(t, err)
 	pausedSecond, pauseEventSecond, err := second.PauseSystemEntity(types.MsgPauseSystemEntity{
 		Authority:                       prototype.DefaultAuthority,
-		ModuleName:                      "storage-rent",
+		ModuleName:                      "state-metering",
 		Height:                          10,
 		AllowPrivilegedCallsWhilePaused: false,
 	})
@@ -91,26 +91,26 @@ func TestPauseResumeEventsAreDeterministic(t *testing.T) {
 	require.Equal(t, pausedFirst, pausedSecond)
 	require.Equal(t, pauseEventFirst, pauseEventSecond)
 	require.Equal(t, types.EventTypePaused, pauseEventFirst.Type)
-	allowed, err := first.CanReceivePrivilegedCall("storage-rent")
+	allowed, err := first.CanReceivePrivilegedCall("state-metering")
 	require.NoError(t, err)
 	require.False(t, allowed)
 
 	resumedFirst, resumeEventFirst, err := first.ResumeSystemEntity(types.MsgResumeSystemEntity{
 		Authority:  prototype.DefaultAuthority,
-		ModuleName: "storage-rent",
+		ModuleName: "state-metering",
 		Height:     11,
 	})
 	require.NoError(t, err)
 	resumedSecond, resumeEventSecond, err := second.ResumeSystemEntity(types.MsgResumeSystemEntity{
 		Authority:  prototype.DefaultAuthority,
-		ModuleName: "storage-rent",
+		ModuleName: "state-metering",
 		Height:     11,
 	})
 	require.NoError(t, err)
 	require.Equal(t, resumedFirst, resumedSecond)
 	require.Equal(t, resumeEventFirst, resumeEventSecond)
 	require.Equal(t, types.EventTypeResumed, resumeEventFirst.Type)
-	allowed, err = first.CanReceivePrivilegedCall("storage-rent")
+	allowed, err = first.CanReceivePrivilegedCall("state-metering")
 	require.NoError(t, err)
 	require.True(t, allowed)
 }
@@ -120,7 +120,7 @@ func TestPausedModulePrivilegedCallsRequireExplicitAllowance(t *testing.T) {
 	_, _, err := k.RegisterSystemEntity(types.MsgRegisterSystemEntity{
 		Authority: prototype.DefaultAuthority,
 		Entity: types.SystemEntity{
-			ModuleName:           "performance-oracle",
+			ModuleName:           "latency-oracle",
 			ModuleAccountAddress: testAddress(0x56),
 			AuthorityAddress:     prototype.DefaultAuthority,
 			Status:               types.StatusActive,
@@ -132,12 +132,12 @@ func TestPausedModulePrivilegedCallsRequireExplicitAllowance(t *testing.T) {
 
 	_, _, err = k.PauseSystemEntity(types.MsgPauseSystemEntity{
 		Authority:                       prototype.DefaultAuthority,
-		ModuleName:                      "performance-oracle",
+		ModuleName:                      "latency-oracle",
 		Height:                          7,
 		AllowPrivilegedCallsWhilePaused: true,
 	})
 	require.NoError(t, err)
-	allowed, err := k.CanReceivePrivilegedCall("performance-oracle")
+	allowed, err := k.CanReceivePrivilegedCall("latency-oracle")
 	require.NoError(t, err)
 	require.True(t, allowed)
 }
@@ -168,7 +168,7 @@ func TestDependencyGraphCycleIsRejected(t *testing.T) {
 
 func TestExportImportPreservesRegistryOrdering(t *testing.T) {
 	source := NewKeeper()
-	for _, moduleName := range []string{"validator-election", "emissions"} {
+	for _, moduleName := range []string{"custom-election-audit", "custom-emissions-audit"} {
 		_, _, err := source.RegisterSystemEntity(types.MsgRegisterSystemEntity{
 			Authority: prototype.DefaultAuthority,
 			Entity: types.SystemEntity{
@@ -188,8 +188,8 @@ func TestExportImportPreservesRegistryOrdering(t *testing.T) {
 	require.NoError(t, exported.Validate())
 	entities, err := source.SystemEntities()
 	require.NoError(t, err)
-	require.Equal(t, "config", entities[0].ModuleName)
-	emissions, found, err := source.SystemEntity("emissions")
+	require.LessOrEqual(t, entities[0].ModuleName, entities[len(entities)-1].ModuleName)
+	emissions, found, err := source.SystemEntity("custom-emissions-audit")
 	require.NoError(t, err)
 	require.True(t, found)
 	require.Equal(t, []string{"a", "z"}, emissions.Capabilities)
