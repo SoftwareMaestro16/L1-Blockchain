@@ -67,6 +67,102 @@ func TestKeeperPaymentLifecycleWhenEnabled(t *testing.T) {
 	require.Equal(t, []paymentstypes.SettlementRecord{settlement}, settlements)
 }
 
+func TestKeeperPaymentChannelModuleMessagesAndReplayGuards(t *testing.T) {
+	k := NewKeeper()
+	gs := DefaultGenesis()
+	gs.Params = prototype.TestnetParams()
+	require.NoError(t, k.InitGenesis(gs))
+
+	alice := keeperAddress(0x71)
+	bob := keeperAddress(0x72)
+	outsider := keeperAddress(0x73)
+	openReq := paymentstypes.ChannelOpenRequest{
+		ChainID:         "aetheris-test-1",
+		Participants:    []string{alice, bob},
+		InitialBalances: []paymentstypes.Balance{{Participant: alice, Amount: "100"}, {Participant: bob, Amount: "0"}},
+		ChannelType:     paymentstypes.ChannelTypeBidirectional,
+		Collateral:      "100",
+		CloseDelay:      8,
+		ChallengePeriod: 8,
+		FeePolicyID:     paymentstypes.NativeDenom,
+		OpeningFeeDenom: paymentstypes.NativeDenom,
+		OpeningFeePaid:  paymentstypes.DefaultOpeningFee,
+		OpenHeight:      10,
+	}
+	_, err := k.ValidatePaymentChannelAnte(paymentstypes.MsgOpenChannel{
+		Signer:  outsider,
+		Request: openReq,
+	})
+	require.ErrorContains(t, err, "signer must be participant")
+
+	result, err := k.HandlePaymentChannelMessage(paymentstypes.MsgOpenChannel{
+		Signer:  alice,
+		Request: openReq,
+	})
+	require.NoError(t, err)
+	require.Equal(t, paymentstypes.PaymentChannelMsgOpenChannel, result.MsgType)
+	require.NoError(t, k.AssertPaymentChannelCollateralInvariant())
+	exported := k.ExportGenesis()
+	require.Len(t, exported.State.Channels, 1)
+	channel := exported.State.Channels[0]
+
+	closeState := keeperSignedState(t, channel, 2, channel.OpeningStateHash, []paymentstypes.Balance{
+		{Participant: alice, Amount: "55"},
+		{Participant: bob, Amount: "45"},
+	})
+	plan, err := k.PaymentChannelAccessPlan(paymentstypes.MsgUnilateralClose{
+		Signer: alice,
+		Request: paymentstypes.ChannelCloseRequest{
+			ChannelID:     channel.ChannelID,
+			ClosingState:  closeState,
+			Submitter:     alice,
+			CurrentHeight: 20,
+			SettlementFee: "0",
+		},
+	}, 20)
+	require.NoError(t, err)
+	require.Contains(t, plan.WriteKeys, paymentstypes.PaymentPendingCloseIndexKey(channel.ChannelID))
+
+	_, err = k.HandlePaymentChannelMessage(paymentstypes.MsgUnilateralClose{
+		Signer: alice,
+		Request: paymentstypes.ChannelCloseRequest{
+			ChannelID:     channel.ChannelID,
+			ClosingState:  closeState,
+			Submitter:     alice,
+			CurrentHeight: 20,
+			SettlementFee: "0",
+		},
+	})
+	require.NoError(t, err)
+	require.NoError(t, k.AssertPaymentChannelCollateralInvariant())
+	exported = k.ExportGenesis()
+	require.Equal(t, paymentstypes.ChannelStatusPendingClose, exported.State.Channels[0].Status)
+
+	result, err = k.HandlePaymentChannelMessage(paymentstypes.MsgFinalizeClose{
+		Signer: bob,
+		Request: paymentstypes.FinalSettlementRequest{
+			ChannelID:     channel.ChannelID,
+			CurrentHeight: 28,
+		},
+	})
+	require.NoError(t, err)
+	require.Equal(t, paymentstypes.PaymentChannelMsgFinalizeClose, result.MsgType)
+	require.Equal(t, "55", keeperAmountFor(result.Settlement.FinalBalances, alice))
+	require.Equal(t, "45", keeperAmountFor(result.Settlement.FinalBalances, bob))
+	require.NoError(t, k.AssertPaymentChannelCollateralInvariant())
+	require.ErrorContains(t, k.RejectEarlyTombstonePruning(channel.ChannelID, 30), "before replay horizon")
+	require.NoError(t, k.RejectEarlyTombstonePruning(channel.ChannelID, 28+paymentstypes.DefaultReplayHorizon))
+
+	snapshot, err := k.PaymentChannelModuleState(28)
+	require.NoError(t, err)
+	require.Len(t, snapshot.Participants, 2)
+	require.Len(t, snapshot.SettlementTombstones, 1)
+	accs, page, err := k.ChannelFeeAccumulators(nil, 28)
+	require.NoError(t, err)
+	require.Zero(t, page.NextOffset)
+	require.Len(t, accs, 1)
+}
+
 func TestKeeperStoreV2ParticipantChannelPagination(t *testing.T) {
 	k := NewKeeper()
 	gs := DefaultGenesis()

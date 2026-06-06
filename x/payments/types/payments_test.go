@@ -4208,6 +4208,127 @@ func TestPaymentBlockAccumulatorAggregatesAfterSettlementHotPath(t *testing.T) {
 	require.Equal(t, uint64(1), acc.OperationCount)
 }
 
+func TestPaymentChannelModuleMessagesDispatchAnteAndInvariants(t *testing.T) {
+	alice := testAddress(0x8b)
+	bob := testAddress(0x8c)
+	openReq := ChannelOpenRequest{
+		ChainID:         "aetheris-test-1",
+		Participants:    []string{alice, bob},
+		InitialBalances: []Balance{{Participant: alice, Amount: "100"}, {Participant: bob, Amount: "0"}},
+		ChannelType:     ChannelTypeBidirectional,
+		Collateral:      "100",
+		CloseDelay:      8,
+		ChallengePeriod: 8,
+		FeePolicyID:     NativeDenom,
+		OpeningFeeDenom: NativeDenom,
+		OpeningFeePaid:  DefaultOpeningFee,
+		OpenHeight:      10,
+	}
+	openMsg := MsgOpenChannel{Signer: alice, Request: openReq}.Normalize()
+	state := EmptyState()
+	ante, err := ValidatePaymentChannelMessageFee(state, openMsg)
+	require.NoError(t, err)
+	require.Equal(t, PaymentFeeClassChannelOpen, ante.FeeClass)
+
+	state, result, err := ApplyPaymentChannelMessage(state, openMsg)
+	require.NoError(t, err)
+	require.Equal(t, PaymentChannelMsgOpenChannel, result.MsgType)
+	require.Len(t, state.Channels, 1)
+	require.NoError(t, ValidateLockedCollateralForFinality(state))
+	channel := state.Channels[0]
+
+	nextState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "90"},
+		{Participant: bob, Amount: "10"},
+	})
+	state, result, err = ApplyPaymentChannelMessage(state, MsgSubmitCheckpoint{
+		Signer: alice,
+		Request: ChannelUpdateRequest{
+			ChannelID:          channel.ChannelID,
+			State:              nextState,
+			RegisterCheckpoint: true,
+			Submitter:          alice,
+			CurrentHeight:      12,
+			CheckpointFeePaid:  "0",
+		},
+	})
+	require.NoError(t, err)
+	require.True(t, result.Checkpoint.CheckpointRegistered)
+	require.Equal(t, nextState.StateHash, state.Channels[0].LatestState.StateHash)
+
+	closeMsg := MsgUnilateralClose{
+		Signer: alice,
+		Request: ChannelCloseRequest{
+			ChannelID:     channel.ChannelID,
+			ClosingState:  nextState,
+			Submitter:     alice,
+			CurrentHeight: 20,
+			SettlementFee: "0",
+		},
+	}.Normalize()
+	plan, err := PaymentChannelMessageAccessPlan(closeMsg, 20)
+	require.NoError(t, err)
+	require.Contains(t, plan.WriteKeys, PaymentPendingCloseIndexKey(channel.ChannelID))
+	state, _, err = ApplyPaymentChannelMessage(state, closeMsg)
+	require.NoError(t, err)
+	require.Equal(t, ChannelStatusPendingClose, state.Channels[0].Status)
+	require.NoError(t, ValidateLockedCollateralForFinality(state))
+
+	state, result, err = ApplyPaymentChannelMessage(state, MsgFinalizeClose{
+		Signer: bob,
+		Request: FinalSettlementRequest{
+			ChannelID:     channel.ChannelID,
+			CurrentHeight: 28,
+		},
+	})
+	require.NoError(t, err)
+	require.Equal(t, PaymentChannelMsgFinalizeClose, result.MsgType)
+	require.Equal(t, ChannelStatusSettled, state.Channels[0].Status)
+	require.Empty(t, state.CustodyLocks)
+	require.NoError(t, ValidateLockedCollateralForFinality(state))
+	require.Len(t, state.ClosedChannels, 1)
+
+	snapshot, err := SnapshotPaymentChannelModuleState(state, 28)
+	require.NoError(t, err)
+	require.Len(t, snapshot.Channels, 1)
+	require.Len(t, snapshot.Participants, 2)
+	require.Len(t, snapshot.Configs, 1)
+	require.Len(t, snapshot.Settlements, 1)
+	require.Len(t, snapshot.SettlementTombstones, 1)
+	require.Len(t, snapshot.FeeAccumulators, 1)
+}
+
+func TestPaymentChannelModuleBlockSTMProfilesMessageConflicts(t *testing.T) {
+	alice := testAddress(0x8d)
+	bob := testAddress(0x8e)
+	first := signedChannel(t, "msg-blockstm-first", "100", alice, bob)
+	second := signedChannel(t, "msg-blockstm-second", "100", alice, bob)
+	firstClose := signedState(t, first, 2, first.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "40"},
+		{Participant: bob, Amount: "60"},
+	})
+	secondClose := signedState(t, second, 2, second.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "70"},
+		{Participant: bob, Amount: "30"},
+	})
+
+	profile, err := PaymentChannelMessagesConflictProfile([]PaymentChannelModuleMessage{
+		MsgUnilateralClose{Signer: alice, Request: ChannelCloseRequest{ChannelID: first.ChannelID, ClosingState: firstClose, Submitter: alice, CurrentHeight: 20}},
+		MsgUnilateralClose{Signer: alice, Request: ChannelCloseRequest{ChannelID: second.ChannelID, ClosingState: secondClose, Submitter: alice, CurrentHeight: 20}},
+	}, 20)
+	require.NoError(t, err)
+	require.True(t, profile.ConflictFree)
+	require.True(t, profile.GlobalAccountingDeferred)
+
+	profile, err = PaymentChannelMessagesConflictProfile([]PaymentChannelModuleMessage{
+		MsgUnilateralClose{Signer: alice, Request: ChannelCloseRequest{ChannelID: first.ChannelID, ClosingState: firstClose, Submitter: alice, CurrentHeight: 20}},
+		MsgDisputeClose{Signer: bob, Request: ChannelDisputeRequest{ChannelID: first.ChannelID, ClosingStateReference: firstClose.StateHash, NewerState: firstClose, Submitter: bob, CurrentHeight: 21}},
+	}, 21)
+	require.NoError(t, err)
+	require.False(t, profile.ConflictFree)
+	require.NotEmpty(t, profile.Conflicts)
+}
+
 func TestStoreV2LayoutUsesSpecifiedPrefixesAndCompactChannelRecords(t *testing.T) {
 	alice := testAddress(0x89)
 	bob := testAddress(0x8a)
