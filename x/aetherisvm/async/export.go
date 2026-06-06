@@ -85,6 +85,9 @@ func ValidateExportedState(exported ExportedState) error {
 		if queued.DestinationKey != string(queued.Envelope.Destination) {
 			return fmt.Errorf("queued message %d destination key drift", queued.Sequence)
 		}
+		if queued.Envelope.ExecutionBlockHeight != 0 {
+			return fmt.Errorf("queued message %d execution block height must be zero", queued.Sequence)
+		}
 		if i > 0 && queuedMessageLess(queued, exported.Queue[i-1]) {
 			return fmt.Errorf("queued messages must be sorted by tx/message/logical/destination/sequence order")
 		}
@@ -120,6 +123,9 @@ func validateQueuedView(name, owner string, messages []QueuedMessage, params Par
 		return fmt.Errorf("%s owner key must not be empty", name)
 	}
 	for _, queued := range messages {
+		if queued.Envelope.ExecutionBlockHeight != 0 {
+			return fmt.Errorf("%s message %d execution block height must be zero", name, queued.Sequence)
+		}
 		if err := queued.Envelope.Validate(params); err != nil {
 			return fmt.Errorf("invalid %s message %d: %w", name, queued.Sequence, err)
 		}

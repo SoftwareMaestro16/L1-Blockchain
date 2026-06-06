@@ -63,6 +63,10 @@ func TestVerifierRejectsOversizedCodeAndNondeterministicOpcode(t *testing.T) {
 	badImport := counterModule()
 	badImport.Imports = append(badImport.Imports, HostFunction(999))
 	require.ErrorContains(t, verifier.Verify(badImport), "not allowed")
+
+	missingImport := counterModule()
+	missingImport.Imports = []HostFunction{HostReadStorage, HostReturn}
+	require.ErrorContains(t, verifier.Verify(missingImport), "requires host function")
 }
 
 func TestRunSimpleCounterDeterministicallyAndBoundsGas(t *testing.T) {
@@ -120,13 +124,122 @@ func TestStorageSnapshotIsDeterministicAndBounded(t *testing.T) {
 	require.Equal(t, async.ResultLimitExceeded, result.ResultCode)
 }
 
+func TestSnapshotDecodeRoundTripRejectsNonCanonicalInput(t *testing.T) {
+	storage := Storage{
+		"a": EncodeU64(1),
+		"b": EncodeU64(2),
+	}
+	decoded, err := DecodeSnapshot(EncodeSnapshot(storage))
+	require.NoError(t, err)
+	require.Equal(t, storage, decoded)
+
+	buf := bytes.NewBuffer(nil)
+	writeU32(buf, 2)
+	writeU16(buf, 1)
+	buf.WriteString("b")
+	writeU32(buf, 1)
+	buf.WriteByte(2)
+	writeU16(buf, 1)
+	buf.WriteString("a")
+	writeU32(buf, 1)
+	buf.WriteByte(1)
+	_, err = DecodeSnapshot(buf.Bytes())
+	require.ErrorContains(t, err, "sorted")
+}
+
+func TestExecutionProofIsDeterministicAndBindsStateContextAndTrace(t *testing.T) {
+	runner := newTestRunner(t)
+	module := counterModule()
+	storage := Storage{"counter": EncodeU64(7)}
+	ctx := runtimeCtx(EntryReceiveInternal)
+	ctx.BlockHeight = 42
+
+	exec, err := runner.Run(module, storage, ctx)
+	require.NoError(t, err)
+	first, err := BuildExecutionProof(module, storage, ctx, exec)
+	require.NoError(t, err)
+	second, err := BuildExecutionProof(module, storage, ctx, exec)
+	require.NoError(t, err)
+	require.Equal(t, first, second)
+	require.NotEqual(t, [32]byte{}, ExecutionProofHash(first))
+
+	exec.GasUsed++
+	changed, err := BuildExecutionProof(module, storage, ctx, exec)
+	require.NoError(t, err)
+	require.NotEqual(t, ExecutionProofHash(first), ExecutionProofHash(changed))
+}
+
+func TestInterfaceManifestHashCommitsMetadataAndExports(t *testing.T) {
+	manifest := InterfaceManifest{
+		Name:    "counter",
+		Version: 1,
+		Methods: []InterfaceMethod{
+			{Name: "increment", Entrypoint: EntryReceiveInternal, Opcode: 1, Async: true},
+			{Name: "query", Entrypoint: EntryQuery, Opcode: 2},
+		},
+		Events: []InterfaceEvent{{Name: "incremented", Opcode: 10}},
+	}
+	hash, err := InterfaceHash(manifest)
+	require.NoError(t, err)
+	module := counterModule()
+	module.MetadataHash = hash
+	require.NoError(t, VerifyInterface(module, manifest))
+
+	module.MetadataHash[0] ^= 1
+	require.ErrorContains(t, VerifyInterface(module, manifest), "metadata hash")
+
+	bad := manifest
+	bad.Methods = append(bad.Methods, InterfaceMethod{Name: "again", Entrypoint: EntryReceiveInternal, Opcode: 1})
+	_, err = InterfaceHash(bad)
+	require.ErrorContains(t, err, "duplicate")
+}
+
+func TestHostContextOpcodesReadEnvelopeBlockAndChargeGas(t *testing.T) {
+	runner := newTestRunner(t)
+	module := Module{
+		Version: Version,
+		Imports: []HostFunction{
+			HostInspectMsg,
+			HostBlockContext,
+			HostChargeGas,
+			HostWriteStorage,
+			HostReturn,
+		},
+		Exports: map[Entrypoint]uint32{EntryReceiveInternal: 0},
+		Code: []Instruction{
+			{Op: OpReadMsgOpcode},
+			{Op: OpReadMsgQueryID},
+			{Op: OpAdd},
+			{Op: OpReadBlock},
+			{Op: OpAdd},
+			{Op: OpChargeGas, Arg: 7},
+			{Op: OpWriteStorage, Data: []byte("sum")},
+			{Op: OpReturn, Arg: uint64(async.ResultOK)},
+		},
+	}
+	ctx := runtimeCtx(EntryReceiveInternal)
+	ctx.Message.Opcode = 10
+	ctx.Message.QueryID = 20
+	ctx.BlockHeight = 5
+	result, err := runner.Run(module, nil, ctx)
+	require.NoError(t, err)
+	require.Equal(t, async.ResultOK, result.ResultCode)
+	require.Equal(t, uint64(35), DecodeU64(result.State["sum"]))
+	require.GreaterOrEqual(t, result.GasUsed, uint64(7))
+
+	ctx.GasLimit = 30
+	limited, err := runner.Run(module, nil, ctx)
+	require.NoError(t, err)
+	require.Equal(t, async.ResultLimitExceeded, limited.ResultCode)
+}
+
 func TestAVMEmitsInternalMessageIntoAsyncQueue(t *testing.T) {
 	runner := newTestRunner(t)
 	module := emitterModule()
 	executor, err := async.NewExecutor(async.DefaultParams())
 	require.NoError(t, err)
 	deployer := testAddr(1)
-	source := deployAsyncContract(t, executor, deployer, []byte("source"))
+	source := deployAsyncContract(t, executor, deployer, []byte("source"), EncodeSnapshot(nil))
 	destination := deployAsyncContract(t, executor, deployer, []byte("dest"))
 	require.NoError(t, executor.RegisterHandler(source, runner.AsyncHandler(module, nil, RuntimeContext{
 		EmitDestination: destination,
@@ -147,13 +260,64 @@ func TestAVMEmitsInternalMessageIntoAsyncQueue(t *testing.T) {
 	require.Equal(t, []byte("dest:avm-out"), contract.State)
 }
 
+func TestAVMAsyncHandlerRestoresSnapshotStateAcrossMessages(t *testing.T) {
+	runner := newTestRunner(t)
+	executor, err := async.NewExecutor(async.DefaultParams())
+	require.NoError(t, err)
+	deployer := testAddr(1)
+	initial := EncodeSnapshot(Storage{"counter": EncodeU64(0)})
+	contract := deployAsyncContract(t, executor, deployer, []byte("stateful"), initial)
+	require.NoError(t, executor.RegisterHandler(contract, runner.AsyncHandler(counterModule(), nil, RuntimeContext{})))
+
+	require.NoError(t, executor.EnqueueTxMessages([]async.MessageEnvelope{
+		testAsyncMessage(testAddr(9), contract, 1),
+		testAsyncMessage(testAddr(9), contract, 2),
+	}))
+	receipts, err := executor.ProcessBlock(1)
+	require.NoError(t, err)
+	require.Len(t, receipts, 2)
+	account, ok := executor.Contract(contract)
+	require.True(t, ok)
+	storage, err := DecodeSnapshot(account.State)
+	require.NoError(t, err)
+	require.Equal(t, uint64(2), DecodeU64(storage["counter"]))
+}
+
+func TestAVMSchedulesSelfContinuationAtFutureBlock(t *testing.T) {
+	runner := newTestRunner(t)
+	module := continuationModule()
+	executor, err := async.NewExecutor(async.DefaultParams())
+	require.NoError(t, err)
+	deployer := testAddr(1)
+	contract := deployAsyncContract(t, executor, deployer, []byte("cont"), EncodeSnapshot(nil))
+	require.NoError(t, executor.RegisterHandler(contract, runner.AsyncHandler(module, nil, RuntimeContext{})))
+
+	require.NoError(t, executor.EnqueueTxMessages([]async.MessageEnvelope{testAsyncMessage(testAddr(9), contract, 1)}))
+	receipts, err := executor.ProcessBlock(1)
+	require.NoError(t, err)
+	require.Len(t, receipts, 1)
+	require.Len(t, executor.Queue(), 1)
+	require.Equal(t, uint64(3), executor.Queue()[0].Envelope.DeliverAtBlock)
+	require.True(t, executor.Queue()[0].Envelope.Destination.Equals(contract))
+
+	receipts, err = executor.ProcessBlock(2)
+	require.NoError(t, err)
+	require.Empty(t, receipts)
+	require.Len(t, executor.Queue(), 1)
+
+	receipts, err = executor.ProcessBlock(3)
+	require.NoError(t, err)
+	require.Len(t, receipts, 1)
+	require.Equal(t, async.ResultOK, receipts[0].ResultCode)
+}
+
 func TestAVMAsyncFailedSendBouncesAndQueueSurvivesExportImport(t *testing.T) {
 	runner := newTestRunner(t)
 	module := emitterModule()
 	executor, err := async.NewExecutor(async.DefaultParams())
 	require.NoError(t, err)
 	deployer := testAddr(1)
-	source := deployAsyncContract(t, executor, deployer, []byte("source"))
+	source := deployAsyncContract(t, executor, deployer, []byte("source"), EncodeSnapshot(nil))
 	missingDestination, err := async.DeriveContractAddress(deployer, bytes.Repeat([]byte{9}, async.CodeHashLength), []byte("missing"))
 	require.NoError(t, err)
 	require.NoError(t, executor.RegisterHandler(source, runner.AsyncHandler(module, nil, RuntimeContext{
@@ -216,6 +380,21 @@ func emitterModule() Module {
 	}
 }
 
+func continuationModule() Module {
+	return Module{
+		Version: Version,
+		Imports: []HostFunction{
+			HostScheduleSelf,
+			HostReturn,
+		},
+		Exports: map[Entrypoint]uint32{EntryReceiveInternal: 0},
+		Code: []Instruction{
+			{Op: OpScheduleSelf, Arg: 2, Data: []byte("resume")},
+			{Op: OpReturn, Arg: uint64(async.ResultOK)},
+		},
+	}
+}
+
 func newTestVerifier(t *testing.T) *Verifier {
 	t.Helper()
 	verifier, err := NewVerifier(DefaultParams())
@@ -238,9 +417,13 @@ func runtimeCtx(entry Entrypoint) RuntimeContext {
 	}
 }
 
-func deployAsyncContract(t *testing.T, executor *async.Executor, deployer sdk.AccAddress, salt []byte) sdk.AccAddress {
+func deployAsyncContract(t *testing.T, executor *async.Executor, deployer sdk.AccAddress, salt []byte, state ...[]byte) sdk.AccAddress {
 	t.Helper()
-	address, err := executor.DeployContract(deployer, bytes.Repeat([]byte{salt[0]}, async.CodeHashLength), salt, nil, sdkmath.NewInt(10_000))
+	initial := []byte(nil)
+	if len(state) > 0 {
+		initial = state[0]
+	}
+	address, err := executor.DeployContract(deployer, bytes.Repeat([]byte{salt[0]}, async.CodeHashLength), salt, initial, sdkmath.NewInt(10_000))
 	require.NoError(t, err)
 	return address
 }

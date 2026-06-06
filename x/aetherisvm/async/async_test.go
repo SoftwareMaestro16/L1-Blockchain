@@ -156,6 +156,87 @@ func TestQueueLimitsPreventDoS(t *testing.T) {
 	require.Equal(t, uint64(1), executor.Metrics().QueueLag)
 }
 
+func TestDelayedMessagesWaitForReadyBlockAndSurviveExportImport(t *testing.T) {
+	executor := newTestExecutor(t)
+	deployer := testAddr(1)
+	contract := deployTestContract(t, executor, deployer, []byte("delay"))
+	require.NoError(t, executor.RegisterHandler(contract, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
+		return ExecutionResult{NewState: append([]byte("seen:"), msg.Body...), ResultCode: ResultOK}
+	}))
+
+	delayed := testMessage(testAddr(9), contract, 1)
+	delayed.Body = []byte("delayed")
+	delayed.DeliverAtBlock = 3
+	immediate := testMessage(testAddr(9), contract, 2)
+	immediate.Body = []byte("immediate")
+	require.NoError(t, executor.EnqueueTxMessages([]MessageEnvelope{delayed, immediate}))
+
+	receipts, err := executor.ProcessBlock(1)
+	require.NoError(t, err)
+	require.Len(t, receipts, 1)
+	require.Equal(t, uint64(2), receipts[0].QueryID)
+	require.Len(t, executor.Queue(), 1)
+	require.Equal(t, uint64(3), executor.Queue()[0].Envelope.DeliverAtBlock)
+	require.Zero(t, executor.Metrics().QueueLag)
+
+	exported := executor.ExportState()
+	imported, err := ImportState(exported)
+	require.NoError(t, err)
+	require.True(t, reflect.DeepEqual(exported, imported.ExportState()))
+	require.NoError(t, imported.RegisterHandler(contract, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
+		return ExecutionResult{NewState: append([]byte("seen:"), msg.Body...), ResultCode: ResultOK}
+	}))
+
+	receipts, err = imported.ProcessBlock(2)
+	require.NoError(t, err)
+	require.Empty(t, receipts)
+	require.Len(t, imported.Queue(), 1)
+
+	receipts, err = imported.ProcessBlock(3)
+	require.NoError(t, err)
+	require.Len(t, receipts, 1)
+	require.Equal(t, uint64(1), receipts[0].QueryID)
+	updated, ok := imported.Contract(contract)
+	require.True(t, ok)
+	require.Equal(t, []byte("seen:delayed"), updated.State)
+}
+
+func TestMessageEnvelopeRejectsDeliveryAfterDeadline(t *testing.T) {
+	msg := testMessage(testAddr(1), testAddr(2), 1)
+	msg.DeliverAtBlock = 10
+	msg.DeadlineBlock = 9
+	require.ErrorContains(t, msg.Validate(DefaultParams()), "deliver block")
+}
+
+func TestInvalidOutgoingMessageDoesNotCommitRecipientState(t *testing.T) {
+	executor := newTestExecutor(t)
+	deployer := testAddr(1)
+	dest := deployTestContract(t, executor, deployer, []byte("dest"))
+	require.NoError(t, executor.RegisterHandler(dest, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
+		out := testMessage(contract.Address, dest, 99)
+		out.DeliverAtBlock = 5
+		out.DeadlineBlock = 4
+		return ExecutionResult{
+			NewState:   []byte("mutated"),
+			Outgoing:   []MessageEnvelope{out},
+			ResultCode: ResultOK,
+		}
+	}))
+	msg := testMessage(testAddr(9), dest, 1)
+	msg.Bounce = false
+	msg.Value = naetCoin(0)
+	require.NoError(t, executor.EnqueueTxMessages([]MessageEnvelope{msg}))
+
+	receipts, err := executor.ProcessBlock(1)
+	require.NoError(t, err)
+	require.Len(t, receipts, 1)
+	require.Equal(t, ResultLimitExceeded, receipts[0].ResultCode)
+	require.Empty(t, executor.Queue())
+	contract, ok := executor.Contract(dest)
+	require.True(t, ok)
+	require.Equal(t, []byte("init:dest"), contract.State)
+}
+
 func TestFailureRollsBackRecipientStateAndRefundsWhenBounceDisabled(t *testing.T) {
 	executor := newTestExecutor(t)
 	deployer := testAddr(1)
@@ -292,6 +373,14 @@ func TestImportStateRejectsDuplicateAndMalformedContractQueueState(t *testing.T)
 		corrupted.Queue[0].DestinationKey = "wrong"
 		_, err := ImportState(corrupted)
 		require.ErrorContains(t, err, "destination key drift")
+	})
+
+	t.Run("runtime execution block height is not importable queue state", func(t *testing.T) {
+		corrupted := exported
+		corrupted.Queue = cloneQueuedMessagesForTest(exported.Queue)
+		corrupted.Queue[0].Envelope.ExecutionBlockHeight = 99
+		_, err := ImportState(corrupted)
+		require.ErrorContains(t, err, "execution block height")
 	})
 
 	t.Run("tx index drift", func(t *testing.T) {

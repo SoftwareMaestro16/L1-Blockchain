@@ -30,6 +30,7 @@ func (e *Executor) EnqueueMessage(msg MessageEnvelope) error {
 }
 
 func (e *Executor) enqueueMessageWithOrder(msg MessageEnvelope, txIndex uint64, messageIndex uint32) error {
+	msg.ExecutionBlockHeight = 0
 	if err := msg.Validate(e.params); err != nil {
 		return err
 	}
@@ -62,6 +63,9 @@ func (e *Executor) ProcessBlock(height uint64) ([]ExecutionReceipt, error) {
 	count := uint32(0)
 	receipts := make([]ExecutionReceipt, 0)
 	for len(e.queue) > 0 && count < e.params.MaxMessagesPerBlock {
+		if readyBlock(e.queue[0]) > height {
+			break
+		}
 		receipt, err := e.processNext()
 		if err != nil {
 			return receipts, err
@@ -79,6 +83,10 @@ func (e *Executor) updateQueueLag() {
 		return
 	}
 	oldest := e.queue[0].EnqueuedBlock
+	if readyBlock(e.queue[0]) > e.blockHeight {
+		e.metrics.QueueLag = 0
+		return
+	}
 	if e.blockHeight > oldest {
 		e.metrics.QueueLag = e.blockHeight - oldest
 		return
@@ -87,6 +95,9 @@ func (e *Executor) updateQueueLag() {
 }
 
 func queuedMessageLess(a, b QueuedMessage) bool {
+	if readyBlock(a) != readyBlock(b) {
+		return readyBlock(a) < readyBlock(b)
+	}
 	if a.TxIndex != b.TxIndex {
 		return a.TxIndex < b.TxIndex
 	}
@@ -100,4 +111,8 @@ func queuedMessageLess(a, b QueuedMessage) bool {
 		return a.DestinationKey < b.DestinationKey
 	}
 	return a.Sequence < b.Sequence
+}
+
+func readyBlock(msg QueuedMessage) uint64 {
+	return msg.Envelope.DeliverAtBlock
 }

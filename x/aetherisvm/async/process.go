@@ -11,6 +11,7 @@ func (e *Executor) processNext() (ExecutionReceipt, error) {
 	queued := e.queue[0]
 	e.queue = e.queue[1:]
 	msg := queued.Envelope
+	msg.ExecutionBlockHeight = e.blockHeight
 	receipt := ExecutionReceipt{
 		Sequence:       queued.Sequence,
 		Source:         append(sdk.AccAddress(nil), msg.Source...),
@@ -75,15 +76,28 @@ func (e *Executor) processNext() (ExecutionReceipt, error) {
 		e.receipts = append(e.receipts, receipt)
 		return receipt, nil
 	}
-	e.contracts[string(working.Address)] = working
+	outgoing := make([]MessageEnvelope, len(result.Outgoing))
 	outgoingTxIndex := e.nextTxIndex
-	if len(result.Outgoing) > 0 {
-		e.nextTxIndex++
-	}
 	for i, out := range result.Outgoing {
 		out.Source = append(sdk.AccAddress(nil), working.Address...)
 		out.CreatedLogicalTime = working.LogicalTime
+		out.ExecutionBlockHeight = 0
 		out.Depth = msg.Depth + 1
+		if err := out.Validate(e.params); err != nil {
+			receipt.ResultCode = ResultLimitExceeded
+			receipt.Error = err.Error()
+			e.metrics.FailedExecutions++
+			e.finalizeFailure(msg, receipt)
+			e.receipts = append(e.receipts, receipt)
+			return receipt, nil
+		}
+		outgoing[i] = out
+	}
+	e.contracts[string(working.Address)] = working
+	if len(outgoing) > 0 {
+		e.nextTxIndex++
+	}
+	for i, out := range outgoing {
 		if err := e.enqueueMessageWithOrder(out, outgoingTxIndex, uint32(i)); err != nil {
 			receipt.ResultCode = ResultLimitExceeded
 			receipt.Error = err.Error()

@@ -41,6 +41,9 @@ func (m MessageEnvelope) Validate(params Params) error {
 	if len(m.Body) > int(params.MaxBodySize) {
 		return fmt.Errorf("message body size must be <= %d", params.MaxBodySize)
 	}
+	if m.DeliverAtBlock != 0 && m.DeadlineBlock != 0 && m.DeliverAtBlock > m.DeadlineBlock {
+		return errors.New("message deliver block must not exceed deadline block")
+	}
 	if m.GasLimit == 0 {
 		return errors.New("message gas limit must be positive")
 	}

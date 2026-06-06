@@ -51,10 +51,13 @@ type MessageEnvelope struct {
 	Bounce             bool
 	Bounced            bool
 	CreatedLogicalTime uint64
-	DeadlineBlock      uint64
-	GasLimit           uint64
-	ForwardFee         sdk.Coin
-	Depth              uint32
+	DeliverAtBlock     uint64
+	// ExecutionBlockHeight is set only while a queued message is being delivered.
+	ExecutionBlockHeight uint64
+	DeadlineBlock        uint64
+	GasLimit             uint64
+	ForwardFee           sdk.Coin
+	Depth                uint32
 }
 
 type QueuedMessage struct {
