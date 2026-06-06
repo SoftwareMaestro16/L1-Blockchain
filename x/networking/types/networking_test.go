@@ -4366,11 +4366,14 @@ func TestNetworkingObservabilitySpecCoversRequiredMetricsAndEvents(t *testing.T)
 	require.NoError(t, ValidateNetworkingObservabilitySpec(spec))
 	require.Len(t, spec.Metrics, 16)
 	require.Len(t, spec.Events, 13)
+	require.Len(t, spec.Alerts, 9)
 	require.NotEmpty(t, spec.SpecRoot)
 	require.Contains(t, spec.Metrics, ObservableMetricActivePeers)
 	require.Contains(t, spec.Metrics, ObservableMetricRoutingFailureCount)
 	require.Contains(t, spec.Events, ObservableEventNetworkNodeRegistered)
 	require.Contains(t, spec.Events, ObservableEventNetworkRouteFailed)
+	require.Contains(t, spec.Alerts, ObservableAlertConsensusChannelLatencyAboveThreshold)
+	require.Contains(t, spec.Alerts, ObservableAlertEclipseRiskPeerDiversityLow)
 
 	missingMetric := spec
 	missingMetric.Metrics = append([]NetworkingObservableMetric(nil), spec.Metrics[:len(spec.Metrics)-1]...)
@@ -4382,6 +4385,17 @@ func TestNetworkingObservabilitySpecCoversRequiredMetricsAndEvents(t *testing.T)
 	unknownEvent.Events[0] = NetworkingObservableEvent("network_unknown")
 	unknownEvent.SpecRoot = ComputeNetworkingObservabilitySpecRoot(unknownEvent)
 	require.ErrorContains(t, ValidateNetworkingObservabilitySpec(unknownEvent), "unknown networking observability event")
+
+	missingAlert := spec
+	missingAlert.Alerts = append([]NetworkingObservableAlert(nil), spec.Alerts[:len(spec.Alerts)-1]...)
+	missingAlert.SpecRoot = ComputeNetworkingObservabilitySpecRoot(missingAlert)
+	require.ErrorContains(t, ValidateNetworkingObservabilitySpec(missingAlert), "must define 9 alerts")
+
+	unknownAlert := spec
+	unknownAlert.Alerts = append([]NetworkingObservableAlert(nil), spec.Alerts...)
+	unknownAlert.Alerts[0] = NetworkingObservableAlert("network_unknown_alert")
+	unknownAlert.SpecRoot = ComputeNetworkingObservabilitySpecRoot(unknownAlert)
+	require.ErrorContains(t, ValidateNetworkingObservabilitySpec(unknownAlert), "unknown networking observability alert")
 }
 
 func TestNetworkingObservabilityReportRequiresSamplesAndEvents(t *testing.T) {
@@ -4421,6 +4435,45 @@ func TestNetworkingObservabilityReportRequiresSamplesAndEvents(t *testing.T) {
 	tampered[0].EventID = HashParts("wrong-event-id")
 	_, err = BuildNetworkingObservabilityReport(spec, metrics, tampered)
 	require.ErrorContains(t, err, "event id mismatch")
+}
+
+func TestNetworkingAlertRulesAndSignalsCoverSectionSeventeenThree(t *testing.T) {
+	rules := DefaultNetworkingAlertRules()
+	require.NoError(t, ValidateNetworkingAlertRules(rules))
+	require.Len(t, rules, 9)
+	require.Contains(t, networkingAlertRuleIDs(rules), ObservableAlertConsensusChannelLatencyAboveThreshold)
+	require.Contains(t, networkingAlertRuleIDs(rules), ObservableAlertDiscoveryPoisoningAttempt)
+	require.Contains(t, networkingAlertRuleIDs(rules), ObservableAlertEclipseRiskPeerDiversityLow)
+
+	missing := append([]NetworkingAlertRule(nil), rules[:len(rules)-1]...)
+	require.ErrorContains(t, ValidateNetworkingAlertRules(missing), "must define 9 alerts")
+
+	invalid := append([]NetworkingAlertRule(nil), rules...)
+	invalid[0].Threshold = 0
+	require.ErrorContains(t, ValidateNetworkingAlertRules(invalid), "threshold must be positive")
+
+	signals := testNetworkingAlertSignals(rules)
+	report, err := BuildNetworkingAlertReport(rules, signals)
+	require.NoError(t, err)
+	require.True(t, report.Ready)
+	require.Empty(t, report.MissingAlerts)
+	require.NotEmpty(t, report.ReportHash)
+
+	withoutDiscovery := make([]NetworkingAlertSignal, 0, len(signals)-1)
+	for _, signal := range signals {
+		if signal.Alert != ObservableAlertDiscoveryPoisoningAttempt {
+			withoutDiscovery = append(withoutDiscovery, signal)
+		}
+	}
+	report, err = BuildNetworkingAlertReport(rules, withoutDiscovery)
+	require.NoError(t, err)
+	require.False(t, report.Ready)
+	require.Contains(t, report.MissingAlerts, ObservableAlertDiscoveryPoisoningAttempt)
+
+	tampered := append([]NetworkingAlertSignal(nil), signals...)
+	tampered[0].TriggerID = HashParts("wrong-alert-trigger")
+	_, err = BuildNetworkingAlertReport(rules, tampered)
+	require.ErrorContains(t, err, "trigger id mismatch")
 }
 
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
@@ -5308,6 +5361,37 @@ func testNetworkingObservabilityEvents() []NetworkingEventRecord {
 		NewNetworkingEventRecord(ObservableEventNetworkBroadcastConflict, peerID, overlayID, ChannelBlock, "", messageID, evidenceHash, 61),
 		NewNetworkingEventRecord(ObservableEventNetworkRouteFailed, peerID, overlayID, ChannelRouting, "", messageID, evidenceHash, 62),
 	}
+}
+
+func networkingAlertRuleIDs(rules []NetworkingAlertRule) []NetworkingObservableAlert {
+	out := make([]NetworkingObservableAlert, len(rules))
+	for i, rule := range rules {
+		out[i] = NormalizeNetworkingAlertRule(rule).Alert
+	}
+	sortObservableAlerts(out)
+	return out
+}
+
+func testNetworkingAlertSignals(rules []NetworkingAlertRule) []NetworkingAlertSignal {
+	nodeID := HashParts("observability-alert-node")
+	overlayID := HashParts("observability-alert-overlay")
+	signals := make([]NetworkingAlertSignal, 0, len(rules))
+	for i, rule := range NormalizeNetworkingAlertRules(rules) {
+		observed := rule.Threshold + 1
+		if rule.Condition == NetworkingAlertConditionBelowThreshold {
+			observed = rule.Threshold - 1
+		}
+		var sourceMetric NetworkingObservableMetric
+		var sourceEvent NetworkingObservableEvent
+		if len(rule.SourceMetrics) > 0 {
+			sourceMetric = rule.SourceMetrics[0]
+		}
+		if len(rule.SourceEvents) > 0 {
+			sourceEvent = rule.SourceEvents[0]
+		}
+		signals = append(signals, NewNetworkingAlertSignal(rule, sourceMetric, sourceEvent, nodeID, overlayID, observed, uint64(70+i)))
+	}
+	return signals
 }
 
 func testRequiredNetworkingCoverageEvidence() []NetworkingTestCoverageEvidence {
