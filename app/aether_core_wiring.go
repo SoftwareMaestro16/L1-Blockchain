@@ -46,6 +46,7 @@ import (
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
 	shardingcoordinatortypes "github.com/sovereign-l1/l1/x/sharding-coordinator/types"
+	stakeconcentrationtypes "github.com/sovereign-l1/l1/x/stake-concentration/types"
 	singlenominatorpooltypes "github.com/sovereign-l1/l1/x/single-nominator-pool/types"
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
 	systemregistrytypes "github.com/sovereign-l1/l1/x/system-registry/types"
@@ -274,6 +275,7 @@ func aetherCoreInitGenesisOrder() []string {
 		treasurytypes.ModuleName,
 		emissionstypes.ModuleName,
 		dynamiccommissiontypes.ModuleName,
+		stakeconcentrationtypes.ModuleName,
 		feecollectortypes.ModuleName,
 		feestypes.ModuleName,
 		tokenfactorytypes.ModuleName,
@@ -329,6 +331,7 @@ func aetherCoreExportGenesisOrder() []string {
 		treasurytypes.ModuleName,
 		emissionstypes.ModuleName,
 		dynamiccommissiontypes.ModuleName,
+		stakeconcentrationtypes.ModuleName,
 		feecollectortypes.ModuleName,
 		feestypes.ModuleName,
 		tokenfactorytypes.ModuleName,

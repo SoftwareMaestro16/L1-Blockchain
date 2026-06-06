@@ -96,6 +96,8 @@ import (
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
 	shardingcoordinatorkeeper "github.com/sovereign-l1/l1/x/sharding-coordinator/keeper"
 	shardingcoordinatortypes "github.com/sovereign-l1/l1/x/sharding-coordinator/types"
+	stakeconcentrationkeeper "github.com/sovereign-l1/l1/x/stake-concentration/keeper"
+	stakeconcentrationtypes "github.com/sovereign-l1/l1/x/stake-concentration/types"
 	singlenominatorpoolkeeper "github.com/sovereign-l1/l1/x/single-nominator-pool/keeper"
 	singlenominatorpooltypes "github.com/sovereign-l1/l1/x/single-nominator-pool/types"
 	storagerentkeeper "github.com/sovereign-l1/l1/x/storage-rent/keeper"
@@ -313,6 +315,11 @@ func (app *L1App) initKeepers(
 	app.DynamicCommissionKeeper = dynamiccommissionkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[dynamiccommissiontypes.StoreKey]),
+		govAuthority,
+	)
+	app.StakeConcentrationKeeper = stakeconcentrationkeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(keys[stakeconcentrationtypes.StoreKey]),
 		govAuthority,
 	)
 	app.FeeCollectorKeeper = feecollectorkeeper.NewKeeper(

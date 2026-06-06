@@ -57,6 +57,7 @@ import (
 	routingmodule "github.com/sovereign-l1/l1/x/routing"
 	schedulermodule "github.com/sovereign-l1/l1/x/scheduler"
 	shardingcoordinatormodule "github.com/sovereign-l1/l1/x/sharding-coordinator"
+	stakeconcentrationmodule "github.com/sovereign-l1/l1/x/stake-concentration"
 	singlenominatorpoolmodule "github.com/sovereign-l1/l1/x/single-nominator-pool"
 	storagerentmodule "github.com/sovereign-l1/l1/x/storage-rent"
 	systemregistrymodule "github.com/sovereign-l1/l1/x/system-registry"
@@ -123,6 +124,7 @@ func (app *L1App) initModules(
 		treasurymodule.NewAppModule(appCodec, app.TreasuryKeeper),
 		emissionsmodule.NewAppModule(appCodec, app.EmissionsKeeper),
 		dynamiccommissionmodule.NewAppModule(appCodec, app.DynamicCommissionKeeper),
+		stakeconcentrationmodule.NewAppModule(appCodec, app.StakeConcentrationKeeper),
 		feecollectormodule.NewAppModule(appCodec, app.FeeCollectorKeeper),
 		feesmodule.NewAppModule(appCodec, app.FeesKeeper),
 	)

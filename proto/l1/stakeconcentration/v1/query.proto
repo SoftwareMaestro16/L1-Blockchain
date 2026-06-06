@@ -1,0 +1,42 @@
+syntax = "proto3";
+package l1.stakeconcentration.v1;
+
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "l1/stakeconcentration/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/stake-concentration/types";
+
+service Query {
+  rpc ValidatorConcentration(QueryValidatorConcentrationRequest) returns (QueryValidatorConcentrationResponse) {
+    option (google.api.http).get = "/l1/stakeconcentration/v1/validators/{operator_address}";
+  }
+
+  rpc NetworkConcentration(QueryNetworkConcentrationRequest) returns (QueryNetworkConcentrationResponse) {
+    option (google.api.http).get = "/l1/stakeconcentration/v1/network";
+  }
+
+  rpc ConcentrationParams(QueryConcentrationParamsRequest) returns (QueryConcentrationParamsResponse) {
+    option (google.api.http).get = "/l1/stakeconcentration/v1/params";
+  }
+}
+
+message QueryValidatorConcentrationRequest {
+  string operator_address = 1;
+}
+
+message QueryValidatorConcentrationResponse {
+  ValidatorConcentration concentration = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryNetworkConcentrationRequest {}
+
+message QueryNetworkConcentrationResponse {
+  NetworkConcentration network = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryConcentrationParamsRequest {}
+
+message QueryConcentrationParamsResponse {
+  Params params = 1 [(gogoproto.nullable) = false];
+}

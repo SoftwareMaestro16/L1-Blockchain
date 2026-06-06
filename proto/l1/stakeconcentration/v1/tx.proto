@@ -1,0 +1,36 @@
+syntax = "proto3";
+package l1.stakeconcentration.v1;
+
+import "cosmos/msg/v1/msg.proto";
+import "gogoproto/gogo.proto";
+import "l1/stakeconcentration/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/stake-concentration/types";
+
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  rpc UpdateConcentrationParams(MsgUpdateConcentrationParams) returns (MsgUpdateConcentrationParamsResponse);
+  rpc RecomputeConcentration(MsgRecomputeConcentration) returns (MsgRecomputeConcentrationResponse);
+}
+
+message MsgUpdateConcentrationParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  string authority = 1;
+  Params params = 2 [(gogoproto.nullable) = false];
+}
+
+message MsgUpdateConcentrationParamsResponse {}
+
+message MsgRecomputeConcentration {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  string authority = 1;
+  uint64 epoch = 2;
+  repeated ValidatorPower validator_set = 3 [(gogoproto.nullable) = false];
+}
+
+message MsgRecomputeConcentrationResponse {
+  NetworkConcentration network = 1 [(gogoproto.nullable) = false];
+}

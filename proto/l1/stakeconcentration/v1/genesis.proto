@@ -1,0 +1,46 @@
+syntax = "proto3";
+package l1.stakeconcentration.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/stake-concentration/types";
+
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+  NetworkConcentration network = 2 [(gogoproto.nullable) = false];
+}
+
+message Params {
+  uint32 max_voting_power_bps = 1;
+  uint32 soft_voting_power_bps = 2;
+  uint32 max_reward_reduction_bps = 3;
+  uint32 warning_threshold_bps = 4;
+  bool delegation_rejection_enabled = 5;
+}
+
+message ValidatorPower {
+  string operator_address = 1;
+  uint64 voting_power = 2;
+}
+
+message ValidatorConcentration {
+  string operator_address = 1;
+  uint64 voting_power = 2;
+  uint32 raw_voting_power_bps = 3;
+  uint32 effective_voting_power_bps = 4;
+  bool above_soft_cap = 5;
+  bool above_hard_cap = 6;
+  bool delegation_allowed = 7;
+  uint32 reward_modifier_bps = 8;
+  string warning = 9;
+}
+
+message NetworkConcentration {
+  uint64 epoch = 1;
+  uint64 total_voting_power = 2;
+  uint32 max_validator_power_bps = 3;
+  uint32 top_three_power_bps = 4;
+  repeated ValidatorConcentration validators = 5 [(gogoproto.nullable) = false];
+  repeated string warnings = 6;
+  int64 recomputed_height = 7;
+}
