@@ -987,6 +987,18 @@ type KeeperIntegrationManifest struct {
 	Root                  string
 }
 
+type StateKeySpec struct {
+	Domain     string
+	Name       string
+	Template   string
+	Components []string
+}
+
+type StateModelManifest struct {
+	Keys []StateKeySpec
+	Root string
+}
+
 func (p CentralizationControlParams) Validate() error {
 	checks := []struct {
 		name  string
@@ -1835,6 +1847,173 @@ func knownKeeperIntegrationModules(compatibility CosmosSDKCompatibilityManifest)
 	known["bank"] = struct{}{}
 	known["gov"] = struct{}{}
 	return known
+}
+
+func DefaultStateModelManifest() StateModelManifest {
+	manifest := StateModelManifest{Keys: []StateKeySpec{
+		{Domain: "epoch", Name: "current", Template: "epoch/current"},
+		{Domain: "epoch", Name: "records", Template: "epoch/records/{epoch_id}", Components: []string{"epoch_id"}},
+		{Domain: "epoch", Name: "phase", Template: "epoch/phase/{epoch_id}", Components: []string{"epoch_id"}},
+		{Domain: "epoch", Name: "seed", Template: "epoch/seed/{epoch_id}", Components: []string{"epoch_id"}},
+		{Domain: "validator_economy", Name: "scores", Template: "valecon/scores/{epoch_id}/{validator}", Components: []string{"epoch_id", "validator"}},
+		{Domain: "validator_economy", Name: "effective_stake", Template: "valecon/effective_stake/{epoch_id}/{validator}", Components: []string{"epoch_id", "validator"}},
+		{Domain: "validator_economy", Name: "saturation", Template: "valecon/saturation/{epoch_id}/{validator}", Components: []string{"epoch_id", "validator"}},
+		{Domain: "validator_economy", Name: "roles", Template: "valecon/roles/{epoch_id}/{validator}/{role}", Components: []string{"epoch_id", "validator", "role"}},
+		{Domain: "taskgroups", Name: "groups", Template: "taskgroups/groups/{epoch_id}/{task_group_id}", Components: []string{"epoch_id", "task_group_id"}},
+		{Domain: "taskgroups", Name: "workloads", Template: "taskgroups/workloads/{workload_id}", Components: []string{"workload_id"}},
+		{Domain: "taskgroups", Name: "assignments", Template: "taskgroups/assignments/{epoch_id}/{validator}/{task_group_id}", Components: []string{"epoch_id", "validator", "task_group_id"}},
+		{Domain: "taskgroups", Name: "proposer", Template: "taskgroups/proposer/{epoch_id}/{slot}/{task_group_id}", Components: []string{"epoch_id", "slot", "task_group_id"}},
+		{Domain: "evidence", Name: "records", Template: "evidence/records/{evidence_id}", Components: []string{"evidence_id"}},
+		{Domain: "evidence", Name: "by_accused", Template: "evidence/by_accused/{validator}/{evidence_id}", Components: []string{"validator", "evidence_id"}},
+		{Domain: "evidence", Name: "by_reporter", Template: "evidence/by_reporter/{reporter}/{evidence_id}", Components: []string{"reporter", "evidence_id"}},
+		{Domain: "evidence", Name: "verification_groups", Template: "evidence/verification_groups/{evidence_id}", Components: []string{"evidence_id"}},
+		{Domain: "evidence", Name: "deposits", Template: "evidence/deposits/{evidence_id}", Components: []string{"evidence_id"}},
+		{Domain: "performance", Name: "records", Template: "performance/records/{epoch_id}/{operator}/{role}", Components: []string{"epoch_id", "operator", "role"}},
+		{Domain: "performance", Name: "uptime", Template: "performance/uptime/{epoch_id}/{validator}", Components: []string{"epoch_id", "validator"}},
+		{Domain: "performance", Name: "correctness", Template: "performance/correctness/{epoch_id}/{validator}", Components: []string{"epoch_id", "validator"}},
+		{Domain: "performance", Name: "tasks", Template: "performance/tasks/{epoch_id}/{validator}", Components: []string{"epoch_id", "validator"}},
+		{Domain: "risk", Name: "unbonding", Template: "risk/unbonding/{delegator}/{validator}/{creation_height}", Components: []string{"delegator", "validator", "creation_height"}},
+		{Domain: "risk", Name: "redelegation", Template: "risk/redelegation/{delegator}/{src_validator}/{dst_validator}/{epoch_id}", Components: []string{"delegator", "src_validator", "dst_validator", "epoch_id"}},
+		{Domain: "risk", Name: "exposure", Template: "risk/exposure/{epoch_id}/{validator}/{delegator}", Components: []string{"epoch_id", "validator", "delegator"}},
+	}}
+	manifest.Root = ComputeStateModelRoot(manifest)
+	return manifest
+}
+
+func (m StateModelManifest) Validate() error {
+	if len(m.Keys) == 0 {
+		return errors.New("state model keys are required")
+	}
+	seenTemplates := make(map[string]struct{}, len(m.Keys))
+	seenNames := make(map[string]struct{}, len(m.Keys))
+	for _, key := range m.Keys {
+		if err := key.Validate(); err != nil {
+			return err
+		}
+		if _, found := seenTemplates[key.Template]; found {
+			return fmt.Errorf("duplicate state key template %s", key.Template)
+		}
+		seenTemplates[key.Template] = struct{}{}
+		qualified := key.Domain + "/" + key.Name
+		if _, found := seenNames[qualified]; found {
+			return fmt.Errorf("duplicate state key name %s", qualified)
+		}
+		seenNames[qualified] = struct{}{}
+	}
+	if err := validatePosHash("state model root", m.Root); err != nil {
+		return err
+	}
+	if expected := ComputeStateModelRoot(m); expected != m.Root {
+		return errors.New("state model root mismatch")
+	}
+	return nil
+}
+
+func (s StateKeySpec) Validate() error {
+	if err := validatePosToken("state key domain", s.Domain); err != nil {
+		return err
+	}
+	if err := validatePosToken("state key name", s.Name); err != nil {
+		return err
+	}
+	if strings.TrimSpace(s.Template) != s.Template || s.Template == "" {
+		return errors.New("state key template is required and must not have surrounding whitespace")
+	}
+	if strings.Contains(s.Template, "//") {
+		return fmt.Errorf("state key template %s must not contain empty segments", s.Template)
+	}
+	for _, component := range s.Components {
+		if err := validatePosToken("state key component", component); err != nil {
+			return err
+		}
+		if !strings.Contains(s.Template, "{"+component+"}") {
+			return fmt.Errorf("state key component %s is not present in template %s", component, s.Template)
+		}
+	}
+	return nil
+}
+
+func ComputeStateModelRoot(manifest StateModelManifest) string {
+	return posHashRoot("aetheris-pos-state-model-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(manifest.Keys)))
+		for _, key := range manifest.Keys {
+			posWritePart(w, key.Domain)
+			posWritePart(w, key.Name)
+			posWritePart(w, key.Template)
+			posWriteStringSlice(w, key.Components)
+		}
+	})
+}
+
+func EpochCurrentKey() string { return "epoch/current" }
+func EpochRecordKey(epochID uint64) string {
+	return stateKey("epoch", "records", uint64StateComponent(epochID))
+}
+func EpochPhaseKey(epochID uint64) string {
+	return stateKey("epoch", "phase", uint64StateComponent(epochID))
+}
+func EpochSeedKey(epochID uint64) string {
+	return stateKey("epoch", "seed", uint64StateComponent(epochID))
+}
+func ValidatorScoreKey(epochID uint64, validator string) (string, error) {
+	return stateKeyChecked("valecon", "scores", uint64StateComponent(epochID), validator)
+}
+func ValidatorEffectiveStakeKey(epochID uint64, validator string) (string, error) {
+	return stateKeyChecked("valecon", "effective_stake", uint64StateComponent(epochID), validator)
+}
+func ValidatorSaturationKey(epochID uint64, validator string) (string, error) {
+	return stateKeyChecked("valecon", "saturation", uint64StateComponent(epochID), validator)
+}
+func ValidatorRoleKey(epochID uint64, validator string, role ValidatorRole) (string, error) {
+	return stateKeyChecked("valecon", "roles", uint64StateComponent(epochID), validator, string(role))
+}
+func TaskGroupKey(epochID uint64, taskGroupID string) (string, error) {
+	return stateKeyChecked("taskgroups", "groups", uint64StateComponent(epochID), taskGroupID)
+}
+func WorkloadKey(workloadID string) (string, error) {
+	return stateKeyChecked("taskgroups", "workloads", workloadID)
+}
+func TaskAssignmentKey(epochID uint64, validator string, taskGroupID string) (string, error) {
+	return stateKeyChecked("taskgroups", "assignments", uint64StateComponent(epochID), validator, taskGroupID)
+}
+func ProposerKey(epochID uint64, slot uint64, taskGroupID string) (string, error) {
+	return stateKeyChecked("taskgroups", "proposer", uint64StateComponent(epochID), uint64StateComponent(slot), taskGroupID)
+}
+func EvidenceRecordKey(evidenceID string) (string, error) {
+	return stateKeyChecked("evidence", "records", evidenceID)
+}
+func EvidenceByAccusedKey(validator string, evidenceID string) (string, error) {
+	return stateKeyChecked("evidence", "by_accused", validator, evidenceID)
+}
+func EvidenceByReporterKey(reporter string, evidenceID string) (string, error) {
+	return stateKeyChecked("evidence", "by_reporter", reporter, evidenceID)
+}
+func EvidenceVerificationGroupKey(evidenceID string) (string, error) {
+	return stateKeyChecked("evidence", "verification_groups", evidenceID)
+}
+func EvidenceDepositKey(evidenceID string) (string, error) {
+	return stateKeyChecked("evidence", "deposits", evidenceID)
+}
+func PerformanceRecordKey(epochID uint64, operator string, role ValidatorRole) (string, error) {
+	return stateKeyChecked("performance", "records", uint64StateComponent(epochID), operator, string(role))
+}
+func PerformanceUptimeKey(epochID uint64, validator string) (string, error) {
+	return stateKeyChecked("performance", "uptime", uint64StateComponent(epochID), validator)
+}
+func PerformanceCorrectnessKey(epochID uint64, validator string) (string, error) {
+	return stateKeyChecked("performance", "correctness", uint64StateComponent(epochID), validator)
+}
+func PerformanceTasksKey(epochID uint64, validator string) (string, error) {
+	return stateKeyChecked("performance", "tasks", uint64StateComponent(epochID), validator)
+}
+func RiskUnbondingKey(delegator string, validator string, creationHeight uint64) (string, error) {
+	return stateKeyChecked("risk", "unbonding", delegator, validator, uint64StateComponent(creationHeight))
+}
+func RiskRedelegationKey(delegator string, sourceValidator string, destinationValidator string, epochID uint64) (string, error) {
+	return stateKeyChecked("risk", "redelegation", delegator, sourceValidator, destinationValidator, uint64StateComponent(epochID))
+}
+func RiskExposureKey(epochID uint64, validator string, delegator string) (string, error) {
+	return stateKeyChecked("risk", "exposure", uint64StateComponent(epochID), validator, delegator)
 }
 
 func (a LayeredPosArchitecture) Validate() error {
@@ -6710,6 +6889,36 @@ func intRatioBps(numerator sdkmath.Int, denominator sdkmath.Int) uint32 {
 		return BasisPoints
 	}
 	return uint32(numerator.MulRaw(int64(BasisPoints)).Quo(denominator).Uint64())
+}
+
+func stateKey(parts ...string) string {
+	return strings.Join(parts, "/")
+}
+
+func stateKeyChecked(parts ...string) (string, error) {
+	if len(parts) == 0 {
+		return "", errors.New("state key parts are required")
+	}
+	for _, part := range parts {
+		if err := validateStateKeyComponent("state key component", part); err != nil {
+			return "", err
+		}
+	}
+	return stateKey(parts...), nil
+}
+
+func uint64StateComponent(value uint64) string {
+	return fmt.Sprintf("%d", value)
+}
+
+func validateStateKeyComponent(fieldName string, value string) error {
+	if err := validatePosToken(fieldName, value); err != nil {
+		return err
+	}
+	if strings.Contains(value, "/") {
+		return fmt.Errorf("%s must not contain path separator", fieldName)
+	}
+	return nil
 }
 
 func validatePosToken(fieldName string, value string) error {
