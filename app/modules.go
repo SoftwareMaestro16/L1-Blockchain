@@ -36,6 +36,7 @@ import (
 	aethercoremodule "github.com/sovereign-l1/l1/x/aethercore"
 	avmschedulermodule "github.com/sovereign-l1/l1/x/avm-scheduler"
 	bridgehubmodule "github.com/sovereign-l1/l1/x/bridge-hub"
+	burnmodule "github.com/sovereign-l1/l1/x/burn"
 	configmodule "github.com/sovereign-l1/l1/x/config"
 	configvotingmodule "github.com/sovereign-l1/l1/x/config-voting"
 	constitutionmodule "github.com/sovereign-l1/l1/x/constitution"
@@ -110,6 +111,7 @@ func (app *L1App) initModules(
 		shardingcoordinatormodule.NewAppModule(&app.ShardingCoordinatorKeeper),
 		tokenfactorymodule.NewAppModule(appCodec, app.TokenFactoryKeeper),
 		dexmodule.NewAppModule(appCodec, app.DexKeeper),
+		burnmodule.NewAppModule(appCodec, app.BurnKeeper),
 		dynamiccommissionmodule.NewAppModule(appCodec, app.DynamicCommissionKeeper),
 		feecollectormodule.NewAppModule(appCodec, app.FeeCollectorKeeper),
 		feesmodule.NewAppModule(appCodec, app.FeesKeeper),

@@ -25,6 +25,7 @@ import (
 	aethercoretypes "github.com/sovereign-l1/l1/x/aethercore/types"
 	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	bridgehubtypes "github.com/sovereign-l1/l1/x/bridge-hub/types"
+	burntypes "github.com/sovereign-l1/l1/x/burn/types"
 	configvotingtypes "github.com/sovereign-l1/l1/x/config-voting/types"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
 	constitutiontypes "github.com/sovereign-l1/l1/x/constitution/types"
@@ -249,6 +250,7 @@ func aetherCoreInitGenesisOrder() []string {
 		bridgehubtypes.ModuleName,
 		crosschainregistrytypes.ModuleName,
 		shardingcoordinatortypes.ModuleName,
+		burntypes.ModuleName,
 		dynamiccommissiontypes.ModuleName,
 		feecollectortypes.ModuleName,
 		feestypes.ModuleName,
@@ -298,6 +300,7 @@ func aetherCoreExportGenesisOrder() []string {
 		bridgehubtypes.ModuleName,
 		crosschainregistrytypes.ModuleName,
 		shardingcoordinatortypes.ModuleName,
+		burntypes.ModuleName,
 		dynamiccommissiontypes.ModuleName,
 		feecollectortypes.ModuleName,
 		feestypes.ModuleName,

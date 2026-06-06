@@ -28,6 +28,7 @@ import (
 	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
 	appparams "github.com/sovereign-l1/l1/app/params"
 	"github.com/sovereign-l1/l1/observability"
+	burntypes "github.com/sovereign-l1/l1/x/burn/types"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feecollectortypes "github.com/sovereign-l1/l1/x/fee-collector/types"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
@@ -507,6 +508,7 @@ func TestPrototypeModuleAccountPermissionsAreNarrow(t *testing.T) {
 		protocolpooltypes.ProtocolPoolEscrowAccount:    nil,
 		tokenfactorytypes.ModuleName:                   {authtypes.Minter, authtypes.Burner},
 		dextypes.ModuleName:                            {authtypes.Minter, authtypes.Burner},
+		burntypes.ModuleName:                           {authtypes.Burner},
 		feecollectortypes.CollectorModuleName:          {authtypes.Burner},
 		feecollectortypes.TreasuryModuleName:           nil,
 		feecollectortypes.ProtectionModuleName:         nil,

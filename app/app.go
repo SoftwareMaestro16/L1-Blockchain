@@ -60,6 +60,8 @@ import (
 	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	bridgehubkeeper "github.com/sovereign-l1/l1/x/bridge-hub/keeper"
 	bridgehubtypes "github.com/sovereign-l1/l1/x/bridge-hub/types"
+	burnkeeper "github.com/sovereign-l1/l1/x/burn/keeper"
+	burntypes "github.com/sovereign-l1/l1/x/burn/types"
 	configvotingkeeper "github.com/sovereign-l1/l1/x/config-voting/keeper"
 	configvotingtypes "github.com/sovereign-l1/l1/x/config-voting/types"
 	configkeeper "github.com/sovereign-l1/l1/x/config/keeper"
@@ -135,6 +137,7 @@ var (
 		protocolpooltypes.ProtocolPoolEscrowAccount:    nil,
 		tokenfactorytypes.ModuleName:                   {authtypes.Minter, authtypes.Burner},
 		dextypes.ModuleName:                            {authtypes.Minter, authtypes.Burner},
+		burntypes.ModuleName:                           {authtypes.Burner},
 		feecollectortypes.CollectorModuleName:          {authtypes.Burner},
 		feecollectortypes.TreasuryModuleName:           nil,
 		feecollectortypes.ProtectionModuleName:         nil,
@@ -187,6 +190,7 @@ type L1App struct {
 	ConstitutionKeeper        constitutionkeeper.Keeper
 	TokenFactoryKeeper        tokenfactorykeeper.Keeper
 	DexKeeper                 dexkeeper.Keeper
+	BurnKeeper                burnkeeper.Keeper
 	DynamicCommissionKeeper   dynamiccommissionkeeper.Keeper
 	FeeCollectorKeeper        feecollectorkeeper.Keeper
 	FeesKeeper                feeskeeper.Keeper
@@ -319,6 +323,7 @@ func NewL1App(
 		configvotingtypes.StoreKey,
 		tokenfactorytypes.StoreKey,
 		dextypes.StoreKey,
+		burntypes.StoreKey,
 		dynamiccommissiontypes.StoreKey,
 		feecollectortypes.StoreKey,
 		feestypes.StoreKey,

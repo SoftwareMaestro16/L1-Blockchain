@@ -54,6 +54,8 @@ import (
 	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	bridgehubkeeper "github.com/sovereign-l1/l1/x/bridge-hub/keeper"
 	bridgehubtypes "github.com/sovereign-l1/l1/x/bridge-hub/types"
+	burnkeeper "github.com/sovereign-l1/l1/x/burn/keeper"
+	burntypes "github.com/sovereign-l1/l1/x/burn/types"
 	configvotingkeeper "github.com/sovereign-l1/l1/x/config-voting/keeper"
 	configvotingtypes "github.com/sovereign-l1/l1/x/config-voting/types"
 	configkeeper "github.com/sovereign-l1/l1/x/config/keeper"
@@ -274,6 +276,12 @@ func (app *L1App) initKeepers(
 	app.DexKeeper = dexkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[dextypes.StoreKey]),
+		app.BankKeeper,
+		govAuthority,
+	)
+	app.BurnKeeper = burnkeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(keys[burntypes.StoreKey]),
 		app.BankKeeper,
 		govAuthority,
 	)

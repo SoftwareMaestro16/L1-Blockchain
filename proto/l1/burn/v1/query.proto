@@ -1,0 +1,44 @@
+syntax = "proto3";
+package l1.burn.v1;
+
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "l1/burn/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/burn/types";
+
+service Query {
+  rpc BurnedByDenom(QueryBurnedByDenomRequest) returns (QueryBurnedByDenomResponse) {
+    option (google.api.http).get = "/l1/burn/v1/burned_by_denom";
+  }
+
+  rpc BurnedByEpoch(QueryBurnedByEpochRequest) returns (QueryBurnedByEpochResponse) {
+    option (google.api.http).get = "/l1/burn/v1/burned_by_epoch";
+  }
+
+  rpc BurnParams(QueryBurnParamsRequest) returns (QueryBurnParamsResponse) {
+    option (google.api.http).get = "/l1/burn/v1/params";
+  }
+}
+
+message QueryBurnedByDenomRequest {
+  string denom = 1;
+}
+
+message QueryBurnedByDenomResponse {
+  repeated BurnedByDenomEntry burned_by_denom = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryBurnedByEpochRequest {
+  uint64 epoch = 1;
+}
+
+message QueryBurnedByEpochResponse {
+  repeated BurnedByEpochEntry burned_by_epoch = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryBurnParamsRequest {}
+
+message QueryBurnParamsResponse {
+  Params params = 1 [(gogoproto.nullable) = false];
+}

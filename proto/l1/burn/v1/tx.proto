@@ -1,0 +1,64 @@
+syntax = "proto3";
+package l1.burn.v1;
+
+import "amino/amino.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "l1/burn/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/burn/types";
+
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  rpc BurnProtocolCoins(MsgBurnProtocolCoins) returns (MsgBurnProtocolCoinsResponse);
+  rpc BurnUserCoins(MsgBurnUserCoins) returns (MsgBurnUserCoinsResponse);
+  rpc UpdateBurnParams(MsgUpdateBurnParams) returns (MsgUpdateBurnParamsResponse);
+}
+
+message MsgBurnProtocolCoins {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "l1/burn/MsgBurnProtocolCoins";
+
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string source_module = 2;
+  repeated cosmos.base.v1beta1.Coin amount = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  uint64 epoch = 4;
+  string reason = 5;
+}
+
+message MsgBurnProtocolCoinsResponse {
+  BurnReason burn = 1 [(gogoproto.nullable) = false];
+}
+
+message MsgBurnUserCoins {
+  option (cosmos.msg.v1.signer) = "burner";
+  option (amino.name) = "l1/burn/MsgBurnUserCoins";
+
+  string burner = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  repeated cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  uint64 epoch = 3;
+  string reason = 4;
+}
+
+message MsgBurnUserCoinsResponse {
+  BurnReason burn = 1 [(gogoproto.nullable) = false];
+}
+
+message MsgUpdateBurnParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "l1/burn/MsgUpdateBurnParams";
+
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  Params params = 2 [(gogoproto.nullable) = false];
+}
+
+message MsgUpdateBurnParamsResponse {}
