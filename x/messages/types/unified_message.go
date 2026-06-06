@@ -47,6 +47,13 @@ const (
 	MessageLifecycleInbox    MessageLifecycleStage = "destination_inbox"
 	MessageLifecycleExecuted MessageLifecycleStage = "executed"
 	MessageLifecycleReceipt  MessageLifecycleStage = "receipt_committed"
+
+	MessageLifecycleQueuedInSourceOutbox     MessageLifecycleStage = "queued_in_source_outbox"
+	MessageLifecycleCommittedInMessageRoot   MessageLifecycleStage = "committed_in_message_root"
+	MessageLifecycleEligibleForDelivery      MessageLifecycleStage = "eligible_for_delivery"
+	MessageLifecycleQueuedInDestinationInbox MessageLifecycleStage = "queued_in_destination_inbox"
+	MessageLifecycleExecutedOrFailed         MessageLifecycleStage = "executed_or_failed"
+	MessageLifecycleBounceOrFinalize         MessageLifecycleStage = "bounce_or_finalize"
 )
 
 type UnifiedMessageRoute struct {
@@ -410,7 +417,19 @@ func IsUnifiedOrderingClass(class UnifiedOrderingClass) bool {
 
 func IsMessageLifecycleStage(stage MessageLifecycleStage) bool {
 	switch stage {
-	case MessageLifecycleCreated, MessageLifecycleRouted, MessageLifecycleOutbox, MessageLifecycleCore, MessageLifecycleInbox, MessageLifecycleExecuted, MessageLifecycleReceipt:
+	case MessageLifecycleCreated,
+		MessageLifecycleRouted,
+		MessageLifecycleOutbox,
+		MessageLifecycleCore,
+		MessageLifecycleInbox,
+		MessageLifecycleExecuted,
+		MessageLifecycleReceipt,
+		MessageLifecycleQueuedInSourceOutbox,
+		MessageLifecycleCommittedInMessageRoot,
+		MessageLifecycleEligibleForDelivery,
+		MessageLifecycleQueuedInDestinationInbox,
+		MessageLifecycleExecutedOrFailed,
+		MessageLifecycleBounceOrFinalize:
 		return true
 	default:
 		return false
