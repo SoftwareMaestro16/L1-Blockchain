@@ -679,6 +679,53 @@ type ConditionClaimRecord struct {
 	ExpiresHeight  uint64
 }
 
+type AsyncFinalizationJob struct {
+	JobID           string
+	ChannelID       string
+	FinalizeHeight  uint64
+	EnqueuedHeight  uint64
+	Attempts        uint32
+	LastRunHeight   uint64
+	LastError       string
+	Completed       bool
+	CompletedHeight uint64
+	SettlementHash  string
+}
+
+type AsyncPromiseExpiryJob struct {
+	JobID             string
+	ChannelID         string
+	PromiseID         string
+	Promise           ConditionalPromise
+	Resolver          string
+	ExpireAfterHeight uint64
+	EnqueuedHeight    uint64
+	Attempts          uint32
+	LastRunHeight     uint64
+	LastError         string
+	Completed         bool
+	CompletedHeight   uint64
+	ResolutionHash    string
+}
+
+type AsyncSettlementCompletion struct {
+	CompletionID string
+	JobID        string
+	JobType      string
+	ChannelID    string
+	ObjectID     string
+	ResultHash   string
+	Height       uint64
+}
+
+type AsyncExecutionResult struct {
+	ProcessedFinalizations   uint64
+	ProcessedPromiseExpiries uint64
+	CompletedJobIDs          []string
+	FailedJobIDs             []string
+	EmittedCompletionIDs     []string
+}
+
 type PreimageRevealRequest struct {
 	ChannelID     string
 	Promises      []ConditionalPromise
@@ -3654,6 +3701,111 @@ func (r ConditionClaimRecord) Validate() error {
 	return nil
 }
 
+func (j AsyncFinalizationJob) Normalize() AsyncFinalizationJob {
+	j.JobID = normalizeOptionalHash(j.JobID)
+	j.ChannelID = normalizeHash(j.ChannelID)
+	j.LastError = strings.TrimSpace(j.LastError)
+	j.SettlementHash = normalizeOptionalHash(j.SettlementHash)
+	return j
+}
+
+func (j AsyncFinalizationJob) Validate() error {
+	job := j.Normalize()
+	if err := ValidateHash("payments async finalization job id", job.JobID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments async finalization channel id", job.ChannelID); err != nil {
+		return err
+	}
+	if job.FinalizeHeight == 0 || job.EnqueuedHeight == 0 {
+		return errors.New("payments async finalization heights must be positive")
+	}
+	if job.Completed {
+		if job.CompletedHeight == 0 {
+			return errors.New("payments async finalization completed height must be positive")
+		}
+		if err := ValidateHash("payments async finalization settlement hash", job.SettlementHash); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (j AsyncPromiseExpiryJob) Normalize() AsyncPromiseExpiryJob {
+	j.JobID = normalizeOptionalHash(j.JobID)
+	j.ChannelID = normalizeHash(j.ChannelID)
+	j.PromiseID = normalizeHash(j.PromiseID)
+	j.Promise = j.Promise.Normalize()
+	j.Resolver = strings.TrimSpace(j.Resolver)
+	j.LastError = strings.TrimSpace(j.LastError)
+	j.ResolutionHash = normalizeOptionalHash(j.ResolutionHash)
+	return j
+}
+
+func (j AsyncPromiseExpiryJob) Validate() error {
+	job := j.Normalize()
+	if err := ValidateHash("payments async promise expiry job id", job.JobID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments async promise expiry channel id", job.ChannelID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments async promise id", job.PromiseID); err != nil {
+		return err
+	}
+	if job.Promise.ChannelID != job.ChannelID || job.Promise.PromiseID != job.PromiseID {
+		return errors.New("payments async promise expiry job promise mismatch")
+	}
+	if err := addressing.ValidateUserAddress("payments async promise resolver", job.Resolver); err != nil {
+		return err
+	}
+	if job.ExpireAfterHeight == 0 || job.EnqueuedHeight == 0 {
+		return errors.New("payments async promise expiry heights must be positive")
+	}
+	if job.Completed {
+		if job.CompletedHeight == 0 {
+			return errors.New("payments async promise expiry completed height must be positive")
+		}
+		if err := ValidateHash("payments async promise expiry resolution hash", job.ResolutionHash); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c AsyncSettlementCompletion) Normalize() AsyncSettlementCompletion {
+	c.CompletionID = normalizeOptionalHash(c.CompletionID)
+	c.JobID = normalizeHash(c.JobID)
+	c.JobType = strings.TrimSpace(c.JobType)
+	c.ChannelID = normalizeHash(c.ChannelID)
+	c.ObjectID = strings.TrimSpace(c.ObjectID)
+	c.ResultHash = normalizeHash(c.ResultHash)
+	return c
+}
+
+func (c AsyncSettlementCompletion) Validate() error {
+	completion := c.Normalize()
+	if err := ValidateHash("payments async completion id", completion.CompletionID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments async completion job id", completion.JobID); err != nil {
+		return err
+	}
+	if completion.JobType == "" {
+		return errors.New("payments async completion job type is required")
+	}
+	if err := ValidateHash("payments async completion channel id", completion.ChannelID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments async completion result hash", completion.ResultHash); err != nil {
+		return err
+	}
+	if completion.Height == 0 {
+		return errors.New("payments async completion height must be positive")
+	}
+	return nil
+}
+
 func (r PreimageRevealRequest) Normalize() PreimageRevealRequest {
 	r.ChannelID = normalizeHash(r.ChannelID)
 	r.Promises = normalizeConditionalPromises(r.Promises)
@@ -5269,6 +5421,23 @@ func ChannelFinalityTransitionEvent(channel ChannelRecord, previous, next Channe
 		ChannelID:  channel.ChannelID,
 		Height:     height,
 		Attributes: attrs,
+	}
+	return event.Normalize()
+}
+
+func AsyncSettlementCompletionEvent(completion AsyncSettlementCompletion) PaymentEvent {
+	completion = completion.Normalize()
+	event := PaymentEvent{
+		EventID:   HashParts("async-settlement-completion-event", completion.CompletionID),
+		EventType: "async-settlement-completion",
+		ChannelID: completion.ChannelID,
+		Height:    completion.Height,
+		Attributes: []PaymentEventAttribute{
+			{Key: "job_id", Value: completion.JobID},
+			{Key: "job_type", Value: completion.JobType},
+			{Key: "object_id", Value: completion.ObjectID},
+			{Key: "result_hash", Value: completion.ResultHash},
+		},
 	}
 	return event.Normalize()
 }

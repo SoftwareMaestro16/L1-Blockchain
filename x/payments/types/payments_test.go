@@ -1063,6 +1063,104 @@ func TestFraudProofVerificationFeeRefundsWhenAccepted(t *testing.T) {
 	require.Equal(t, state.FeeRefunds[0].FeeID, fraudFee.FeeID)
 }
 
+func TestAsyncExecutionFinalizationQueueIsBoundedAndIdempotent(t *testing.T) {
+	alice := testAddress(0xa6)
+	bob := testAddress(0xa7)
+	first := signedChannel(t, "async-finalize-first", "100", alice, bob)
+	second := signedChannel(t, "async-finalize-second", "100", alice, bob)
+	state := EmptyState()
+	var err error
+	state, err = OpenChannel(state, first)
+	require.NoError(t, err)
+	state, err = OpenChannel(state, second)
+	require.NoError(t, err)
+	firstClose := signedState(t, first, 2, first.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "40"},
+		{Participant: bob, Amount: "60"},
+	})
+	secondClose := signedState(t, second, 2, second.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "45"},
+		{Participant: bob, Amount: "55"},
+	})
+	state, err = SubmitClose(state, first.ChannelID, firstClose, alice, 20, "0")
+	require.NoError(t, err)
+	state, err = SubmitClose(state, second.ChannelID, secondClose, alice, 20, "0")
+	require.NoError(t, err)
+
+	state, result, err := ProcessAsyncExecutionQueues(state, 28, 1, 0)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), result.ProcessedFinalizations)
+	require.Len(t, result.CompletedJobIDs, 1)
+	require.Len(t, state.Settlements, 1)
+	require.Len(t, state.AsyncCompletions, 1)
+	require.Contains(t, paymentEventTypes(state.Events), "async-settlement-completion")
+
+	state, result, err = ProcessAsyncExecutionQueues(state, 28, 1, 0)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), result.ProcessedFinalizations)
+	require.Len(t, state.Settlements, 2)
+	require.Len(t, state.AsyncCompletions, 2)
+
+	state, result, err = ProcessAsyncExecutionQueues(state, 28, 10, 0)
+	require.NoError(t, err)
+	require.Zero(t, result.ProcessedFinalizations)
+	require.Len(t, state.Settlements, 2)
+	require.Len(t, state.AsyncCompletions, 2)
+	for _, job := range state.AsyncFinalizationQueue {
+		require.True(t, job.Completed)
+		require.NotEmpty(t, job.SettlementHash)
+	}
+}
+
+func TestAsyncExecutionExpiredPromiseQueueIsBoundedAndRetriable(t *testing.T) {
+	alice := testAddress(0xa8)
+	bob := testAddress(0xa9)
+	channel := signedChannel(t, "async-promise-expiry", "1000", alice, bob)
+	base := signedReserveState(t, channel, 2, channel.OpeningStateHash, "80", "0", []Balance{
+		{Participant: alice, Amount: "900"},
+		{Participant: bob, Amount: "20"},
+	})
+	promiseChannel := channel
+	promiseChannel.LatestState = base
+	firstPromise := signedLinkedPromise(t, promiseChannel, HashParts("async-expiry-promise", channel.ChannelID, "first"), alice, bob, "10", "0", 9, 40, HashParts("async-expiry-one"), "", "")
+	secondPromise := signedLinkedPromise(t, promiseChannel, HashParts("async-expiry-promise", channel.ChannelID, "second"), alice, bob, "10", "0", 10, 41, HashParts("async-expiry-two"), "", "")
+	conditioned, _, err := BuildConditionRootUpdateFromPromises(promiseChannel, base, []ConditionalPromise{firstPromise, secondPromise}, nil)
+	require.NoError(t, err)
+	conditioned = resignState(t, channel, conditioned)
+	state := EmptyState()
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+	state, err = AcceptSignedState(state, channel.ChannelID, conditioned, 20)
+	require.NoError(t, err)
+	state, firstJob, err := EnqueueExpiredPromise(state, firstPromise, alice, 21)
+	require.NoError(t, err)
+	state, secondJob, err := EnqueueExpiredPromise(state, secondPromise, alice, 21)
+	require.NoError(t, err)
+	require.NotEqual(t, firstJob.JobID, secondJob.JobID)
+
+	state, result, err := ProcessAsyncExecutionQueues(state, 41, 0, 1)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), result.ProcessedPromiseExpiries)
+	require.Len(t, state.ConditionClaims, 1)
+	require.Len(t, state.AsyncCompletions, 1)
+
+	state, result, err = ProcessAsyncExecutionQueues(state, 42, 0, 1)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), result.ProcessedPromiseExpiries)
+	require.Len(t, state.ConditionClaims, 2)
+	require.Len(t, state.AsyncCompletions, 2)
+
+	state, result, err = ProcessAsyncExecutionQueues(state, 42, 0, 10)
+	require.NoError(t, err)
+	require.Zero(t, result.ProcessedPromiseExpiries)
+	require.Len(t, state.ConditionClaims, 2)
+	require.Len(t, state.AsyncCompletions, 2)
+	for _, job := range state.AsyncPromiseExpiryQueue {
+		require.True(t, job.Completed)
+		require.NotEmpty(t, job.ResolutionHash)
+	}
+}
+
 func TestBidirectionalStateCommitmentIncludesDomainFields(t *testing.T) {
 	alice := testAddress(0x37)
 	bob := testAddress(0x38)

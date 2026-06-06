@@ -122,6 +122,33 @@ func TestKeeperPaymentFeeScheduleBlocksOpenBypass(t *testing.T) {
 	require.Equal(t, "6", exported.State.FeeCharges[0].RequiredAmount)
 }
 
+func TestKeeperAsyncExecutionFinalizesQueuedChannel(t *testing.T) {
+	k := NewKeeper()
+	gs := DefaultGenesis()
+	gs.Params = prototype.TestnetParams()
+	require.NoError(t, k.InitGenesis(gs))
+
+	alice := keeperAddress(0x6d)
+	bob := keeperAddress(0x6e)
+	channel := keeperSignedChannel(t, "keeper-async-finalize", "100", alice, bob)
+	require.NoError(t, k.OpenChannel(channel))
+	closeState := keeperSignedState(t, channel, 2, channel.OpeningStateHash, []paymentstypes.Balance{
+		{Participant: alice, Amount: "40"},
+		{Participant: bob, Amount: "60"},
+	})
+	require.NoError(t, k.SubmitClose(channel.ChannelID, closeState, alice, 20, "0"))
+	require.NoError(t, k.RefreshAsyncExecutionQueues(21))
+	exported := k.ExportGenesis()
+	require.Len(t, exported.State.AsyncFinalizationQueue, 1)
+	result, err := k.ProcessAsyncExecutionQueues(28, 1, 0)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), result.ProcessedFinalizations)
+	exported = k.ExportGenesis()
+	require.Len(t, exported.State.Settlements, 1)
+	require.Len(t, exported.State.AsyncCompletions, 1)
+	require.True(t, exported.State.AsyncFinalizationQueue[0].Completed)
+}
+
 func TestKeeperAdaptiveSyncSnapshotRecovery(t *testing.T) {
 	k := NewKeeper()
 	gs := DefaultGenesis()

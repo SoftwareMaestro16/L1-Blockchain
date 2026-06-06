@@ -228,6 +228,42 @@ func (k *Keeper) BatchSettleLinkedPromises(req paymentstypes.BatchConditionSettl
 	return result, nil
 }
 
+func (k *Keeper) RefreshAsyncExecutionQueues(currentHeight uint64) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.RefreshAsyncExecutionQueues(k.genesis.State, currentHeight)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
+func (k *Keeper) EnqueueExpiredPromise(promise paymentstypes.ConditionalPromise, resolver string, currentHeight uint64) (paymentstypes.AsyncPromiseExpiryJob, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return paymentstypes.AsyncPromiseExpiryJob{}, err
+	}
+	next, job, err := paymentstypes.EnqueueExpiredPromise(k.genesis.State, promise, resolver, currentHeight)
+	if err != nil {
+		return paymentstypes.AsyncPromiseExpiryJob{}, err
+	}
+	k.genesis.State = next
+	return job, nil
+}
+
+func (k *Keeper) ProcessAsyncExecutionQueues(currentHeight, maxFinalizations, maxPromiseExpiries uint64) (paymentstypes.AsyncExecutionResult, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return paymentstypes.AsyncExecutionResult{}, err
+	}
+	next, result, err := paymentstypes.ProcessAsyncExecutionQueues(k.genesis.State, currentHeight, maxFinalizations, maxPromiseExpiries)
+	if err != nil {
+		return paymentstypes.AsyncExecutionResult{}, err
+	}
+	k.genesis.State = next
+	return result, nil
+}
+
 func (k *Keeper) SubmitClose(channelID string, closingState paymentstypes.ChannelState, submitter string, currentHeight uint64, settlementFee string) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err
