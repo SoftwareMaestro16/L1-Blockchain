@@ -79,6 +79,100 @@ type DelegationCommissionStatus struct {
 	Alert                  *DelegationCommissionAlert
 }
 
+const (
+	DelegationPolicyLowRisk                    = "low_risk"
+	DelegationPolicyHighAvailability           = "high_availability"
+	DelegationPolicyDecentralizationSupporting = "decentralization_supporting"
+	DelegationPolicyMaxYieldWithinRiskBounds   = "max_yield_within_risk_bounds"
+
+	ConcentrationStatusNormal  = "normal"
+	ConcentrationStatusWarning = "warning"
+)
+
+type ValidatorRiskScoreComponents struct {
+	Validator            string
+	SlashHistoryRiskBps  uint32
+	ReliabilityRiskBps   uint32
+	ConcentrationRiskBps uint32
+	CommissionRiskBps    uint32
+	TotalRiskScoreBps    uint32
+}
+
+type DelegationYieldEstimate struct {
+	Validator                  string
+	Delegator                  string
+	DelegationAmountNaet       sdkmath.Int
+	RewardInputNaet            sdkmath.Int
+	AdjustedRewardInputNaet    sdkmath.Int
+	EstimatedRewardNaet        sdkmath.Int
+	GrossYieldBps              uint32
+	NetYieldBps                uint32
+	CommissionBps              uint32
+	PerformanceAdjustmentBps   uint32
+	ConcentrationAdjustmentBps uint32
+	ValidatorCommissionNaet    sdkmath.Int
+	UsesDistributionInputs     bool
+}
+
+type ValidatorDisclosure struct {
+	Validator              string
+	CommissionBps          uint32
+	MaxCommissionChangeBps uint32
+	UptimeBps              uint32
+	SlashHistoryCount      uint32
+	TotalSlashedNaet       sdkmath.Int
+	SelfDelegationNaet     sdkmath.Int
+	ConcentrationStatus    string
+	ConcentrationWarnings  []string
+}
+
+type DelegationPolicyTemplate struct {
+	Name                      string
+	RiskAppetite              string
+	MaxRiskScoreBps           uint32
+	MinUptimeBps              uint32
+	MaxCommissionBps          uint32
+	MaxValidatorShareBps      uint32
+	RequireNoSlashHistory     bool
+	PreferConcentrationRelief bool
+	AdvisoryOnly              bool
+}
+
+type DelegationPolicyEvaluation struct {
+	PolicyName   string
+	Matches      bool
+	Reasons      []string
+	AdvisoryOnly bool
+}
+
+type DelegatorValidatorProfile struct {
+	Validator             string
+	Risk                  ValidatorRisk
+	RiskComponents        ValidatorRiskScoreComponents
+	YieldEstimate         DelegationYieldEstimate
+	ConcentrationWarnings []string
+	Disclosure            ValidatorDisclosure
+	PolicyEvaluations     []DelegationPolicyEvaluation
+	AdvisoryOnly          bool
+}
+
+type RedelegationRewardPreview struct {
+	Delegator             string
+	FromValidator         string
+	ToValidator           string
+	AmountNaet            sdkmath.Int
+	CurrentEstimate       DelegationYieldEstimate
+	TargetEstimate        DelegationYieldEstimate
+	RewardDeltaNaet       sdkmath.Int
+	NetYieldDeltaBps      int32
+	TargetRisk            ValidatorRisk
+	TargetRiskComponents  ValidatorRiskScoreComponents
+	TargetDisclosure      ValidatorDisclosure
+	PolicyEvaluations     []DelegationPolicyEvaluation
+	AdvisoryOnly          bool
+	StakeMovementExecuted bool
+}
+
 type FirstLossSelfBondAccounting struct {
 	Validator                  string
 	TargetSlashNaet            sdkmath.Int
@@ -624,6 +718,38 @@ func (s ValidatorMarketState) QueryValidatorRisk(validator string) (ValidatorRis
 	return risk, true
 }
 
+func (s ValidatorMarketState) QueryValidatorRiskComponents(validator string, decParams DecentralizationParams, activeValidatorIDs []string) (ValidatorRiskScoreComponents, bool, error) {
+	validator = strings.TrimSpace(validator)
+	risk, found := s.QueryValidatorRisk(validator)
+	if !found {
+		return ValidatorRiskScoreComponents{}, false, nil
+	}
+	commission := uint32(0)
+	if candidate, candidateFound := s.findCandidate(validator); candidateFound {
+		commission = latestCommissionBps(s.CommissionHistory, validator, candidate.CommissionBps)
+	}
+	concentrationRisk := uint32(0)
+	report, err := s.QueryConcentrationReport(decParams, activeValidatorIDs)
+	if err != nil {
+		return ValidatorRiskScoreComponents{}, false, err
+	}
+	for _, metric := range report.Metrics {
+		if metric.Validator == validator {
+			concentrationRisk = minBps(uint64(metric.RewardDampeningBps) + uint64(metric.StakeMovementIncentiveBps))
+			break
+		}
+	}
+	components := ValidatorRiskScoreComponents{
+		Validator:            validator,
+		SlashHistoryRiskBps:  minBps(uint64(risk.SlashEventCount) * 1_000),
+		ReliabilityRiskBps:   postypes.BasisPoints - risk.LatestReliabilityBps,
+		ConcentrationRiskBps: concentrationRisk,
+		CommissionRiskBps:    commission,
+	}
+	components.TotalRiskScoreBps = minBps(uint64(components.SlashHistoryRiskBps) + uint64(components.ReliabilityRiskBps) + uint64(components.ConcentrationRiskBps) + uint64(components.CommissionRiskBps))
+	return components, true, nil
+}
+
 func (s ValidatorMarketState) QueryValidatorEffectiveYield(validator string, annualRewardsNaet sdkmath.Int) (ValidatorEffectiveYield, bool, error) {
 	if annualRewardsNaet.IsNegative() {
 		return ValidatorEffectiveYield{}, false, errors.New("annual rewards cannot be negative")
@@ -647,6 +773,79 @@ func (s ValidatorMarketState) QueryValidatorEffectiveYield(validator string, ann
 		NetYieldBps:            net,
 		CommissionBps:          commission,
 		SaturationDampeningBps: shareBps(preview.RewardWeightNaet, preview.BondedStakeNaet),
+	}, true, nil
+}
+
+func (s ValidatorMarketState) QueryDelegationYieldEstimate(delegator string, validator string, delegationAmountNaet sdkmath.Int, annualRewardsNaet sdkmath.Int, decParams DecentralizationParams, activeValidatorIDs []string) (DelegationYieldEstimate, bool, error) {
+	delegator = strings.TrimSpace(delegator)
+	validator = strings.TrimSpace(validator)
+	if err := validateEconomyToken("yield estimate delegator", delegator); err != nil {
+		return DelegationYieldEstimate{}, false, err
+	}
+	candidate, found := s.findCandidate(validator)
+	if !found {
+		return DelegationYieldEstimate{}, false, nil
+	}
+	if annualRewardsNaet.IsNegative() {
+		return DelegationYieldEstimate{}, false, errors.New("annual rewards cannot be negative")
+	}
+	amount := normalizeEconomyInt(delegationAmountNaet)
+	if !amount.IsPositive() {
+		if record, recordFound := s.findDelegation(delegator, validator); recordFound {
+			amount = record.Amount
+		}
+	}
+	if !amount.IsPositive() {
+		return DelegationYieldEstimate{}, false, errors.New("delegation amount must be positive")
+	}
+	commission := latestCommissionBps(s.CommissionHistory, validator, candidate.CommissionBps)
+	performance := validatorPerformanceAdjustmentBps(candidate, latestScoreRecord(s.ScoreRecords, validator))
+	concentration := uint32(0)
+	report, err := s.QueryConcentrationReport(decParams, activeValidatorIDs)
+	if err != nil {
+		return DelegationYieldEstimate{}, false, err
+	}
+	for _, metric := range report.Metrics {
+		if metric.Validator == validator {
+			concentration = metric.RewardDampeningBps
+			break
+		}
+	}
+	adjustedRewards := annualRewardsNaet.MulRaw(int64(performance)).QuoRaw(int64(postypes.BasisPoints))
+	adjustedRewards = adjustedRewards.MulRaw(int64(postypes.BasisPoints - concentration)).QuoRaw(int64(postypes.BasisPoints))
+	nominations := s.rewardNominationsForValidator(validator, delegator, amount)
+	distribution, err := postypes.DistributeRewards(postypes.RewardInput{
+		ValidatorID:      validator,
+		TotalRewardsNaet: adjustedRewards,
+		CommissionBps:    commission,
+		SelfStakeNaet:    candidate.SelfStakeNaet,
+		Nominations:      nominations,
+	})
+	if err != nil {
+		return DelegationYieldEstimate{}, false, err
+	}
+	estimatedReward := sdkmath.ZeroInt()
+	for _, reward := range distribution.NominatorRewards {
+		if reward.NominatorID == delegator {
+			estimatedReward = reward.RewardNaet
+			break
+		}
+	}
+	totalStake := candidate.SelfStakeNaet.Add(sumNominationStake(nominations))
+	return DelegationYieldEstimate{
+		Validator:                  validator,
+		Delegator:                  delegator,
+		DelegationAmountNaet:       amount,
+		RewardInputNaet:            annualRewardsNaet,
+		AdjustedRewardInputNaet:    adjustedRewards,
+		EstimatedRewardNaet:        estimatedReward,
+		GrossYieldBps:              shareBps(annualRewardsNaet, totalStake),
+		NetYieldBps:                shareBps(estimatedReward, amount),
+		CommissionBps:              commission,
+		PerformanceAdjustmentBps:   performance,
+		ConcentrationAdjustmentBps: concentration,
+		ValidatorCommissionNaet:    distribution.ValidatorCommissionNaet,
+		UsesDistributionInputs:     true,
 	}, true, nil
 }
 
@@ -759,6 +958,133 @@ func (s ValidatorMarketState) QueryDelegationLockEligibility(delegator string, v
 		return LockDurationRewardEligibility{}, false, err
 	}
 	return eligibility, true, nil
+}
+
+func (s ValidatorMarketState) QueryDelegatorValidatorProfile(delegator string, validator string, delegationAmountNaet sdkmath.Int, annualRewardsNaet sdkmath.Int, decParams DecentralizationParams, activeValidatorIDs []string) (DelegatorValidatorProfile, bool, error) {
+	risk, found := s.QueryValidatorRisk(validator)
+	if !found {
+		return DelegatorValidatorProfile{}, false, nil
+	}
+	components, found, err := s.QueryValidatorRiskComponents(validator, decParams, activeValidatorIDs)
+	if err != nil || !found {
+		return DelegatorValidatorProfile{}, found, err
+	}
+	yield, found, err := s.QueryDelegationYieldEstimate(delegator, validator, delegationAmountNaet, annualRewardsNaet, decParams, activeValidatorIDs)
+	if err != nil || !found {
+		return DelegatorValidatorProfile{}, found, err
+	}
+	disclosure, found, err := s.QueryValidatorDisclosure(validator, decParams, activeValidatorIDs)
+	if err != nil || !found {
+		return DelegatorValidatorProfile{}, found, err
+	}
+	evaluations := EvaluateDelegationPolicyTemplates(DefaultDelegationPolicyTemplates(s.Params), components, yield, disclosure)
+	return DelegatorValidatorProfile{
+		Validator:             strings.TrimSpace(validator),
+		Risk:                  risk,
+		RiskComponents:        components,
+		YieldEstimate:         yield,
+		ConcentrationWarnings: disclosure.ConcentrationWarnings,
+		Disclosure:            disclosure,
+		PolicyEvaluations:     evaluations,
+		AdvisoryOnly:          true,
+	}, true, nil
+}
+
+func (s ValidatorMarketState) QueryValidatorDisclosure(validator string, decParams DecentralizationParams, activeValidatorIDs []string) (ValidatorDisclosure, bool, error) {
+	validator = strings.TrimSpace(validator)
+	candidate, found := s.findCandidate(validator)
+	if !found {
+		return ValidatorDisclosure{}, false, nil
+	}
+	risk, _ := s.QueryValidatorRisk(validator)
+	report, err := s.QueryConcentrationReport(decParams, activeValidatorIDs)
+	if err != nil {
+		return ValidatorDisclosure{}, false, err
+	}
+	warnings := []string(nil)
+	status := ConcentrationStatusNormal
+	for _, metric := range report.Metrics {
+		if metric.Validator == validator {
+			warnings = append(warnings, metric.Warnings...)
+			if len(metric.Warnings) > 0 {
+				status = ConcentrationStatusWarning
+			}
+			break
+		}
+	}
+	commission := latestCommissionBps(s.CommissionHistory, validator, candidate.CommissionBps)
+	uptime := candidate.UptimeFactorBps
+	if latest := latestScoreRecord(s.ScoreRecords, validator); latest.ValidatorAddress != "" {
+		uptime = latest.UptimeFactor
+	}
+	return ValidatorDisclosure{
+		Validator:              validator,
+		CommissionBps:          commission,
+		MaxCommissionChangeBps: s.Params.MaxCommissionBps - commission,
+		UptimeBps:              normalizeOptionalBps(uptime),
+		SlashHistoryCount:      risk.SlashEventCount,
+		TotalSlashedNaet:       risk.TotalSlashedNaet,
+		SelfDelegationNaet:     candidate.SelfStakeNaet,
+		ConcentrationStatus:    status,
+		ConcentrationWarnings:  warnings,
+	}, true, nil
+}
+
+func (s ValidatorMarketState) QueryRedelegationRewardPreview(delegator string, fromValidator string, toValidator string, amount sdkmath.Int, annualRewardsNaet sdkmath.Int, decParams DecentralizationParams, activeValidatorIDs []string) (RedelegationRewardPreview, bool, error) {
+	delegator = strings.TrimSpace(delegator)
+	fromValidator = strings.TrimSpace(fromValidator)
+	toValidator = strings.TrimSpace(toValidator)
+	if err := validateEconomyToken("redelegation delegator", delegator); err != nil {
+		return RedelegationRewardPreview{}, false, err
+	}
+	if err := validateEconomyToken("redelegation source validator", fromValidator); err != nil {
+		return RedelegationRewardPreview{}, false, err
+	}
+	if err := validateEconomyToken("redelegation target validator", toValidator); err != nil {
+		return RedelegationRewardPreview{}, false, err
+	}
+	if !normalizeEconomyInt(amount).IsPositive() {
+		return RedelegationRewardPreview{}, false, errors.New("redelegation preview amount must be positive")
+	}
+	if _, found := s.findCandidate(fromValidator); !found {
+		return RedelegationRewardPreview{}, false, nil
+	}
+	if _, found := s.findCandidate(toValidator); !found {
+		return RedelegationRewardPreview{}, false, nil
+	}
+	current, found, err := s.QueryDelegationYieldEstimate(delegator, fromValidator, amount, annualRewardsNaet, decParams, activeValidatorIDs)
+	if err != nil || !found {
+		return RedelegationRewardPreview{}, found, err
+	}
+	target, found, err := s.QueryDelegationYieldEstimate(delegator, toValidator, amount, annualRewardsNaet, decParams, activeValidatorIDs)
+	if err != nil || !found {
+		return RedelegationRewardPreview{}, found, err
+	}
+	targetRisk, _ := s.QueryValidatorRisk(toValidator)
+	targetComponents, found, err := s.QueryValidatorRiskComponents(toValidator, decParams, activeValidatorIDs)
+	if err != nil || !found {
+		return RedelegationRewardPreview{}, found, err
+	}
+	targetDisclosure, found, err := s.QueryValidatorDisclosure(toValidator, decParams, activeValidatorIDs)
+	if err != nil || !found {
+		return RedelegationRewardPreview{}, found, err
+	}
+	return RedelegationRewardPreview{
+		Delegator:             delegator,
+		FromValidator:         fromValidator,
+		ToValidator:           toValidator,
+		AmountNaet:            amount,
+		CurrentEstimate:       current,
+		TargetEstimate:        target,
+		RewardDeltaNaet:       target.EstimatedRewardNaet.Sub(current.EstimatedRewardNaet),
+		NetYieldDeltaBps:      int32(target.NetYieldBps) - int32(current.NetYieldBps),
+		TargetRisk:            targetRisk,
+		TargetRiskComponents:  targetComponents,
+		TargetDisclosure:      targetDisclosure,
+		PolicyEvaluations:     EvaluateDelegationPolicyTemplates(DefaultDelegationPolicyTemplates(s.Params), targetComponents, target, targetDisclosure),
+		AdvisoryOnly:          true,
+		StakeMovementExecuted: false,
+	}, true, nil
 }
 
 func (s ValidatorMarketState) QueryConcentrationReport(params DecentralizationParams, activeValidatorIDs []string) (ActiveSetConcentrationReport, error) {
@@ -921,6 +1247,150 @@ func (s ValidatorMarketState) delegatorConcentrationBps(validator string) uint32
 		}
 	}
 	return shareBps(maxDelegation, total)
+}
+
+func DefaultDelegationPolicyTemplates(params postypes.Params) []DelegationPolicyTemplate {
+	maxConcentration := params.MaxVotingPowerBps
+	if maxConcentration == 0 {
+		maxConcentration = postypes.DefaultMaxVotingPowerBps
+	}
+	return []DelegationPolicyTemplate{
+		{
+			Name:                  DelegationPolicyLowRisk,
+			RiskAppetite:          RiskAppetiteConservative,
+			MaxRiskScoreBps:       2_000,
+			MinUptimeBps:          9_800,
+			MaxCommissionBps:      minUint32(params.MaxCommissionBps, 1_000),
+			MaxValidatorShareBps:  maxConcentration,
+			RequireNoSlashHistory: false,
+			AdvisoryOnly:          true,
+		},
+		{
+			Name:                 DelegationPolicyHighAvailability,
+			RiskAppetite:         RiskAppetiteBalanced,
+			MaxRiskScoreBps:      3_000,
+			MinUptimeBps:         9_900,
+			MaxCommissionBps:     params.MaxCommissionBps,
+			MaxValidatorShareBps: postypes.BasisPoints,
+			AdvisoryOnly:         true,
+		},
+		{
+			Name:                      DelegationPolicyDecentralizationSupporting,
+			RiskAppetite:              RiskAppetiteBalanced,
+			MaxRiskScoreBps:           5_000,
+			MinUptimeBps:              params.MinUptimeBps,
+			MaxCommissionBps:          params.MaxCommissionBps,
+			MaxValidatorShareBps:      maxConcentration,
+			PreferConcentrationRelief: true,
+			AdvisoryOnly:              true,
+		},
+		{
+			Name:                 DelegationPolicyMaxYieldWithinRiskBounds,
+			RiskAppetite:         RiskAppetiteAggressive,
+			MaxRiskScoreBps:      5_000,
+			MinUptimeBps:         params.MinUptimeBps,
+			MaxCommissionBps:     params.MaxCommissionBps,
+			MaxValidatorShareBps: postypes.BasisPoints,
+			AdvisoryOnly:         true,
+		},
+	}
+}
+
+func EvaluateDelegationPolicyTemplates(templates []DelegationPolicyTemplate, risk ValidatorRiskScoreComponents, yield DelegationYieldEstimate, disclosure ValidatorDisclosure) []DelegationPolicyEvaluation {
+	out := make([]DelegationPolicyEvaluation, 0, len(templates))
+	for _, template := range templates {
+		reasons := make([]string, 0, 4)
+		if risk.TotalRiskScoreBps > template.MaxRiskScoreBps {
+			reasons = append(reasons, "risk_score_above_policy_bound")
+		}
+		if disclosure.UptimeBps < template.MinUptimeBps {
+			reasons = append(reasons, "uptime_below_policy_minimum")
+		}
+		if disclosure.CommissionBps > template.MaxCommissionBps {
+			reasons = append(reasons, "commission_above_policy_bound")
+		}
+		if template.RequireNoSlashHistory && disclosure.SlashHistoryCount > 0 {
+			reasons = append(reasons, "slash_history_not_empty")
+		}
+		if template.MaxValidatorShareBps < postypes.BasisPoints && hasWarning(disclosure.ConcentrationWarnings, ConcentrationWarningValidatorShare) {
+			reasons = append(reasons, "validator_concentration_above_policy_bound")
+		}
+		if template.PreferConcentrationRelief && disclosure.ConcentrationStatus == ConcentrationStatusWarning {
+			reasons = append(reasons, "target_does_not_relieve_concentration")
+		}
+		if yield.NetYieldBps == 0 {
+			reasons = append(reasons, "net_yield_unavailable")
+		}
+		out = append(out, DelegationPolicyEvaluation{
+			PolicyName:   template.Name,
+			Matches:      len(reasons) == 0,
+			Reasons:      reasons,
+			AdvisoryOnly: true,
+		})
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		return out[i].PolicyName < out[j].PolicyName
+	})
+	return out
+}
+
+func (s ValidatorMarketState) rewardNominationsForValidator(validator string, delegator string, amount sdkmath.Int) []postypes.Nomination {
+	validator = strings.TrimSpace(validator)
+	delegator = strings.TrimSpace(delegator)
+	amount = normalizeEconomyInt(amount)
+	byDelegator := make(map[string]sdkmath.Int)
+	for _, record := range s.Delegations {
+		if record.Validator != validator {
+			continue
+		}
+		current := byDelegator[record.Delegator]
+		if current.IsNil() {
+			current = sdkmath.ZeroInt()
+		}
+		byDelegator[record.Delegator] = current.Add(record.Amount)
+	}
+	if delegator != "" && amount.IsPositive() {
+		byDelegator[delegator] = amount
+	}
+	out := make([]postypes.Nomination, 0, len(byDelegator))
+	for nominator, stake := range byDelegator {
+		if stake.IsPositive() {
+			out = append(out, postypes.Nomination{NominatorID: nominator, StakeNaet: stake})
+		}
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		return out[i].NominatorID < out[j].NominatorID
+	})
+	return out
+}
+
+func sumNominationStake(nominations []postypes.Nomination) sdkmath.Int {
+	total := sdkmath.ZeroInt()
+	for _, nomination := range nominations {
+		total = total.Add(nomination.StakeNaet)
+	}
+	return total
+}
+
+func validatorPerformanceAdjustmentBps(candidate postypes.Candidate, latest ValidatorScoreRecord) uint32 {
+	performance := normalizeOptionalBps(candidate.PerformanceScoreBps)
+	uptime := normalizeOptionalBps(candidate.UptimeFactorBps)
+	reliability := normalizeOptionalBps(candidate.ReliabilityIndexBps)
+	if latest.ValidatorAddress != "" {
+		performance = normalizeOptionalBps(latest.PerformanceFactor)
+		uptime = normalizeOptionalBps(latest.UptimeFactor)
+		reliability = normalizeOptionalBps(latest.ReliabilityIndex)
+	}
+	return minUint32(performance, minUint32(uptime, reliability))
+}
+
+func hasWarning(warnings []string, target string) bool {
+	for _, warning := range warnings {
+		if warning == target {
+			return true
+		}
+	}
+	return false
 }
 
 func normalizeActiveSet(activeValidatorIDs []string) map[string]struct{} {

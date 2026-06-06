@@ -182,6 +182,107 @@ func TestConcentrationReportExposesWarningsDampeningAndStakeMovementIncentives(t
 	require.LessOrEqual(t, metric.RewardDampeningBps, uint32(2_500))
 }
 
+func TestDelegatorValidatorProfileExposesRiskAdjustedYieldDisclosureAndPolicies(t *testing.T) {
+	params := testParams()
+	params.MaxVotingPowerBps = 6_000
+	candidates := []postypes.Candidate{
+		marketCandidate("val-safe", 2_000, 3_000, 500),
+		marketCandidate("val-peer", 2_500, 2_500, 500),
+	}
+	delegations := []DelegationRecord{
+		marketDelegation("del-a", "val-safe", 1_000, ""),
+		marketDelegation("del-b", "val-safe", 2_000, ""),
+		marketDelegation("del-peer", "val-peer", 2_500, ""),
+	}
+	score := testRecord(5, "val-safe", 5_000)
+	score.PerformanceFactor = 9_600
+	score.UptimeFactor = 9_800
+	score.ReliabilityIndex = 9_700
+	slash := ValidatorSlashHistoryRecord{
+		EpochID:              3,
+		Height:               30,
+		Validator:            "val-safe",
+		Misbehavior:          postypes.MisbehaviorDowntime,
+		SlashFractionBps:     100,
+		SelfBondSlashedNaet:  sdkmath.NewInt(20),
+		DelegatorSlashedNaet: sdkmath.NewInt(80),
+		TotalSlashedNaet:     sdkmath.NewInt(100),
+	}
+	state, err := NewValidatorMarketState(params, candidates, delegations, []ValidatorScoreRecord{score}, []ValidatorSlashHistoryRecord{slash}, nil)
+	require.NoError(t, err)
+	decParams := DefaultDecentralizationParams(params)
+	decParams.MaxTopNShareBps = postypes.BasisPoints
+	decParams.MaxDelegatorConcentrationBps = 7_000
+
+	profile, found, err := state.QueryDelegatorValidatorProfile("del-a", "val-safe", sdkmath.NewInt(1_000), sdkmath.NewInt(500), decParams, []string{"val-safe", "val-peer"})
+	require.NoError(t, err)
+	require.True(t, found)
+	require.True(t, profile.AdvisoryOnly)
+	require.Equal(t, uint32(1_300), profile.Risk.RiskScoreBps)
+	require.Equal(t, uint32(1_000), profile.RiskComponents.SlashHistoryRiskBps)
+	require.Equal(t, uint32(300), profile.RiskComponents.ReliabilityRiskBps)
+	require.Equal(t, uint32(1_800), profile.RiskComponents.TotalRiskScoreBps)
+
+	require.True(t, profile.YieldEstimate.UsesDistributionInputs)
+	require.Equal(t, sdkmath.NewInt(500), profile.YieldEstimate.RewardInputNaet)
+	require.Equal(t, sdkmath.NewInt(480), profile.YieldEstimate.AdjustedRewardInputNaet)
+	require.Equal(t, sdkmath.NewInt(91), profile.YieldEstimate.EstimatedRewardNaet)
+	require.Equal(t, uint32(1_000), profile.YieldEstimate.GrossYieldBps)
+	require.Equal(t, uint32(910), profile.YieldEstimate.NetYieldBps)
+	require.Equal(t, uint32(500), profile.YieldEstimate.CommissionBps)
+	require.Equal(t, uint32(9_600), profile.YieldEstimate.PerformanceAdjustmentBps)
+	require.Zero(t, profile.YieldEstimate.ConcentrationAdjustmentBps)
+
+	require.Equal(t, uint32(500), profile.Disclosure.CommissionBps)
+	require.Equal(t, uint32(1_500), profile.Disclosure.MaxCommissionChangeBps)
+	require.Equal(t, uint32(9_800), profile.Disclosure.UptimeBps)
+	require.Equal(t, uint32(1), profile.Disclosure.SlashHistoryCount)
+	require.Equal(t, sdkmath.NewInt(2_000), profile.Disclosure.SelfDelegationNaet)
+	require.Equal(t, ConcentrationStatusNormal, profile.Disclosure.ConcentrationStatus)
+
+	evaluations := policyEvaluationMap(profile.PolicyEvaluations)
+	require.True(t, evaluations[DelegationPolicyLowRisk].Matches)
+	require.False(t, evaluations[DelegationPolicyHighAvailability].Matches)
+	require.Contains(t, evaluations[DelegationPolicyHighAvailability].Reasons, "uptime_below_policy_minimum")
+	require.True(t, evaluations[DelegationPolicyLowRisk].AdvisoryOnly)
+}
+
+func TestRedelegationRewardPreviewIsAdvisoryAndDoesNotMoveStake(t *testing.T) {
+	params := testParams()
+	params.MaxVotingPowerBps = postypes.BasisPoints
+	candidates := []postypes.Candidate{
+		marketCandidate("val-from", 1_000, 4_000, 1_000),
+		marketCandidate("val-to", 2_000, 1_000, 0),
+	}
+	delegations := []DelegationRecord{
+		marketDelegation("del-a", "val-from", 1_000, ""),
+		marketDelegation("del-other", "val-from", 3_000, ""),
+		marketDelegation("del-target", "val-to", 1_000, ""),
+	}
+	scores := []ValidatorScoreRecord{
+		testRecord(7, "val-from", 5_000),
+		testRecord(7, "val-to", 3_000),
+	}
+	state, err := NewValidatorMarketState(params, candidates, delegations, scores, nil, nil)
+	require.NoError(t, err)
+	beforeFrom := state.totalDelegatedAtValidator("val-from")
+	beforeTo := state.totalDelegatedAtValidator("val-to")
+	decParams := DefaultDecentralizationParams(params)
+	decParams.MaxTopNShareBps = postypes.BasisPoints
+
+	preview, found, err := state.QueryRedelegationRewardPreview("del-a", "val-from", "val-to", sdkmath.NewInt(1_000), sdkmath.NewInt(500), decParams, []string{"val-from", "val-to"})
+	require.NoError(t, err)
+	require.True(t, found)
+	require.True(t, preview.AdvisoryOnly)
+	require.False(t, preview.StakeMovementExecuted)
+	require.Equal(t, sdkmath.NewInt(90), preview.CurrentEstimate.EstimatedRewardNaet)
+	require.Equal(t, sdkmath.NewInt(125), preview.TargetEstimate.EstimatedRewardNaet)
+	require.Equal(t, sdkmath.NewInt(35), preview.RewardDeltaNaet)
+	require.Equal(t, int32(350), preview.NetYieldDeltaBps)
+	require.Equal(t, beforeFrom, state.totalDelegatedAtValidator("val-from"))
+	require.Equal(t, beforeTo, state.totalDelegatedAtValidator("val-to"))
+}
+
 func TestDelegationMarketQueriesExposeRiskYieldSaturationAndHistory(t *testing.T) {
 	params := testParams()
 	params.StakeSaturationThresholdNaet = sdkmath.NewInt(1_000)
@@ -347,4 +448,12 @@ func marketCandidate(id string, selfStake int64, delegatedStake int64, commissio
 		CommissionBps:       commissionBps,
 		Nominations:         nominations,
 	}
+}
+
+func policyEvaluationMap(evaluations []DelegationPolicyEvaluation) map[string]DelegationPolicyEvaluation {
+	out := make(map[string]DelegationPolicyEvaluation, len(evaluations))
+	for _, evaluation := range evaluations {
+		out[evaluation.PolicyName] = evaluation
+	}
+	return out
 }
