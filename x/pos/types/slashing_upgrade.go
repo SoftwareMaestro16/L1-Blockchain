@@ -111,6 +111,43 @@ type SlashingPenaltyRouting struct {
 	RoutingHash            string
 }
 
+type SlashingRecord struct {
+	PenaltyID              string
+	ValidatorAddress       string
+	EvidenceID             string
+	Severity               string
+	StakeExposure          sdkmath.Int
+	RoleWeight             uint32
+	SlashAmount            sdkmath.Int
+	DelegatorSlashAmount   sdkmath.Int
+	RewardConfiscation     sdkmath.Int
+	JailUntilEpochOptional uint64
+	Tombstone              bool
+	Routing                SlashingPenaltyRouting
+	ExecutedHeight         int64
+	RecordHash             string
+}
+
+type SlashingExecutionInput struct {
+	EvidenceID             string
+	ReporterID             string
+	AffectedPoolIDOptional string
+	ExecutedHeight         int64
+	CurrentEpoch           uint64
+	Candidate              Candidate
+	PenaltyInput           SlashingPenaltyInput
+	RoutingInput           SlashingPenaltyRoutingInput
+}
+
+type SlashingExecutionResult struct {
+	Record           SlashingRecord
+	UpdatedCandidate Candidate
+	SeverityMatrix   map[string]uint32
+	NonNegative      bool
+	ExactRouting     bool
+	DelegatorExact   bool
+}
+
 func SlashSeverityClasses() []string {
 	return []string{
 		SlashSeverityMinorLivenessFault,
@@ -361,6 +398,166 @@ func RouteSlashingPenalty(input SlashingPenaltyRoutingInput) (SlashingPenaltyRou
 	return routing, routing.Validate()
 }
 
+func ExecuteSlashing(input SlashingExecutionInput) (SlashingExecutionResult, error) {
+	input.EvidenceID = strings.TrimSpace(input.EvidenceID)
+	input.ReporterID = strings.TrimSpace(input.ReporterID)
+	input.AffectedPoolIDOptional = strings.TrimSpace(input.AffectedPoolIDOptional)
+	if err := validatePosToken("slashing execution evidence id", input.EvidenceID); err != nil {
+		return SlashingExecutionResult{}, err
+	}
+	if input.ExecutedHeight < 0 {
+		return SlashingExecutionResult{}, errors.New("slashing executed height cannot be negative")
+	}
+	if input.CurrentEpoch == 0 {
+		return SlashingExecutionResult{}, errors.New("slashing current epoch is required")
+	}
+	penaltyInput := input.PenaltyInput
+	penaltyInput.ValidatorID = input.Candidate.ValidatorID
+	penalty, err := ComputeSlashingPenalty(penaltyInput)
+	if err != nil {
+		return SlashingExecutionResult{}, err
+	}
+	routingInput := input.RoutingInput
+	routingInput.Penalty = penalty
+	if routingInput.ReporterID == "" {
+		routingInput.ReporterID = input.ReporterID
+	}
+	if routingInput.AffectedPoolIDOptional == "" {
+		routingInput.AffectedPoolIDOptional = input.AffectedPoolIDOptional
+	}
+	routing, err := RouteSlashingPenalty(routingInput)
+	if err != nil {
+		return SlashingExecutionResult{}, err
+	}
+	updated, err := ApplySlashingPenaltyToCandidate(input.Candidate, penalty)
+	if err != nil {
+		return SlashingExecutionResult{}, err
+	}
+	record := NewSlashingRecord(input.EvidenceID, penalty, routing, input.CurrentEpoch, input.ExecutedHeight)
+	result := SlashingExecutionResult{
+		Record:           record,
+		UpdatedCandidate: updated,
+		SeverityMatrix:   SeverityMatrix(),
+		NonNegative:      !updated.SelfStakeNaet.IsNegative() && !updated.DelegatedStakeNaet.IsNegative(),
+		ExactRouting:     routing.BurnNaet.Add(routing.ReporterRewardNaet).Add(routing.ProtocolTreasuryNaet).Add(routing.CompensationNaet).Add(routing.ResidualNaet).Equal(routing.TotalPenaltyNaet),
+		DelegatorExact:   record.DelegatorSlashAmount.Equal(penalty.DelegatorProportionalSlash),
+	}
+	if err := result.Validate(); err != nil {
+		return SlashingExecutionResult{}, err
+	}
+	return result, nil
+}
+
+func NewSlashingRecord(evidenceID string, penalty SlashingPenalty, routing SlashingPenaltyRouting, currentEpoch uint64, executedHeight int64) SlashingRecord {
+	jailUntil := uint64(0)
+	if penalty.TemporaryJailEpochs > 0 {
+		jailUntil = currentEpoch + penalty.TemporaryJailEpochs
+	}
+	record := SlashingRecord{
+		PenaltyID:              penalty.PenaltyID,
+		ValidatorAddress:       penalty.ValidatorID,
+		EvidenceID:             strings.TrimSpace(evidenceID),
+		Severity:               penalty.SeverityLevel,
+		StakeExposure:          penalty.StakeExposureNaet,
+		RoleWeight:             penalty.RoleWeightBps,
+		SlashAmount:            penalty.StakeSlashNaet,
+		DelegatorSlashAmount:   penalty.DelegatorProportionalSlash,
+		RewardConfiscation:     penalty.RewardConfiscationNaet,
+		JailUntilEpochOptional: jailUntil,
+		Tombstone:              penalty.PermanentTombstone,
+		Routing:                routing,
+		ExecutedHeight:         executedHeight,
+	}
+	record.RecordHash = computeSlashingRecordHash(record)
+	return record
+}
+
+func SlashingRecordFieldNames() []string {
+	return []string{
+		"penalty_id",
+		"validator_address",
+		"evidence_id",
+		"severity",
+		"stake_exposure",
+		"role_weight",
+		"slash_amount",
+		"delegator_slash_amount",
+		"reward_confiscation",
+		"jail_until_epoch_optional",
+		"tombstone",
+		"routing",
+		"executed_height",
+	}
+}
+
+func SeverityMatrix() map[string]uint32 {
+	matrix := make(map[string]uint32, len(SlashSeverityClasses()))
+	for _, severity := range SlashSeverityClasses() {
+		bps, _ := DefaultSeverityBps(severity)
+		matrix[severity] = bps
+	}
+	return matrix
+}
+
+func (r SlashingRecord) Validate() error {
+	if err := validatePosToken("slashing record penalty id", r.PenaltyID); err != nil {
+		return err
+	}
+	if err := validatePosToken("slashing record validator address", r.ValidatorAddress); err != nil {
+		return err
+	}
+	if err := validatePosToken("slashing record evidence id", r.EvidenceID); err != nil {
+		return err
+	}
+	if _, err := DefaultSeverityBps(r.Severity); err != nil {
+		return err
+	}
+	if r.StakeExposure.IsNil() || r.StakeExposure.IsNegative() {
+		return errors.New("slashing record stake exposure cannot be negative")
+	}
+	if r.RoleWeight == 0 || r.RoleWeight > BasisPoints {
+		return fmt.Errorf("slashing record role weight must be within 1..%d bps", BasisPoints)
+	}
+	if r.SlashAmount.IsNil() || r.SlashAmount.IsNegative() {
+		return errors.New("slashing record slash amount cannot be negative")
+	}
+	if r.DelegatorSlashAmount.IsNil() || r.DelegatorSlashAmount.IsNegative() {
+		return errors.New("slashing record delegator slash amount cannot be negative")
+	}
+	if r.RewardConfiscation.IsNil() || r.RewardConfiscation.IsNegative() {
+		return errors.New("slashing record reward confiscation cannot be negative")
+	}
+	if r.ExecutedHeight < 0 {
+		return errors.New("slashing record executed height cannot be negative")
+	}
+	if err := r.Routing.Validate(); err != nil {
+		return err
+	}
+	if !r.Routing.TotalPenaltyNaet.Equal(r.SlashAmount.Add(r.RewardConfiscation)) {
+		return errors.New("slashing record routing total must equal slash plus confiscated reward")
+	}
+	if r.RecordHash != computeSlashingRecordHash(r) {
+		return errors.New("slashing record hash mismatch")
+	}
+	return nil
+}
+
+func (r SlashingExecutionResult) Validate() error {
+	if err := r.Record.Validate(); err != nil {
+		return err
+	}
+	if !r.NonNegative {
+		return errors.New("slashing execution produced negative balances")
+	}
+	if !r.ExactRouting {
+		return errors.New("slashing execution routing is not exact")
+	}
+	if !r.DelegatorExact {
+		return errors.New("slashing execution delegator propagation is not exact")
+	}
+	return nil
+}
+
 func (i SlashingPenaltyRoutingInput) Validate() error {
 	if err := i.Penalty.Validate(); err != nil {
 		return err
@@ -546,6 +743,24 @@ func computeSlashingPenaltyRoutingHash(routing SlashingPenaltyRouting) string {
 		posWriteUint64(w, uint64(routing.ProtocolTreasuryBps))
 		posWriteUint64(w, uint64(routing.CompensationBps))
 		posWriteUint64(w, uint64(routing.ReporterRewardCapBps))
+	})
+}
+
+func computeSlashingRecordHash(record SlashingRecord) string {
+	return posHashRoot("aetheris-pos-slashing-record-v1", func(w posByteWriter) {
+		posWritePart(w, record.PenaltyID)
+		posWritePart(w, record.ValidatorAddress)
+		posWritePart(w, record.EvidenceID)
+		posWritePart(w, record.Severity)
+		posWritePart(w, record.StakeExposure.String())
+		posWriteUint64(w, uint64(record.RoleWeight))
+		posWritePart(w, record.SlashAmount.String())
+		posWritePart(w, record.DelegatorSlashAmount.String())
+		posWritePart(w, record.RewardConfiscation.String())
+		posWriteUint64(w, record.JailUntilEpochOptional)
+		posWritePart(w, fmt.Sprintf("%t", record.Tombstone))
+		posWritePart(w, record.Routing.RoutingHash)
+		posWritePart(w, fmt.Sprintf("%d", record.ExecutedHeight))
 	})
 }
 

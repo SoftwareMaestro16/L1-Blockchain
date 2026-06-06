@@ -133,6 +133,118 @@ func TestRouteSlashingPenaltySplitsBurnReporterTreasuryAndCompensation(t *testin
 	require.Len(t, routing.RoutingHash, PosHashHexLength)
 }
 
+func TestSlashingRecordMatchesDesignFieldsAndExecutesInvariants(t *testing.T) {
+	require.Equal(t, []string{
+		"penalty_id",
+		"validator_address",
+		"evidence_id",
+		"severity",
+		"stake_exposure",
+		"role_weight",
+		"slash_amount",
+		"delegator_slash_amount",
+		"reward_confiscation",
+		"jail_until_epoch_optional",
+		"tombstone",
+		"routing",
+		"executed_height",
+	}, SlashingRecordFieldNames())
+	matrix := SeverityMatrix()
+	require.Equal(t, uint32(5_000), matrix[SlashSeverityDoubleSign])
+	require.Equal(t, uint32(7_500), matrix[SlashSeverityEvidenceFraud])
+
+	candidate := candidate("val-a", 10_000, 5_000)
+	candidate.ReliabilityIndexBps = BasisPoints
+	candidate.Roles = []ValidatorRole{ValidatorRoleVerifier, ValidatorRoleBlockProducer}
+	result, err := ExecuteSlashing(SlashingExecutionInput{
+		EvidenceID:             "evidence-1",
+		ReporterID:             "reporter-a",
+		AffectedPoolIDOptional: "pool-a",
+		ExecutedHeight:         100,
+		CurrentEpoch:           10,
+		Candidate:              candidate,
+		PenaltyInput: SlashingPenaltyInput{
+			PenaltyID:                     "penalty-record-1",
+			SeverityLevel:                 SlashSeverityInvalidTaskExecution,
+			StakeExposureNaet:             sdkmath.NewInt(15_000),
+			RoleWeightBps:                 10_000,
+			SelfStakeNaet:                 candidate.SelfStakeNaet,
+			Nominations:                   candidate.Nominations,
+			RewardConfiscationNaet:        sdkmath.NewInt(100),
+			TemporaryJailEpochs:           2,
+			RoleSuspensions:               []ValidatorRole{ValidatorRoleVerifier},
+			FutureElectionScorePenaltyBps: 1_000,
+			EvidenceHeight:                90,
+		},
+		RoutingInput: SlashingPenaltyRoutingInput{
+			BurnBps:              3_000,
+			ReporterRewardBps:    1_000,
+			ProtocolTreasuryBps:  4_000,
+			CompensationBps:      2_000,
+			ReporterRewardCapBps: 1_000,
+		},
+	})
+	require.NoError(t, err)
+	require.True(t, result.NonNegative)
+	require.True(t, result.ExactRouting)
+	require.True(t, result.DelegatorExact)
+	require.Equal(t, "penalty-record-1", result.Record.PenaltyID)
+	require.Equal(t, "val-a", result.Record.ValidatorAddress)
+	require.Equal(t, "evidence-1", result.Record.EvidenceID)
+	require.Equal(t, SlashSeverityInvalidTaskExecution, result.Record.Severity)
+	require.Equal(t, sdkmath.NewInt(15_000), result.Record.StakeExposure)
+	require.Equal(t, uint32(10_000), result.Record.RoleWeight)
+	require.Equal(t, sdkmath.NewInt(1_125), result.Record.SlashAmount)
+	require.Equal(t, sdkmath.NewInt(375), result.Record.DelegatorSlashAmount)
+	require.Equal(t, sdkmath.NewInt(100), result.Record.RewardConfiscation)
+	require.Equal(t, uint64(12), result.Record.JailUntilEpochOptional)
+	require.False(t, result.Record.Tombstone)
+	require.Equal(t, int64(100), result.Record.ExecutedHeight)
+	require.Len(t, result.Record.RecordHash, PosHashHexLength)
+	require.NoError(t, result.Record.Validate())
+	require.Equal(t, result.Record.Routing.TotalPenaltyNaet, result.Record.Routing.BurnNaet.Add(result.Record.Routing.ReporterRewardNaet).Add(result.Record.Routing.ProtocolTreasuryNaet).Add(result.Record.Routing.CompensationNaet).Add(result.Record.Routing.ResidualNaet))
+	require.False(t, result.UpdatedCandidate.SelfStakeNaet.IsNegative())
+	require.False(t, result.UpdatedCandidate.DelegatedStakeNaet.IsNegative())
+	require.Equal(t, []ValidatorRole{ValidatorRoleBlockProducer}, result.UpdatedCandidate.Roles)
+}
+
+func TestSlashingRecordRejectsRoutingMismatchAndNegativeExecution(t *testing.T) {
+	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
+		PenaltyID:              "penalty-record-bad",
+		ValidatorID:            "val-a",
+		SeverityLevel:          SlashSeverityDoubleSign,
+		StakeExposureNaet:      sdkmath.NewInt(1_000),
+		SelfStakeNaet:          sdkmath.NewInt(1_000),
+		RewardConfiscationNaet: sdkmath.NewInt(100),
+		EvidenceHeight:         90,
+	})
+	require.NoError(t, err)
+	routing, err := RouteSlashingPenalty(SlashingPenaltyRoutingInput{
+		Penalty:                penalty,
+		ReporterID:             "reporter-a",
+		AffectedPoolIDOptional: "pool-a",
+	})
+	require.NoError(t, err)
+	record := NewSlashingRecord("evidence-bad", penalty, routing, 10, 100)
+	require.NoError(t, record.Validate())
+	record.SlashAmount = record.SlashAmount.AddRaw(1)
+	require.ErrorContains(t, record.Validate(), "routing total")
+
+	_, err = ExecuteSlashing(SlashingExecutionInput{
+		EvidenceID:     "evidence-bad",
+		ExecutedHeight: -1,
+		CurrentEpoch:   10,
+		Candidate:      candidate("val-a", 1_000, 0),
+		PenaltyInput: SlashingPenaltyInput{
+			PenaltyID:         "penalty-record-bad-2",
+			SeverityLevel:     SlashSeverityDoubleSign,
+			StakeExposureNaet: sdkmath.NewInt(1_000),
+			SelfStakeNaet:     sdkmath.NewInt(1_000),
+		},
+	})
+	require.ErrorContains(t, err, "executed height")
+}
+
 func TestRouteSlashingPenaltyRejectsMissingPoolsAndInvalidBps(t *testing.T) {
 	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
 		PenaltyID:         "penalty-routing-bad",
