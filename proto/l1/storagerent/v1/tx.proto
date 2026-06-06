@@ -74,5 +74,5 @@ service Msg {
   rpc FreezeExpiredContract(MsgFreezeExpiredContract) returns (MsgFreezeExpiredContractResponse);
   rpc UnfreezeContract(MsgUnfreezeContract) returns (MsgUnfreezeContractResponse);
   rpc DeleteExpiredContract(MsgDeleteExpiredContract) returns (MsgDeleteExpiredContractResponse);
-  rpc UpdateStorageRentParams(MsgUpdateStorageRent) returns (MsgUpdateStorageRentParamsResponse);
+  rpc UpdateStorageRentParams(MsgUpdateStorageRentParams) returns (MsgUpdateStorageRentParamsResponse);
 }
