@@ -74,6 +74,63 @@ func TestPrepareServiceInterfaceCallRejectsMalformedRequests(t *testing.T) {
 	require.ErrorContains(t, broken.Validate(), "method hash mismatch")
 }
 
+func TestServiceMethodSchemaIncludesTimeoutIdempotencyAndCallback(t *testing.T) {
+	descriptor := testInterfaceSystemDescriptor()
+	definition, err := NewFormalServiceInterface(descriptor.Interface)
+	require.NoError(t, err)
+
+	method, found := definition.MethodByName("submit")
+	require.True(t, found)
+	require.Equal(t, uint64(10), method.TimeoutPolicy.TimeoutHeightDelta)
+	require.Equal(t, coretypes.ServiceFailureRetry, method.TimeoutPolicy.FailureBehavior)
+	require.True(t, method.IdempotencyRequired)
+	require.True(t, method.CallbackSupported)
+	require.NotEmpty(t, method.TimeoutPolicy.PolicyHash)
+	require.NoError(t, method.Validate())
+
+	changed := method
+	changed.IdempotencyRequired = false
+	require.NotEqual(t, method.MethodHash, ComputeServiceInterfaceMethodSchemaHash(changed))
+}
+
+func TestServiceInterfaceValidationRules(t *testing.T) {
+	descriptor := testInterfaceSystemDescriptor()
+	require.NoError(t, ValidateServiceInterfaceForDescriptor(descriptor))
+
+	duplicateName := descriptor
+	duplicateName.Interface.Methods[1].Name = duplicateName.Interface.Methods[0].Name
+	duplicateName.Interface.InterfaceHash = coretypes.ComputeServiceInterfaceHash(duplicateName.Interface)
+	require.ErrorContains(t, ValidateServiceInterfaceForDescriptor(duplicateName), "duplicate")
+
+	badEncoding := testInterfaceSystemDescriptor()
+	badEncoding.Interface.SchemaEncoding = "yaml-v1"
+	badEncoding.Interface.InterfaceHash = coretypes.ComputeServiceInterfaceHash(badEncoding.Interface)
+	require.ErrorContains(t, ValidateServiceInterfaceForDescriptor(badEncoding), "not supported")
+
+	offChain := testInterfaceSystemDescriptor()
+	offChain.ServiceType = coretypes.ServiceTypeOffChain
+	offChain.Execution.Location = coretypes.ServiceLocationExternal
+	offChain.Verification.TrustModel = coretypes.ServiceTrustFullyTrusted
+	offChain.Verification.Model = coretypes.ServiceVerificationSignedResult
+	offChain.Interface.Methods[0].VerificationModel = coretypes.ServiceVerificationAdvisory
+	offChain.Interface.InterfaceHash = coretypes.ComputeServiceInterfaceHash(offChain.Interface)
+	require.ErrorContains(t, ValidateServiceInterfaceForDescriptor(offChain), "response verification")
+}
+
+func TestServiceInterfaceVersionChangeRequiresNewHash(t *testing.T) {
+	previous := testInterfaceSystemDescriptor().Interface
+	next := previous
+	next.Version = 2
+	next.InterfaceName = "l1.services.v2.Portable"
+	next.InterfaceHash = coretypes.ComputeServiceInterfaceHash(next)
+
+	require.NoError(t, ValidateServiceInterfaceVersionChange(previous, next))
+
+	bad := previous
+	bad.Version = 2
+	require.ErrorContains(t, ValidateServiceInterfaceVersionChange(previous, bad), "new interface hash")
+}
+
 func testInterfaceSystemDescriptor() coretypes.ServiceDescriptor {
 	methods := []coretypes.ServiceMethodDescriptor{
 		testInterfaceMethod("query", coretypes.ServiceMethodSync, coretypes.ServiceVerificationConsensusReceipt, coretypes.DefaultGasPolicy),

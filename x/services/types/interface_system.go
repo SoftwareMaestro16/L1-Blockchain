@@ -17,8 +17,17 @@ type ServiceInterfaceMethodSchema struct {
 	ExecutionType       coretypes.ServiceMethodExecutionType
 	GasModel            string
 	VerificationModel   coretypes.ServiceVerificationModel
+	TimeoutPolicy       ServiceMethodTimeoutPolicy
+	IdempotencyRequired bool
+	CallbackSupported   bool
 	PaymentRequirements string
 	MethodHash          string
+}
+
+type ServiceMethodTimeoutPolicy struct {
+	TimeoutHeightDelta uint64
+	FailureBehavior    coretypes.ServiceFailureBehavior
+	PolicyHash         string
 }
 
 type FormalServiceInterface struct {
@@ -65,15 +74,22 @@ func NewFormalServiceInterface(iface ServiceInterface) (FormalServiceInterface, 
 	methods := make([]ServiceInterfaceMethodSchema, 0, len(iface.Methods))
 	for _, method := range iface.Methods {
 		methodSchema := ServiceInterfaceMethodSchema{
-			MethodID:            method.MethodID,
-			Name:                method.Name,
-			InputSchemaHash:     method.InputSchemaHash,
-			OutputSchemaHash:    method.OutputSchemaHash,
-			ExecutionType:       method.ExecutionType,
-			GasModel:            method.GasModel,
-			VerificationModel:   method.VerificationModel,
+			MethodID:          method.MethodID,
+			Name:              method.Name,
+			InputSchemaHash:   method.InputSchemaHash,
+			OutputSchemaHash:  method.OutputSchemaHash,
+			ExecutionType:     method.ExecutionType,
+			GasModel:          method.GasModel,
+			VerificationModel: method.VerificationModel,
+			TimeoutPolicy: ServiceMethodTimeoutPolicy{
+				TimeoutHeightDelta: method.TimeoutHeightDelta,
+				FailureBehavior:    method.FailureBehavior,
+			},
+			IdempotencyRequired: method.IdempotencyRequired,
+			CallbackSupported:   method.CallbackSupported,
 			PaymentRequirements: method.RequiredPaymentModel,
 		}
+		methodSchema.TimeoutPolicy.PolicyHash = ComputeServiceMethodTimeoutPolicyHash(methodSchema.TimeoutPolicy)
 		methodSchema.MethodHash = ComputeServiceInterfaceMethodSchemaHash(methodSchema)
 		methods = append(methods, methodSchema)
 	}
@@ -128,6 +144,9 @@ func (definition FormalServiceInterface) Validate() error {
 	if err := validateInterfaceToken("services interface schema encoding", definition.SchemaEncoding); err != nil {
 		return err
 	}
+	if !IsSupportedServiceSchemaEncoding(definition.SchemaEncoding) {
+		return fmt.Errorf("services interface schema encoding %q is not supported", definition.SchemaEncoding)
+	}
 	if definition.MetadataHash != "" {
 		if err := coretypes.ValidateHash("services interface metadata hash", definition.MetadataHash); err != nil {
 			return err
@@ -169,6 +188,9 @@ func (method ServiceInterfaceMethodSchema) Validate() error {
 	if !coretypes.IsServiceVerificationModel(method.VerificationModel) {
 		return fmt.Errorf("services interface unknown verification model %q", method.VerificationModel)
 	}
+	if err := method.TimeoutPolicy.Validate(); err != nil {
+		return err
+	}
 	if err := validateInterfaceToken("services interface method payment requirements", method.PaymentRequirements); err != nil {
 		return err
 	}
@@ -177,6 +199,74 @@ func (method ServiceInterfaceMethodSchema) Validate() error {
 	}
 	if expected := ComputeServiceInterfaceMethodSchemaHash(method); method.MethodHash != expected {
 		return fmt.Errorf("services interface method hash mismatch: expected %s", expected)
+	}
+	return nil
+}
+
+func (policy ServiceMethodTimeoutPolicy) Validate() error {
+	if policy.TimeoutHeightDelta == 0 {
+		return errors.New("services interface timeout policy requires positive timeout")
+	}
+	if !coretypes.IsServiceFailureBehavior(policy.FailureBehavior) {
+		return fmt.Errorf("services interface timeout policy unknown failure behavior %q", policy.FailureBehavior)
+	}
+	if err := coretypes.ValidateHash("services interface timeout policy hash", policy.PolicyHash); err != nil {
+		return err
+	}
+	if expected := ComputeServiceMethodTimeoutPolicyHash(policy); policy.PolicyHash != expected {
+		return fmt.Errorf("services interface timeout policy hash mismatch: expected %s", expected)
+	}
+	return nil
+}
+
+func ValidateServiceInterfaceForDescriptor(descriptor ServiceDescriptor) error {
+	descriptor = coretypes.CanonicalServiceDescriptor(descriptor)
+	if err := descriptor.Validate(); err != nil {
+		return err
+	}
+	definition, err := NewFormalServiceInterface(descriptor.Interface)
+	if err != nil {
+		return err
+	}
+	if descriptor.Interface.InterfaceHash != coretypes.ComputeServiceInterfaceHash(descriptor.Interface) {
+		return errors.New("services interface hash must commit to descriptor interface fields")
+	}
+	if definition.InterfaceHash != descriptor.Interface.InterfaceHash {
+		return errors.New("services formal interface hash mismatch")
+	}
+	for _, method := range definition.Methods {
+		switch descriptor.ServiceType {
+		case coretypes.ServiceTypeOnChain:
+			if method.GasModel == "" {
+				return fmt.Errorf("services on-chain method %s requires gas model", method.MethodID)
+			}
+		case coretypes.ServiceTypeOffChain:
+			if !methodHasResponseVerification(method.VerificationModel) {
+				return fmt.Errorf("services off-chain method %s requires response verification model", method.MethodID)
+			}
+		case coretypes.ServiceTypeMixed:
+			if !methodHasDisputeOrFallback(method, descriptor) {
+				return fmt.Errorf("services mixed method %s requires dispute or fallback model", method.MethodID)
+			}
+		}
+	}
+	return nil
+}
+
+func ValidateServiceInterfaceVersionChange(previous ServiceInterface, next ServiceInterface) error {
+	previous = coretypes.CanonicalServiceInterfaceDescriptor(previous)
+	next = coretypes.CanonicalServiceInterfaceDescriptor(next)
+	if err := previous.Validate(); err != nil {
+		return err
+	}
+	if next.Version <= previous.Version {
+		return errors.New("services interface version must increase")
+	}
+	if next.InterfaceHash == previous.InterfaceHash {
+		return errors.New("services interface version change must create a new interface hash")
+	}
+	if err := next.Validate(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -305,7 +395,18 @@ func ComputeServiceInterfaceMethodSchemaHash(method ServiceInterfaceMethodSchema
 		string(method.ExecutionType),
 		method.GasModel,
 		string(method.VerificationModel),
+		method.TimeoutPolicy.PolicyHash,
+		fmt.Sprint(method.IdempotencyRequired),
+		fmt.Sprint(method.CallbackSupported),
 		method.PaymentRequirements,
+	)
+}
+
+func ComputeServiceMethodTimeoutPolicyHash(policy ServiceMethodTimeoutPolicy) string {
+	return servicesHashParts(
+		"aetheris-services-interface-timeout-policy-v1",
+		fmt.Sprint(policy.TimeoutHeightDelta),
+		string(policy.FailureBehavior),
 	)
 }
 
@@ -356,16 +457,49 @@ func ComputeServiceInterfaceCallPreparationHash(preparation ServiceInterfaceCall
 
 func validateInterfaceMethods(methods []ServiceInterfaceMethodSchema) error {
 	previous := ""
+	names := map[string]struct{}{}
 	for _, method := range methods {
 		if err := method.Validate(); err != nil {
 			return err
 		}
+		if _, found := names[method.Name]; found {
+			return fmt.Errorf("services interface method name %s is duplicated", method.Name)
+		}
+		names[method.Name] = struct{}{}
 		if previous != "" && previous >= method.MethodID {
 			return errors.New("services interface methods must be sorted canonically")
 		}
 		previous = method.MethodID
 	}
 	return nil
+}
+
+func IsSupportedServiceSchemaEncoding(encoding string) bool {
+	switch encoding {
+	case "json-schema-v1", "protobuf-v3", "openapi-v3":
+		return true
+	default:
+		return false
+	}
+}
+
+func methodHasResponseVerification(model coretypes.ServiceVerificationModel) bool {
+	switch model {
+	case coretypes.ServiceVerificationSignedResult, coretypes.ServiceVerificationProofAnchored,
+		coretypes.ServiceVerificationChallengeWindow, coretypes.ServiceVerificationEconomicCollateral:
+		return true
+	default:
+		return false
+	}
+}
+
+func methodHasDisputeOrFallback(method ServiceInterfaceMethodSchema, descriptor ServiceDescriptor) bool {
+	return method.VerificationModel == coretypes.ServiceVerificationChallengeWindow ||
+		method.TimeoutPolicy.FailureBehavior == coretypes.ServiceFailureChallenge ||
+		method.TimeoutPolicy.FailureBehavior == coretypes.ServiceFailureFallbackOnChain ||
+		descriptor.Execution.ChallengeWindow != 0 ||
+		descriptor.Verification.ChallengeWindow != 0 ||
+		descriptor.Verification.FallbackServiceID != ""
 }
 
 func validateSortedTokens(fieldName string, values []string) error {
