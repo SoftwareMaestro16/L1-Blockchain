@@ -235,6 +235,38 @@ func TestCoreExecutionPipelineSpecMatchesABCIPhases(t *testing.T) {
 	require.ErrorContains(t, mutated.ValidateHash(), "phase order mismatch")
 }
 
+func TestCoreImplementationTasksMatchRoadmapAndReadiness(t *testing.T) {
+	tasks, err := DefaultCoreImplementationTasks()
+	require.NoError(t, err)
+	require.Len(t, tasks, 11)
+	require.Equal(t, CoreTaskPriorityP0, taskByID(t, tasks, CoreTaskZoneRegistry).Priority)
+	require.Equal(t, CoreTaskPriorityP0, taskByID(t, tasks, CoreTaskProofRootRegistry).Priority)
+	require.Equal(t, CoreTaskPriorityP1, taskByID(t, tasks, CoreTaskKeeperIntegration).Priority)
+	require.Equal(t, CoreTaskPriorityP2, taskByID(t, tasks, CoreTaskOperationalExportImport).Priority)
+	require.Contains(t, taskByID(t, tasks, CoreTaskInboundMessageScheduler).AcceptanceCriteria, "reject-reordered-messages")
+
+	pipeline, err := DefaultCoreExecutionPipelineSpec()
+	require.NoError(t, err)
+	state := nextReadyState(t,
+		[]ZoneID{ZoneIDFinancial, ZoneIDIdentity, ZoneIDApplication, ZoneIDContract},
+		[]ZoneID{ZoneIDFinancial, ZoneIDIdentity, ZoneIDApplication, ZoneIDContract},
+	)
+	state, _ = appendTestFinalityRecord(t, state, 10)
+	evidence := DeriveCoreImplementationEvidence(state, pipeline)
+	readiness, err := AssessCoreImplementationReadiness(tasks, evidence)
+	require.NoError(t, err)
+	require.True(t, readiness.Ready)
+	require.Empty(t, readiness.RequiredP0Missing)
+	require.Contains(t, readiness.MissingTaskIDs, CoreTaskKeeperIntegration)
+	require.Contains(t, readiness.MissingTaskIDs, CoreTaskOperationalExportImport)
+	require.NotEmpty(t, readiness.ReadinessHash)
+
+	mutated := tasks
+	mutated[0].TaskHash = testHash("wrong-task-hash")
+	_, err = AssessCoreImplementationReadiness(mutated, evidence)
+	require.ErrorContains(t, err, "task hash mismatch")
+}
+
 func TestRootReplayIdenticalAcrossNodes(t *testing.T) {
 	nodeA := populatedState(t, []ZoneID{ZoneIDFinancial, ZoneIDContract})
 	nodeB := populatedState(t, []ZoneID{ZoneIDContract, ZoneIDFinancial})
@@ -972,6 +1004,17 @@ func appendTestFinalityRecord(t *testing.T, state AetherCoreState, height uint64
 	next, err = AppendFinalityRecord(next, record)
 	require.NoError(t, err)
 	return next, record
+}
+
+func taskByID(t *testing.T, tasks []CoreImplementationTaskSpec, taskID CoreImplementationTaskID) CoreImplementationTaskSpec {
+	t.Helper()
+	for _, task := range tasks {
+		if task.TaskID == taskID {
+			return task
+		}
+	}
+	t.Fatalf("missing task %s", taskID)
+	return CoreImplementationTaskSpec{}
 }
 
 func testHash(value string) string {
