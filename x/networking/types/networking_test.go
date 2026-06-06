@@ -2922,6 +2922,173 @@ func TestStreamPartialRecoveryFetchAndStableReassemblyRoot(t *testing.T) {
 	require.Equal(t, "peer-a", plan.Requests[2].AssignedPeer)
 }
 
+func TestNetworkSecurityPolicyDetectsThreatsAndProtectsConsensus(t *testing.T) {
+	policy := DefaultNetworkSecurityPolicy()
+	require.NoError(t, policy.Validate())
+
+	score := PeerScore{ScoreBps: 8_500, ReliabilityBps: 9_000, ThroughputBps: 8_000}
+	decision, err := EvaluateNetworkSecurity(score, PeerSecurityObservation{
+		PeerNodeID:            HashParts("security-peer"),
+		InvalidMessages:       policy.MaxInvalidMessages + 1,
+		DuplicateMessages:     policy.MaxInvalidMessages + 2,
+		CorruptChunks:         1,
+		ForgedAdvertisements:  1,
+		BytesThisEpoch:        policy.MaxBytesPerEpoch + 1,
+		SybilClusterPeers:     3,
+		CrossZoneReplayCount:  1,
+		ConflictingBroadcasts: 1,
+	}, policy)
+	require.NoError(t, err)
+	require.False(t, decision.Accepted)
+	require.True(t, decision.Quarantine)
+	require.True(t, decision.RotatePeer)
+	require.True(t, decision.DropMessage)
+	require.True(t, decision.DowngradeQoS)
+	require.True(t, decision.ConsensusIsolated)
+	require.Less(t, decision.Score.ScoreBps, score.ScoreBps)
+	require.Contains(t, decision.Threats, ThreatSpamFlood)
+	require.Contains(t, decision.Threats, ThreatBandwidthExhaustion)
+	require.Contains(t, decision.Threats, ThreatChunkCorruption)
+	require.Contains(t, decision.Controls, ControlReplayProtection)
+	require.Contains(t, decision.Controls, ControlQoSIsolation)
+
+	ok, err := CheckChannelRateLimit(ChannelRateLimit{Channel: ChannelDiscovery, MaxBytes: 1024, WindowHeight: 1, DropOnExceeded: true}, ChannelRateUsage{
+		Channel:     ChannelDiscovery,
+		Bytes:       2048,
+		WindowStart: 10,
+		WindowEnd:   10,
+	})
+	require.NoError(t, err)
+	require.False(t, ok)
+
+	broken := policy
+	broken.RequiredControls = []SecurityControl{ControlPeerReputation}
+	require.ErrorContains(t, broken.Validate(), "missing required control")
+}
+
+func TestNetworkSecurityReplayChannelBindingAndQoSIsolation(t *testing.T) {
+	cache := NewReplayProtectionCache(4)
+	replayID := HashParts("cross-zone-message", "zone-a", "zone-b", "1")
+	var accepted bool
+	var err error
+	cache, accepted, err = cache.Accept(replayID, 10)
+	require.NoError(t, err)
+	require.True(t, accepted)
+	cache, accepted, err = cache.Accept(replayID, 11)
+	require.NoError(t, err)
+	require.False(t, accepted)
+	cache, accepted, err = cache.Accept(HashParts("cross-zone-message", "zone-a", "zone-b", "2"), 20)
+	require.NoError(t, err)
+	require.True(t, accepted)
+	require.Len(t, cache.Entries, 1)
+
+	salt := []byte("aetheris-test-network")
+	local := signedNodeRecord(t, 0x74, salt, 100, NodeRoleFull)
+	remote := signedNodeRecord(t, 0x75, salt, 100, NodeRoleService)
+	session, err := NegotiateVerifiedSession(local, remote, testSessionRequest(local, remote, 10, 80, "security-channel", nil), salt, 10)
+	require.NoError(t, err)
+	require.NoError(t, ValidateSecurityChannelBinding(session, remote, session.Streams[0].StreamID))
+	require.ErrorContains(t, ValidateSecurityChannelBinding(session, local, session.Streams[0].StreamID), "remote node mismatch")
+	require.ErrorContains(t, ValidateSecurityChannelBinding(session, remote, "missing-stream"), "not bound")
+
+	require.NoError(t, ValidateSecurityQoSIsolation(DefaultQoSClassPolicies()))
+	broken := append([]QoSClassPolicy(nil), DefaultQoSClassPolicies()...)
+	for i := range broken {
+		if broken[i].Class == QoSClassBulkData {
+			broken[i].Priority = 2
+		}
+	}
+	require.ErrorContains(t, ValidateSecurityQoSIsolation(broken), "bulk traffic")
+}
+
+func TestNetworkSecurityAuthenticatesDiscoveryOverlayAndChunks(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	owner := signedNodeRecordWithCapabilities(t, 0x76, salt, 100, []NodeRole{NodeRoleService}, nil, []string{"svc.secure"})
+	record := testSignedDiscoveryObjectRecord(t, owner, 0x76, salt, DRTObjectServiceEndpoint, HashParts("target", "svc.secure"), HashParts("endpoint", "svc.secure"), "", "svc.secure", "", 90)
+	require.NoError(t, ValidateSecurityDiscoveryRecord(record, salt, 20))
+
+	forged := record
+	forged.AdvertisementHash = HashParts("endpoint", "forged")
+	require.ErrorContains(t, ValidateSecurityDiscoveryRecord(forged, salt, 20), "record id")
+
+	expired := record
+	expired.ExpiresHeight = 19
+	expired.RecordID = ComputeDiscoveryRecordID(expired)
+	require.ErrorContains(t, ValidateSecurityDiscoveryRecord(expired, salt, 20), "expired")
+
+	serviceDesc := testDefaultOverlayDescriptor(t, OverlayTypeService)
+	serviceMsg := testMeshMessage(t, MeshMessageService, serviceDesc.OverlayID, owner.NodeID, HashParts("security-destination"), PriorityForChannel(ChannelService), 1)
+	require.NoError(t, ValidateOverlayIsolation(serviceDesc, serviceMsg))
+	badMsg := serviceMsg
+	badMsg.Type = MeshMessageExecution
+	badMsg.MessageID = ComputeAetherMeshMessageID(badMsg)
+	require.ErrorContains(t, ValidateOverlayIsolation(serviceDesc, badMsg), "non-service")
+
+	payload := bytes.Repeat([]byte("secure-chunk"), 64)
+	chunks, err := ChunkPayload(payload, 128)
+	require.NoError(t, err)
+	transfer, err := NewRL2TransferFromChunks(owner.NodeID, HashParts("security-target"), RL2PayloadStorageObject, chunks, PriorityForChannel(ChannelData), 0, RL2FECNone)
+	require.NoError(t, err)
+	descriptors, err := NewRL2ChunkDescriptors(transfer, chunks)
+	require.NoError(t, err)
+	require.NoError(t, VerifySecurityChunk(transfer, descriptors[0], chunks[0]))
+
+	corrupt := chunks[0]
+	corrupt.Bytes = cloneBytes(corrupt.Bytes)
+	corrupt.Bytes[0] ^= 0xff
+	require.ErrorContains(t, VerifySecurityChunk(transfer, descriptors[0], corrupt), "chunk hash")
+}
+
+func TestNetworkSecurityPeerDiversityAndWithheldBlockChunks(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	peerA := signedNodeRecordWithCapabilities(t, 0x77, salt, 100, []NodeRole{NodeRoleFull}, []string{"zone-a"}, nil)
+	peerB := peerA
+	peerC := signedNodeRecordWithCapabilities(t, 0x78, salt, 100, []NodeRole{NodeRoleFull}, []string{"zone-b"}, nil)
+
+	report, err := EvaluatePeerDiversity([]NodeRecord{peerA, peerB, peerC}, DefaultNetworkSecurityPolicy())
+	require.NoError(t, err)
+	require.Equal(t, uint32(3), report.TotalPeers)
+	require.Equal(t, uint32(2), report.UniqueNodeIDs)
+	require.True(t, report.SybilRisk)
+
+	proposerKey := deterministicPrivateKey(0x79)
+	validatorKey := deterministicPrivateKey(0x7a).Public().(ed25519.PublicKey)
+	addressHash, err := HashNetworkAddresses([]string{"tcp://127.0.0.79:26656"})
+	require.NoError(t, err)
+	proposer, err := SignNodeRecord(NodeRecord{
+		ValidatorPubKey:      validatorKey,
+		Roles:                []NodeRole{NodeRoleValidator},
+		NetworkAddressesHash: addressHash,
+		ProtocolVersions:     []string{DefaultProtocolVersion},
+		ExpiresHeight:        100,
+	}, proposerKey, salt)
+	require.NoError(t, err)
+	blockBytes := bytes.Repeat([]byte("security-block"), 32)
+	chunks, err := ChunkPayload(blockBytes, 96)
+	require.NoError(t, err)
+	chunkRoot, err := ComputeRL2ChunkRoot(chunks)
+	require.NoError(t, err)
+	proofHashes := []string{HashParts("security-proof", "commit")}
+	proofRoot := HashParts(append([]string{"block-proof-set"}, proofHashes...)...)
+	headerHash := HashParts("security-header", "42")
+	header, err := NewBlockBroadcastHeader(BlockBroadcastHeader{
+		Height:                   42,
+		ProposerNodeID:           proposer.NodeID,
+		HeaderHash:               headerHash,
+		ChunkSetRoot:             chunkRoot,
+		ProofSetRoot:             proofRoot,
+		BlockRoot:                ComputeBlockRoot(headerHash, chunkRoot, proofRoot),
+		ChunkCount:               uint32(len(chunks)),
+		AvailabilityMetadataHash: HashParts("security-availability"),
+	})
+	require.NoError(t, err)
+	session, err := StartBlockPropagation(header, BlockProofSet{BlockID: header.BlockID, ProofRoot: proofRoot, ProofHashes: proofHashes}, proposer, 42)
+	require.NoError(t, err)
+	withheld, err := DetectWithheldBlockChunks(session, 45, DefaultNetworkSecurityPolicy())
+	require.NoError(t, err)
+	require.True(t, withheld)
+}
+
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 	metrics := PeerMetrics{LatencyMillis: 25, ReliabilityBps: 9_900, ThroughputBytesPerSec: 32 << 20}
 	score, err := ComputePeerScore(metrics)
@@ -3272,6 +3439,18 @@ func mustTestStreamSession(t *testing.T, payloadType StreamingPayloadType, prior
 	stream, err = OpenStreamSession(stream)
 	require.NoError(t, err)
 	return stream
+}
+
+func testDefaultOverlayDescriptor(t *testing.T, overlayType OverlayType) OverlayDescriptor {
+	t.Helper()
+
+	for _, desc := range DefaultOverlayDescriptors() {
+		if desc.OverlayType == overlayType {
+			return desc
+		}
+	}
+	t.Fatalf("missing default overlay descriptor %s", overlayType)
+	return OverlayDescriptor{}
 }
 
 func signedNodeRecord(t *testing.T, seed byte, salt []byte, expiresHeight uint64, roles ...NodeRole) NodeRecord {
