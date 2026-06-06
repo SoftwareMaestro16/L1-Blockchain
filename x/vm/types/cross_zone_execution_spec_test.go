@@ -35,6 +35,54 @@ func TestAVMCrossZoneRouteAdmitsZoneAToZoneBQueueAndCommitsReceipt(t *testing.T)
 	require.Equal(t, ComputeAVMCrossZoneExecutionHash(execution), execution.ExecutionHash)
 }
 
+func TestAVMZoneRouterTableZoneRootsCoreCommitmentAndProofQuery(t *testing.T) {
+	msg := testAVMCrossZoneMessage(t, true, true, 25)
+	policy := testAVMCrossZonePolicy(t, AVMCrossZoneProofAuthAndState, AVMCrossZoneValueEscrow, AVMCrossZoneBounceAllowed)
+	queue, err := NewAVMZoneQueue(AVMZoneQueue{ZoneID: msg.DestinationZone})
+	require.NoError(t, err)
+	_, entry, err := AdmitAVMCrossZoneMessage(queue, msg, msg.CreatedHeight, 10, policy)
+	require.NoError(t, err)
+	receipt := testAVMCrossZoneReceipt(t, msg, AVMReceiptStatusExecuted, 14)
+	escrow := testAVMCrossZoneEscrow(t, msg)
+	released, err := ReleaseAVMCrossZoneEscrow(escrow, receipt)
+	require.NoError(t, err)
+	require.Equal(t, AVMCrossZoneEscrowReleased, released.Status)
+	require.Equal(t, msg.ValueNAET, released.ReleasedNAET)
+
+	roots := testAVMCrossZoneRoots(t, msg.DestinationZone, 14, []AVMAsyncMessage{msg}, []AVMZoneQueueEntry{entry}, []AVMExecutionReceipt{receipt}, []AVMCrossZoneValueEscrowRecord{released})
+	route, err := NewAVMZoneRouterRoute(policy, roots)
+	require.NoError(t, err)
+	table, err := NewAVMZoneRouterTable(AVMZoneRouterTable{Height: 14, Routes: []AVMZoneRouterRoute{route}})
+	require.NoError(t, err)
+	require.Equal(t, ComputeAVMZoneRouterTableRoot(table), table.TableRoot)
+
+	zoneRoot, err := NewAVMZoneStateRoot(AVMZoneStateRoot{
+		ZoneID:           msg.DestinationZone,
+		Height:           14,
+		StateRoot:        engineHash("zone-state"),
+		MessageRoot:      engineHash("zone-message"),
+		ExecutionRoot:    engineHash("zone-execution"),
+		ContinuationRoot: engineHash("zone-continuation"),
+	})
+	require.NoError(t, err)
+	core, err := NewAVMAetherCoreZoneCommitmentSet(AVMAetherCoreZoneCommitmentSet{Height: 14, ZoneRoots: []AVMZoneStateRoot{zoneRoot}})
+	require.NoError(t, err)
+	require.Equal(t, ComputeAVMAetherCoreZoneCommitmentRoot(core), core.CoreRoot)
+
+	execution := testAVMCrossZoneExecution(t, msg, policy, entry, receipt, msg.ValueNAET)
+	proof, err := QueryAVMCrossZoneProof(AVMCrossZoneProofIndex{
+		RouterTable: table,
+		ZoneRoots:   []AVMCrossZoneZoneRoots{roots},
+		Executions:  []AVMCrossZoneExecution{execution},
+		Escrows:     []AVMCrossZoneValueEscrowRecord{released},
+	}, AVMCrossZoneProofEscrow, msg.DestinationZone, msg.ID)
+	require.NoError(t, err)
+	require.Equal(t, table.TableRoot, proof.RouterTableRoot)
+	require.Equal(t, roots.CrossZoneRootHash, proof.ZoneCrossRoot)
+	require.Equal(t, released.EscrowHash, proof.EscrowHash)
+	require.Equal(t, ComputeAVMCrossZoneProofHash(proof), proof.ProofHash)
+}
+
 func TestAVMCrossZoneRouteRejectsDirectWriteFilterProofAndValueDrift(t *testing.T) {
 	msg := testAVMCrossZoneMessage(t, true, false, 5)
 	policy := testAVMCrossZonePolicy(t, AVMCrossZoneProofAuthAndState, AVMCrossZoneValueEscrow, AVMCrossZoneBounceAllowed)
@@ -74,6 +122,23 @@ func TestAVMCrossZoneRouteRejectsDirectWriteFilterProofAndValueDrift(t *testing.
 	execution.ValueEscrowedNAET = withProofs.ValueNAET - 1
 	_, err = NewAVMCrossZoneExecution(execution)
 	require.ErrorContains(t, err, "escrow value accounting")
+}
+
+func TestAVMZoneRouterTableRejectsFailedRouteAndProofMiss(t *testing.T) {
+	msg := testAVMCrossZoneMessage(t, true, true, 1)
+	policy := testAVMCrossZonePolicy(t, AVMCrossZoneProofAuthAndState, AVMCrossZoneValueEscrow, AVMCrossZoneBounceAllowed)
+	roots := testAVMCrossZoneRoots(t, msg.DestinationZone, 14, []AVMAsyncMessage{msg}, nil, nil, nil)
+	route, err := NewAVMZoneRouterRoute(policy, roots)
+	require.NoError(t, err)
+
+	duplicate := route
+	_, err = NewAVMZoneRouterTable(AVMZoneRouterTable{Height: 14, Routes: []AVMZoneRouterRoute{route, duplicate}})
+	require.ErrorContains(t, err, "duplicate")
+
+	table, err := NewAVMZoneRouterTable(AVMZoneRouterTable{Height: 14, Routes: []AVMZoneRouterRoute{route}})
+	require.NoError(t, err)
+	_, err = QueryAVMCrossZoneProof(AVMCrossZoneProofIndex{RouterTable: table}, AVMCrossZoneProofRoute, msg.DestinationZone, msg.ID)
+	require.ErrorContains(t, err, "zone roots not found")
 }
 
 func TestAVMCrossZoneFailureMustBounceOrDeadLetter(t *testing.T) {
@@ -129,6 +194,37 @@ func TestAVMCrossZoneFailureMustBounceOrDeadLetter(t *testing.T) {
 	require.ErrorContains(t, err, "reference original")
 }
 
+func TestAVMCrossZoneDisabledBounceRequiresDeadLetterAndRefundsEscrow(t *testing.T) {
+	msg := testAVMCrossZoneMessage(t, true, true, 7)
+	policy := testAVMCrossZonePolicy(t, AVMCrossZoneProofAuthAndState, AVMCrossZoneValueEscrow, AVMCrossZoneBounceDisabled)
+	queue, err := NewAVMZoneQueue(AVMZoneQueue{ZoneID: msg.DestinationZone})
+	require.NoError(t, err)
+	_, entry, err := AdmitAVMCrossZoneMessage(queue, msg, msg.CreatedHeight, 10, policy)
+	require.NoError(t, err)
+	failed := testAVMCrossZoneReceipt(t, msg, AVMReceiptStatusFailed, 14)
+	bounce := testAVMCrossZoneBounceMessage(t, msg)
+
+	_, err = NewAVMCrossZoneExecution(AVMCrossZoneExecution{
+		Message:                  msg,
+		RoutePolicy:              policy,
+		DestinationQueueEntry:    entry,
+		DestinationReceipt:       failed,
+		SourceOutputMessagesRoot: engineHash("source-output"),
+		DestinationReceiptRoot:   engineHash("destination-receipt"),
+		ValueEscrowedNAET:        msg.ValueNAET,
+		FailureResolution:        AVMCrossZoneFailureBounced,
+		BounceMessageOptional:    bounce,
+	})
+	require.ErrorContains(t, err, "bounce is disabled")
+
+	escrow := testAVMCrossZoneEscrow(t, msg)
+	refunded, err := RefundAVMCrossZoneEscrow(escrow, failed)
+	require.NoError(t, err)
+	require.Equal(t, AVMCrossZoneEscrowRefunded, refunded.Status)
+	require.Equal(t, msg.ValueNAET, refunded.RefundedNAET)
+	require.Equal(t, failed.ReceiptID, refunded.RefundReceiptID)
+}
+
 func TestAVMCrossZoneDeadLetterResolution(t *testing.T) {
 	msg := testAVMCrossZoneMessage(t, true, true, 1)
 	policy := testAVMCrossZonePolicy(t, AVMCrossZoneProofAuthAndState, AVMCrossZoneValueEscrow, AVMCrossZoneBounceAllowed)
@@ -161,6 +257,47 @@ func TestAVMCrossZoneDeadLetterResolution(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NoError(t, execution.Validate())
+}
+
+func testAVMCrossZoneExecution(t *testing.T, msg AVMAsyncMessage, policy AVMCrossZoneRoutePolicy, entry AVMZoneQueueEntry, receipt AVMExecutionReceipt, escrowed uint64) AVMCrossZoneExecution {
+	t.Helper()
+	execution, err := NewAVMCrossZoneExecution(AVMCrossZoneExecution{
+		Message:                  msg,
+		RoutePolicy:              policy,
+		DestinationQueueEntry:    entry,
+		DestinationReceipt:       receipt,
+		SourceOutputMessagesRoot: engineHash("source-output"),
+		DestinationReceiptRoot:   engineHash("destination-receipt"),
+		ValueEscrowedNAET:        escrowed,
+	})
+	require.NoError(t, err)
+	return execution
+}
+
+func testAVMCrossZoneRoots(t *testing.T, zoneID zonestypes.ZoneID, height uint64, messages []AVMAsyncMessage, entries []AVMZoneQueueEntry, receipts []AVMExecutionReceipt, escrows []AVMCrossZoneValueEscrowRecord) AVMCrossZoneZoneRoots {
+	t.Helper()
+	roots, err := NewAVMCrossZoneZoneRoots(AVMCrossZoneZoneRoots{
+		ZoneID:               zoneID,
+		Height:               height,
+		OutputMessageRoot:    ComputeAVMZoneOutputMessageRoot(zoneID, messages),
+		DestinationInboxRoot: ComputeAVMDestinationInboxRoot(zoneID, entries),
+		CrossZoneReceiptRoot: ComputeAVMCrossZoneReceiptRoot(zoneID, receipts),
+		ValueEscrowRoot:      ComputeAVMCrossZoneEscrowRoot(zoneID, escrows),
+	})
+	require.NoError(t, err)
+	return roots
+}
+
+func testAVMCrossZoneEscrow(t *testing.T, msg AVMAsyncMessage) AVMCrossZoneValueEscrowRecord {
+	t.Helper()
+	record, err := NewAVMCrossZoneValueEscrowRecord(AVMCrossZoneValueEscrowRecord{
+		MessageID:       msg.ID,
+		SourceZone:      msg.SourceZone,
+		DestinationZone: msg.DestinationZone,
+		AmountNAET:      msg.ValueNAET,
+	})
+	require.NoError(t, err)
+	return record
 }
 
 func testAVMCrossZonePolicy(t *testing.T, proof AVMCrossZoneProofRequirement, value AVMCrossZoneValueAccounting, bounce AVMCrossZoneBounceBehavior) AVMCrossZoneRoutePolicy {
