@@ -4009,6 +4009,130 @@ func TestNetworkingComponentMapRejectsUnsafeBoundariesAndMissingLinks(t *testing
 	require.ErrorContains(t, ValidateNetworkingComponentMap(componentMap), "root mismatch")
 }
 
+func TestXNetworkStateKeysMessagesAndQueries(t *testing.T) {
+	salt := []byte("aetheris-x-network-state")
+	node := signedNodeRecord(t, 0x85, salt, 100, NodeRoleFull, NodeRoleRouting)
+	service := signedNodeRecordWithCapabilities(t, 0x86, salt, 100, []NodeRole{NodeRoleService}, []string{"zone-net"}, []string{"svc.net"})
+	state := EmptyState()
+	var err error
+	state, err = RegisterNodeRecord(state, node, salt, 10)
+	require.NoError(t, err)
+	state, err = RegisterNodeRecord(state, service, salt, 10)
+	require.NoError(t, err)
+	state, err = RegisterRoleCommitment(state, RoleCommitment{
+		NodeID:         service.NodeID,
+		Role:           NodeRoleService,
+		Bonded:         true,
+		CommitmentHash: HashParts("x-network-role-commitment"),
+		ExpiresHeight:  90,
+	}, 11)
+	require.NoError(t, err)
+	discovery := testSignedDiscoveryObjectRecord(t, service, 0x86, salt, DRTObjectServiceEndpoint, HashParts("x-network-discovery-target"), HashParts("x-network-discovery-ad"), "", "svc.net", "", 90)
+	evidence, err := NewNetworkEvidenceRecord(NetworkEvidenceRecord{
+		EvidenceType:   NetworkEvidenceConflictingBroadcast,
+		ReporterNodeID: node.NodeID,
+		SubjectNodeID:  service.NodeID,
+		EvidenceHash:   HashParts("x-network-evidence-hash"),
+		EvidenceHeight: 20,
+		PayloadBytes:   512,
+		Committed:      true,
+	})
+	require.NoError(t, err)
+	reputation := NetworkReputationRecord{
+		NodeID:            service.NodeID,
+		Score:             PeerScore{ScoreBps: 8_000, LatencyBps: 8_500, ReliabilityBps: 9_000, ThroughputBps: 7_500, PenaltyBps: 250},
+		LastUpdatedHeight: 20,
+		EvidenceHash:      evidence.EvidenceHash,
+		ConsensusEligible: true,
+	}
+	params := DefaultXNetworkParams(salt)
+	xstate, err := NewXNetworkState(params, state, []DiscoveryRecord{discovery}, []NetworkReputationRecord{reputation}, []NetworkEvidenceRecord{evidence})
+	require.NoError(t, err)
+	require.NotEmpty(t, xstate.StateRoot)
+
+	keys, err := BuildXNetworkStateKeys(xstate)
+	require.NoError(t, err)
+	require.Equal(t, "network/params", keys.ParamsKey)
+	require.Contains(t, keys.NodeKeys, "network/nodes/"+service.NodeID)
+	require.Contains(t, keys.RoleKeys, "network/roles/SERVICE_NODE/"+service.NodeID)
+	require.Contains(t, keys.DiscoveryKeys, "network/discovery/"+discovery.RecordID)
+	require.Contains(t, keys.ReputationKeys, "network/reputation/"+service.NodeID)
+	require.Contains(t, keys.EvidenceKeys, "network/evidence/"+evidence.EvidenceID)
+	require.Equal(t, ComputeXNetworkStateKeysRoot(keys), keys.StateKeysRoot)
+	require.NoError(t, ValidateXNetworkStateKey(XNetworkRoleStateKey(NodeRoleService, service.NodeID)))
+
+	require.NoError(t, MsgRegisterNodeRequest{SignerNodeID: node.NodeID, Record: node, NetworkSalt: salt, CurrentHeight: 10}.ValidateBasic())
+	require.NoError(t, MsgUpdateNodeRequest{SignerNodeID: service.NodeID, Record: service, NetworkSalt: salt, CurrentHeight: 10}.ValidateBasic())
+	require.NoError(t, MsgRenewNodeRequest{SignerNodeID: service.NodeID, Record: service, NetworkSalt: salt, CurrentHeight: 10}.ValidateBasic())
+	require.NoError(t, MsgRevokeNodeRequest{SignerNodeID: service.NodeID, NodeID: service.NodeID, ReasonHash: HashParts("x-network-revoke-reason"), CurrentHeight: 20}.ValidateBasic())
+	require.NoError(t, MsgSubmitNetworkEvidenceRequest{SignerNodeID: node.NodeID, Evidence: evidence}.ValidateBasic(params))
+
+	foundNode, found, err := QueryNodeFromXNetworkState(xstate, QueryNodeRequest{NodeID: service.NodeID})
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, service.NodeID, foundNode.NodeID)
+	services, err := QueryNodesByRoleFromXNetworkState(xstate, QueryNodesByRoleRequest{Role: NodeRoleService, CurrentHeight: 20})
+	require.NoError(t, err)
+	require.Len(t, services, 1)
+	overlay, found, err := QueryOverlayFromXNetworkState(xstate, QueryOverlayRequest{OverlayID: state.OverlayDescriptors[0].OverlayID})
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, state.OverlayDescriptors[0].OverlayID, overlay.OverlayID)
+	foundDiscovery, found, err := QueryDiscoveryRecordFromXNetworkState(xstate, QueryDiscoveryRecordRequest{RecordID: discovery.RecordID})
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, discovery.RecordID, foundDiscovery.RecordID)
+	foundParams, err := QueryNetworkParamsFromXNetworkState(xstate, QueryNetworkParamsRequest{})
+	require.NoError(t, err)
+	require.Equal(t, params.NetworkSaltHash, foundParams.NetworkSaltHash)
+	foundEvidence, found, err := QueryNetworkEvidenceFromXNetworkState(xstate, QueryNetworkEvidenceRequest{EvidenceID: evidence.EvidenceID})
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, evidence.EvidenceID, foundEvidence.EvidenceID)
+}
+
+func TestXNetworkStateRejectsInvalidKeysMessagesAndConsensusReputation(t *testing.T) {
+	salt := []byte("aetheris-x-network-invalid")
+	node := signedNodeRecord(t, 0x87, salt, 100, NodeRoleFull)
+	params := DefaultXNetworkParams(salt)
+	state, err := NewXNetworkState(params, EmptyState(), nil, nil, nil)
+	require.NoError(t, err)
+	state.StateRoot = HashParts("wrong-x-network-root")
+	require.ErrorContains(t, state.Validate(), "root mismatch")
+
+	require.ErrorContains(t, ValidateXNetworkStateKey("network/roles/BAD/"+node.NodeID), "unknown")
+	require.ErrorContains(t, MsgRegisterNodeRequest{SignerNodeID: HashParts("wrong-signer"), Record: node, NetworkSalt: salt, CurrentHeight: 10}.ValidateBasic(), "signer")
+	require.ErrorContains(t, MsgRevokeNodeRequest{SignerNodeID: node.NodeID, NodeID: HashParts("other-node"), ReasonHash: HashParts("reason"), CurrentHeight: 20}.ValidateBasic(), "signer")
+
+	evidence, err := NewNetworkEvidenceRecord(NetworkEvidenceRecord{
+		EvidenceType:   NetworkEvidenceChunkCorruption,
+		ReporterNodeID: node.NodeID,
+		SubjectNodeID:  HashParts("subject"),
+		EvidenceHash:   HashParts("evidence"),
+		EvidenceHeight: 20,
+		PayloadBytes:   params.MaxEvidenceBytes + 1,
+	})
+	require.ErrorContains(t, err, "payload bytes")
+	require.Empty(t, evidence.EvidenceID)
+
+	badReputation := NetworkReputationRecord{
+		NodeID:            node.NodeID,
+		Score:             PeerScore{ScoreBps: BasisPoints + 1},
+		LastUpdatedHeight: 20,
+	}
+	_, err = NewXNetworkState(params, EmptyState(), nil, []NetworkReputationRecord{badReputation}, nil)
+	require.ErrorContains(t, err, "peer score")
+
+	consensusReputation := NetworkReputationRecord{
+		NodeID:            node.NodeID,
+		Score:             PeerScore{ScoreBps: 5_000},
+		LastUpdatedHeight: 20,
+		ConsensusEligible: true,
+	}
+	_, err = NewXNetworkState(params, EmptyState(), nil, []NetworkReputationRecord{consensusReputation}, nil)
+	require.ErrorContains(t, err, "evidence hash")
+}
+
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 	metrics := PeerMetrics{LatencyMillis: 25, ReliabilityBps: 9_900, ThroughputBytesPerSec: 32 << 20}
 	score, err := ComputePeerScore(metrics)
