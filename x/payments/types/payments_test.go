@@ -534,6 +534,38 @@ func TestPaymentRoadmapPhase0ThroughPhase6VectorsAndExitCriteria(t *testing.T) {
 	require.Equal(t, uint64(len(snapshot.WatcherReplayEvents)), opsVector.WatcherReplayCount)
 }
 
+func TestRequiredPaymentTestCoverageMatrixCoversUnitAndIntegrationSpecs(t *testing.T) {
+	report := BuildRequiredTestCoverageReport()
+	require.NoError(t, ValidateRequiredTestCoverageReport(report))
+	require.Equal(t, uint64(14), report.UnitCount)
+	require.Equal(t, uint64(9), report.IntegrationCount)
+	require.Len(t, report.Entries, 23)
+
+	seen := map[RequiredTestCoverageID]RequiredTestCoverageEntry{}
+	for _, entry := range report.Entries {
+		require.NotEmpty(t, entry.TestNames)
+		require.NotEmpty(t, entry.Evidence)
+		require.NoError(t, ValidateHash("coverage entry evidence", entry.EvidenceHash))
+		seen[entry.CoverageID] = entry
+	}
+	require.Equal(t, RequiredTestCoverageUnit, seen["unit_channel_id_generation"].Kind)
+	require.Contains(t, seen["unit_channel_id_generation"].Evidence, "HashParts")
+	require.Equal(t, RequiredTestCoverageIntegration, seen["integration_parent_dispute_with_virtual_active"].Kind)
+	require.Contains(t, seen["integration_parent_dispute_with_virtual_active"].TestNames, "TestParentChannelDisputeWhileVirtualChannelIsActive")
+
+	duplicate := report
+	duplicate.Entries = append(duplicate.Entries, report.Entries[0])
+	duplicate.ReportHash = ComputeRequiredTestCoverageReportHash(duplicate)
+	require.ErrorContains(t, ValidateRequiredTestCoverageReport(duplicate), "duplicate payments required test coverage")
+
+	missing := report
+	missing.Entries = missing.Entries[:len(missing.Entries)-1]
+	missing.UnitCount = 14
+	missing.IntegrationCount = 8
+	missing.ReportHash = ComputeRequiredTestCoverageReportHash(missing)
+	require.ErrorContains(t, ValidateRequiredTestCoverageReport(missing), "missing payments required test coverage")
+}
+
 func TestSettlementArbitrationBoundaryRejectsNonDeterministicInputs(t *testing.T) {
 	alice := testAddress(0x12)
 	bob := testAddress(0x13)
@@ -3773,6 +3805,40 @@ func TestVirtualChannelNestedDisputeSimulation(t *testing.T) {
 	require.Empty(t, state.VirtualChannels)
 	require.Equal(t, "35", closed.BalanceB)
 	require.Equal(t, uint64(31+DefaultDisputePeriod), releases[0].ReleaseHeight)
+}
+
+func TestParentChannelDisputeWhileVirtualChannelIsActive(t *testing.T) {
+	alice := testAddress(0x7c)
+	router := testAddress(0x7d)
+	bob := testAddress(0x7e)
+	state, vc, activation := virtualChannelFixture(t, "vc-parent-dispute", alice, router, bob, "100", 40)
+	parent := state.Channels[0].Normalize()
+	closeState := parent.LatestState.Normalize()
+	parentStateHash := parent.LatestState.StateHash
+	virtualStateHash := state.VirtualChannels[0].StateHash
+
+	var err error
+	state, err = SubmitClose(state, parent.ChannelID, closeState, parent.Participants[0], 25, "0")
+	require.NoError(t, err)
+	require.Len(t, state.VirtualChannels, 1)
+	require.Equal(t, vc.VirtualChannelID, state.VirtualChannels[0].VirtualChannelID)
+	require.Equal(t, virtualStateHash, state.VirtualChannels[0].StateHash)
+	require.Contains(t, state.VirtualChannels[0].ParentReserveCommitments, activation.ParentReserves[0].ReserveCommitment)
+
+	newerParent := signedReserveState(t, parent, closeState.Nonce+1, closeState.StateHash, "100", "0", []Balance{
+		{Participant: parent.Participants[0], Amount: "790"},
+		{Participant: parent.Participants[1], Amount: "10"},
+	})
+	state, err = DisputeClose(state, parent.ChannelID, newerParent, parent.Participants[1], 26)
+	require.NoError(t, err)
+	disputedParent, found := state.ChannelByID(parent.ChannelID)
+	require.True(t, found)
+	require.Equal(t, ChannelFinalityInDispute, disputedParent.Finality)
+	require.Equal(t, newerParent.StateHash, disputedParent.PendingClose.State.StateHash)
+	require.NotEqual(t, parentStateHash, disputedParent.PendingClose.State.StateHash)
+	require.Len(t, state.VirtualChannels, 1)
+	require.Equal(t, vc.VirtualChannelID, state.VirtualChannels[0].VirtualChannelID)
+	require.Equal(t, virtualStateHash, state.VirtualChannels[0].StateHash)
 }
 
 func TestVirtualChannelLiquidityAggregationSegmentsAndPartialFailure(t *testing.T) {
