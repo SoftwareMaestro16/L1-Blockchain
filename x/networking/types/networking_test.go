@@ -3343,6 +3343,96 @@ func TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations(t *testing.
 	require.Contains(t, threats, ThreatEclipseAttack)
 }
 
+func TestPerformanceModelValidatesOptimizationTargets(t *testing.T) {
+	blockSession := testPerformanceBlockSession(t)
+	streamPlan := testPerformanceStreamPlan()
+	zoneGraph := RoutingGraph{
+		OverlayID: HashParts("performance-zone-overlay"),
+		Version:   1,
+		Edges: []RoutingEdge{
+			{FromNodeID: HashParts("performance-source"), ToNodeID: HashParts("performance-zone-peer-a"), LatencyMillis: 25, Weight: 9_000, Priority: 1, ZoneID: "zone-a"},
+			{FromNodeID: HashParts("performance-source"), ToNodeID: HashParts("performance-zone-peer-b"), LatencyMillis: 35, Weight: 8_500, Priority: 2, ZoneID: "zone-a"},
+		},
+	}
+	zoneGraph.GraphHash = ComputeRoutingGraphHash(zoneGraph)
+
+	plan, err := BuildPerformanceModelPlan(PerformanceModelInput{
+		PeerCount:                4096,
+		DiscoveryBranchingFactor: 16,
+		OverlayDescriptors:       DefaultOverlayDescriptors(),
+		RoutingGraphs:            []RoutingGraph{zoneGraph},
+		BlockSession:             blockSession,
+		StreamPlan:               streamPlan,
+		QoSPolicies:              DefaultQoSClassPolicies(),
+		ZoneID:                   "zone-a",
+		MaxZoneLatencyMillis:     50,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint32(3), plan.DiscoveryHops)
+	require.GreaterOrEqual(t, plan.OverlayConcurrency, uint32(2))
+	require.False(t, plan.GlobalBroadcastOnly)
+	require.True(t, plan.ShardLocalExecution)
+	require.True(t, plan.ZoneIsolated)
+	require.True(t, plan.HeaderFirstBlockPropagation)
+	require.True(t, plan.ParallelChunkStreaming)
+	require.True(t, plan.ServiceTrafficIsolated)
+	require.Contains(t, plan.SatisfiedOptimizationGoals, PerformanceGoalParallelPropagation)
+	require.Contains(t, plan.SatisfiedOptimizationGoals, PerformanceGoalNoGlobalBroadcastOnly)
+	require.Contains(t, plan.SatisfiedTargetProperties, PerformanceTargetLogDiscovery)
+	require.Contains(t, plan.SatisfiedTargetProperties, PerformanceTargetParallelChunks)
+	require.NoError(t, ValidatePerformanceModelPlan(plan))
+
+	plan.GlobalBroadcastOnly = true
+	require.ErrorContains(t, ValidatePerformanceModelPlan(plan), "global broadcast")
+}
+
+func TestPerformanceModelBoundsFanoutLatencyStreamingAndQoS(t *testing.T) {
+	desc := testDefaultOverlayDescriptor(t, OverlayTypeService)
+	fanout, err := ValidateBoundedOverlayFanout(desc, 100)
+	require.NoError(t, err)
+	require.LessOrEqual(t, fanout, desc.Fanout)
+
+	msg := BroadcastMessage{
+		BroadcastID:  HashParts("performance-broadcast"),
+		OriginNode:   HashParts("performance-origin"),
+		OverlayID:    desc.OverlayID,
+		PayloadHash:  HashParts("performance-payload"),
+		PayloadType:  BroadcastPayloadService,
+		Height:       10,
+		TTL:          10,
+		Priority:     PriorityForChannel(ChannelService),
+		FanoutPolicy: BroadcastFanoutPolicy{TreeFanout: desc.Fanout + 10, GossipFanout: desc.Fanout + 20, OverlayBound: true},
+	}
+	require.NoError(t, ValidateBoundedBroadcastFanout(msg, desc))
+	require.NoError(t, ValidateHeaderFirstPerformance(testPerformanceBlockSession(t)))
+	require.NoError(t, ValidateParallelChunkPerformance(testPerformanceStreamPlan()))
+
+	graph := RoutingGraph{
+		OverlayID: HashParts("performance-latency-overlay"),
+		Version:   1,
+		Edges: []RoutingEdge{
+			{FromNodeID: HashParts("latency-source"), ToNodeID: HashParts("latency-fast"), LatencyMillis: 20, ZoneID: "zone-fast"},
+			{FromNodeID: HashParts("latency-source"), ToNodeID: HashParts("latency-slow"), LatencyMillis: 300, ZoneID: "zone-fast"},
+		},
+	}
+	latency, isolated, err := EvaluateZoneLocalLatency([]RoutingGraph{graph}, "zone-fast", 100)
+	require.NoError(t, err)
+	require.Equal(t, uint64(300), latency)
+	require.False(t, isolated)
+
+	require.NoError(t, ValidatePerformanceQoSIsolation(DefaultQoSClassPolicies()))
+	broken := append([]QoSClassPolicy(nil), DefaultQoSClassPolicies()...)
+	for i := range broken {
+		if broken[i].Class == QoSClassServiceCall {
+			broken[i].Priority = 0
+		}
+	}
+	require.ErrorContains(t, ValidatePerformanceQoSIsolation(broken), "priority inversion")
+
+	_, err = EstimateDiscoveryHops(100, 1)
+	require.ErrorContains(t, err, "branching")
+}
+
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 	metrics := PeerMetrics{LatencyMillis: 25, ReliabilityBps: 9_900, ThroughputBytesPerSec: 32 << 20}
 	score, err := ComputePeerScore(metrics)
@@ -3664,6 +3754,47 @@ func testSecurityAdaptivePeer(label string, roles []NodeRole, zones []string) Ad
 		ZonesSupported:  zones,
 		LastSeenHeight:  7,
 		LastScoreHeight: 7,
+	}
+}
+
+func testPerformanceBlockSession(t *testing.T) BlockPropagationSession {
+	t.Helper()
+
+	chunks, err := ChunkPayload(bytes.Repeat([]byte("performance-block"), 16), 64)
+	require.NoError(t, err)
+	chunkRoot, err := ComputeRL2ChunkRoot(chunks)
+	require.NoError(t, err)
+	proofRoot := HashParts("performance-proof-root")
+	headerHash := HashParts("performance-header")
+	header, err := NewBlockBroadcastHeader(BlockBroadcastHeader{
+		Height:                   12,
+		ProposerNodeID:           HashParts("performance-proposer"),
+		HeaderHash:               headerHash,
+		ChunkSetRoot:             chunkRoot,
+		ProofSetRoot:             proofRoot,
+		BlockRoot:                ComputeBlockRoot(headerHash, chunkRoot, proofRoot),
+		ChunkCount:               uint32(len(chunks)),
+		AvailabilityMetadataHash: HashParts("performance-availability"),
+	})
+	require.NoError(t, err)
+	return BlockPropagationSession{
+		Header:         header,
+		ProofSet:       BlockProofSet{BlockID: header.BlockID, ProofRoot: proofRoot, ProofHashes: []string{HashParts("performance-proof")}},
+		VerifiedBitmap: make([]bool, header.ChunkCount),
+	}
+}
+
+func testPerformanceStreamPlan() StreamParallelFetchPlan {
+	streamID := HashParts("performance-stream")
+	return StreamParallelFetchPlan{
+		StreamID:     streamID,
+		ChunkSize:    256,
+		PayloadBytes: 1024,
+		TotalChunks:  4,
+		Requests: []StreamFetchRequest{
+			{StreamID: streamID, ChunkIndex: 0, RangeStart: 0, RangeEnd: 256, ChunkSize: 256, AssignedPeer: "peer-a"},
+			{StreamID: streamID, ChunkIndex: 1, RangeStart: 256, RangeEnd: 512, ChunkSize: 256, AssignedPeer: "peer-b"},
+		},
 	}
 }
 
