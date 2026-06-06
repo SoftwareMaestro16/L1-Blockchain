@@ -99,6 +99,106 @@ func TestStateCommitmentProofTypesAndNonExistenceProofValidate(t *testing.T) {
 	require.ErrorContains(t, invalid.Validate(), "non-existence proof")
 }
 
+func TestRootEncodingRegistryQueryAndProofVerification(t *testing.T) {
+	encoding := DefaultRootEncodingDescriptor()
+	require.NoError(t, encoding.Validate())
+	require.Equal(t, CanonicalEmptyRootValue(), encoding.EmptyRoot)
+
+	state := populatedState(t, []ZoneID{ZoneIDFinancial, ZoneIDContract})
+	root, err := BuildGlobalStateRoot(7, state, testContributions(7))
+	require.NoError(t, err)
+	state, err = AppendGlobalRoot(state, root)
+	require.NoError(t, err)
+
+	registry, err := BuildProofRegistryFromGlobalRoot(root)
+	require.NoError(t, err)
+	require.NoError(t, registry.Validate())
+	require.Len(t, registry.Entries, 9)
+
+	query, err := QueryCommittedRoot(state, RootQuery{Height: 7, RootType: RootType("routing"), RootID: "global"})
+	require.NoError(t, err)
+	require.True(t, query.Found)
+	require.Equal(t, root.RoutingRoot, query.Root.RootHash)
+	require.NoError(t, query.Validate())
+
+	proof, err := NewStateCommitmentProof(RoutingProofType, 7, RootType("routing"), "global", testHash("routing/key"), testHash("routing/value"), root.RoutingRoot, []string{testHash("routing/path")}, true)
+	require.NoError(t, err)
+	result, err := VerifyStateCommitmentProof(ProofVerificationRequest{
+		ExpectedRoot: root.RoutingRoot,
+		Registry:     registry,
+		Proof:        proof,
+	})
+	require.NoError(t, err)
+	require.True(t, result.Verified)
+	require.NoError(t, ValidateHash("test proof verification result", result.VerificationHash))
+
+	queried, err := QueryStateProof(state, registry, proof)
+	require.NoError(t, err)
+	require.Equal(t, result.VerificationHash, queried.VerificationHash)
+
+	_, err = QueryCommittedRoot(state, RootQuery{Height: 7, RootType: RootType("routing"), RootID: "missing"})
+	require.NoError(t, err)
+	missing, err := QueryCommittedRoot(state, RootQuery{Height: 7, RootType: RootType("routing"), RootID: "missing"})
+	require.NoError(t, err)
+	require.False(t, missing.Found)
+}
+
+func TestProofVerificationRejectsRegistryAndRootMismatch(t *testing.T) {
+	state := populatedState(t, []ZoneID{ZoneIDFinancial, ZoneIDContract})
+	root, err := BuildGlobalStateRoot(7, state, testContributions(7))
+	require.NoError(t, err)
+	registry, err := BuildProofRegistryFromGlobalRoot(root)
+	require.NoError(t, err)
+
+	proof, err := NewStateCommitmentProof(PaymentProofType, 7, RootType("payments"), "global", testHash("payments/key"), testHash("payments/value"), root.PaymentsRoot, nil, true)
+	require.NoError(t, err)
+
+	_, err = VerifyStateCommitmentProof(ProofVerificationRequest{
+		ExpectedRoot: root.RoutingRoot,
+		Registry:     registry,
+		Proof:        proof,
+	})
+	require.ErrorContains(t, err, "root mismatch")
+
+	disabled := registry
+	disabled.Entries = append([]ProofRegistryEntry(nil), registry.Entries...)
+	for i := range disabled.Entries {
+		if disabled.Entries[i].ProofType == PaymentProofType {
+			disabled.Entries[i].Enabled = false
+			disabled.Entries[i].RegistryHash = ComputeProofRegistryEntryHash(disabled.Entries[i])
+		}
+	}
+	disabled.RegistryRoot = ComputeProofRegistryRoot(disabled)
+	_, err = VerifyStateCommitmentProof(ProofVerificationRequest{
+		ExpectedRoot: root.PaymentsRoot,
+		Registry:     disabled,
+		Proof:        proof,
+	})
+	require.ErrorContains(t, err, "disabled")
+}
+
+func TestExportImportRootChecksRejectManifestRootTampering(t *testing.T) {
+	state := populatedState(t, []ZoneID{ZoneIDFinancial, ZoneIDContract})
+	root, err := BuildGlobalStateRoot(7, state, testContributions(7))
+	require.NoError(t, err)
+	state, err = AppendGlobalRoot(state, root)
+	require.NoError(t, err)
+
+	manifest, err := NewExportManifest(root, testHash("export/app"), state)
+	require.NoError(t, err)
+	require.NoError(t, ValidateExportImportRootChecks(state, manifest))
+	require.NoError(t, ValidateKernelImport(state, manifest))
+
+	tampered := manifest
+	tampered.RoutingRoot = testHash("export/wrong-routing-root")
+	tampered.ManifestHash = ComputeExportManifestHash(tampered)
+	require.ErrorContains(t, ValidateExportImportRootChecks(state, tampered), "root set mismatch")
+	require.ErrorContains(t, ValidateKernelImport(state, tampered), "root set mismatch")
+
+	_, err = AddExportManifest(state, tampered)
+	require.ErrorContains(t, err, "root set mismatch")
+}
+
 func testRootContribution(t *testing.T, rootType RootType, id string, seed string) RootContribution {
 	t.Helper()
 	contribution, err := NewRootContribution(rootType, id, testHash(seed))

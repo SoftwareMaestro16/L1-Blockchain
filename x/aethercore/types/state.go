@@ -340,6 +340,9 @@ func AddExportManifest(state CoreState, manifest ExportManifest) (CoreState, err
 	if manifest.GlobalRoot != root.GlobalRoot {
 		return CoreState{}, errors.New("aethercore export manifest global root mismatch")
 	}
+	if err := ValidateExportImportRootChecks(state, manifest); err != nil {
+		return CoreState{}, err
+	}
 	for _, existing := range state.ExportManifests {
 		if existing.Height == manifest.Height {
 			return CoreState{}, errors.New("duplicate aethercore export manifest height")

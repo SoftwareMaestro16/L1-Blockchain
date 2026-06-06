@@ -499,6 +499,9 @@ func ValidateKernelImport(state CoreState, manifest ExportManifest) error {
 	if manifest.GlobalRoot != root.GlobalRoot {
 		return errors.New("aethercore kernel import global root mismatch")
 	}
+	if err := ValidateExportImportRootChecks(state, manifest); err != nil {
+		return err
+	}
 	if manifest.ZoneCommitmentCount != uint64(len(state.CommitmentsAtHeight(manifest.Height))) {
 		return errors.New("aethercore kernel import zone commitment count mismatch")
 	}
