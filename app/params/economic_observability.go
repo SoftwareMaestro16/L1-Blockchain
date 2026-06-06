@@ -9,6 +9,7 @@ import (
 const (
 	EconomicObservabilityKindMetric = "metric"
 	EconomicObservabilityKindEvent  = "event"
+	EconomicObservabilityKindQuery  = "query"
 
 	EconomicMetricCurrentInflationRate          = "current_inflation_rate"
 	EconomicMetricGrossMintedPerEpoch           = "gross_minted_aet_per_epoch"
@@ -42,6 +43,19 @@ const (
 	EconomicEventStorageFee                    = "storage_fee_event"
 	EconomicEventStateRentWarning              = "state_rent_warning_event"
 	EconomicEventCircuitBreaker                = "circuit_breaker_event"
+
+	EconomicQueryCurrentParameters             = "current_economic_parameters"
+	EconomicQueryInflationState                = "current_and_historical_inflation_state"
+	EconomicQueryNetIssuanceByEpoch            = "net_issuance_by_epoch"
+	EconomicQueryFeeDistributionByEpoch        = "fee_distribution_by_epoch"
+	EconomicQueryBurnHistory                   = "burn_history"
+	EconomicQueryValidatorScoreComponents      = "validator_score_and_score_components"
+	EconomicQueryValidatorConcentration        = "validator_concentration_metrics"
+	EconomicQueryDelegatorRiskAdjustedYield    = "delegator_risk_adjusted_yield_estimate"
+	EconomicQueryStorageFootprint              = "storage_footprint_by_account_or_contract"
+	EconomicQueryStateRentStatus               = "state_rent_status"
+	EconomicQueryFeeEstimateTxClass            = "fee_estimate_for_transaction_class"
+	EconomicQuerySupplyProjectionCurrentParams = "supply_projection_under_current_parameters"
 )
 
 type EconomicObservabilitySignal struct {
@@ -60,12 +74,16 @@ type EconomicObservabilitySignal struct {
 type EconomicObservabilityReport struct {
 	Metrics           []EconomicObservabilitySignal
 	Events            []EconomicObservabilitySignal
+	Queries           []EconomicObservabilitySignal
 	RequiredMetrics   int
 	RequiredEvents    int
+	RequiredQueries   int
 	CoveredMetrics    int
 	CoveredEvents     int
+	CoveredQueries    int
 	MetricCoverageBps int64
 	EventCoverageBps  int64
+	QueryCoverageBps  int64
 	Passed            bool
 	Failed            []string
 	GovernanceSummary string
@@ -112,32 +130,60 @@ func DefaultEconomicObservabilityEvents() []EconomicObservabilitySignal {
 	}
 }
 
-func BuildEconomicObservabilityReport(metrics, events []EconomicObservabilitySignal) EconomicObservabilityReport {
+func DefaultEconomicObservabilityQueries() []EconomicObservabilitySignal {
+	return []EconomicObservabilitySignal{
+		requiredQuery(EconomicQueryCurrentParameters, "governance", "params.economic_control_surface", "module"),
+		requiredQuery(EconomicQueryInflationState, "epoch", "adaptive_inflation.controller_state", "epoch_id"),
+		requiredQuery(EconomicQueryNetIssuanceByEpoch, "epoch", "adaptive_inflation.net_issuance", "epoch_id"),
+		requiredQuery(EconomicQueryFeeDistributionByEpoch, "epoch", "fee_market_optimizer.allocation", "epoch_id", "bucket"),
+		requiredQuery(EconomicQueryBurnHistory, "epoch_window", "burn_deflation.supply_query", "from_epoch", "to_epoch"),
+		requiredQuery(EconomicQueryValidatorScoreComponents, "validator_epoch", "staking_enhancements.score", "epoch_id", "validator_id"),
+		requiredQuery(EconomicQueryValidatorConcentration, "epoch", "staking_enhancements.concentration_metrics", "epoch_id", "top_n"),
+		requiredQuery(EconomicQueryDelegatorRiskAdjustedYield, "delegator_validator_epoch", "validator_reputation.yield_estimate", "epoch_id", "delegator", "validator_id"),
+		requiredQuery(EconomicQueryStorageFootprint, "account_contract", "storage_economy.footprint", "owner_id"),
+		requiredQuery(EconomicQueryStateRentStatus, "account_contract_epoch", "storage_economy.rent_status", "epoch_id", "owner_id"),
+		requiredQuery(EconomicQueryFeeEstimateTxClass, "transaction_class", "fee_market_optimizer.estimate", "tx_class"),
+		requiredQuery(EconomicQuerySupplyProjectionCurrentParams, "governance_projection", "supply_stabilization.projection", "projection_years"),
+	}
+}
+
+func BuildEconomicObservabilityReport(metrics, events []EconomicObservabilitySignal, queriesInput ...[]EconomicObservabilitySignal) EconomicObservabilityReport {
 	if metrics == nil {
 		metrics = DefaultEconomicObservabilityMetrics()
 	}
 	if events == nil {
 		events = DefaultEconomicObservabilityEvents()
 	}
+	queries := DefaultEconomicObservabilityQueries()
+	if len(queriesInput) > 0 && queriesInput[0] != nil {
+		queries = queriesInput[0]
+	}
 	metricSignals, metricFailed, requiredMetrics, coveredMetrics := evaluateObservabilitySignals(EconomicObservabilityKindMetric, metrics, requiredEconomicMetricIDs())
 	eventSignals, eventFailed, requiredEvents, coveredEvents := evaluateObservabilitySignals(EconomicObservabilityKindEvent, events, requiredEconomicEventIDs())
+	querySignals, queryFailed, requiredQueries, coveredQueries := evaluateObservabilitySignals(EconomicObservabilityKindQuery, queries, requiredEconomicQueryIDs())
 	failed := append(metricFailed, eventFailed...)
+	failed = append(failed, queryFailed...)
 	sort.Strings(failed)
 
 	metricCoverage := coverageBps(coveredMetrics, requiredMetrics)
 	eventCoverage := coverageBps(coveredEvents, requiredEvents)
+	queryCoverage := coverageBps(coveredQueries, requiredQueries)
 	return EconomicObservabilityReport{
 		Metrics:           metricSignals,
 		Events:            eventSignals,
+		Queries:           querySignals,
 		RequiredMetrics:   requiredMetrics,
 		RequiredEvents:    requiredEvents,
+		RequiredQueries:   requiredQueries,
 		CoveredMetrics:    coveredMetrics,
 		CoveredEvents:     coveredEvents,
+		CoveredQueries:    coveredQueries,
 		MetricCoverageBps: metricCoverage,
 		EventCoverageBps:  eventCoverage,
-		Passed:            len(failed) == 0 && metricCoverage == BasisPoints && eventCoverage == BasisPoints,
+		QueryCoverageBps:  queryCoverage,
+		Passed:            len(failed) == 0 && metricCoverage == BasisPoints && eventCoverage == BasisPoints && queryCoverage == BasisPoints,
 		Failed:            failed,
-		GovernanceSummary: fmt.Sprintf("required_metrics=%d/%d required_events=%d/%d metric_coverage_bps=%d event_coverage_bps=%d", coveredMetrics, requiredMetrics, coveredEvents, requiredEvents, metricCoverage, eventCoverage),
+		GovernanceSummary: fmt.Sprintf("required_metrics=%d/%d required_events=%d/%d required_queries=%d/%d metric_coverage_bps=%d event_coverage_bps=%d query_coverage_bps=%d", coveredMetrics, requiredMetrics, coveredEvents, requiredEvents, coveredQueries, requiredQueries, metricCoverage, eventCoverage, queryCoverage),
 	}
 }
 
@@ -169,6 +215,19 @@ func requiredEvent(id, scope, source string, labels ...string) EconomicObservabi
 	}
 }
 
+func requiredQuery(id, scope, source string, labels ...string) EconomicObservabilitySignal {
+	return EconomicObservabilitySignal{
+		ID:            id,
+		Kind:          EconomicObservabilityKindQuery,
+		Scope:         scope,
+		Source:        source,
+		Required:      true,
+		Queryable:     true,
+		SchemaVersion: 1,
+		Labels:        append([]string{}, labels...),
+	}
+}
+
 func evaluateObservabilitySignals(kind string, signals []EconomicObservabilitySignal, expectedIDs []string) ([]EconomicObservabilitySignal, []string, int, int) {
 	out := append([]EconomicObservabilitySignal{}, signals...)
 	sort.SliceStable(out, func(i, j int) bool {
@@ -195,9 +254,6 @@ func evaluateObservabilitySignals(kind string, signals []EconomicObservabilitySi
 			if strings.TrimSpace(signal.Source) == "" {
 				failed = append(failed, signal.ID+":source_missing")
 			}
-			if !signal.TelemetryEnabled {
-				failed = append(failed, signal.ID+":telemetry_disabled")
-			}
 			if signal.SchemaVersion == 0 {
 				failed = append(failed, signal.ID+":schema_version_missing")
 			}
@@ -209,11 +265,25 @@ func evaluateObservabilitySignals(kind string, signals []EconomicObservabilitySi
 					failed = append(failed, fmt.Sprintf("%s:label_%d_blank", signal.ID, i))
 				}
 			}
-			if kind == EconomicObservabilityKindMetric && !signal.Queryable {
-				failed = append(failed, signal.ID+":metric_not_queryable")
-			}
-			if kind == EconomicObservabilityKindEvent && !signal.Emitted {
-				failed = append(failed, signal.ID+":event_not_emitted")
+			switch kind {
+			case EconomicObservabilityKindMetric:
+				if !signal.Queryable {
+					failed = append(failed, signal.ID+":metric_not_queryable")
+				}
+				if !signal.TelemetryEnabled {
+					failed = append(failed, signal.ID+":telemetry_disabled")
+				}
+			case EconomicObservabilityKindEvent:
+				if !signal.Emitted {
+					failed = append(failed, signal.ID+":event_not_emitted")
+				}
+				if !signal.TelemetryEnabled {
+					failed = append(failed, signal.ID+":telemetry_disabled")
+				}
+			case EconomicObservabilityKindQuery:
+				if !signal.Queryable {
+					failed = append(failed, signal.ID+":query_not_queryable")
+				}
 			}
 		}
 	}
@@ -234,13 +304,16 @@ func evaluateObservabilitySignals(kind string, signals []EconomicObservabilitySi
 }
 
 func observabilitySignalCovered(kind string, signal EconomicObservabilitySignal) bool {
-	if !signal.Required || signal.Kind != kind || !signal.TelemetryEnabled || signal.SchemaVersion == 0 || len(signal.Labels) == 0 || strings.TrimSpace(signal.Source) == "" || strings.TrimSpace(signal.Scope) == "" {
+	if !signal.Required || signal.Kind != kind || signal.SchemaVersion == 0 || len(signal.Labels) == 0 || strings.TrimSpace(signal.Source) == "" || strings.TrimSpace(signal.Scope) == "" {
 		return false
 	}
 	if kind == EconomicObservabilityKindMetric {
-		return signal.Queryable
+		return signal.Queryable && signal.TelemetryEnabled
 	}
-	return signal.Emitted
+	if kind == EconomicObservabilityKindEvent {
+		return signal.Emitted && signal.TelemetryEnabled
+	}
+	return signal.Queryable
 }
 
 func requiredEconomicMetricIDs() []string {
@@ -281,5 +354,22 @@ func requiredEconomicEventIDs() []string {
 		EconomicEventStorageFee,
 		EconomicEventStateRentWarning,
 		EconomicEventCircuitBreaker,
+	}
+}
+
+func requiredEconomicQueryIDs() []string {
+	return []string{
+		EconomicQueryCurrentParameters,
+		EconomicQueryInflationState,
+		EconomicQueryNetIssuanceByEpoch,
+		EconomicQueryFeeDistributionByEpoch,
+		EconomicQueryBurnHistory,
+		EconomicQueryValidatorScoreComponents,
+		EconomicQueryValidatorConcentration,
+		EconomicQueryDelegatorRiskAdjustedYield,
+		EconomicQueryStorageFootprint,
+		EconomicQueryStateRentStatus,
+		EconomicQueryFeeEstimateTxClass,
+		EconomicQuerySupplyProjectionCurrentParams,
 	}
 }

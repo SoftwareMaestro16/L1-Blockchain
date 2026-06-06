@@ -11,14 +11,19 @@ func TestDefaultEconomicObservabilityReportIsComplete(t *testing.T) {
 	require.True(t, report.Passed, report.Failed)
 	require.Len(t, report.Metrics, 18)
 	require.Len(t, report.Events, 13)
+	require.Len(t, report.Queries, 12)
 	require.Equal(t, 18, report.RequiredMetrics)
 	require.Equal(t, 13, report.RequiredEvents)
+	require.Equal(t, 12, report.RequiredQueries)
 	require.Equal(t, 18, report.CoveredMetrics)
 	require.Equal(t, 13, report.CoveredEvents)
+	require.Equal(t, 12, report.CoveredQueries)
 	require.Equal(t, BasisPoints, report.MetricCoverageBps)
 	require.Equal(t, BasisPoints, report.EventCoverageBps)
+	require.Equal(t, BasisPoints, report.QueryCoverageBps)
 	require.Contains(t, report.GovernanceSummary, "required_metrics=18/18")
 	require.Contains(t, report.GovernanceSummary, "required_events=13/13")
+	require.Contains(t, report.GovernanceSummary, "required_queries=12/12")
 
 	for _, metric := range report.Metrics {
 		require.Equal(t, EconomicObservabilityKindMetric, metric.Kind)
@@ -37,6 +42,14 @@ func TestDefaultEconomicObservabilityReportIsComplete(t *testing.T) {
 		require.NotZero(t, event.SchemaVersion)
 		require.NotEmpty(t, event.Source)
 		require.NotEmpty(t, event.Labels)
+	}
+	for _, query := range report.Queries {
+		require.Equal(t, EconomicObservabilityKindQuery, query.Kind)
+		require.True(t, query.Required)
+		require.True(t, query.Queryable)
+		require.NotZero(t, query.SchemaVersion)
+		require.NotEmpty(t, query.Source)
+		require.NotEmpty(t, query.Labels)
 	}
 }
 
@@ -80,6 +93,32 @@ func TestEconomicObservabilityRequiresEmittedEvents(t *testing.T) {
 	require.False(t, report.Passed)
 	require.Contains(t, report.Failed, EconomicEventDeflationGuard+":event_not_emitted")
 	require.Less(t, report.EventCoverageBps, BasisPoints)
+}
+
+func TestEconomicObservabilityRejectsMissingAndDuplicateQuery(t *testing.T) {
+	queries := DefaultEconomicObservabilityQueries()
+	queries = append(queries[:1], queries[2:]...)
+	queries = append(queries, queries[0])
+
+	report := BuildEconomicObservabilityReport(nil, nil, queries)
+	require.False(t, report.Passed)
+	require.Contains(t, report.Failed, EconomicQueryInflationState+":missing_required_observability")
+	require.Contains(t, report.Failed, EconomicQueryCurrentParameters+":duplicate_signal")
+	require.Less(t, report.QueryCoverageBps, BasisPoints)
+}
+
+func TestEconomicObservabilityRequiresQueryableQueries(t *testing.T) {
+	queries := DefaultEconomicObservabilityQueries()
+	for i := range queries {
+		if queries[i].ID == EconomicQueryDelegatorRiskAdjustedYield {
+			queries[i].Queryable = false
+		}
+	}
+
+	report := BuildEconomicObservabilityReport(nil, nil, queries)
+	require.False(t, report.Passed)
+	require.Contains(t, report.Failed, EconomicQueryDelegatorRiskAdjustedYield+":query_not_queryable")
+	require.Less(t, report.QueryCoverageBps, BasisPoints)
 }
 
 func TestEconomicObservabilityRejectsBadSignalMetadata(t *testing.T) {
