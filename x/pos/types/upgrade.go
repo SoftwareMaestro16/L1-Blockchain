@@ -90,6 +90,12 @@ type EpochRecord struct {
 	SettlementStatus SettlementStatus
 }
 
+type EpochSettlementRoots struct {
+	PerformanceRoot string
+	RewardRoot      string
+	SlashRoot       string
+}
+
 type WorkloadTask struct {
 	TaskID             string
 	ZoneID             string
@@ -471,6 +477,84 @@ func MaxValidatorSetChanges(params Params, activeValidatorCount uint32) (uint32,
 	return uint32(changes), nil
 }
 
+func EpochRecordFieldNames() []string {
+	return []string{
+		"epoch_id",
+		"start_height",
+		"end_height",
+		"phase",
+		"seed",
+		"validator_set_hash",
+		"task_group_root",
+		"performance_root",
+		"reward_root",
+		"slash_root",
+		"settlement_status",
+	}
+}
+
+func EpochPhaseValues() []EpochPhase {
+	return []EpochPhase{
+		EpochPhaseDelegation,
+		EpochPhaseElection,
+		EpochPhaseAssignment,
+		EpochPhaseActive,
+		EpochPhaseSettlement,
+		EpochPhaseClosed,
+	}
+}
+
+func ValidateValidatorSetChangeActivation(epoch EpochRecord, activationHeight uint64) error {
+	if err := epoch.Validate(); err != nil {
+		return err
+	}
+	if activationHeight != epoch.StartHeight {
+		return fmt.Errorf("validator set changes must activate at epoch boundary height %d", epoch.StartHeight)
+	}
+	return nil
+}
+
+func ValidateConsecutiveEpochs(previous EpochRecord, next EpochRecord) error {
+	if err := previous.Validate(); err != nil {
+		return err
+	}
+	if err := next.Validate(); err != nil {
+		return err
+	}
+	if next.EpochID != previous.EpochID+1 {
+		return errors.New("next epoch id must increment by one")
+	}
+	if next.StartHeight != previous.EndHeight+1 {
+		return errors.New("next epoch must start at previous end height plus one")
+	}
+	return nil
+}
+
+func DelegationEffectiveElectionEpoch(params Params, requestedEpoch uint64) (uint64, error) {
+	if err := params.Validate(); err != nil {
+		return 0, err
+	}
+	return requestedEpoch + params.DelegationActivationEpochs, nil
+}
+
+func DelegationAffectsElection(params Params, requestedEpoch uint64, electionEpoch uint64) (bool, error) {
+	effectiveEpoch, err := DelegationEffectiveElectionEpoch(params, requestedEpoch)
+	if err != nil {
+		return false, err
+	}
+	return electionEpoch >= effectiveEpoch, nil
+}
+
+func EvidenceWithinSlashableWindow(params Params, evidenceEpoch uint64, currentEpoch uint64) (bool, error) {
+	if err := params.Validate(); err != nil {
+		return false, err
+	}
+	if currentEpoch < evidenceEpoch {
+		return false, errors.New("current epoch cannot be before evidence epoch")
+	}
+	return currentEpoch-evidenceEpoch <= params.EvidenceWindowEpochs, nil
+}
+
 func DefaultEpochPhaseDurations(epochDurationSeconds uint64) EpochPhaseDurations {
 	delegation := epochDurationSeconds / 4
 	election := epochDurationSeconds / 12
@@ -604,6 +688,9 @@ func CloseEpochRecord(record EpochRecord, performanceRoot string, rewardRoot str
 	if err := record.Validate(); err != nil {
 		return EpochRecord{}, err
 	}
+	if record.Phase != EpochPhaseSettlement {
+		return EpochRecord{}, errors.New("epoch must be in settlement phase before closing")
+	}
 	if err := validatePosHash("performance root", performanceRoot); err != nil {
 		return EpochRecord{}, err
 	}
@@ -653,6 +740,9 @@ func (r EpochRecord) Validate() error {
 	}
 	if r.Phase == EpochPhaseClosed && r.SettlementStatus != SettlementStatusFinalized {
 		return errors.New("closed epoch must have finalized settlement")
+	}
+	if r.SettlementStatus == SettlementStatusFinalized && r.Phase != EpochPhaseClosed {
+		return errors.New("finalized settlement must close the epoch")
 	}
 	return nil
 }
@@ -732,6 +822,13 @@ func BuildTaskAssignments(params Params, epoch EpochRecord, validators []ScoredV
 	}
 	if len(validators) == 0 {
 		return TaskAssignmentSet{}, errors.New("task assignment requires active validators")
+	}
+	validatorSetHash, err := ComputeValidatorSetHash(validators)
+	if err != nil {
+		return TaskAssignmentSet{}, err
+	}
+	if validatorSetHash != epoch.ValidatorSetHash {
+		return TaskAssignmentSet{}, errors.New("task assignments require committed validator set hash")
 	}
 	if len(tasks) == 0 {
 		return TaskAssignmentSet{
@@ -1055,10 +1152,11 @@ func (e EvidenceCase) Validate(params Params, currentEpoch uint64) error {
 	if !e.Finalized {
 		return errors.New("evidence must be finalized before settlement")
 	}
-	if currentEpoch < e.EvidenceEpoch {
-		return errors.New("current epoch cannot be before evidence epoch")
+	withinWindow, err := EvidenceWithinSlashableWindow(params, e.EvidenceEpoch, currentEpoch)
+	if err != nil {
+		return err
 	}
-	if currentEpoch-e.EvidenceEpoch > params.EvidenceWindowEpochs {
+	if !withinWindow {
 		return errors.New("evidence is outside slashable window")
 	}
 	return nil

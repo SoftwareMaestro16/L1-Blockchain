@@ -161,10 +161,92 @@ func TestEpochLifecyclePhasesAndSeedAreDeterministic(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEqual(t, left.Seed, sourceRecord.Seed)
 
-	closed, err := CloseEpochRecord(left, PosEmptyRootHash, PosEmptyRootHash, PosEmptyRootHash)
+	_, err = CloseEpochRecord(left, PosEmptyRootHash, PosEmptyRootHash, PosEmptyRootHash)
+	require.ErrorContains(t, err, "settlement phase")
+
+	settlementRecord, err := NewEpochRecord(params, 7, 100, 199, EpochPhaseSettlement, "", validators)
+	require.NoError(t, err)
+	closed, err := CloseEpochRecord(settlementRecord, PosEmptyRootHash, PosEmptyRootHash, PosEmptyRootHash)
 	require.NoError(t, err)
 	require.Equal(t, EpochPhaseClosed, closed.Phase)
 	require.Equal(t, SettlementStatusFinalized, closed.SettlementStatus)
+}
+
+func TestEpochRecordStateContractMatchesDesignFieldsAndPhaseValues(t *testing.T) {
+	require.Equal(t, []string{
+		"epoch_id",
+		"start_height",
+		"end_height",
+		"phase",
+		"seed",
+		"validator_set_hash",
+		"task_group_root",
+		"performance_root",
+		"reward_root",
+		"slash_root",
+		"settlement_status",
+	}, EpochRecordFieldNames())
+	require.Equal(t, []EpochPhase{
+		EpochPhaseDelegation,
+		EpochPhaseElection,
+		EpochPhaseAssignment,
+		EpochPhaseActive,
+		EpochPhaseSettlement,
+		EpochPhaseClosed,
+	}, EpochPhaseValues())
+
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	record, err := NewEpochRecord(params, 2, 10, 20, EpochPhaseDelegation, "", scoredCandidates(t, params, makeCandidates(3, 1_000)))
+	require.NoError(t, err)
+	require.NoError(t, record.Validate())
+
+	record.Phase = "invalid"
+	require.ErrorContains(t, record.Validate(), "unsupported epoch phase")
+}
+
+func TestEpochRulesEnforceValidatorSetChangeBoundaries(t *testing.T) {
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	previousSettlement, err := NewEpochRecord(params, 5, 100, 199, EpochPhaseSettlement, "", scoredCandidates(t, params, makeCandidates(3, 1_000)))
+	require.NoError(t, err)
+	previous, err := CloseEpochRecord(previousSettlement, PosEmptyRootHash, PosEmptyRootHash, PosEmptyRootHash)
+	require.NoError(t, err)
+	next, err := NewEpochRecord(params, 6, 200, 299, EpochPhaseDelegation, previous.Seed, scoredCandidates(t, params, makeCandidates(3, 1_000)))
+	require.NoError(t, err)
+
+	require.NoError(t, ValidateConsecutiveEpochs(previous, next))
+	require.NoError(t, ValidateValidatorSetChangeActivation(next, next.StartHeight))
+	require.ErrorContains(t, ValidateValidatorSetChangeActivation(next, next.StartHeight+1), "epoch boundary")
+
+	next.StartHeight = 201
+	require.ErrorContains(t, ValidateConsecutiveEpochs(previous, next), "previous end height plus one")
+}
+
+func TestEpochRulesEnforceDelegationDelayAndEvidenceWindow(t *testing.T) {
+	params := DefaultParams()
+	params.DelegationActivationEpochs = 2
+	params.EvidenceWindowEpochs = 4
+
+	effectiveEpoch, err := DelegationEffectiveElectionEpoch(params, 10)
+	require.NoError(t, err)
+	require.Equal(t, uint64(12), effectiveEpoch)
+
+	active, err := DelegationAffectsElection(params, 10, 11)
+	require.NoError(t, err)
+	require.False(t, active)
+	active, err = DelegationAffectsElection(params, 10, 12)
+	require.NoError(t, err)
+	require.True(t, active)
+
+	within, err := EvidenceWithinSlashableWindow(params, 10, 14)
+	require.NoError(t, err)
+	require.True(t, within)
+	within, err = EvidenceWithinSlashableWindow(params, 10, 15)
+	require.NoError(t, err)
+	require.False(t, within)
+	_, err = EvidenceWithinSlashableWindow(params, 10, 9)
+	require.ErrorContains(t, err, "before evidence epoch")
 }
 
 func TestMaxValidatorSetChangesUsesConfiguredRate(t *testing.T) {
@@ -247,6 +329,9 @@ func TestTaskAssignmentsAreSeededRoleAwareAndStable(t *testing.T) {
 			require.True(t, ValidatorSupportsRole(candidateByID[validatorID], assignment.Role))
 		}
 	}
+
+	_, err = BuildTaskAssignments(params, epoch, validators[1:], tasks)
+	require.ErrorContains(t, err, "committed validator set hash")
 }
 
 func TestDelegationIntentsRespectActivationDelayAndRiskProfile(t *testing.T) {
