@@ -16,15 +16,15 @@ func TestFinancialZoneBoundaryRoutesStateUnderSpecPrefixes(t *testing.T) {
 
 	accountKey, err := FinancialAccountKey("alice")
 	require.NoError(t, err)
-	require.Equal(t, "financial/accounts/alice", accountKey)
+	require.Equal(t, "zone/financial/accounts/alice", accountKey)
 
 	balanceKey, err := FinancialBalanceKey("alice", "naet")
 	require.NoError(t, err)
-	require.Equal(t, "financial/balances/alice/naet", balanceKey)
+	require.Equal(t, "zone/financial/balances/alice/naet", balanceKey)
 
 	feeKey, err := FinancialFeeBucketKey("base-fee")
 	require.NoError(t, err)
-	require.Equal(t, "financial/fees/buckets/base-fee", feeKey)
+	require.Equal(t, "zone/financial/fees/buckets/base-fee", feeKey)
 
 	denomKey, err := FinancialFactoryDenomKey("factory/alice/token")
 	require.NoError(t, err)
@@ -36,19 +36,23 @@ func TestFinancialZoneBoundaryRoutesStateUnderSpecPrefixes(t *testing.T) {
 
 	poolKey, err := FinancialDEXPoolKey(42)
 	require.NoError(t, err)
-	require.Equal(t, "financial/dex/pools/00000000000000000042", poolKey)
+	require.Equal(t, "zone/financial/dex/pools/00000000000000000042", poolKey)
 
 	orderKey, err := FinancialDEXOrderKey("order-1")
 	require.NoError(t, err)
-	require.Equal(t, "financial/dex/orders/order-1", orderKey)
+	require.Equal(t, "zone/financial/dex/orders/order-1", orderKey)
 
 	channelKey, err := FinancialPaymentChannelKey("channel-1")
 	require.NoError(t, err)
-	require.Equal(t, "financial/payments/channels/channel-1", channelKey)
+	require.Equal(t, "zone/financial/payments/channels/channel-1", channelKey)
 
 	conditionKey, err := FinancialPaymentConditionKey("condition-1")
 	require.NoError(t, err)
-	require.Equal(t, "financial/payments/conditions/condition-1", conditionKey)
+	require.Equal(t, "zone/financial/payments/conditions/condition-1", conditionKey)
+
+	escrowKey, err := FinancialTransferEscrowKey("transfer-1")
+	require.NoError(t, err)
+	require.Equal(t, "zone/financial/payments/escrow/transfer-1", escrowKey)
 }
 
 func TestFinancialZoneMessageDrivenTransferIngressAndFeeAccounting(t *testing.T) {
@@ -215,4 +219,95 @@ func TestFinancialZoneStateRootIsCanonicalAndBuildsZoneRoot(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, ZoneIDFinancial, req.ZoneID)
 	require.Equal(t, "QueryBalance/alice/naet", req.Key)
+}
+
+func TestFinancialShardRoutingEscrowAndFeeAggregation(t *testing.T) {
+	accountRouteA, err := RouteFinancialBalanceShard("alice", "naet", 8, 3)
+	require.NoError(t, err)
+	accountRouteB, err := RouteFinancialBalanceShard("alice", "naet", 8, 3)
+	require.NoError(t, err)
+	require.Equal(t, accountRouteA, accountRouteB)
+	require.Equal(t, FinancialRouteAccountAddress, accountRouteA.RoutingMode)
+
+	poolRoute, err := RouteFinancialDEXPoolShard(42, 8, 3)
+	require.NoError(t, err)
+	require.Equal(t, FinancialRoutePoolID, poolRoute.RoutingMode)
+	require.NotEqual(t, "", poolRoute.RouteHash)
+
+	channelRoute, err := RouteFinancialPaymentChannelShard("channel-1", 8, 3)
+	require.NoError(t, err)
+	require.Equal(t, FinancialRoutePaymentChannel, channelRoute.RoutingMode)
+
+	receiver := distinctFinancialShardReceiver(t, "alice", "naet", 4, 3)
+	state := FinancialZoneState{
+		Accounts: []string{"alice", receiver},
+		Balances: []FinancialBalance{
+			{Address: "alice", Denom: "naet", Amount: 100},
+		},
+	}
+	next, escrow, err := OpenFinancialCrossShardTransferEscrow(state, "alice", receiver, "naet", 25, 4, 3, 1)
+	require.NoError(t, err)
+	require.Equal(t, FinancialEscrowDebited, escrow.Status)
+	require.Equal(t, uint64(75), balanceAmount(next, "alice", "naet"))
+	require.Equal(t, uint64(0), balanceAmount(next, receiver, "naet"))
+
+	settled, settledEscrow, err := SettleFinancialCrossShardTransferEscrow(next, escrow.TransferID, escrow.DebitReceiptHash)
+	require.NoError(t, err)
+	require.Equal(t, FinancialEscrowSettled, settledEscrow.Status)
+	require.Equal(t, uint64(25), balanceAmount(settled, receiver, "naet"))
+
+	refundState := FinancialZoneState{
+		Accounts: []string{"alice", receiver},
+		Balances: []FinancialBalance{
+			{Address: "alice", Denom: "naet", Amount: 100},
+		},
+	}
+	refundState, refundEscrow, err := OpenFinancialCrossShardTransferEscrow(refundState, "alice", receiver, "naet", 30, 4, 3, 2)
+	require.NoError(t, err)
+	refunded, refundedEscrow, err := RefundFinancialCrossShardTransferEscrow(refundState, refundEscrow.TransferID, refundEscrow.DebitReceiptHash)
+	require.NoError(t, err)
+	require.Equal(t, FinancialEscrowRefunded, refundedEscrow.Status)
+	require.Equal(t, uint64(100), balanceAmount(refunded, "alice", "naet"))
+
+	fees, err := CreditFinancialShardFeeBucket(FinancialZoneState{}, 1, "naet", 3)
+	require.NoError(t, err)
+	fees, err = CreditFinancialShardFeeBucket(fees, 0, "naet", 2)
+	require.NoError(t, err)
+	fees, aggregateRoot, err := AggregateFinancialShardFees(fees, "end-block")
+	require.NoError(t, err)
+	require.NotEmpty(t, aggregateRoot)
+	require.Equal(t, uint64(5), balanceFeeBucketAmount(fees, "end-block", "naet"))
+}
+
+func balanceAmount(state FinancialZoneState, address, denom string) uint64 {
+	for _, balance := range state.Normalize().Balances {
+		if balance.Address == address && balance.Denom == denom {
+			return balance.Amount
+		}
+	}
+	return 0
+}
+
+func distinctFinancialShardReceiver(t *testing.T, from, denom string, shardCount uint32, layoutEpoch uint64) string {
+	t.Helper()
+	source, err := RouteFinancialBalanceShard(from, denom, shardCount, layoutEpoch)
+	require.NoError(t, err)
+	for _, candidate := range []string{"bob", "carol", "dave", "erin", "frank", "grace"} {
+		route, err := RouteFinancialBalanceShard(candidate, denom, shardCount, layoutEpoch)
+		require.NoError(t, err)
+		if route.ShardID != source.ShardID {
+			return candidate
+		}
+	}
+	t.Fatal("missing distinct financial shard receiver")
+	return ""
+}
+
+func balanceFeeBucketAmount(state FinancialZoneState, bucketID, denom string) uint64 {
+	for _, bucket := range state.Normalize().FeeBuckets {
+		if bucket.BucketID == bucketID && bucket.Denom == denom {
+			return bucket.Amount
+		}
+	}
+	return 0
 }
