@@ -9,6 +9,7 @@ import (
 const (
 	EconomicTestCoverageKindInvariant  = "invariant"
 	EconomicTestCoverageKindSimulation = "simulation"
+	EconomicTestCoverageKindUpgrade    = "upgrade"
 
 	EconomicInvariantMintedSupplyReconciles     = "minted_supply_equals_rewards_plus_module_balances"
 	EconomicInvariantBurnRemovedFromSpendable   = "burned_supply_removed_from_spendable_supply"
@@ -34,6 +35,14 @@ const (
 	EconomicSimulationDeploymentCongestion    = "deployment_congestion"
 	EconomicSimulationRapidCommissionIncrease = "rapid_commission_increase"
 	EconomicSimulationSuddenDelegationInflow  = "sudden_delegation_inflow_to_one_validator"
+
+	EconomicUpgradeParameterMigrationPreservesBalances        = "parameter_migration_preserves_existing_balances"
+	EconomicUpgradeExistingDelegationsRemainValid             = "existing_delegations_remain_valid"
+	EconomicUpgradeExistingValidatorsRemainQueryable          = "existing_validators_remain_queryable"
+	EconomicUpgradeFeeDistributionDoesNotStrandBalances       = "fee_distribution_changes_do_not_strand_module_balances"
+	EconomicUpgradeBurnActivationKeepsRewardDistribution      = "burn_controller_activation_keeps_reward_distribution"
+	EconomicUpgradeStatePricingDefinedStartingState           = "state_pricing_activation_has_defined_starting_state"
+	EconomicUpgradeInflationControllerStartsFromCurrentParams = "inflation_controller_upgrade_starts_from_current_parameters"
 )
 
 type EconomicTestCoverageCase struct {
@@ -49,12 +58,16 @@ type EconomicTestCoverageCase struct {
 type EconomicTestCoverageReport struct {
 	InvariantCases        []EconomicTestCoverageCase
 	SimulationCases       []EconomicTestCoverageCase
+	UpgradeCases          []EconomicTestCoverageCase
 	RequiredInvariants    int
 	RequiredSimulations   int
+	RequiredUpgrades      int
 	CoveredInvariants     int
 	CoveredSimulations    int
+	CoveredUpgrades       int
 	InvariantCoverageBps  int64
 	SimulationCoverageBps int64
+	UpgradeCoverageBps    int64
 	Passed                bool
 	Failed                []string
 	GovernanceSummary     string
@@ -93,33 +106,56 @@ func DefaultRequiredEconomicSimulationCoverageCases() []EconomicTestCoverageCase
 	}
 }
 
-func BuildRequiredEconomicTestCoverageReport(invariantCases, simulationCases []EconomicTestCoverageCase) EconomicTestCoverageReport {
+func DefaultRequiredEconomicUpgradeCoverageCases() []EconomicTestCoverageCase {
+	return []EconomicTestCoverageCase{
+		requiredCoverageCase(EconomicTestCoverageKindUpgrade, EconomicUpgradeParameterMigrationPreservesBalances, "parameter migration preserves existing balances", "TestCustomModuleMigrationsFromV1ToCurrent", "TestMigrationPhase0ReadinessPassesBaselineHardening"),
+		requiredCoverageCase(EconomicTestCoverageKindUpgrade, EconomicUpgradeExistingDelegationsRemainValid, "existing delegations remain valid after upgrade", "TestMigrationPhase0ReadinessPassesBaselineHardening", "TestKeeperIntegrationManifestCoversRequiredStoresHooksAndMigrations"),
+		requiredCoverageCase(EconomicTestCoverageKindUpgrade, EconomicUpgradeExistingValidatorsRemainQueryable, "existing validators remain queryable after upgrade", "TestKeeperIntegrationManifestCoversRequiredStoresHooksAndMigrations", "TestPosMigrationStrategyCoversAllActivationPhases"),
+		requiredCoverageCase(EconomicTestCoverageKindUpgrade, EconomicUpgradeFeeDistributionDoesNotStrandBalances, "fee distribution changes do not strand module balances", "TestFeeMarketAllocationSumsExactlyWithCaps", "TestFeesMigrationSucceedsOnValidState"),
+		requiredCoverageCase(EconomicTestCoverageKindUpgrade, EconomicUpgradeBurnActivationKeepsRewardDistribution, "burn controller activation does not break reward distribution", "TestBurnIntegratedFeeDistributionGuardsDeflationAndPreservesRewards", "TestBurnIntegratedFeeDistributionEnforcesNetIssuanceFloor"),
+		requiredCoverageCase(EconomicTestCoverageKindUpgrade, EconomicUpgradeStatePricingDefinedStartingState, "state pricing activation has a defined starting state", "TestStorageFootprintIsQueryableForAccountsAndContracts", "TestStorageRentStatusWarningAndRecoveryPath"),
+		requiredCoverageCase(EconomicTestCoverageKindUpgrade, EconomicUpgradeInflationControllerStartsFromCurrentParams, "inflation controller upgrade starts from current inflation parameters", "TestActivityInflationControllerEmergencyFreezeHoldsCurrentInflation", "TestGovernanceParameterImpactRequiresPreUpgradeSimulation"),
+	}
+}
+
+func BuildRequiredEconomicTestCoverageReport(invariantCases, simulationCases []EconomicTestCoverageCase, upgradeCases ...[]EconomicTestCoverageCase) EconomicTestCoverageReport {
 	if invariantCases == nil {
 		invariantCases = DefaultRequiredEconomicInvariantCoverageCases()
 	}
 	if simulationCases == nil {
 		simulationCases = DefaultRequiredEconomicSimulationCoverageCases()
 	}
+	upgradesInput := DefaultRequiredEconomicUpgradeCoverageCases()
+	if len(upgradeCases) > 0 && upgradeCases[0] != nil {
+		upgradesInput = upgradeCases[0]
+	}
 
 	invariants, invariantFailed, requiredInvariants, coveredInvariants := evaluateCoverageCases(EconomicTestCoverageKindInvariant, invariantCases, requiredInvariantCoverageIDs())
 	simulations, simulationFailed, requiredSimulations, coveredSimulations := evaluateCoverageCases(EconomicTestCoverageKindSimulation, simulationCases, requiredSimulationCoverageIDs())
+	upgrades, upgradeFailed, requiredUpgrades, coveredUpgrades := evaluateCoverageCases(EconomicTestCoverageKindUpgrade, upgradesInput, requiredUpgradeCoverageIDs())
 	failed := append(invariantFailed, simulationFailed...)
+	failed = append(failed, upgradeFailed...)
 	sort.Strings(failed)
 
 	invariantCoverage := coverageBps(coveredInvariants, requiredInvariants)
 	simulationCoverage := coverageBps(coveredSimulations, requiredSimulations)
+	upgradeCoverage := coverageBps(coveredUpgrades, requiredUpgrades)
 	return EconomicTestCoverageReport{
 		InvariantCases:        invariants,
 		SimulationCases:       simulations,
+		UpgradeCases:          upgrades,
 		RequiredInvariants:    requiredInvariants,
 		RequiredSimulations:   requiredSimulations,
+		RequiredUpgrades:      requiredUpgrades,
 		CoveredInvariants:     coveredInvariants,
 		CoveredSimulations:    coveredSimulations,
+		CoveredUpgrades:       coveredUpgrades,
 		InvariantCoverageBps:  invariantCoverage,
 		SimulationCoverageBps: simulationCoverage,
-		Passed:                len(failed) == 0 && invariantCoverage == BasisPoints && simulationCoverage == BasisPoints,
+		UpgradeCoverageBps:    upgradeCoverage,
+		Passed:                len(failed) == 0 && invariantCoverage == BasisPoints && simulationCoverage == BasisPoints && upgradeCoverage == BasisPoints,
 		Failed:                failed,
-		GovernanceSummary:     fmt.Sprintf("required_invariants=%d/%d required_simulations=%d/%d invariant_coverage_bps=%d simulation_coverage_bps=%d", coveredInvariants, requiredInvariants, coveredSimulations, requiredSimulations, invariantCoverage, simulationCoverage),
+		GovernanceSummary:     fmt.Sprintf("required_invariants=%d/%d required_simulations=%d/%d required_upgrades=%d/%d invariant_coverage_bps=%d simulation_coverage_bps=%d upgrade_coverage_bps=%d", coveredInvariants, requiredInvariants, coveredSimulations, requiredSimulations, coveredUpgrades, requiredUpgrades, invariantCoverage, simulationCoverage, upgradeCoverage),
 	}
 }
 
@@ -228,5 +264,17 @@ func requiredSimulationCoverageIDs() []string {
 		EconomicSimulationDeploymentCongestion,
 		EconomicSimulationRapidCommissionIncrease,
 		EconomicSimulationSuddenDelegationInflow,
+	}
+}
+
+func requiredUpgradeCoverageIDs() []string {
+	return []string{
+		EconomicUpgradeParameterMigrationPreservesBalances,
+		EconomicUpgradeExistingDelegationsRemainValid,
+		EconomicUpgradeExistingValidatorsRemainQueryable,
+		EconomicUpgradeFeeDistributionDoesNotStrandBalances,
+		EconomicUpgradeBurnActivationKeepsRewardDistribution,
+		EconomicUpgradeStatePricingDefinedStartingState,
+		EconomicUpgradeInflationControllerStartsFromCurrentParams,
 	}
 }

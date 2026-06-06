@@ -11,14 +11,19 @@ func TestDefaultRequiredEconomicTestCoverageIsComplete(t *testing.T) {
 	require.True(t, report.Passed, report.Failed)
 	require.Len(t, report.InvariantCases, 9)
 	require.Len(t, report.SimulationCases, 14)
+	require.Len(t, report.UpgradeCases, 7)
 	require.Equal(t, 9, report.RequiredInvariants)
 	require.Equal(t, 14, report.RequiredSimulations)
+	require.Equal(t, 7, report.RequiredUpgrades)
 	require.Equal(t, 9, report.CoveredInvariants)
 	require.Equal(t, 14, report.CoveredSimulations)
+	require.Equal(t, 7, report.CoveredUpgrades)
 	require.Equal(t, BasisPoints, report.InvariantCoverageBps)
 	require.Equal(t, BasisPoints, report.SimulationCoverageBps)
+	require.Equal(t, BasisPoints, report.UpgradeCoverageBps)
 	require.Contains(t, report.GovernanceSummary, "required_invariants=9/9")
 	require.Contains(t, report.GovernanceSummary, "required_simulations=14/14")
+	require.Contains(t, report.GovernanceSummary, "required_upgrades=7/7")
 
 	for _, item := range report.InvariantCases {
 		require.Equal(t, EconomicTestCoverageKindInvariant, item.Kind)
@@ -29,6 +34,13 @@ func TestDefaultRequiredEconomicTestCoverageIsComplete(t *testing.T) {
 	}
 	for _, item := range report.SimulationCases {
 		require.Equal(t, EconomicTestCoverageKindSimulation, item.Kind)
+		require.True(t, item.Required)
+		require.True(t, item.Deterministic)
+		require.True(t, item.CIEnabled)
+		require.NotEmpty(t, item.Evidence)
+	}
+	for _, item := range report.UpgradeCases {
+		require.Equal(t, EconomicTestCoverageKindUpgrade, item.Kind)
 		require.True(t, item.Required)
 		require.True(t, item.Deterministic)
 		require.True(t, item.CIEnabled)
@@ -60,6 +72,30 @@ func TestRequiredEconomicTestCoverageRejectsMissingAndDuplicateSimulationCases(t
 	require.Contains(t, report.Failed, EconomicSimulationNormalTargetStake+":missing_required_coverage")
 	require.Contains(t, report.Failed, EconomicSimulationLowActivityLowFees+":duplicate_coverage_case")
 	require.Less(t, report.SimulationCoverageBps, BasisPoints)
+}
+
+func TestRequiredEconomicTestCoverageRejectsMissingUpgradeCase(t *testing.T) {
+	upgrades := DefaultRequiredEconomicUpgradeCoverageCases()
+	upgrades = append(upgrades[:1], upgrades[2:]...)
+
+	report := BuildRequiredEconomicTestCoverageReport(nil, nil, upgrades)
+	require.False(t, report.Passed)
+	require.Contains(t, report.Failed, EconomicUpgradeExistingDelegationsRemainValid+":missing_required_coverage")
+	require.Equal(t, int64(8_571), report.UpgradeCoverageBps)
+}
+
+func TestRequiredEconomicTestCoverageRejectsUnsafeUpgradeCase(t *testing.T) {
+	upgrades := DefaultRequiredEconomicUpgradeCoverageCases()
+	upgrades[0].Kind = EconomicTestCoverageKindSimulation
+	upgrades[1].Evidence = nil
+	upgrades[2].CIEnabled = false
+
+	report := BuildRequiredEconomicTestCoverageReport(nil, nil, upgrades)
+	require.False(t, report.Passed)
+	require.Contains(t, report.Failed, EconomicUpgradeParameterMigrationPreservesBalances+":wrong_coverage_kind")
+	require.Contains(t, report.Failed, EconomicUpgradeExistingDelegationsRemainValid+":evidence_missing")
+	require.Contains(t, report.Failed, EconomicUpgradeExistingValidatorsRemainQueryable+":not_ci_enabled")
+	require.Less(t, report.UpgradeCoverageBps, BasisPoints)
 }
 
 func TestRequiredEconomicTestCoverageRequiresDeterministicCIEnabledCases(t *testing.T) {
