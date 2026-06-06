@@ -457,6 +457,146 @@ func TestChunkPayloadRoundTripAndCorruptionDetection(t *testing.T) {
 	require.ErrorContains(t, err, "chunk hash")
 }
 
+func TestRL2TransferIDValidationAndChannelMapping(t *testing.T) {
+	source := HashParts("rl2-node", "source")
+	target := HashParts("rl2-node", "target")
+	payloadRoot := HashParts("rl2-payload", "root")
+	cases := []struct {
+		payloadType RL2PayloadType
+		channel     ChannelClass
+	}{
+		{RL2PayloadLargeBlock, ChannelBlock},
+		{RL2PayloadBlockChunk, ChannelBlock},
+		{RL2PayloadStateSyncStream, ChannelStateSync},
+		{RL2PayloadZoneSnapshot, ChannelStateSync},
+		{RL2PayloadExecutionResult, ChannelExecution},
+		{RL2PayloadStorageObject, ChannelData},
+		{RL2PayloadProofSet, ChannelData},
+	}
+
+	for _, tc := range cases {
+		t.Run(string(tc.payloadType), func(t *testing.T) {
+			transfer, err := NewRL2Transfer(RL2Transfer{
+				SourceNode:     source,
+				TargetNode:     target,
+				PayloadType:    tc.payloadType,
+				PayloadRoot:    payloadRoot,
+				ChunkCount:     4,
+				ChunkSize:      1024,
+				Priority:       DefaultRL2Priority(tc.payloadType),
+				DeadlineHeight: 100,
+			})
+			require.NoError(t, err)
+			require.Equal(t, ComputeRL2TransferID(transfer), transfer.TransferID)
+			require.Equal(t, RL2FECNone, transfer.FECPolicy)
+			require.Equal(t, tc.channel, RL2ChannelForPayloadType(tc.payloadType))
+
+			envelope, err := transfer.TransportEnvelope(20, 7)
+			require.NoError(t, err)
+			require.Equal(t, tc.channel, envelope.Channel)
+			require.Equal(t, transfer.ChunkSize, envelope.SizeBytes)
+			require.Equal(t, transfer.PayloadRoot, envelope.PayloadHash)
+		})
+	}
+}
+
+func TestRL2TransferRejectsExpiredInvalidRootAndChunkBounds(t *testing.T) {
+	source := HashParts("rl2-node", "source")
+	target := HashParts("rl2-node", "target")
+	payloadRoot := HashParts("rl2-payload", "root")
+	valid, err := NewRL2Transfer(RL2Transfer{
+		SourceNode:     source,
+		TargetNode:     target,
+		PayloadType:    RL2PayloadStateSyncStream,
+		PayloadRoot:    payloadRoot,
+		ChunkCount:     2,
+		ChunkSize:      512,
+		Priority:       DefaultRL2Priority(RL2PayloadStateSyncStream),
+		DeadlineHeight: 50,
+	})
+	require.NoError(t, err)
+
+	require.ErrorContains(t, valid.Validate(51), "expired")
+
+	_, err = NewRL2Transfer(RL2Transfer{
+		SourceNode:  source,
+		TargetNode:  target,
+		PayloadType: RL2PayloadStateSyncStream,
+		PayloadRoot: "bad-root",
+		ChunkCount:  2,
+		ChunkSize:   512,
+		Priority:    DefaultRL2Priority(RL2PayloadStateSyncStream),
+	})
+	require.ErrorContains(t, err, "payload root")
+
+	_, err = NewRL2Transfer(RL2Transfer{
+		SourceNode:  source,
+		TargetNode:  target,
+		PayloadType: RL2PayloadStateSyncStream,
+		PayloadRoot: payloadRoot,
+		ChunkSize:   512,
+		Priority:    DefaultRL2Priority(RL2PayloadStateSyncStream),
+	})
+	require.ErrorContains(t, err, "chunk count")
+
+	_, err = NewRL2Transfer(RL2Transfer{
+		SourceNode:  source,
+		TargetNode:  target,
+		PayloadType: RL2PayloadStateSyncStream,
+		PayloadRoot: payloadRoot,
+		ChunkCount:  2,
+		ChunkSize:   MaxChunkBytes + 1,
+		Priority:    DefaultRL2Priority(RL2PayloadStateSyncStream),
+	})
+	require.ErrorContains(t, err, "chunk size")
+
+	withBadResume := valid
+	withBadResume.ResumeToken = "not-a-hash"
+	require.ErrorContains(t, withBadResume.Validate(10), "resume token")
+}
+
+func TestRL2TransferBuildsFromChunksResumeTokenAndPropagationPlan(t *testing.T) {
+	source := HashParts("rl2-node", "source")
+	target := HashParts("rl2-node", "target")
+	payload := bytes.Repeat([]byte("rl2-state-sync-stream"), 128)
+	chunks, err := ChunkPayload(payload, 128)
+	require.NoError(t, err)
+	require.Greater(t, len(chunks), 2)
+
+	transfer, err := NewRL2TransferFromChunks(
+		source,
+		target,
+		RL2PayloadStorageObject,
+		chunks,
+		DefaultRL2Priority(RL2PayloadStorageObject),
+		80,
+		RL2FECXORParity,
+	)
+	require.NoError(t, err)
+	require.Equal(t, chunks[0].PayloadHash, transfer.PayloadRoot)
+	require.Equal(t, chunks[0].Total, transfer.ChunkCount)
+	require.Equal(t, RL2FECXORParity, transfer.FECPolicy)
+
+	progress, err := NewRL2TransferProgress(transfer, []uint32{2, 0})
+	require.NoError(t, err)
+	sameProgress, err := NewRL2TransferProgress(transfer, []uint32{0, 2})
+	require.NoError(t, err)
+	require.Equal(t, []uint32{0, 2}, progress.ReceivedChunks)
+	require.Equal(t, sameProgress.ResumeToken, progress.ResumeToken)
+
+	_, err = NewRL2TransferProgress(transfer, []uint32{0, 0})
+	require.ErrorContains(t, err, "unique")
+	_, err = NewRL2TransferProgress(transfer, []uint32{transfer.ChunkCount})
+	require.ErrorContains(t, err, "out of range")
+
+	plan, err := PlanRL2Transfer(DefaultAetherNetworkingAdapter(), transfer, 20, 9, 12, PeerScore{ScoreBps: 9_000})
+	require.NoError(t, err)
+	require.Equal(t, ChannelData, plan.Envelope.Channel)
+	require.False(t, plan.HandledByCometBFT)
+	require.True(t, plan.UsesAdvisoryPeerMetric)
+	require.Greater(t, plan.AdapterFanout, uint32(0))
+}
+
 func TestNetworkingStateRegistersNodesAndSessionsCanonically(t *testing.T) {
 	salt := []byte("aetheris-test-network")
 	local := signedNodeRecord(t, 0x31, salt, 100, NodeRoleFull)
