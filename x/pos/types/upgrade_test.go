@@ -567,6 +567,7 @@ func TestPosObservabilityManifestCoversMetricsAndEvents(t *testing.T) {
 	require.Equal(t, ComputePosObservabilityRoot(manifest), manifest.Root)
 	require.Len(t, manifest.Metrics, len(RequiredPosMetricNames()))
 	require.Len(t, manifest.Events, len(RequiredPosEventNames()))
+	require.Len(t, manifest.Alerts, len(RequiredPosAlertNames()))
 
 	for _, name := range RequiredPosMetricNames() {
 		metric, found := PosMetricByName(manifest, name)
@@ -577,6 +578,12 @@ func TestPosObservabilityManifestCoversMetricsAndEvents(t *testing.T) {
 		event, found := PosEventByName(manifest, name)
 		require.True(t, found, name)
 		require.NotEmpty(t, event.Attributes)
+	}
+	for _, name := range RequiredPosAlertNames() {
+		alert, found := PosAlertByName(manifest, name)
+		require.True(t, found, name)
+		require.NotEmpty(t, alert.MetricRefs)
+		require.NotEmpty(t, alert.MitigationHint)
 	}
 
 	epoch, found := PosMetricByName(manifest, "current_epoch")
@@ -601,6 +608,19 @@ func TestPosObservabilityManifestCoversMetricsAndEvents(t *testing.T) {
 	require.True(t, found)
 	require.Equal(t, "delegation_market", risk.ModuleName)
 	require.Contains(t, risk.Attributes, "activation_epoch")
+
+	concentration, found := PosAlertByName(manifest, "validator concentration above threshold")
+	require.True(t, found)
+	require.Equal(t, "security_metrics", concentration.ModuleName)
+	require.Equal(t, "critical", concentration.Severity)
+	require.Contains(t, concentration.MetricRefs, "top_n_voting_power_concentration")
+
+	spam, found := PosAlertByName(manifest, "evidence spam spike")
+	require.True(t, found)
+	require.Equal(t, "evidence", spam.ModuleName)
+	require.Equal(t, "warning", spam.Severity)
+	require.Contains(t, spam.MetricRefs, "evidence_submitted")
+	require.Contains(t, spam.EventRefs, "evidence_rejected")
 }
 
 func TestPosObservabilityManifestRejectsMissingDuplicateAndInvalidSpecs(t *testing.T) {
@@ -636,6 +656,36 @@ func TestPosObservabilityManifestRejectsMissingDuplicateAndInvalidSpecs(t *testi
 	missingAttributes.Events[0].Attributes = nil
 	missingAttributes.Root = ComputePosObservabilityRoot(missingAttributes)
 	require.ErrorContains(t, missingAttributes.Validate(compatibility), "attributes")
+
+	missingAlert := manifest
+	missingAlert.Alerts = append([]PosAlertSpec{}, manifest.Alerts...)
+	missingAlert.Alerts = missingAlert.Alerts[1:]
+	missingAlert.Root = ComputePosObservabilityRoot(missingAlert)
+	require.ErrorContains(t, missingAlert.Validate(compatibility), "validator concentration above threshold")
+
+	duplicateAlert := manifest
+	duplicateAlert.Alerts = append([]PosAlertSpec{}, manifest.Alerts...)
+	duplicateAlert.Alerts = append(duplicateAlert.Alerts, manifest.Alerts[0])
+	duplicateAlert.Root = ComputePosObservabilityRoot(duplicateAlert)
+	require.ErrorContains(t, duplicateAlert.Validate(compatibility), "duplicate pos alert")
+
+	unknownMetric := manifest
+	unknownMetric.Alerts = append([]PosAlertSpec{}, manifest.Alerts...)
+	unknownMetric.Alerts[0].MetricRefs = []string{"unknown_metric"}
+	unknownMetric.Root = ComputePosObservabilityRoot(unknownMetric)
+	require.ErrorContains(t, unknownMetric.Validate(compatibility), "unknown metric")
+
+	unknownEvent := manifest
+	unknownEvent.Alerts = append([]PosAlertSpec{}, manifest.Alerts...)
+	unknownEvent.Alerts[1].EventRefs = []string{"unknown_event"}
+	unknownEvent.Root = ComputePosObservabilityRoot(unknownEvent)
+	require.ErrorContains(t, unknownEvent.Validate(compatibility), "unknown event")
+
+	badSeverity := manifest
+	badSeverity.Alerts = append([]PosAlertSpec{}, manifest.Alerts...)
+	badSeverity.Alerts[0].Severity = "page"
+	badSeverity.Root = ComputePosObservabilityRoot(badSeverity)
+	require.ErrorContains(t, badSeverity.Validate(compatibility), "invalid")
 
 	rootMismatch := manifest
 	rootMismatch.Root = PosEmptyRootHash

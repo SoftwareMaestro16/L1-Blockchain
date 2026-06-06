@@ -1048,9 +1048,20 @@ type PosEventSpec struct {
 	Attributes []string
 }
 
+type PosAlertSpec struct {
+	Name           string
+	ModuleName     string
+	Severity       string
+	Trigger        string
+	MetricRefs     []string
+	EventRefs      []string
+	MitigationHint string
+}
+
 type PosObservabilityManifest struct {
 	Metrics []PosMetricSpec
 	Events  []PosEventSpec
+	Alerts  []PosAlertSpec
 	Root    string
 }
 
@@ -2461,6 +2472,17 @@ func DefaultPosObservabilityManifest() PosObservabilityManifest {
 			{Name: "performance_record_finalized", ModuleName: "performance", Attributes: []string{"epoch_id", "operator", "role", "reward_multiplier"}},
 			{Name: "delegation_risk_profile_updated", ModuleName: "delegation_market", Attributes: []string{"delegator", "validator", "activation_epoch"}},
 		},
+		Alerts: []PosAlertSpec{
+			{Name: "validator concentration above threshold", ModuleName: "security_metrics", Severity: "critical", Trigger: "top-n voting power concentration exceeds configured threshold", MetricRefs: []string{"top_n_voting_power_concentration"}, MitigationHint: "apply saturation dampening and emit delegation risk warning"},
+			{Name: "task group below minimum size", ModuleName: "taskgroups", Severity: "critical", Trigger: "active task group member count drops below minimum group size", MetricRefs: []string{"task_groups_active"}, EventRefs: []string{"task_group_assigned"}, MitigationHint: "recompute assignment or suspend workload activation"},
+			{Name: "evidence spam spike", ModuleName: "evidence", Severity: "warning", Trigger: "evidence submitted counter spikes above baseline", MetricRefs: []string{"evidence_submitted", "evidence_rejected"}, EventRefs: []string{"evidence_submitted", "evidence_rejected"}, MitigationHint: "raise deposit requirements and throttle duplicate evidence"},
+			{Name: "performance score collapse", ModuleName: "performance", Severity: "warning", Trigger: "average task completion or reward multiplier collapses", MetricRefs: []string{"average_task_completion_rate", "performance_reward_multiplier_distribution"}, EventRefs: []string{"performance_record_finalized"}, MitigationHint: "inspect workload availability and apply future score penalties"},
+			{Name: "epoch settlement delayed", ModuleName: "epoch", Severity: "critical", Trigger: "epoch remains in settlement beyond configured deadline", MetricRefs: []string{"current_epoch", "current_epoch_phase"}, EventRefs: []string{"epoch_phase_advanced", "epoch_settled"}, MitigationHint: "finalize settlement roots or halt phase advancement"},
+			{Name: "slash routing invariant failure", ModuleName: "slashing", Severity: "critical", Trigger: "slash routing total does not equal slashed amount", MetricRefs: []string{"slashed_amount_by_severity"}, EventRefs: []string{"validator_slashed"}, MitigationHint: "reject penalty finalization and recompute routing"},
+			{Name: "low participation rate", ModuleName: "performance", Severity: "warning", Trigger: "validator participation rate falls below configured threshold", MetricRefs: []string{"average_task_completion_rate"}, EventRefs: []string{"verification_receipt_submitted"}, MitigationHint: "reduce rewards and review liveness conditions"},
+			{Name: "repeated proposer failure", ModuleName: "taskgroups", Severity: "warning", Trigger: "same proposer repeatedly misses canonical slots", MetricRefs: []string{"average_task_completion_rate"}, EventRefs: []string{"proposer_selected"}, MitigationHint: "activate fallback order and reduce proposer priority"},
+			{Name: "unbonding exposure backlog", ModuleName: "staking", Severity: "warning", Trigger: "unbonding slash exposure backlog grows above threshold", MetricRefs: []string{"unbonding_slash_exposure"}, EventRefs: []string{"validator_slashed"}, MitigationHint: "prioritize historical fault evidence settlement"},
+		},
 	}
 	manifest.Root = ComputePosObservabilityRoot(manifest)
 	return manifest
@@ -2508,6 +2530,20 @@ func RequiredPosEventNames() []string {
 	}
 }
 
+func RequiredPosAlertNames() []string {
+	return []string{
+		"validator concentration above threshold",
+		"task group below minimum size",
+		"evidence spam spike",
+		"performance score collapse",
+		"epoch settlement delayed",
+		"slash routing invariant failure",
+		"low participation rate",
+		"repeated proposer failure",
+		"unbonding exposure backlog",
+	}
+}
+
 func (m PosObservabilityManifest) Validate(compatibility CosmosSDKCompatibilityManifest) error {
 	if err := compatibility.Validate(); err != nil {
 		return err
@@ -2519,11 +2555,44 @@ func (m PosObservabilityManifest) Validate(compatibility CosmosSDKCompatibilityM
 	if err := validatePosEventSpecs(m.Events, RequiredPosEventNames(), knownModules); err != nil {
 		return err
 	}
+	if err := validatePosAlertSpecs(m.Alerts, RequiredPosAlertNames(), knownModules, m.Metrics, m.Events); err != nil {
+		return err
+	}
 	if err := validatePosHash("pos observability root", m.Root); err != nil {
 		return err
 	}
 	if expected := ComputePosObservabilityRoot(m); expected != m.Root {
 		return errors.New("pos observability root mismatch")
+	}
+	return nil
+}
+
+func validatePosAlertSpecs(specs []PosAlertSpec, required []string, knownModules map[string]struct{}, metrics []PosMetricSpec, events []PosEventSpec) error {
+	if len(specs) == 0 {
+		return errors.New("pos alerts are required")
+	}
+	knownMetrics := make(map[string]struct{}, len(metrics))
+	for _, metric := range metrics {
+		knownMetrics[metric.Name] = struct{}{}
+	}
+	knownEvents := make(map[string]struct{}, len(events))
+	for _, event := range events {
+		knownEvents[event.Name] = struct{}{}
+	}
+	seen := make(map[string]struct{}, len(specs))
+	for _, spec := range specs {
+		if err := spec.Validate(knownModules, knownMetrics, knownEvents); err != nil {
+			return err
+		}
+		if _, found := seen[spec.Name]; found {
+			return fmt.Errorf("duplicate pos alert %s", spec.Name)
+		}
+		seen[spec.Name] = struct{}{}
+	}
+	for _, name := range required {
+		if _, found := seen[name]; !found {
+			return fmt.Errorf("required pos alert %s is missing", name)
+		}
 	}
 	return nil
 }
@@ -2620,12 +2689,59 @@ func (s PosEventSpec) Validate(knownModules map[string]struct{}) error {
 	return nil
 }
 
+func (s PosAlertSpec) Validate(knownModules map[string]struct{}, knownMetrics map[string]struct{}, knownEvents map[string]struct{}) error {
+	if err := validatePosResponsibility("pos alert name", s.Name); err != nil {
+		return err
+	}
+	if err := validatePosToken("pos alert module", s.ModuleName); err != nil {
+		return err
+	}
+	if _, found := knownModules[s.ModuleName]; !found {
+		return fmt.Errorf("pos alert %s references unknown module %s", s.Name, s.ModuleName)
+	}
+	if err := validatePosAlertSeverity(s.Severity); err != nil {
+		return err
+	}
+	if err := validatePosResponsibility("pos alert trigger", s.Trigger); err != nil {
+		return err
+	}
+	if len(s.MetricRefs) == 0 {
+		return fmt.Errorf("pos alert %s must reference metrics", s.Name)
+	}
+	for _, metric := range s.MetricRefs {
+		if err := validatePosToken("pos alert metric reference", metric); err != nil {
+			return err
+		}
+		if _, found := knownMetrics[metric]; !found {
+			return fmt.Errorf("pos alert %s references unknown metric %s", s.Name, metric)
+		}
+	}
+	for _, event := range s.EventRefs {
+		if err := validatePosToken("pos alert event reference", event); err != nil {
+			return err
+		}
+		if _, found := knownEvents[event]; !found {
+			return fmt.Errorf("pos alert %s references unknown event %s", s.Name, event)
+		}
+	}
+	return validatePosResponsibility("pos alert mitigation hint", s.MitigationHint)
+}
+
 func validatePosMetricType(metricType string) error {
 	switch metricType {
 	case "counter", "gauge", "histogram":
 		return nil
 	default:
 		return fmt.Errorf("pos metric type %s is invalid", metricType)
+	}
+}
+
+func validatePosAlertSeverity(severity string) error {
+	switch severity {
+	case "info", "warning", "critical":
+		return nil
+	default:
+		return fmt.Errorf("pos alert severity %s is invalid", severity)
 	}
 }
 
@@ -2644,6 +2760,16 @@ func ComputePosObservabilityRoot(manifest PosObservabilityManifest) string {
 			posWritePart(w, event.Name)
 			posWritePart(w, event.ModuleName)
 			posWriteStringSlice(w, event.Attributes)
+		}
+		posWriteUint64(w, uint64(len(manifest.Alerts)))
+		for _, alert := range manifest.Alerts {
+			posWritePart(w, alert.Name)
+			posWritePart(w, alert.ModuleName)
+			posWritePart(w, alert.Severity)
+			posWritePart(w, alert.Trigger)
+			posWriteStringSlice(w, alert.MetricRefs)
+			posWriteStringSlice(w, alert.EventRefs)
+			posWritePart(w, alert.MitigationHint)
 		}
 	})
 }
@@ -2664,6 +2790,15 @@ func PosEventByName(manifest PosObservabilityManifest, name string) (PosEventSpe
 		}
 	}
 	return PosEventSpec{}, false
+}
+
+func PosAlertByName(manifest PosObservabilityManifest, name string) (PosAlertSpec, bool) {
+	for _, alert := range manifest.Alerts {
+		if alert.Name == name {
+			return alert, true
+		}
+	}
+	return PosAlertSpec{}, false
 }
 
 func DefaultKeeperIntegrationManifest() KeeperIntegrationManifest {
