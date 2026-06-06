@@ -55,6 +55,12 @@ func TestMetricNamesSnapshot(t *testing.T) {
 		MetricFeeModelEfficiencyRisks,
 		MetricValidatorRewardPerPowerNaet,
 		MetricValidatorProfitabilityBps,
+		MetricSlashingPenaltyNaet,
+		MetricSlashingBurnNaet,
+		MetricSlashingTreasuryNaet,
+		MetricSlashingReporterNaet,
+		MetricValidatorTopNPowerBps,
+		MetricValidatorConcentrationRisks,
 		MetricLocalnetHealth,
 		MetricProcessUptimeSeconds,
 		MetricProcessMemoryBytes,
@@ -160,6 +166,12 @@ func (r *Registry) RecordTestSamples() {
 	r.SetGauge(MetricFeeModelEfficiencyRisks, nil, 0)
 	r.SetGauge(MetricValidatorRewardPerPowerNaet, Labels{"state": "active", "denom": "naet"}, 100)
 	r.SetGauge(MetricValidatorProfitabilityBps, Labels{"state": "active"}, 1_000)
+	r.SetGauge(MetricSlashingPenaltyNaet, Labels{"reason": "equivocation", "denom": "naet"}, 100)
+	r.SetGauge(MetricSlashingBurnNaet, Labels{"reason": "equivocation", "denom": "naet"}, 50)
+	r.SetGauge(MetricSlashingTreasuryNaet, Labels{"reason": "equivocation", "denom": "naet"}, 40)
+	r.SetGauge(MetricSlashingReporterNaet, Labels{"reason": "equivocation", "denom": "naet"}, 10)
+	r.SetGauge(MetricValidatorTopNPowerBps, nil, 6_700)
+	r.SetGauge(MetricValidatorConcentrationRisks, nil, 2)
 }
 
 func renderRegistry(t *testing.T, reg *Registry) string {

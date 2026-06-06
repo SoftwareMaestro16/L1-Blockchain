@@ -115,6 +115,109 @@ type DelegatorSlashExposure struct {
 	RiskTranche string
 }
 
+const (
+	SlashSeverityMinorDowntime                SlashSeverityClass = "minor_downtime"
+	SlashSeverityMajorDowntime                SlashSeverityClass = "major_downtime"
+	SlashSeverityRepeatedDowntime             SlashSeverityClass = "repeated_downtime"
+	SlashSeverityEquivocation                 SlashSeverityClass = "equivocation"
+	SlashSeverityEvidenceManipulation         SlashSeverityClass = "evidence_manipulation"
+	SlashSeverityKeyCompromiseResponseFailure SlashSeverityClass = "key_compromise_response_failure"
+	DefaultRepeatOffenseDecayEpochs                              = uint64(4)
+	DefaultRepeatOffenseStepBps                                  = uint32(2_500)
+	DefaultMaxRepeatOffenseMultiplierBps                         = uint32(30_000)
+
+	ConcentrationWarningValidatorShare        = "validator_voting_power_concentration"
+	ConcentrationWarningTopNShare             = "top_n_voting_power_concentration"
+	ConcentrationWarningDelegatorShare        = "delegator_concentration"
+	ConcentrationWarningSelfDelegation        = "self_delegation_below_requirement"
+	ConcentrationWarningCommissionByPower     = "commission_concentration_by_power"
+	ConcentrationWarningRewardDampeningActive = "reward_dampening_active"
+)
+
+type SlashSeverityClass string
+
+type SlashingSeverityParam struct {
+	Severity             SlashSeverityClass
+	BasePenaltyBps       uint32
+	BurnBps              uint32
+	TreasuryBps          uint32
+	ReporterRewardBps    uint32
+	ReporterRewardCapBps uint32
+}
+
+type SlashingEvidence struct {
+	EvidenceID string
+	ReporterID string
+	Accepted   bool
+	Duplicate  bool
+}
+
+type SlashingRoutingInput struct {
+	Validator          string
+	Severity           SlashSeverityClass
+	TotalStakeNaet     sdkmath.Int
+	Evidence           SlashingEvidence
+	PriorOffenseEpochs []uint64
+	CurrentEpoch       uint64
+	Params             []SlashingSeverityParam
+}
+
+type SlashingRoutingResult struct {
+	Validator             string
+	Severity              SlashSeverityClass
+	PenaltyBps            uint32
+	RepeatMultiplierBps   uint32
+	PenaltyNaet           sdkmath.Int
+	BurnNaet              sdkmath.Int
+	TreasuryNaet          sdkmath.Int
+	ReporterRewardNaet    sdkmath.Int
+	ValidatorResidualNaet sdkmath.Int
+	ReporterPaid          bool
+	Event                 SlashingEvent
+}
+
+type SlashingEvent struct {
+	Validator          string
+	Severity           SlashSeverityClass
+	Reason             string
+	PenaltyNaet        sdkmath.Int
+	BurnNaet           sdkmath.Int
+	TreasuryNaet       sdkmath.Int
+	ReporterRewardNaet sdkmath.Int
+	ReporterID         string
+	ReporterPaid       bool
+}
+
+type DecentralizationParams struct {
+	TopN                          int
+	MaxValidatorShareBps          uint32
+	MaxTopNShareBps               uint32
+	MaxDelegatorConcentrationBps  uint32
+	MinSelfDelegationRatioBps     uint32
+	MinSelfDelegationNaet         sdkmath.Int
+	MaxCommissionWeightedBps      uint32
+	RewardDampeningSafetyFloorBps uint32
+	StakeMovementIncentiveBps     uint32
+}
+
+type ValidatorConcentrationMetric struct {
+	Validator                 string
+	VotingPowerShareBps       uint32
+	DelegatorConcentrationBps uint32
+	SelfDelegationRatioBps    uint32
+	CommissionBps             uint32
+	RewardDampeningBps        uint32
+	StakeMovementIncentiveBps uint32
+	Warnings                  []string
+}
+
+type ActiveSetConcentrationReport struct {
+	Metrics               []ValidatorConcentrationMetric
+	TopNShareBps          uint32
+	CommissionWeightedBps uint32
+	ActiveSetWarnings     []string
+}
+
 func NewValidatorMarketState(params postypes.Params, candidates []postypes.Candidate, delegations []DelegationRecord, scoreRecords []ValidatorScoreRecord, slashHistory []ValidatorSlashHistoryRecord, commissionHistory []ValidatorCommissionRecord) (ValidatorMarketState, error) {
 	if err := params.Validate(); err != nil {
 		return ValidatorMarketState{}, err
@@ -199,6 +302,227 @@ func (r ValidatorCommissionRecord) Validate(params postypes.Params) error {
 	}
 	if r.CommissionBps > params.MaxCommissionBps {
 		return fmt.Errorf("commission history bps must be <= %d", params.MaxCommissionBps)
+	}
+	return nil
+}
+
+func DefaultSlashingSeverityParams() []SlashingSeverityParam {
+	return []SlashingSeverityParam{
+		{Severity: SlashSeverityMinorDowntime, BasePenaltyBps: 100, BurnBps: 2_000, TreasuryBps: 7_500, ReporterRewardBps: 500, ReporterRewardCapBps: 500},
+		{Severity: SlashSeverityMajorDowntime, BasePenaltyBps: 500, BurnBps: 3_000, TreasuryBps: 6_000, ReporterRewardBps: 1_000, ReporterRewardCapBps: 1_000},
+		{Severity: SlashSeverityRepeatedDowntime, BasePenaltyBps: 1_000, BurnBps: 4_000, TreasuryBps: 5_000, ReporterRewardBps: 1_000, ReporterRewardCapBps: 1_000},
+		{Severity: SlashSeverityEquivocation, BasePenaltyBps: 5_000, BurnBps: 5_000, TreasuryBps: 4_000, ReporterRewardBps: 1_000, ReporterRewardCapBps: 1_500},
+		{Severity: SlashSeverityEvidenceManipulation, BasePenaltyBps: 7_500, BurnBps: 6_000, TreasuryBps: 3_000, ReporterRewardBps: 1_000, ReporterRewardCapBps: 1_500},
+		{Severity: SlashSeverityKeyCompromiseResponseFailure, BasePenaltyBps: 3_000, BurnBps: 4_000, TreasuryBps: 5_000, ReporterRewardBps: 1_000, ReporterRewardCapBps: 1_500},
+	}
+}
+
+func (s SlashSeverityClass) Validate() error {
+	switch s {
+	case SlashSeverityMinorDowntime, SlashSeverityMajorDowntime, SlashSeverityRepeatedDowntime,
+		SlashSeverityEquivocation, SlashSeverityEvidenceManipulation, SlashSeverityKeyCompromiseResponseFailure:
+		return nil
+	default:
+		return fmt.Errorf("unsupported slash severity %q", s)
+	}
+}
+
+func (p SlashingSeverityParam) Validate() error {
+	if err := p.Severity.Validate(); err != nil {
+		return err
+	}
+	for _, item := range []struct {
+		name  string
+		value uint32
+	}{
+		{name: "base_penalty_bps", value: p.BasePenaltyBps},
+		{name: "burn_bps", value: p.BurnBps},
+		{name: "treasury_bps", value: p.TreasuryBps},
+		{name: "reporter_reward_bps", value: p.ReporterRewardBps},
+		{name: "reporter_reward_cap_bps", value: p.ReporterRewardCapBps},
+	} {
+		if item.value > postypes.BasisPoints {
+			return fmt.Errorf("%s must be <= %d bps", item.name, postypes.BasisPoints)
+		}
+	}
+	if p.BasePenaltyBps == 0 {
+		return errors.New("base penalty bps is required")
+	}
+	if uint64(p.BurnBps)+uint64(p.TreasuryBps)+uint64(p.ReporterRewardBps) > uint64(postypes.BasisPoints) {
+		return errors.New("slashing routing bps cannot exceed 10000")
+	}
+	return nil
+}
+
+func ComputeRepeatOffenseMultiplier(currentEpoch uint64, priorOffenseEpochs []uint64, decayEpochs uint64, stepBps uint32, maxBps uint32) (uint32, error) {
+	if currentEpoch == 0 {
+		return 0, errors.New("current epoch is required")
+	}
+	if decayEpochs == 0 {
+		decayEpochs = DefaultRepeatOffenseDecayEpochs
+	}
+	if stepBps == 0 {
+		stepBps = DefaultRepeatOffenseStepBps
+	}
+	if maxBps == 0 {
+		maxBps = DefaultMaxRepeatOffenseMultiplierBps
+	}
+	if maxBps < postypes.BasisPoints {
+		return 0, errors.New("max repeat offense multiplier cannot be below 10000 bps")
+	}
+	activeOffenses := uint32(0)
+	for _, epoch := range priorOffenseEpochs {
+		if epoch == 0 || epoch > currentEpoch {
+			continue
+		}
+		if currentEpoch-epoch <= decayEpochs {
+			activeOffenses++
+		}
+	}
+	multiplier := uint64(postypes.BasisPoints) + uint64(activeOffenses)*uint64(stepBps)
+	if multiplier > uint64(maxBps) {
+		multiplier = uint64(maxBps)
+	}
+	return uint32(multiplier), nil
+}
+
+func RouteSlashing(input SlashingRoutingInput) (SlashingRoutingResult, error) {
+	validator := strings.TrimSpace(input.Validator)
+	if err := validateEconomyToken("slashing validator", validator); err != nil {
+		return SlashingRoutingResult{}, err
+	}
+	if err := input.Severity.Validate(); err != nil {
+		return SlashingRoutingResult{}, err
+	}
+	totalStake := normalizeEconomyInt(input.TotalStakeNaet)
+	if !totalStake.IsPositive() {
+		return SlashingRoutingResult{}, errors.New("slashing total stake must be positive")
+	}
+	params := input.Params
+	if len(params) == 0 {
+		params = DefaultSlashingSeverityParams()
+	}
+	param, found, err := findSlashingSeverityParam(params, input.Severity)
+	if err != nil {
+		return SlashingRoutingResult{}, err
+	}
+	if !found {
+		return SlashingRoutingResult{}, fmt.Errorf("missing slashing params for severity %q", input.Severity)
+	}
+	multiplier, err := ComputeRepeatOffenseMultiplier(input.CurrentEpoch, input.PriorOffenseEpochs, DefaultRepeatOffenseDecayEpochs, DefaultRepeatOffenseStepBps, DefaultMaxRepeatOffenseMultiplierBps)
+	if err != nil {
+		return SlashingRoutingResult{}, err
+	}
+	penaltyBps := uint32(uint64(param.BasePenaltyBps) * uint64(multiplier) / uint64(postypes.BasisPoints))
+	penaltyBps = minUint32(penaltyBps, postypes.BasisPoints)
+	penalty := mulIntBps(totalStake, penaltyBps)
+	burn := mulIntBps(penalty, param.BurnBps)
+	treasury := mulIntBps(penalty, param.TreasuryBps)
+	reporter := sdkmath.ZeroInt()
+	reporterPaid := false
+	reporterID := strings.TrimSpace(input.Evidence.ReporterID)
+	if input.Evidence.Accepted && !input.Evidence.Duplicate && reporterID != "" {
+		reporter = mulIntBps(penalty, param.ReporterRewardBps)
+		capAmount := mulIntBps(penalty, param.ReporterRewardCapBps)
+		if reporter.GT(capAmount) {
+			reporter = capAmount
+		}
+		reporterPaid = reporter.IsPositive()
+	}
+	routed := burn.Add(treasury).Add(reporter)
+	if routed.GT(penalty) {
+		return SlashingRoutingResult{}, errors.New("slashing routing exceeds penalty amount")
+	}
+	residual := penalty.Sub(routed)
+	event := SlashingEvent{
+		Validator:          validator,
+		Severity:           input.Severity,
+		Reason:             string(input.Severity),
+		PenaltyNaet:        penalty,
+		BurnNaet:           burn,
+		TreasuryNaet:       treasury,
+		ReporterRewardNaet: reporter,
+		ReporterID:         reporterID,
+		ReporterPaid:       reporterPaid,
+	}
+	result := SlashingRoutingResult{
+		Validator:             validator,
+		Severity:              input.Severity,
+		PenaltyBps:            penaltyBps,
+		RepeatMultiplierBps:   multiplier,
+		PenaltyNaet:           penalty,
+		BurnNaet:              burn,
+		TreasuryNaet:          treasury,
+		ReporterRewardNaet:    reporter,
+		ValidatorResidualNaet: residual,
+		ReporterPaid:          reporterPaid,
+		Event:                 event,
+	}
+	if !result.BurnNaet.Add(result.TreasuryNaet).Add(result.ReporterRewardNaet).Add(result.ValidatorResidualNaet).Equal(result.PenaltyNaet) {
+		return SlashingRoutingResult{}, errors.New("slashing routing invariant failed")
+	}
+	return result, nil
+}
+
+func findSlashingSeverityParam(params []SlashingSeverityParam, severity SlashSeverityClass) (SlashingSeverityParam, bool, error) {
+	seen := make(map[SlashSeverityClass]struct{}, len(params))
+	for _, param := range params {
+		if err := param.Validate(); err != nil {
+			return SlashingSeverityParam{}, false, err
+		}
+		if _, duplicate := seen[param.Severity]; duplicate {
+			return SlashingSeverityParam{}, false, fmt.Errorf("duplicate slashing params for severity %q", param.Severity)
+		}
+		seen[param.Severity] = struct{}{}
+		if param.Severity == severity {
+			return param, true, nil
+		}
+	}
+	return SlashingSeverityParam{}, false, nil
+}
+
+func DefaultDecentralizationParams(params postypes.Params) DecentralizationParams {
+	return DecentralizationParams{
+		TopN:                          3,
+		MaxValidatorShareBps:          params.MaxVotingPowerBps,
+		MaxTopNShareBps:               6_700,
+		MaxDelegatorConcentrationBps:  5_000,
+		MinSelfDelegationRatioBps:     500,
+		MinSelfDelegationNaet:         params.MinStakeNaet,
+		MaxCommissionWeightedBps:      params.MaxCommissionBps,
+		RewardDampeningSafetyFloorBps: 7_500,
+		StakeMovementIncentiveBps:     250,
+	}
+}
+
+func (p DecentralizationParams) Validate(posParams postypes.Params) error {
+	if err := posParams.Validate(); err != nil {
+		return err
+	}
+	if p.TopN <= 0 {
+		return errors.New("top n must be positive")
+	}
+	for _, item := range []struct {
+		name  string
+		value uint32
+	}{
+		{name: "max_validator_share_bps", value: p.MaxValidatorShareBps},
+		{name: "max_top_n_share_bps", value: p.MaxTopNShareBps},
+		{name: "max_delegator_concentration_bps", value: p.MaxDelegatorConcentrationBps},
+		{name: "min_self_delegation_ratio_bps", value: p.MinSelfDelegationRatioBps},
+		{name: "max_commission_weighted_bps", value: p.MaxCommissionWeightedBps},
+		{name: "reward_dampening_safety_floor_bps", value: p.RewardDampeningSafetyFloorBps},
+		{name: "stake_movement_incentive_bps", value: p.StakeMovementIncentiveBps},
+	} {
+		if item.value > postypes.BasisPoints {
+			return fmt.Errorf("%s must be <= %d bps", item.name, postypes.BasisPoints)
+		}
+	}
+	if p.MaxValidatorShareBps == 0 || p.MaxTopNShareBps == 0 || p.RewardDampeningSafetyFloorBps == 0 {
+		return errors.New("concentration thresholds and reward safety floor are required")
+	}
+	if !normalizeEconomyInt(p.MinSelfDelegationNaet).IsPositive() {
+		return errors.New("minimum self delegation amount must be positive")
 	}
 	return nil
 }
@@ -437,6 +761,86 @@ func (s ValidatorMarketState) QueryDelegationLockEligibility(delegator string, v
 	return eligibility, true, nil
 }
 
+func (s ValidatorMarketState) QueryConcentrationReport(params DecentralizationParams, activeValidatorIDs []string) (ActiveSetConcentrationReport, error) {
+	if params.MinSelfDelegationNaet.IsNil() {
+		params = DefaultDecentralizationParams(s.Params)
+	}
+	if err := params.Validate(s.Params); err != nil {
+		return ActiveSetConcentrationReport{}, err
+	}
+	activeSet := normalizeActiveSet(activeValidatorIDs)
+	candidates := make([]postypes.Candidate, 0, len(s.Candidates))
+	for _, candidate := range s.Candidates {
+		validatorID := strings.TrimSpace(candidate.ValidatorID)
+		if len(activeSet) == 0 {
+			candidates = append(candidates, candidate)
+			continue
+		}
+		if _, active := activeSet[validatorID]; active {
+			candidates = append(candidates, candidate)
+		}
+	}
+	sort.SliceStable(candidates, func(i, j int) bool {
+		left := candidates[i].SelfStakeNaet.Add(candidates[i].DelegatedStakeNaet)
+		right := candidates[j].SelfStakeNaet.Add(candidates[j].DelegatedStakeNaet)
+		if !left.Equal(right) {
+			return left.GT(right)
+		}
+		return strings.TrimSpace(candidates[i].ValidatorID) < strings.TrimSpace(candidates[j].ValidatorID)
+	})
+	totalStake := sdkmath.ZeroInt()
+	for _, candidate := range candidates {
+		totalStake = totalStake.Add(candidate.SelfStakeNaet).Add(candidate.DelegatedStakeNaet)
+	}
+	report := ActiveSetConcentrationReport{
+		Metrics: make([]ValidatorConcentrationMetric, 0, len(candidates)),
+	}
+	topLimit := params.TopN
+	if topLimit > len(candidates) {
+		topLimit = len(candidates)
+	}
+	topStake := sdkmath.ZeroInt()
+	commissionWeighted := uint64(0)
+	for i, candidate := range candidates {
+		validatorID := strings.TrimSpace(candidate.ValidatorID)
+		totalForValidator := candidate.SelfStakeNaet.Add(candidate.DelegatedStakeNaet)
+		share := shareBps(totalForValidator, totalStake)
+		if i < topLimit {
+			topStake = topStake.Add(totalForValidator)
+		}
+		commission := latestCommissionBps(s.CommissionHistory, validatorID, candidate.CommissionBps)
+		commissionWeighted += uint64(share) * uint64(commission)
+		metric := ValidatorConcentrationMetric{
+			Validator:                 validatorID,
+			VotingPowerShareBps:       share,
+			DelegatorConcentrationBps: s.delegatorConcentrationBps(validatorID),
+			SelfDelegationRatioBps:    shareBps(candidate.SelfStakeNaet, totalForValidator),
+			CommissionBps:             commission,
+		}
+		metric.RewardDampeningBps = concentrationRewardDampeningBps(share, params.MaxValidatorShareBps, params.RewardDampeningSafetyFloorBps)
+		metric.Warnings = concentrationWarnings(params, candidate, metric)
+		if hasConcentrationStakeMovementWarning(metric.Warnings) {
+			metric.StakeMovementIncentiveBps = params.StakeMovementIncentiveBps
+		}
+		report.Metrics = append(report.Metrics, metric)
+	}
+	report.TopNShareBps = shareBps(topStake, totalStake)
+	report.CommissionWeightedBps = uint32(commissionWeighted / uint64(postypes.BasisPoints))
+	if report.TopNShareBps > params.MaxTopNShareBps {
+		report.ActiveSetWarnings = append(report.ActiveSetWarnings, ConcentrationWarningTopNShare)
+	}
+	if report.CommissionWeightedBps > params.MaxCommissionWeightedBps {
+		report.ActiveSetWarnings = append(report.ActiveSetWarnings, ConcentrationWarningCommissionByPower)
+	}
+	sort.SliceStable(report.Metrics, func(i, j int) bool {
+		if report.Metrics[i].VotingPowerShareBps != report.Metrics[j].VotingPowerShareBps {
+			return report.Metrics[i].VotingPowerShareBps > report.Metrics[j].VotingPowerShareBps
+		}
+		return report.Metrics[i].Validator < report.Metrics[j].Validator
+	})
+	return report, nil
+}
+
 func (s ValidatorMarketState) QueryValidatorCommissionHistory(validator string) []ValidatorCommissionRecord {
 	validator = strings.TrimSpace(validator)
 	out := make([]ValidatorCommissionRecord, 0)
@@ -502,6 +906,73 @@ func (s ValidatorMarketState) totalDelegatedAtValidator(validator string) sdkmat
 		}
 	}
 	return total
+}
+
+func (s ValidatorMarketState) delegatorConcentrationBps(validator string) uint32 {
+	total := sdkmath.ZeroInt()
+	maxDelegation := sdkmath.ZeroInt()
+	for _, record := range s.Delegations {
+		if record.Validator != validator {
+			continue
+		}
+		total = total.Add(record.Amount)
+		if record.Amount.GT(maxDelegation) {
+			maxDelegation = record.Amount
+		}
+	}
+	return shareBps(maxDelegation, total)
+}
+
+func normalizeActiveSet(activeValidatorIDs []string) map[string]struct{} {
+	out := make(map[string]struct{}, len(activeValidatorIDs))
+	for _, validatorID := range activeValidatorIDs {
+		validatorID = strings.TrimSpace(validatorID)
+		if validatorID != "" {
+			out[validatorID] = struct{}{}
+		}
+	}
+	return out
+}
+
+func concentrationRewardDampeningBps(share uint32, threshold uint32, safetyFloor uint32) uint32 {
+	if share <= threshold || threshold >= postypes.BasisPoints {
+		return 0
+	}
+	maxDampening := postypes.BasisPoints - safetyFloor
+	denom := postypes.BasisPoints - threshold
+	if denom == 0 {
+		return maxDampening
+	}
+	over := share - threshold
+	dampening := uint32(uint64(over) * uint64(maxDampening) / uint64(denom))
+	return minUint32(dampening, maxDampening)
+}
+
+func concentrationWarnings(params DecentralizationParams, candidate postypes.Candidate, metric ValidatorConcentrationMetric) []string {
+	warnings := make([]string, 0, 4)
+	if metric.VotingPowerShareBps > params.MaxValidatorShareBps {
+		warnings = append(warnings, ConcentrationWarningValidatorShare)
+	}
+	if metric.DelegatorConcentrationBps > params.MaxDelegatorConcentrationBps {
+		warnings = append(warnings, ConcentrationWarningDelegatorShare)
+	}
+	if metric.SelfDelegationRatioBps < params.MinSelfDelegationRatioBps || candidate.SelfStakeNaet.LT(params.MinSelfDelegationNaet) {
+		warnings = append(warnings, ConcentrationWarningSelfDelegation)
+	}
+	if metric.RewardDampeningBps > 0 {
+		warnings = append(warnings, ConcentrationWarningRewardDampeningActive)
+	}
+	return warnings
+}
+
+func hasConcentrationStakeMovementWarning(warnings []string) bool {
+	for _, warning := range warnings {
+		switch warning {
+		case ConcentrationWarningValidatorShare, ConcentrationWarningDelegatorShare, ConcentrationWarningRewardDampeningActive:
+			return true
+		}
+	}
+	return false
 }
 
 func filterDelegationsForValidator(records []DelegationRecord, validator string) []DelegationRecord {

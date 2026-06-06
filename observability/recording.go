@@ -126,6 +126,37 @@ func RecordValidatorProfitability(state string, rewardPerVotingPowerNaet int64, 
 	SetGauge(MetricValidatorProfitabilityBps, Labels{"state": state}, float64(profitabilityMarginBps))
 }
 
+func RecordSlashingRoute(reason string, penaltyNaet, burnNaet, treasuryNaet, reporterNaet int64) {
+	if penaltyNaet < 0 {
+		penaltyNaet = 0
+	}
+	if burnNaet < 0 {
+		burnNaet = 0
+	}
+	if treasuryNaet < 0 {
+		treasuryNaet = 0
+	}
+	if reporterNaet < 0 {
+		reporterNaet = 0
+	}
+	labels := Labels{"reason": reason, "denom": "naet"}
+	SetGauge(MetricSlashingPenaltyNaet, labels, float64(penaltyNaet))
+	SetGauge(MetricSlashingBurnNaet, labels, float64(burnNaet))
+	SetGauge(MetricSlashingTreasuryNaet, labels, float64(treasuryNaet))
+	SetGauge(MetricSlashingReporterNaet, labels, float64(reporterNaet))
+}
+
+func RecordValidatorConcentration(topNShareBps int64, warningCount int) {
+	if topNShareBps < 0 {
+		topNShareBps = 0
+	}
+	if warningCount < 0 {
+		warningCount = 0
+	}
+	SetGauge(MetricValidatorTopNPowerBps, nil, float64(topNShareBps))
+	SetGauge(MetricValidatorConcentrationRisks, nil, float64(warningCount))
+}
+
 func (r *Registry) collectRuntime() {
 	var mem runtime.MemStats
 	runtime.ReadMemStats(&mem)

@@ -44,6 +44,12 @@ const (
 	MetricFeeModelEfficiencyRisks      = "aetheris_fee_model_efficiency_risks"
 	MetricValidatorRewardPerPowerNaet  = "aetheris_validator_reward_per_power_naet"
 	MetricValidatorProfitabilityBps    = "aetheris_validator_profitability_bps"
+	MetricSlashingPenaltyNaet          = "aetheris_slashing_penalty_naet"
+	MetricSlashingBurnNaet             = "aetheris_slashing_burn_naet"
+	MetricSlashingTreasuryNaet         = "aetheris_slashing_treasury_naet"
+	MetricSlashingReporterNaet         = "aetheris_slashing_reporter_naet"
+	MetricValidatorTopNPowerBps        = "aetheris_validator_top_n_power_bps"
+	MetricValidatorConcentrationRisks  = "aetheris_validator_concentration_risks"
 	MetricLocalnetHealth               = "aetheris_localnet_health"
 	MetricProcessUptimeSeconds         = "aetheris_process_uptime_seconds"
 	MetricProcessMemoryBytes           = "aetheris_process_memory_bytes"
@@ -101,6 +107,12 @@ var Definitions = []Definition{
 	{MetricFeeModelEfficiencyRisks, "Number of fee model efficiency risks in the last evaluation.", kindGauge},
 	{MetricValidatorRewardPerPowerNaet, "Validator reward per unit of voting power in naet, labeled by validator state.", kindGauge},
 	{MetricValidatorProfitabilityBps, "Validator profitability margin in basis points, labeled by validator state.", kindGauge},
+	{MetricSlashingPenaltyNaet, "Last slashing penalty amount in naet, labeled by bounded reason.", kindGauge},
+	{MetricSlashingBurnNaet, "Last slashing burn routing amount in naet, labeled by bounded reason.", kindGauge},
+	{MetricSlashingTreasuryNaet, "Last slashing treasury routing amount in naet, labeled by bounded reason.", kindGauge},
+	{MetricSlashingReporterNaet, "Last slashing reporter reward amount in naet, labeled by bounded reason.", kindGauge},
+	{MetricValidatorTopNPowerBps, "Last validator active-set top-N voting power share in basis points.", kindGauge},
+	{MetricValidatorConcentrationRisks, "Number of validator concentration warnings in the last report.", kindGauge},
 	{MetricLocalnetHealth, "Localnet metrics endpoint health marker.", kindGauge},
 	{MetricProcessUptimeSeconds, "Aetheris process uptime in seconds.", kindGauge},
 	{MetricProcessMemoryBytes, "Go runtime memory allocation bytes.", kindGauge},
