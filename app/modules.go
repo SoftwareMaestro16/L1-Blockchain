@@ -45,6 +45,7 @@ import (
 	paymentsmodule "github.com/sovereign-l1/l1/x/payments"
 	routingmodule "github.com/sovereign-l1/l1/x/routing"
 	schedulermodule "github.com/sovereign-l1/l1/x/scheduler"
+	storagerentmodule "github.com/sovereign-l1/l1/x/storage-rent"
 	tokenfactorymodule "github.com/sovereign-l1/l1/x/tokenfactory"
 	zonesmodule "github.com/sovereign-l1/l1/x/zones"
 )
@@ -84,6 +85,7 @@ func (app *L1App) initModules(
 		schedulermodule.NewAppModule(&app.SchedulerKeeper),
 		avmschedulermodule.NewAppModule(&app.AVMSchedulerKeeper),
 		actorregistrymodule.NewAppModule(&app.ActorRegistryKeeper),
+		storagerentmodule.NewAppModule(&app.StorageRentKeeper),
 		tokenfactorymodule.NewAppModule(appCodec, app.TokenFactoryKeeper),
 		dexmodule.NewAppModule(appCodec, app.DexKeeper),
 		feesmodule.NewAppModule(appCodec, app.FeesKeeper),

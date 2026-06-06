@@ -78,6 +78,8 @@ import (
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
 	schedulerkeeper "github.com/sovereign-l1/l1/x/scheduler/keeper"
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
+	storagerentkeeper "github.com/sovereign-l1/l1/x/storage-rent/keeper"
+	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
 	tokenfactorykeeper "github.com/sovereign-l1/l1/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 	zoneskeeper "github.com/sovereign-l1/l1/x/zones/keeper"
@@ -163,6 +165,7 @@ type L1App struct {
 	SchedulerKeeper    schedulerkeeper.Keeper
 	AVMSchedulerKeeper avmschedulerkeeper.Keeper
 	ActorRegistryKeeper actorregistrykeeper.Keeper
+	StorageRentKeeper storagerentkeeper.Keeper
 
 	// the module manager
 	ModuleManager      *module.Manager
@@ -277,6 +280,7 @@ func NewL1App(
 		schedulertypes.StoreKey,
 		avmschedulertypes.StoreKey,
 		actorregistrytypes.StoreKey,
+		storagerenttypes.StoreKey,
 	)
 
 	// register streaming services

@@ -1,0 +1,48 @@
+syntax = "proto3";
+package l1.storagerent.v1;
+
+import "l1/storagerent/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/storage-rent/types";
+
+message QueryContractRentRequest {
+  string contract_address = 1;
+}
+
+message QueryContractRentResponse {
+  ContractRentRecord contract = 1;
+}
+
+message QueryRentDebtRequest {
+  string contract_address = 1;
+}
+
+message QueryRentDebtResponse {
+  uint64 rent_debt = 1;
+}
+
+message QueryFrozenContractsRequest {}
+
+message QueryFrozenContractsResponse {
+  repeated ContractRentRecord contracts = 1;
+}
+
+message QueryDeletionQueueRequest {}
+
+message QueryDeletionQueueResponse {
+  repeated ContractRentRecord contracts = 1;
+}
+
+message QueryStorageRentParamsRequest {}
+
+message QueryStorageRentParamsResponse {
+  StorageRentParams params = 1;
+}
+
+service Query {
+  rpc ContractRent(QueryContractRentRequest) returns (QueryContractRentResponse);
+  rpc RentDebt(QueryRentDebtRequest) returns (QueryRentDebtResponse);
+  rpc FrozenContracts(QueryFrozenContractsRequest) returns (QueryFrozenContractsResponse);
+  rpc DeletionQueue(QueryDeletionQueueRequest) returns (QueryDeletionQueueResponse);
+  rpc StorageRentParams(QueryStorageRentParamsRequest) returns (QueryStorageRentParamsResponse);
+}

@@ -1,0 +1,78 @@
+syntax = "proto3";
+package l1.storagerent.v1;
+
+import "l1/storagerent/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/storage-rent/types";
+
+message MsgPayStorageRent {
+  string payer = 1;
+  string contract_address = 2;
+  uint64 amount = 3;
+  uint64 height = 4;
+}
+
+message MsgPayStorageRentResponse {
+  ContractRentRecord contract = 1;
+  RentDistributionRecord distribution = 2;
+}
+
+message MsgWithdrawExcessRent {
+  string authority = 1;
+  string contract_address = 2;
+  uint64 amount = 3;
+  uint64 height = 4;
+}
+
+message MsgWithdrawExcessRentResponse {
+  ContractRentRecord contract = 1;
+}
+
+message MsgFreezeExpiredContract {
+  string authority = 1;
+  string contract_address = 2;
+  uint64 height = 3;
+}
+
+message MsgFreezeExpiredContractResponse {
+  ContractRentRecord contract = 1;
+}
+
+message MsgUnfreezeContract {
+  string payer = 1;
+  string contract_address = 2;
+  uint64 amount = 3;
+  uint64 height = 4;
+}
+
+message MsgUnfreezeContractResponse {
+  ContractRentRecord contract = 1;
+  RentDistributionRecord distribution = 2;
+}
+
+message MsgDeleteExpiredContract {
+  string authority = 1;
+  string contract_address = 2;
+  uint64 height = 3;
+  string archival_proof_root = 4;
+}
+
+message MsgDeleteExpiredContractResponse {
+  ContractRentRecord contract = 1;
+}
+
+message MsgUpdateStorageRentParams {
+  string authority = 1;
+  StorageRentParams params = 2;
+}
+
+message MsgUpdateStorageRentParamsResponse {}
+
+service Msg {
+  rpc PayStorageRent(MsgPayStorageRent) returns (MsgPayStorageRentResponse);
+  rpc WithdrawExcessRent(MsgWithdrawExcessRent) returns (MsgWithdrawExcessRentResponse);
+  rpc FreezeExpiredContract(MsgFreezeExpiredContract) returns (MsgFreezeExpiredContractResponse);
+  rpc UnfreezeContract(MsgUnfreezeContract) returns (MsgUnfreezeContractResponse);
+  rpc DeleteExpiredContract(MsgDeleteExpiredContract) returns (MsgDeleteExpiredContractResponse);
+  rpc UpdateStorageRentParams(MsgUpdateStorageRent) returns (MsgUpdateStorageRentParamsResponse);
+}
