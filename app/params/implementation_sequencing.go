@@ -11,6 +11,8 @@ import (
 const (
 	EconomicSequencePhase0 = "phase_0_measurement_accounting"
 	EconomicSequencePhase1 = "phase_1_production_safety"
+	EconomicSequencePhase2 = "phase_2_validator_delegation_incentives"
+	EconomicSequencePhase3 = "phase_3_fee_storage_execution_optimization"
 
 	SequencingStatusReady   = "ready"
 	SequencingStatusBlocked = "blocked"
@@ -29,6 +31,20 @@ const (
 	SequencingTaskMempoolExecutionFeeValidationAlignment = "mempool_execution_fee_validation_alignment"
 	SequencingTaskSlashingFundRouting                    = "slashing_fund_routing"
 	SequencingTaskFundMovementInvariantTests             = "fund_movement_invariant_tests"
+	SequencingTaskValidatorScoring                       = "validator_scoring"
+	SequencingTaskEpochBasedSelectionProduction          = "epoch_based_selection_production"
+	SequencingTaskConcentrationRewardDampening           = "concentration_reward_dampening"
+	SequencingTaskValidatorRiskScoreQueries              = "validator_risk_score_queries"
+	SequencingTaskCommissionChangeWarnings               = "commission_change_warnings"
+	SequencingTaskRiskAdjustedYieldEstimates             = "risk_adjusted_yield_estimates"
+	SequencingTaskValidatorBootstrapBand                 = "validator_bootstrap_band"
+	SequencingTaskResourceSpecificFeeMultipliers         = "resource_specific_fee_multipliers"
+	SequencingTaskSenderLocalSpamSurcharge               = "sender_local_spam_surcharge"
+	SequencingTaskStorageWriteUpdatePricing              = "storage_write_update_pricing"
+	SequencingTaskStorageFootprintQueries                = "storage_footprint_queries"
+	SequencingTaskDeleteRefundPolicy                     = "delete_refund_policy"
+	SequencingTaskDeploymentForwardingFeeEstimation      = "deployment_forwarding_fee_estimation"
+	SequencingTaskStateGrowthSurcharge                   = "state_growth_surcharge"
 )
 
 type EconomicSequencingTask struct {
@@ -61,7 +77,10 @@ type EconomicSequencingPhaseReport struct {
 type EconomicSequencingReport struct {
 	Phases                   []EconomicSequencingPhaseReport
 	ReadyForPhase1           bool
+	ReadyForPhase2           bool
+	ReadyForPhase3           bool
 	ReadyForIncentiveChanges bool
+	ReadyForResourcePricing  bool
 	Failed                   []string
 	Passed                   bool
 	GovernanceSummary        string
@@ -119,12 +138,50 @@ func DefaultPhase1SequencingTasks() []EconomicSequencingTask {
 	}
 }
 
+func DefaultPhase2SequencingTasks() []EconomicSequencingTask {
+	return []EconomicSequencingTask{
+		readySequencingTask(EconomicSequencePhase2, SequencingTaskValidatorScoring, true, true, []string{"validator_eligibility_score", "score_component_events"}),
+		readySequencingTask(EconomicSequencePhase2, SequencingTaskEpochBasedSelectionProduction, true, true, []string{"epoch_selection_recommendation", "bounded_validator_churn"}),
+		readySequencingTask(EconomicSequencePhase2, SequencingTaskConcentrationRewardDampening, true, true, []string{"concentration_soft_cap", "reward_adjustment_bounds"}),
+		readySequencingTask(EconomicSequencePhase2, SequencingTaskValidatorRiskScoreQueries, false, true, []string{"validator_reputation_score", "risk_score_explanation"}),
+		readySequencingTask(EconomicSequencePhase2, SequencingTaskCommissionChangeWarnings, false, true, []string{"commission_stability_score", "capture_risk_warning"}),
+		readySequencingTask(EconomicSequencePhase2, SequencingTaskRiskAdjustedYieldEstimates, false, true, []string{"estimated_net_yield", "risk_adjusted_yield_formula"}),
+		readySequencingTask(EconomicSequencePhase2, SequencingTaskValidatorBootstrapBand, true, true, []string{"bootstrap_bonus_bps", "automatic_expiry_conditions"}),
+	}
+}
+
+func DefaultPhase3SequencingTasks() []EconomicSequencingTask {
+	return []EconomicSequencingTask{
+		readySequencingTask(EconomicSequencePhase3, SequencingTaskResourceSpecificFeeMultipliers, true, true, []string{"compute_storage_deployment_forwarding_multipliers"}),
+		readySequencingTask(EconomicSequencePhase3, SequencingTaskSenderLocalSpamSurcharge, true, true, []string{"sender_failed_tx_surcharge", "mempool_execution_alignment"}),
+		readySequencingTask(EconomicSequencePhase3, SequencingTaskStorageWriteUpdatePricing, true, true, []string{"state_write_fee", "state_update_fee"}),
+		readySequencingTask(EconomicSequencePhase3, SequencingTaskStorageFootprintQueries, false, true, []string{"storage_footprint_query", "rent_status_query"}),
+		readySequencingTask(EconomicSequencePhase3, SequencingTaskDeleteRefundPolicy, true, true, []string{"delete_refund_cap", "refund_decay"}),
+		readySequencingTask(EconomicSequencePhase3, SequencingTaskDeploymentForwardingFeeEstimation, true, true, []string{"deployment_fee_estimate", "async_forwarding_fee_estimate"}),
+		readySequencingTask(EconomicSequencePhase3, SequencingTaskStateGrowthSurcharge, true, true, []string{"state_growth_surcharge_bps", "state_growth_telemetry"}),
+	}
+}
+
 func BuildImplementationSequencingReport(phase0Tasks, phase1Tasks []EconomicSequencingTask) EconomicSequencingReport {
+	return buildImplementationSequencingReport(phase0Tasks, phase1Tasks, nil, nil, false)
+}
+
+func BuildFullImplementationSequencingReport(phase0Tasks, phase1Tasks, phase2Tasks, phase3Tasks []EconomicSequencingTask) EconomicSequencingReport {
+	return buildImplementationSequencingReport(phase0Tasks, phase1Tasks, phase2Tasks, phase3Tasks, true)
+}
+
+func buildImplementationSequencingReport(phase0Tasks, phase1Tasks, phase2Tasks, phase3Tasks []EconomicSequencingTask, includeLaterPhases bool) EconomicSequencingReport {
 	if phase0Tasks == nil {
 		phase0Tasks = DefaultPhase0SequencingTasks()
 	}
 	if phase1Tasks == nil {
 		phase1Tasks = DefaultPhase1SequencingTasks()
+	}
+	if phase2Tasks == nil {
+		phase2Tasks = DefaultPhase2SequencingTasks()
+	}
+	if phase3Tasks == nil {
+		phase3Tasks = DefaultPhase3SequencingTasks()
 	}
 
 	phase0 := buildSequencingPhaseReport(
@@ -139,25 +196,51 @@ func BuildImplementationSequencingReport(phase0Tasks, phase1Tasks []EconomicSequ
 		phase1Tasks,
 		phase1ExpectedTasks(),
 	)
+	phase2 := buildSequencingPhaseReport(
+		EconomicSequencePhase2,
+		"improve security and decentralization of staking",
+		phase2Tasks,
+		phase2ExpectedTasks(),
+	)
+	phase3 := buildSequencingPhaseReport(
+		EconomicSequencePhase3,
+		"price resource usage more accurately",
+		phase3Tasks,
+		phase3ExpectedTasks(),
+	)
 
 	readyForPhase1 := phase0.Passed
-	readyForIncentiveChanges := phase0.Passed && phase1.Passed
+	readyForPhase2 := phase0.Passed && phase1.Passed
+	readyForPhase3 := readyForPhase2 && phase2.Passed
+	readyForIncentiveChanges := readyForPhase2
+	readyForResourcePricing := false
+	phases := []EconomicSequencingPhaseReport{phase0, phase1}
 	failed := append([]string{}, phase0.Failed...)
 	failed = append(failed, phase1.Failed...)
+	if includeLaterPhases {
+		readyForIncentiveChanges = readyForPhase3
+		readyForResourcePricing = readyForPhase3 && phase3.Passed
+		phases = append(phases, phase2, phase3)
+		failed = append(failed, phase2.Failed...)
+		failed = append(failed, phase3.Failed...)
+	}
 	sort.Strings(failed)
 
 	status := SequencingStatusReady
-	if !readyForIncentiveChanges {
+	if len(failed) > 0 {
 		status = SequencingStatusBlocked
 	}
 
 	return EconomicSequencingReport{
-		Phases:                   []EconomicSequencingPhaseReport{phase0, phase1},
+		Phases:                   phases,
 		ReadyForPhase1:           readyForPhase1,
+		ReadyForPhase2:           readyForPhase2,
+		ReadyForPhase3:           readyForPhase3,
 		ReadyForIncentiveChanges: readyForIncentiveChanges,
+		ReadyForResourcePricing:  readyForResourcePricing,
 		Failed:                   failed,
 		Passed:                   len(failed) == 0,
-		GovernanceSummary:        fmt.Sprintf("%s:%s phase0=%s phase1=%s", status, strings.TrimPrefix(EconomicSequencePhase0, "phase_"), phase0.Status, phase1.Status),
+		GovernanceSummary:        sequencingGovernanceSummary(status, phases),
 	}
 }
 
@@ -263,15 +346,28 @@ func buildSequencingPhaseReport(phaseID, goal string, tasks []EconomicSequencing
 		sequencingCriterion(phaseID+":all_tasks_implemented_observable_tested", allSequencingTasksReady(tasks), "one_or_more_tasks_not_ready"),
 		sequencingCriterion(phaseID+":required_tasks_present", sequencingExpectedTasksPresent(taskByName, expected), "required_task_missing"),
 	}
-	if phaseID == EconomicSequencePhase0 {
+	switch phaseID {
+	case EconomicSequencePhase0:
 		criteria = append(criteria,
 			sequencingCriterion(phaseID+":accounting_reconciles_per_epoch", sequencingTasksReconciled(taskByName, []string{SequencingTaskNetIssuanceAccounting, SequencingTaskCumulativeBurnAccounting, SequencingTaskFeeBucketAccounting, SequencingTaskEpochEconomicReportGeneration}), "accounting_task_not_reconciled"),
 			sequencingCriterion(phaseID+":concentration_and_state_growth_queryable", sequencingTasksQueryable(taskByName, []string{SequencingTaskValidatorConcentrationMetrics, SequencingTaskStateGrowthTelemetry, SequencingTaskValidatorRewardPerVotingPower}), "measurement_task_not_queryable"),
 		)
-	} else {
+	case EconomicSequencePhase1:
 		criteria = append(criteria,
 			sequencingCriterion(phaseID+":fund_paths_connected", sequencingTasksReconciled(taskByName, []string{SequencingTaskBurnControllerFeeDistributionWiring, SequencingTaskSlashingFundRouting, SequencingTaskFundMovementInvariantTests}), "fund_path_not_reconciled"),
 			sequencingCriterion(phaseID+":controllers_bounded_and_aligned", sequencingTasksReconciled(taskByName, []string{SequencingTaskDeflationGuardEnforcement, SequencingTaskBurnCaps, SequencingTaskFeeControllerBounds, SequencingTaskMempoolExecutionFeeValidationAlignment}), "controller_or_fee_validation_not_reconciled"),
+		)
+	case EconomicSequencePhase2:
+		criteria = append(criteria,
+			sequencingCriterion(phaseID+":delegator_risk_yield_data_queryable", sequencingTasksQueryable(taskByName, []string{SequencingTaskValidatorRiskScoreQueries, SequencingTaskCommissionChangeWarnings, SequencingTaskRiskAdjustedYieldEstimates}), "delegator_query_surface_not_ready"),
+			sequencingCriterion(phaseID+":concentration_incentives_active_bounded", sequencingTasksReconciled(taskByName, []string{SequencingTaskValidatorScoring, SequencingTaskConcentrationRewardDampening, SequencingTaskValidatorBootstrapBand}), "validator_incentive_not_bounded"),
+			sequencingCriterion(phaseID+":active_set_transitions_deterministic_tested", sequencingTasksReconciled(taskByName, []string{SequencingTaskEpochBasedSelectionProduction}), "epoch_selection_not_deterministic"),
+		)
+	case EconomicSequencePhase3:
+		criteria = append(criteria,
+			sequencingCriterion(phaseID+":persistent_state_and_spam_directly_priced", sequencingTasksReconciled(taskByName, []string{SequencingTaskSenderLocalSpamSurcharge, SequencingTaskStorageWriteUpdatePricing, SequencingTaskDeleteRefundPolicy, SequencingTaskStateGrowthSurcharge}), "resource_abuse_not_directly_priced"),
+			sequencingCriterion(phaseID+":fee_estimator_covers_transaction_deployment_async", sequencingTasksReconciled(taskByName, []string{SequencingTaskResourceSpecificFeeMultipliers, SequencingTaskDeploymentForwardingFeeEstimation}), "fee_estimator_coverage_missing"),
+			sequencingCriterion(phaseID+":state_growth_bounded_by_pricing_telemetry", sequencingTasksQueryable(taskByName, []string{SequencingTaskStorageFootprintQueries}) && sequencingTasksReconciled(taskByName, []string{SequencingTaskStateGrowthSurcharge}), "state_growth_bound_not_queryable"),
 		)
 	}
 	for _, criterion := range criteria {
@@ -326,9 +422,14 @@ func sequencingTaskReady(task EconomicSequencingTask) bool {
 	switch task.Name {
 	case SequencingTaskValidatorConcentrationMetrics, SequencingTaskStateGrowthTelemetry, SequencingTaskValidatorRewardPerVotingPower:
 		return task.Queryable
+	case SequencingTaskValidatorRiskScoreQueries, SequencingTaskCommissionChangeWarnings, SequencingTaskRiskAdjustedYieldEstimates, SequencingTaskStorageFootprintQueries:
+		return task.Queryable
 	case SequencingTaskNetIssuanceAccounting, SequencingTaskCumulativeBurnAccounting, SequencingTaskFeeBucketAccounting, SequencingTaskEpochEconomicReportGeneration,
 		SequencingTaskBurnControllerFeeDistributionWiring, SequencingTaskDeflationGuardEnforcement, SequencingTaskBurnCaps, SequencingTaskFeeControllerBounds,
-		SequencingTaskMempoolExecutionFeeValidationAlignment, SequencingTaskSlashingFundRouting, SequencingTaskFundMovementInvariantTests:
+		SequencingTaskMempoolExecutionFeeValidationAlignment, SequencingTaskSlashingFundRouting, SequencingTaskFundMovementInvariantTests,
+		SequencingTaskValidatorScoring, SequencingTaskEpochBasedSelectionProduction, SequencingTaskConcentrationRewardDampening, SequencingTaskValidatorBootstrapBand,
+		SequencingTaskResourceSpecificFeeMultipliers, SequencingTaskSenderLocalSpamSurcharge, SequencingTaskStorageWriteUpdatePricing, SequencingTaskDeleteRefundPolicy,
+		SequencingTaskDeploymentForwardingFeeEstimation, SequencingTaskStateGrowthSurcharge:
 		return task.Reconciled
 	default:
 		return false
@@ -405,4 +506,37 @@ func phase1ExpectedTasks() []string {
 		SequencingTaskSlashingFundRouting,
 		SequencingTaskFundMovementInvariantTests,
 	}
+}
+
+func phase2ExpectedTasks() []string {
+	return []string{
+		SequencingTaskValidatorScoring,
+		SequencingTaskEpochBasedSelectionProduction,
+		SequencingTaskConcentrationRewardDampening,
+		SequencingTaskValidatorRiskScoreQueries,
+		SequencingTaskCommissionChangeWarnings,
+		SequencingTaskRiskAdjustedYieldEstimates,
+		SequencingTaskValidatorBootstrapBand,
+	}
+}
+
+func phase3ExpectedTasks() []string {
+	return []string{
+		SequencingTaskResourceSpecificFeeMultipliers,
+		SequencingTaskSenderLocalSpamSurcharge,
+		SequencingTaskStorageWriteUpdatePricing,
+		SequencingTaskStorageFootprintQueries,
+		SequencingTaskDeleteRefundPolicy,
+		SequencingTaskDeploymentForwardingFeeEstimation,
+		SequencingTaskStateGrowthSurcharge,
+	}
+}
+
+func sequencingGovernanceSummary(status string, phases []EconomicSequencingPhaseReport) string {
+	parts := make([]string, 0, len(phases)+1)
+	parts = append(parts, status+":"+strings.TrimPrefix(EconomicSequencePhase0, "phase_"))
+	for i, phase := range phases {
+		parts = append(parts, fmt.Sprintf("phase%d=%s", i, phase.Status))
+	}
+	return strings.Join(parts, " ")
 }
