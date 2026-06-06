@@ -134,6 +134,13 @@ func RequiredPaymentFee(state PaymentsState, feeClass PaymentFeeClass, channel C
 	if err := schedule.Validate(); err != nil {
 		return "", 0, 0, err
 	}
+	if feeClass == PaymentFeeClassChannelOpen {
+		formula, err := ComputeChannelOpenFeeFormula(state, channel)
+		if err != nil {
+			return "", 0, 0, err
+		}
+		return formula.TotalFee, formula.StorageBytes, formula.MultiplierBps, nil
+	}
 	baseText, err := paymentFeeBaseAmount(schedule, feeClass)
 	if err != nil {
 		return "", 0, 0, err
@@ -150,20 +157,108 @@ func RequiredPaymentFee(state PaymentsState, feeClass PaymentFeeClass, channel C
 		}
 		base = base.Add(byteFee.Mul(sdkmath.NewIntFromUint64(storageBytes)))
 	}
-	multiplier := schedule.BaseMultiplierBps
-	for _, configured := range state.FeeMultipliers {
-		configured = configured.Normalize()
-		if configured.FeeClass == feeClass {
-			multiplier = configured.MultiplierBps
-			break
-		}
-	}
+	multiplier := feeMultiplierForClass(state, feeClass, schedule)
 	required := base.Mul(sdkmath.NewInt(int64(multiplier)))
 	denom := sdkmath.NewInt(10_000)
 	if !required.IsZero() {
 		required = required.Add(denom.Sub(sdkmath.OneInt())).Quo(denom)
 	}
 	return required.String(), storageBytes, multiplier, nil
+}
+
+func ComputeChannelOpenFeeFormula(state PaymentsState, channel ChannelRecord) (ChannelOpenFeeFormula, error) {
+	state = state.Export()
+	schedule := state.FeeSchedule.Normalize()
+	if err := schedule.Validate(); err != nil {
+		return ChannelOpenFeeFormula{}, err
+	}
+	channel = channel.Normalize()
+	base, err := parseNonNegativeInt("payments channel open base fee", schedule.ChannelOpenFee)
+	if err != nil {
+		return ChannelOpenFeeFormula{}, err
+	}
+	perParticipant, err := parseNonNegativeInt("payments channel open per participant fee", schedule.ChannelOpenPerParticipantFee)
+	if err != nil {
+		return ChannelOpenFeeFormula{}, err
+	}
+	participantCount := uint64(len(channel.Participants))
+	participantFee := perParticipant.Mul(sdkmath.NewIntFromUint64(participantCount))
+	storageBytes := EstimateChannelOpenStorageFootprint(channel)
+	byteFee, err := parseNonNegativeInt("payments channel open storage byte fee", schedule.StorageByteFee)
+	if err != nil {
+		return ChannelOpenFeeFormula{}, err
+	}
+	storageFee := sdkmath.ZeroInt()
+	if schedule.StorageFeeEnabled {
+		storageFee = byteFee.Mul(sdkmath.NewIntFromUint64(storageBytes))
+	}
+	conditionalSurcharge, err := parseNonNegativeInt("payments conditional capability surcharge", schedule.ConditionalCapabilitySurcharge)
+	if err != nil {
+		return ChannelOpenFeeFormula{}, err
+	}
+	if !channel.ConditionalPayments {
+		conditionalSurcharge = sdkmath.ZeroInt()
+	}
+	virtualSurcharge, err := parseNonNegativeInt("payments virtual channel anchor surcharge", schedule.VirtualChannelAnchorSurcharge)
+	if err != nil {
+		return ChannelOpenFeeFormula{}, err
+	}
+	// Base channel opens are not virtual channel anchors; the configured anchor
+	// surcharge is reserved for virtual-channel anchor fee classes.
+	virtualSurcharge = sdkmath.ZeroInt()
+	routingDeposit, err := parseNonNegativeInt("payments routing advertisement deposit", schedule.RoutingAdvertisementDeposit)
+	if err != nil {
+		return ChannelOpenFeeFormula{}, err
+	}
+	if !channel.RoutingAdvertised {
+		routingDeposit = sdkmath.ZeroInt()
+	}
+	rentReserve := sdkmath.ZeroInt()
+	if schedule.RenewalPeriod > 0 {
+		rentPerBlock, err := parseNonNegativeInt("payments storage rent per block", schedule.StorageRentPerBlock)
+		if err != nil {
+			return ChannelOpenFeeFormula{}, err
+		}
+		rentReserve = rentPerBlock.Mul(sdkmath.NewIntFromUint64(schedule.RenewalPeriod))
+	}
+	subtotal := base.Add(participantFee).Add(storageFee).Add(conditionalSurcharge).Add(virtualSurcharge).Add(routingDeposit).Add(rentReserve)
+	minFee, err := parseNonNegativeInt("payments open fee minimum", schedule.OpenFeeMin)
+	if err != nil {
+		return ChannelOpenFeeFormula{}, err
+	}
+	if subtotal.LT(minFee) {
+		subtotal = minFee
+	}
+	maxFee, err := parseNonNegativeInt("payments open fee maximum", schedule.OpenFeeMax)
+	if err != nil {
+		return ChannelOpenFeeFormula{}, err
+	}
+	if !maxFee.IsZero() && subtotal.GT(maxFee) {
+		subtotal = maxFee
+	}
+	multiplier := feeMultiplierForClass(state, PaymentFeeClassChannelOpen, schedule)
+	total := subtotal.Mul(sdkmath.NewInt(int64(multiplier)))
+	denom := sdkmath.NewInt(10_000)
+	if !total.IsZero() {
+		total = total.Add(denom.Sub(sdkmath.OneInt())).Quo(denom)
+	}
+	return ChannelOpenFeeFormula{
+		Denom:                  NativeDenom,
+		BaseFee:                base.String(),
+		ParticipantFee:         participantFee.String(),
+		ParticipantCount:       participantCount,
+		StorageByteFee:         byteFee.String(),
+		StorageBytes:           storageBytes,
+		StorageFee:             storageFee.String(),
+		ConditionalSurcharge:   conditionalSurcharge.String(),
+		VirtualAnchorSurcharge: virtualSurcharge.String(),
+		RoutingDeposit:         routingDeposit.String(),
+		RentReserve:            rentReserve.String(),
+		MultiplierBps:          multiplier,
+		MinFee:                 schedule.OpenFeeMin,
+		MaxFee:                 schedule.OpenFeeMax,
+		TotalFee:               total.String(),
+	}, nil
 }
 
 func ChargePaymentFee(state PaymentsState, feeClass PaymentFeeClass, channel ChannelRecord, payer, objectID, amountPaid string, height uint64) (PaymentsState, PaymentFeeCharge, error) {
@@ -4721,7 +4816,7 @@ func paymentStorageFootprint(feeClass PaymentFeeClass, channel ChannelRecord) ui
 	channel = channel.Normalize()
 	switch feeClass {
 	case PaymentFeeClassChannelOpen, PaymentFeeClassChannelCheckpoint, PaymentFeeClassUnilateralClose, PaymentFeeClassDispute:
-		return uint64(len(channel.ChannelID) + len(channel.ChainID) + len(channel.Participants)*48 + len(channel.LatestState.StateHash) + 96)
+		return EstimateChannelOpenStorageFootprint(channel)
 	case PaymentFeeClassConditionalPromiseSettlement:
 		return uint64(len(channel.ChannelID) + len(channel.LatestState.Conditions)*128)
 	case PaymentFeeClassVirtualChannelAnchor:
@@ -4731,6 +4826,37 @@ func paymentStorageFootprint(feeClass PaymentFeeClass, channel ChannelRecord) ui
 	default:
 		return 0
 	}
+}
+
+func EstimateChannelOpenStorageFootprint(channel ChannelRecord) uint64 {
+	channel = channel.Normalize()
+	footprint := uint64(128)
+	footprint += uint64(len(channel.ChannelID) + len(channel.ChainID) + len(channel.Denom) + len(channel.Collateral))
+	footprint += uint64(len(channel.Participants) * 48)
+	footprint += uint64(len(channel.RequiredSigners) * 48)
+	footprint += uint64(len(channel.OpeningStateHash) + len(channel.LatestState.StateHash) + len(channel.LatestState.ParticipantSetHash))
+	footprint += uint64(len(channel.LatestState.Balances) * 64)
+	footprint += uint64(len(channel.LatestState.ReserveA) + len(channel.LatestState.ReserveB))
+	footprint += uint64(len(channel.LatestState.Conditions) * 160)
+	if channel.ConditionalPayments {
+		footprint += 64
+	}
+	if channel.RoutingAdvertised {
+		footprint += 96
+	}
+	return footprint
+}
+
+func feeMultiplierForClass(state PaymentsState, feeClass PaymentFeeClass, schedule PaymentFeeSchedule) uint32 {
+	multiplier := schedule.Normalize().BaseMultiplierBps
+	for _, configured := range state.FeeMultipliers {
+		configured = configured.Normalize()
+		if configured.FeeClass == feeClass {
+			multiplier = configured.MultiplierBps
+			break
+		}
+	}
+	return multiplier
 }
 
 func feeChannelForVirtual(vc VirtualChannel) ChannelRecord {

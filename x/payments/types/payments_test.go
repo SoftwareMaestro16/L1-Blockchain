@@ -961,6 +961,95 @@ func TestPaymentFeeScheduleChargesStorageAndDynamicMultiplier(t *testing.T) {
 	require.Equal(t, storageBytes, state.FeeCharges[0].StorageBytes)
 }
 
+func TestChannelOpenFeeFormulaComponentsAndBounds(t *testing.T) {
+	alice := testAddress(0xa0)
+	bob := testAddress(0xa1)
+	channel := signedChannel(t, "fee-open-formula", "100", alice, bob)
+	channel.ConditionalPayments = true
+	channel.RoutingAdvertised = true
+
+	schedule := DefaultPaymentFeeSchedule()
+	schedule.ChannelOpenFee = "5"
+	schedule.ChannelOpenPerParticipantFee = "2"
+	schedule.StorageFeeEnabled = true
+	schedule.StorageByteFee = "1"
+	schedule.ConditionalCapabilitySurcharge = "7"
+	schedule.RoutingAdvertisementDeposit = "11"
+	schedule.StorageRentPerBlock = "3"
+	schedule.RenewalPeriod = 4
+	schedule.OpenFeeMin = "1"
+	state, err := ConfigurePaymentFeeSchedule(EmptyState(), schedule)
+	require.NoError(t, err)
+
+	formula, err := ComputeChannelOpenFeeFormula(state, channel)
+	require.NoError(t, err)
+	expected := 5 + 2*len(channel.Participants) + int(formula.StorageBytes) + 7 + 11 + 3*4
+	require.Equal(t, fmt.Sprintf("%d", expected), formula.TotalFee)
+	require.Equal(t, "4", formula.ParticipantFee)
+	require.Equal(t, "7", formula.ConditionalSurcharge)
+	require.Equal(t, "11", formula.RoutingDeposit)
+	require.Equal(t, "12", formula.RentReserve)
+	require.Equal(t, uint64(2), formula.ParticipantCount)
+	require.NotZero(t, formula.StorageBytes)
+
+	channel.OpeningFeePaid = formula.TotalFee
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+	require.Equal(t, formula.TotalFee, state.FeeCharges[0].RequiredAmount)
+
+	boundedSchedule := schedule
+	boundedSchedule.ChannelOpenFee = "100"
+	boundedSchedule.ChannelOpenPerParticipantFee = "0"
+	boundedSchedule.StorageFeeEnabled = false
+	boundedSchedule.ConditionalCapabilitySurcharge = "0"
+	boundedSchedule.RoutingAdvertisementDeposit = "0"
+	boundedSchedule.StorageRentPerBlock = "0"
+	boundedSchedule.RenewalPeriod = 0
+	boundedSchedule.OpenFeeMax = "20"
+	boundedState, err := ConfigurePaymentFeeSchedule(EmptyState(), boundedSchedule)
+	require.NoError(t, err)
+	boundedState, err = SetPaymentFeeMultiplier(boundedState, PaymentFeeMultiplier{
+		FeeClass:      PaymentFeeClassChannelOpen,
+		MultiplierBps: 15_000,
+		CongestionBps: 2_500,
+		UpdatedHeight: channel.OpenHeight,
+	})
+	require.NoError(t, err)
+	formula, err = ComputeChannelOpenFeeFormula(boundedState, channel)
+	require.NoError(t, err)
+	require.Equal(t, "20", formula.MaxFee)
+	require.Equal(t, uint32(15_000), formula.MultiplierBps)
+	require.Equal(t, "30", formula.TotalFee)
+}
+
+func TestChannelOpenFeeFormulaPreventsManySmallChannelBypass(t *testing.T) {
+	schedule := DefaultPaymentFeeSchedule()
+	schedule.ChannelOpenFee = "5"
+	schedule.ChannelOpenPerParticipantFee = "1"
+	schedule.StorageFeeEnabled = true
+	schedule.StorageByteFee = "1"
+	schedule.OpenFeeMin = "1"
+	state, err := ConfigurePaymentFeeSchedule(EmptyState(), schedule)
+	require.NoError(t, err)
+
+	for i := 0; i < 6; i++ {
+		alice := testAddress(byte(0xb0 + i*2))
+		bob := testAddress(byte(0xb1 + i*2))
+		channel := signedChannel(t, fmt.Sprintf("small-open-%d", i), "1", alice, bob)
+
+		_, err = OpenChannel(state, channel)
+		require.ErrorContains(t, err, "fee below required")
+
+		formula, err := ComputeChannelOpenFeeFormula(state, channel)
+		require.NoError(t, err)
+		channel.OpeningFeePaid = formula.TotalFee
+		state, err = OpenChannel(state, channel)
+		require.NoError(t, err)
+	}
+	require.Len(t, state.Channels, 6)
+	require.Len(t, state.FeeCharges, 6)
+}
+
 func TestPaymentFeeScheduleRejectsCloseDisputeAndRoutingBypass(t *testing.T) {
 	alice := testAddress(0xa2)
 	bob := testAddress(0xa3)

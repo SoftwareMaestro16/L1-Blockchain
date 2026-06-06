@@ -1028,6 +1028,7 @@ type FraudPenaltyPolicy struct {
 type PaymentFeeSchedule struct {
 	Denom                           string
 	ChannelOpenFee                  string
+	ChannelOpenPerParticipantFee    string
 	ChannelCheckpointFee            string
 	CooperativeCloseFee             string
 	UnilateralCloseFee              string
@@ -1036,8 +1037,15 @@ type PaymentFeeSchedule struct {
 	ConditionalPromiseSettlementFee string
 	VirtualChannelAnchorFee         string
 	RoutingAdvertisementFee         string
+	RoutingAdvertisementDeposit     string
+	ConditionalCapabilitySurcharge  string
+	VirtualChannelAnchorSurcharge   string
 	StorageByteFee                  string
 	StorageFeeEnabled               bool
+	OpenFeeMin                      string
+	OpenFeeMax                      string
+	StorageRentPerBlock             string
+	RenewalPeriod                   uint64
 	BaseMultiplierBps               uint32
 	MaxMultiplierBps                uint32
 }
@@ -1074,10 +1082,29 @@ type PaymentFeeRefund struct {
 	Height    uint64
 }
 
+type ChannelOpenFeeFormula struct {
+	Denom                  string
+	BaseFee                string
+	ParticipantFee         string
+	ParticipantCount       uint64
+	StorageByteFee         string
+	StorageBytes           uint64
+	StorageFee             string
+	ConditionalSurcharge   string
+	VirtualAnchorSurcharge string
+	RoutingDeposit         string
+	RentReserve            string
+	MultiplierBps          uint32
+	MinFee                 string
+	MaxFee                 string
+	TotalFee               string
+}
+
 func DefaultPaymentFeeSchedule() PaymentFeeSchedule {
 	return PaymentFeeSchedule{
 		Denom:                           NativeDenom,
 		ChannelOpenFee:                  DefaultOpeningFee,
+		ChannelOpenPerParticipantFee:    "0",
 		ChannelCheckpointFee:            "0",
 		CooperativeCloseFee:             "0",
 		UnilateralCloseFee:              "0",
@@ -1086,7 +1113,13 @@ func DefaultPaymentFeeSchedule() PaymentFeeSchedule {
 		ConditionalPromiseSettlementFee: "0",
 		VirtualChannelAnchorFee:         "0",
 		RoutingAdvertisementFee:         "0",
+		RoutingAdvertisementDeposit:     "0",
+		ConditionalCapabilitySurcharge:  "0",
+		VirtualChannelAnchorSurcharge:   "0",
 		StorageByteFee:                  "0",
+		OpenFeeMin:                      DefaultOpeningFee,
+		OpenFeeMax:                      "0",
+		StorageRentPerBlock:             "0",
 		BaseMultiplierBps:               10_000,
 		MaxMultiplierBps:                100_000,
 	}
@@ -4989,6 +5022,7 @@ func (s PaymentFeeSchedule) Normalize() PaymentFeeSchedule {
 	}
 	fields := []*string{
 		&s.ChannelOpenFee,
+		&s.ChannelOpenPerParticipantFee,
 		&s.ChannelCheckpointFee,
 		&s.CooperativeCloseFee,
 		&s.UnilateralCloseFee,
@@ -4997,7 +5031,13 @@ func (s PaymentFeeSchedule) Normalize() PaymentFeeSchedule {
 		&s.ConditionalPromiseSettlementFee,
 		&s.VirtualChannelAnchorFee,
 		&s.RoutingAdvertisementFee,
+		&s.RoutingAdvertisementDeposit,
+		&s.ConditionalCapabilitySurcharge,
+		&s.VirtualChannelAnchorSurcharge,
 		&s.StorageByteFee,
+		&s.OpenFeeMin,
+		&s.OpenFeeMax,
+		&s.StorageRentPerBlock,
 	}
 	for _, field := range fields {
 		*field = strings.TrimSpace(*field)
@@ -5007,6 +5047,9 @@ func (s PaymentFeeSchedule) Normalize() PaymentFeeSchedule {
 	}
 	if s.ChannelOpenFee == "0" {
 		s.ChannelOpenFee = defaults.ChannelOpenFee
+	}
+	if s.OpenFeeMin == "0" {
+		s.OpenFeeMin = defaults.OpenFeeMin
 	}
 	if s.BaseMultiplierBps == 0 {
 		s.BaseMultiplierBps = defaults.BaseMultiplierBps
@@ -5027,6 +5070,7 @@ func (s PaymentFeeSchedule) Validate() error {
 		amount string
 	}{
 		{"payments channel open fee", s.ChannelOpenFee},
+		{"payments channel open per participant fee", s.ChannelOpenPerParticipantFee},
 		{"payments checkpoint fee", s.ChannelCheckpointFee},
 		{"payments cooperative close fee", s.CooperativeCloseFee},
 		{"payments unilateral close fee", s.UnilateralCloseFee},
@@ -5035,10 +5079,29 @@ func (s PaymentFeeSchedule) Validate() error {
 		{"payments conditional promise settlement fee", s.ConditionalPromiseSettlementFee},
 		{"payments virtual channel anchor fee", s.VirtualChannelAnchorFee},
 		{"payments routing advertisement fee", s.RoutingAdvertisementFee},
+		{"payments routing advertisement deposit", s.RoutingAdvertisementDeposit},
+		{"payments conditional capability surcharge", s.ConditionalCapabilitySurcharge},
+		{"payments virtual channel anchor surcharge", s.VirtualChannelAnchorSurcharge},
 		{"payments storage byte fee", s.StorageByteFee},
+		{"payments open fee minimum", s.OpenFeeMin},
+		{"payments open fee maximum", s.OpenFeeMax},
+		{"payments storage rent per block", s.StorageRentPerBlock},
 	} {
 		if err := validateNonNegativeInt(item.name, item.amount); err != nil {
 			return err
+		}
+	}
+	if s.OpenFeeMax != "0" {
+		minFee, err := parseNonNegativeInt("payments open fee minimum", s.OpenFeeMin)
+		if err != nil {
+			return err
+		}
+		maxFee, err := parseNonNegativeInt("payments open fee maximum", s.OpenFeeMax)
+		if err != nil {
+			return err
+		}
+		if maxFee.LT(minFee) {
+			return errors.New("payments open fee maximum cannot be below minimum")
 		}
 	}
 	if s.BaseMultiplierBps == 0 || s.BaseMultiplierBps > s.MaxMultiplierBps {
