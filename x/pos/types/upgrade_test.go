@@ -428,6 +428,9 @@ func TestPosRequiredTestCoverageManifestCoversUnitAndIntegrationCases(t *testing
 	require.Equal(t, ComputePosRequiredTestCoverageRoot(manifest), manifest.Root)
 	require.Len(t, manifest.UnitTests, len(RequiredPosUnitTestCoverageNames()))
 	require.Len(t, manifest.IntegrationTests, len(RequiredPosIntegrationTestCoverageNames()))
+	require.Len(t, manifest.InvariantTests, len(RequiredPosInvariantTestCoverageNames()))
+	require.Len(t, manifest.SimulationTests, len(RequiredPosSimulationTestCoverageNames()))
+	require.Len(t, manifest.PerformanceTests, len(RequiredPosPerformanceTestCoverageNames()))
 
 	for _, name := range RequiredPosUnitTestCoverageNames() {
 		spec, found := PosUnitTestCoverageByName(manifest, name)
@@ -440,6 +443,27 @@ func TestPosRequiredTestCoverageManifestCoversUnitAndIntegrationCases(t *testing
 		spec, found := PosIntegrationTestCoverageByName(manifest, name)
 		require.True(t, found, name)
 		require.Equal(t, "integration", spec.TestType)
+		require.NotEmpty(t, spec.Assertions)
+		require.NotEmpty(t, spec.MigrationPhases)
+	}
+	for _, name := range RequiredPosInvariantTestCoverageNames() {
+		spec, found := PosInvariantTestCoverageByName(manifest, name)
+		require.True(t, found, name)
+		require.Equal(t, "invariant", spec.TestType)
+		require.NotEmpty(t, spec.Assertions)
+		require.NotEmpty(t, spec.MigrationPhases)
+	}
+	for _, name := range RequiredPosSimulationTestCoverageNames() {
+		spec, found := PosSimulationTestCoverageByName(manifest, name)
+		require.True(t, found, name)
+		require.Equal(t, "simulation", spec.TestType)
+		require.NotEmpty(t, spec.Assertions)
+		require.NotEmpty(t, spec.MigrationPhases)
+	}
+	for _, name := range RequiredPosPerformanceTestCoverageNames() {
+		spec, found := PosPerformanceTestCoverageByName(manifest, name)
+		require.True(t, found, name)
+		require.Equal(t, "performance", spec.TestType)
 		require.NotEmpty(t, spec.Assertions)
 		require.NotEmpty(t, spec.MigrationPhases)
 	}
@@ -461,6 +485,21 @@ func TestPosRequiredTestCoverageManifestCoversUnitAndIntegrationCases(t *testing
 	require.Equal(t, "evidence", evidence.ModuleName)
 	require.Equal(t, []uint32{4}, evidence.MigrationPhases)
 	require.Contains(t, evidence.Assertions, "accepted evidence maps to one penalty")
+
+	invariant, found := PosInvariantTestCoverageByName(manifest, "penalty routing exactly equals slashed amount")
+	require.True(t, found)
+	require.Equal(t, "slashing", invariant.ModuleName)
+	require.Contains(t, invariant.Assertions, "burn reward treasury and compensation sums equal slash")
+
+	simulation, found := PosSimulationTestCoverageByName(manifest, "fisherman valid and invalid proof submissions")
+	require.True(t, found)
+	require.Equal(t, "fishermen", simulation.ModuleName)
+	require.Equal(t, []uint32{4}, simulation.MigrationPhases)
+
+	performance, found := PosPerformanceTestCoverageByName(manifest, "validator score calculation for 400 validators")
+	require.True(t, found)
+	require.Equal(t, "validator_economy", performance.ModuleName)
+	require.Contains(t, performance.Assertions, "400 validator scores finish within benchmark budget")
 }
 
 func TestPosRequiredTestCoverageManifestRejectsMissingDuplicateAndInvalidCoverage(t *testing.T) {
@@ -497,6 +536,24 @@ func TestPosRequiredTestCoverageManifestRejectsMissingDuplicateAndInvalidCoverag
 	missingAssertions.UnitTests[0].Assertions = nil
 	missingAssertions.Root = ComputePosRequiredTestCoverageRoot(missingAssertions)
 	require.ErrorContains(t, missingAssertions.Validate(compatibility, migration), "assertions")
+
+	missingInvariant := manifest
+	missingInvariant.InvariantTests = append([]PosTestCoverageSpec{}, manifest.InvariantTests...)
+	missingInvariant.InvariantTests = missingInvariant.InvariantTests[:len(missingInvariant.InvariantTests)-1]
+	missingInvariant.Root = ComputePosRequiredTestCoverageRoot(missingInvariant)
+	require.ErrorContains(t, missingInvariant.Validate(compatibility, migration), "performance root matches records")
+
+	duplicateSimulation := manifest
+	duplicateSimulation.SimulationTests = append([]PosTestCoverageSpec{}, manifest.SimulationTests...)
+	duplicateSimulation.SimulationTests = append(duplicateSimulation.SimulationTests, manifest.SimulationTests[0])
+	duplicateSimulation.Root = ComputePosRequiredTestCoverageRoot(duplicateSimulation)
+	require.ErrorContains(t, duplicateSimulation.Validate(compatibility, migration), "duplicate pos simulation test coverage")
+
+	wrongPerformanceType := manifest
+	wrongPerformanceType.PerformanceTests = append([]PosTestCoverageSpec{}, manifest.PerformanceTests...)
+	wrongPerformanceType.PerformanceTests[0].TestType = "unit"
+	wrongPerformanceType.Root = ComputePosRequiredTestCoverageRoot(wrongPerformanceType)
+	require.ErrorContains(t, wrongPerformanceType.Validate(compatibility, migration), "must be performance")
 
 	rootMismatch := manifest
 	rootMismatch.Root = PosEmptyRootHash

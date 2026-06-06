@@ -1028,6 +1028,9 @@ type PosTestCoverageSpec struct {
 type PosRequiredTestCoverageManifest struct {
 	UnitTests        []PosTestCoverageSpec
 	IntegrationTests []PosTestCoverageSpec
+	InvariantTests   []PosTestCoverageSpec
+	SimulationTests  []PosTestCoverageSpec
+	PerformanceTests []PosTestCoverageSpec
 	Root             string
 }
 
@@ -2163,6 +2166,36 @@ func DefaultPosRequiredTestCoverageManifest() PosRequiredTestCoverageManifest {
 			{Name: "unbonding stake is slashed for historical fault", TestType: "integration", ModuleName: "staking", CoverageTarget: "historical fault slash exposure", Assertions: []string{"fault epoch inside window is slashable", "expired exposure is not slashable"}, MigrationPhases: []uint32{4}},
 			{Name: "distribution rewards use performance multiplier", TestType: "integration", ModuleName: "distribution", CoverageTarget: "distribution reward multiplier integration", Assertions: []string{"distribution reads performance multiplier", "reward delta is bounded and deterministic"}, MigrationPhases: []uint32{3}},
 		},
+		InvariantTests: []PosTestCoverageSpec{
+			{Name: "effective stake <= raw stake", TestType: "invariant", ModuleName: "validator_economy", CoverageTarget: "effective stake bounded by raw stake", Assertions: []string{"effective stake never exceeds raw stake", "saturation does not mutate bonded balance"}, MigrationPhases: []uint32{1, 4}},
+			{Name: "total active task group membership references active validators", TestType: "invariant", ModuleName: "taskgroups", CoverageTarget: "task group active validator references", Assertions: []string{"every task group member is active", "inactive validators cannot be assigned"}, MigrationPhases: []uint32{2}},
+			{Name: "penalty routing exactly equals slashed amount", TestType: "invariant", ModuleName: "slashing", CoverageTarget: "slash routing exact accounting", Assertions: []string{"burn reward treasury and compensation sums equal slash", "no routing bucket is negative"}, MigrationPhases: []uint32{4}},
+			{Name: "reporter rewards do not exceed configured cap", TestType: "invariant", ModuleName: "evidence", CoverageTarget: "reporter reward cap", Assertions: []string{"reporter reward is capped by penalty amount", "configured cap basis points are enforced"}, MigrationPhases: []uint32{4}},
+			{Name: "validator cannot escape slash exposure by redelegation", TestType: "invariant", ModuleName: "staking", CoverageTarget: "redelegation slash exposure retention", Assertions: []string{"redelegation keeps historical risk", "fault before exit remains slashable"}, MigrationPhases: []uint32{4}},
+			{Name: "evidence cannot be finalized twice", TestType: "invariant", ModuleName: "evidence", CoverageTarget: "evidence finality idempotence", Assertions: []string{"accepted evidence maps to one penalty", "second finalization is rejected"}, MigrationPhases: []uint32{4}},
+			{Name: "task group root matches assignments", TestType: "invariant", ModuleName: "taskgroups", CoverageTarget: "task group root commitment", Assertions: []string{"root recomputes from assignments", "tampered assignment changes root"}, MigrationPhases: []uint32{2}},
+			{Name: "performance root matches records", TestType: "invariant", ModuleName: "performance", CoverageTarget: "performance root commitment", Assertions: []string{"root recomputes from performance records", "tampered record changes root"}, MigrationPhases: []uint32{3}},
+		},
+		SimulationTests: []PosTestCoverageSpec{
+			{Name: "stake concentration above soft cap", TestType: "simulation", ModuleName: "validator_economy", CoverageTarget: "stake concentration soft cap simulation", Assertions: []string{"concentration warning is emitted", "marginal effective stake is dampened"}, MigrationPhases: []uint32{1, 4}},
+			{Name: "stake splitting across validators", TestType: "simulation", ModuleName: "validator_economy", CoverageTarget: "stake splitting simulation", Assertions: []string{"split validators cannot bypass total concentration controls", "effective stake gain is bounded"}, MigrationPhases: []uint32{1, 4}},
+			{Name: "low participation epoch", TestType: "simulation", ModuleName: "performance", CoverageTarget: "low participation epoch simulation", Assertions: []string{"participation rate reduces rewards", "security metric reflects lower participation"}, MigrationPhases: []uint32{3}},
+			{Name: "repeated downtime", TestType: "simulation", ModuleName: "performance", CoverageTarget: "repeated downtime simulation", Assertions: []string{"future score penalty accumulates", "recovery follows configured decay"}, MigrationPhases: []uint32{3, 4}},
+			{Name: "invalid task execution", TestType: "simulation", ModuleName: "taskgroups", CoverageTarget: "invalid task execution simulation", Assertions: []string{"invalid execution creates evidence path", "assigned verifier participation is recorded"}, MigrationPhases: []uint32{2, 4}},
+			{Name: "collator invalid output", TestType: "simulation", ModuleName: "collators", CoverageTarget: "invalid collator output simulation", Assertions: []string{"invalid collator output is rejected", "bonded collator penalty is bounded"}, MigrationPhases: []uint32{4}},
+			{Name: "fisherman valid and invalid proof submissions", TestType: "simulation", ModuleName: "fishermen", CoverageTarget: "fisherman proof simulation", Assertions: []string{"valid proof earns reward", "invalid proof loses deposit"}, MigrationPhases: []uint32{4}},
+			{Name: "high evidence spam", TestType: "simulation", ModuleName: "evidence", CoverageTarget: "evidence spam resistance simulation", Assertions: []string{"deposit limits spam", "duplicate evidence is rejected"}, MigrationPhases: []uint32{4}},
+			{Name: "validator churn at epoch boundary", TestType: "simulation", ModuleName: "epoch", CoverageTarget: "epoch boundary validator churn simulation", Assertions: []string{"validator set change rate is enforced", "epoch boundary activates changes deterministically"}, MigrationPhases: []uint32{1, 2, 4}},
+			{Name: "delegation market response to commission increase", TestType: "simulation", ModuleName: "delegation_market", CoverageTarget: "commission tolerance market simulation", Assertions: []string{"commission exceeded status is emitted", "delegation risk query reflects change"}, MigrationPhases: []uint32{3}},
+		},
+		PerformanceTests: []PosTestCoverageSpec{
+			{Name: "validator score calculation for 400 validators", TestType: "performance", ModuleName: "validator_economy", CoverageTarget: "validator score batch performance", Assertions: []string{"400 validator scores finish within benchmark budget", "result ordering stays deterministic"}, MigrationPhases: []uint32{1, 4}},
+			{Name: "task group assignment for many workloads", TestType: "performance", ModuleName: "taskgroups", CoverageTarget: "task assignment scalability", Assertions: []string{"many workload assignment finishes within benchmark budget", "assignment root remains reproducible"}, MigrationPhases: []uint32{2}},
+			{Name: "evidence verification group assignment", TestType: "performance", ModuleName: "evidence", CoverageTarget: "evidence verification assignment performance", Assertions: []string{"verification group selection finishes within benchmark budget", "excluded validators are never assigned"}, MigrationPhases: []uint32{4}},
+			{Name: "epoch settlement runtime", TestType: "performance", ModuleName: "epoch", CoverageTarget: "epoch settlement runtime", Assertions: []string{"settlement finishes within benchmark budget", "settlement roots are stable"}, MigrationPhases: []uint32{3, 4}},
+			{Name: "reward distribution with performance multipliers", TestType: "performance", ModuleName: "distribution", CoverageTarget: "performance multiplier distribution runtime", Assertions: []string{"reward distribution finishes within benchmark budget", "bounded multipliers are applied deterministically"}, MigrationPhases: []uint32{3}},
+			{Name: "query latency for validator score and risk data", TestType: "performance", ModuleName: "validator_economy", CoverageTarget: "validator score and risk query latency", Assertions: []string{"validator score query is within latency budget", "risk data query is within latency budget"}, MigrationPhases: []uint32{1, 3}},
+		},
 	}
 	manifest.Root = ComputePosRequiredTestCoverageRoot(manifest)
 	return manifest
@@ -2199,6 +2232,45 @@ func RequiredPosIntegrationTestCoverageNames() []string {
 	}
 }
 
+func RequiredPosInvariantTestCoverageNames() []string {
+	return []string{
+		"effective stake <= raw stake",
+		"total active task group membership references active validators",
+		"penalty routing exactly equals slashed amount",
+		"reporter rewards do not exceed configured cap",
+		"validator cannot escape slash exposure by redelegation",
+		"evidence cannot be finalized twice",
+		"task group root matches assignments",
+		"performance root matches records",
+	}
+}
+
+func RequiredPosSimulationTestCoverageNames() []string {
+	return []string{
+		"stake concentration above soft cap",
+		"stake splitting across validators",
+		"low participation epoch",
+		"repeated downtime",
+		"invalid task execution",
+		"collator invalid output",
+		"fisherman valid and invalid proof submissions",
+		"high evidence spam",
+		"validator churn at epoch boundary",
+		"delegation market response to commission increase",
+	}
+}
+
+func RequiredPosPerformanceTestCoverageNames() []string {
+	return []string{
+		"validator score calculation for 400 validators",
+		"task group assignment for many workloads",
+		"evidence verification group assignment",
+		"epoch settlement runtime",
+		"reward distribution with performance multipliers",
+		"query latency for validator score and risk data",
+	}
+}
+
 func (m PosRequiredTestCoverageManifest) Validate(compatibility CosmosSDKCompatibilityManifest, migration PosMigrationStrategyManifest) error {
 	if err := compatibility.Validate(); err != nil {
 		return err
@@ -2215,6 +2287,15 @@ func (m PosRequiredTestCoverageManifest) Validate(compatibility CosmosSDKCompati
 		return err
 	}
 	if err := validatePosCoverageSet("integration", m.IntegrationTests, RequiredPosIntegrationTestCoverageNames(), knownModules, knownPhases); err != nil {
+		return err
+	}
+	if err := validatePosCoverageSet("invariant", m.InvariantTests, RequiredPosInvariantTestCoverageNames(), knownModules, knownPhases); err != nil {
+		return err
+	}
+	if err := validatePosCoverageSet("simulation", m.SimulationTests, RequiredPosSimulationTestCoverageNames(), knownModules, knownPhases); err != nil {
+		return err
+	}
+	if err := validatePosCoverageSet("performance", m.PerformanceTests, RequiredPosPerformanceTestCoverageNames(), knownModules, knownPhases); err != nil {
 		return err
 	}
 	if err := validatePosHash("pos required test coverage root", m.Root); err != nil {
@@ -2287,6 +2368,9 @@ func ComputePosRequiredTestCoverageRoot(manifest PosRequiredTestCoverageManifest
 	return posHashRoot("aetheris-pos-required-test-coverage-v1", func(w posByteWriter) {
 		posWriteCoverageSpecs(w, manifest.UnitTests)
 		posWriteCoverageSpecs(w, manifest.IntegrationTests)
+		posWriteCoverageSpecs(w, manifest.InvariantTests)
+		posWriteCoverageSpecs(w, manifest.SimulationTests)
+		posWriteCoverageSpecs(w, manifest.PerformanceTests)
 	})
 }
 
@@ -2296,6 +2380,18 @@ func PosUnitTestCoverageByName(manifest PosRequiredTestCoverageManifest, name st
 
 func PosIntegrationTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
 	return posTestCoverageByName(manifest.IntegrationTests, name)
+}
+
+func PosInvariantTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
+	return posTestCoverageByName(manifest.InvariantTests, name)
+}
+
+func PosSimulationTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
+	return posTestCoverageByName(manifest.SimulationTests, name)
+}
+
+func PosPerformanceTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
+	return posTestCoverageByName(manifest.PerformanceTests, name)
 }
 
 func posTestCoverageByName(specs []PosTestCoverageSpec, name string) (PosTestCoverageSpec, bool) {
@@ -8122,7 +8218,7 @@ func validatePosResponsibility(fieldName string, value string) error {
 		return fmt.Errorf("%s must be <= %d bytes", fieldName, maxPosTokenLength)
 	}
 	for _, r := range value {
-		if r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '_' || r == '-' || r == '.' || r == ':' || r == '/' || r == ' ' || r == '+' || r == ',' {
+		if r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '_' || r == '-' || r == '.' || r == ':' || r == '/' || r == ' ' || r == '+' || r == ',' || r == '<' || r == '=' {
 			continue
 		}
 		return fmt.Errorf("%s contains invalid character", fieldName)
