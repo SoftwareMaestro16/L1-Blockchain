@@ -96,16 +96,25 @@ const (
 
 type ZoneDescriptor struct {
 	ZoneID                ZoneID
+	ZoneName              string
 	ZoneType              ZoneType
 	ModuleName            string
 	Enabled               bool
 	StateMachineVersion   uint64
+	StateVersion          uint64
+	KeeperScope           string
+	MsgServerScope        string
+	QueryServerScope      string
 	MempoolPolicyID       string
 	FeePolicyID           string
+	GasPolicyID           string
+	MessagePolicyID       string
+	RootPrefix            string
 	ShardLayoutEpoch      uint64
 	MaxShards             uint32
 	MessageCapabilities   []string
 	ProofCapabilities     []string
+	Capabilities          []string
 	UpgradeHeightOptional uint64
 }
 
@@ -220,7 +229,11 @@ type ServiceVerificationDescriptor struct {
 }
 
 func (d ZoneDescriptor) Validate(params AetherCoreParams) error {
+	d = CanonicalZoneDescriptor(d)
 	if err := ValidateZoneID(d.ZoneID); err != nil {
+		return err
+	}
+	if err := validatePolicyID("aethercore zone name", d.ZoneName); err != nil {
 		return err
 	}
 	if !IsZoneType(d.ZoneType) {
@@ -232,10 +245,34 @@ func (d ZoneDescriptor) Validate(params AetherCoreParams) error {
 	if d.StateMachineVersion == 0 {
 		return errors.New("aethercore zone state machine version must be positive")
 	}
+	if d.StateVersion == 0 {
+		return errors.New("aethercore zone state version must be positive")
+	}
+	if d.StateVersion != d.StateMachineVersion {
+		return errors.New("aethercore zone state version mismatch")
+	}
+	if err := validatePolicyID("aethercore zone keeper scope", d.KeeperScope); err != nil {
+		return err
+	}
+	if err := validatePolicyID("aethercore zone MsgServer scope", d.MsgServerScope); err != nil {
+		return err
+	}
+	if err := validatePolicyID("aethercore zone QueryServer scope", d.QueryServerScope); err != nil {
+		return err
+	}
 	if err := validatePolicyID("aethercore zone mempool policy", d.MempoolPolicyID); err != nil {
 		return err
 	}
 	if err := validatePolicyID("aethercore zone fee policy", d.FeePolicyID); err != nil {
+		return err
+	}
+	if err := validatePolicyID("aethercore zone gas policy", d.GasPolicyID); err != nil {
+		return err
+	}
+	if err := validatePolicyID("aethercore zone message policy", d.MessagePolicyID); err != nil {
+		return err
+	}
+	if err := validatePolicyID("aethercore zone root prefix", d.RootPrefix); err != nil {
 		return err
 	}
 	if d.FeePolicyID != NativeFeePolicyID {
@@ -247,7 +284,10 @@ func (d ZoneDescriptor) Validate(params AetherCoreParams) error {
 	if err := validateCapabilitiesForField("aethercore zone message capabilities", d.MessageCapabilities); err != nil {
 		return err
 	}
-	return validateCapabilitiesForField("aethercore zone proof capabilities", d.ProofCapabilities)
+	if err := validateCapabilitiesForField("aethercore zone proof capabilities", d.ProofCapabilities); err != nil {
+		return err
+	}
+	return validateCapabilitiesForField("aethercore zone capabilities", d.Capabilities)
 }
 
 func (d ServiceDescriptor) Validate() error {
@@ -438,10 +478,51 @@ func IsServiceReceiptPolicy(policy ServiceReceiptPolicy) bool {
 }
 
 func CanonicalZoneDescriptor(d ZoneDescriptor) ZoneDescriptor {
+	if d.ZoneName == "" {
+		d.ZoneName = d.ModuleName
+	}
+	if d.ModuleName == "" {
+		d.ModuleName = d.ZoneName
+	}
+	if d.StateVersion == 0 {
+		d.StateVersion = d.StateMachineVersion
+	}
+	if d.StateMachineVersion == 0 {
+		d.StateMachineVersion = d.StateVersion
+	}
+	if d.KeeperScope == "" {
+		d.KeeperScope = d.ModuleName
+	}
+	if d.MsgServerScope == "" {
+		d.MsgServerScope = d.ModuleName + ".msg"
+	}
+	if d.QueryServerScope == "" {
+		d.QueryServerScope = d.ModuleName + ".query"
+	}
+	if d.MempoolPolicyID == "" {
+		d.MempoolPolicyID = DefaultMempoolPolicy
+	}
+	if d.FeePolicyID == "" {
+		d.FeePolicyID = NativeFeePolicyID
+	}
+	if d.GasPolicyID == "" {
+		d.GasPolicyID = DefaultGasPolicy
+	}
+	if d.MessagePolicyID == "" {
+		d.MessagePolicyID = DefaultMessagePolicy
+	}
+	if d.RootPrefix == "" && d.ZoneID != "" {
+		d.RootPrefix = fmt.Sprintf("zone/%s", d.ZoneID)
+	}
 	d.MessageCapabilities = append([]string(nil), d.MessageCapabilities...)
 	d.ProofCapabilities = append([]string(nil), d.ProofCapabilities...)
+	d.Capabilities = append([]string(nil), d.Capabilities...)
 	sort.Strings(d.MessageCapabilities)
 	sort.Strings(d.ProofCapabilities)
+	sort.Strings(d.Capabilities)
+	if len(d.Capabilities) == 0 {
+		d.Capabilities = mergeZoneCapabilities(d.MessageCapabilities, d.ProofCapabilities)
+	}
 	return d
 }
 
@@ -850,6 +931,57 @@ func ComputeServiceInterfaceHash(d ServiceInterfaceDescriptor) string {
 	return hashParts(parts...)
 }
 
+func ComputeZoneDescriptorHash(d ZoneDescriptor) string {
+	d = CanonicalZoneDescriptor(d)
+	parts := []string{
+		"aetheris-aek-zone-descriptor-v1",
+		string(d.ZoneID),
+		d.ZoneName,
+		string(d.ZoneType),
+		fmt.Sprint(d.Enabled),
+		fmt.Sprint(d.StateVersion),
+		d.KeeperScope,
+		d.MsgServerScope,
+		d.QueryServerScope,
+		d.GasPolicyID,
+		d.MessagePolicyID,
+		d.RootPrefix,
+		fmt.Sprint(d.UpgradeHeightOptional),
+		d.ModuleName,
+		fmt.Sprint(d.StateMachineVersion),
+		d.MempoolPolicyID,
+		d.FeePolicyID,
+		fmt.Sprint(d.ShardLayoutEpoch),
+		fmt.Sprint(d.MaxShards),
+	}
+	parts = appendStringSliceParts(parts, "capabilities", d.Capabilities)
+	parts = appendStringSliceParts(parts, "message", d.MessageCapabilities)
+	parts = appendStringSliceParts(parts, "proof", d.ProofCapabilities)
+	return hashParts(parts...)
+}
+
+func ComputeZoneDescriptorRoot(descriptors []ZoneDescriptor, params AetherCoreParams) (string, error) {
+	if err := params.Validate(); err != nil {
+		return "", err
+	}
+	ordered := append([]ZoneDescriptor(nil), descriptors...)
+	sortZoneDescriptors(ordered)
+	parts := []string{"aetheris-aek-zone-descriptors-root-v1", fmt.Sprint(len(ordered))}
+	var previous ZoneID
+	for i, descriptor := range ordered {
+		descriptor = CanonicalZoneDescriptor(descriptor)
+		if err := descriptor.Validate(params); err != nil {
+			return "", err
+		}
+		if i > 0 && previous >= descriptor.ZoneID {
+			return "", errors.New("aethercore zone descriptors must be sorted canonically by zone id")
+		}
+		parts = append(parts, ComputeZoneDescriptorHash(descriptor))
+		previous = descriptor.ZoneID
+	}
+	return hashParts(parts...), nil
+}
+
 func ComputeServiceMethodHash(d ServiceMethodDescriptor) string {
 	return hashParts(
 		"aetheris-aek-service-method-v1",
@@ -1028,4 +1160,21 @@ func appendStringSliceParts(parts []string, label string, values []string) []str
 		parts = append(parts, value)
 	}
 	return parts
+}
+
+func mergeZoneCapabilities(left []string, right []string) []string {
+	seen := make(map[string]struct{}, len(left)+len(right))
+	out := make([]string, 0, len(left)+len(right))
+	for _, value := range append(append([]string(nil), left...), right...) {
+		if value == "" {
+			continue
+		}
+		if _, found := seen[value]; found {
+			continue
+		}
+		seen[value] = struct{}{}
+		out = append(out, value)
+	}
+	sort.Strings(out)
+	return out
 }

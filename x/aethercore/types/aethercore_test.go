@@ -135,6 +135,57 @@ func TestServiceByIDReturnsIsolatedDescriptor(t *testing.T) {
 	require.Equal(t, "resolve", descriptor.Interface.Methods[0].MethodID)
 }
 
+func TestZoneDescriptorCoversKernelSpecificationFields(t *testing.T) {
+	descriptor := ZoneDescriptor{
+		ZoneID:                ZoneIDApplication,
+		ZoneName:              "application",
+		ZoneType:              ZoneTypeApplication,
+		Enabled:               true,
+		StateVersion:          2,
+		KeeperScope:           "application.keeper",
+		MsgServerScope:        "application.msg",
+		QueryServerScope:      "application.query",
+		GasPolicyID:           DefaultGasPolicy,
+		MessagePolicyID:       DefaultMessagePolicy,
+		RootPrefix:            "zone/APPLICATION_ZONE",
+		UpgradeHeightOptional: 100,
+		Capabilities:          []string{"receipt", "state", "async-outbox", "async-inbox"},
+		MaxShards:             4,
+	}
+	descriptor = CanonicalZoneDescriptor(descriptor)
+	require.Equal(t, "application", descriptor.ModuleName)
+	require.Equal(t, uint64(2), descriptor.StateMachineVersion)
+	require.Equal(t, []string{"async-inbox", "async-outbox", "receipt", "state"}, descriptor.Capabilities)
+	require.NoError(t, descriptor.Validate(TestnetParams()))
+
+	mutated := descriptor
+	mutated.Capabilities = []string{"state", "receipt", "async-outbox", "async-inbox"}
+	rootA, err := ComputeZoneDescriptorRoot([]ZoneDescriptor{descriptor}, TestnetParams())
+	require.NoError(t, err)
+	rootB, err := ComputeZoneDescriptorRoot([]ZoneDescriptor{mutated}, TestnetParams())
+	require.NoError(t, err)
+	require.Equal(t, rootA, rootB)
+	require.Equal(t, ComputeZoneDescriptorHash(descriptor), ComputeZoneDescriptorHash(mutated))
+}
+
+func TestZoneCommitmentCoversKernelSpecificationFields(t *testing.T) {
+	commitment := testCommitment(t, 21, ZoneIDFinancial)
+	require.Equal(t, uint64(21), commitment.Height)
+	require.Equal(t, ZoneID(ZoneIDFinancial), commitment.ZoneID)
+	require.NotEmpty(t, commitment.StateRoot)
+	require.NotEmpty(t, commitment.InboxRoot)
+	require.NotEmpty(t, commitment.OutboxRoot)
+	require.NotEmpty(t, commitment.ReceiptsRoot)
+	require.NotEmpty(t, commitment.EventsRoot)
+	require.NotEmpty(t, commitment.ParamsHash)
+	require.NotEmpty(t, commitment.ExecutionSummaryHash)
+	require.NoError(t, commitment.ValidateHash())
+
+	mutated := commitment
+	mutated.EventsRoot = testHash("mutated/events")
+	require.ErrorContains(t, mutated.ValidateHash(), "commitment hash mismatch")
+}
+
 func TestRootReplayIdenticalAcrossNodes(t *testing.T) {
 	nodeA := populatedState(t, []ZoneID{ZoneIDFinancial, ZoneIDContract})
 	nodeB := populatedState(t, []ZoneID{ZoneIDContract, ZoneIDFinancial})
