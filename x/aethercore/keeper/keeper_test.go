@@ -78,6 +78,13 @@ func TestBuildProposalScheduleChecksRegisteredZones(t *testing.T) {
 	require.NoError(t, keeper.RegisterZoneDescriptor(keeperZone(types.ZoneIDFinancial, types.ZoneTypeFinancial, "financial")))
 	require.NoError(t, keeper.RegisterZoneDescriptor(keeperZone(types.ZoneIDContract, types.ZoneTypeContract, "contract")))
 
+	_, err := keeper.BuildProposalSchedule(8, []types.ProposalItem{
+		keeperProposalItem(types.ZoneIDFinancial, "1", "financial-b", 2, 8, 1),
+	})
+	require.ErrorContains(t, err, "missing shard layout")
+
+	require.NoError(t, keeper.RegisterShardLayout(keeperLayout(t, types.ZoneIDFinancial, 1, []types.ShardID{"1"})))
+	require.NoError(t, keeper.RegisterShardLayout(keeperLayout(t, types.ZoneIDContract, 1, []types.ShardID{"0"})))
 	schedule, err := keeper.BuildProposalSchedule(8, []types.ProposalItem{
 		keeperProposalItem(types.ZoneIDFinancial, "1", "financial-b", 2, 8, 1),
 		keeperProposalItem(types.ZoneIDContract, "0", "contract-a", 1, 8, 0),
@@ -92,7 +99,7 @@ func TestBuildProposalScheduleChecksRegisteredZones(t *testing.T) {
 	_, err = keeper.BuildProposalSchedule(8, []types.ProposalItem{
 		keeperProposalItem(types.ZoneIDIdentity, "0", "identity-a", 1, 8, 0),
 	})
-	require.ErrorContains(t, err, "unregistered zone")
+	require.ErrorContains(t, err, "not registered")
 }
 
 func TestExportImportRoundTripDeterministic(t *testing.T) {
@@ -166,6 +173,23 @@ func keeperCommitment(t *testing.T, height uint64, zoneID types.ZoneID) types.Zo
 	)
 	require.NoError(t, err)
 	return commitment
+}
+
+func keeperLayout(t *testing.T, zoneID types.ZoneID, epoch uint64, shardIDs []types.ShardID) types.ShardLayout {
+	t.Helper()
+	shards := make([]types.ShardDescriptor, len(shardIDs))
+	for i, shardID := range shardIDs {
+		shards[i] = types.ShardDescriptor{
+			ShardID:          shardID,
+			StatePrefix:      fmt.Sprintf("zone/%s/shard/%s", zoneID, shardID),
+			ActivationHeight: 1,
+			ValidatorSetHash: keeperHash(fmt.Sprintf("%s/%s/validators", zoneID, shardID)),
+			Available:        true,
+		}
+	}
+	layout, err := types.NewShardLayout(zoneID, epoch, 1, keeperHash(fmt.Sprintf("%s/%d/routing-seed", zoneID, epoch)), shards)
+	require.NoError(t, err)
+	return layout
 }
 
 func keeperContributions(height uint64) types.RootContributions {

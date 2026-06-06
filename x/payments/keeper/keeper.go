@@ -8,7 +8,7 @@ import (
 	corestore "cosmossdk.io/core/store"
 
 	"github.com/sovereign-l1/l1/x/internal/prototype"
-	networkingtypes "github.com/sovereign-l1/l1/x/networking/types"
+	paymentstypes "github.com/sovereign-l1/l1/x/payments/types"
 )
 
 var genesisKey = []byte{0x01}
@@ -16,7 +16,7 @@ var genesisKey = []byte{0x01}
 type GenesisState struct {
 	Version uint64
 	Params  prototype.Params
-	State   networkingtypes.NetworkingState
+	State   paymentstypes.PaymentsState
 }
 
 type Keeper struct {
@@ -36,13 +36,13 @@ func DefaultGenesis() GenesisState {
 	return GenesisState{
 		Version: prototype.CurrentGenesisVersion,
 		Params:  prototype.DefaultParams(),
-		State:   networkingtypes.EmptyState(),
+		State:   paymentstypes.EmptyState(),
 	}
 }
 
 func (gs GenesisState) Validate() error {
 	if gs.Version != prototype.CurrentGenesisVersion {
-		return errors.New("networking prototype unsupported genesis version")
+		return errors.New("payments prototype unsupported genesis version")
 	}
 	if err := gs.Params.Validate(); err != nil {
 		return err
@@ -63,7 +63,7 @@ func (k Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
 		return err
 	}
 	if k.storeService == nil {
-		return errors.New("networking prototype persistent store is not configured")
+		return errors.New("payments prototype persistent store is not configured")
 	}
 	bz, err := json.Marshal(cloneGenesis(gs))
 	if err != nil {
@@ -108,11 +108,11 @@ func (k *Keeper) UpdateParams(authority string, params prototype.Params) error {
 	return nil
 }
 
-func (k *Keeper) RegisterNodeRecord(record networkingtypes.NodeRecord, networkSalt []byte, currentHeight uint64) error {
+func (k *Keeper) OpenChannel(channel paymentstypes.ChannelRecord) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err
 	}
-	next, err := networkingtypes.RegisterNodeRecord(k.genesis.State, record, networkSalt, currentHeight)
+	next, err := paymentstypes.OpenChannel(k.genesis.State, channel)
 	if err != nil {
 		return err
 	}
@@ -120,11 +120,11 @@ func (k *Keeper) RegisterNodeRecord(record networkingtypes.NodeRecord, networkSa
 	return nil
 }
 
-func (k *Keeper) OpenSession(session networkingtypes.SessionChannel, currentHeight uint64) error {
+func (k *Keeper) RegisterRoutingEdge(edge paymentstypes.ChannelEdge) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err
 	}
-	next, err := networkingtypes.OpenSession(k.genesis.State, session, currentHeight)
+	next, err := paymentstypes.RegisterRoutingEdge(k.genesis.State, edge)
 	if err != nil {
 		return err
 	}
@@ -132,11 +132,11 @@ func (k *Keeper) OpenSession(session networkingtypes.SessionChannel, currentHeig
 	return nil
 }
 
-func (k *Keeper) RegisterRoleCommitment(commitment networkingtypes.RoleCommitment, currentHeight uint64) error {
+func (k *Keeper) SubmitClose(channelID string, closingState paymentstypes.ChannelState, submitter string, currentHeight uint64, settlementFee string) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err
 	}
-	next, err := networkingtypes.RegisterRoleCommitment(k.genesis.State, commitment, currentHeight)
+	next, err := paymentstypes.SubmitClose(k.genesis.State, channelID, closingState, submitter, currentHeight, settlementFee)
 	if err != nil {
 		return err
 	}
@@ -144,11 +144,11 @@ func (k *Keeper) RegisterRoleCommitment(commitment networkingtypes.RoleCommitmen
 	return nil
 }
 
-func (k *Keeper) PruneExpired(currentHeight uint64) error {
+func (k *Keeper) DisputeClose(channelID string, newerState paymentstypes.ChannelState, submitter string, currentHeight uint64) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err
 	}
-	next, err := networkingtypes.PruneExpired(k.genesis.State, currentHeight)
+	next, err := paymentstypes.DisputeClose(k.genesis.State, channelID, newerState, submitter, currentHeight)
 	if err != nil {
 		return err
 	}
@@ -156,26 +156,78 @@ func (k *Keeper) PruneExpired(currentHeight uint64) error {
 	return nil
 }
 
-func (k Keeper) NodeRecords(req *prototype.PageRequest) ([]networkingtypes.NodeRecord, prototype.PageResponse, error) {
-	records := k.genesis.State.Export().NodeRecords
-	start, end, res, err := prototype.NormalizePage(req, k.genesis.Params, len(records))
+func (k *Keeper) SubmitFraudProof(channelID string, proof paymentstypes.FraudProof, currentHeight uint64) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.SubmitFraudProof(k.genesis.State, channelID, proof, currentHeight)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
+func (k *Keeper) FinalizeSettlement(channelID string, currentHeight uint64) (paymentstypes.SettlementRecord, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	next, settlement, err := paymentstypes.FinalizeSettlement(k.genesis.State, channelID, currentHeight)
+	if err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	k.genesis.State = next
+	return settlement, nil
+}
+
+func (k *Keeper) OpenVirtualChannel(vc paymentstypes.VirtualChannel) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.OpenVirtualChannel(k.genesis.State, vc)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
+func (k *Keeper) AddSettlementBatch(batch paymentstypes.SettlementBatch) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.AddSettlementBatch(k.genesis.State, batch)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
+func (k Keeper) Channels(req *prototype.PageRequest) ([]paymentstypes.ChannelRecord, prototype.PageResponse, error) {
+	channels := k.genesis.State.Export().Channels
+	start, end, res, err := prototype.NormalizePage(req, k.genesis.Params, len(channels))
 	if err != nil {
 		return nil, prototype.PageResponse{}, err
 	}
-	out := make([]networkingtypes.NodeRecord, end-start)
-	copy(out, records[start:end])
+	out := make([]paymentstypes.ChannelRecord, end-start)
+	copy(out, channels[start:end])
 	return out, res, nil
 }
 
-func (k Keeper) Sessions(req *prototype.PageRequest) ([]networkingtypes.SessionChannel, prototype.PageResponse, error) {
-	sessions := k.genesis.State.Export().Sessions
-	start, end, res, err := prototype.NormalizePage(req, k.genesis.Params, len(sessions))
+func (k Keeper) Settlements(req *prototype.PageRequest) ([]paymentstypes.SettlementRecord, prototype.PageResponse, error) {
+	settlements := k.genesis.State.Export().Settlements
+	start, end, res, err := prototype.NormalizePage(req, k.genesis.Params, len(settlements))
 	if err != nil {
 		return nil, prototype.PageResponse{}, err
 	}
-	out := make([]networkingtypes.SessionChannel, end-start)
-	copy(out, sessions[start:end])
+	out := make([]paymentstypes.SettlementRecord, end-start)
+	copy(out, settlements[start:end])
 	return out, res, nil
+}
+
+func (k Keeper) RoutePayment(from, to, amount string, currentHeight uint64, maxHops int) ([]paymentstypes.ChannelEdge, error) {
+	return paymentstypes.RoutePayment(k.genesis.State, from, to, amount, currentHeight, maxHops)
 }
 
 type Migrator struct {

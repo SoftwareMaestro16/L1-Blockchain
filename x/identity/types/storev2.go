@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	IdentityStoreV2Prefix = "identity/v2"
+	IdentityStoreV2Prefix = "zone/identity/v2"
 
 	IdentityStoreV2DomainPrefix          = IdentityStoreV2Prefix + "/domain"
 	IdentityStoreV2ResolverPrefix        = IdentityStoreV2Prefix + "/resolver"
@@ -116,6 +116,14 @@ func IdentityPendingResolverStoreKey(domain string, actor sdk.AccAddress, nonce 
 		return "", err
 	}
 	return fmt.Sprintf("%s/%s/%s/%s/%020d", IdentityStoreV2PendingResolverPrefix, identityStoreShard(normalized), reversedDomainStorePath(normalized), hex.EncodeToString(actor), nonce), nil
+}
+
+func IdentityNameShard(name string) (string, error) {
+	normalized, err := NormalizeAETDomain(name)
+	if err != nil {
+		return "", err
+	}
+	return identityStoreShard(normalized), nil
 }
 
 func IdentityResolutionAccessSet(name string) (IdentityAccessSet, error) {

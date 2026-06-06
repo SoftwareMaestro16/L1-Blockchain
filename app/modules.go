@@ -38,6 +38,7 @@ import (
 	loadmodule "github.com/sovereign-l1/l1/x/load"
 	meshmodule "github.com/sovereign-l1/l1/x/mesh"
 	networkingmodule "github.com/sovereign-l1/l1/x/networking"
+	paymentsmodule "github.com/sovereign-l1/l1/x/payments"
 	routingmodule "github.com/sovereign-l1/l1/x/routing"
 	tokenfactorymodule "github.com/sovereign-l1/l1/x/tokenfactory"
 	zonesmodule "github.com/sovereign-l1/l1/x/zones"
@@ -72,6 +73,7 @@ func (app *L1App) initModules(
 		zonesmodule.NewAppModule(app.ZonesKeeper),
 		meshmodule.NewAppModule(app.MeshKeeper),
 		networkingmodule.NewAppModule(app.NetworkingKeeper),
+		paymentsmodule.NewAppModule(app.PaymentsKeeper),
 		tokenfactorymodule.NewAppModule(appCodec, app.TokenFactoryKeeper),
 		dexmodule.NewAppModule(appCodec, app.DexKeeper),
 		feesmodule.NewAppModule(appCodec, app.FeesKeeper),

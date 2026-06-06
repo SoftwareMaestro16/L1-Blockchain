@@ -23,6 +23,8 @@ import (
 	meshtypes "github.com/sovereign-l1/l1/x/mesh/types"
 	networkingkeeper "github.com/sovereign-l1/l1/x/networking/keeper"
 	networkingtypes "github.com/sovereign-l1/l1/x/networking/types"
+	paymentskeeper "github.com/sovereign-l1/l1/x/payments/keeper"
+	paymentstypes "github.com/sovereign-l1/l1/x/payments/types"
 	routingkeeper "github.com/sovereign-l1/l1/x/routing/keeper"
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
 	zoneskeeper "github.com/sovereign-l1/l1/x/zones/keeper"
@@ -78,6 +80,11 @@ func TestAetherCoreWiringGateRegistersPrototypeModulesDisabled(t *testing.T) {
 	require.NotEmpty(t, networkingGenesis.State.ChannelPolicies)
 	require.Empty(t, networkingGenesis.State.NodeRecords)
 	require.Empty(t, networkingGenesis.State.Sessions)
+
+	paymentsGenesis := decodeJSONGenesis[paymentskeeper.GenesisState](t, genesis[paymentstypes.ModuleName])
+	require.False(t, paymentsGenesis.Params.Enabled)
+	require.Empty(t, paymentsGenesis.State.Channels)
+	require.Empty(t, paymentsGenesis.State.Settlements)
 }
 
 func TestFeatureDisabledMainnetProfileHasNoActiveProductionShardingBehavior(t *testing.T) {
@@ -92,6 +99,8 @@ func TestFeatureDisabledMainnetProfileHasNoActiveProductionShardingBehavior(t *t
 	err = app.MeshKeeper.RegisterDestination(meshtypes.MeshDestination{})
 	require.ErrorContains(t, err, "disabled")
 	err = app.NetworkingKeeper.RegisterNodeRecord(networkingtypes.NodeRecord{}, nil, 1)
+	require.ErrorContains(t, err, "disabled")
+	err = app.PaymentsKeeper.OpenChannel(paymentstypes.ChannelRecord{})
 	require.ErrorContains(t, err, "disabled")
 	err = app.AetherCoreKeeper.RegisterZoneDescriptor(aethercoretypes.ZoneDescriptor{})
 	require.ErrorContains(t, err, "disabled")
@@ -130,6 +139,8 @@ func TestAetherCorePrototypeStateSurvivesRestartWhenDisabled(t *testing.T) {
 	require.NoError(t, err)
 	sourceNetworking, err := source.NetworkingKeeper.ExportGenesisState(sourceCtx)
 	require.NoError(t, err)
+	sourcePayments, err := source.PaymentsKeeper.ExportGenesisState(sourceCtx)
+	require.NoError(t, err)
 	sourceAetherCore, err := source.AetherCoreKeeper.ExportGenesisState(sourceCtx)
 	require.NoError(t, err)
 
@@ -145,6 +156,8 @@ func TestAetherCorePrototypeStateSurvivesRestartWhenDisabled(t *testing.T) {
 	require.NoError(t, err)
 	restartedNetworking, err := restarted.NetworkingKeeper.ExportGenesisState(restartedCtx)
 	require.NoError(t, err)
+	restartedPayments, err := restarted.PaymentsKeeper.ExportGenesisState(restartedCtx)
+	require.NoError(t, err)
 	restartedAetherCore, err := restarted.AetherCoreKeeper.ExportGenesisState(restartedCtx)
 	require.NoError(t, err)
 
@@ -154,6 +167,7 @@ func TestAetherCorePrototypeStateSurvivesRestartWhenDisabled(t *testing.T) {
 	require.Equal(t, sourceZones, restartedZones)
 	require.Equal(t, sourceMesh, restartedMesh)
 	require.Equal(t, sourceNetworking, restartedNetworking)
+	require.Equal(t, sourcePayments, restartedPayments)
 }
 
 func decodeJSONGenesis[T any](t *testing.T, raw json.RawMessage) T {

@@ -14,15 +14,15 @@ const (
 	ExecutionModeSync  ExecutionMode = "SYNC"
 	ExecutionModeAsync ExecutionMode = "ASYNC"
 
-	DeliveryStatusClassified       DeliveryStatus = "CLASSIFIED"
-	DeliveryStatusPrepared         DeliveryStatus = "PREPARED"
-	DeliveryStatusExecuted         DeliveryStatus = "EXECUTED"
-	DeliveryStatusRootCommitted    DeliveryStatus = "ROOT_COMMITTED"
+	DeliveryStatusClassified        DeliveryStatus = "CLASSIFIED"
+	DeliveryStatusPrepared          DeliveryStatus = "PREPARED"
+	DeliveryStatusExecuted          DeliveryStatus = "EXECUTED"
+	DeliveryStatusRootCommitted     DeliveryStatus = "ROOT_COMMITTED"
 	DeliveryStatusNextBlockEligible DeliveryStatus = "NEXT_BLOCK_ELIGIBLE"
-	DeliveryStatusDelivered        DeliveryStatus = "DELIVERED"
-	DeliveryStatusBounced          DeliveryStatus = "BOUNCED"
-	DeliveryStatusRefunded         DeliveryStatus = "REFUNDED"
-	DeliveryStatusFailed           DeliveryStatus = "FAILED"
+	DeliveryStatusDelivered         DeliveryStatus = "DELIVERED"
+	DeliveryStatusBounced           DeliveryStatus = "BOUNCED"
+	DeliveryStatusRefunded          DeliveryStatus = "REFUNDED"
+	DeliveryStatusFailed            DeliveryStatus = "FAILED"
 
 	ReceiptStatusSuccess         ReceiptStatus = "SUCCESS"
 	ReceiptStatusBounced         ReceiptStatus = "BOUNCED"
@@ -86,13 +86,13 @@ type ExecutionReceipt struct {
 }
 
 type CrossZoneDelivery struct {
-	TxHash              string
-	SourceZone          ZoneID
-	SourceShard         ShardID
-	DestinationZone     ZoneID
-	DestinationShard    ShardID
-	CommittedHeight     uint64
-	EligibleHeight      uint64
+	TxHash               string
+	SourceZone           ZoneID
+	SourceShard          ShardID
+	DestinationZone      ZoneID
+	DestinationShard     ShardID
+	CommittedHeight      uint64
+	EligibleHeight       uint64
 	SourceCommitmentHash string
 	MessageRoot          string
 	DeliveryItem         ProposalItem
@@ -110,6 +110,9 @@ func ClassifyTransaction(state CoreState, input ClassificationInput) (Classified
 	}
 	if input.AdmissionHeight == 0 {
 		input.AdmissionHeight = input.Height
+	}
+	if input.AdmissionHeight > input.Height {
+		return ClassifiedTransaction{}, errors.New("aethercore admission height must not exceed classification height")
 	}
 	if err := validateZoneAndShard(state, input.SourceZone, input.SourceShard, input.Height); err != nil {
 		return ClassifiedTransaction{}, err
@@ -150,14 +153,14 @@ func ExecuteSync(classified ClassifiedTransaction, result ExecutionResult, heigh
 	if classified.ExecutionMode != ExecutionModeSync {
 		return ExecutionReceipt{}, errors.New("aethercore sync execution requires same-zone classification")
 	}
-	return buildExecutionReceipt(classified, result, height, sequence, FailureReasonExecutionFailed)
+	return buildExecutionReceipt(classified, result, height, sequence, FailureReasonExecutionFailed, false)
 }
 
 func ExecuteAsyncLocal(classified ClassifiedTransaction, result ExecutionResult, height uint64, sequence uint64) (ExecutionReceipt, error) {
 	if classified.ExecutionMode != ExecutionModeAsync {
 		return ExecutionReceipt{}, errors.New("aethercore async local execution requires cross-zone classification")
 	}
-	return buildExecutionReceipt(classified, result, height, sequence, FailureReasonExecutionFailed)
+	return buildExecutionReceipt(classified, result, height, sequence, FailureReasonExecutionFailed, true)
 }
 
 func MarkCrossZoneEligible(state CoreState, classified ClassifiedTransaction, committedHeight uint64) (CrossZoneDelivery, error) {
@@ -182,13 +185,13 @@ func MarkCrossZoneEligible(state CoreState, classified ClassifiedTransaction, co
 		delay = 1
 	}
 	delivery := CrossZoneDelivery{
-		TxHash:              classified.TxHash,
-		SourceZone:          classified.SourceZone,
-		SourceShard:         classified.SourceShard,
-		DestinationZone:     classified.DestinationZone,
-		DestinationShard:    classified.DestinationShard,
-		CommittedHeight:     committedHeight,
-		EligibleHeight:      committedHeight + delay,
+		TxHash:               classified.TxHash,
+		SourceZone:           classified.SourceZone,
+		SourceShard:          classified.SourceShard,
+		DestinationZone:      classified.DestinationZone,
+		DestinationShard:     classified.DestinationShard,
+		CommittedHeight:      committedHeight,
+		EligibleHeight:       committedHeight + delay,
 		SourceCommitmentHash: commitment.CommitmentHash,
 		MessageRoot:          commitment.OutboxRoot,
 		DeliveryItem: ProposalItem{
@@ -200,7 +203,7 @@ func MarkCrossZoneEligible(state CoreState, classified ClassifiedTransaction, co
 			TxIndex:         classified.ProposalItem.TxIndex,
 			MessageIndex:    classified.ProposalItem.MessageIndex,
 		},
-		Status:               DeliveryStatusNextBlockEligible,
+		Status: DeliveryStatusNextBlockEligible,
 	}
 	return delivery, delivery.Validate()
 }
@@ -222,7 +225,7 @@ func DeliverCrossZone(delivery CrossZoneDelivery, result ExecutionResult, height
 		ExecutionMode:    ExecutionModeAsync,
 		DeliveryStatus:   DeliveryStatusNextBlockEligible,
 	}
-	receipt, err := buildExecutionReceipt(classified, result, height, sequence, FailureReasonExecutionFailed)
+	receipt, err := buildExecutionReceipt(classified, result, height, sequence, FailureReasonExecutionFailed, false)
 	if err != nil {
 		return CrossZoneDelivery{}, err
 	}
@@ -266,7 +269,7 @@ func FailCrossZoneDelivery(delivery CrossZoneDelivery, reason FailureReason, hei
 		DestinationShard: delivery.DestinationShard,
 		ExecutionMode:    ExecutionModeAsync,
 	}
-	receipt, err := buildExecutionReceiptWithReason(classified, result, height, sequence, reason)
+	receipt, err := buildExecutionReceiptWithReason(classified, result, height, sequence, reason, false)
 	if err != nil {
 		return CrossZoneDelivery{}, err
 	}
@@ -309,12 +312,18 @@ func (c ClassifiedTransaction) Validate() error {
 	if c.ExecutionMode == ExecutionModeAsync && c.SourceZone == c.DestinationZone {
 		return errors.New("aethercore async execution requires cross-zone delivery")
 	}
+	if c.DeliveryStatus != "" && !IsDeliveryStatus(c.DeliveryStatus) {
+		return fmt.Errorf("unknown aethercore classified delivery status %q", c.DeliveryStatus)
+	}
 	if c.ProposalItem.TxHash != "" {
 		if c.ProposalItem.TxHash != c.TxHash {
 			return errors.New("aethercore classified proposal item tx hash mismatch")
 		}
 		if c.ProposalItem.ZoneID != c.SourceZone || c.ProposalItem.ShardID != c.SourceShard {
 			return errors.New("aethercore classified proposal item route mismatch")
+		}
+		if c.ProposalItem.AdmissionHeight == 0 || c.ProposalItem.AdmissionHeight > c.Height {
+			return errors.New("aethercore classified proposal item admission height is invalid")
 		}
 		return c.ProposalItem.Validate()
 	}
@@ -346,6 +355,9 @@ func (r ExecutionReceipt) Validate() error {
 	}
 	if r.Status == ReceiptStatusSuccess && r.Reason != FailureReasonNone {
 		return errors.New("aethercore success receipt must not include failure reason")
+	}
+	if r.Status != ReceiptStatusSuccess && r.Reason == FailureReasonNone {
+		return errors.New("aethercore failed receipt requires failure reason")
 	}
 	if r.Status != ReceiptStatusSuccess && !IsFailureReason(r.Reason) {
 		return fmt.Errorf("unknown aethercore receipt failure reason %q", r.Reason)
@@ -403,6 +415,9 @@ func (d CrossZoneDelivery) Validate() error {
 		if d.DeliveryItem.ZoneID != d.DestinationZone || d.DeliveryItem.ShardID != d.DestinationShard {
 			return errors.New("aethercore cross-zone delivery item route mismatch")
 		}
+		if d.DeliveryItem.AdmissionHeight != d.EligibleHeight {
+			return errors.New("aethercore cross-zone delivery item admission height must match eligible height")
+		}
 		if err := d.DeliveryItem.Validate(); err != nil {
 			return err
 		}
@@ -414,10 +429,78 @@ func (d CrossZoneDelivery) Validate() error {
 		if err := d.Receipt.Validate(); err != nil {
 			return err
 		}
+		if err := d.validateDeliveryReceiptRoute(); err != nil {
+			return err
+		}
 	}
 	if d.BounceReceipt.ReceiptHash != "" {
 		if err := d.BounceReceipt.Validate(); err != nil {
 			return err
+		}
+		if err := d.validateBounceReceiptRoute(); err != nil {
+			return err
+		}
+	}
+	return d.validateDeliveryLifecycle()
+}
+
+func (d CrossZoneDelivery) validateDeliveryReceiptRoute() error {
+	if d.Receipt.TxHash != d.TxHash {
+		return errors.New("aethercore cross-zone receipt tx hash mismatch")
+	}
+	if d.Receipt.SourceZone != d.SourceZone || d.Receipt.SourceShard != d.SourceShard {
+		return errors.New("aethercore cross-zone receipt source route mismatch")
+	}
+	if d.Receipt.DestinationZone != d.DestinationZone || d.Receipt.DestinationShard != d.DestinationShard {
+		return errors.New("aethercore cross-zone receipt destination route mismatch")
+	}
+	if d.Receipt.ExecutionMode != ExecutionModeAsync {
+		return errors.New("aethercore cross-zone receipt must be async")
+	}
+	return nil
+}
+
+func (d CrossZoneDelivery) validateBounceReceiptRoute() error {
+	if d.BounceReceipt.SourceZone != d.DestinationZone || d.BounceReceipt.SourceShard != d.DestinationShard {
+		return errors.New("aethercore cross-zone bounce source route mismatch")
+	}
+	if d.BounceReceipt.DestinationZone != d.SourceZone || d.BounceReceipt.DestinationShard != d.SourceShard {
+		return errors.New("aethercore cross-zone bounce destination route mismatch")
+	}
+	if d.BounceReceipt.ExecutionMode != ExecutionModeAsync {
+		return errors.New("aethercore cross-zone bounce receipt must be async")
+	}
+	return nil
+}
+
+func (d CrossZoneDelivery) validateDeliveryLifecycle() error {
+	hasReceipt := d.Receipt.ReceiptHash != ""
+	hasBounce := d.BounceReceipt.ReceiptHash != ""
+	switch d.Status {
+	case DeliveryStatusNextBlockEligible:
+		if hasReceipt || hasBounce {
+			return errors.New("aethercore eligible delivery must not include execution receipts")
+		}
+	case DeliveryStatusDelivered:
+		if !hasReceipt || d.Receipt.Status != ReceiptStatusSuccess {
+			return errors.New("aethercore delivered cross-zone message requires success receipt")
+		}
+		if hasBounce {
+			return errors.New("aethercore delivered cross-zone message must not include bounce receipt")
+		}
+	case DeliveryStatusRefunded:
+		if !hasReceipt || d.Receipt.Status != ReceiptStatusRefunded {
+			return errors.New("aethercore refunded cross-zone message requires refund receipt")
+		}
+		if !hasBounce || d.BounceReceipt.Status != ReceiptStatusBounced {
+			return errors.New("aethercore refunded cross-zone message requires bounce receipt")
+		}
+	case DeliveryStatusBounced:
+		if !hasReceipt || d.Receipt.Status != ReceiptStatusBounced {
+			return errors.New("aethercore bounced cross-zone message requires bounced receipt")
+		}
+		if !hasBounce || d.BounceReceipt.Status != ReceiptStatusBounced {
+			return errors.New("aethercore bounced cross-zone message requires bounce receipt")
 		}
 	}
 	return nil
@@ -491,14 +574,14 @@ func validateZoneAndShard(state CoreState, zoneID ZoneID, shardID ShardID, heigh
 	return nil
 }
 
-func buildExecutionReceipt(classified ClassifiedTransaction, result ExecutionResult, height uint64, sequence uint64, failureReason FailureReason) (ExecutionReceipt, error) {
+func buildExecutionReceipt(classified ClassifiedTransaction, result ExecutionResult, height uint64, sequence uint64, failureReason FailureReason, terminalAsyncFailure bool) (ExecutionReceipt, error) {
 	if !result.Success && failureReason == FailureReasonNone {
 		return ExecutionReceipt{}, errors.New("aethercore failed execution requires failure reason")
 	}
-	return buildExecutionReceiptWithReason(classified, result, height, sequence, failureReason)
+	return buildExecutionReceiptWithReason(classified, result, height, sequence, failureReason, terminalAsyncFailure)
 }
 
-func buildExecutionReceiptWithReason(classified ClassifiedTransaction, result ExecutionResult, height uint64, sequence uint64, failureReason FailureReason) (ExecutionReceipt, error) {
+func buildExecutionReceiptWithReason(classified ClassifiedTransaction, result ExecutionResult, height uint64, sequence uint64, failureReason FailureReason, terminalAsyncFailure bool) (ExecutionReceipt, error) {
 	if height == 0 {
 		return ExecutionReceipt{}, errors.New("aethercore receipt height must be positive")
 	}
@@ -512,7 +595,7 @@ func buildExecutionReceiptWithReason(classified ClassifiedTransaction, result Ex
 	reason := FailureReasonNone
 	if !result.Success {
 		reason = failureReason
-		if classified.ExecutionMode == ExecutionModeSync {
+		if classified.ExecutionMode == ExecutionModeSync || terminalAsyncFailure {
 			status = ReceiptStatusTerminalFailure
 		} else if reason == FailureReasonExecutionFailed {
 			status = ReceiptStatusRefunded

@@ -196,14 +196,8 @@ func (k Keeper) BuildProposalSchedule(height uint64, items []types.ProposalItem)
 	if err != nil {
 		return types.ProposalSchedule{}, err
 	}
-	for _, group := range schedule.Groups {
-		zone, found := k.genesis.State.ZoneDescriptorByID(group.ZoneID)
-		if !found {
-			return types.ProposalSchedule{}, errors.New("aethercore proposal references unregistered zone")
-		}
-		if !zone.Enabled {
-			return types.ProposalSchedule{}, errors.New("aethercore proposal references disabled zone")
-		}
+	if err := types.ValidateProposalScheduleForState(schedule, k.genesis.State); err != nil {
+		return types.ProposalSchedule{}, err
 	}
 	return schedule, nil
 }

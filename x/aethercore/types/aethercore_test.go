@@ -49,6 +49,92 @@ func TestRegisterZonesAndAggregateGlobalRoot(t *testing.T) {
 	require.NoError(t, state.Validate())
 }
 
+func TestServiceDescriptorsCoverRuntimeModels(t *testing.T) {
+	state := EmptyState()
+	var err error
+	for _, zone := range []ZoneDescriptor{
+		testDescriptor(ZoneIDIdentity, ZoneTypeIdentity, "identity"),
+		testDescriptor(ZoneIDApplication, ZoneTypeApplication, "application"),
+	} {
+		state, err = RegisterZoneDescriptor(state, zone)
+		require.NoError(t, err)
+	}
+
+	for _, service := range []ServiceDescriptor{
+		testService("identity-resolver", ZoneIDIdentity),
+		testOffChainService("indexer-feed", ZoneIDApplication),
+		testMixedService("hybrid-storage", ZoneIDApplication),
+		testFogMarketService("fog-compute", ZoneIDApplication),
+	} {
+		state, err = RegisterServiceDescriptor(state, service)
+		require.NoError(t, err)
+	}
+
+	require.Len(t, state.ServiceDescriptors, 4)
+	require.NoError(t, state.Validate())
+	root, err := ComputeServiceRoot(state.ServiceDescriptors)
+	require.NoError(t, err)
+	require.NoError(t, ValidateHash("test service root", root))
+}
+
+func TestServiceDescriptorRejectsInterfaceHashMismatch(t *testing.T) {
+	state := EmptyState()
+	var err error
+	state, err = RegisterZoneDescriptor(state, testDescriptor(ZoneIDIdentity, ZoneTypeIdentity, "identity"))
+	require.NoError(t, err)
+
+	service := testService("identity-resolver", ZoneIDIdentity)
+	service.Interface.Methods[0].InputSchemaHash = testHash("mutated-input-schema")
+	_, err = RegisterServiceDescriptor(state, service)
+	require.ErrorContains(t, err, "interface hash mismatch")
+}
+
+func TestServiceDescriptorRejectsUnsafeOffChainService(t *testing.T) {
+	state := EmptyState()
+	var err error
+	state, err = RegisterZoneDescriptor(state, testDescriptor(ZoneIDApplication, ZoneTypeApplication, "application"))
+	require.NoError(t, err)
+
+	service := testOffChainService("unsafe-indexer", ZoneIDApplication)
+	service.Verification = ServiceVerificationDescriptor{
+		TrustModel: ServiceTrustFullyTrusted,
+		Model:      ServiceVerificationAdvisory,
+	}
+	_, err = RegisterServiceDescriptor(state, service)
+	require.ErrorContains(t, err, "signed, proof-backed, or economically constrained")
+}
+
+func TestServiceDescriptorRejectsMixedServiceWithoutChallengeOrFallback(t *testing.T) {
+	state := EmptyState()
+	var err error
+	state, err = RegisterZoneDescriptor(state, testDescriptor(ZoneIDApplication, ZoneTypeApplication, "application"))
+	require.NoError(t, err)
+
+	service := testMixedService("hybrid-storage", ZoneIDApplication)
+	service.Execution.ChallengeWindow = 0
+	service.Verification.ChallengeWindow = 0
+	service.Verification.FallbackServiceID = ""
+	_, err = RegisterServiceDescriptor(state, service)
+	require.ErrorContains(t, err, "challenge window")
+}
+
+func TestServiceByIDReturnsIsolatedDescriptor(t *testing.T) {
+	state := EmptyState()
+	var err error
+	state, err = RegisterZoneDescriptor(state, testDescriptor(ZoneIDIdentity, ZoneTypeIdentity, "identity"))
+	require.NoError(t, err)
+	state, err = RegisterServiceDescriptor(state, testService("identity-resolver", ZoneIDIdentity))
+	require.NoError(t, err)
+
+	descriptor, found := state.ServiceByID("identity-resolver")
+	require.True(t, found)
+	descriptor.Interface.Methods[0].MethodID = "mutated"
+
+	descriptor, found = state.ServiceByID("identity-resolver")
+	require.True(t, found)
+	require.Equal(t, "resolve", descriptor.Interface.Methods[0].MethodID)
+}
+
 func TestRootReplayIdenticalAcrossNodes(t *testing.T) {
 	nodeA := populatedState(t, []ZoneID{ZoneIDFinancial, ZoneIDContract})
 	nodeB := populatedState(t, []ZoneID{ZoneIDContract, ZoneIDFinancial})
@@ -273,14 +359,250 @@ func testDescriptor(id ZoneID, zoneType ZoneType, moduleName string) ZoneDescrip
 }
 
 func testService(serviceID string, zoneID ZoneID) ServiceDescriptor {
+	interfaceID := "l1.identity.v1.Query"
 	return ServiceDescriptor{
 		ServiceID:        serviceID,
+		Owner:            DefaultAuthority,
+		ServiceType:      ServiceTypeOnChain,
 		ZoneID:           zoneID,
-		InterfaceID:      "l1.identity.v1.Query",
+		InterfaceID:      interfaceID,
 		EndpointKey:      "identity.query",
 		Version:          1,
 		AvailabilityHash: testHash(serviceID + "/availability"),
 		Enabled:          true,
+		Status:           ServiceStatusActive,
+		ExpiryHeight:     100,
+		CreatedHeight:    1,
+		UpdatedHeight:    1,
+		Interface: testServiceInterface(interfaceID, []ServiceMethodDescriptor{
+			testServiceMethod("resolve", ServiceMethodSync, ServiceVerificationConsensusReceipt, DefaultGasPolicy, ServiceFailureRevert),
+		}),
+		Execution: ServiceExecutionDescriptor{
+			Location:        ServiceLocationModule,
+			Target:          "identity.query",
+			ModuleRoute:     "identity",
+			Mode:            ExecutionModeSync,
+			Deterministic:   true,
+			FailureBehavior: ServiceFailureRevert,
+		},
+		Discovery: ServiceDiscoveryDescriptor{
+			ServiceName:       serviceID,
+			IdentityName:      "identity.aet",
+			MetadataHash:      testHash(serviceID + "/metadata"),
+			CacheExpiryHeight: 90,
+			SignaturePolicy:   "owner-signature-v1",
+		},
+		Payment: ServicePaymentDescriptor{
+			SettlementMode: ServicePaymentOnChain,
+			Denom:          NativeFeePolicyID,
+			Amount:         "0",
+			PricingUnit:    ServicePricingPerCall,
+		},
+		Storage: ServiceStorageDescriptor{
+			Model:         ServiceStorageOnChain,
+			StateRootType: StateProofRootType,
+			ProofRequired: true,
+		},
+		Verification: ServiceVerificationDescriptor{
+			TrustModel: ServiceTrustConsensusExecuted,
+			Model:      ServiceVerificationConsensusReceipt,
+		},
+	}
+}
+
+func testOffChainService(serviceID string, zoneID ZoneID) ServiceDescriptor {
+	interfaceID := "l1.indexer.v1.Query"
+	return ServiceDescriptor{
+		ServiceID:        serviceID,
+		Owner:            DefaultAuthority,
+		ServiceType:      ServiceTypeOffChain,
+		ZoneID:           zoneID,
+		InterfaceID:      interfaceID,
+		EndpointKey:      "indexer.query",
+		Version:          1,
+		AvailabilityHash: testHash(serviceID + "/availability"),
+		Enabled:          true,
+		Status:           ServiceStatusActive,
+		ExpiryHeight:     120,
+		CreatedHeight:    1,
+		UpdatedHeight:    1,
+		Interface: testServiceInterface(interfaceID, []ServiceMethodDescriptor{
+			testServiceMethod("query", ServiceMethodAsync, ServiceVerificationSignedResult, "", ServiceFailureRetry),
+		}),
+		Execution: ServiceExecutionDescriptor{
+			Location:        ServiceLocationExternal,
+			Target:          "indexer.query",
+			Endpoint:        "https://indexer.aetheris.local/v1",
+			Mode:            ExecutionModeAsync,
+			FailureBehavior: ServiceFailureRetry,
+			ResultExpiry:    30,
+		},
+		Discovery: ServiceDiscoveryDescriptor{
+			ServiceName:       serviceID,
+			MetadataHash:      testHash(serviceID + "/metadata"),
+			CacheExpiryHeight: 100,
+			SignaturePolicy:   "provider-signature-v1",
+		},
+		Payment: ServicePaymentDescriptor{
+			SettlementMode: ServicePaymentPrepaid,
+			Denom:          NativeFeePolicyID,
+			Amount:         "1",
+			PricingUnit:    ServicePricingPerCall,
+		},
+		Storage: ServiceStorageDescriptor{
+			Model: ServiceStorageDistributedOffChain,
+		},
+		Verification: ServiceVerificationDescriptor{
+			TrustModel:              ServiceTrustFullyTrusted,
+			Model:                   ServiceVerificationSignedResult,
+			RequestSigningRequired:  true,
+			ResponseSigningRequired: true,
+		},
+	}
+}
+
+func testMixedService(serviceID string, zoneID ZoneID) ServiceDescriptor {
+	interfaceID := "l1.storage.v1.Mixed"
+	return ServiceDescriptor{
+		ServiceID:        serviceID,
+		Owner:            DefaultAuthority,
+		ServiceType:      ServiceTypeMixed,
+		ZoneID:           zoneID,
+		InterfaceID:      interfaceID,
+		EndpointKey:      "storage.hybrid",
+		Version:          1,
+		AvailabilityHash: testHash(serviceID + "/availability"),
+		Enabled:          true,
+		Status:           ServiceStatusActive,
+		ExpiryHeight:     180,
+		CreatedHeight:    1,
+		UpdatedHeight:    1,
+		Interface: testServiceInterface(interfaceID, []ServiceMethodDescriptor{
+			testServiceMethod("put", ServiceMethodAsync, ServiceVerificationChallengeWindow, "", ServiceFailureChallenge),
+		}),
+		Execution: ServiceExecutionDescriptor{
+			Location:        ServiceLocationHybrid,
+			Target:          "storage.hybrid",
+			Endpoint:        "https://storage.aetheris.local/v1",
+			Mode:            ExecutionModeAsync,
+			FailureBehavior: ServiceFailureChallenge,
+			ResultExpiry:    40,
+			ChallengeWindow: 20,
+		},
+		Discovery: ServiceDiscoveryDescriptor{
+			ServiceName:       serviceID,
+			MetadataHash:      testHash(serviceID + "/metadata"),
+			CacheExpiryHeight: 150,
+			SignaturePolicy:   "owner-and-provider-signature-v1",
+		},
+		Payment: ServicePaymentDescriptor{
+			SettlementMode: ServicePaymentEscrow,
+			Denom:          NativeFeePolicyID,
+			Amount:         "5",
+			PricingUnit:    ServicePricingPerByte,
+			EscrowRequired: true,
+			EscrowID:       "storage-escrow",
+		},
+		Storage: ServiceStorageDescriptor{
+			Model:          ServiceStorageHybridCommitment,
+			CommitmentHash: testHash(serviceID + "/storage-commitment"),
+			ProofRequired:  true,
+		},
+		Verification: ServiceVerificationDescriptor{
+			TrustModel:      ServiceTrustHybridChallengeable,
+			Model:           ServiceVerificationChallengeWindow,
+			ChallengeWindow: 20,
+			FaultPolicy:     ServiceFailureChallenge,
+		},
+	}
+}
+
+func testFogMarketService(serviceID string, zoneID ZoneID) ServiceDescriptor {
+	interfaceID := "l1.fog.v1.Compute"
+	return ServiceDescriptor{
+		ServiceID:        serviceID,
+		Owner:            DefaultAuthority,
+		ServiceType:      ServiceTypeFogMarket,
+		ZoneID:           zoneID,
+		InterfaceID:      interfaceID,
+		EndpointKey:      "fog.compute",
+		Version:          1,
+		AvailabilityHash: testHash(serviceID + "/availability"),
+		Enabled:          true,
+		Status:           ServiceStatusActive,
+		ExpiryHeight:     200,
+		CreatedHeight:    1,
+		UpdatedHeight:    1,
+		Interface: testServiceInterface(interfaceID, []ServiceMethodDescriptor{
+			testServiceMethod("run", ServiceMethodAsync, ServiceVerificationEconomicCollateral, "", ServiceFailureSlashProvider),
+		}),
+		Execution: ServiceExecutionDescriptor{
+			Location:        ServiceLocationProviderPool,
+			Target:          "fog.compute",
+			ProviderPoolID:  "compute-pool",
+			Mode:            ExecutionModeAsync,
+			FailureBehavior: ServiceFailureSlashProvider,
+			ResultExpiry:    25,
+		},
+		Discovery: ServiceDiscoveryDescriptor{
+			ServiceName:       serviceID,
+			ProviderRoot:      testHash(serviceID + "/providers"),
+			MetadataHash:      testHash(serviceID + "/metadata"),
+			CacheExpiryHeight: 180,
+			SignaturePolicy:   "provider-set-signature-v1",
+		},
+		Payment: ServicePaymentDescriptor{
+			SettlementMode: ServicePaymentMetered,
+			Denom:          NativeFeePolicyID,
+			Amount:         "2",
+			PricingUnit:    ServicePricingPerComputeUnit,
+			MeterID:        "compute-meter",
+		},
+		Storage: ServiceStorageDescriptor{
+			Model: ServiceStorageEphemeral,
+		},
+		Verification: ServiceVerificationDescriptor{
+			TrustModel:               ServiceTrustEconomicallySecured,
+			Model:                    ServiceVerificationEconomicCollateral,
+			ProviderCollateralDenom:  NativeFeePolicyID,
+			ProviderCollateralAmount: "100",
+			FaultPolicy:              ServiceFailureSlashProvider,
+		},
+	}
+}
+
+func testServiceInterface(interfaceID string, methods []ServiceMethodDescriptor) ServiceInterfaceDescriptor {
+	descriptor := ServiceInterfaceDescriptor{
+		InterfaceID:    interfaceID,
+		InterfaceName:  interfaceID,
+		Version:        1,
+		SchemaEncoding: "json-schema-v1",
+		Methods:        methods,
+		Events:         []string{"service.receipt"},
+		Errors:         []string{"service.error"},
+		AuthModel:      "aetheris-account",
+		PaymentModel:   "naet-fixed",
+		MetadataHash:   testHash(interfaceID + "/metadata"),
+		CreatedHeight:  1,
+	}
+	descriptor = CanonicalServiceInterfaceDescriptor(descriptor)
+	descriptor.InterfaceHash = ComputeServiceInterfaceHash(descriptor)
+	return descriptor
+}
+
+func testServiceMethod(methodID string, executionType ServiceMethodExecutionType, verificationModel ServiceVerificationModel, gasModel string, failureBehavior ServiceFailureBehavior) ServiceMethodDescriptor {
+	return ServiceMethodDescriptor{
+		MethodID:             methodID,
+		Name:                 methodID,
+		InputSchemaHash:      testHash(methodID + "/input"),
+		OutputSchemaHash:     testHash(methodID + "/output"),
+		ExecutionType:        executionType,
+		RequiredPaymentModel: "naet-fixed",
+		GasModel:             gasModel,
+		VerificationModel:    verificationModel,
+		TimeoutHeightDelta:   10,
+		IdempotencyRequired:  true,
+		FailureBehavior:      failureBehavior,
 	}
 }
 

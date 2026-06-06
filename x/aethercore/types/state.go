@@ -91,6 +91,7 @@ func RegisterServiceDescriptor(state CoreState, descriptor ServiceDescriptor) (C
 	if err := state.Validate(); err != nil {
 		return CoreState{}, err
 	}
+	descriptor = CanonicalServiceDescriptor(descriptor)
 	if err := descriptor.Validate(); err != nil {
 		return CoreState{}, err
 	}
@@ -343,6 +344,7 @@ func (s CoreState) Export() CoreState {
 	out := s.Clone()
 	sortZoneDescriptors(out.Zones)
 	out.ZoneDescriptors = append([]ZoneDescriptor(nil), out.Zones...)
+	out.ServiceDescriptors = cloneServiceDescriptors(out.ServiceDescriptors)
 	sortServiceDescriptors(out.ServiceDescriptors)
 	sortShardLayouts(out.ShardLayouts)
 	sortRoutingTables(out.RoutingTables)
@@ -359,7 +361,7 @@ func (s CoreState) Clone() CoreState {
 		Params:             s.Params,
 		Zones:              make([]ZoneDescriptor, len(zones)),
 		ZoneDescriptors:    make([]ZoneDescriptor, len(zones)),
-		ServiceDescriptors: append([]ServiceDescriptor(nil), s.ServiceDescriptors...),
+		ServiceDescriptors: cloneServiceDescriptors(s.ServiceDescriptors),
 		ShardLayouts:       cloneShardLayouts(s.ShardLayouts),
 		RoutingTables:      cloneRoutingTables(s.RoutingTables),
 		ZoneCommitments:    append([]ZoneCommitment(nil), s.ZoneCommitments...),
@@ -513,7 +515,7 @@ func (s CoreState) ShardLayoutProofRootsAtHeight(height uint64) []ProofRoot {
 func (s CoreState) ServiceByID(id string) (ServiceDescriptor, bool) {
 	for _, descriptor := range s.ServiceDescriptors {
 		if descriptor.ServiceID == id {
-			return descriptor, true
+			return cloneServiceDescriptor(descriptor), true
 		}
 	}
 	return ServiceDescriptor{}, false
@@ -628,6 +630,7 @@ func validateServiceDescriptors(descriptors []ServiceDescriptor, registeredZones
 	var previous string
 	seen := make(map[string]struct{}, len(descriptors))
 	for i, descriptor := range descriptors {
+		descriptor = CanonicalServiceDescriptor(descriptor)
 		if err := descriptor.Validate(); err != nil {
 			return err
 		}

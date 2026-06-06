@@ -8,15 +8,21 @@ import (
 )
 
 type NetworkingState struct {
+	LayerStack      []LayerSpec
+	Adapter         AetherNetworkingAdapter
 	ChannelPolicies []ChannelPolicy
 	NodeRecords     []NodeRecord
+	RoleCommitments []RoleCommitment
 	Sessions        []SessionChannel
 }
 
 func EmptyState() NetworkingState {
 	return NetworkingState{
+		LayerStack:      DefaultLayerStack(),
+		Adapter:         DefaultAetherNetworkingAdapter(),
 		ChannelPolicies: DefaultChannelPolicies(),
 		NodeRecords:     []NodeRecord{},
+		RoleCommitments: []RoleCommitment{},
 		Sessions:        []SessionChannel{},
 	}
 }
@@ -79,7 +85,11 @@ func PruneExpired(state NetworkingState, currentHeight uint64) (NetworkingState,
 	if err := state.Validate(); err != nil {
 		return NetworkingState{}, err
 	}
-	next := NetworkingState{ChannelPolicies: cloneChannelPolicies(state.ChannelPolicies)}
+	next := NetworkingState{
+		LayerStack:      cloneLayerStack(state.LayerStack),
+		Adapter:         cloneAdapter(state.Adapter),
+		ChannelPolicies: cloneChannelPolicies(state.ChannelPolicies),
+	}
 	for _, record := range state.NodeRecords {
 		if currentHeight == 0 || currentHeight <= record.ExpiresHeight {
 			next.NodeRecords = append(next.NodeRecords, record)
@@ -92,7 +102,15 @@ func PruneExpired(state NetworkingState, currentHeight uint64) (NetworkingState,
 			}
 		}
 	}
+	for _, commitment := range state.RoleCommitments {
+		if currentHeight == 0 || currentHeight <= commitment.ExpiresHeight {
+			if containsNode(next.NodeRecords, commitment.NodeID) {
+				next.RoleCommitments = append(next.RoleCommitments, commitment)
+			}
+		}
+	}
 	sortNodeRecords(next.NodeRecords)
+	sortRoleCommitments(next.RoleCommitments)
 	sortSessions(next.Sessions)
 	return next, next.Validate()
 }
@@ -107,19 +125,29 @@ func ImportState(state NetworkingState) (NetworkingState, error) {
 
 func (s NetworkingState) Export() NetworkingState {
 	out := s.Clone()
+	if len(out.LayerStack) == 0 {
+		out.LayerStack = DefaultLayerStack()
+	}
+	if out.Adapter.BaselineTransport == "" {
+		out.Adapter = DefaultAetherNetworkingAdapter()
+	}
 	if len(out.ChannelPolicies) == 0 {
 		out.ChannelPolicies = DefaultChannelPolicies()
 	}
 	sortChannelPolicies(out.ChannelPolicies)
 	sortNodeRecords(out.NodeRecords)
+	sortRoleCommitments(out.RoleCommitments)
 	sortSessions(out.Sessions)
 	return out
 }
 
 func (s NetworkingState) Clone() NetworkingState {
 	out := NetworkingState{
+		LayerStack:      cloneLayerStack(s.LayerStack),
+		Adapter:         cloneAdapter(s.Adapter),
 		ChannelPolicies: cloneChannelPolicies(s.ChannelPolicies),
 		NodeRecords:     make([]NodeRecord, len(s.NodeRecords)),
+		RoleCommitments: cloneRoleCommitments(s.RoleCommitments),
 		Sessions:        make([]SessionChannel, len(s.Sessions)),
 	}
 	for i, record := range s.NodeRecords {
@@ -132,10 +160,19 @@ func (s NetworkingState) Clone() NetworkingState {
 }
 
 func (s NetworkingState) Validate() error {
+	if err := ValidateLayerStack(s.LayerStack); err != nil {
+		return err
+	}
+	if err := ValidateAetherNetworkingAdapter(s.Adapter); err != nil {
+		return err
+	}
 	if err := ValidateChannelPolicies(s.ChannelPolicies); err != nil {
 		return err
 	}
 	if err := validateNodeRecords(s.NodeRecords); err != nil {
+		return err
+	}
+	if err := validateRoleCommitments(s.NodeRecords, s.RoleCommitments); err != nil {
 		return err
 	}
 	return validateSessions(s.NodeRecords, s.Sessions)
@@ -232,6 +269,17 @@ func sortChannelPolicies(policies []ChannelPolicy) {
 func sortNodeRecords(records []NodeRecord) {
 	sort.SliceStable(records, func(i, j int) bool {
 		return NormalizeNodeRecord(records[i]).NodeID < NormalizeNodeRecord(records[j]).NodeID
+	})
+}
+
+func sortRoleCommitments(commitments []RoleCommitment) {
+	sort.SliceStable(commitments, func(i, j int) bool {
+		left := NormalizeRoleCommitment(commitments[i])
+		right := NormalizeRoleCommitment(commitments[j])
+		if left.NodeID != right.NodeID {
+			return left.NodeID < right.NodeID
+		}
+		return left.Role < right.Role
 	})
 }
 

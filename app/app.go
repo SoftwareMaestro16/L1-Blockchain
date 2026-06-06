@@ -64,6 +64,8 @@ import (
 	meshtypes "github.com/sovereign-l1/l1/x/mesh/types"
 	networkingkeeper "github.com/sovereign-l1/l1/x/networking/keeper"
 	networkingtypes "github.com/sovereign-l1/l1/x/networking/types"
+	paymentskeeper "github.com/sovereign-l1/l1/x/payments/keeper"
+	paymentstypes "github.com/sovereign-l1/l1/x/payments/types"
 	routingkeeper "github.com/sovereign-l1/l1/x/routing/keeper"
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
 	tokenfactorykeeper "github.com/sovereign-l1/l1/x/tokenfactory/keeper"
@@ -145,6 +147,7 @@ type L1App struct {
 	ZonesKeeper        zoneskeeper.Keeper
 	MeshKeeper         meshkeeper.Keeper
 	NetworkingKeeper   networkingkeeper.Keeper
+	PaymentsKeeper     paymentskeeper.Keeper
 
 	// the module manager
 	ModuleManager      *module.Manager
@@ -253,6 +256,7 @@ func NewL1App(
 		zonestypes.StoreKey,
 		meshtypes.StoreKey,
 		networkingtypes.StoreKey,
+		paymentstypes.StoreKey,
 	)
 
 	// register streaming services

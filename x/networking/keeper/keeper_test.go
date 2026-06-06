@@ -60,6 +60,14 @@ func TestKeeperRegistersNodeAndSessionWhenEnabled(t *testing.T) {
 	sessions, _, err := k.Sessions(nil)
 	require.NoError(t, err)
 	require.Equal(t, []networkingtypes.SessionChannel{session}, sessions)
+
+	require.NoError(t, k.RegisterRoleCommitment(networkingtypes.RoleCommitment{
+		NodeID:         remote.NodeID,
+		Role:           networkingtypes.NodeRoleService,
+		Bonded:         true,
+		CommitmentHash: networkingtypes.HashParts("keeper-service-role"),
+		ExpiresHeight:  80,
+	}, 22))
 }
 
 func signedKeeperNode(t *testing.T, seed byte, salt []byte, expiresHeight uint64, roles ...networkingtypes.NodeRole) networkingtypes.NodeRecord {
