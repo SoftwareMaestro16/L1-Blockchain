@@ -2545,6 +2545,158 @@ function Get-AexsTxAuthBankExploitOverrides {
   return $overrides
 }
 
+function Get-AexsTokenEconomyExploitOverrides {
+  $overrides = @{
+    "TOKENEXP-01" = [ordered]@{
+      path            = "attempt tokenfactory admin takeover by spoofing denom admin, changing admin out of order, or replaying stale authority"
+      expected_state  = "factory denom admin cannot be changed or used for mint authority unless the current canonical admin authorizes it"
+      affected        = @("x/tokenfactory", "x/bank", "app auth")
+      severity        = "Critical"
+      fix             = "add admin takeover regression tests for create denom, change admin, mint, stale admin replay, and zero-admin boundaries"
+    }
+    "TOKENEXP-02" = [ordered]@{
+      path            = "attempt unauthorized burn from another account, module account, or native denom through tokenfactory burn paths"
+      expected_state  = "burn requires exact authority and source ownership; unauthorized burn cannot debit balances or reduce supply"
+      affected        = @("x/tokenfactory", "x/bank")
+      severity        = "Critical"
+      fix             = "add burn-from mismatch, wrong admin, module account, native denom, and supply delta tests"
+    }
+    "TOKENEXP-03" = [ordered]@{
+      path            = "time governance parameter changes around mint, inflation, staking reward, and distribution state to manipulate inflation"
+      expected_state  = "governance timing cannot set inflation or mint parameters outside hard bounds or execute before the configured delay"
+      affected        = @("x/gov", "x/mint", "x/distribution", "x/staking")
+      severity        = "Critical"
+      fix             = "add governance delay, hard-bound params, mint epoch, and distribution replay tests"
+    }
+    "TOKENEXP-04" = [ordered]@{
+      path            = "manipulate fee routing through malformed fee splits, wrong treasury target, non-naet fee denom, or routing epoch changes"
+      expected_state  = "fees route only through configured deterministic targets and cannot be redirected by tx shape, denom spoofing, or local routing state"
+      affected        = @("x/fees", "x/bank", "x/distribution", "x/routing")
+      severity        = "High"
+      fix             = "add fee-routing split, treasury target, non-naet rejection, and deterministic routing interaction tests"
+    }
+    "TOKENEXP-05" = [ordered]@{
+      path            = "attempt treasury drain with a governance proposal that sets unsafe recipients, invalid spend params, or unbounded distribution targets"
+      expected_state  = "governance-controlled treasury actions remain within hard protocol bounds and reject invalid recipients or unsafe params"
+      affected        = @("x/gov", "x/fees", "x/bank", "treasury module account")
+      severity        = "Critical"
+      fix             = "add governance proposal tests for treasury spend bounds, invalid authority, zero address, and unsafe recipient rejection"
+    }
+    "TOKENEXP-06" = [ordered]@{
+      path            = "inflate staking rewards by manipulating commission, reward withdrawal timing, validator state, or distribution indexes"
+      expected_state  = "reward accounting pays no more than accrued deterministic rewards and cannot mint outside authorized distribution paths"
+      affected        = @("x/staking", "x/distribution", "x/mint")
+      severity        = "Critical"
+      fix             = "add staking reward inflation tests for commission, repeated withdrawal, tiny rewards, and distribution index replay"
+    }
+    "TOKENEXP-07" = [ordered]@{
+      path            = "farm staking rewards through delegate, redelegate, unbond, rebond, and withdraw loops around rounding boundaries"
+      expected_state  = "staking reward loops cannot produce extra rewards, bypass slash risk, or create accounting drift"
+      affected        = @("x/staking", "x/distribution", "x/slashing")
+      severity        = "High"
+      fix             = "add stateful staking reward farming loop tests and share/reward rounding invariants"
+    }
+    "TOKENEXP-08" = [ordered]@{
+      path            = "manipulate supply through edge-case mint amount, metadata, duplicate denom, zero admin, max amount, or export/import paths"
+      expected_state  = "mint amount and denom validation reject edge cases and accepted mints change supply by exactly the requested amount"
+      affected        = @("x/tokenfactory", "x/bank", "genesis export/import")
+      severity        = "Critical"
+      fix             = "add edge-case mint tests for zero/max amounts, duplicate denom, invalid metadata, export/import, and exact supply delta"
+    }
+    "TOKENEXP-09" = [ordered]@{
+      path            = "spoof native denom through tokenfactory subdenom, bank metadata, display denom, LP denom, or fee denom aliases"
+      expected_state  = "factory assets cannot spoof native denom, native metadata, protocol fee denom, staking denom, or LP denom namespace"
+      affected        = @("x/tokenfactory", "x/bank", "x/fees", "x/staking")
+      severity        = "Critical"
+      fix             = "add native denom spoof tests for metadata, base/display denom, tokenfactory subdenom, fee denom, staking denom, and LP namespace"
+    }
+    "TOKENEXP-10" = [ordered]@{
+      path            = "exploit display/base decimal mismatch between ORB display, naet base units, bank metadata, fees, and localnet genesis balances"
+      expected_state  = "display/base metadata remains canonical and cannot alter supply, fee amount, staking amount, or wallet-visible balances"
+      affected        = @("app params", "x/bank", "x/fees", "localnet genesis")
+      severity        = "High"
+      fix             = "add bank metadata, exponent, fee amount, staking denom, and genesis display/base decimal regression tests"
+    }
+  }
+  return $overrides
+}
+
+function Get-AexsDexExploitOverrides {
+  $overrides = @{
+    "DEXEXP-01" = [ordered]@{
+      path            = "execute swaps against crafted reserves to reduce the fee-adjusted constant product or violate canonical reserve ordering"
+      expected_state  = "fee-adjusted constant-product invariant holds after every accepted swap and violation attempts reject before reserve mutation"
+      affected        = @("x/dex", "x/bank")
+      severity        = "Critical"
+      fix             = "add constant-product invariant tests for reserve ordering, fee-adjusted math, extreme ratios, and repeated tiny swaps"
+    }
+    "DEXEXP-02" = [ordered]@{
+      path            = "drain pool liquidity through repeated swaps, rounded outputs, stale quotes, and fee edge cases"
+      expected_state  = "swap math, slippage checks, and module balances prevent liquidity drain beyond deterministic AMM rules"
+      affected        = @("x/dex", "x/bank")
+      severity        = "Critical"
+      fix             = "add multi-step liquidity drain simulations with reserve/module balance and slippage assertions"
+    }
+    "DEXEXP-03" = [ordered]@{
+      path            = "initialize pool with same denoms, duplicate pair, tiny reserves, wrong canonical order, or invalid initial LP shares"
+      expected_state  = "pool creation rejects malformed pairs and creates canonical pair index, reserves, and LP supply atomically"
+      affected        = @("x/dex", "x/bank")
+      severity        = "High"
+      fix             = "add pool initialization tests for duplicate pairs, same denom, zero/tiny liquidity, canonical order, and LP genesis"
+    }
+    "DEXEXP-04" = [ordered]@{
+      path            = "inflate LP tokens by forged LP denom, duplicate pool id, add-liquidity rounding, or LP mint without matching reserves"
+      expected_state  = "LP supply equals pool total shares and cannot be minted without matching reserve deposits"
+      affected        = @("x/dex", "x/bank", "x/tokenfactory")
+      severity        = "Critical"
+      fix             = "add LP inflation tests for forged LP denom, duplicate pool id, share rounding, and reserve/share reconciliation"
+    }
+    "DEXEXP-05" = [ordered]@{
+      path            = "race liquidity removal against swaps, LP burns, pool updates, and failed bank movement to extract extra reserves"
+      expected_state  = "remove liquidity is atomic and deterministic; races cannot burn shares twice or withdraw more than owned"
+      affected        = @("x/dex", "x/bank", "app cache context")
+      severity        = "High"
+      fix             = "add stateful remove-liquidity race tests with LP supply, reserve, and rollback snapshots"
+    }
+    "DEXEXP-06" = [ordered]@{
+      path            = "swap or add/remove liquidity against zero-liquidity or insolvent pools to trigger divide-by-zero or impossible output"
+      expected_state  = "zero-liquidity and insolvent pools reject before arithmetic panic, bank movement, or pool mutation"
+      affected        = @("x/dex", "x/bank")
+      severity        = "Critical"
+      fix             = "add zero-liquidity, insolvent pool, divide-by-zero, and panic-safety tests"
+    }
+    "DEXEXP-07" = [ordered]@{
+      path            = "desynchronize pool reserves from module account balances through corrupted state, partial bank moves, or export/import drift"
+      expected_state  = "pool reserves reconcile with module balances and any mismatch rejects or records a critical invariant failure"
+      affected        = @("x/dex", "x/bank", "genesis export/import")
+      severity        = "Critical"
+      fix             = "add reserve/module balance reconciliation tests for every DEX operation and export/import round trip"
+    }
+    "DEXEXP-08" = [ordered]@{
+      path            = "force bank movement failure after DEX state update attempt and check for partial reserve, share, or LP mutation"
+      expected_state  = "failed bank movement rolls back all DEX state changes in the cached context"
+      affected        = @("x/dex", "x/bank", "app cache context")
+      severity        = "Critical"
+      fix             = "add failed bank movement simulations for create pool, add liquidity, remove liquidity, swap, and LP mint/burn"
+    }
+    "DEXEXP-09" = [ordered]@{
+      path            = "bypass slippage with stale quote, min-output off-by-one, rounded output, route manipulation, or denom order confusion"
+      expected_state  = "swap rejects before state mutation whenever deterministic output is below user slippage constraints"
+      affected        = @("x/dex", "x/routing", "x/bank")
+      severity        = "High"
+      fix             = "add slippage bypass tests for stale quotes, min-output boundaries, rounding, route hints, and denom ordering"
+    }
+    "DEXEXP-10" = [ordered]@{
+      path            = "exploit AMM rounding through tiny repeated swaps, asymmetric reserves, fee rounding, or LP share truncation"
+      expected_state  = "rounding rules are deterministic, bounded, and cannot drain value or violate reserve/share invariants"
+      affected        = @("x/dex", "x/bank")
+      severity        = "High"
+      fix             = "add property and fuzz tests for swap rounding, LP rounding, tiny amounts, and asymmetric reserve sequences"
+    }
+  }
+  return $overrides
+}
+
 function Get-AexsExploitRecordsForSection {
   param(
     [string]$Text,
@@ -2941,6 +3093,34 @@ $requiredTransactionExploitTerms = @(
   "Attempt zero-address transfer or signer path."
 )
 
+$requiredTokenEconomyExploitTerms = @(
+  "Token And Economy Exploits",
+  "Attempt tokenfactory mint authority takeover.",
+  "Attempt unauthorized burn bypass.",
+  "Attempt inflation manipulation through governance timing.",
+  "Attempt fee routing manipulation.",
+  "Attempt treasury drain via governance proposal.",
+  "Attempt staking reward inflation.",
+  "Attempt staking reward farming loop.",
+  "Attempt supply manipulation through edge-case mint path.",
+  "Attempt native denom spoofing.",
+  "Attempt display/base decimal mismatch exploit."
+)
+
+$requiredDexExploitTerms = @(
+  "DEX Exploits",
+  "Attempt constant-product invariant break.",
+  "Attempt liquidity drain through swap sequence.",
+  "Attempt pool initialization manipulation.",
+  "Attempt LP token inflation.",
+  "Attempt liquidity removal race.",
+  "Attempt zero-liquidity swap edge case.",
+  "Attempt reserve/module balance desync.",
+  "Attempt failed bank movement partial update.",
+  "Attempt slippage bypass.",
+  "Attempt rounding exploit."
+)
+
 $sourceFailures = @()
 foreach ($term in $requiredSourceTerms) {
   if (-not (Test-AexsTextAny -Text $taskText -Terms @($term)) -and -not (Test-AexsTextAny -Text $pipelineText -Terms @($term))) {
@@ -2989,6 +3169,12 @@ if ([string]::IsNullOrWhiteSpace($exploitCatalogSection)) {
   }
   foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredTransactionExploitTerms)) {
     $sourceFailures += "missing transaction/auth/bank exploit catalog term: $term"
+  }
+  foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredTokenEconomyExploitTerms)) {
+    $sourceFailures += "missing token/economy exploit catalog term: $term"
+  }
+  foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredDexExploitTerms)) {
+    $sourceFailures += "missing DEX exploit catalog term: $term"
   }
 }
 
@@ -3089,7 +3275,21 @@ foreach ($record in $txAuthBankExploitRecords) {
   $record["invalid_reasons"] = $invalidReasons
 }
 $invalidTxAuthBankExploitRecords = @($txAuthBankExploitRecords | Where-Object { -not $_["valid"] })
-$exploitRecords = @($coreExploitRecords + $slashingExploitRecords + $txAuthBankExploitRecords)
+$tokenEconomyExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 4 -SectionTitle "Token And Economy Exploits" -IdPrefix "TOKENEXP" -SeedNamespace "token-economy-exploit" -Overrides (Get-AexsTokenEconomyExploitOverrides) -DefaultAffectedModules @("x/tokenfactory", "x/fees", "x/bank", "x/gov", "x/staking", "x/distribution") -DefaultSeverity "High")
+foreach ($record in $tokenEconomyExploitRecords) {
+  $invalidReasons = @(Test-AexsExploitRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidTokenEconomyExploitRecords = @($tokenEconomyExploitRecords | Where-Object { -not $_["valid"] })
+$dexExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 5 -SectionTitle "DEX Exploits" -IdPrefix "DEXEXP" -SeedNamespace "dex-exploit" -Overrides (Get-AexsDexExploitOverrides) -DefaultAffectedModules @("x/dex", "x/bank", "app cache context") -DefaultSeverity "High")
+foreach ($record in $dexExploitRecords) {
+  $invalidReasons = @(Test-AexsExploitRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidDexExploitRecords = @($dexExploitRecords | Where-Object { -not $_["valid"] })
+$exploitRecords = @($coreExploitRecords + $slashingExploitRecords + $txAuthBankExploitRecords + $tokenEconomyExploitRecords + $dexExploitRecords)
 $invalidExploitRecords = @($exploitRecords | Where-Object { -not $_["valid"] })
 $mandatoryInvariantPassRate = 0
 $auditPassed = $false
@@ -3673,6 +3873,14 @@ $summary = [ordered]@{
   invalid_tx_auth_bank_exploit_count  = $invalidTxAuthBankExploitRecords.Count
   tx_auth_bank_exploit_ids            = @($txAuthBankExploitRecords | ForEach-Object { $_["exploit_id"] })
   invalid_tx_auth_bank_exploit_records = @($invalidTxAuthBankExploitRecords | ForEach-Object { $_["exploit_id"] })
+  token_economy_exploit_count         = $tokenEconomyExploitRecords.Count
+  invalid_token_economy_exploit_count = $invalidTokenEconomyExploitRecords.Count
+  token_economy_exploit_ids           = @($tokenEconomyExploitRecords | ForEach-Object { $_["exploit_id"] })
+  invalid_token_economy_exploit_records = @($invalidTokenEconomyExploitRecords | ForEach-Object { $_["exploit_id"] })
+  dex_exploit_count                   = $dexExploitRecords.Count
+  invalid_dex_exploit_count           = $invalidDexExploitRecords.Count
+  dex_exploit_ids                     = @($dexExploitRecords | ForEach-Object { $_["exploit_id"] })
+  invalid_dex_exploit_records         = @($invalidDexExploitRecords | ForEach-Object { $_["exploit_id"] })
   atomic_task_count                   = $atomicTasks.Count
   invalid_atomic_task_count           = $invalidAtomicTasks.Count
   invalid_atomic_tasks                = @($invalidAtomicTasks | ForEach-Object { $_["task_id"] })
@@ -3834,6 +4042,10 @@ $report += "- slashing bypass exploit records: $($slashingExploitRecords.Count)"
 $report += "- invalid slashing bypass exploit records: $($invalidSlashingExploitRecords.Count)"
 $report += "- transaction/auth/bank exploit records: $($txAuthBankExploitRecords.Count)"
 $report += "- invalid transaction/auth/bank exploit records: $($invalidTxAuthBankExploitRecords.Count)"
+$report += "- token/economy exploit records: $($tokenEconomyExploitRecords.Count)"
+$report += "- invalid token/economy exploit records: $($invalidTokenEconomyExploitRecords.Count)"
+$report += "- DEX exploit records: $($dexExploitRecords.Count)"
+$report += "- invalid DEX exploit records: $($invalidDexExploitRecords.Count)"
 $report += ""
 $report += "## Gate Decision"
 $report += ""
@@ -3851,6 +4063,8 @@ $report += "- invalid exploit records: $(@($invalidExploitRecords | ForEach-Obje
 $report += "- invalid consensus/aether core exploit records: $(@($invalidCoreExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
 $report += "- invalid slashing bypass exploit records: $(@($invalidSlashingExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
 $report += "- invalid transaction/auth/bank exploit records: $(@($invalidTxAuthBankExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+$report += "- invalid token/economy exploit records: $(@($invalidTokenEconomyExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+$report += "- invalid DEX exploit records: $(@($invalidDexExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
 $report += ""
 $report += "## Module Matrix"
 $report += ""
@@ -3919,6 +4133,18 @@ if ($txAuthBankExploitRecords.Count -lt 11) {
 }
 if ($invalidTxAuthBankExploitRecords.Count -gt 0) {
   throw "AEXS transaction/auth/bank exploit catalog validation failed for record(s): $(@($invalidTxAuthBankExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+}
+if ($tokenEconomyExploitRecords.Count -lt 10) {
+  throw "AEXS token/economy exploit catalog validation failed: fewer than required token/economy exploit records"
+}
+if ($invalidTokenEconomyExploitRecords.Count -gt 0) {
+  throw "AEXS token/economy exploit catalog validation failed for record(s): $(@($invalidTokenEconomyExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+}
+if ($dexExploitRecords.Count -lt 10) {
+  throw "AEXS DEX exploit catalog validation failed: fewer than required DEX exploit records"
+}
+if ($invalidDexExploitRecords.Count -gt 0) {
+  throw "AEXS DEX exploit catalog validation failed for record(s): $(@($invalidDexExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
 }
 if ($invalidExploitRecords.Count -gt 0) {
   throw "AEXS exploit catalog validation failed for record(s): $(@($invalidExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"

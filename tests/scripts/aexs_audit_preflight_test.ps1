@@ -67,7 +67,11 @@ try {
   Assert-True ($result.invalid_slashing_exploit_count -eq 0) "AEXS must not generate invalid slashing exploit records"
   Assert-True ($result.tx_auth_bank_exploit_count -ge 11) "AEXS must record transaction/auth/bank exploit catalog entries"
   Assert-True ($result.invalid_tx_auth_bank_exploit_count -eq 0) "AEXS must not generate invalid transaction/auth/bank exploit records"
-  Assert-True ($result.exploit_count -ge 31) "AEXS must record all current exploit catalog entries"
+  Assert-True ($result.token_economy_exploit_count -ge 10) "AEXS must record token/economy exploit catalog entries"
+  Assert-True ($result.invalid_token_economy_exploit_count -eq 0) "AEXS must not generate invalid token/economy exploit records"
+  Assert-True ($result.dex_exploit_count -ge 10) "AEXS must record DEX exploit catalog entries"
+  Assert-True ($result.invalid_dex_exploit_count -eq 0) "AEXS must not generate invalid DEX exploit records"
+  Assert-True ($result.exploit_count -ge 51) "AEXS must record all current exploit catalog entries"
   Assert-True ($result.invalid_exploit_count -eq 0) "AEXS must not generate invalid exploit records"
 
   foreach ($module in @(
@@ -309,7 +313,27 @@ try {
       "TXEXP-08",
       "TXEXP-09",
       "TXEXP-10",
-      "TXEXP-11"
+      "TXEXP-11",
+      "TOKENEXP-01",
+      "TOKENEXP-02",
+      "TOKENEXP-03",
+      "TOKENEXP-04",
+      "TOKENEXP-05",
+      "TOKENEXP-06",
+      "TOKENEXP-07",
+      "TOKENEXP-08",
+      "TOKENEXP-09",
+      "TOKENEXP-10",
+      "DEXEXP-01",
+      "DEXEXP-02",
+      "DEXEXP-03",
+      "DEXEXP-04",
+      "DEXEXP-05",
+      "DEXEXP-06",
+      "DEXEXP-07",
+      "DEXEXP-08",
+      "DEXEXP-09",
+      "DEXEXP-10"
     )) {
     Assert-True ($exploitById.ContainsKey($exploitId)) "exploit catalog record missing: $exploitId"
   }
@@ -333,6 +357,26 @@ try {
   Assert-True ($exploitById["TXEXP-08"].exploit_path -match "multi-send") "TXEXP-08 must record multi-send partial failure"
   Assert-True ($exploitById["TXEXP-09"].exploit_path -match "double spend") "TXEXP-09 must record race-condition double spend"
   Assert-True ($exploitById["TXEXP-11"].exploit_path -match "zero address") "TXEXP-11 must record zero-address path"
+  Assert-True ($exploitById["TOKENEXP-01"].exploit_path -match "admin takeover") "TOKENEXP-01 must record tokenfactory admin takeover"
+  Assert-True ($exploitById["TOKENEXP-02"].exploit_path -match "unauthorized burn") "TOKENEXP-02 must record unauthorized burn"
+  Assert-True ($exploitById["TOKENEXP-03"].exploit_path -match "governance parameter changes") "TOKENEXP-03 must record governance inflation timing"
+  Assert-True ($exploitById["TOKENEXP-04"].exploit_path -match "fee routing") "TOKENEXP-04 must record fee routing manipulation"
+  Assert-True ($exploitById["TOKENEXP-05"].exploit_path -match "treasury drain") "TOKENEXP-05 must record treasury drain"
+  Assert-True ($exploitById["TOKENEXP-06"].exploit_path -match "staking rewards") "TOKENEXP-06 must record staking reward inflation"
+  Assert-True ($exploitById["TOKENEXP-07"].exploit_path -match "delegate, redelegate, unbond") "TOKENEXP-07 must record reward farming loop"
+  Assert-True ($exploitById["TOKENEXP-08"].exploit_path -match "edge-case mint") "TOKENEXP-08 must record edge-case mint path"
+  Assert-True ($exploitById["TOKENEXP-09"].exploit_path -match "Spoof native denom|spoof native denom") "TOKENEXP-09 must record native denom spoofing"
+  Assert-True ($exploitById["TOKENEXP-10"].exploit_path -match "display/base decimal mismatch") "TOKENEXP-10 must record decimal mismatch"
+  Assert-True ($exploitById["DEXEXP-01"].exploit_path -match "constant product") "DEXEXP-01 must record constant-product break"
+  Assert-True ($exploitById["DEXEXP-02"].exploit_path -match "drain pool liquidity") "DEXEXP-02 must record liquidity drain"
+  Assert-True ($exploitById["DEXEXP-03"].exploit_path -match "initialize pool") "DEXEXP-03 must record pool initialization manipulation"
+  Assert-True ($exploitById["DEXEXP-04"].exploit_path -match "Inflate LP tokens|inflate LP tokens") "DEXEXP-04 must record LP token inflation"
+  Assert-True ($exploitById["DEXEXP-05"].exploit_path -match "race liquidity removal") "DEXEXP-05 must record liquidity removal race"
+  Assert-True ($exploitById["DEXEXP-06"].exploit_path -match "zero-liquidity") "DEXEXP-06 must record zero-liquidity edge"
+  Assert-True ($exploitById["DEXEXP-07"].exploit_path -match "Desynchronize pool reserves|desynchronize pool reserves") "DEXEXP-07 must record reserve/module desync"
+  Assert-True ($exploitById["DEXEXP-08"].exploit_path -match "bank movement failure") "DEXEXP-08 must record failed bank movement partial update"
+  Assert-True ($exploitById["DEXEXP-09"].exploit_path -match "Bypass slippage|bypass slippage") "DEXEXP-09 must record slippage bypass"
+  Assert-True ($exploitById["DEXEXP-10"].exploit_path -match "rounding") "DEXEXP-10 must record rounding exploit"
 
   $campaignSetup = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "campaign-setup.json") | ConvertFrom-Json
   Assert-True ($campaignSetup.campaign_id -eq $result.campaign_id) "campaign setup campaign id must match summary"

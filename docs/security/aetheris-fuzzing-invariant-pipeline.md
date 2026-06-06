@@ -432,6 +432,15 @@ cross-context replay, invalid nonce bypass, transaction malleability, fee
 underpayment, fee inflation manipulation, low-fee spam griefing, multi-send
 partial failure, race-condition double spend, rollback during replayed state
 transitions, and zero-address transfer or signer paths.
+The token and economy catalog section covers tokenfactory mint authority
+takeover, unauthorized burn bypass, governance-timed inflation manipulation,
+fee routing manipulation, treasury drain proposals, staking reward inflation,
+staking reward farming loops, edge-case mint supply manipulation, native denom
+spoofing, and display/base decimal mismatch. The DEX catalog section covers
+constant-product invariant breaks, liquidity drain swap sequences, pool
+initialization manipulation, LP token inflation, liquidity removal races,
+zero-liquidity edge cases, reserve/module balance desynchronization, failed
+bank movement partial updates, slippage bypass, and rounding exploits.
 
 The base-chain `x/auth`, `x/bank`, `x/staking`, `x/slashing`, `x/gov`,
 `x/distribution`, `x/fees`, `x/tokenfactory`, `x/dex`, `x/identity`,
