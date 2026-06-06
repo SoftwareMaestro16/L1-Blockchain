@@ -107,13 +107,14 @@ type ChannelState struct {
 }
 
 type PendingClose struct {
-	Submitter         string
-	SubmittedHeight   uint64
-	SettleAfterHeight uint64
-	SettlementFee     string
-	State             ChannelState
-	FraudProofs       []FraudProof
-	Penalties         []Penalty
+	Submitter          string
+	SubmittedHeight    uint64
+	SettleAfterHeight  uint64
+	SettlementFeeDenom string
+	SettlementFee      string
+	State              ChannelState
+	FraudProofs        []FraudProof
+	Penalties          []Penalty
 }
 
 type FraudProof struct {
@@ -123,6 +124,7 @@ type FraudProof struct {
 	OffendingSigner string
 	StateA          ChannelState
 	StateB          ChannelState
+	PenaltyDenom    string
 	PenaltyAmount   string
 	EvidenceHash    string
 }
@@ -130,6 +132,7 @@ type FraudProof struct {
 type Penalty struct {
 	Offender  string
 	Recipient string
+	Denom     string
 	Amount    string
 }
 
@@ -151,14 +154,15 @@ type ChannelRecord struct {
 }
 
 type SettlementRecord struct {
-	ChannelID      string
-	StateHash      string
-	Nonce          uint64
-	FinalBalances  []Balance
-	SettlementFee  string
-	Penalties      []Penalty
-	SettledHeight  uint64
-	SettlementHash string
+	ChannelID          string
+	StateHash          string
+	Nonce              uint64
+	FinalBalances      []Balance
+	SettlementFeeDenom string
+	SettlementFee      string
+	Penalties          []Penalty
+	SettledHeight      uint64
+	SettlementHash     string
 }
 
 type ChannelEdge struct {
@@ -166,6 +170,7 @@ type ChannelEdge struct {
 	From          string
 	To            string
 	Capacity      string
+	FeeDenom      string
 	FeeAmount     string
 	ExpiresHeight uint64
 	Active        bool
@@ -406,6 +411,7 @@ func (c ChannelRecord) Validate() error {
 
 func (p PendingClose) Normalize() PendingClose {
 	p.Submitter = strings.TrimSpace(p.Submitter)
+	p.SettlementFeeDenom = normalizeAssetDenom(p.SettlementFeeDenom)
 	p.SettlementFee = strings.TrimSpace(p.SettlementFee)
 	p.State = p.State.Normalize()
 	p.FraudProofs = normalizeFraudProofs(p.FraudProofs)
@@ -426,6 +432,9 @@ func (p PendingClose) ValidateForChannel(channel ChannelRecord) error {
 	}
 	if p.SettleAfterHeight <= p.SubmittedHeight {
 		return errors.New("payments pending close settlement height must exceed submitted height")
+	}
+	if p.SettlementFeeDenom != NativeDenom {
+		return fmt.Errorf("payments settlement fee denom must be %s", NativeDenom)
 	}
 	if err := validateNonNegativeInt("payments settlement fee", p.SettlementFee); err != nil {
 		return err
@@ -450,6 +459,7 @@ func (f FraudProof) Normalize() FraudProof {
 	f.ProofID = normalizeHash(f.ProofID)
 	f.SubmittedBy = strings.TrimSpace(f.SubmittedBy)
 	f.OffendingSigner = strings.TrimSpace(f.OffendingSigner)
+	f.PenaltyDenom = normalizeAssetDenom(f.PenaltyDenom)
 	f.PenaltyAmount = strings.TrimSpace(f.PenaltyAmount)
 	f.EvidenceHash = normalizeHash(f.EvidenceHash)
 	f.StateA = f.StateA.Normalize()
@@ -473,6 +483,9 @@ func (f FraudProof) ValidateForChannel(channel ChannelRecord) error {
 	}
 	if !containsString(channel.Participants, proof.SubmittedBy) || !containsString(channel.Participants, proof.OffendingSigner) {
 		return errors.New("payments fraud parties must be channel participants")
+	}
+	if proof.PenaltyDenom != NativeDenom {
+		return fmt.Errorf("payments fraud penalty denom must be %s", NativeDenom)
 	}
 	if err := validatePositiveInt("payments fraud penalty", proof.PenaltyAmount); err != nil {
 		return err
@@ -516,6 +529,7 @@ func (f FraudProof) ValidateForChannel(channel ChannelRecord) error {
 func (p Penalty) Normalize() Penalty {
 	p.Offender = strings.TrimSpace(p.Offender)
 	p.Recipient = strings.TrimSpace(p.Recipient)
+	p.Denom = normalizeAssetDenom(p.Denom)
 	p.Amount = strings.TrimSpace(p.Amount)
 	return p
 }
@@ -534,12 +548,16 @@ func (p Penalty) ValidateForChannel(channel ChannelRecord) error {
 	if p.Offender == p.Recipient {
 		return errors.New("payments penalty parties must differ")
 	}
+	if p.Denom != NativeDenom {
+		return fmt.Errorf("payments penalty denom must be %s", NativeDenom)
+	}
 	return validatePositiveInt("payments penalty amount", p.Amount)
 }
 
 func (s SettlementRecord) Normalize() SettlementRecord {
 	s.ChannelID = normalizeHash(s.ChannelID)
 	s.StateHash = normalizeHash(s.StateHash)
+	s.SettlementFeeDenom = normalizeAssetDenom(s.SettlementFeeDenom)
 	s.SettlementFee = strings.TrimSpace(s.SettlementFee)
 	s.SettlementHash = normalizeOptionalHash(s.SettlementHash)
 	s.FinalBalances = normalizeBalances(s.FinalBalances)
@@ -560,6 +578,9 @@ func (s SettlementRecord) ValidateForChannel(channel ChannelRecord) error {
 	}
 	if settlement.SettledHeight == 0 {
 		return errors.New("payments settlement height must be positive")
+	}
+	if settlement.SettlementFeeDenom != NativeDenom {
+		return fmt.Errorf("payments settlement fee denom must be %s", NativeDenom)
 	}
 	if err := validateNonNegativeInt("payments settlement fee", settlement.SettlementFee); err != nil {
 		return err
@@ -603,6 +624,7 @@ func (e ChannelEdge) Normalize() ChannelEdge {
 	e.From = strings.TrimSpace(e.From)
 	e.To = strings.TrimSpace(e.To)
 	e.Capacity = strings.TrimSpace(e.Capacity)
+	e.FeeDenom = normalizeAssetDenom(e.FeeDenom)
 	e.FeeAmount = strings.TrimSpace(e.FeeAmount)
 	return e
 }
@@ -623,6 +645,9 @@ func (e ChannelEdge) Validate() error {
 	}
 	if err := validatePositiveInt("payments routing capacity", e.Capacity); err != nil {
 		return err
+	}
+	if e.FeeDenom != NativeDenom {
+		return fmt.Errorf("payments routing fee denom must be %s", NativeDenom)
 	}
 	return validateNonNegativeInt("payments routing fee", e.FeeAmount)
 }
@@ -1170,6 +1195,14 @@ func normalizeOptionalHash(value string) string {
 		return ""
 	}
 	return normalizeHash(value)
+}
+
+func normalizeAssetDenom(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return NativeDenom
+	}
+	return value
 }
 
 func containsString(values []string, needle string) bool {

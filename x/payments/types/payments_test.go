@@ -92,6 +92,68 @@ func TestPaymentStateRejectsNonNaetAndCollateralMismatch(t *testing.T) {
 	require.ErrorContains(t, err, "conserve")
 }
 
+func TestPaymentAssetScopeRejectsNonNaetFeesAndPenalties(t *testing.T) {
+	alice := testAddress(0x35)
+	bob := testAddress(0x36)
+	channel := signedChannel(t, "asset-scope", "1000", alice, bob)
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "500"},
+		{Participant: bob, Amount: "500"},
+	})
+
+	edge := ChannelEdge{
+		ChannelID: channel.ChannelID,
+		From:      alice,
+		To:        bob,
+		Capacity:  "100",
+		FeeDenom:  "uatom",
+		FeeAmount: "1",
+		Active:    true,
+	}
+	require.ErrorContains(t, edge.Validate(), "naet")
+
+	pending := PendingClose{
+		Submitter:          alice,
+		SubmittedHeight:    20,
+		SettleAfterHeight:  28,
+		SettlementFeeDenom: "uatom",
+		SettlementFee:      "1",
+		State:              closeState,
+	}
+	require.ErrorContains(t, pending.ValidateForChannel(channel), "naet")
+
+	proof := FraudProof{
+		ProofID:         HashParts("bad-penalty-denom"),
+		ProofType:       FraudProofTypeStaleClose,
+		SubmittedBy:     bob,
+		OffendingSigner: alice,
+		StateA:          closeState,
+		StateB: signedState(t, channel, 3, closeState.StateHash, []Balance{
+			{Participant: alice, Amount: "450"},
+			{Participant: bob, Amount: "550"},
+		}),
+		PenaltyDenom:  "uatom",
+		PenaltyAmount: "10",
+		EvidenceHash:  HashParts("evidence", "bad-penalty-denom"),
+	}
+	require.ErrorContains(t, proof.ValidateForChannel(channel), "naet")
+
+	penalty := Penalty{Offender: alice, Recipient: bob, Denom: "uatom", Amount: "10"}
+	require.ErrorContains(t, penalty.ValidateForChannel(channel), "naet")
+
+	settlement := SettlementRecord{
+		ChannelID:          channel.ChannelID,
+		StateHash:          closeState.StateHash,
+		Nonce:              closeState.Nonce,
+		FinalBalances:      closeState.Balances,
+		SettlementFeeDenom: "uatom",
+		SettlementFee:      "0",
+		SettledHeight:      40,
+	}
+	settlement.SettlementHash = ComputeSettlementHash(settlement)
+	require.ErrorContains(t, settlement.ValidateForChannel(channel), "naet")
+}
+
 func TestRoutePaymentAndVirtualChannelUseExistingLiquidity(t *testing.T) {
 	alice := testAddress(0x41)
 	router := testAddress(0x42)

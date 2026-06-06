@@ -95,11 +95,12 @@ func SubmitClose(state PaymentsState, channelID string, closingState ChannelStat
 		return PaymentsState{}, errors.New("payments channel is not open")
 	}
 	pending := PendingClose{
-		Submitter:         submitter,
-		SubmittedHeight:   currentHeight,
-		SettleAfterHeight: currentHeight + channel.DisputePeriod,
-		SettlementFee:     settlementFee,
-		State:             closingState.Normalize(),
+		Submitter:          submitter,
+		SubmittedHeight:    currentHeight,
+		SettleAfterHeight:  currentHeight + channel.DisputePeriod,
+		SettlementFeeDenom: NativeDenom,
+		SettlementFee:      settlementFee,
+		State:              closingState.Normalize(),
 	}
 	if err := pending.ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, err
@@ -178,7 +179,7 @@ func SubmitFraudProof(state PaymentsState, channelID string, proof FraudProof, c
 			return PaymentsState{}, errors.New("payments duplicate fraud proof")
 		}
 	}
-	penalty := Penalty{Offender: proof.OffendingSigner, Recipient: proof.SubmittedBy, Amount: proof.PenaltyAmount}.Normalize()
+	penalty := Penalty{Offender: proof.OffendingSigner, Recipient: proof.SubmittedBy, Denom: NativeDenom, Amount: proof.PenaltyAmount}.Normalize()
 	if err := penalty.ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, err
 	}
@@ -211,13 +212,14 @@ func FinalizeSettlement(state PaymentsState, channelID string, currentHeight uin
 		return PaymentsState{}, SettlementRecord{}, err
 	}
 	settlement := SettlementRecord{
-		ChannelID:     channel.ChannelID,
-		StateHash:     channel.PendingClose.State.StateHash,
-		Nonce:         channel.PendingClose.State.Nonce,
-		FinalBalances: finalBalances,
-		SettlementFee: channel.PendingClose.SettlementFee,
-		Penalties:     channel.PendingClose.Penalties,
-		SettledHeight: currentHeight,
+		ChannelID:          channel.ChannelID,
+		StateHash:          channel.PendingClose.State.StateHash,
+		Nonce:              channel.PendingClose.State.Nonce,
+		FinalBalances:      finalBalances,
+		SettlementFeeDenom: channel.PendingClose.SettlementFeeDenom,
+		SettlementFee:      channel.PendingClose.SettlementFee,
+		Penalties:          channel.PendingClose.Penalties,
+		SettledHeight:      currentHeight,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
 	if err := settlement.ValidateForChannel(channel); err != nil {

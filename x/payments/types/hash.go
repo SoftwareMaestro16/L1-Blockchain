@@ -81,6 +81,7 @@ func ComputeSettlementHash(settlement SettlementRecord) string {
 	writeString(h, settlement.StateHash)
 	writeUint64(h, settlement.Nonce)
 	writeUint64(h, settlement.SettledHeight)
+	writeString(h, settlement.SettlementFeeDenom)
 	writeString(h, settlement.SettlementFee)
 	for _, balance := range settlement.FinalBalances {
 		writeString(h, balance.Participant)
@@ -89,6 +90,7 @@ func ComputeSettlementHash(settlement SettlementRecord) string {
 	for _, penalty := range settlement.Penalties {
 		writeString(h, penalty.Offender)
 		writeString(h, penalty.Recipient)
+		writeString(h, penalty.Denom)
 		writeString(h, penalty.Amount)
 	}
 	return hex.EncodeToString(h.Sum(nil))
