@@ -15,6 +15,8 @@ const (
 	PaymentRoadmapPhase0 PaymentRoadmapPhaseID = "phase_0_specification_and_test_vectors"
 	PaymentRoadmapPhase1 PaymentRoadmapPhaseID = "phase_1_base_channel_settlement"
 	PaymentRoadmapPhase2 PaymentRoadmapPhaseID = "phase_2_fraud_proofs_and_penalties"
+	PaymentRoadmapPhase3 PaymentRoadmapPhaseID = "phase_3_conditional_payments"
+	PaymentRoadmapPhase4 PaymentRoadmapPhaseID = "phase_4_routing_engine"
 )
 
 type PaymentRoadmapTask struct {
@@ -82,6 +84,30 @@ type PaymentRoadmapBlockSTMPlan struct {
 	PlanHash           string
 }
 
+type PaymentRoadmapConditionalVector struct {
+	VectorID          string
+	RouteID           string
+	PromiseIDs        []string
+	Mode              ConditionSettlementMode
+	Atomic            bool
+	ReserveReleased   bool
+	PreimageReplayKey string
+	EvidenceHash      string
+}
+
+type PaymentRoadmapRoutingVector struct {
+	VectorID           string
+	RouteHash          string
+	AttemptID          string
+	FailureClass       RouteFailureClass
+	CapacityAware      bool
+	FeeAware           bool
+	TimeoutAware       bool
+	FailureAware       bool
+	StructuredFailures bool
+	EvidenceHash       string
+}
+
 func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 	phases := []PaymentRoadmapPhase{
 		{
@@ -140,6 +166,42 @@ func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 				roadmapCriterion("phase2_duplicate_evidence", "Duplicate evidence is rejected.", "FraudProofVerificationState.HasEvidence", "TestKeeperFraudProofVerificationModuleRecordsRewardsAndDedup"),
 			},
 		},
+		{
+			PhaseID: PaymentRoadmapPhase3,
+			Title:   "Conditional Payments",
+			Tasks: []PaymentRoadmapTask{
+				roadmapTask("phase3_promise_object", "Implement promise object.", "ConditionalPromise", "BuildConditionalPromise", "SignatureForPromise"),
+				roadmapTask("phase3_hash_lock_resolution", "Implement hash-lock resolution.", "RevealPromisePreimage", "VerifyPromisePreimage", "MsgResolvePromise"),
+				roadmapTask("phase3_time_lock_expiry", "Implement time-lock expiry.", "ExpireConditionalPromises", "PromiseExpiryRequest", "MsgExpirePromise"),
+				roadmapTask("phase3_reserved_balance_accounting", "Implement reserved balance accounting.", "ValidateReservedBalancesForConditions", "BuildConditionRootUpdateFromPromises"),
+				roadmapTask("phase3_batch_resolution", "Implement batch promise resolution.", "BatchSettleLinkedPromises", "MsgBatchResolvePromises"),
+				roadmapTask("phase3_timeout_hierarchy", "Add timeout hierarchy validation.", "ValidatePromiseTimeoutOrdering", "ValidateCrossChannelPromiseTimeoutOrdering"),
+				roadmapTask("phase3_atomic_route_tests", "Add atomic route settlement tests.", "TestAtomicCrossChannelSettlementBatchAndPartialDispute", "TestBatchConditionSettlementRejectsBrokenRouteInvariants"),
+			},
+			ExitCriteria: []PaymentRoadmapExitCriterion{
+				roadmapCriterion("phase3_atomic_multihop", "Multi-hop conditional payments settle atomically.", "BatchSettleLinkedPromises", "ConditionLinkageProof.ValidateForState"),
+				roadmapCriterion("phase3_expiry_releases_reserves", "Expired promises release reserves.", "ExpireConditionalPromises", "BuildConditionRootAfterExpiry"),
+				roadmapCriterion("phase3_preimage_replay_rejected", "Preimage replay is rejected.", "rejectReusedConditionClaims", "ConditionClaimRecord"),
+			},
+		},
+		{
+			PhaseID: PaymentRoadmapPhase4,
+			Title:   "Routing Engine",
+			Tasks: []PaymentRoadmapTask{
+				roadmapTask("phase4_signed_gossip", "Implement signed gossip envelope.", "BuildRoutingGossipEnvelope", "SignedGossipEnvelope.ValidateAtHeight"),
+				roadmapTask("phase4_topology_database", "Implement topology database.", "TopologyStore", "ApplyGossipEnvelope", "PruneTopologyStore"),
+				roadmapTask("phase4_liquidity_hints", "Implement liquidity hints.", "LiquidityHint", "GossipLiquidityHint", "LiquidityHintFromGossip"),
+				roadmapTask("phase4_fee_policies", "Implement fee policies.", "RoutingFeePolicyUpdate", "BuildRoutingFeePolicyUpdate", "FeePolicyFromGossip"),
+				roadmapTask("phase4_capacity_path_search", "Implement capacity-aware path search.", "SelectPaymentRoute", "candidateRoutingEdges", "edgeEffectiveCapacityCovers"),
+				roadmapTask("phase4_congestion_scoring", "Implement congestion-aware route scoring.", "ApplyCongestionSnapshot", "routeEdgeWeight", "DecayRoutePenalties"),
+				roadmapTask("phase4_retry_policy", "Implement route retry policy.", "RetryPaymentRoute", "RetryRoutingEnginePath", "RouteRetryPolicy"),
+			},
+			ExitCriteria: []PaymentRoadmapExitCriterion{
+				roadmapCriterion("phase4_capacity_fee_timeout_failure_selection", "Routes are selected using capacity, fee, timeout, and failure signals.", "SelectPaymentRoute", "RoutePolicy", "EdgeRoutingStats"),
+				roadmapCriterion("phase4_stale_false_liquidity_penalty", "Stale or false liquidity reduces local route score.", "ApplyFalseLiquidityAdvertisementPenalty", "ApplyRouteFailureScoring"),
+				roadmapCriterion("phase4_structured_failures", "Route attempts produce structured failure data.", "RouteFailureReport", "RouteAttempt", "RetryRoutingEnginePath"),
+			},
+		},
 	}
 	report := PaymentRoadmapReport{Phases: phases}
 	for _, phase := range phases {
@@ -157,8 +219,8 @@ func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 
 func ValidatePaymentImplementationRoadmap(report PaymentRoadmapReport) error {
 	report = report.Normalize()
-	if len(report.Phases) != 3 {
-		return errors.New("payments roadmap requires phases 0 through 2")
+	if len(report.Phases) != 5 {
+		return errors.New("payments roadmap requires phases 0 through 4")
 	}
 	seenPhases := map[PaymentRoadmapPhaseID]struct{}{}
 	for _, phase := range report.Phases {
@@ -199,7 +261,7 @@ func ValidatePaymentImplementationRoadmap(report PaymentRoadmapReport) error {
 			}
 		}
 	}
-	for _, required := range []PaymentRoadmapPhaseID{PaymentRoadmapPhase0, PaymentRoadmapPhase1, PaymentRoadmapPhase2} {
+	for _, required := range []PaymentRoadmapPhaseID{PaymentRoadmapPhase0, PaymentRoadmapPhase1, PaymentRoadmapPhase2, PaymentRoadmapPhase3, PaymentRoadmapPhase4} {
 		if _, found := seenPhases[required]; !found {
 			return fmt.Errorf("payments roadmap missing phase %q", required)
 		}
@@ -484,6 +546,128 @@ func BuildPaymentRoadmapBlockSTMPlan(plans []BlockSTMAccessPlan) (PaymentRoadmap
 	}
 	out.PlanHash = HashParts(parts...)
 	return out, nil
+}
+
+func BuildPaymentRoadmapConditionalVector(result BatchConditionSettlementResult, mode ConditionSettlementMode, reserveReleased bool, replay ConditionClaimRecord) (PaymentRoadmapConditionalVector, error) {
+	result = result.Normalize()
+	if result.RouteID == "" || len(result.Resolutions) == 0 {
+		return PaymentRoadmapConditionalVector{}, errors.New("payments roadmap conditional vector requires route resolutions")
+	}
+	ids := make([]string, 0, len(result.Resolutions))
+	for _, resolution := range result.Resolutions {
+		resolution = resolution.Normalize()
+		ids = append(ids, resolution.ConditionID)
+	}
+	sort.Strings(ids)
+	vector := PaymentRoadmapConditionalVector{
+		VectorID:          HashParts("payments-roadmap-conditional-vector", result.RouteID, string(mode), result.EvidenceHash),
+		RouteID:           result.RouteID,
+		PromiseIDs:        ids,
+		Mode:              mode,
+		Atomic:            len(result.ConditionRootUpdates) > 0 && len(result.Resolutions) == len(ids),
+		ReserveReleased:   reserveReleased,
+		PreimageReplayKey: replay.Normalize().EvidenceHash,
+		EvidenceHash:      HashParts("payments-roadmap-conditional-evidence", result.EvidenceHash, strings.Join(ids, "|"), fmt.Sprintf("%t", reserveReleased), replay.Normalize().EvidenceHash),
+	}
+	vector = vector.Normalize()
+	return vector, vector.Validate()
+}
+
+func (v PaymentRoadmapConditionalVector) Normalize() PaymentRoadmapConditionalVector {
+	v.VectorID = normalizeOptionalHash(v.VectorID)
+	v.RouteID = normalizeHash(v.RouteID)
+	for i := range v.PromiseIDs {
+		v.PromiseIDs[i] = normalizeHash(v.PromiseIDs[i])
+	}
+	sort.Strings(v.PromiseIDs)
+	v.PreimageReplayKey = normalizeOptionalHash(v.PreimageReplayKey)
+	v.EvidenceHash = normalizeOptionalHash(v.EvidenceHash)
+	return v
+}
+
+func (v PaymentRoadmapConditionalVector) Validate() error {
+	vector := v.Normalize()
+	if err := ValidateHash("payments roadmap conditional vector id", vector.VectorID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments roadmap conditional route id", vector.RouteID); err != nil {
+		return err
+	}
+	if vector.Mode != ConditionSettlementModePreimage && vector.Mode != ConditionSettlementModeExpiry {
+		return errors.New("payments roadmap conditional vector mode is invalid")
+	}
+	if !vector.Atomic || len(vector.PromiseIDs) == 0 {
+		return errors.New("payments roadmap conditional vector must be atomic")
+	}
+	if !vector.ReserveReleased {
+		return errors.New("payments roadmap conditional vector must release reserves")
+	}
+	for _, id := range vector.PromiseIDs {
+		if err := ValidateHash("payments roadmap conditional promise id", id); err != nil {
+			return err
+		}
+	}
+	if err := ValidateHash("payments roadmap conditional replay key", vector.PreimageReplayKey); err != nil {
+		return err
+	}
+	return ValidateHash("payments roadmap conditional evidence", vector.EvidenceHash)
+}
+
+func BuildPaymentRoadmapRoutingVector(route ScoredRoute, attempt RouteAttempt, failure RouteFailureReport) (PaymentRoadmapRoutingVector, error) {
+	route = route.Normalize()
+	attempt = attempt.Normalize()
+	failure = failure.Normalize()
+	if err := route.Validate(); err != nil {
+		return PaymentRoadmapRoutingVector{}, err
+	}
+	if err := attempt.Validate(); err != nil {
+		return PaymentRoadmapRoutingVector{}, err
+	}
+	if err := failure.Validate(); err != nil {
+		return PaymentRoadmapRoutingVector{}, err
+	}
+	vector := PaymentRoadmapRoutingVector{
+		VectorID:           HashParts("payments-roadmap-routing-vector", route.ScoreHash, attempt.AttemptID, route.Amount, string(failure.FailureClass)),
+		RouteHash:          route.ScoreHash,
+		AttemptID:          attempt.AttemptID,
+		FailureClass:       failure.FailureClass,
+		CapacityAware:      route.MinCapacity != "" && route.MinCapacity != "0",
+		FeeAware:           route.TotalFee != "",
+		TimeoutAware:       failure.FailureClass == RouteFailureTimeout || failure.ObservedHeight > 0,
+		FailureAware:       IsRouteFailureClass(failure.FailureClass),
+		StructuredFailures: failure.ChannelID != "" && failure.From != "" && failure.To != "",
+		EvidenceHash:       HashParts("payments-roadmap-routing-evidence", route.ScoreHash, attempt.AttemptID, failure.ChannelID, string(failure.FailureClass), fmt.Sprintf("%020d", failure.ObservedHeight)),
+	}
+	vector = vector.Normalize()
+	return vector, vector.Validate()
+}
+
+func (v PaymentRoadmapRoutingVector) Normalize() PaymentRoadmapRoutingVector {
+	v.VectorID = normalizeOptionalHash(v.VectorID)
+	v.RouteHash = normalizeOptionalHash(v.RouteHash)
+	v.AttemptID = normalizeOptionalHash(v.AttemptID)
+	v.EvidenceHash = normalizeOptionalHash(v.EvidenceHash)
+	return v
+}
+
+func (v PaymentRoadmapRoutingVector) Validate() error {
+	vector := v.Normalize()
+	if err := ValidateHash("payments roadmap routing vector id", vector.VectorID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments roadmap routing route hash", vector.RouteHash); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments roadmap routing attempt id", vector.AttemptID); err != nil {
+		return err
+	}
+	if !IsRouteFailureClass(vector.FailureClass) {
+		return fmt.Errorf("unknown payments roadmap routing failure class %q", vector.FailureClass)
+	}
+	if !vector.CapacityAware || !vector.FeeAware || !vector.TimeoutAware || !vector.FailureAware || !vector.StructuredFailures {
+		return errors.New("payments roadmap routing vector is missing required route signals")
+	}
+	return ValidateHash("payments roadmap routing evidence", vector.EvidenceHash)
 }
 
 func roadmapTask(id PaymentRoadmapTaskID, description string, evidence ...string) PaymentRoadmapTask {

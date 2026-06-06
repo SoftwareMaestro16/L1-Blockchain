@@ -331,12 +331,12 @@ func TestPaymentAPISurfaceVirtualChannelMessagesAndQueries(t *testing.T) {
 	require.Equal(t, string(PaymentAPIEventFraudProofRejected), rejected.EventType)
 }
 
-func TestPaymentRoadmapPhase0ThroughPhase2VectorsAndExitCriteria(t *testing.T) {
+func TestPaymentRoadmapPhase0ThroughPhase4VectorsAndExitCriteria(t *testing.T) {
 	report := BuildPaymentImplementationRoadmap()
 	require.NoError(t, ValidatePaymentImplementationRoadmap(report))
 	require.Equal(t, report.TotalTaskCount, report.CompletedTaskCount)
-	require.Equal(t, uint64(22), report.TotalTaskCount)
-	require.Equal(t, uint64(10), report.ExitCriteriaCount)
+	require.Equal(t, uint64(36), report.TotalTaskCount)
+	require.Equal(t, uint64(16), report.ExitCriteriaCount)
 
 	alice := testAddress(0x46)
 	router := testAddress(0x47)
@@ -395,6 +395,33 @@ func TestPaymentRoadmapPhase0ThroughPhase2VectorsAndExitCriteria(t *testing.T) {
 	invalidTimeout := BuildPaymentRoadmapTimeoutOrderingVector(channel, upstream, unsafeDownstream, DefaultTimeoutMargin)
 	require.NoError(t, ValidatePaymentRoadmapTimeoutVector(invalidTimeout, false))
 
+	conditionalVector, err := BuildPaymentRoadmapConditionalVector(BatchConditionSettlementResult{
+		RouteID:      HashParts("roadmap-conditional-route", channel.ChannelID),
+		EvidenceHash: HashParts("roadmap-conditional-result", promise.PromiseID),
+		Resolutions: []ConditionResolution{{
+			ConditionID:  promise.PromiseID,
+			Resolver:     bob,
+			Recipient:    bob,
+			Amount:       promise.Amount,
+			EvidenceHash: HashParts("roadmap-conditional-resolution", promise.PromiseID),
+		}},
+		ConditionRootUpdates: []ConditionRootUpdate{{
+			ChannelID:      channel.ChannelID,
+			Nonce:          state.Nonce + 1,
+			ConditionRoot:  ComputeConditionsRoot(nil),
+			ConditionCount: 0,
+		}},
+	}, ConditionSettlementModePreimage, true, ConditionClaimRecord{
+		ChainID:        channel.ChainID,
+		ChannelID:      channel.ChannelID,
+		ConditionID:    promise.PromiseID,
+		EvidenceHash:   HashParts("roadmap-preimage-replay-key", promise.PromiseID),
+		ResolvedHeight: 40,
+		ExpiresHeight:  40 + DefaultReplayHorizon,
+	})
+	require.NoError(t, err)
+	require.NoError(t, conditionalVector.Validate())
+
 	firstPlan, err := AccessPlanForSettlementOperation(SettlementOperation{
 		OperationID:   HashParts("roadmap-plan-first"),
 		OperationType: BatchOperationSettle,
@@ -418,6 +445,36 @@ func TestPaymentRoadmapPhase0ThroughPhase2VectorsAndExitCriteria(t *testing.T) {
 	require.True(t, blockPlan.DeferredAccounting)
 	require.NotEmpty(t, blockPlan.IndependentGroups)
 	require.NoError(t, ValidateHash("roadmap blockstm plan hash", blockPlan.PlanHash))
+
+	edge := ChannelEdge{ChannelID: channel.ChannelID, From: alice, To: bob, Capacity: "1000", FeeDenom: NativeDenom, FeeAmount: "1", Active: true}
+	route := ScoredRoute{
+		Edges:       []ChannelEdge{edge},
+		Amount:      "100",
+		TotalFee:    "1",
+		TotalCost:   "101",
+		MinCapacity: "1000",
+		ScoreHash:   HashParts("roadmap-route-score", channel.ChannelID),
+	}
+	attempt := RouteAttempt{
+		AttemptID:     HashParts("roadmap-route-attempt", route.ScoreHash),
+		From:          alice,
+		To:            bob,
+		Amount:        "100",
+		CurrentHeight: 50,
+		Route:         route,
+		Success:       true,
+	}
+	failure := RouteFailureReport{
+		ChannelID:      channel.ChannelID,
+		From:           alice,
+		To:             bob,
+		FailureClass:   RouteFailureTimeout,
+		Retryable:      true,
+		ObservedHeight: 51,
+	}
+	routingVector, err := BuildPaymentRoadmapRoutingVector(route, attempt, failure)
+	require.NoError(t, err)
+	require.NoError(t, routingVector.Validate())
 }
 
 func TestSettlementArbitrationBoundaryRejectsNonDeterministicInputs(t *testing.T) {
