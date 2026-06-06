@@ -1,32 +1,173 @@
 # Aetheris Blockchain
 
-Aetheris is a sovereign Cosmos SDK Layer 1 blockchain implemented in Go. Its native token is Aetheris (`AET`), with base denom `naet` and `1 AET = 1,000,000,000 naet`. The PoS supply is uncapped: new `AET` can be issued through staking inflation and validator/delegator rewards.
+Aetheris is a sovereign Cosmos SDK Layer 1 blockchain implemented in Go. The repository lives at [SoftwareMaestro16/Aetra-Blockchain](https://github.com/SoftwareMaestro16/Aetra-Blockchain).
 
-This prototype is not mainnet-ready. Local Aetheris validator/full nodes do not require Redis or PostgreSQL for consensus, mempool, or app state.
+The native asset is **Aetheris (`AET`)**. On chain it is represented as the base denomination `naet`, where:
+
+```text
+1 AET = 1,000,000,000 naet
+```
+
+This codebase is a fast-moving prototype and testnet-preparation chain. It already boots as a Cosmos SDK application with PoS, native fees, staking, governance, custom modules, system entities, genesis validation, export/import tests, and localnet scripts. It is not mainnet-ready yet.
+
+Local Aetheris validator/full nodes do not require Redis or PostgreSQL for consensus, mempool, or application state.
 
 ## Current Surface
 
 ```mermaid
-flowchart LR
-  CLI["aetherisd CLI"] --> RPC["gRPC / REST / CometBFT RPC"]
-  RPC --> APP["Aetheris app"]
-  APP --> CORE["auth / bank / staking / distribution / gov / mint"]
-  APP --> FEES["x/fees"]
-  APP --> TF["x/tokenfactory"]
-  APP --> DEX["x/dex"]
-  APP --> AVM["AVM readiness specs"]
-  APP --> WASM["CosmWasm readiness gate"]
+flowchart TD
+  USER["CLI / REST / gRPC clients"] --> RPC["CometBFT RPC and app query servers"]
+  RPC --> CONSENSUS["CometBFT consensus, mempool, CheckTx, DeliverTx"]
+  CONSENSUS --> ANTE["Aetheris ante admission: signatures, fees, reserved-address policy"]
+  ANTE --> CORE["Cosmos SDK core: auth, bank, staking, slashing, distribution, gov, mint"]
+  CORE --> ECON["Native economy: fees, fee collector, treasury, burn, emissions, mint authority"]
+  CORE --> POS["Validator surface: staking, validator registry/election, insurance, protection, reputation"]
+  CORE --> SYS["System entities: config, constitution, system registry, scheduler, storage rent, identity root"]
+  CORE --> EXEC["Execution apps: tokenfactory, DEX, AVM/actor scheduling surfaces"]
+  ECON --> STATE["Deterministic stores, genesis validation, export/import"]
+  POS --> STATE
+  SYS --> STATE
+  EXEC --> STATE
 ```
 
-- `cmd/l1d`: Aetheris node binary and CLI.
-- `app`: Cosmos SDK app wiring, genesis policy, custom address codec, PoS and fee configuration.
-- `x/fees`: deterministic native fee-denom policy; v1 accepts only `naet` fees.
-- `x/tokenfactory`: factory asset creation, mint, burn, and admin lifecycle.
-- `x/dex`: local constant-product DEX module for pools, liquidity, swaps, and LP tokens.
-- `x/aetherisvm`: AVM and async execution executable specifications, not yet production state mutation.
-- `scripts/localnet`: local validator network initialization, startup, diagnostics, and smoke support.
+### Transaction Path
 
-The full target design for Aether Core, Execution Zones, Compute Shards, deterministic `LOAD_SCORE`, routing, Aether Mesh, Identity, security, economics, and failure handling is documented in [Aetheris Modular L1 Execution OS](docs/architecture/aetheris-modular-execution-os.md). Production zones, compute shards, Aether Mesh, AVM state mutation, and CosmWasm execution remain target architecture until implementation, simulator, long-run testnet, consensus-safety proof, and independent audit gates pass.
+A normal transaction follows this path:
+
+1. The user signs and broadcasts through `aetherisd`, REST, gRPC, or CometBFT RPC.
+2. CometBFT admits it into mempool and later proposes it in a block.
+3. Aetheris ante validation runs before message execution.
+4. The fee decorator enforces native `naet` fee policy, bounded dynamic fees, signer policy, fee payer policy, and reserved system address restrictions.
+5. Cosmos SDK auth verifies signatures and account sequence.
+6. Messages route to module keepers such as `bank`, `staking`, `gov`, `tokenfactory`, `dex`, `burn`, `treasury`, `fees`, and the Aetheris native modules.
+7. BeginBlocker and EndBlocker ordering is explicit in `app/aether_core_wiring.go`.
+8. State is committed through deterministic stores and can be exported/imported for restart testing.
+
+Important admission rules:
+
+- protocol fees are paid in `naet`;
+- malformed, zero, and unsupported addresses are rejected;
+- reserved system addresses cannot sign user transactions;
+- user sends to non-receivable system addresses are rejected;
+- `AETBurn` can receive user funds when burn-by-send policy allows it;
+- core `-7:` protocol addresses do not receive user funds.
+
+## Implemented Runtime
+
+### Base Chain
+
+- Cosmos SDK application wiring in `app`.
+- CometBFT consensus integration.
+- `aetherisd` node binary and CLI in `cmd/l1d`.
+- Account, bank, staking, distribution, slashing, governance, mint, evidence, feegrant, authz, upgrade, epochs, protocolpool, and consensus parameter modules.
+- Deterministic genesis policy and export/import checks.
+- Localnet scripts for multi-validator testing.
+
+### Addresses And System Accounts
+
+Aetheris uses a custom address codec:
+
+- user raw address: `4:<64 lowercase hex>`;
+- protocol-core raw address: `-7:<64 lowercase hex>`;
+- user-friendly address: `AE...`;
+- zero address is rejected by default.
+
+Reserved system addresses are defined in `app/addressing/system_addresses.go`. They cover core entities such as elector, config, constitution, system registry, validator registry, config voting, mint, burn, fee collector, treasury, storage rent, actor registry, identity root, bridge hub, sharding coordinator, and other native modules.
+
+Reserved system module accounts are wired in `app/system_module_accounts.go`. Fund-capable or accounting-relevant accounts include:
+
+- `AETMint` / `mint-authority`;
+- `AETBurn` / `burn`;
+- `AETFeeCollector`;
+- `AETTreasury`;
+- `AETStorageRent`;
+- `AETDelegatorProtection`;
+- `AETValidatorInsurance`;
+- `AETReporterRewards`.
+
+Core registry/config/elector accounts are non-spendable system accounts for authority and event identity. No system address has a private key.
+
+### Fees
+
+`x/fees` is the chain-level fee admission layer.
+
+- Only `naet` is accepted as a protocol fee denom in v1.
+- Delivered transactions must pay at least the configured minimum fee.
+- A bounded dynamic fee reacts to block gas utilization.
+- A hard cap prevents fee auctions from becoming the priority mechanism.
+- Per-sender and block-level protections limit spam pressure.
+- Fee validation runs before message execution and before custom messages can mutate state.
+
+### Economy
+
+The economy is split into explicit modules instead of one opaque account:
+
+- `x/fee-collector`: collects protocol income and prepares deterministic bucket accounting.
+- `x/treasury`: treasury allocations and controlled spend lifecycle.
+- `x/burn`: user/protocol burn accounting by denom and epoch.
+- `x/emissions`: emission policy surface.
+- `x/mint-authority`: controlled mint authority for the base denom.
+- `x/delegator-protection`: protection fund surface.
+- `x/validator-insurance`: validator insurance reserve surface.
+- `x/reporter`: reporter reward surface.
+- `x/storage-rent`: rent and storage reserve surface for future AVM contracts.
+
+Protocol income is designed to route through configurable buckets such as validator rewards, treasury, delegator protection, validator insurance, ecosystem grants, storage rent reserve, burn, and reporter rewards. Bucket weights must be deterministic and reconcile against bank balances.
+
+### Proof Of Stake And Validators
+
+Aetheris uses Cosmos SDK staking as the live PoS base:
+
+- validators are created through staking transactions;
+- delegators can delegate, unbond, and redelegate `naet`;
+- staking denom is `naet`;
+- distribution handles validator/delegator rewards;
+- slashing and evidence modules are wired for validator safety;
+- minting supports uncapped PoS supply through inflation and rewards.
+
+Native validator-system modules extend the target validator surface:
+
+- `x/validator-registry`: native validator metadata and status registry;
+- `x/validator-election`: validator set/election coordination surface;
+- `x/nominator-pool` and `x/single-nominator-pool`: nominator-pool surfaces;
+- `x/validator-insurance`: insurance accounting;
+- `x/delegator-protection`: protection accounting;
+- `x/reputation`: account/validator reputation scoring surface;
+- `x/performance`: performance oracle surface;
+- `x/dynamic-commission`: commission policy surface;
+- `x/stake-concentration`: decentralization and concentration controls.
+
+Some of these modules are already wired with genesis, keeper state, tests, and query/msg surfaces; others are intentionally gated or prototype-level until public testnet readiness criteria are met.
+
+### Native System Entity Layer
+
+Aetheris has a native system-entity direction beyond standard Cosmos modules:
+
+- `x/config`: protocol configuration state.
+- `x/config-voting`: controlled voting path for critical configuration changes.
+- `x/constitution`: constitutional guardrail surface.
+- `x/system-registry`: registry for native system entities.
+- `x/scheduler`: periodic/delayed job surface.
+- `x/avm-scheduler`: AVM execution scheduling and conflict-coordination surface.
+- `x/actor-registry`: AVM actor/contract account registry surface.
+- `x/storage-rent`: storage-rent lifecycle surface.
+- `x/identity-root`: `.aet` identity/name root surface.
+- `x/bridge-hub`: bridge coordination surface.
+- `x/cross-chain-registry`: trusted external chain/channel/route registry surface.
+- `x/sharding-coordinator`: future shard/zone allocation surface.
+
+These modules are wired into app genesis ordering and block ordering. Production activation still depends on module-specific tests, migrations, invariants, long-run localnet checks, and audit gates.
+
+### Execution And Assets
+
+Implemented or wired execution/application surfaces:
+
+- `x/tokenfactory`: factory denoms, mint, burn, and admin lifecycle.
+- `x/dex`: constant-product pool surface, swaps, liquidity, and LP tokens.
+- `x/aetherisvm`: AVM and async execution executable specifications.
+- `x/actor-registry` and `x/avm-scheduler`: native AVM account and scheduling surfaces.
+
+AVM state mutation is not treated as production-ready until gas accounting, storage bounds, async queues, conflict handling, export/import, fuzzing, and independent audit gates pass.
 
 ## Build
 
@@ -34,9 +175,13 @@ The full target design for Aether Core, Execution Zones, Compute Shards, determi
 .\scripts\build-aetherisd.ps1
 ```
 
-The build script uses the repo-local Go toolchain under `.work\tools\go1.25.11` when present, falls back to `go` on PATH, runs `go mod verify`, and builds `build\aetherisd.exe`.
+The build script uses the repo-local Go toolchain under `.work\tools\go1.25.11` when present, falls back to `go` on PATH, runs `go mod verify`, and builds:
 
-If disk space is tight, either free space on `C:\` or lower the local guard explicitly:
+```text
+build\aetherisd.exe
+```
+
+If disk space is tight, lower the local guard explicitly:
 
 ```powershell
 .\scripts\build-aetherisd.ps1 -MinFreeGB 2
@@ -58,18 +203,76 @@ Short smoke and audit probes:
 .\scripts\security\prototype-audit.ps1 -Profile Fast
 ```
 
-Default node endpoints:
+Default local endpoints:
 
-- node0: P2P `26656`, RPC `26657`, gRPC `9090`, REST `1317`
-- node1: P2P `26666`, RPC `26667`, gRPC `9100`, REST `1327`
-- node2: P2P `26676`, RPC `26677`, gRPC `9110`, REST `1337`
+- node0: P2P `26656`, RPC `26657`, gRPC `9090`, REST `1317`;
+- node1: P2P `26666`, RPC `26667`, gRPC `9100`, REST `1327`;
+- node2: P2P `26676`, RPC `26677`, gRPC `9110`, REST `1337`.
 
 Each init writes `.localnet*\localnet.json` with node homes, RPC, REST, gRPC, CometBFT metrics, and Aetheris app metrics URLs. Logs are under `.localnet*\logs`.
 
-README keeps only the shortest probes. Use [Operator Commands](docs/operator-commands.md) for the full build, localnet, query, staking, bank, tokenfactory, DEX, diagnostics, and release command runbook.
+## Common Commands
 
-Core runbooks:
+Query chain state:
 
+```powershell
+build\aetherisd.exe query block --node tcp://127.0.0.1:26657
+build\aetherisd.exe query bank denom-metadata naet --node tcp://127.0.0.1:26657 --output json
+build\aetherisd.exe query bank total-supply-of naet --node tcp://127.0.0.1:26657 --output json
+build\aetherisd.exe query fees params --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
+build\aetherisd.exe query tokenfactory params --node tcp://127.0.0.1:26657 --output json
+build\aetherisd.exe query dex params --node tcp://127.0.0.1:26657 --output json
+```
+
+Send native funds on localnet:
+
+```powershell
+$node0 = build\aetherisd.exe keys show node0 -a --home .localnet\node0\aetherisd --keyring-backend test
+$node1 = build\aetherisd.exe keys show node1 -a --home .localnet\node1\aetherisd --keyring-backend test
+
+build\aetherisd.exe tx bank send node0 $node1 1000naet `
+  --home .localnet\node0\aetherisd `
+  --keyring-backend test `
+  --chain-id aetheris-local-1 `
+  --node tcp://127.0.0.1:26657 `
+  --fees 1000000naet `
+  -y
+```
+
+## Token Summary
+
+- Name: `Aetheris`
+- Symbol/display denom: `AET`
+- Base denom: `naet`
+- Conversion: `1 AET = 1,000,000,000 naet`
+- Staking denom: `naet`
+- Fee denom: `naet`
+- Mint denom: `naet`
+- Supply: uncapped PoS supply through inflation and rewards
+
+Operators and scripts should use `naet` for balances, fees, staking, and transaction amounts. `AET` is display metadata.
+
+## Security Posture
+
+Current hardening work includes:
+
+- deterministic genesis validation;
+- export/import roundtrip tests;
+- zero-address rejection;
+- reserved system address parsing and signer rejection;
+- native-only fee validation;
+- bounded dynamic fees;
+- malformed transaction and wrong-chain checks;
+- staking, delegation, unbonding, redelegation, slashing, downtime, and restart tests;
+- module-account wiring validation;
+- bank blocked-address policy for system accounts;
+- govulncheck, gosec, gitleaks, dependency review, and CodeQL workflows.
+
+## Documentation
+
+Useful docs:
+
+- [Operator Commands](docs/operator-commands.md)
 - [Prototype Contract](docs/prototype-contract.md)
 - [Operator Troubleshooting](docs/operator-troubleshooting.md)
 - [Transaction Lifecycle Matrix](docs/transaction-lifecycle-matrix.md)
@@ -84,86 +287,19 @@ Core runbooks:
 - [Security Testing](docs/security-testing.md)
 - [Cosmos Security Checklist](docs/security/cosmos-security-checklist.md)
 - [Test Pyramid](docs/test-pyramid.md)
+- [Public Testnet Preparation](docs/public-testnet-preparation.md)
+- [Validator Onboarding](docs/validator-onboarding.md)
 
-## Common Queries
+## Public Testnet Status
 
-```powershell
-build\aetherisd.exe query block --node tcp://127.0.0.1:26657
-build\aetherisd.exe query bank denom-metadata naet --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query bank total-supply-of naet --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query fees params --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query dex params --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query tokenfactory params --node tcp://127.0.0.1:26657 --output json
-```
+Before public testnet, Aetheris still needs the full readiness gate:
 
-Get local keys and send native funds:
-
-```powershell
-$node0 = build\aetherisd.exe keys show node0 -a --home .localnet\node0\aetherisd --keyring-backend test
-$node1 = build\aetherisd.exe keys show node1 -a --home .localnet\node1\aetherisd --keyring-backend test
-
-build\aetherisd.exe query bank balance $node0 naet --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe tx bank send node0 $node1 1000naet `
-  --home .localnet\node0\aetherisd `
-  --keyring-backend test `
-  --chain-id aetheris-local-1 `
-  --node tcp://127.0.0.1:26657 `
-  --fees 1000000naet `
-  -y
-```
-
-## Token
-
-- Name: `Aetheris`
-- Symbol/display denom: `AET`
-- Base denom: `naet`
-- Conversion: `1 AET = 1,000,000,000 naet`
-- Staking denom: `naet`
-- Fee denom: `naet`
-- Mint denom: `naet`
-- Supply: uncapped PoS supply through inflation and rewards
-
-Operators and scripts must use `naet` for balances, fees, staking, and tx amounts. `AET` is display metadata only.
-
-## Fee Model
-
-Base-chain transaction fees are native-only and capped. In v1, `allowed_fee_denoms` must be exactly `["naet"]`, delivered transactions must pay at least `1naet`, and non-`naet` fees are rejected even when the fee payer owns the token.
-
-The protocol uses a bounded dynamic fee based on block gas utilization. Normal traffic pays the base fee (`1naet` by default), congestion raises the required fee along a deterministic curve, and the hard cap (`1000naet` by default) cannot be exceeded. Fee overpayment does not buy priority, so the system avoids Ethereum-style fee auctions.
-
-User-created tokens, DEX LP tokens, NFT/SBT assets, `testtoken`, and display denom `AET` cannot pay protocol fees. Gasless or user-friendly flows must use relayers that pay `naet` on-chain; any alternative token collection is outside the base-chain fee path.
-
-Spam is handled by protocol controls: max tx gas, max block gas, max block tx count, per-sender block rate limits, congestion checks, and stake-weighted priority formulas. Validators remain economically incentivized by PoS issuance and rewards rather than high transaction fees.
-
-Localnet validator `minimum-gas-prices` may be `0naet` so development txs are not filtered before ante checks run. That mempool setting does not disable protocol fee validation for delivered transactions.
-
-## Addresses
-
-Aetheris uses a custom address codec for protocol-facing addresses:
-
-- raw: `4:` followed by 64 lowercase hex characters, total length 66
-- userfriendly: 48 base64url characters, starts with `AE`, alphabet `A-Z a-z 0-9 - _`
-- zero address: `4:0000000000000000000000000000000000000000000000000000000000000000`
-
-The zero address is protocol-invalid by default. It must not be a signer, admin, recipient, authority, genesis account, fee collector, DEX actor, or tokenfactory admin/recipient/source.
-
-## Security
-
-Aetheris currently prioritizes base-chain hardening before public testnet expansion:
-
-- deterministic genesis validation and export/import checks
-- zero-address rejection across custom modules and genesis policy
-- native fee policy restricted to `naet`
-- transaction replay, invalid signer, wrong chain-id, malformed tx, and insufficient funds tests
-- PoS staking lifecycle tests for validator creation, delegation, unbonding, redelegation, slashing, downtime, and restart persistence
-- security workflows for govulncheck, gosec, gitleaks, dependency review, and CodeQL
-
-## AVM And CosmWasm Readiness
-
-AVM is the Aetheris-defined native VM direction for deterministic asynchronous contracts. CosmWasm remains an explicitly gated compatibility direction. Neither runtime mutates production chain state until base-chain safety, async queue semantics, gas accounting, storage bounds, adversarial tests, fuzzing, export/import, and independent audit gates pass.
-
-AVM contracts execute through explicit entrypoints for deploy, external call, internal call, bounced call, query, and migration. All protocol fees remain in `naet`, and AVM routing cannot bypass signer, address, zero-address, fee, memo, staking, slashing, or governance validation.
-
-## Public Testnet
-
-Public testnet preparation lives in [Public Testnet Preparation](docs/public-testnet-preparation.md), with validator onboarding in [Validator Onboarding](docs/validator-onboarding.md). Production zones, compute shards, Aether Mesh, and AVM state mutation remain target architecture until implementation, simulator, long-run testnet, audit, and production gates pass.
+- all module params documented;
+- every native module covered by genesis, export/import, authority, invariant, malformed message, and migration tests;
+- fee/mint/burn accounting reconciled with bank supply;
+- validator set transitions tested across multiple epochs;
+- storage-rent freeze/unfreeze/delete tested with AVM contracts;
+- scheduler gas bounds enforced under load;
+- no unbounded user-controlled iteration;
+- localnet multi-validator runs covering epoch transition, slashing, evidence, fee distribution, storage rent, and export/import restart;
+- independent security review.
