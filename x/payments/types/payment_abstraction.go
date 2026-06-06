@@ -53,7 +53,7 @@ type Payment struct {
 	Signature       string
 }
 
-type PaymentReceipt struct {
+type PaymentAbstractionReceipt struct {
 	PaymentID      string
 	Status         PaymentStatus
 	SettlementZone string
@@ -75,7 +75,7 @@ type PaymentNonceRecord struct {
 type PaymentAbstractionState struct {
 	Height   uint64
 	Payments []Payment
-	Receipts []PaymentReceipt
+	Receipts []PaymentAbstractionReceipt
 	Nonces   []PaymentNonceRecord
 }
 
@@ -93,7 +93,7 @@ func EmptyPaymentAbstractionState(height uint64) PaymentAbstractionState {
 	return PaymentAbstractionState{
 		Height:   height,
 		Payments: []Payment{},
-		Receipts: []PaymentReceipt{},
+		Receipts: []PaymentAbstractionReceipt{},
 		Nonces:   []PaymentNonceRecord{},
 	}
 }
@@ -156,8 +156,8 @@ func RegisterPayment(state PaymentAbstractionState, payment Payment, currentHeig
 	return next, payment, next.Validate()
 }
 
-func SettlePaymentInFinancialZone(state PaymentAbstractionState, paymentID string, gasUsed uint64, feeCharged string, currentHeight uint64) (PaymentAbstractionState, PaymentReceipt, error) {
-	return appendPaymentReceipt(state, PaymentReceipt{
+func SettlePaymentInFinancialZone(state PaymentAbstractionState, paymentID string, gasUsed uint64, feeCharged string, currentHeight uint64) (PaymentAbstractionState, PaymentAbstractionReceipt, error) {
+	return appendPaymentAbstractionReceipt(state, PaymentAbstractionReceipt{
 		PaymentID:      paymentID,
 		Status:         PaymentStatusSettled,
 		SettlementZone: FinancialSettlementZoneID,
@@ -167,8 +167,8 @@ func SettlePaymentInFinancialZone(state PaymentAbstractionState, paymentID strin
 	})
 }
 
-func RejectPaymentInFinancialZone(state PaymentAbstractionState, paymentID, errorCode string, currentHeight uint64) (PaymentAbstractionState, PaymentReceipt, error) {
-	return appendPaymentReceipt(state, PaymentReceipt{
+func RejectPaymentInFinancialZone(state PaymentAbstractionState, paymentID, errorCode string, currentHeight uint64) (PaymentAbstractionState, PaymentAbstractionReceipt, error) {
+	return appendPaymentAbstractionReceipt(state, PaymentAbstractionReceipt{
 		PaymentID:      paymentID,
 		Status:         PaymentStatusRejected,
 		SettlementZone: FinancialSettlementZoneID,
@@ -177,7 +177,7 @@ func RejectPaymentInFinancialZone(state PaymentAbstractionState, paymentID, erro
 	})
 }
 
-func ExpirePayments(state PaymentAbstractionState, currentHeight uint64) (PaymentAbstractionState, []PaymentReceipt, error) {
+func ExpirePayments(state PaymentAbstractionState, currentHeight uint64) (PaymentAbstractionState, []PaymentAbstractionReceipt, error) {
 	state = state.Export()
 	if currentHeight == 0 {
 		return PaymentAbstractionState{}, nil, errors.New("payments abstraction expiry height must be positive")
@@ -187,7 +187,7 @@ func ExpirePayments(state PaymentAbstractionState, currentHeight uint64) (Paymen
 	}
 	next := state.Clone()
 	next.Height = currentHeight
-	created := make([]PaymentReceipt, 0)
+	created := make([]PaymentAbstractionReceipt, 0)
 	for _, payment := range state.Payments {
 		payment = payment.Normalize()
 		if payment.Expiry >= currentHeight {
@@ -196,7 +196,7 @@ func ExpirePayments(state PaymentAbstractionState, currentHeight uint64) (Paymen
 		if _, found := state.ReceiptByPaymentID(payment.PaymentID); found {
 			continue
 		}
-		receipt, err := BuildPaymentReceipt(PaymentReceipt{
+		receipt, err := BuildPaymentAbstractionReceipt(PaymentAbstractionReceipt{
 			PaymentID:      payment.PaymentID,
 			Status:         PaymentStatusExpired,
 			SettlementZone: FinancialSettlementZoneID,
@@ -208,33 +208,33 @@ func ExpirePayments(state PaymentAbstractionState, currentHeight uint64) (Paymen
 		next.Receipts = append(next.Receipts, receipt)
 		created = append(created, receipt)
 	}
-	sortPaymentReceipts(next.Receipts)
+	sortPaymentAbstractionReceipts(next.Receipts)
 	return next, created, next.Validate()
 }
 
-func appendPaymentReceipt(state PaymentAbstractionState, receipt PaymentReceipt) (PaymentAbstractionState, PaymentReceipt, error) {
+func appendPaymentAbstractionReceipt(state PaymentAbstractionState, receipt PaymentAbstractionReceipt) (PaymentAbstractionState, PaymentAbstractionReceipt, error) {
 	state = state.Export()
 	if err := state.Validate(); err != nil {
-		return PaymentAbstractionState{}, PaymentReceipt{}, err
+		return PaymentAbstractionState{}, PaymentAbstractionReceipt{}, err
 	}
 	receipt = receipt.Normalize()
 	if receipt.ExecutedHeight == 0 {
-		return PaymentAbstractionState{}, PaymentReceipt{}, errors.New("payments abstraction receipt height must be positive")
+		return PaymentAbstractionState{}, PaymentAbstractionReceipt{}, errors.New("payments abstraction receipt height must be positive")
 	}
 	if _, found := state.PaymentByID(receipt.PaymentID); !found {
-		return PaymentAbstractionState{}, PaymentReceipt{}, errors.New("payments abstraction receipt references unknown payment")
+		return PaymentAbstractionState{}, PaymentAbstractionReceipt{}, errors.New("payments abstraction receipt references unknown payment")
 	}
 	if _, found := state.ReceiptByPaymentID(receipt.PaymentID); found {
-		return PaymentAbstractionState{}, PaymentReceipt{}, errors.New("payments abstraction receipt already exists")
+		return PaymentAbstractionState{}, PaymentAbstractionReceipt{}, errors.New("payments abstraction receipt already exists")
 	}
-	built, err := BuildPaymentReceipt(receipt)
+	built, err := BuildPaymentAbstractionReceipt(receipt)
 	if err != nil {
-		return PaymentAbstractionState{}, PaymentReceipt{}, err
+		return PaymentAbstractionState{}, PaymentAbstractionReceipt{}, err
 	}
 	next := state.Clone()
 	next.Height = receipt.ExecutedHeight
 	next.Receipts = append(next.Receipts, built)
-	sortPaymentReceipts(next.Receipts)
+	sortPaymentAbstractionReceipts(next.Receipts)
 	return next, built, next.Validate()
 }
 
@@ -294,15 +294,15 @@ func SelectOptimalPaymentRoute(payment Payment, quotes []PaymentRouteQuote, curr
 	return candidates[0], candidates[0].Validate()
 }
 
-func BuildPaymentReceipt(receipt PaymentReceipt) (PaymentReceipt, error) {
+func BuildPaymentAbstractionReceipt(receipt PaymentAbstractionReceipt) (PaymentAbstractionReceipt, error) {
 	if receipt.ReceiptHash != "" {
-		return PaymentReceipt{}, errors.New("payments abstraction receipt hash must be empty before construction")
+		return PaymentAbstractionReceipt{}, errors.New("payments abstraction receipt hash must be empty before construction")
 	}
 	receipt = receipt.Normalize()
 	if err := receipt.ValidateFormat(); err != nil {
-		return PaymentReceipt{}, err
+		return PaymentAbstractionReceipt{}, err
 	}
-	receipt.ReceiptHash = ComputePaymentReceiptHash(receipt)
+	receipt.ReceiptHash = ComputePaymentAbstractionReceiptHash(receipt)
 	return receipt, receipt.Validate()
 }
 
@@ -336,7 +336,7 @@ func ComputePaymentSignatureHash(payment Payment) string {
 	)
 }
 
-func ComputePaymentReceiptHash(receipt PaymentReceipt) string {
+func ComputePaymentAbstractionReceiptHash(receipt PaymentAbstractionReceipt) string {
 	receipt = receipt.Normalize()
 	return HashParts(
 		"aetheris-payment-receipt-v1",
@@ -480,7 +480,7 @@ func (payment Payment) Validate() error {
 	return nil
 }
 
-func (receipt PaymentReceipt) Normalize() PaymentReceipt {
+func (receipt PaymentAbstractionReceipt) Normalize() PaymentAbstractionReceipt {
 	receipt.PaymentID = normalizeHash(receipt.PaymentID)
 	receipt.SettlementZone = strings.TrimSpace(receipt.SettlementZone)
 	receipt.FeeCharged = strings.TrimSpace(receipt.FeeCharged)
@@ -492,7 +492,7 @@ func (receipt PaymentReceipt) Normalize() PaymentReceipt {
 	return receipt
 }
 
-func (receipt PaymentReceipt) ValidateFormat() error {
+func (receipt PaymentAbstractionReceipt) ValidateFormat() error {
 	receipt = receipt.Normalize()
 	if err := ValidateHash("payments abstraction receipt payment id", receipt.PaymentID); err != nil {
 		return err
@@ -520,7 +520,7 @@ func (receipt PaymentReceipt) ValidateFormat() error {
 	return nil
 }
 
-func (receipt PaymentReceipt) Validate() error {
+func (receipt PaymentAbstractionReceipt) Validate() error {
 	receipt = receipt.Normalize()
 	if err := receipt.ValidateFormat(); err != nil {
 		return err
@@ -528,7 +528,7 @@ func (receipt PaymentReceipt) Validate() error {
 	if receipt.ReceiptHash == "" {
 		return errors.New("payments abstraction receipt hash is required")
 	}
-	if expected := ComputePaymentReceiptHash(receipt); receipt.ReceiptHash != expected {
+	if expected := ComputePaymentAbstractionReceiptHash(receipt); receipt.ReceiptHash != expected {
 		return fmt.Errorf("payments abstraction receipt hash mismatch: expected %s", expected)
 	}
 	return nil
@@ -624,7 +624,7 @@ func (quote PaymentRouteQuote) Validate() error {
 func (state PaymentAbstractionState) Export() PaymentAbstractionState {
 	out := state.Clone()
 	sortPayments(out.Payments)
-	sortPaymentReceipts(out.Receipts)
+	sortPaymentAbstractionReceipts(out.Receipts)
 	sortPaymentNonceRecords(out.Nonces)
 	return out
 }
@@ -633,7 +633,7 @@ func (state PaymentAbstractionState) Clone() PaymentAbstractionState {
 	out := PaymentAbstractionState{
 		Height:   state.Height,
 		Payments: make([]Payment, len(state.Payments)),
-		Receipts: make([]PaymentReceipt, len(state.Receipts)),
+		Receipts: make([]PaymentAbstractionReceipt, len(state.Receipts)),
 		Nonces:   make([]PaymentNonceRecord, len(state.Nonces)),
 	}
 	for i, payment := range state.Payments {
@@ -704,7 +704,7 @@ func (state PaymentAbstractionState) PaymentByID(paymentID string) (Payment, boo
 	return Payment{}, false
 }
 
-func (state PaymentAbstractionState) ReceiptByPaymentID(paymentID string) (PaymentReceipt, bool) {
+func (state PaymentAbstractionState) ReceiptByPaymentID(paymentID string) (PaymentAbstractionReceipt, bool) {
 	needle := normalizeHash(paymentID)
 	for _, receipt := range state.Receipts {
 		receipt = receipt.Normalize()
@@ -712,7 +712,7 @@ func (state PaymentAbstractionState) ReceiptByPaymentID(paymentID string) (Payme
 			return receipt, true
 		}
 	}
-	return PaymentReceipt{}, false
+	return PaymentAbstractionReceipt{}, false
 }
 
 func (state PaymentAbstractionState) NonceRecord(sourceZone, sender string, nonce uint64) (PaymentNonceRecord, bool) {
@@ -778,7 +778,7 @@ func sortPayments(payments []Payment) {
 	})
 }
 
-func sortPaymentReceipts(receipts []PaymentReceipt) {
+func sortPaymentAbstractionReceipts(receipts []PaymentAbstractionReceipt) {
 	sort.SliceStable(receipts, func(i, j int) bool {
 		return receipts[i].Normalize().PaymentID < receipts[j].Normalize().PaymentID
 	})

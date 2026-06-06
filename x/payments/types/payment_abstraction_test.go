@@ -91,13 +91,13 @@ func TestPaymentAbstractionStateRejectsNonceReplayAndSettlesInFinancialZone(t *t
 	require.NoError(t, err)
 	require.Equal(t, PaymentStatusSettled, receipt.Status)
 	require.Equal(t, FinancialSettlementZoneID, receipt.SettlementZone)
-	require.Equal(t, receipt.ReceiptHash, ComputePaymentReceiptHash(receipt))
+	require.Equal(t, receipt.ReceiptHash, ComputePaymentAbstractionReceiptHash(receipt))
 	require.NoError(t, state.Validate())
 
 	badReceipt := receipt
 	badReceipt.SettlementZone = "APPLICATION_ZONE"
 	badReceipt.ReceiptHash = ""
-	_, err = BuildPaymentReceipt(badReceipt)
+	_, err = BuildPaymentAbstractionReceipt(badReceipt)
 	require.ErrorContains(t, err, "financial zone")
 }
 
