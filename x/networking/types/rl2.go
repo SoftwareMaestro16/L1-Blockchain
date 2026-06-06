@@ -31,6 +31,23 @@ const (
 	RL2FECReedSolomon RL2FECPolicy = "reed_solomon"
 )
 
+type RL2TransferState string
+
+const (
+	RL2StateOffered          RL2TransferState = "offered"
+	RL2StateAccepted         RL2TransferState = "accepted"
+	RL2StateStreaming        RL2TransferState = "streaming"
+	RL2StatePaused           RL2TransferState = "paused"
+	RL2StateResumed          RL2TransferState = "resumed"
+	RL2StateVerified         RL2TransferState = "verified"
+	RL2StateCompleted        RL2TransferState = "completed"
+	RL2StateTimeout          RL2TransferState = "timeout"
+	RL2StateCancelled        RL2TransferState = "cancelled"
+	RL2StateInvalidChunk     RL2TransferState = "invalid_chunk"
+	RL2StateRootMismatch     RL2TransferState = "root_mismatch"
+	RL2StatePeerDisconnected RL2TransferState = "peer_disconnected"
+)
+
 type RL2Transfer struct {
 	TransferID     string
 	SourceNode     string
@@ -77,6 +94,45 @@ type RL2StreamingPlan struct {
 	ChunkBudgetBytes   uint64
 	BackpressureActive bool
 	FECEnabled         bool
+}
+
+type RL2TransferOffer struct {
+	OfferID            string
+	Transfer           RL2Transfer
+	DescriptorRoot     string
+	OfferedHeight      uint64
+	ExpiresHeight      uint64
+	SuggestedChunkSize uint64
+	MaxParallelStreams uint32
+	ResumeToken        string
+}
+
+type RL2TransferAcceptance struct {
+	OfferID            string
+	TransferID         string
+	AcceptedHeight     uint64
+	AcceptedChunkSize  uint64
+	MaxParallelStreams uint32
+	ResumeToken        string
+}
+
+type RL2BackpressureSignal struct {
+	TransferID        string
+	QueuedBytes       uint64
+	AvailableBytes    uint64
+	MaxInFlightChunks uint32
+	PauseRequested    bool
+	ResumeToken       string
+}
+
+type RL2TransferSession struct {
+	Offer         RL2TransferOffer
+	Acceptance    RL2TransferAcceptance
+	State         RL2TransferState
+	Progress      RL2TransferProgress
+	StreamingPlan RL2StreamingPlan
+	FailureReason string
+	LastHeight    uint64
 }
 
 func NewRL2Transfer(transfer RL2Transfer) (RL2Transfer, error) {
@@ -164,6 +220,48 @@ func ComputeRL2ChunkProofPath(chunks []PayloadChunk, chunkIndex uint32) ([]strin
 	return proof, nil
 }
 
+func NewRL2TransferOffer(offer RL2TransferOffer) (RL2TransferOffer, error) {
+	offer = offer.Normalize()
+	if offer.OfferID == "" {
+		offer.OfferID = ComputeRL2OfferID(offer)
+	}
+	if err := offer.Validate(0); err != nil {
+		return RL2TransferOffer{}, err
+	}
+	return offer, nil
+}
+
+func NewRL2TransferOfferFromChunks(sourceNode, targetNode string, payloadType RL2PayloadType, chunks []PayloadChunk, priority, offeredHeight, expiresHeight uint32, fecPolicy RL2FECPolicy, score PeerScore, availableBytesPerBlock uint64, maxParallelStreams uint32) (RL2TransferOffer, []RL2ChunkDescriptor, error) {
+	transfer, err := NewRL2TransferFromChunks(sourceNode, targetNode, payloadType, chunks, priority, uint64(expiresHeight), fecPolicy)
+	if err != nil {
+		return RL2TransferOffer{}, nil, err
+	}
+	descriptors, err := NewRL2ChunkDescriptors(transfer, chunks)
+	if err != nil {
+		return RL2TransferOffer{}, nil, err
+	}
+	descriptorRoot, err := ComputeRL2ChunkDescriptorRoot(descriptors)
+	if err != nil {
+		return RL2TransferOffer{}, nil, err
+	}
+	chunkSize, err := RecommendRL2ChunkSize(uint64(len(mustReassembleRL2Payload(chunks))), score, availableBytesPerBlock, 1, transfer.ChunkSize)
+	if err != nil {
+		return RL2TransferOffer{}, nil, err
+	}
+	offer, err := NewRL2TransferOffer(RL2TransferOffer{
+		Transfer:           transfer,
+		DescriptorRoot:     descriptorRoot,
+		OfferedHeight:      uint64(offeredHeight),
+		ExpiresHeight:      uint64(expiresHeight),
+		SuggestedChunkSize: chunkSize,
+		MaxParallelStreams: maxParallelStreams,
+	})
+	if err != nil {
+		return RL2TransferOffer{}, nil, err
+	}
+	return offer, descriptors, nil
+}
+
 func (t RL2Transfer) Normalize() RL2Transfer {
 	t.TransferID = strings.ToLower(strings.TrimSpace(t.TransferID))
 	t.SourceNode = strings.ToLower(strings.TrimSpace(t.SourceNode))
@@ -176,6 +274,96 @@ func (t RL2Transfer) Normalize() RL2Transfer {
 	}
 	t.ResumeToken = strings.ToLower(strings.TrimSpace(t.ResumeToken))
 	return t
+}
+
+func (o RL2TransferOffer) Normalize() RL2TransferOffer {
+	o.OfferID = strings.ToLower(strings.TrimSpace(o.OfferID))
+	o.Transfer = o.Transfer.Normalize()
+	o.DescriptorRoot = strings.ToLower(strings.TrimSpace(o.DescriptorRoot))
+	o.ResumeToken = strings.ToLower(strings.TrimSpace(o.ResumeToken))
+	if o.MaxParallelStreams == 0 {
+		o.MaxParallelStreams = 1
+	}
+	return o
+}
+
+func (o RL2TransferOffer) Validate(currentHeight uint64) error {
+	offer := o.Normalize()
+	if err := ValidateHash("networking RL2 offer id", offer.OfferID); err != nil {
+		return err
+	}
+	if offer.OfferID != ComputeRL2OfferID(offer) {
+		return errors.New("networking RL2 offer id mismatch")
+	}
+	if err := offer.Transfer.Validate(currentHeight); err != nil {
+		return err
+	}
+	if err := ValidateHash("networking RL2 descriptor root", offer.DescriptorRoot); err != nil {
+		return err
+	}
+	if offer.OfferedHeight == 0 {
+		return errors.New("networking RL2 offer height must be positive")
+	}
+	if offer.ExpiresHeight == 0 || offer.ExpiresHeight < offer.OfferedHeight {
+		return errors.New("networking RL2 offer expiry must be >= offer height")
+	}
+	if currentHeight > 0 && currentHeight > offer.ExpiresHeight {
+		return errors.New("networking RL2 offer is expired")
+	}
+	if offer.SuggestedChunkSize == 0 || offer.SuggestedChunkSize > offer.Transfer.ChunkSize || offer.SuggestedChunkSize > MaxChunkBytes {
+		return errors.New("networking RL2 offer suggested chunk size out of bounds")
+	}
+	if offer.MaxParallelStreams == 0 || offer.MaxParallelStreams > offer.Transfer.ChunkCount {
+		return errors.New("networking RL2 offer parallel streams out of bounds")
+	}
+	if offer.ResumeToken != "" {
+		if err := ValidateHash("networking RL2 offer resume token", offer.ResumeToken); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (a RL2TransferAcceptance) Normalize() RL2TransferAcceptance {
+	a.OfferID = strings.ToLower(strings.TrimSpace(a.OfferID))
+	a.TransferID = strings.ToLower(strings.TrimSpace(a.TransferID))
+	a.ResumeToken = strings.ToLower(strings.TrimSpace(a.ResumeToken))
+	if a.MaxParallelStreams == 0 {
+		a.MaxParallelStreams = 1
+	}
+	return a
+}
+
+func (a RL2TransferAcceptance) Validate(offer RL2TransferOffer, currentHeight uint64) error {
+	acceptance := a.Normalize()
+	offer = offer.Normalize()
+	if err := offer.Validate(currentHeight); err != nil {
+		return err
+	}
+	if acceptance.OfferID != offer.OfferID {
+		return errors.New("networking RL2 acceptance offer mismatch")
+	}
+	if acceptance.TransferID != offer.Transfer.TransferID {
+		return errors.New("networking RL2 acceptance transfer mismatch")
+	}
+	if acceptance.AcceptedHeight == 0 || acceptance.AcceptedHeight < offer.OfferedHeight {
+		return errors.New("networking RL2 acceptance height must be >= offer height")
+	}
+	if acceptance.AcceptedHeight > offer.ExpiresHeight {
+		return errors.New("networking RL2 acceptance is expired")
+	}
+	if acceptance.AcceptedChunkSize == 0 || acceptance.AcceptedChunkSize > offer.Transfer.ChunkSize {
+		return errors.New("networking RL2 acceptance chunk size out of bounds")
+	}
+	if acceptance.MaxParallelStreams == 0 || acceptance.MaxParallelStreams > offer.MaxParallelStreams {
+		return errors.New("networking RL2 acceptance parallel streams out of bounds")
+	}
+	if acceptance.ResumeToken != "" {
+		if err := ValidateHash("networking RL2 acceptance resume token", acceptance.ResumeToken); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (t RL2Transfer) ValidateBasic() error {
@@ -263,6 +451,20 @@ func ComputeRL2TransferID(transfer RL2Transfer) string {
 	)
 }
 
+func ComputeRL2OfferID(offer RL2TransferOffer) string {
+	offer = offer.Normalize()
+	return HashParts(
+		"rl2-offer",
+		offer.Transfer.TransferID,
+		offer.DescriptorRoot,
+		fmt.Sprintf("%d", offer.OfferedHeight),
+		fmt.Sprintf("%d", offer.ExpiresHeight),
+		fmt.Sprintf("%d", offer.SuggestedChunkSize),
+		fmt.Sprintf("%d", offer.MaxParallelStreams),
+		offer.ResumeToken,
+	)
+}
+
 func ComputeRL2ResumeToken(transfer RL2Transfer, receivedChunks []uint32) (string, error) {
 	transfer = transfer.Normalize()
 	if err := transfer.Validate(0); err != nil {
@@ -285,6 +487,54 @@ func ComputeRL2ResumeToken(transfer RL2Transfer, receivedChunks []uint32) (strin
 		parts = append(parts, fmt.Sprintf("%d", index))
 	}
 	return HashParts(parts...), nil
+}
+
+func ComputeRL2ChunkDescriptorHash(descriptor RL2ChunkDescriptor) (string, error) {
+	descriptor = descriptor.Normalize()
+	if err := ValidateHash("networking RL2 descriptor transfer id", descriptor.TransferID); err != nil {
+		return "", err
+	}
+	if err := ValidateHash("networking RL2 descriptor chunk hash", descriptor.ChunkHash); err != nil {
+		return "", err
+	}
+	parts := []string{
+		"rl2-chunk-descriptor",
+		descriptor.TransferID,
+		fmt.Sprintf("%d", descriptor.ChunkIndex),
+		descriptor.ChunkHash,
+		fmt.Sprintf("%d", descriptor.ChunkSize),
+		fmt.Sprintf("%d", descriptor.RangeStart),
+		fmt.Sprintf("%d", descriptor.RangeEnd),
+	}
+	for _, proofHash := range descriptor.ProofPath {
+		if err := ValidateHash("networking RL2 descriptor proof hash", proofHash); err != nil {
+			return "", err
+		}
+		parts = append(parts, proofHash)
+	}
+	return HashParts(parts...), nil
+}
+
+func ComputeRL2ChunkDescriptorRoot(descriptors []RL2ChunkDescriptor) (string, error) {
+	if len(descriptors) == 0 || len(descriptors) > MaxPayloadChunks {
+		return "", fmt.Errorf("networking RL2 descriptors must be between 1 and %d", MaxPayloadChunks)
+	}
+	ordered := append([]RL2ChunkDescriptor(nil), descriptors...)
+	sort.SliceStable(ordered, func(i, j int) bool {
+		return ordered[i].ChunkIndex < ordered[j].ChunkIndex
+	})
+	descriptorHashes := make([]string, len(ordered))
+	for i, descriptor := range ordered {
+		if descriptor.ChunkIndex != uint32(i) {
+			return "", errors.New("networking RL2 descriptor sequence gap")
+		}
+		descriptorHash, err := ComputeRL2ChunkDescriptorHash(descriptor)
+		if err != nil {
+			return "", err
+		}
+		descriptorHashes[i] = descriptorHash
+	}
+	return HashParts(append([]string{"rl2-descriptor-root"}, descriptorHashes...)...), nil
 }
 
 func NewRL2TransferProgress(transfer RL2Transfer, receivedChunks []uint32) (RL2TransferProgress, error) {
@@ -501,6 +751,37 @@ func VerifyRL2ChunkProof(descriptor RL2ChunkDescriptor, payloadRoot string, chun
 	return nil
 }
 
+func ReassembleRL2Payload(transfer RL2Transfer, descriptors []RL2ChunkDescriptor, chunks []PayloadChunk) ([]byte, error) {
+	transfer = transfer.Normalize()
+	if err := ValidateRL2ChunkDescriptors(transfer, descriptors); err != nil {
+		return nil, err
+	}
+	if uint32(len(chunks)) != transfer.ChunkCount {
+		return nil, errors.New("networking RL2 reassembly chunk count mismatch")
+	}
+	orderedChunks, err := orderedRL2Chunks(chunks)
+	if err != nil {
+		return nil, err
+	}
+	orderedDescriptors := append([]RL2ChunkDescriptor(nil), descriptors...)
+	sort.SliceStable(orderedDescriptors, func(i, j int) bool {
+		return orderedDescriptors[i].ChunkIndex < orderedDescriptors[j].ChunkIndex
+	})
+	for i, chunk := range orderedChunks {
+		if err := VerifyRL2Chunk(transfer, orderedDescriptors[i], chunk); err != nil {
+			return nil, err
+		}
+	}
+	root, err := ComputeRL2ChunkRoot(orderedChunks)
+	if err != nil {
+		return nil, err
+	}
+	if root != transfer.PayloadRoot {
+		return nil, errors.New("networking RL2 reassembly root mismatch")
+	}
+	return ReassemblePayload(orderedChunks)
+}
+
 func MissingRL2ChunkIndexes(transfer RL2Transfer, verifiedChunks []uint32) ([]uint32, error) {
 	progress, err := NewRL2TransferProgress(transfer, verifiedChunks)
 	if err != nil {
@@ -529,6 +810,73 @@ func NewRL2ChunkRequest(transfer RL2Transfer, verifiedChunks []uint32) (RL2Chunk
 		MissingIndexes: missing,
 		ResumeToken:    progress.ResumeToken,
 	}, nil
+}
+
+func NewRL2BackpressureSignal(transfer RL2Transfer, queuedBytes, availableBytes uint64, verifiedChunks []uint32) (RL2BackpressureSignal, error) {
+	transfer = transfer.Normalize()
+	if err := transfer.Validate(0); err != nil {
+		return RL2BackpressureSignal{}, err
+	}
+	if availableBytes == 0 {
+		return RL2BackpressureSignal{}, errors.New("networking RL2 backpressure available bytes must be positive")
+	}
+	progress, err := NewRL2TransferProgress(transfer, verifiedChunks)
+	if err != nil {
+		return RL2BackpressureSignal{}, err
+	}
+	maxInFlight := uint32(availableBytes / transfer.ChunkSize)
+	if maxInFlight == 0 {
+		maxInFlight = 1
+	}
+	if maxInFlight > transfer.ChunkCount {
+		maxInFlight = transfer.ChunkCount
+	}
+	return RL2BackpressureSignal{
+		TransferID:        transfer.TransferID,
+		QueuedBytes:       queuedBytes,
+		AvailableBytes:    availableBytes,
+		MaxInFlightChunks: maxInFlight,
+		PauseRequested:    queuedBytes >= availableBytes,
+		ResumeToken:       progress.ResumeToken,
+	}, nil
+}
+
+func RecommendRL2ChunkSize(payloadBytes uint64, score PeerScore, availableBytesPerBlock, minChunkBytes, maxChunkBytes uint64) (uint64, error) {
+	if payloadBytes == 0 {
+		return 0, errors.New("networking RL2 payload bytes must be positive")
+	}
+	if score.ScoreBps > BasisPoints {
+		return 0, fmt.Errorf("networking RL2 score must be <= %d bps", BasisPoints)
+	}
+	if availableBytesPerBlock == 0 {
+		return 0, errors.New("networking RL2 available bandwidth must be positive")
+	}
+	if minChunkBytes == 0 {
+		minChunkBytes = 1
+	}
+	if maxChunkBytes == 0 || maxChunkBytes > MaxChunkBytes {
+		maxChunkBytes = MaxChunkBytes
+	}
+	if minChunkBytes > maxChunkBytes {
+		return 0, errors.New("networking RL2 min chunk size must be <= max chunk size")
+	}
+	target := availableBytesPerBlock / 4
+	if score.ScoreBps > 0 {
+		target = (target * uint64(score.ScoreBps)) / uint64(BasisPoints)
+	}
+	if target == 0 {
+		target = minChunkBytes
+	}
+	if target > payloadBytes {
+		target = payloadBytes
+	}
+	if target < minChunkBytes {
+		return minChunkBytes, nil
+	}
+	if target > maxChunkBytes {
+		return maxChunkBytes, nil
+	}
+	return target, nil
 }
 
 func PlanRL2Streaming(transfer RL2Transfer, score PeerScore, availableBytesPerBlock, queuedBytes uint64, maxParallelStreams uint32) (RL2StreamingPlan, error) {
@@ -591,6 +939,176 @@ func PlanRL2Transfer(adapter AetherNetworkingAdapter, transfer RL2Transfer, enqu
 	return PlanPropagation(adapter, envelope, peerCount, score)
 }
 
+func AcceptRL2TransferOffer(offer RL2TransferOffer, verifiedChunks []uint32, acceptedHeight uint64) (RL2TransferSession, error) {
+	offer = offer.Normalize()
+	if err := offer.Validate(acceptedHeight); err != nil {
+		return RL2TransferSession{}, err
+	}
+	progress, err := NewRL2TransferProgress(offer.Transfer, verifiedChunks)
+	if err != nil {
+		return RL2TransferSession{}, err
+	}
+	acceptance := RL2TransferAcceptance{
+		OfferID:            offer.OfferID,
+		TransferID:         offer.Transfer.TransferID,
+		AcceptedHeight:     acceptedHeight,
+		AcceptedChunkSize:  offer.SuggestedChunkSize,
+		MaxParallelStreams: offer.MaxParallelStreams,
+		ResumeToken:        progress.ResumeToken,
+	}.Normalize()
+	if err := acceptance.Validate(offer, acceptedHeight); err != nil {
+		return RL2TransferSession{}, err
+	}
+	return RL2TransferSession{
+		Offer:      offer,
+		Acceptance: acceptance,
+		State:      RL2StateAccepted,
+		Progress:   progress,
+		LastHeight: acceptedHeight,
+	}, nil
+}
+
+func StartRL2Transfer(session RL2TransferSession, score PeerScore, availableBytesPerBlock, queuedBytes uint64) (RL2TransferSession, error) {
+	if err := session.Validate(); err != nil {
+		return RL2TransferSession{}, err
+	}
+	if session.State != RL2StateAccepted && session.State != RL2StateResumed {
+		return RL2TransferSession{}, errors.New("networking RL2 transfer can start only from accepted or resumed")
+	}
+	plan, err := PlanRL2Streaming(session.Offer.Transfer, score, availableBytesPerBlock, queuedBytes, session.Acceptance.MaxParallelStreams)
+	if err != nil {
+		return RL2TransferSession{}, err
+	}
+	session.StreamingPlan = plan
+	session.State = RL2StateStreaming
+	return session, nil
+}
+
+func PauseRL2Transfer(session RL2TransferSession, signal RL2BackpressureSignal, height uint64) (RL2TransferSession, error) {
+	if err := session.Validate(); err != nil {
+		return RL2TransferSession{}, err
+	}
+	if session.State != RL2StateStreaming {
+		return RL2TransferSession{}, errors.New("networking RL2 transfer can pause only while streaming")
+	}
+	if signal.TransferID != session.Offer.Transfer.TransferID || !signal.PauseRequested {
+		return RL2TransferSession{}, errors.New("networking RL2 pause requires matching backpressure signal")
+	}
+	session.State = RL2StatePaused
+	session.LastHeight = height
+	return session, nil
+}
+
+func ResumeRL2Transfer(session RL2TransferSession, verifiedChunks []uint32, height uint64) (RL2TransferSession, error) {
+	if err := session.Validate(); err != nil {
+		return RL2TransferSession{}, err
+	}
+	if session.State != RL2StatePaused {
+		return RL2TransferSession{}, errors.New("networking RL2 transfer can resume only from paused")
+	}
+	progress, err := NewRL2TransferProgress(session.Offer.Transfer, verifiedChunks)
+	if err != nil {
+		return RL2TransferSession{}, err
+	}
+	session.Progress = progress
+	session.Acceptance.ResumeToken = progress.ResumeToken
+	session.State = RL2StateResumed
+	session.LastHeight = height
+	return session, nil
+}
+
+func AcceptRL2Chunk(session RL2TransferSession, descriptor RL2ChunkDescriptor, chunk PayloadChunk, height uint64) (RL2TransferSession, error) {
+	if err := session.Validate(); err != nil {
+		return RL2TransferSession{}, err
+	}
+	if session.State != RL2StateStreaming && session.State != RL2StateResumed {
+		return RL2TransferSession{}, errors.New("networking RL2 chunks require streaming or resumed state")
+	}
+	if err := VerifyRL2Chunk(session.Offer.Transfer, descriptor, chunk); err != nil {
+		session.LastHeight = height
+		session.FailureReason = err.Error()
+		if strings.Contains(err.Error(), "root mismatch") {
+			session.State = RL2StateRootMismatch
+		} else {
+			session.State = RL2StateInvalidChunk
+		}
+		return session, nil
+	}
+	received := append([]uint32(nil), session.Progress.ReceivedChunks...)
+	if !session.Progress.VerifiedBitmap[chunk.Index] {
+		received = append(received, chunk.Index)
+	}
+	progress, err := NewRL2TransferProgress(session.Offer.Transfer, received)
+	if err != nil {
+		return RL2TransferSession{}, err
+	}
+	session.Progress = progress
+	session.Acceptance.ResumeToken = progress.ResumeToken
+	session.LastHeight = height
+	if uint32(len(progress.ReceivedChunks)) == session.Offer.Transfer.ChunkCount {
+		session.State = RL2StateVerified
+	}
+	return session, nil
+}
+
+func VerifyRL2TransferCompletion(session RL2TransferSession, descriptors []RL2ChunkDescriptor, chunks []PayloadChunk, height uint64) (RL2TransferSession, []byte, error) {
+	if err := session.Validate(); err != nil {
+		return RL2TransferSession{}, nil, err
+	}
+	if session.State != RL2StateVerified {
+		return RL2TransferSession{}, nil, errors.New("networking RL2 completion requires verified state")
+	}
+	payload, err := ReassembleRL2Payload(session.Offer.Transfer, descriptors, chunks)
+	if err != nil {
+		session.State = RL2StateRootMismatch
+		session.FailureReason = err.Error()
+		session.LastHeight = height
+		return session, nil, nil
+	}
+	session.State = RL2StateCompleted
+	session.LastHeight = height
+	return session, payload, nil
+}
+
+func FailRL2Transfer(session RL2TransferSession, state RL2TransferState, reason string, height uint64) (RL2TransferSession, error) {
+	if !IsRL2FailureState(state) {
+		return RL2TransferSession{}, errors.New("networking RL2 failure state required")
+	}
+	if IsRL2TerminalState(session.State) {
+		return RL2TransferSession{}, errors.New("networking RL2 terminal transfer cannot fail again")
+	}
+	session.State = state
+	session.FailureReason = strings.TrimSpace(reason)
+	session.LastHeight = height
+	return session, nil
+}
+
+func (s RL2TransferSession) Validate() error {
+	session := s
+	if !IsRL2TransferState(session.State) {
+		return fmt.Errorf("unknown networking RL2 state %q", session.State)
+	}
+	if err := session.Offer.Validate(session.LastHeight); err != nil {
+		return err
+	}
+	if session.State == RL2StateOffered {
+		return nil
+	}
+	if err := session.Acceptance.Validate(session.Offer, session.LastHeight); err != nil {
+		return err
+	}
+	if session.Progress.TransferID != session.Offer.Transfer.TransferID {
+		return errors.New("networking RL2 session progress transfer mismatch")
+	}
+	if len(session.Progress.VerifiedBitmap) != int(session.Offer.Transfer.ChunkCount) {
+		return errors.New("networking RL2 session progress bitmap mismatch")
+	}
+	if session.State == RL2StateCompleted && len(session.Progress.ReceivedChunks) != int(session.Offer.Transfer.ChunkCount) {
+		return errors.New("networking RL2 completed transfer requires all chunks")
+	}
+	return nil
+}
+
 func RL2ChannelForPayloadType(payloadType RL2PayloadType) ChannelClass {
 	switch payloadType {
 	case RL2PayloadLargeBlock, RL2PayloadBlockChunk:
@@ -636,6 +1154,39 @@ func IsRL2FECPolicy(policy RL2FECPolicy) bool {
 	default:
 		return false
 	}
+}
+
+func IsRL2TransferState(state RL2TransferState) bool {
+	switch state {
+	case RL2StateOffered,
+		RL2StateAccepted,
+		RL2StateStreaming,
+		RL2StatePaused,
+		RL2StateResumed,
+		RL2StateVerified,
+		RL2StateCompleted,
+		RL2StateTimeout,
+		RL2StateCancelled,
+		RL2StateInvalidChunk,
+		RL2StateRootMismatch,
+		RL2StatePeerDisconnected:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsRL2FailureState(state RL2TransferState) bool {
+	switch state {
+	case RL2StateTimeout, RL2StateCancelled, RL2StateInvalidChunk, RL2StateRootMismatch, RL2StatePeerDisconnected:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsRL2TerminalState(state RL2TransferState) bool {
+	return state == RL2StateCompleted || IsRL2FailureState(state)
 }
 
 func orderedRL2Chunks(chunks []PayloadChunk) ([]PayloadChunk, error) {
@@ -701,4 +1252,12 @@ func normalizeHashPath(path []string) []string {
 		out = append(out, hash)
 	}
 	return out
+}
+
+func mustReassembleRL2Payload(chunks []PayloadChunk) []byte {
+	payload, err := ReassemblePayload(chunks)
+	if err != nil {
+		return nil
+	}
+	return payload
 }

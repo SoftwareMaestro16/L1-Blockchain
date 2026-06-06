@@ -705,6 +705,163 @@ func TestRL2StreamingPlanAdaptsBandwidthBackpressureParallelismAndFEC(t *testing
 	require.Equal(t, uint32(1), congested.MaxInFlightChunks)
 }
 
+func TestRL2OfferStateMachineResumesInterruptedTransferAndCompletes(t *testing.T) {
+	source := HashParts("rl2-node", "source")
+	target := HashParts("rl2-node", "target")
+	payload := bytes.Repeat([]byte{0x42}, 512)
+	chunks, err := ChunkPayload(payload, 128)
+	require.NoError(t, err)
+
+	offer, descriptors, err := NewRL2TransferOfferFromChunks(
+		source,
+		target,
+		RL2PayloadStateSyncStream,
+		chunks,
+		DefaultRL2Priority(RL2PayloadStateSyncStream),
+		10,
+		100,
+		RL2FECReedSolomon,
+		PeerScore{ScoreBps: 8_000},
+		1024,
+		4,
+	)
+	require.NoError(t, err)
+	require.Equal(t, ComputeRL2OfferID(offer), offer.OfferID)
+	require.NoError(t, offer.Validate(10))
+
+	session, err := AcceptRL2TransferOffer(offer, nil, 11)
+	require.NoError(t, err)
+	require.Equal(t, RL2StateAccepted, session.State)
+
+	session, err = StartRL2Transfer(session, PeerScore{ScoreBps: 8_000}, 1024, 0)
+	require.NoError(t, err)
+	require.Equal(t, RL2StateStreaming, session.State)
+
+	session, err = AcceptRL2Chunk(session, descriptors[0], chunks[0], 12)
+	require.NoError(t, err)
+	session, err = AcceptRL2Chunk(session, descriptors[1], chunks[1], 13)
+	require.NoError(t, err)
+	require.Equal(t, RL2StateStreaming, session.State)
+	require.Equal(t, []uint32{0, 1}, session.Progress.ReceivedChunks)
+
+	signal, err := NewRL2BackpressureSignal(offer.Transfer, 2048, 512, session.Progress.ReceivedChunks)
+	require.NoError(t, err)
+	require.True(t, signal.PauseRequested)
+	session, err = PauseRL2Transfer(session, signal, 14)
+	require.NoError(t, err)
+	require.Equal(t, RL2StatePaused, session.State)
+
+	request, err := NewRL2ChunkRequest(offer.Transfer, session.Progress.ReceivedChunks)
+	require.NoError(t, err)
+	require.Equal(t, []uint32{2, 3}, request.MissingIndexes)
+	session, err = ResumeRL2Transfer(session, session.Progress.ReceivedChunks, 15)
+	require.NoError(t, err)
+	require.Equal(t, RL2StateResumed, session.State)
+
+	session, err = StartRL2Transfer(session, PeerScore{ScoreBps: 9_000}, 2048, 0)
+	require.NoError(t, err)
+	for _, index := range request.MissingIndexes {
+		session, err = AcceptRL2Chunk(session, descriptors[index], chunks[index], 16+uint64(index))
+		require.NoError(t, err)
+	}
+	require.Equal(t, RL2StateVerified, session.State)
+
+	session, decoded, err := VerifyRL2TransferCompletion(session, descriptors, chunks, 20)
+	require.NoError(t, err)
+	require.Equal(t, RL2StateCompleted, session.State)
+	require.Equal(t, payload, decoded)
+	require.True(t, IsRL2TerminalState(session.State))
+}
+
+func TestRL2StateMachineClassifiesInvalidChunksAndRootMismatch(t *testing.T) {
+	source := HashParts("rl2-node", "source")
+	target := HashParts("rl2-node", "target")
+	payload := bytes.Repeat([]byte{0x24}, 256)
+	chunks, err := ChunkPayload(payload, 64)
+	require.NoError(t, err)
+
+	offer, descriptors, err := NewRL2TransferOfferFromChunks(
+		source,
+		target,
+		RL2PayloadStorageObject,
+		chunks,
+		DefaultRL2Priority(RL2PayloadStorageObject),
+		10,
+		100,
+		RL2FECNone,
+		PeerScore{ScoreBps: 7_000},
+		1024,
+		2,
+	)
+	require.NoError(t, err)
+
+	session, err := AcceptRL2TransferOffer(offer, nil, 11)
+	require.NoError(t, err)
+	session, err = StartRL2Transfer(session, PeerScore{ScoreBps: 7_000}, 1024, 0)
+	require.NoError(t, err)
+
+	corruptChunk := chunks[0]
+	corruptChunk.Bytes[0] ^= 0xff
+	session, err = AcceptRL2Chunk(session, descriptors[0], corruptChunk, 12)
+	require.NoError(t, err)
+	require.Equal(t, RL2StateInvalidChunk, session.State)
+	require.Contains(t, session.FailureReason, "chunk hash")
+	require.True(t, IsRL2FailureState(session.State))
+
+	session, err = AcceptRL2TransferOffer(offer, nil, 11)
+	require.NoError(t, err)
+	session, err = StartRL2Transfer(session, PeerScore{ScoreBps: 7_000}, 1024, 0)
+	require.NoError(t, err)
+	badDescriptor := descriptors[1]
+	badDescriptor.ChunkHash = HashParts("rl2", "different-chunk")
+	session, err = AcceptRL2Chunk(session, badDescriptor, chunks[1], 12)
+	require.NoError(t, err)
+	require.Equal(t, RL2StateRootMismatch, session.State)
+	require.Contains(t, session.FailureReason, "root mismatch")
+
+	session, err = AcceptRL2TransferOffer(offer, nil, 11)
+	require.NoError(t, err)
+	session, err = FailRL2Transfer(session, RL2StatePeerDisconnected, "remote closed session", 12)
+	require.NoError(t, err)
+	require.Equal(t, RL2StatePeerDisconnected, session.State)
+	require.True(t, IsRL2TerminalState(session.State))
+}
+
+func TestRL2AdaptiveChunkSizingAndOfferValidation(t *testing.T) {
+	size, err := RecommendRL2ChunkSize(4096, PeerScore{ScoreBps: 5_000}, 2048, 128, 1024)
+	require.NoError(t, err)
+	require.Equal(t, uint64(256), size)
+
+	_, err = RecommendRL2ChunkSize(4096, PeerScore{ScoreBps: BasisPoints + 1}, 2048, 128, 1024)
+	require.ErrorContains(t, err, "score")
+
+	source := HashParts("rl2-node", "source")
+	target := HashParts("rl2-node", "target")
+	payload := bytes.Repeat([]byte{0x11}, 256)
+	chunks, err := ChunkPayload(payload, 64)
+	require.NoError(t, err)
+	offer, _, err := NewRL2TransferOfferFromChunks(
+		source,
+		target,
+		RL2PayloadExecutionResult,
+		chunks,
+		DefaultRL2Priority(RL2PayloadExecutionResult),
+		10,
+		20,
+		RL2FECNone,
+		PeerScore{ScoreBps: 5_000},
+		512,
+		2,
+	)
+	require.NoError(t, err)
+	require.ErrorContains(t, offer.Validate(21), "expired")
+
+	tampered := offer
+	tampered.SuggestedChunkSize = offer.Transfer.ChunkSize + 1
+	tampered.OfferID = ComputeRL2OfferID(tampered)
+	require.ErrorContains(t, tampered.Validate(10), "suggested chunk size")
+}
+
 func TestNetworkingStateRegistersNodesAndSessionsCanonically(t *testing.T) {
 	salt := []byte("aetheris-test-network")
 	local := signedNodeRecord(t, 0x31, salt, 100, NodeRoleFull)
