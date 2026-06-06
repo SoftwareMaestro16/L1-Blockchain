@@ -4,13 +4,14 @@ import (
 	"strings"
 	"testing"
 
+	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestIdentityZonePrefixShardDescriptorAndNFTBinding(t *testing.T) {
 	descriptor := DefaultIdentityZoneStateMachineDescriptor()
 	require.NoError(t, descriptor.Validate())
-	require.Equal(t, "identity", descriptor.StorePrefix)
+	require.Equal(t, IdentityStoreV2Prefix, descriptor.StorePrefix)
 	require.Contains(t, descriptor.MessageHandlers, IdentityMessageRegisterIdentity)
 	require.Contains(t, descriptor.MessageHandlers, IdentityMessageFinalizeIdentityAuction)
 	require.Contains(t, descriptor.ProofQueries, IdentityProofIdentityRoot)
@@ -25,6 +26,86 @@ func TestIdentityZonePrefixShardDescriptorAndNFTBinding(t *testing.T) {
 
 	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
 	require.NoError(t, CheckIdentityNFTBinding(state, "alice.aet", 11))
+}
+
+func TestIdentityZoneV2ShardRoutingProofRootsAndLookupMessages(t *testing.T) {
+	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
+	state, _, err := PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{Primary: addr(2)}, 12)
+	require.NoError(t, err)
+	state, _, err = SetIdentityReverse(state, addr(2), addr(2), "alice.aet", 13)
+	require.NoError(t, err)
+
+	domainRoute, err := RouteIdentityDomainShard("alice.aet", 8, 3)
+	require.NoError(t, err)
+	resolverRoute, err := RouteIdentityResolverShard("alice.aet", 8, 3)
+	require.NoError(t, err)
+	require.Equal(t, domainRoute.ShardID, resolverRoute.ShardID)
+	require.Equal(t, IdentityRouteNameHash, domainRoute.RoutingMode)
+	require.True(t, strings.HasPrefix(domainRoute.StateKey, IdentityStoreV2SpecDomainsPrefix+"/"))
+
+	reverseRoute, err := RouteIdentityReverseShard(addr(2), 8, 3)
+	require.NoError(t, err)
+	require.Equal(t, IdentityRouteAddress, reverseRoute.RoutingMode)
+
+	auctionID := identityHash("auction-route")
+	auctionRoute, err := RouteIdentityAuctionShard(auctionID, 8, 3)
+	require.NoError(t, err)
+	require.Equal(t, IdentityRouteAuction, auctionRoute.RoutingMode)
+
+	msg, err := NewMsgResolveIdentity(MsgResolveIdentity{
+		RequestID:     "req-1",
+		Requester:     "financial/alice",
+		SourceZoneID:  "FINANCIAL_ZONE",
+		TargetName:    "alice.aet",
+		TargetType:    IdentityLookupTargetResolver,
+		ProofRequired: true,
+		ReplyTo:       "zone/financial/inbox",
+		ExpiryHeight:  100,
+	})
+	require.NoError(t, err)
+	require.NoError(t, msg.Validate())
+
+	reverseResponse, err := BuildProofBackedIdentityReverseLookup(state, addr(2), 13)
+	require.NoError(t, err)
+	require.NoError(t, reverseResponse.Validate())
+
+	result, err := NewMsgIdentityResolutionResult(MsgIdentityResolutionResult{
+		RequestID:             msg.RequestID,
+		Name:                  msg.TargetName,
+		TargetType:            msg.TargetType,
+		ResolvedValue:         "addr:2",
+		ResolverRecordVersion: 1,
+		ProofHashOptional:     reverseResponse.ProofIndex.ProofHash,
+		Status:                IdentityResolutionStatusResolved,
+		ExpiryHeight:          100,
+	})
+	require.NoError(t, err)
+	require.NoError(t, result.Validate())
+
+	proofIndex, err := QueryIdentityZoneLightClientProof(state, IdentityProofResolver, "alice.aet", 13)
+	require.NoError(t, err)
+	roots, err := BuildIdentityZoneRoots(13, state, nil, nil, nil, []IdentityZoneProofIndexEntry{proofIndex, reverseResponse.ProofIndex})
+	require.NoError(t, err)
+	proofRoots, err := BuildIdentityZoneProofRoots(13, roots)
+	require.NoError(t, err)
+	require.Len(t, proofRoots, 5)
+	require.True(t, hasIdentityProofRoot(proofRoots, "identity", roots.StateRoot))
+	require.True(t, hasIdentityProofRoot(proofRoots, "resolver", roots.ResolverRoot))
+	require.True(t, hasIdentityProofRoot(proofRoots, "reverse", roots.ReverseRoot))
+
+	layout, err := DefaultIdentityStoreV2NameHashLayout()
+	require.NoError(t, err)
+	require.NoError(t, layout.Validate())
+	require.Equal(t, IdentityZoneShardKey, layout.PrimaryShardKey)
+}
+
+func hasIdentityProofRoot(roots []coretypes.ProofRoot, rootType string, rootHash string) bool {
+	for _, root := range roots {
+		if root.ZoneID == coretypes.ZoneIDIdentity && string(root.RootType) == rootType && root.RootHash == rootHash {
+			return true
+		}
+	}
+	return false
 }
 
 func TestIdentityZoneSpecStateKeys(t *testing.T) {

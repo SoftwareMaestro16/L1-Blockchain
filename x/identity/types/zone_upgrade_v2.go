@@ -76,7 +76,7 @@ func DefaultAetherCoreIdentityZoneDescriptor() coretypes.ZoneDescriptor {
 		FeePolicyID:         coretypes.NativeFeePolicyID,
 		GasPolicyID:         coretypes.DefaultGasPolicy,
 		MessagePolicyID:     coretypes.DefaultMessagePolicy,
-		RootPrefix:          IdentityZonePrefix,
+		RootPrefix:          IdentityStoreV2Prefix,
 		ShardLayoutEpoch:    1,
 		MaxShards:           64,
 		MessageCapabilities: []string{"identity-async-lookup", "identity-receipts", "cross-zone-binding"},
@@ -155,7 +155,7 @@ func ValidateIdentityZoneAEKDescriptor(descriptor coretypes.ZoneDescriptor) erro
 	if !descriptor.Enabled {
 		return errors.New("identity upgrade AEK descriptor must be enabled")
 	}
-	if descriptor.ModuleName != "identity" || descriptor.RootPrefix != IdentityZonePrefix {
+	if descriptor.ModuleName != "identity" || descriptor.RootPrefix != IdentityStoreV2Prefix {
 		return errors.New("identity upgrade AEK descriptor must route to identity module and root prefix")
 	}
 	for _, capability := range identityCapabilitiesAsStrings(DefaultIdentityZoneCapabilities()) {
@@ -223,7 +223,7 @@ func (manifest IdentityZoneUpgradeManifest) Validate() error {
 	if manifest.ZoneType != string(coretypes.ZoneTypeIdentity) {
 		return errors.New("identity zone upgrade manifest must target identity zone type")
 	}
-	if manifest.StorePrefix != IdentityZonePrefix {
+	if manifest.StorePrefix != IdentityStoreV2Prefix {
 		return errors.New("identity zone upgrade manifest store prefix mismatch")
 	}
 	for _, item := range []struct {

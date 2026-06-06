@@ -13,7 +13,7 @@ func TestIdentityZoneUpgradeManifestCoversRequiredCapabilities(t *testing.T) {
 	require.NoError(t, manifest.Validate())
 	require.Equal(t, IdentityZoneID, manifest.ZoneID)
 	require.Equal(t, "IDENTITY", manifest.ZoneType)
-	require.Equal(t, IdentityZonePrefix, manifest.StorePrefix)
+	require.Equal(t, IdentityStoreV2Prefix, manifest.StorePrefix)
 	require.Equal(t, roots.StateRoot, manifest.StateRoot)
 	require.Equal(t, ComputeIdentityZoneCapabilityRoot(DefaultIdentityZoneCapabilities()), manifest.CapabilityRoot)
 	require.Len(t, manifest.RequiredCapabilities, len(DefaultIdentityZoneCapabilities()))

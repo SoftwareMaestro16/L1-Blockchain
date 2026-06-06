@@ -159,7 +159,7 @@ type IdentityZoneRoots struct {
 func DefaultIdentityZoneStateMachineDescriptor() IdentityZoneStateMachineDescriptor {
 	return IdentityZoneStateMachineDescriptor{
 		ZoneID:        IdentityZoneID,
-		StorePrefix:   IdentityZonePrefix,
+		StorePrefix:   IdentityStoreV2Prefix,
 		ShardStrategy: IdentityZoneShardKey,
 		MessageHandlers: []IdentityZoneMessageKind{
 			IdentityMessageRegisterIdentity,
@@ -192,8 +192,8 @@ func (d IdentityZoneStateMachineDescriptor) Validate() error {
 	if d.ZoneID != IdentityZoneID {
 		return errors.New("identity zone descriptor must use IDENTITY_ZONE")
 	}
-	if d.StorePrefix != IdentityZonePrefix {
-		return fmt.Errorf("identity zone store prefix must be %q", IdentityZonePrefix)
+	if d.StorePrefix != IdentityStoreV2Prefix {
+		return fmt.Errorf("identity zone store prefix must be %q", IdentityStoreV2Prefix)
 	}
 	if d.ShardStrategy != IdentityZoneShardKey {
 		return fmt.Errorf("identity zone shard strategy must be %q", IdentityZoneShardKey)
