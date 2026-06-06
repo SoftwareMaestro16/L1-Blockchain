@@ -178,6 +178,75 @@ func TestSessionNegotiationCreatesDeterministicStreams(t *testing.T) {
 	require.ErrorContains(t, err, "expired")
 }
 
+func TestMultiplexedStreamsEnforceEncryptionCapacityAndResetPolicy(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	local := signedNodeRecord(t, 0x23, salt, 100, NodeRoleFull)
+	remote := signedNodeRecord(t, 0x24, salt, 100, NodeRoleService)
+	session, err := NegotiateVerifiedSession(local, remote, testSessionRequest(local, remote, 10, 50, "multiplexed-streams", nil), salt, 10)
+	require.NoError(t, err)
+
+	var consensus StreamSpec
+	var service StreamSpec
+	var bulk StreamSpec
+	for _, stream := range session.Streams {
+		require.NotEmpty(t, stream.EncryptionContext)
+		switch stream.Channel {
+		case ChannelConsensus:
+			consensus = stream
+		case ChannelService:
+			service = stream
+		case ChannelData:
+			bulk = stream
+		}
+	}
+	require.GreaterOrEqual(t, consensus.FlowControlWindow, uint64(DefaultFlowWindowBytes))
+	require.Greater(t, service.Priority, consensus.Priority)
+	require.GreaterOrEqual(t, bulk.FlowControlWindow, bulk.MaxMessageBytes)
+
+	broken := append([]StreamSpec(nil), session.Streams...)
+	for i := range broken {
+		if broken[i].Channel == ChannelService {
+			broken[i].Priority = consensus.Priority
+		}
+	}
+	require.ErrorContains(t, ValidateStreamSet(broken, DefaultQoSClassPolicies()), "outrank consensus")
+
+	decision, err := ResetStream(session, service.StreamID, StreamResetKeepSession)
+	require.NoError(t, err)
+	require.False(t, decision.SessionClosed)
+	require.Len(t, decision.RemainingStreams, len(session.Streams)-1)
+
+	decision, err = ResetStream(session, service.StreamID, StreamResetCloseSession)
+	require.NoError(t, err)
+	require.True(t, decision.SessionClosed)
+}
+
+func TestQoSClassPoliciesForbidConsensusInversionAndDowngradeServiceOnly(t *testing.T) {
+	policies := DefaultQoSClassPolicies()
+	require.NoError(t, ValidateQoSClassPolicies(policies))
+
+	broken := append([]QoSClassPolicy(nil), policies...)
+	for i := range broken {
+		if broken[i].Class == QoSClassCriticalConsensus {
+			broken[i].Priority = PriorityForChannel(ChannelData)
+		}
+	}
+	require.ErrorContains(t, ValidateQoSClassPolicies(broken), "priority inversion")
+
+	broken = append([]QoSClassPolicy(nil), policies...)
+	for i := range broken {
+		if broken[i].Class == QoSClassBulkData {
+			broken[i].Backpressure = false
+		}
+	}
+	require.ErrorContains(t, ValidateQoSClassPolicies(broken), "backpressure")
+
+	decision := EvaluatePeerServiceQuota(2<<20, 1<<20)
+	require.True(t, decision.DowngradeServiceTraffic)
+	require.False(t, decision.DisconnectConsensus)
+	require.Equal(t, QoSClassServiceCall, decision.Class)
+}
+
 func TestConsensusEnvelopeOutranksServiceAndBulkData(t *testing.T) {
 	policies := DefaultChannelPolicies()
 	service := TransportEnvelope{

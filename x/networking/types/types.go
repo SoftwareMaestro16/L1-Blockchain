@@ -12,30 +12,32 @@ import (
 )
 
 const (
-	HashHexLength            = 64
-	BasisPoints              = uint32(10_000)
-	MaxRolesPerNode          = 16
-	MaxZonesPerNode          = 128
-	MaxServicesPerNode       = 128
-	MaxProtocolsPerNode      = 32
-	MaxNetworkAddressBytes   = 256
-	MaxProtocolIDBytes       = 64
-	MaxServiceIDBytes        = 96
-	MaxZoneIDBytes           = 64
-	MaxNonceBytes            = 64
-	MaxChannelPolicies       = 32
-	MaxStreamsPerSession     = 32
-	SessionEphemeralKeyBytes = 32
-	MaxPayloadChunks         = 65_536
-	MaxChunkBytes            = 4 << 20
-	MaxStreamMessageBytes    = 64 << 20
-	DefaultMaxMessageBytes   = 1 << 20
-	DefaultFlowWindowBytes   = 4 << 20
-	DefaultHandshakeVersion  = uint32(1)
-	DefaultProtocolVersion   = "aetheris-networking-v1"
-	DefaultCipherSuite       = CipherSuiteEd25519X25519ChaCha20Poly1305
-	DefaultCompressionMode   = CompressionModeNone
-	DefaultQoSPolicy         = QoSPolicyBalanced
+	HashHexLength             = 64
+	BasisPoints               = uint32(10_000)
+	MaxRolesPerNode           = 16
+	MaxZonesPerNode           = 128
+	MaxServicesPerNode        = 128
+	MaxProtocolsPerNode       = 32
+	MaxNetworkAddressBytes    = 256
+	MaxProtocolIDBytes        = 64
+	MaxServiceIDBytes         = 96
+	MaxZoneIDBytes            = 64
+	MaxNonceBytes             = 64
+	MaxChannelPolicies        = 32
+	MaxStreamsPerSession      = 32
+	SessionEphemeralKeyBytes  = 32
+	MaxEncryptionContextBytes = 128
+	MaxQoSClassPolicies       = 16
+	MaxPayloadChunks          = 65_536
+	MaxChunkBytes             = 4 << 20
+	MaxStreamMessageBytes     = 64 << 20
+	DefaultMaxMessageBytes    = 1 << 20
+	DefaultFlowWindowBytes    = 4 << 20
+	DefaultHandshakeVersion   = uint32(1)
+	DefaultProtocolVersion    = "aetheris-networking-v1"
+	DefaultCipherSuite        = CipherSuiteEd25519X25519ChaCha20Poly1305
+	DefaultCompressionMode    = CompressionModeNone
+	DefaultQoSPolicy          = QoSPolicyBalanced
 )
 
 type NodeRole string
@@ -88,6 +90,18 @@ const (
 	QoSPolicyBulk           QoSPolicy = "BULK"
 )
 
+type QoSClass string
+
+const (
+	QoSClassCriticalConsensus QoSClass = "critical_consensus"
+	QoSClassBlockPropagation  QoSClass = "block_propagation"
+	QoSClassStateSync         QoSClass = "state_sync"
+	QoSClassExecutionMessage  QoSClass = "execution_message"
+	QoSClassServiceCall       QoSClass = "service_call"
+	QoSClassDiscovery         QoSClass = "discovery"
+	QoSClassBulkData          QoSClass = "bulk_data"
+)
+
 type NodeRecord struct {
 	NodeID               string
 	NodePubKey           []byte
@@ -117,6 +131,7 @@ type StreamSpec struct {
 	FlowControlWindow uint64
 	MaxMessageBytes   uint64
 	Compression       CompressionMode
+	EncryptionContext string
 }
 
 type SessionRequest struct {
@@ -193,6 +208,36 @@ type PeerScore struct {
 	PenaltyBps     uint32
 }
 
+type QoSClassPolicy struct {
+	Class             QoSClass
+	Channel           ChannelClass
+	Priority          uint32
+	BandwidthFloorBps uint32
+	BandwidthCeilBps  uint32
+	ReservedCapacity  bool
+	Backpressure      bool
+}
+
+type StreamResetPolicy string
+
+const (
+	StreamResetKeepSession  StreamResetPolicy = "KEEP_SESSION"
+	StreamResetCloseSession StreamResetPolicy = "CLOSE_SESSION"
+)
+
+type StreamResetDecision struct {
+	StreamID         string
+	SessionClosed    bool
+	RemainingStreams []StreamSpec
+}
+
+type PeerQoSDecision struct {
+	Class                   QoSClass
+	DowngradeServiceTraffic bool
+	DisconnectConsensus     bool
+	Reason                  string
+}
+
 func DefaultChannelPolicies() []ChannelPolicy {
 	return []ChannelPolicy{
 		{Channel: ChannelConsensus, Priority: 0, MaxMessageBytes: DefaultMaxMessageBytes, BandwidthWeight: 3_000, BurstBytes: 2 << 20},
@@ -204,6 +249,18 @@ func DefaultChannelPolicies() []ChannelPolicy {
 		{Channel: ChannelRouting, Priority: 5, MaxMessageBytes: DefaultMaxMessageBytes, BandwidthWeight: 750, BurstBytes: 2 << 20},
 		{Channel: ChannelDiscovery, Priority: 5, MaxMessageBytes: 256 << 10, BandwidthWeight: 500, BurstBytes: 1 << 20},
 		{Channel: ChannelData, Priority: 6, MaxMessageBytes: MaxStreamMessageBytes, BandwidthWeight: 150, BurstBytes: MaxStreamMessageBytes},
+	}
+}
+
+func DefaultQoSClassPolicies() []QoSClassPolicy {
+	return []QoSClassPolicy{
+		{Class: QoSClassCriticalConsensus, Channel: ChannelConsensus, Priority: 0, BandwidthFloorBps: 3_000, BandwidthCeilBps: BasisPoints, ReservedCapacity: true},
+		{Class: QoSClassBlockPropagation, Channel: ChannelBlock, Priority: 1, BandwidthFloorBps: 1_500, BandwidthCeilBps: 8_000, ReservedCapacity: true},
+		{Class: QoSClassStateSync, Channel: ChannelStateSync, Priority: 2, BandwidthFloorBps: 1_000, BandwidthCeilBps: 7_000, Backpressure: true},
+		{Class: QoSClassExecutionMessage, Channel: ChannelExecution, Priority: 3, BandwidthFloorBps: 750, BandwidthCeilBps: 6_000},
+		{Class: QoSClassServiceCall, Channel: ChannelService, Priority: 5, BandwidthFloorBps: 250, BandwidthCeilBps: 4_000},
+		{Class: QoSClassDiscovery, Channel: ChannelDiscovery, Priority: 5, BandwidthFloorBps: 100, BandwidthCeilBps: 2_000},
+		{Class: QoSClassBulkData, Channel: ChannelData, Priority: 6, BandwidthFloorBps: 0, BandwidthCeilBps: 3_000, Backpressure: true},
 	}
 }
 
@@ -435,6 +492,18 @@ func (s StreamSpec) Validate() error {
 	if !IsCompressionMode(s.Compression) {
 		return fmt.Errorf("unknown networking compression mode %q", s.Compression)
 	}
+	if strings.TrimSpace(s.EncryptionContext) != s.EncryptionContext || s.EncryptionContext == "" {
+		return errors.New("networking stream encryption context is required and must not have surrounding whitespace")
+	}
+	if len(s.EncryptionContext) > MaxEncryptionContextBytes {
+		return fmt.Errorf("networking stream encryption context must be <= %d bytes", MaxEncryptionContextBytes)
+	}
+	if s.Channel == ChannelConsensus && s.FlowControlWindow < DefaultFlowWindowBytes {
+		return errors.New("networking consensus stream requires reserved flow control capacity")
+	}
+	if s.Channel == ChannelData && s.FlowControlWindow < s.MaxMessageBytes {
+		return errors.New("networking bulk data stream requires backpressure-capable flow window")
+	}
 	return nil
 }
 
@@ -521,7 +590,7 @@ func NegotiateSession(local, remote NodeRecord, req SessionRequest) (SessionChan
 		OpenedHeight:     req.OpenedHeight,
 		ExpiresHeight:    req.ExpiresHeight,
 		SessionKeys:      sessionKeys,
-		Streams:          defaultStreams(channels),
+		Streams:          defaultStreams(channels, sessionKeys.KeyID),
 		QOSPolicy:        req.QOSPolicy,
 	}
 	session.SessionID = ComputeSessionID(req, cipher, protocols, channels)
@@ -582,6 +651,9 @@ func (s SessionChannel) Validate() error {
 			return errors.New("networking duplicate stream id")
 		}
 		seen[stream.StreamID] = struct{}{}
+	}
+	if err := ValidateStreamSet(s.Streams, DefaultQoSClassPolicies()); err != nil {
+		return err
 	}
 	if !IsQoSPolicy(s.QOSPolicy) {
 		return fmt.Errorf("unknown networking qos policy %q", s.QOSPolicy)
@@ -655,6 +727,129 @@ func NegotiateVerifiedSession(local, remote NodeRecord, req SessionRequest, netw
 		return SessionChannel{}, err
 	}
 	return NegotiateSession(local, remote, req)
+}
+
+func ValidateQoSClassPolicies(policies []QoSClassPolicy) error {
+	if len(policies) == 0 || len(policies) > MaxQoSClassPolicies {
+		return fmt.Errorf("networking qos class policies must be between 1 and %d", MaxQoSClassPolicies)
+	}
+	seen := make(map[QoSClass]struct{}, len(policies))
+	for _, policy := range policies {
+		if err := policy.Validate(); err != nil {
+			return err
+		}
+		if _, found := seen[policy.Class]; found {
+			return errors.New("networking duplicate qos class policy")
+		}
+		seen[policy.Class] = struct{}{}
+	}
+	if priorityForQoSClass(policies, QoSClassCriticalConsensus) >= priorityForQoSClass(policies, QoSClassServiceCall) {
+		return errors.New("networking qos priority inversion for consensus and service traffic")
+	}
+	if priorityForQoSClass(policies, QoSClassCriticalConsensus) >= priorityForQoSClass(policies, QoSClassBulkData) {
+		return errors.New("networking qos priority inversion for consensus and bulk data")
+	}
+	consensus, found := findQoSClassPolicy(policies, QoSClassCriticalConsensus)
+	if !found || !consensus.ReservedCapacity || consensus.BandwidthFloorBps == 0 {
+		return errors.New("networking consensus qos class requires reserved bandwidth floor")
+	}
+	bulk, found := findQoSClassPolicy(policies, QoSClassBulkData)
+	if !found || !bulk.Backpressure {
+		return errors.New("networking bulk data qos class requires backpressure")
+	}
+	return nil
+}
+
+func (p QoSClassPolicy) Validate() error {
+	if !IsQoSClass(p.Class) {
+		return fmt.Errorf("unknown networking qos class %q", p.Class)
+	}
+	if !IsChannelClass(p.Channel) {
+		return fmt.Errorf("unknown networking qos channel %q", p.Channel)
+	}
+	if p.BandwidthFloorBps > BasisPoints || p.BandwidthCeilBps > BasisPoints {
+		return fmt.Errorf("networking qos bandwidth floor and ceiling must be <= %d bps", BasisPoints)
+	}
+	if p.BandwidthCeilBps == 0 || p.BandwidthFloorBps > p.BandwidthCeilBps {
+		return errors.New("networking qos bandwidth floor must be <= positive ceiling")
+	}
+	if QoSClassForChannel(p.Channel) != p.Class {
+		return errors.New("networking qos class does not match channel")
+	}
+	return nil
+}
+
+func ValidateStreamSet(streams []StreamSpec, policies []QoSClassPolicy) error {
+	if err := ValidateQoSClassPolicies(policies); err != nil {
+		return err
+	}
+	byChannel := make(map[ChannelClass]StreamSpec, len(streams))
+	for _, stream := range streams {
+		byChannel[stream.Channel] = stream
+	}
+	consensus, found := byChannel[ChannelConsensus]
+	if !found {
+		return errors.New("networking stream set requires consensus stream")
+	}
+	if consensus.Priority != priorityForQoSClass(policies, QoSClassCriticalConsensus) {
+		return errors.New("networking consensus stream priority must match qos class")
+	}
+	for _, channel := range []ChannelClass{ChannelService, ChannelData} {
+		stream, found := byChannel[channel]
+		if !found {
+			continue
+		}
+		if stream.Priority <= consensus.Priority {
+			return errors.New("networking service or bulk stream cannot outrank consensus stream")
+		}
+	}
+	if data, found := byChannel[ChannelData]; found && data.FlowControlWindow < data.MaxMessageBytes {
+		return errors.New("networking bulk data stream must support backpressure")
+	}
+	return nil
+}
+
+func ResetStream(session SessionChannel, streamID string, policy StreamResetPolicy) (StreamResetDecision, error) {
+	if err := session.Validate(); err != nil {
+		return StreamResetDecision{}, err
+	}
+	streamID = strings.TrimSpace(streamID)
+	if streamID == "" {
+		return StreamResetDecision{}, errors.New("networking stream reset id is required")
+	}
+	switch policy {
+	case StreamResetKeepSession, StreamResetCloseSession:
+	default:
+		return StreamResetDecision{}, fmt.Errorf("unknown networking stream reset policy %q", policy)
+	}
+	if policy == StreamResetCloseSession {
+		return StreamResetDecision{StreamID: streamID, SessionClosed: true}, nil
+	}
+	remaining := make([]StreamSpec, 0, len(session.Streams))
+	found := false
+	for _, stream := range session.Streams {
+		if stream.StreamID == streamID {
+			found = true
+			continue
+		}
+		remaining = append(remaining, stream)
+	}
+	if !found {
+		return StreamResetDecision{}, errors.New("networking stream reset target not found")
+	}
+	return StreamResetDecision{StreamID: streamID, RemainingStreams: remaining}, nil
+}
+
+func EvaluatePeerServiceQuota(usedBytes, quotaBytes uint64) PeerQoSDecision {
+	if quotaBytes == 0 || usedBytes <= quotaBytes {
+		return PeerQoSDecision{Class: QoSClassServiceCall}
+	}
+	return PeerQoSDecision{
+		Class:                   QoSClassServiceCall,
+		DowngradeServiceTraffic: true,
+		DisconnectConsensus:     false,
+		Reason:                  "service quota exceeded",
+	}
 }
 
 func (e TransportEnvelope) Normalize() TransportEnvelope {
@@ -908,23 +1103,59 @@ func IsQoSPolicy(policy QoSPolicy) bool {
 	}
 }
 
-func defaultStreams(channels []ChannelClass) []StreamSpec {
+func IsQoSClass(class QoSClass) bool {
+	switch class {
+	case QoSClassCriticalConsensus, QoSClassBlockPropagation, QoSClassStateSync, QoSClassExecutionMessage, QoSClassServiceCall, QoSClassDiscovery, QoSClassBulkData:
+		return true
+	default:
+		return false
+	}
+}
+
+func QoSClassForChannel(channel ChannelClass) QoSClass {
+	switch channel {
+	case ChannelConsensus, ChannelMempool:
+		return QoSClassCriticalConsensus
+	case ChannelBlock:
+		return QoSClassBlockPropagation
+	case ChannelStateSync:
+		return QoSClassStateSync
+	case ChannelExecution:
+		return QoSClassExecutionMessage
+	case ChannelService, ChannelRouting:
+		return QoSClassServiceCall
+	case ChannelDiscovery:
+		return QoSClassDiscovery
+	case ChannelData:
+		return QoSClassBulkData
+	default:
+		return ""
+	}
+}
+
+func defaultStreams(channels []ChannelClass, sessionKeyID string) []StreamSpec {
 	streams := make([]StreamSpec, len(channels))
 	for i, channel := range channels {
 		maxMessageBytes := uint64(DefaultMaxMessageBytes)
 		if channel == ChannelData {
 			maxMessageBytes = uint64(MaxStreamMessageBytes)
 		}
+		streamID := strings.ToLower(strings.TrimSuffix(string(channel), "_CHANNEL"))
 		streams[i] = StreamSpec{
-			StreamID:          strings.ToLower(strings.TrimSuffix(string(channel), "_CHANNEL")),
+			StreamID:          streamID,
 			Channel:           channel,
 			Priority:          PriorityForChannel(channel),
 			FlowControlWindow: maxUint64(DefaultFlowWindowBytes, maxMessageBytes),
 			MaxMessageBytes:   maxMessageBytes,
 			Compression:       DefaultCompressionMode,
+			EncryptionContext: streamEncryptionContext(sessionKeyID, streamID),
 		}
 	}
 	return streams
+}
+
+func streamEncryptionContext(sessionKeyID, streamID string) string {
+	return HashParts("stream-encryption-context", sessionKeyID, streamID)[:MaxEncryptionContextBytes/2]
 }
 
 func chooseCipher(cipherSuites []CipherSuite) (CipherSuite, error) {
@@ -950,6 +1181,37 @@ func priorityForPolicy(policies []ChannelPolicy, channel ChannelClass) uint32 {
 		return policy.Priority
 	}
 	return PriorityForChannel(channel)
+}
+
+func findQoSClassPolicy(policies []QoSClassPolicy, class QoSClass) (QoSClassPolicy, bool) {
+	for _, policy := range policies {
+		if policy.Class == class {
+			return policy, true
+		}
+	}
+	return QoSClassPolicy{}, false
+}
+
+func priorityForQoSClass(policies []QoSClassPolicy, class QoSClass) uint32 {
+	if policy, found := findQoSClassPolicy(policies, class); found {
+		return policy.Priority
+	}
+	switch class {
+	case QoSClassCriticalConsensus:
+		return 0
+	case QoSClassBlockPropagation:
+		return 1
+	case QoSClassStateSync:
+		return 2
+	case QoSClassExecutionMessage:
+		return 3
+	case QoSClassServiceCall, QoSClassDiscovery:
+		return 5
+	case QoSClassBulkData:
+		return 6
+	default:
+		return 100
+	}
 }
 
 func channelSortRank(channel ChannelClass) uint32 {
