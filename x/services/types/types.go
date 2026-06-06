@@ -23,6 +23,13 @@ type ReputationRecord = coretypes.ReputationRecord
 type ServiceReceipt = coretypes.ServiceReceipt
 type ServiceRegistryState = coretypes.ServiceRegistryState
 type ServiceRegistryProof = coretypes.ServiceRegistryProof
+type ServiceConsensusContext = coretypes.ServiceConsensusContext
+type ServiceCallEnvelope = coretypes.ServiceCallEnvelope
+type ServiceCallKind = coretypes.ServiceCallKind
+type ServiceCallStatus = coretypes.ServiceCallStatus
+type ServicePaymentStatus = coretypes.ServicePaymentStatus
+type ServiceExecutionOutcome = coretypes.ServiceExecutionOutcome
+type ServiceCallReceipt = coretypes.ServiceCallReceipt
 
 type MsgRegisterService = coretypes.MsgRegisterService
 type MsgUpdateService = coretypes.MsgUpdateService
