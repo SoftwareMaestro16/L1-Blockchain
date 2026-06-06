@@ -29,6 +29,7 @@ const (
 	IdentityStoreV2SpecNFTBindingsPrefix       = IdentityStoreV2Prefix + "/nft_bindings"
 	IdentityStoreV2SpecNFTBindingsByNamePrefix = IdentityStoreV2Prefix + "/nft_bindings_by_name"
 	IdentityStoreV2SpecResolversPrefix         = IdentityStoreV2Prefix + "/resolvers"
+	IdentityStoreV2SpecReversePrefix           = IdentityStoreV2Prefix + "/reverse"
 	IdentityStoreV2SpecDelegationsPrefix       = IdentityStoreV2Prefix + "/delegations"
 	IdentityStoreV2SpecSubdomainsPrefix        = IdentityStoreV2Prefix + "/subdomains"
 	IdentityStoreV2SpecAuctionsPrefix          = IdentityStoreV2Prefix + "/auctions"
@@ -37,6 +38,7 @@ const (
 	IdentityStoreV2SpecExpiryIndexPrefix       = IdentityStoreV2Prefix + "/expiry_index"
 	IdentityStoreV2SpecOwnerIndexPrefix        = IdentityStoreV2Prefix + "/owner_index"
 	IdentityStoreV2SpecResolverIndexPrefix     = IdentityStoreV2Prefix + "/resolver_index"
+	IdentityStoreV2SpecInterfaceMetadataPrefix = IdentityStoreV2Prefix + "/interface_metadata"
 )
 
 type IdentityAccessSet struct {
@@ -193,7 +195,7 @@ func IdentityStoreV2SpecReverseKey(address sdk.AccAddress) (string, error) {
 	if err := validateSpecAddress("identity v2 reverse address", address); err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s/%s", IdentityStoreV2ReversePrefix, hex.EncodeToString(address)), nil
+	return fmt.Sprintf("%s/%s", IdentityStoreV2SpecReversePrefix, hex.EncodeToString(address)), nil
 }
 
 func IdentityStoreV2SpecDelegationKey(name string, delegate sdk.AccAddress, scope DelegationScopeV2) (string, error) {
@@ -208,6 +210,14 @@ func IdentityStoreV2SpecDelegationKey(name string, delegate sdk.AccAddress, scop
 		return "", err
 	}
 	return fmt.Sprintf("%s/%s/%s/%s", IdentityStoreV2SpecDelegationsPrefix, nameHash, hex.EncodeToString(delegate), scope), nil
+}
+
+func IdentityStoreV2SpecDelegationsByNamePrefix(name string) (string, error) {
+	nameHash, err := DomainRecordV2NameHash(name)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s/%s", IdentityStoreV2SpecDelegationsPrefix, nameHash), nil
 }
 
 func IdentityStoreV2SpecSubdomainKey(parentName string, childLabel string) (string, error) {
@@ -284,12 +294,55 @@ func IdentityStoreV2SpecResolverIndexKey(resolver sdk.AccAddress, name string) (
 	return fmt.Sprintf("%s/%s/%s", IdentityStoreV2SpecResolverIndexPrefix, hex.EncodeToString(resolver), nameHash), nil
 }
 
+func IdentityStoreV2SpecInterfaceMetadataKey(schemaHash string) (string, error) {
+	if err := validateHexHash("identity v2 interface metadata hash", schemaHash); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s/%s", IdentityStoreV2SpecInterfaceMetadataPrefix, schemaHash), nil
+}
+
 func IdentityStoreV2SpecDirectResolverReadAccessSet(name string) (IdentityAccessSet, error) {
 	key, err := IdentityStoreV2SpecResolverKey(name)
 	if err != nil {
 		return IdentityAccessSet{}, err
 	}
 	return newIdentityAccessSet([]string{key}, nil), nil
+}
+
+func IdentityStoreV2SpecDirectResolutionReadAccessSet(name string, includeNFTBinding bool) (IdentityAccessSet, error) {
+	domainKey, err := IdentityStoreV2SpecDomainKey(name)
+	if err != nil {
+		return IdentityAccessSet{}, err
+	}
+	resolverKey, err := IdentityStoreV2SpecResolverKey(name)
+	if err != nil {
+		return IdentityAccessSet{}, err
+	}
+	reads := []string{domainKey, resolverKey}
+	if includeNFTBinding {
+		nftKey, err := IdentityStoreV2SpecNFTBindingByNameKey(name)
+		if err != nil {
+			return IdentityAccessSet{}, err
+		}
+		reads = append(reads, nftKey)
+	}
+	return newIdentityAccessSet(reads, nil), nil
+}
+
+func IdentityStoreV2SpecReverseResolutionReadAccessSet(address sdk.AccAddress, name string) (IdentityAccessSet, error) {
+	reverseKey, err := IdentityStoreV2SpecReverseKey(address)
+	if err != nil {
+		return IdentityAccessSet{}, err
+	}
+	domainKey, err := IdentityStoreV2SpecDomainKey(name)
+	if err != nil {
+		return IdentityAccessSet{}, err
+	}
+	resolverKey, err := IdentityStoreV2SpecResolverKey(name)
+	if err != nil {
+		return IdentityAccessSet{}, err
+	}
+	return newIdentityAccessSet([]string{reverseKey, domainKey, resolverKey}, nil), nil
 }
 
 func IdentityStoreV2SpecRecursiveResolutionPathKeys(name string) ([]string, error) {
@@ -310,6 +363,50 @@ func IdentityStoreV2SpecRecursiveResolutionPathKeys(name string) ([]string, erro
 		keys = append(keys, domainKey, resolverKey)
 	}
 	return keys, nil
+}
+
+func IdentityStoreV2SpecRecursiveResolutionReadAccessSet(name string, includeDelegations bool) (IdentityAccessSet, error) {
+	path, err := CanonicalResolutionPathV2(name)
+	if err != nil {
+		return IdentityAccessSet{}, err
+	}
+	reads := make([]string, 0, len(path.Path)+1)
+	for _, candidate := range path.Path {
+		key, err := IdentityStoreV2SpecDomainKey(candidate)
+		if err != nil {
+			return IdentityAccessSet{}, err
+		}
+		reads = append(reads, key)
+	}
+	finalResolver, err := IdentityStoreV2SpecResolverKey(path.TargetName)
+	if err != nil {
+		return IdentityAccessSet{}, err
+	}
+	reads = append(reads, finalResolver)
+	if includeDelegations {
+		for _, candidate := range path.Path[:len(path.Path)-1] {
+			prefix, err := IdentityStoreV2SpecDelegationsByNamePrefix(candidate)
+			if err != nil {
+				return IdentityAccessSet{}, err
+			}
+			reads = append(reads, prefix)
+		}
+	}
+	return newIdentityAccessSet(reads, nil), nil
+}
+
+func IdentityStoreV2SpecResolutionProofReadAccessSet(name string, recursive bool) (IdentityAccessSet, error) {
+	var base IdentityAccessSet
+	var err error
+	if recursive {
+		base, err = IdentityStoreV2SpecRecursiveResolutionReadAccessSet(name, true)
+	} else {
+		base, err = IdentityStoreV2SpecDirectResolutionReadAccessSet(name, true)
+	}
+	if err != nil {
+		return IdentityAccessSet{}, err
+	}
+	return newIdentityAccessSet(base.Reads, nil), nil
 }
 
 func IdentityStoreV2SpecBoundedExpiryScanPrefix(expiryHeight uint64) (string, error) {
