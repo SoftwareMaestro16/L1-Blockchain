@@ -534,14 +534,22 @@ func ComputeVirtualChannelAnchor(vc VirtualChannel) string {
 	writeString(h, vc.ChainID)
 	writeString(h, vc.VirtualChannelID)
 	writeUint64(h, vc.Nonce)
+	writeString(h, vc.ParentRouteID)
 	for _, id := range vc.ParentChannelIDs {
 		writeString(h, id)
 	}
 	for _, endpoint := range vc.Endpoints {
 		writeString(h, endpoint)
 	}
+	writeString(h, vc.EndpointA)
+	writeString(h, vc.EndpointB)
+	writeString(h, vc.IntermediarySetHash)
 	writeString(h, vc.Capacity)
+	writeString(h, vc.BalanceA)
+	writeString(h, vc.BalanceB)
+	writeString(h, vc.RoutingFeeAmount)
 	writeUint64(h, vc.ExpiresHeight)
+	writeString(h, vc.ConditionRoot)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
@@ -553,16 +561,27 @@ func ComputeVirtualChannelStateHash(vc VirtualChannel) string {
 	writeString(h, vc.ChainID)
 	writeString(h, vc.VirtualChannelID)
 	writeUint64(h, vc.Nonce)
+	writeString(h, vc.ParentRouteID)
 	for _, id := range vc.ParentChannelIDs {
 		writeString(h, id)
 	}
 	for _, endpoint := range vc.Endpoints {
 		writeString(h, endpoint)
 	}
+	writeString(h, vc.EndpointA)
+	writeString(h, vc.EndpointB)
+	for _, intermediary := range vc.Intermediaries {
+		writeString(h, intermediary)
+	}
+	writeString(h, vc.IntermediarySetHash)
 	writeString(h, vc.Capacity)
+	writeString(h, vc.BalanceA)
+	writeString(h, vc.BalanceB)
+	writeString(h, vc.RoutingFeeAmount)
 	writeUint64(h, vc.ExpiresHeight)
 	writeString(h, string(vc.Status))
 	writeString(h, vc.AnchorCommitment)
+	writeString(h, vc.ConditionRoot)
 	return hex.EncodeToString(h.Sum(nil))
 }
 

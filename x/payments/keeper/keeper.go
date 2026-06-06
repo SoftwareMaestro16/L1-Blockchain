@@ -384,6 +384,18 @@ func (k *Keeper) OpenVirtualChannel(vc paymentstypes.VirtualChannel) error {
 	return nil
 }
 
+func (k *Keeper) CloseVirtualChannel(virtualChannelID string, currentHeight uint64) (paymentstypes.VirtualChannel, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return paymentstypes.VirtualChannel{}, err
+	}
+	next, closed, err := paymentstypes.CloseVirtualChannel(k.genesis.State, virtualChannelID, currentHeight)
+	if err != nil {
+		return paymentstypes.VirtualChannel{}, err
+	}
+	k.genesis.State = next
+	return closed, nil
+}
+
 func (k *Keeper) AddSettlementBatch(batch paymentstypes.SettlementBatch) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err

@@ -1187,10 +1187,17 @@ func OpenVirtualChannel(state PaymentsState, vc VirtualChannel) (PaymentsState, 
 		if !containsString(channel.Participants, vc.Endpoints[0]) && !containsString(channel.Participants, vc.Endpoints[1]) {
 			return PaymentsState{}, errors.New("payments virtual channel parent path must touch an endpoint")
 		}
-		if channelCapacity, err := parsePositiveInt("payments channel collateral", channel.Collateral); err != nil {
+		if reserved, err := parentReservedCapacity(channel); err != nil {
 			return PaymentsState{}, err
-		} else if channelCapacity.LT(capacity) {
-			return PaymentsState{}, errors.New("payments virtual channel capacity exceeds parent capacity")
+		} else if reserved.LT(capacity) {
+			return PaymentsState{}, errors.New("payments virtual channel capacity exceeds parent reserved capacity")
+		}
+		parentSafetyHeight := channel.LatestState.TimeoutHeight
+		if parentSafetyHeight == 0 {
+			parentSafetyHeight = channel.OpenHeight + channel.CloseDelay + channel.DisputePeriod
+		}
+		if vc.ExpiresHeight+channel.CloseDelay+channel.DisputePeriod < vc.ExpiresHeight || vc.ExpiresHeight+channel.CloseDelay+channel.DisputePeriod >= parentSafetyHeight {
+			return PaymentsState{}, errors.New("payments virtual channel expiry must be earlier than parent safety timeout")
 		}
 	}
 	if vc.ChainID == "" {
@@ -1201,19 +1208,52 @@ func OpenVirtualChannel(state PaymentsState, vc VirtualChannel) (PaymentsState, 
 	if vc.ChainID != parentChainID {
 		return PaymentsState{}, errors.New("payments virtual channel chain id mismatch")
 	}
-	if vc.AnchorCommitment == "" {
-		vc.AnchorCommitment = ComputeVirtualChannelAnchor(vc)
+	if vc.AnchorCommitment == "" || vc.StateHash == "" || vc.ParentRouteID == "" || vc.IntermediarySetHash == "" {
+		preservedSignatures := vc.Signatures
+		vc.Signatures = nil
+		built, err := BuildVirtualChannel(vc)
+		if err != nil {
+			return PaymentsState{}, err
+		}
+		vc = built
+		vc.Signatures = preservedSignatures
 	}
-	if vc.StateHash == "" {
-		vc.StateHash = ComputeVirtualChannelStateHash(vc)
-	}
-	if err := vc.Validate(); err != nil {
+	if err := ValidateVirtualChannelActivation(vc); err != nil {
 		return PaymentsState{}, err
 	}
 	next := state.Clone()
 	next.VirtualChannels = append(next.VirtualChannels, vc)
 	sortVirtualChannels(next.VirtualChannels)
 	return next, next.Validate()
+}
+
+func CloseVirtualChannel(state PaymentsState, virtualChannelID string, currentHeight uint64) (PaymentsState, VirtualChannel, error) {
+	state = state.Export()
+	if err := state.Validate(); err != nil {
+		return PaymentsState{}, VirtualChannel{}, err
+	}
+	if currentHeight == 0 {
+		return PaymentsState{}, VirtualChannel{}, errors.New("payments virtual close height must be positive")
+	}
+	virtualChannelID = normalizeHash(virtualChannelID)
+	index := -1
+	var closed VirtualChannel
+	for i, vc := range state.VirtualChannels {
+		vc = vc.Normalize()
+		if vc.VirtualChannelID == virtualChannelID {
+			index = i
+			closed = vc
+			break
+		}
+	}
+	if index < 0 {
+		return PaymentsState{}, VirtualChannel{}, errors.New("payments virtual channel not found")
+	}
+	closed.Status = VirtualChannelStatusSettled
+	next := state.Clone()
+	next.VirtualChannels = append(next.VirtualChannels[:index], next.VirtualChannels[index+1:]...)
+	sortVirtualChannels(next.VirtualChannels)
+	return next, closed.Normalize(), next.Validate()
 }
 
 func AddSettlementBatch(state PaymentsState, batch SettlementBatch) (PaymentsState, error) {
@@ -2416,6 +2456,19 @@ func activeEdgesForAmount(edges []ChannelEdge, amount sdkmath.Int, currentHeight
 		out = append(out, edge)
 	}
 	return out
+}
+
+func parentReservedCapacity(channel ChannelRecord) (sdkmath.Int, error) {
+	channel = channel.Normalize()
+	reserveA, err := parseNonNegativeInt("payments virtual parent reserve a", channel.LatestState.ReserveA)
+	if err != nil {
+		return sdkmath.ZeroInt(), err
+	}
+	reserveB, err := parseNonNegativeInt("payments virtual parent reserve b", channel.LatestState.ReserveB)
+	if err != nil {
+		return sdkmath.ZeroInt(), err
+	}
+	return reserveA.Add(reserveB), nil
 }
 
 type routeSearchPath struct {

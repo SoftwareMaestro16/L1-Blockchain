@@ -22,6 +22,7 @@ const (
 	SignatureObjectDelta     = "async_delta"
 	SignatureObjectPromise   = "conditional_promise"
 	SignatureObjectGossip    = "payment_gossip"
+	SignatureObjectVirtual   = "virtual_channel"
 	DefaultDisputePeriod     = uint64(16)
 	DefaultOpeningFee        = "1"
 	MaxDisputeExtensions     = uint32(2)
@@ -979,16 +980,26 @@ type ChannelEdge struct {
 }
 
 type VirtualChannel struct {
-	VirtualChannelID string
-	ChainID          string
-	Nonce            uint64
-	ParentChannelIDs []string
-	Endpoints        []string
-	Capacity         string
-	ExpiresHeight    uint64
-	Status           VirtualChannelStatus
-	AnchorCommitment string
-	StateHash        string
+	VirtualChannelID    string
+	ChainID             string
+	Nonce               uint64
+	ParentRouteID       string
+	ParentChannelIDs    []string
+	Endpoints           []string
+	EndpointA           string
+	EndpointB           string
+	Intermediaries      []string
+	IntermediarySetHash string
+	Capacity            string
+	BalanceA            string
+	BalanceB            string
+	RoutingFeeAmount    string
+	ExpiresHeight       uint64
+	Status              VirtualChannelStatus
+	AnchorCommitment    string
+	ConditionRoot       string
+	StateHash           string
+	Signatures          []StateSignature
 }
 
 type SettlementOperation struct {
@@ -4526,6 +4537,100 @@ func (e ChannelEdge) Validate() error {
 	return validateNonNegativeInt("payments routing fee", e.FeeAmount)
 }
 
+func BuildVirtualChannel(vc VirtualChannel) (VirtualChannel, error) {
+	vc = vc.Normalize()
+	if vc.ParentRouteID == "" {
+		parts := append([]string{"virtual-parent-route", vc.VirtualChannelID}, vc.ParentChannelIDs...)
+		vc.ParentRouteID = HashParts(parts...)
+	}
+	if vc.IntermediarySetHash == "" {
+		vc.IntermediarySetHash = ComputeParticipantSetHash(vc.Intermediaries)
+	}
+	vc.AnchorCommitment = ""
+	vc.StateHash = ""
+	vc.AnchorCommitment = ComputeVirtualChannelAnchor(vc)
+	vc.StateHash = ComputeVirtualChannelStateHash(vc)
+	if err := vc.ValidateCore(); err != nil {
+		return VirtualChannel{}, err
+	}
+	return vc.Normalize(), nil
+}
+
+func SignatureForVirtualChannel(vc VirtualChannel, signer string) (StateSignature, error) {
+	vc = vc.Normalize()
+	if vc.StateHash == "" {
+		var err error
+		vc, err = BuildVirtualChannel(vc)
+		if err != nil {
+			return StateSignature{}, err
+		}
+	}
+	signer = strings.TrimSpace(signer)
+	if err := addressing.ValidateUserAddress("payments virtual channel signer", signer); err != nil {
+		return StateSignature{}, err
+	}
+	return StateSignature{
+		Signer:           signer,
+		ChainID:          vc.ChainID,
+		ChannelID:        vc.VirtualChannelID,
+		ObjectType:       SignatureObjectVirtual,
+		Version:          CurrentStateVersion,
+		Nonce:            vc.Nonce,
+		ObjectID:         vc.StateHash,
+		ExpirationHeight: vc.ExpiresHeight,
+		CommitmentHash:   vc.StateHash,
+		StateHash:        vc.StateHash,
+		SignatureHash: ComputeSignatureEnvelopeHash(
+			signer,
+			vc.ChainID,
+			vc.VirtualChannelID,
+			SignatureObjectVirtual,
+			CurrentStateVersion,
+			vc.Nonce,
+			vc.StateHash,
+			vc.ExpiresHeight,
+			vc.StateHash,
+		),
+	}, nil
+}
+
+func ValidateVirtualChannelSignature(sig StateSignature, vc VirtualChannel) error {
+	sig = sig.Normalize()
+	vc = vc.Normalize()
+	if err := addressing.ValidateUserAddress("payments virtual channel signature signer", sig.Signer); err != nil {
+		return err
+	}
+	if sig.ChainID != vc.ChainID {
+		return errors.New("payments virtual channel signature chain id mismatch")
+	}
+	if sig.ChannelID != vc.VirtualChannelID {
+		return errors.New("payments virtual channel signature channel id mismatch")
+	}
+	if sig.ObjectType != SignatureObjectVirtual {
+		return errors.New("payments virtual channel signature object type mismatch")
+	}
+	if sig.Version != CurrentStateVersion {
+		return errors.New("payments virtual channel signature version mismatch")
+	}
+	if sig.Nonce != vc.Nonce {
+		return errors.New("payments virtual channel signature nonce mismatch")
+	}
+	if sig.ObjectID != vc.StateHash || sig.CommitmentHash != vc.StateHash || sig.StateHash != vc.StateHash {
+		return errors.New("payments virtual channel signature commitment mismatch")
+	}
+	if sig.ExpirationHeight != vc.ExpiresHeight {
+		return errors.New("payments virtual channel signature expiration mismatch")
+	}
+	if err := ValidateHash("payments virtual channel signature hash", sig.SignatureHash); err != nil {
+		return err
+	}
+	expected := ComputeSignatureEnvelopeHash(sig.Signer, sig.ChainID, sig.ChannelID, sig.ObjectType, sig.Version, sig.Nonce, sig.ObjectID, sig.ExpirationHeight, sig.CommitmentHash)
+	if sig.SignatureHash != expected {
+		return errors.New("payments virtual channel signature hash mismatch")
+	}
+	return nil
+}
+
 func IsGossipMessageType(messageType GossipMessageType) bool {
 	switch messageType {
 	case GossipChannelAnnouncement,
@@ -4605,16 +4710,48 @@ func validateGossipEdgeFields(message GossipMessage, requireCapacity bool) error
 func (v VirtualChannel) Normalize() VirtualChannel {
 	v.VirtualChannelID = normalizeHash(v.VirtualChannelID)
 	v.ChainID = strings.TrimSpace(v.ChainID)
+	v.ParentRouteID = normalizeOptionalHash(v.ParentRouteID)
 	for i := range v.ParentChannelIDs {
 		v.ParentChannelIDs[i] = normalizeHash(v.ParentChannelIDs[i])
 	}
 	v.Endpoints = normalizeAddressSet(v.Endpoints)
+	v.EndpointA = strings.TrimSpace(v.EndpointA)
+	v.EndpointB = strings.TrimSpace(v.EndpointB)
+	if len(v.Endpoints) == 2 {
+		if v.EndpointA == "" {
+			v.EndpointA = v.Endpoints[0]
+		}
+		if v.EndpointB == "" {
+			v.EndpointB = v.Endpoints[1]
+		}
+	}
+	if v.EndpointA != "" && v.EndpointB != "" {
+		v.Endpoints = normalizeAddressSet([]string{v.EndpointA, v.EndpointB})
+		v.EndpointA = v.Endpoints[0]
+		v.EndpointB = v.Endpoints[1]
+	}
+	v.Intermediaries = normalizeAddressSet(v.Intermediaries)
+	v.IntermediarySetHash = normalizeOptionalHash(v.IntermediarySetHash)
 	v.Capacity = strings.TrimSpace(v.Capacity)
+	v.BalanceA = strings.TrimSpace(v.BalanceA)
+	v.BalanceB = strings.TrimSpace(v.BalanceB)
+	v.RoutingFeeAmount = strings.TrimSpace(v.RoutingFeeAmount)
 	if v.Nonce == 0 {
 		v.Nonce = 1
 	}
+	if v.BalanceA == "" {
+		v.BalanceA = v.Capacity
+	}
+	if v.BalanceB == "" {
+		v.BalanceB = "0"
+	}
+	if v.RoutingFeeAmount == "" {
+		v.RoutingFeeAmount = "0"
+	}
 	v.AnchorCommitment = normalizeOptionalHash(v.AnchorCommitment)
+	v.ConditionRoot = normalizeOptionalHash(v.ConditionRoot)
 	v.StateHash = normalizeOptionalHash(v.StateHash)
+	v.Signatures = normalizeSignatures(v.Signatures)
 	if v.Status == "" {
 		v.Status = VirtualChannelStatusOpen
 	}
@@ -4622,6 +4759,10 @@ func (v VirtualChannel) Normalize() VirtualChannel {
 }
 
 func (v VirtualChannel) Validate() error {
+	return v.ValidateCore()
+}
+
+func (v VirtualChannel) ValidateCore() error {
 	vc := v.Normalize()
 	if err := ValidateHash("payments virtual channel id", vc.VirtualChannelID); err != nil {
 		return err
@@ -4631,6 +4772,11 @@ func (v VirtualChannel) Validate() error {
 	}
 	if vc.Nonce == 0 {
 		return errors.New("payments virtual channel nonce must be positive")
+	}
+	if vc.ParentRouteID != "" {
+		if err := ValidateHash("payments virtual parent route id", vc.ParentRouteID); err != nil {
+			return err
+		}
 	}
 	if len(vc.ParentChannelIDs) == 0 || len(vc.ParentChannelIDs) > MaxParentChannels {
 		return fmt.Errorf("payments virtual parent channels must be between 1 and %d", MaxParentChannels)
@@ -4648,8 +4794,44 @@ func (v VirtualChannel) Validate() error {
 	if err := validateAddressSet("payments virtual endpoint", vc.Endpoints, 2, 2); err != nil {
 		return err
 	}
+	if vc.EndpointA != vc.Endpoints[0] || vc.EndpointB != vc.Endpoints[1] {
+		return errors.New("payments virtual endpoints must match endpoint fields")
+	}
+	if len(vc.Intermediaries) > MaxParticipants {
+		return fmt.Errorf("payments virtual intermediaries must be <= %d", MaxParticipants)
+	}
+	if vc.IntermediarySetHash == "" {
+		return errors.New("payments virtual intermediary set hash is required")
+	}
+	if expected := ComputeParticipantSetHash(vc.Intermediaries); vc.IntermediarySetHash != expected {
+		return errors.New("payments virtual intermediary set hash mismatch")
+	}
 	if err := validatePositiveInt("payments virtual capacity", vc.Capacity); err != nil {
 		return err
+	}
+	if err := validateNonNegativeInt("payments virtual balance a", vc.BalanceA); err != nil {
+		return err
+	}
+	if err := validateNonNegativeInt("payments virtual balance b", vc.BalanceB); err != nil {
+		return err
+	}
+	if err := validateNonNegativeInt("payments virtual routing fee", vc.RoutingFeeAmount); err != nil {
+		return err
+	}
+	capacity, err := parsePositiveInt("payments virtual capacity", vc.Capacity)
+	if err != nil {
+		return err
+	}
+	balanceA, err := parseNonNegativeInt("payments virtual balance a", vc.BalanceA)
+	if err != nil {
+		return err
+	}
+	balanceB, err := parseNonNegativeInt("payments virtual balance b", vc.BalanceB)
+	if err != nil {
+		return err
+	}
+	if !balanceA.Add(balanceB).Equal(capacity) {
+		return errors.New("payments virtual balances must equal capacity")
 	}
 	if vc.ExpiresHeight == 0 {
 		return errors.New("payments virtual channel expiry height must be positive")
@@ -4663,11 +4845,62 @@ func (v VirtualChannel) Validate() error {
 	if expected := ComputeVirtualChannelAnchor(vc); vc.AnchorCommitment != expected {
 		return errors.New("payments virtual channel anchor mismatch")
 	}
+	if vc.ConditionRoot != "" {
+		if err := ValidateHash("payments virtual condition root", vc.ConditionRoot); err != nil {
+			return err
+		}
+	}
 	if err := ValidateHash("payments virtual channel state hash", vc.StateHash); err != nil {
 		return err
 	}
 	if expected := ComputeVirtualChannelStateHash(vc); vc.StateHash != expected {
 		return errors.New("payments virtual channel state hash mismatch")
+	}
+	if err := validateVirtualChannelSignatures(vc); err != nil {
+		return err
+	}
+	return nil
+}
+
+func validateVirtualChannelSignatures(vc VirtualChannel) error {
+	vc = vc.Normalize()
+	if len(vc.Signatures) == 0 {
+		return nil
+	}
+	seen := make(map[string]struct{}, len(vc.Signatures))
+	for _, sig := range vc.Signatures {
+		if err := ValidateVirtualChannelSignature(sig, vc); err != nil {
+			return err
+		}
+		if _, found := seen[sig.Normalize().Signer]; found {
+			return errors.New("payments duplicate virtual channel signature")
+		}
+		seen[sig.Normalize().Signer] = struct{}{}
+	}
+	return nil
+}
+
+func ValidateVirtualChannelActivation(vc VirtualChannel) error {
+	vc = vc.Normalize()
+	if err := vc.ValidateCore(); err != nil {
+		return err
+	}
+	required := normalizeAddressSet(append(append([]string{}, vc.Endpoints...), vc.Intermediaries...))
+	if len(required) == 0 {
+		return errors.New("payments virtual channel activation requires signers")
+	}
+	seen := make(map[string]struct{}, len(vc.Signatures))
+	for _, sig := range vc.Signatures {
+		sig = sig.Normalize()
+		if err := ValidateVirtualChannelSignature(sig, vc); err != nil {
+			return err
+		}
+		seen[sig.Signer] = struct{}{}
+	}
+	for _, signer := range required {
+		if _, found := seen[signer]; !found {
+			return errors.New("payments virtual channel missing required signature")
+		}
 	}
 	return nil
 }
