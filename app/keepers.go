@@ -1,21 +1,16 @@
 package app
 
 import (
-	"github.com/spf13/cast"
-
 	"cosmossdk.io/log/v2"
+	"github.com/spf13/cast"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/runtime"
-	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
-	sigtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
-	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -41,7 +36,6 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/cosmos/cosmos-sdk/x/tx/signing"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
@@ -162,18 +156,7 @@ func (app *L1App) initKeepers(
 		logger,
 	)
 
-	enabledSignModes := append(authtx.DefaultSignModes, sigtypes.SignMode_SIGN_MODE_TEXTUAL)
-	txConfig, err := authtx.NewTxConfigWithOptions(
-		appCodec,
-		authtx.ConfigOptions{
-			EnabledSignModes:           enabledSignModes,
-			SigningOptions:             &signing.Options{AddressCodec: aetherisaddress.Codec{}, ValidatorAddressCodec: aetherisaddress.Codec{}},
-			TextualCoinMetadataQueryFn: txmodule.NewBankKeeperCoinMetadataQueryFn(app.BankKeeper),
-		},
-	)
-	if err != nil {
-		panic(err)
-	}
+	txConfig := newAetherisTxConfig(appCodec, app.BankKeeper)
 	app.txConfig = txConfig
 
 	app.StakingKeeper = stakingkeeper.NewKeeper(
@@ -236,12 +219,8 @@ func (app *L1App) initKeepers(
 		app.AccountKeeper,
 	)
 
-	skipUpgradeHeights := map[int64]bool{}
-	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
-		skipUpgradeHeights[int64(h)] = true // #nosec G115 -- unsafe skip upgrade heights are non-negative CLI config values.
-	}
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(
-		skipUpgradeHeights,
+		unsafeSkipUpgradeHeights(appOpts),
 		runtime.NewKVStoreService(keys[upgradetypes.StoreKey]),
 		appCodec,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
