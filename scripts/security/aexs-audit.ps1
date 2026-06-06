@@ -2835,6 +2835,642 @@ function Get-AexsRoutingEngineExploitOverrides {
   return $overrides
 }
 
+function Get-AexsExecutionZoneAvmExploitOverrides {
+  $overrides = @{
+    "EXECZONEEXP-01" = [ordered]@{
+      path            = "drive identical cross-zone inputs through multiple zones and attempt divergent state roots or receipts"
+      expected_state  = "same finalized source roots and messages produce deterministic destination state roots, receipts, and commitment outputs"
+      affected        = @("x/execution", "x/zones", "x/mesh", "x/vm")
+      severity        = "Critical"
+      fix             = "add cross-zone deterministic replay tests comparing state roots, receipt roots, and export/import commitments"
+    }
+    "EXECZONEEXP-02" = [ordered]@{
+      path            = "replay finalized cross-zone messages, receipts, or proofs against the same or alternate destination zone"
+      expected_state  = "single-use replay markers reject duplicate cross-zone messages before execution or value movement"
+      affected        = @("x/mesh", "x/messaging", "x/queue", "x/execution")
+      severity        = "Critical"
+      fix             = "add cross-zone replay tests for duplicate message ids, stale receipts, wrong destination, and replay marker export/import"
+    }
+    "EXECZONEEXP-03" = [ordered]@{
+      path            = "invoke AVM host behavior that depends on local time, randomness, map order, platform integers, or external APIs"
+      expected_state  = "AVM execution rejects nondeterministic host behavior and identical replay produces identical writes and receipts"
+      affected        = @("x/aetherisvm/avm", "x/vm", "x/execution")
+      severity        = "Critical"
+      fix             = "add AVM determinism tests for forbidden host calls, local time, randomness, map order, platform variation, and replay"
+    }
+    "EXECZONEEXP-04" = [ordered]@{
+      path            = "execute the same contract call sequence on separate nodes and attempt different emitted messages, events, or writes"
+      expected_state  = "contract execution trace, gas, writes, events, and emitted messages are deterministic for the same state and input"
+      affected        = @("x/aetherisvm/avm", "x/execution", "x/events")
+      severity        = "Critical"
+      fix             = "add contract execution trace comparison tests with same genesis, tx sequence, and export/import replay"
+    }
+    "EXECZONEEXP-05" = [ordered]@{
+      path            = "schedule parallel contract executions with conflicting read/write sets and attempt race-dependent final state"
+      expected_state  = "scheduler detects conflicts and orders or rejects parallel work deterministically before committing writes"
+      affected        = @("x/scheduler", "x/execution", "x/storage", "x/actors")
+      severity        = "Critical"
+      fix             = "add parallel read/write conflict tests, deterministic scheduling checks, and race-order replay fixtures"
+    }
+    "EXECZONEEXP-06" = [ordered]@{
+      path            = "inject corrupted contract storage, zone state, queue state, or commitment roots and attempt accepted state corruption"
+      expected_state  = "state corruption is rejected during validation, export/import, commitment checking, or invariant checks before commit"
+      affected        = @("x/storage", "x/zones", "x/queue", "x/execution")
+      severity        = "Critical"
+      fix             = "add corrupted state fixtures for storage roots, zone commitments, queue entries, and contract namespace validation"
+    }
+    "EXECZONEEXP-07" = [ordered]@{
+      path            = "force failure after partial contract writes, queued messages, emitted events, or value transfers and attempt rollback leakage"
+      expected_state  = "failed execution rolls back all writes, messages, events, and value movement in the cached context"
+      affected        = @("x/execution", "x/vm", "x/queue", "x/bank")
+      severity        = "Critical"
+      fix             = "add partial execution rollback tests across contract writes, queues, emitted messages, and bank movements"
+    }
+    "EXECZONEEXP-08" = [ordered]@{
+      path            = "execute opcodes or host calls with nondeterministic ordering, local data, random values, or wall-clock dependencies"
+      expected_state  = "nondeterministic opcodes and host calls are unavailable or reject before state mutation"
+      affected        = @("x/aetherisvm/avm", "x/vm")
+      severity        = "Critical"
+      fix             = "add opcode/host allowlist tests and fuzz malformed host call selectors"
+    }
+    "EXECZONEEXP-09" = [ordered]@{
+      path            = "submit gas-exhausting contracts, deep queries, storage writes, or message fanout to deny service"
+      expected_state  = "gas limits and per-block limits stop execution deterministically without unbounded resource use or partial commits"
+      affected        = @("x/vm", "x/aetherisvm/avm", "x/queue")
+      severity        = "High"
+      fix             = "add gas exhaustion benchmarks and adversarial tests for deploy, execute, query, storage writes, and emitted messages"
+    }
+    "EXECZONEEXP-10" = [ordered]@{
+      path            = "run infinite loops, recursive calls, or bounce loops to grief validators or keep queues busy forever"
+      expected_state  = "gas, instruction, depth, and per-block queue limits stop loops and preserve deterministic failure state"
+      affected        = @("x/aetherisvm/avm", "x/queue", "x/messaging")
+      severity        = "High"
+      fix             = "add infinite-loop, recursive-call, and bounce-loop tests with gas/depth/per-block bounds"
+    }
+    "EXECZONEEXP-11" = [ordered]@{
+      path            = "create storage keys that collide across contracts, zones, namespaces, or export/import boundaries"
+      expected_state  = "contract storage namespaces and keys remain isolated and canonical ordering prevents collisions"
+      affected        = @("x/storage", "x/vm", "x/zones")
+      severity        = "Critical"
+      fix             = "add storage namespace collision tests for contract id, zone id, key prefix, export/import, and bounded iteration"
+    }
+    "EXECZONEEXP-12" = [ordered]@{
+      path            = "hijack contract upgrade by spoofing admin, governance gate, code owner, migration authority, or zero-admin path"
+      expected_state  = "contract upgrade and migration require authorized admin or governance gate and reject zero or spoofed authority"
+      affected        = @("x/vm", "x/aetherisvm/avm", "x/gov", "app/wasmconfig")
+      severity        = "Critical"
+      fix             = "add upgrade authority tests for admin, governance gate, code owner, zero admin, and migration-disabled params"
+    }
+    "EXECZONEEXP-13" = [ordered]@{
+      path            = "read or write uninitialized storage slots and exploit default values, missing owner records, or absent queue markers"
+      expected_state  = "uninitialized storage has explicit defaults and cannot grant ownership, funds, replay bypass, or resolver rights"
+      affected        = @("x/storage", "x/vm", "x/queue", "x/identity")
+      severity        = "High"
+      fix             = "add uninitialized storage tests for ownership, balances, replay markers, resolver records, and contract state"
+    }
+    "EXECZONEEXP-14" = [ordered]@{
+      path            = "construct deeply nested calls, stack frames, or parser inputs to overflow AVM stack or host recursion"
+      expected_state  = "stack and recursion limits reject before panic, node crash, or partial state mutation"
+      affected        = @("x/aetherisvm/avm", "x/vm")
+      severity        = "High"
+      fix             = "add stack-depth fuzz tests, parser recursion limits, and panic-safety assertions"
+    }
+    "EXECZONEEXP-15" = [ordered]@{
+      path            = "attempt sandbox escape through forbidden host function, direct state mutation, filesystem/network access, or cross-contract state write"
+      expected_state  = "AVM sandbox denies external APIs, direct foreign state mutation, filesystem/network access, and unauthorized host functions"
+      affected        = @("x/aetherisvm/avm", "x/vm", "x/storage")
+      severity        = "Critical"
+      fix             = "add sandbox escape tests for host function allowlist, foreign state mutation, external API denial, and filesystem/network denial"
+    }
+  }
+  return $overrides
+}
+
+function Get-AexsComputeShardExploitOverrides {
+  $overrides = @{
+    "SHARDEXP-01" = [ordered]@{
+      path            = "skew routing keys and load inputs to create shard partition imbalance across active shards"
+      expected_state  = "deterministic shard assignment preserves bounded distribution rules and records imbalance for audit without route desync"
+      affected        = @("x/sharding/sim", "x/routing", "x/load")
+      severity        = "High"
+      fix             = "add shard distribution simulations for skewed keys, routing epochs, active shard counts, and load windows"
+    }
+    "SHARDEXP-02" = [ordered]@{
+      path            = "starve a shard with priority ordering, queue delays, epoch changes, or validator reassignment"
+      expected_state  = "valid shard work makes bounded deterministic progress and starvation attempts fail invariant checks"
+      affected        = @("x/sharding/sim", "x/scheduler", "x/queue")
+      severity        = "High"
+      fix             = "add shard starvation tests for queues, priority, routing epochs, validator reassignment, and progress bounds"
+    }
+    "SHARDEXP-03" = [ordered]@{
+      path            = "overflow a shard with excessive messages, state, or queue depth to collapse split/merge processing"
+      expected_state  = "per-shard queue, state, and processing limits reject or defer overflow without corrupting state"
+      affected        = @("x/sharding/sim", "x/queue", "x/storage")
+      severity        = "High"
+      fix             = "add shard overflow tests for queue depth, state size, split/merge limits, and bounded export/import"
+    }
+    "SHARDEXP-04" = [ordered]@{
+      path            = "commit conflicting cross-shard messages, receipts, or state roots and attempt cross-shard inconsistency"
+      expected_state  = "cross-shard commitments, receipts, and message ordering validate deterministically before finalization"
+      affected        = @("x/sharding/sim", "x/mesh", "x/messaging")
+      severity        = "Critical"
+      fix             = "add cross-shard consistency tests for message order, receipt roots, source finality, and replay markers"
+    }
+    "SHARDEXP-05" = [ordered]@{
+      path            = "spoof load inputs to trigger shard activation, deactivation, split, or merge at attacker-chosen heights"
+      expected_state  = "shard activation uses deterministic normalized load, EMA, MAX_DELTA, and cooldown rules"
+      affected        = @("x/sharding/sim", "x/load")
+      severity        = "Critical"
+      fix             = "add load-spoof shard activation tests for EMA, thresholds, MAX_DELTA, cooldown, and export/import replay"
+    }
+    "SHARDEXP-06" = [ordered]@{
+      path            = "duplicate shard ids, child shard outputs, message queues, or receipts during split/merge transitions"
+      expected_state  = "shard split/merge assigns each message, receipt, and child shard exactly once with canonical ids"
+      affected        = @("x/sharding/sim", "x/mesh", "x/queue")
+      severity        = "Critical"
+      fix             = "add shard duplication tests for child ids, queues, receipts, split/merge, and exact-once partitioning"
+    }
+    "SHARDEXP-07" = [ordered]@{
+      path            = "split state into child shards and attempt missing, duplicated, or inconsistent state partitions"
+      expected_state  = "state split produces deterministic child roots and recombines without missing or duplicated state"
+      affected        = @("x/sharding/sim", "x/storage", "x/zones")
+      severity        = "Critical"
+      fix             = "add state split/merge consistency tests for roots, key ranges, queue partitions, and export/import"
+    }
+    "SHARDEXP-08" = [ordered]@{
+      path            = "execute conflicting transactions in parallel shards with overlapping actors, contracts, or storage keys"
+      expected_state  = "scheduler detects parallel execution collisions and orders or rejects work deterministically"
+      affected        = @("x/sharding/sim", "x/scheduler", "x/execution")
+      severity        = "Critical"
+      fix             = "add parallel collision tests for read/write sets, actor locality, contract storage, and route assignment"
+    }
+    "SHARDEXP-09" = [ordered]@{
+      path            = "manipulate scheduling with priority classes, task ids, dependency edges, or tie-breakers across shards"
+      expected_state  = "same shard tasks and state produce the same schedule with bounded priority and canonical tie-breakers"
+      affected        = @("x/scheduler", "x/sharding/sim", "x/routing")
+      severity        = "High"
+      fix             = "add scheduling manipulation tests for duplicate task ids, dependency conflicts, priority gaming, and tie-break determinism"
+    }
+    "SHARDEXP-10" = [ordered]@{
+      path            = "flood shard queues with messages, delayed tasks, bounces, or refunds to exceed per-block processing limits"
+      expected_state  = "queue flooding is bounded by deterministic per-shard and per-block limits without message loss or double processing"
+      affected        = @("x/sharding/sim", "x/queue", "x/messaging")
+      severity        = "High"
+      fix             = "add queue flooding tests for per-shard limits, delayed execution, bounce/refund, message ordering, and export/import"
+    }
+  }
+  return $overrides
+}
+
+function Get-AexsMeshCrossZoneExploitOverrides {
+  $overrides = @{
+    "MESHEXP-01" = [ordered]@{
+      path            = "replay finalized cross-zone messages against the same destination or a different zone after receipt creation"
+      expected_state  = "single-use replay markers reject duplicate cross-zone messages before execution, receipt creation, or asset movement"
+      affected        = @("x/mesh", "x/messaging", "x/queue", "x/execution")
+      severity        = "Critical"
+      fix             = "add mesh replay tests for message ids, finality references, receipt markers, destination binding, and export/import"
+    }
+    "MESHEXP-02" = [ordered]@{
+      path            = "delay relay delivery to reorder valid cross-zone messages around timeout, finality, or queue boundaries"
+      expected_state  = "message delay cannot change deterministic ordering, timeout handling, receipt state, or refund eligibility"
+      affected        = @("x/mesh", "x/queue", "x/messaging")
+      severity        = "High"
+      fix             = "add delayed relay simulations for finality height, timeout windows, canonical ordering, and deterministic refunds"
+    }
+    "MESHEXP-03" = [ordered]@{
+      path            = "submit cross-zone messages with conflicting source heights, shard ids, message ids, or sequences to attack ordering"
+      expected_state  = "mesh ordering remains canonical by source finality height, source zone, source shard, message id, destination, and sequence"
+      affected        = @("x/mesh", "x/messaging", "x/sharding/sim", "x/queue")
+      severity        = "Critical"
+      fix             = "add ordering attack tests for source finality, source zone/shard, message id, destination, sequence, and tie-breaks"
+    }
+    "MESHEXP-04" = [ordered]@{
+      path            = "duplicate asset commitments across source and destination zones during transfer, bounce, or refund processing"
+      expected_state  = "asset commitments are consumed exactly once and destination mint/release cannot exceed finalized source lock/burn"
+      affected        = @("x/mesh", "x/bank", "x/tokenfactory", "x/queue")
+      severity        = "Critical"
+      fix             = "add cross-zone asset conservation tests for lock/burn, release/mint, bounce, refund, and replay markers"
+    }
+    "MESHEXP-05" = [ordered]@{
+      path            = "double spend the same cross-zone value through duplicate message, duplicate receipt, stale proof, or bounce/refund race"
+      expected_state  = "the same value cannot be spent twice across zones, receipts, bounces, refunds, or replayed proofs"
+      affected        = @("x/mesh", "x/messaging", "x/queue", "x/bank")
+      severity        = "Critical"
+      fix             = "add double-spend tests for duplicate messages, duplicate receipts, stale proofs, bounce/refund, and asset commitments"
+    }
+    "MESHEXP-06" = [ordered]@{
+      path            = "forge source proof, receipt proof, commitment root, or destination binding for a cross-zone action"
+      expected_state  = "proof verification rejects forged roots, malformed proofs, wrong destination bindings, and unfinalized source commitments"
+      affected        = @("x/mesh", "x/zones", "x/storage", "x/messaging")
+      severity        = "Critical"
+      fix             = "add proof forgery tests for root formats, commitment chains, destination binding, malformed proofs, and source finality"
+    }
+    "MESHEXP-07" = [ordered]@{
+      path            = "simulate relay censorship by withholding valid messages or receipts to starve a zone or defer refunds"
+      expected_state  = "relay censorship cannot violate safety and liveness gaps are bounded by deterministic timeout, retry, and refund rules"
+      affected        = @("x/mesh", "x/queue", "x/messaging")
+      severity        = "High"
+      fix             = "add relay censorship simulations with timeout, retry, refund, queue progress, and operator diagnostic evidence"
+    }
+    "MESHEXP-08" = [ordered]@{
+      path            = "starve mesh messages through priority abuse, queue depth, destination congestion, or shard assignment skew"
+      expected_state  = "valid mesh messages make bounded deterministic progress and starvation attempts preserve replay and refund invariants"
+      affected        = @("x/mesh", "x/queue", "x/routing", "x/sharding/sim")
+      severity        = "High"
+      fix             = "add message starvation tests for priority, queue depth, destination congestion, routing keys, and per-block limits"
+    }
+    "MESHEXP-09" = [ordered]@{
+      path            = "mix source and destination commitments from different finality heights to create finality mismatch"
+      expected_state  = "mesh rejects finality mismatch before destination execution, receipt creation, or value movement"
+      affected        = @("x/mesh", "x/zones", "x/sharding/sim")
+      severity        = "Critical"
+      fix             = "add finality mismatch tests for source roots, destination heights, stale commitments, and deterministic rejection"
+    }
+    "MESHEXP-10" = [ordered]@{
+      path            = "replay stale receipts after timeout, refund, bounce, export/import, or destination retry"
+      expected_state  = "receipt state is single-use and stale receipt replay cannot unlock assets, rerun execution, or clear replay markers"
+      affected        = @("x/mesh", "x/queue", "x/messaging", "x/storage")
+      severity        = "Critical"
+      fix             = "add stale receipt replay tests across timeout, refund, bounce, retry, export/import, and replay marker persistence"
+    }
+  }
+  return $overrides
+}
+
+function Get-AexsIdentityDomainExploitOverrides {
+  $overrides = @{
+    "IDENTEXP-01" = [ordered]@{
+      path            = "hijack a .aet domain by overwriting resolver records without current domain owner authorization"
+      expected_state  = "resolver updates require current owner authority and rejected hijacks leave resolver, owner, reverse, and NFT state unchanged"
+      affected        = @("x/identity", "x/storage", "x/indexer")
+      severity        = "Critical"
+      fix             = "add resolver overwrite tests for owner checks, NFT owner consistency, reverse lookup, events, and rejected no-commit paths"
+    }
+    "IDENTEXP-02" = [ordered]@{
+      path            = "take over an expired domain directly without auction, renewal rules, or canonical lifecycle transition"
+      expected_state  = "expired domains follow deterministic auction or renewal paths and cannot be reassigned by direct state mutation"
+      affected        = @("x/identity", "x/gov", "x/storage")
+      severity        = "High"
+      fix             = "add expired-domain takeover tests for lifecycle state, renewal window, auction entry, owner persistence, and export/import"
+    }
+    "IDENTEXP-03" = [ordered]@{
+      path            = "manipulate sealed-bid auction order, reveal height, refund receipts, or tie-breaker commitment hash"
+      expected_state  = "auction winner and refunds are deterministic by bid, reveal height, and commitment hash with no stolen losing bids"
+      affected        = @("x/identity", "x/bank", "x/queue")
+      severity        = "High"
+      fix             = "add auction manipulation tests for commit/reveal, tie-breakers, bid escrow, losing refunds, and replay"
+    }
+    "IDENTEXP-04" = [ordered]@{
+      path            = "spoof resolver target with malformed address, zero address, fake contract, or wrong zone endpoint"
+      expected_state  = "resolver records reject malformed or zero targets and cannot route funds or calls to spoofed destinations"
+      affected        = @("x/identity", "x/routing", "x/vm")
+      severity        = "Critical"
+      fix             = "add resolver spoofing tests for address, contract, zone endpoint, zero target, and payment-before-resolution failure"
+    }
+    "IDENTEXP-05" = [ordered]@{
+      path            = "create subdomain collision through normalization, parent policy bypass, or duplicate child ownership"
+      expected_state  = "subdomain records are unique after normalization and issuance requires parent owner authorization"
+      affected        = @("x/identity", "x/storage")
+      severity        = "High"
+      fix             = "add subdomain collision tests for normalization, parent policy, child owner resolver control, and export/import"
+    }
+    "IDENTEXP-06" = [ordered]@{
+      path            = "poison reverse lookup by binding an address to a domain without address owner authorization"
+      expected_state  = "reverse lookup updates require address owner authorization and remain consistent with forward resolver state"
+      affected        = @("x/identity", "x/auth", "x/indexer")
+      severity        = "High"
+      fix             = "add reverse lookup poisoning tests for signer authority, forward/reverse consistency, zero address, and cache rebuild"
+    }
+    "IDENTEXP-07" = [ordered]@{
+      path            = "race domain binding updates across owner transfer, resolver update, NFT transfer, and index refresh"
+      expected_state  = "domain binding changes are atomic and transfer invalidates unauthorized pending resolver or reverse updates"
+      affected        = @("x/identity", "x/events", "x/indexer")
+      severity        = "High"
+      fix             = "add binding race tests for transfer plus resolver updates, pending operations, event order, and index rebuildability"
+    }
+    "IDENTEXP-08" = [ordered]@{
+      path            = "poison index-layer cache with stale resolver, fake event, duplicate domain, or deleted domain state"
+      expected_state  = "index output remains non-authoritative and can be rebuilt from committed identity state and events"
+      affected        = @("x/indexer", "x/identity", "x/events")
+      severity        = "Medium"
+      fix             = "add index cache poisoning tests for stale resolver, fake events, duplicate records, deletion, and rebuild from state"
+    }
+    "IDENTEXP-09" = [ordered]@{
+      path            = "inject fake domain resolution through malformed name, unicode/confusable normalization, or forged resolver response"
+      expected_state  = "domain normalization and resolver verification reject fake resolution before routing, payment, or contract execution"
+      affected        = @("x/identity", "x/routing", "x/execution")
+      severity        = "Critical"
+      fix             = "add fake resolution tests for normalization, confusables policy, forged resolver response, and funds-before-resolution safety"
+    }
+    "IDENTEXP-10" = [ordered]@{
+      path            = "create multi-resolver inconsistency between address, contract, zone endpoint, reverse lookup, and index records"
+      expected_state  = "multi-resolver state updates remain canonical and export/import preserves consistent forward, reverse, and index rebuild state"
+      affected        = @("x/identity", "x/indexer", "x/storage")
+      severity        = "High"
+      fix             = "add multi-resolver consistency tests for forward records, reverse records, zone endpoints, index rebuild, and export/import"
+    }
+  }
+  return $overrides
+}
+
+function Get-AexsGovernanceExploitOverrides {
+  $overrides = @{
+    "GOVEXP-01" = [ordered]@{
+      path            = "capture governance with manipulated voting power through delegation timing, validator concentration, or stale snapshots"
+      expected_state  = "governance voting power is derived from deterministic staking snapshots and cannot be inflated by timing loops"
+      affected        = @("x/gov", "x/staking", "x/distribution")
+      severity        = "Critical"
+      fix             = "add governance capture simulations for voting power snapshots, delegation timing, validator concentration, and replay"
+    }
+    "GOVEXP-02" = [ordered]@{
+      path            = "flood proposals with low deposits, malformed metadata, duplicate proposals, or expensive tally/query state"
+      expected_state  = "proposal spam is bounded by deposit, metadata, pagination, and deterministic processing limits"
+      affected        = @("x/gov", "x/fees", "x/bank")
+      severity        = "High"
+      fix             = "add proposal spam tests for min deposit, malformed metadata, duplicate proposals, pagination, and state growth"
+    }
+    "GOVEXP-03" = [ordered]@{
+      path            = "abuse emergency parameters to bypass hard bounds for fees, staking, slashing, minting, routing, or VM gates"
+      expected_state  = "governance parameter updates are bounded by protocol hard limits and delayed execution rules"
+      affected        = @("x/gov", "x/fees", "x/staking", "x/slashing", "x/vm")
+      severity        = "Critical"
+      fix             = "add emergency param abuse tests for bounds, delayed execution, authority, and feature-gate safety"
+    }
+    "GOVEXP-04" = [ordered]@{
+      path            = "hijack upgrade plan, handler name, module version, or contract gate through unauthorized proposal execution"
+      expected_state  = "upgrade execution requires authorized governance flow, matching handler, monotonic version, and deterministic migration"
+      affected        = @("x/gov", "x/upgrade", "app", "x/vm")
+      severity        = "Critical"
+      fix             = "add upgrade hijack tests for plan authority, handler names, version checks, migration state, and rollback denial"
+    }
+    "GOVEXP-05" = [ordered]@{
+      path            = "exploit delayed execution by changing dependencies, voting power, params, or module state between pass and execution"
+      expected_state  = "delayed governance execution validates all dependencies and executes exactly once at the scheduled height"
+      affected        = @("x/gov", "x/params", "x/staking", "app")
+      severity        = "High"
+      fix             = "add delayed execution tests for dependency drift, execution height, replay, params validation, and no-op rejection"
+    }
+    "GOVEXP-06" = [ordered]@{
+      path            = "replay governance proposals, votes, deposits, or execution messages across chain id, export/import, or upgrade boundaries"
+      expected_state  = "governance replay is rejected by proposal ids, vote records, sequence checks, chain id, and migration-safe state"
+      affected        = @("x/gov", "x/auth", "x/upgrade")
+      severity        = "High"
+      fix             = "add governance replay tests for proposal ids, votes, deposits, execution, chain id, and export/import"
+    }
+    "GOVEXP-07" = [ordered]@{
+      path            = "front-run proposals with conflicting params, deposits, metadata, or upgrade plans to alter execution order"
+      expected_state  = "proposal ordering, deposits, voting periods, and execution are deterministic and cannot be reordered by front-running"
+      affected        = @("x/gov", "mempool", "x/fees")
+      severity        = "Medium"
+      fix             = "add proposal front-running tests for ordering, conflicting params, deposits, mempool priority, and tie-breaks"
+    }
+    "GOVEXP-08" = [ordered]@{
+      path            = "loop staking delegation, reward withdrawal, redelegation, or unbonding to manipulate governance voting power"
+      expected_state  = "staking-loop voting power cannot exceed deterministic staking keeper state or bypass unbonding/slashing risk"
+      affected        = @("x/gov", "x/staking", "x/distribution", "x/slashing")
+      severity        = "High"
+      fix             = "add staking-loop governance tests for delegate/redelegate/unbond/reward sequences and voting power snapshots"
+    }
+    "GOVEXP-09" = [ordered]@{
+      path            = "grief parameters by toggling fee, load, routing, VM, slashing, or identity bounds at unsafe frequencies"
+      expected_state  = "parameter updates obey hard bounds, delayed activation, cooldowns, and rollback-safe migration rules"
+      affected        = @("x/gov", "x/fees", "x/load", "x/routing", "x/identity")
+      severity        = "High"
+      fix             = "add parameter griefing tests for hard bounds, cooldowns, delayed activation, rollback safety, and operator visibility"
+    }
+  }
+  return $overrides
+}
+
+function Get-AexsGenesisUpgradeStateExploitOverrides {
+  $overrides = @{
+    "STATEEXP-01" = [ordered]@{
+      path            = "inject malformed genesis accounts, balances, params, module state, zone roots, or custom module records"
+      expected_state  = "genesis validation rejects malformed state before node start and never panics on corrupt but parseable input"
+      affected        = @("app", "x/bank", "x/fees", "x/tokenfactory", "x/dex")
+      severity        = "Critical"
+      fix             = "add malformed genesis fixtures for accounts, balances, params, custom modules, roots, and panic-free validation"
+    }
+    "STATEEXP-02" = [ordered]@{
+      path            = "tamper exported state by changing balances, denoms, params, commitments, module versions, or ordering"
+      expected_state  = "export/import validation detects tampering and deterministic export ordering is stable across runs"
+      affected        = @("app", "x/storage", "x/upgrade", "x/zones")
+      severity        = "Critical"
+      fix             = "add export tampering tests for balances, denoms, params, roots, module versions, ordering, and replay"
+    }
+    "STATEEXP-03" = [ordered]@{
+      path            = "rollback an upgrade plan, module version, store migration, or feature gate to re-enable unsafe state"
+      expected_state  = "upgrade versions are monotonic and rollback attempts cannot mutate committed state or bypass handlers"
+      affected        = @("x/upgrade", "app", "x/gov")
+      severity        = "Critical"
+      fix             = "add upgrade rollback tests for monotonic versions, handler names, feature gates, store migrations, and app hash"
+    }
+    "STATEEXP-04" = [ordered]@{
+      path            = "corrupt partial migration by failing after some module writes, version updates, or store key changes"
+      expected_state  = "migration executes atomically or fails before commit with deterministic recovery and no partial state roots"
+      affected        = @("x/upgrade", "app", "x/storage")
+      severity        = "Critical"
+      fix             = "add partial migration corruption tests with injected failures, cached context semantics, version maps, and export/import"
+    }
+    "STATEEXP-05" = [ordered]@{
+      path            = "bypass module initialization by omitting module genesis, duplicating module keys, or changing init order"
+      expected_state  = "module initialization order and default genesis validation reject missing, duplicate, or unordered module state"
+      affected        = @("app", "module manager", "x/params")
+      severity        = "High"
+      fix             = "add module init bypass tests for missing genesis, duplicate keys, init order, defaults, and module manager wiring"
+    }
+    "STATEEXP-06" = [ordered]@{
+      path            = "inject hidden privileged account, module account, authority, admin, or mint permission into genesis/export state"
+      expected_state  = "privileged accounts and module permissions are explicitly validated and unauthorized hidden authorities are rejected"
+      affected        = @("app", "x/auth", "x/bank", "x/tokenfactory", "x/fees")
+      severity        = "Critical"
+      fix             = "add privileged account injection tests for module accounts, authority fields, admin state, mint permissions, and export/import"
+    }
+    "STATEEXP-07" = [ordered]@{
+      path            = "bypass InitGenesis validation with duplicate ids, duplicate denoms, invalid reserves, invalid params, or nil-like records"
+      expected_state  = "InitGenesis validates duplicates, params, reserves, denoms, and nil-like records before state writes"
+      affected        = @("app", "x/dex", "x/tokenfactory", "x/fees", "x/identity")
+      severity        = "Critical"
+      fix             = "add InitGenesis bypass tests for duplicates, invalid params, reserves, denoms, nil records, and panic-free errors"
+    }
+    "STATEEXP-08" = [ordered]@{
+      path            = "exploit version mismatch between app version, module consensus version, store version, or proto schema"
+      expected_state  = "version mismatches fail safely or run explicit migrations and cannot produce divergent app hashes"
+      affected        = @("app", "x/upgrade", "proto", "x/storage")
+      severity        = "High"
+      fix             = "add version mismatch tests for app/module/store/proto versions, no-op migrations, and deterministic app hash"
+    }
+    "STATEEXP-09" = [ordered]@{
+      path            = "create state root collision through malformed keys, canonical encoding ambiguity, or commitment root spoofing"
+      expected_state  = "state roots use canonical encoding and reject malformed keys or spoofed roots before commitment acceptance"
+      affected        = @("x/storage", "app", "x/zones", "x/mesh")
+      severity        = "Critical"
+      fix             = "add state root collision tests for key encoding, root format, commitment hashing, and malformed import fixtures"
+    }
+    "STATEEXP-10" = [ordered]@{
+      path            = "poison snapshot or state-sync artifacts with stale chunks, wrong app hash, missing modules, or corrupted metadata"
+      expected_state  = "snapshot restore verifies app hash, chunk integrity, module state, and metadata before serving or accepting state"
+      affected        = @("app", "x/storage", "state sync", "snapshots")
+      severity        = "Critical"
+      fix             = "add snapshot poisoning tests for chunk integrity, app hash, module completeness, metadata, and restart persistence"
+    }
+  }
+  return $overrides
+}
+
+function Get-AexsMempoolNetworkExploitOverrides {
+  $overrides = @{
+    "NETEXP-01" = [ordered]@{
+      path            = "flood mempool with low-fee, malformed, replayed, oversized, or expensive CheckTx transactions"
+      expected_state  = "mempool flooding is bounded by fee, gas, size, replay, and CheckTx validation without consensus state mutation"
+      affected        = @("mempool", "x/fees", "x/auth", "app ante")
+      severity        = "High"
+      fix             = "add mempool flooding tests for malformed txs, replay, oversized payloads, fee bounds, and CheckTx cost"
+    }
+    "NETEXP-02" = [ordered]@{
+      path            = "game transaction prioritization with fee overpayment, reputation spoofing, local ordering, or routing hints"
+      expected_state  = "transaction priority is deterministic, bounded, and independent of node-local ordering or spoofed hints"
+      affected        = @("mempool", "x/fees", "x/reputation", "x/routing")
+      severity        = "High"
+      fix             = "add prioritization gaming tests for fee caps, reputation bounds, local order, routing hints, and tx hash tie-breaks"
+    }
+    "NETEXP-03" = [ordered]@{
+      path            = "poison gossip with malformed tx bytes, fake peers, duplicate blocks, stale evidence, or invalid proposal data"
+      expected_state  = "gossip poisoning is rejected at decode, evidence, proposal, and block validation boundaries without panics"
+      affected        = @("CometBFT P2P", "mempool", "app", "x/slashing")
+      severity        = "High"
+      fix             = "add gossip poisoning simulations for malformed bytes, duplicate data, stale evidence, proposal validation, and panic safety"
+    }
+    "NETEXP-04" = [ordered]@{
+      path            = "eclipse a node with controlled peers to delay txs, blocks, evidence, or state-sync data"
+      expected_state  = "node eclipse affects liveness diagnostics only and cannot change committed state or deterministic validation"
+      affected        = @("CometBFT P2P", "mempool", "state sync")
+      severity        = "Medium"
+      fix             = "add eclipse simulations for peer diversity, delayed tx/block/evidence propagation, diagnostics, and safe recovery"
+    }
+    "NETEXP-05" = [ordered]@{
+      path            = "partition P2P network to delay finality, isolate validators, or create inconsistent mempool views"
+      expected_state  = "P2P partition cannot violate deterministic finality and recovery preserves app hash consistency"
+      affected        = @("CometBFT consensus", "CometBFT P2P", "mempool")
+      severity        = "High"
+      fix             = "add P2P partition simulations for finality delay, validator isolation, mempool divergence, and recovery app hash"
+    }
+    "NETEXP-06" = [ordered]@{
+      path            = "delay block propagation to trigger missed votes, stale proposals, evidence timing gaps, or fork-choice pressure"
+      expected_state  = "block propagation delay affects liveness only and slashing/evidence handling remains objective and deterministic"
+      affected        = @("CometBFT consensus", "x/slashing", "mempool")
+      severity        = "High"
+      fix             = "add block delay simulations for vote timing, stale proposals, evidence windows, slashing, and finality recovery"
+    }
+    "NETEXP-07" = [ordered]@{
+      path            = "reorder transactions across local mempools, proposal construction, or priority queues to cause state or event divergence"
+      expected_state  = "proposal ordering and app execution are deterministic for accepted block order and no local mempool order leaks into AppHash"
+      affected        = @("mempool", "app", "x/routing", "x/events")
+      severity        = "Critical"
+      fix             = "add transaction reordering tests for local mempool order, proposal order, deterministic execution, and event stability"
+    }
+    "NETEXP-08" = [ordered]@{
+      path            = "exploit network latency as an input to load, routing, priority, or consensus-critical decisions"
+      expected_state  = "network latency is never a consensus-critical input for load, routing, fees, or state transitions"
+      affected        = @("x/load", "x/routing", "mempool", "app")
+      severity        = "Critical"
+      fix             = "add latency exploitation tests proving local latency cannot affect LOAD_SCORE, route decisions, fees, or AppHash"
+    }
+    "NETEXP-09" = [ordered]@{
+      path            = "exhaust bandwidth with oversized messages, tx gossip, evidence spam, state-sync chunks, or peer churn"
+      expected_state  = "bandwidth exhaustion is bounded by message size, rate limits, peer limits, and decode rejection without state mutation"
+      affected        = @("CometBFT P2P", "mempool", "state sync")
+      severity        = "High"
+      fix             = "add bandwidth exhaustion tests for tx size, evidence size, state-sync chunks, peer churn, and decode safety"
+    }
+    "NETEXP-10" = [ordered]@{
+      path            = "target peers or validators based on routing keys, shard assignment, validator set, or relay role"
+      expected_state  = "peer targeting cannot bias routing, validator assignment, finality, or committed state"
+      affected        = @("CometBFT P2P", "x/routing", "x/sharding/sim", "x/staking")
+      severity        = "High"
+      fix             = "add peer targeting simulations for validator assignment, routing keys, shard roles, relay roles, and finality safety"
+    }
+  }
+  return $overrides
+}
+
+function Get-AexsCombinedFullStackExploitOverrides {
+  $overrides = @{
+    "FULLSTACKEXP-01" = [ordered]@{
+      path            = "coordinate spam bursts with routing-key grinding to overload zones and shards while preserving low apparent fees"
+      expected_state  = "spam plus routing attacks remain bounded by fee policy, LOAD_SCORE smoothing, shard activation, and priority caps"
+      affected        = @("x/load", "x/routing", "x/fees", "x/sharding/sim", "mempool")
+      severity        = "Critical"
+      fix             = "add coordinated spam-routing simulations with fee caps, EMA, MAX_DELTA, shard activation, and route determinism"
+    }
+    "FULLSTACKEXP-02" = [ordered]@{
+      path            = "combine load threshold manipulation with governance param changes to destabilize fees, routing, or shard activation"
+      expected_state  = "load plus governance changes obey delayed activation, hard bounds, cooldowns, and deterministic replay"
+      affected        = @("x/load", "x/gov", "x/fees", "x/routing", "x/sharding/sim")
+      severity        = "Critical"
+      fix             = "add load-governance combined tests for thresholds, delayed params, hard bounds, cooldowns, and export/import"
+    }
+    "FULLSTACKEXP-03" = [ordered]@{
+      path            = "combine DEX swaps, mempool reordering, fee priority, and routing locality to drain liquidity or desync reserves"
+      expected_state  = "DEX accounting and routing remain deterministic and failed or reordered txs cannot violate pool invariants"
+      affected        = @("x/dex", "mempool", "x/routing", "x/fees", "x/bank")
+      severity        = "Critical"
+      fix             = "add DEX-mempool-routing scenarios for swap ordering, fee priority, reserve checks, slippage, and failed bank movement"
+    }
+    "FULLSTACKEXP-04" = [ordered]@{
+      path            = "coordinate validator collusion with delayed slashing evidence, redelegation, unbonding, or governance timing"
+      expected_state  = "slashing remains objective and collusion cannot evade penalties through evidence delay or staking lifecycle timing"
+      affected        = @("x/slashing", "x/staking", "x/gov", "CometBFT consensus")
+      severity        = "Critical"
+      fix             = "add validator-collusion slashing tests for delayed evidence, redelegation, unbonding, governance timing, and tombstone state"
+    }
+    "FULLSTACKEXP-05" = [ordered]@{
+      path            = "coordinate cross-zone value extraction through mesh replay, stale receipt, proof forgery, and queue refund timing"
+      expected_state  = "cross-zone value remains conserved and replay, receipt, proof, bounce, and refund paths cannot extract extra funds"
+      affected        = @("x/mesh", "x/queue", "x/messaging", "x/bank", "x/tokenfactory")
+      severity        = "Critical"
+      fix             = "add cross-zone value extraction tests for replay markers, receipts, proofs, bounce/refund, and asset conservation"
+    }
+    "FULLSTACKEXP-06" = [ordered]@{
+      path            = "hijack identity resolution and routing to redirect payments, contract calls, or zone endpoints"
+      expected_state  = "identity and routing authority checks prevent resolver hijack from changing route, payment, or contract destination"
+      affected        = @("x/identity", "x/routing", "x/execution", "x/bank", "x/indexer")
+      severity        = "Critical"
+      fix             = "add identity-routing hijack tests for resolver authority, index rebuild, route locality, payment resolution, and contract calls"
+    }
+    "FULLSTACKEXP-07" = [ordered]@{
+      path            = "cascade shard overload with fee manipulation, priority gaming, queue flooding, and load slow-poison"
+      expected_state  = "shard overload plus fee manipulation is bounded by EMA, MAX_DELTA, fee caps, queue limits, and starvation checks"
+      affected        = @("x/sharding/sim", "x/load", "x/fees", "x/queue", "x/routing")
+      severity        = "Critical"
+      fix             = "add shard-fee cascade simulations for overload, fee caps, queue flooding, slow-poison, and deterministic recovery"
+    }
+    "FULLSTACKEXP-08" = [ordered]@{
+      path            = "combine consensus pressure with mempool flooding, block delay, evidence spam, and malformed proposal data"
+      expected_state  = "consensus plus mempool denial-of-service cannot violate finality safety, evidence validity, or app hash determinism"
+      affected        = @("CometBFT consensus", "mempool", "x/slashing", "app")
+      severity        = "Critical"
+      fix             = "add consensus-mempool hybrid tests for flooding, block delay, evidence spam, proposal validation, and recovery app hash"
+    }
+    "FULLSTACKEXP-09" = [ordered]@{
+      path            = "combine economic manipulation with staking starvation, fee griefing, reward timing, and delegation loops"
+      expected_state  = "economic plus staking attacks cannot starve honest stake, inflate rewards, bypass fees, or evade unbonding/slashing risk"
+      affected        = @("x/staking", "x/distribution", "x/fees", "x/gov", "x/bank")
+      severity        = "Critical"
+      fix             = "add economic-staking starvation tests for fees, rewards, delegation loops, unbonding, slashing, and validator-set updates"
+    }
+    "FULLSTACKEXP-10" = [ordered]@{
+      path            = "destabilize the full stack with combined governance, load, routing, mesh, identity, DEX, VM, and network faults"
+      expected_state  = "full-stack destabilization fails closed with deterministic state, no unauthorized value movement, and triaged exploit evidence"
+      affected        = @("app", "x/gov", "x/load", "x/routing", "x/mesh", "x/identity", "x/dex", "x/vm")
+      severity        = "Critical"
+      fix             = "add full-stack chaos scenarios with deterministic seeds, invariant registry, state diffs, minimized exploits, and rollback checks"
+    }
+  }
+  return $overrides
+}
+
 function Get-AexsExploitRecordsForSection {
   param(
     [string]$Text,
@@ -3285,6 +3921,122 @@ $requiredRoutingEngineExploitTerms = @(
   "Attempt fee-based routing gaming."
 )
 
+$requiredExecutionZoneAvmExploitTerms = @(
+  "Execution Zone And AVM Exploits",
+  "Attempt state divergence between zones.",
+  "Attempt cross-zone replay.",
+  "Attempt AVM determinism violation.",
+  "Attempt contract execution desync.",
+  "Attempt parallel execution race condition.",
+  "Attempt state corruption.",
+  "Attempt partial execution rollback.",
+  "Attempt nondeterministic opcode or host behavior.",
+  "Attempt gas exhaustion denial-of-service.",
+  "Attempt infinite loop griefing.",
+  "Attempt storage collision.",
+  "Attempt contract upgrade hijack.",
+  "Attempt uninitialized storage exploit.",
+  "Attempt stack overflow.",
+  "Attempt sandbox escape."
+)
+
+$requiredComputeShardExploitTerms = @(
+  "Compute Shard Exploits",
+  "Attempt shard partition imbalance.",
+  "Attempt shard starvation.",
+  "Attempt shard overflow collapse.",
+  "Attempt cross-shard inconsistency.",
+  "Attempt load spoofing for shard activation.",
+  "Attempt shard duplication.",
+  "Attempt state split inconsistency.",
+  "Attempt parallel execution collision.",
+  "Attempt scheduling manipulation.",
+  "Attempt queue flooding."
+)
+
+$requiredMeshCrossZoneExploitTerms = @(
+  "Aether Mesh And Cross-Zone Exploits",
+  "Attempt cross-zone message replay.",
+  "Attempt message delay manipulation.",
+  "Attempt message ordering attack.",
+  "Attempt asset duplication across zones.",
+  "Attempt double spend across zones.",
+  "Attempt proof forgery.",
+  "Attempt relay censorship simulation.",
+  "Attempt message starvation.",
+  "Attempt finality mismatch.",
+  "Attempt stale receipt replay."
+)
+
+$requiredIdentityDomainExploitTerms = @(
+  'Identity And `.aet` Domain Exploits',
+  "Attempt domain hijack through resolver overwrite.",
+  "Attempt expired domain takeover without auction.",
+  "Attempt auction manipulation.",
+  "Attempt resolver spoofing.",
+  "Attempt subdomain collision.",
+  "Attempt reverse lookup poisoning.",
+  "Attempt domain binding race condition.",
+  "Attempt index-layer cache poisoning.",
+  "Attempt fake domain resolution injection.",
+  "Attempt multi-resolver inconsistency."
+)
+
+$requiredGovernanceExploitTerms = @(
+  "Governance Exploits",
+  "Attempt governance capture through voting power manipulation.",
+  "Attempt proposal spam.",
+  "Attempt emergency parameter abuse.",
+  "Attempt upgrade hijack.",
+  "Attempt delayed execution exploitation.",
+  "Attempt governance replay.",
+  "Attempt proposal front-running.",
+  "Attempt staking-loop voting power manipulation.",
+  "Attempt parameter griefing."
+)
+
+$requiredGenesisUpgradeStateExploitTerms = @(
+  "Genesis, Upgrade, And State Exploits",
+  "Attempt malformed genesis injection.",
+  "Attempt state export tampering.",
+  "Attempt upgrade rollback.",
+  "Attempt partial migration corruption.",
+  "Attempt module initialization bypass.",
+  "Attempt hidden privileged account injection.",
+  'Attempt `InitGenesis` validation bypass.',
+  "Attempt version mismatch exploit.",
+  "Attempt state root collision.",
+  "Attempt snapshot poisoning."
+)
+
+$requiredMempoolNetworkExploitTerms = @(
+  "Mempool And Network Exploits",
+  "Attempt mempool flooding.",
+  "Attempt transaction prioritization gaming.",
+  "Attempt gossip poisoning.",
+  "Attempt node eclipse simulation.",
+  "Attempt P2P partition simulation.",
+  "Attempt block propagation delay.",
+  "Attempt transaction reordering.",
+  "Attempt network latency exploitation.",
+  "Attempt bandwidth exhaustion.",
+  "Attempt peer targeting."
+)
+
+$requiredCombinedFullStackExploitTerms = @(
+  "Combined Full-Stack Exploits",
+  "Attempt coordinated spam plus routing attack.",
+  "Attempt load plus governance combined attack.",
+  "Attempt DEX plus mempool plus routing exploit.",
+  "Attempt validator collusion plus slashing delay exploit.",
+  "Attempt cross-zone value extraction coordination.",
+  "Attempt identity plus routing hijack.",
+  "Attempt shard overload plus fee manipulation cascade.",
+  "Attempt consensus plus mempool denial-of-service hybrid.",
+  "Attempt economic plus staking starvation.",
+  "Attempt full-stack destabilization."
+)
+
 $sourceFailures = @()
 foreach ($term in $requiredSourceTerms) {
   if (-not (Test-AexsTextAny -Text $taskText -Terms @($term)) -and -not (Test-AexsTextAny -Text $pipelineText -Terms @($term))) {
@@ -3345,6 +4097,30 @@ if ([string]::IsNullOrWhiteSpace($exploitCatalogSection)) {
   }
   foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredRoutingEngineExploitTerms)) {
     $sourceFailures += "missing routing engine exploit catalog term: $term"
+  }
+  foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredExecutionZoneAvmExploitTerms)) {
+    $sourceFailures += "missing execution zone/AVM exploit catalog term: $term"
+  }
+  foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredComputeShardExploitTerms)) {
+    $sourceFailures += "missing compute shard exploit catalog term: $term"
+  }
+  foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredMeshCrossZoneExploitTerms)) {
+    $sourceFailures += "missing mesh/cross-zone exploit catalog term: $term"
+  }
+  foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredIdentityDomainExploitTerms)) {
+    $sourceFailures += "missing identity/.aet exploit catalog term: $term"
+  }
+  foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredGovernanceExploitTerms)) {
+    $sourceFailures += "missing governance exploit catalog term: $term"
+  }
+  foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredGenesisUpgradeStateExploitTerms)) {
+    $sourceFailures += "missing genesis/upgrade/state exploit catalog term: $term"
+  }
+  foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredMempoolNetworkExploitTerms)) {
+    $sourceFailures += "missing mempool/network exploit catalog term: $term"
+  }
+  foreach ($term in @(Get-AexsMissingTerms -Text $exploitCatalogSection -Terms $requiredCombinedFullStackExploitTerms)) {
+    $sourceFailures += "missing combined full-stack exploit catalog term: $term"
   }
 }
 
@@ -3473,7 +4249,63 @@ foreach ($record in $routingEngineExploitRecords) {
   $record["invalid_reasons"] = $invalidReasons
 }
 $invalidRoutingEngineExploitRecords = @($routingEngineExploitRecords | Where-Object { -not $_["valid"] })
-$exploitRecords = @($coreExploitRecords + $slashingExploitRecords + $txAuthBankExploitRecords + $tokenEconomyExploitRecords + $dexExploitRecords + $loadSystemExploitRecords + $routingEngineExploitRecords)
+$executionZoneAvmExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 8 -SectionTitle "Execution Zone And AVM Exploits" -IdPrefix "EXECZONEEXP" -SeedNamespace "execution-zone-avm-exploit" -Overrides (Get-AexsExecutionZoneAvmExploitOverrides) -DefaultAffectedModules @("x/execution", "x/aetherisvm", "x/vm", "x/queue", "x/storage") -DefaultSeverity "High")
+foreach ($record in $executionZoneAvmExploitRecords) {
+  $invalidReasons = @(Test-AexsExploitRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidExecutionZoneAvmExploitRecords = @($executionZoneAvmExploitRecords | Where-Object { -not $_["valid"] })
+$computeShardExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 9 -SectionTitle "Compute Shard Exploits" -IdPrefix "SHARDEXP" -SeedNamespace "compute-shard-exploit" -Overrides (Get-AexsComputeShardExploitOverrides) -DefaultAffectedModules @("x/sharding/sim", "x/routing", "x/load", "x/scheduler", "x/queue") -DefaultSeverity "High")
+foreach ($record in $computeShardExploitRecords) {
+  $invalidReasons = @(Test-AexsExploitRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidComputeShardExploitRecords = @($computeShardExploitRecords | Where-Object { -not $_["valid"] })
+$meshCrossZoneExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 10 -SectionTitle "Aether Mesh And Cross-Zone Exploits" -IdPrefix "MESHEXP" -SeedNamespace "mesh-cross-zone-exploit" -Overrides (Get-AexsMeshCrossZoneExploitOverrides) -DefaultAffectedModules @("x/mesh", "x/messaging", "x/queue", "x/sharding/sim") -DefaultSeverity "High")
+foreach ($record in $meshCrossZoneExploitRecords) {
+  $invalidReasons = @(Test-AexsExploitRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidMeshCrossZoneExploitRecords = @($meshCrossZoneExploitRecords | Where-Object { -not $_["valid"] })
+$identityDomainExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 11 -SectionTitle 'Identity And `.aet` Domain Exploits' -IdPrefix "IDENTEXP" -SeedNamespace "identity-domain-exploit" -Overrides (Get-AexsIdentityDomainExploitOverrides) -DefaultAffectedModules @("x/identity", "x/indexer", "x/routing") -DefaultSeverity "High")
+foreach ($record in $identityDomainExploitRecords) {
+  $invalidReasons = @(Test-AexsExploitRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidIdentityDomainExploitRecords = @($identityDomainExploitRecords | Where-Object { -not $_["valid"] })
+$governanceExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 12 -SectionTitle "Governance Exploits" -IdPrefix "GOVEXP" -SeedNamespace "governance-exploit" -Overrides (Get-AexsGovernanceExploitOverrides) -DefaultAffectedModules @("x/gov", "x/staking", "x/fees", "app") -DefaultSeverity "High")
+foreach ($record in $governanceExploitRecords) {
+  $invalidReasons = @(Test-AexsExploitRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidGovernanceExploitRecords = @($governanceExploitRecords | Where-Object { -not $_["valid"] })
+$genesisUpgradeStateExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 13 -SectionTitle "Genesis, Upgrade, And State Exploits" -IdPrefix "STATEEXP" -SeedNamespace "genesis-upgrade-state-exploit" -Overrides (Get-AexsGenesisUpgradeStateExploitOverrides) -DefaultAffectedModules @("app", "x/upgrade", "x/storage") -DefaultSeverity "High")
+foreach ($record in $genesisUpgradeStateExploitRecords) {
+  $invalidReasons = @(Test-AexsExploitRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidGenesisUpgradeStateExploitRecords = @($genesisUpgradeStateExploitRecords | Where-Object { -not $_["valid"] })
+$mempoolNetworkExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 14 -SectionTitle "Mempool And Network Exploits" -IdPrefix "NETEXP" -SeedNamespace "mempool-network-exploit" -Overrides (Get-AexsMempoolNetworkExploitOverrides) -DefaultAffectedModules @("mempool", "CometBFT P2P", "app") -DefaultSeverity "High")
+foreach ($record in $mempoolNetworkExploitRecords) {
+  $invalidReasons = @(Test-AexsExploitRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidMempoolNetworkExploitRecords = @($mempoolNetworkExploitRecords | Where-Object { -not $_["valid"] })
+$combinedFullStackExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 15 -SectionTitle "Combined Full-Stack Exploits" -IdPrefix "FULLSTACKEXP" -SeedNamespace "combined-full-stack-exploit" -Overrides (Get-AexsCombinedFullStackExploitOverrides) -DefaultAffectedModules @("app", "x/gov", "x/load", "x/routing", "x/mesh") -DefaultSeverity "Critical")
+foreach ($record in $combinedFullStackExploitRecords) {
+  $invalidReasons = @(Test-AexsExploitRecord -Record $record)
+  $record["valid"] = $invalidReasons.Count -eq 0
+  $record["invalid_reasons"] = $invalidReasons
+}
+$invalidCombinedFullStackExploitRecords = @($combinedFullStackExploitRecords | Where-Object { -not $_["valid"] })
+$exploitRecords = @($coreExploitRecords + $slashingExploitRecords + $txAuthBankExploitRecords + $tokenEconomyExploitRecords + $dexExploitRecords + $loadSystemExploitRecords + $routingEngineExploitRecords + $executionZoneAvmExploitRecords + $computeShardExploitRecords + $meshCrossZoneExploitRecords + $identityDomainExploitRecords + $governanceExploitRecords + $genesisUpgradeStateExploitRecords + $mempoolNetworkExploitRecords + $combinedFullStackExploitRecords)
 $invalidExploitRecords = @($exploitRecords | Where-Object { -not $_["valid"] })
 $mandatoryInvariantPassRate = 0
 $auditPassed = $false
@@ -4073,6 +4905,38 @@ $summary = [ordered]@{
   invalid_routing_engine_exploit_count = $invalidRoutingEngineExploitRecords.Count
   routing_engine_exploit_ids          = @($routingEngineExploitRecords | ForEach-Object { $_["exploit_id"] })
   invalid_routing_engine_exploit_records = @($invalidRoutingEngineExploitRecords | ForEach-Object { $_["exploit_id"] })
+  execution_zone_avm_exploit_count    = $executionZoneAvmExploitRecords.Count
+  invalid_execution_zone_avm_exploit_count = $invalidExecutionZoneAvmExploitRecords.Count
+  execution_zone_avm_exploit_ids      = @($executionZoneAvmExploitRecords | ForEach-Object { $_["exploit_id"] })
+  invalid_execution_zone_avm_exploit_records = @($invalidExecutionZoneAvmExploitRecords | ForEach-Object { $_["exploit_id"] })
+  compute_shard_exploit_count         = $computeShardExploitRecords.Count
+  invalid_compute_shard_exploit_count = $invalidComputeShardExploitRecords.Count
+  compute_shard_exploit_ids           = @($computeShardExploitRecords | ForEach-Object { $_["exploit_id"] })
+  invalid_compute_shard_exploit_records = @($invalidComputeShardExploitRecords | ForEach-Object { $_["exploit_id"] })
+  mesh_cross_zone_exploit_count       = $meshCrossZoneExploitRecords.Count
+  invalid_mesh_cross_zone_exploit_count = $invalidMeshCrossZoneExploitRecords.Count
+  mesh_cross_zone_exploit_ids         = @($meshCrossZoneExploitRecords | ForEach-Object { $_["exploit_id"] })
+  invalid_mesh_cross_zone_exploit_records = @($invalidMeshCrossZoneExploitRecords | ForEach-Object { $_["exploit_id"] })
+  identity_domain_exploit_count       = $identityDomainExploitRecords.Count
+  invalid_identity_domain_exploit_count = $invalidIdentityDomainExploitRecords.Count
+  identity_domain_exploit_ids         = @($identityDomainExploitRecords | ForEach-Object { $_["exploit_id"] })
+  invalid_identity_domain_exploit_records = @($invalidIdentityDomainExploitRecords | ForEach-Object { $_["exploit_id"] })
+  governance_exploit_count            = $governanceExploitRecords.Count
+  invalid_governance_exploit_count    = $invalidGovernanceExploitRecords.Count
+  governance_exploit_ids              = @($governanceExploitRecords | ForEach-Object { $_["exploit_id"] })
+  invalid_governance_exploit_records  = @($invalidGovernanceExploitRecords | ForEach-Object { $_["exploit_id"] })
+  genesis_upgrade_state_exploit_count = $genesisUpgradeStateExploitRecords.Count
+  invalid_genesis_upgrade_state_exploit_count = $invalidGenesisUpgradeStateExploitRecords.Count
+  genesis_upgrade_state_exploit_ids   = @($genesisUpgradeStateExploitRecords | ForEach-Object { $_["exploit_id"] })
+  invalid_genesis_upgrade_state_exploit_records = @($invalidGenesisUpgradeStateExploitRecords | ForEach-Object { $_["exploit_id"] })
+  mempool_network_exploit_count       = $mempoolNetworkExploitRecords.Count
+  invalid_mempool_network_exploit_count = $invalidMempoolNetworkExploitRecords.Count
+  mempool_network_exploit_ids         = @($mempoolNetworkExploitRecords | ForEach-Object { $_["exploit_id"] })
+  invalid_mempool_network_exploit_records = @($invalidMempoolNetworkExploitRecords | ForEach-Object { $_["exploit_id"] })
+  combined_full_stack_exploit_count   = $combinedFullStackExploitRecords.Count
+  invalid_combined_full_stack_exploit_count = $invalidCombinedFullStackExploitRecords.Count
+  combined_full_stack_exploit_ids     = @($combinedFullStackExploitRecords | ForEach-Object { $_["exploit_id"] })
+  invalid_combined_full_stack_exploit_records = @($invalidCombinedFullStackExploitRecords | ForEach-Object { $_["exploit_id"] })
   atomic_task_count                   = $atomicTasks.Count
   invalid_atomic_task_count           = $invalidAtomicTasks.Count
   invalid_atomic_tasks                = @($invalidAtomicTasks | ForEach-Object { $_["task_id"] })
@@ -4242,6 +5106,22 @@ $report += "- load system exploit records: $($loadSystemExploitRecords.Count)"
 $report += "- invalid load system exploit records: $($invalidLoadSystemExploitRecords.Count)"
 $report += "- routing engine exploit records: $($routingEngineExploitRecords.Count)"
 $report += "- invalid routing engine exploit records: $($invalidRoutingEngineExploitRecords.Count)"
+$report += "- execution zone/AVM exploit records: $($executionZoneAvmExploitRecords.Count)"
+$report += "- invalid execution zone/AVM exploit records: $($invalidExecutionZoneAvmExploitRecords.Count)"
+$report += "- compute shard exploit records: $($computeShardExploitRecords.Count)"
+$report += "- invalid compute shard exploit records: $($invalidComputeShardExploitRecords.Count)"
+$report += "- mesh/cross-zone exploit records: $($meshCrossZoneExploitRecords.Count)"
+$report += "- invalid mesh/cross-zone exploit records: $($invalidMeshCrossZoneExploitRecords.Count)"
+$report += "- identity/.aet exploit records: $($identityDomainExploitRecords.Count)"
+$report += "- invalid identity/.aet exploit records: $($invalidIdentityDomainExploitRecords.Count)"
+$report += "- governance exploit records: $($governanceExploitRecords.Count)"
+$report += "- invalid governance exploit records: $($invalidGovernanceExploitRecords.Count)"
+$report += "- genesis/upgrade/state exploit records: $($genesisUpgradeStateExploitRecords.Count)"
+$report += "- invalid genesis/upgrade/state exploit records: $($invalidGenesisUpgradeStateExploitRecords.Count)"
+$report += "- mempool/network exploit records: $($mempoolNetworkExploitRecords.Count)"
+$report += "- invalid mempool/network exploit records: $($invalidMempoolNetworkExploitRecords.Count)"
+$report += "- combined full-stack exploit records: $($combinedFullStackExploitRecords.Count)"
+$report += "- invalid combined full-stack exploit records: $($invalidCombinedFullStackExploitRecords.Count)"
 $report += ""
 $report += "## Gate Decision"
 $report += ""
@@ -4263,6 +5143,14 @@ $report += "- invalid token/economy exploit records: $(@($invalidTokenEconomyExp
 $report += "- invalid DEX exploit records: $(@($invalidDexExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
 $report += "- invalid load system exploit records: $(@($invalidLoadSystemExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
 $report += "- invalid routing engine exploit records: $(@($invalidRoutingEngineExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+$report += "- invalid execution zone/AVM exploit records: $(@($invalidExecutionZoneAvmExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+$report += "- invalid compute shard exploit records: $(@($invalidComputeShardExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+$report += "- invalid mesh/cross-zone exploit records: $(@($invalidMeshCrossZoneExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+$report += "- invalid identity/.aet exploit records: $(@($invalidIdentityDomainExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+$report += "- invalid governance exploit records: $(@($invalidGovernanceExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+$report += "- invalid genesis/upgrade/state exploit records: $(@($invalidGenesisUpgradeStateExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+$report += "- invalid mempool/network exploit records: $(@($invalidMempoolNetworkExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+$report += "- invalid combined full-stack exploit records: $(@($invalidCombinedFullStackExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
 $report += ""
 $report += "## Module Matrix"
 $report += ""
@@ -4355,6 +5243,54 @@ if ($routingEngineExploitRecords.Count -lt 9) {
 }
 if ($invalidRoutingEngineExploitRecords.Count -gt 0) {
   throw "AEXS routing engine exploit catalog validation failed for record(s): $(@($invalidRoutingEngineExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+}
+if ($executionZoneAvmExploitRecords.Count -lt 15) {
+  throw "AEXS execution zone/AVM exploit catalog validation failed: fewer than required execution zone/AVM exploit records"
+}
+if ($invalidExecutionZoneAvmExploitRecords.Count -gt 0) {
+  throw "AEXS execution zone/AVM exploit catalog validation failed for record(s): $(@($invalidExecutionZoneAvmExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+}
+if ($computeShardExploitRecords.Count -lt 10) {
+  throw "AEXS compute shard exploit catalog validation failed: fewer than required compute shard exploit records"
+}
+if ($invalidComputeShardExploitRecords.Count -gt 0) {
+  throw "AEXS compute shard exploit catalog validation failed for record(s): $(@($invalidComputeShardExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+}
+if ($meshCrossZoneExploitRecords.Count -lt 10) {
+  throw "AEXS mesh/cross-zone exploit catalog validation failed: fewer than required mesh/cross-zone exploit records"
+}
+if ($invalidMeshCrossZoneExploitRecords.Count -gt 0) {
+  throw "AEXS mesh/cross-zone exploit catalog validation failed for record(s): $(@($invalidMeshCrossZoneExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+}
+if ($identityDomainExploitRecords.Count -lt 10) {
+  throw "AEXS identity/.aet exploit catalog validation failed: fewer than required identity/.aet exploit records"
+}
+if ($invalidIdentityDomainExploitRecords.Count -gt 0) {
+  throw "AEXS identity/.aet exploit catalog validation failed for record(s): $(@($invalidIdentityDomainExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+}
+if ($governanceExploitRecords.Count -lt 9) {
+  throw "AEXS governance exploit catalog validation failed: fewer than required governance exploit records"
+}
+if ($invalidGovernanceExploitRecords.Count -gt 0) {
+  throw "AEXS governance exploit catalog validation failed for record(s): $(@($invalidGovernanceExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+}
+if ($genesisUpgradeStateExploitRecords.Count -lt 10) {
+  throw "AEXS genesis/upgrade/state exploit catalog validation failed: fewer than required genesis/upgrade/state exploit records"
+}
+if ($invalidGenesisUpgradeStateExploitRecords.Count -gt 0) {
+  throw "AEXS genesis/upgrade/state exploit catalog validation failed for record(s): $(@($invalidGenesisUpgradeStateExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+}
+if ($mempoolNetworkExploitRecords.Count -lt 10) {
+  throw "AEXS mempool/network exploit catalog validation failed: fewer than required mempool/network exploit records"
+}
+if ($invalidMempoolNetworkExploitRecords.Count -gt 0) {
+  throw "AEXS mempool/network exploit catalog validation failed for record(s): $(@($invalidMempoolNetworkExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
+}
+if ($combinedFullStackExploitRecords.Count -lt 10) {
+  throw "AEXS combined full-stack exploit catalog validation failed: fewer than required combined full-stack exploit records"
+}
+if ($invalidCombinedFullStackExploitRecords.Count -gt 0) {
+  throw "AEXS combined full-stack exploit catalog validation failed for record(s): $(@($invalidCombinedFullStackExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"
 }
 if ($invalidExploitRecords.Count -gt 0) {
   throw "AEXS exploit catalog validation failed for record(s): $(@($invalidExploitRecords | ForEach-Object { $_["exploit_id"] }) -join ', ')"

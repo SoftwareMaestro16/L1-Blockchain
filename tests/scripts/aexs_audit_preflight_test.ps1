@@ -75,7 +75,23 @@ try {
   Assert-True ($result.invalid_load_system_exploit_count -eq 0) "AEXS must not generate invalid load system exploit records"
   Assert-True ($result.routing_engine_exploit_count -ge 9) "AEXS must record routing engine exploit catalog entries"
   Assert-True ($result.invalid_routing_engine_exploit_count -eq 0) "AEXS must not generate invalid routing engine exploit records"
-  Assert-True ($result.exploit_count -ge 69) "AEXS must record all current exploit catalog entries"
+  Assert-True ($result.execution_zone_avm_exploit_count -ge 15) "AEXS must record execution zone and AVM exploit catalog entries"
+  Assert-True ($result.invalid_execution_zone_avm_exploit_count -eq 0) "AEXS must not generate invalid execution zone and AVM exploit records"
+  Assert-True ($result.compute_shard_exploit_count -ge 10) "AEXS must record compute shard exploit catalog entries"
+  Assert-True ($result.invalid_compute_shard_exploit_count -eq 0) "AEXS must not generate invalid compute shard exploit records"
+  Assert-True ($result.mesh_cross_zone_exploit_count -ge 10) "AEXS must record Aether Mesh and cross-zone exploit catalog entries"
+  Assert-True ($result.invalid_mesh_cross_zone_exploit_count -eq 0) "AEXS must not generate invalid Aether Mesh and cross-zone exploit records"
+  Assert-True ($result.identity_domain_exploit_count -ge 10) "AEXS must record identity and .aet domain exploit catalog entries"
+  Assert-True ($result.invalid_identity_domain_exploit_count -eq 0) "AEXS must not generate invalid identity and .aet exploit records"
+  Assert-True ($result.governance_exploit_count -ge 9) "AEXS must record governance exploit catalog entries"
+  Assert-True ($result.invalid_governance_exploit_count -eq 0) "AEXS must not generate invalid governance exploit records"
+  Assert-True ($result.genesis_upgrade_state_exploit_count -ge 10) "AEXS must record genesis, upgrade, and state exploit catalog entries"
+  Assert-True ($result.invalid_genesis_upgrade_state_exploit_count -eq 0) "AEXS must not generate invalid genesis, upgrade, and state exploit records"
+  Assert-True ($result.mempool_network_exploit_count -ge 10) "AEXS must record mempool and network exploit catalog entries"
+  Assert-True ($result.invalid_mempool_network_exploit_count -eq 0) "AEXS must not generate invalid mempool and network exploit records"
+  Assert-True ($result.combined_full_stack_exploit_count -ge 10) "AEXS must record combined full-stack exploit catalog entries"
+  Assert-True ($result.invalid_combined_full_stack_exploit_count -eq 0) "AEXS must not generate invalid combined full-stack exploit records"
+  Assert-True ($result.exploit_count -ge 153) "AEXS must record all current exploit catalog entries"
   Assert-True ($result.invalid_exploit_count -eq 0) "AEXS must not generate invalid exploit records"
 
   foreach ($module in @(
@@ -355,7 +371,91 @@ try {
       "ROUTEEXP-06",
       "ROUTEEXP-07",
       "ROUTEEXP-08",
-      "ROUTEEXP-09"
+      "ROUTEEXP-09",
+      "EXECZONEEXP-01",
+      "EXECZONEEXP-02",
+      "EXECZONEEXP-03",
+      "EXECZONEEXP-04",
+      "EXECZONEEXP-05",
+      "EXECZONEEXP-06",
+      "EXECZONEEXP-07",
+      "EXECZONEEXP-08",
+      "EXECZONEEXP-09",
+      "EXECZONEEXP-10",
+      "EXECZONEEXP-11",
+      "EXECZONEEXP-12",
+      "EXECZONEEXP-13",
+      "EXECZONEEXP-14",
+      "EXECZONEEXP-15",
+      "SHARDEXP-01",
+      "SHARDEXP-02",
+      "SHARDEXP-03",
+      "SHARDEXP-04",
+      "SHARDEXP-05",
+      "SHARDEXP-06",
+      "SHARDEXP-07",
+      "SHARDEXP-08",
+      "SHARDEXP-09",
+      "SHARDEXP-10",
+      "MESHEXP-01",
+      "MESHEXP-02",
+      "MESHEXP-03",
+      "MESHEXP-04",
+      "MESHEXP-05",
+      "MESHEXP-06",
+      "MESHEXP-07",
+      "MESHEXP-08",
+      "MESHEXP-09",
+      "MESHEXP-10",
+      "IDENTEXP-01",
+      "IDENTEXP-02",
+      "IDENTEXP-03",
+      "IDENTEXP-04",
+      "IDENTEXP-05",
+      "IDENTEXP-06",
+      "IDENTEXP-07",
+      "IDENTEXP-08",
+      "IDENTEXP-09",
+      "IDENTEXP-10",
+      "GOVEXP-01",
+      "GOVEXP-02",
+      "GOVEXP-03",
+      "GOVEXP-04",
+      "GOVEXP-05",
+      "GOVEXP-06",
+      "GOVEXP-07",
+      "GOVEXP-08",
+      "GOVEXP-09",
+      "STATEEXP-01",
+      "STATEEXP-02",
+      "STATEEXP-03",
+      "STATEEXP-04",
+      "STATEEXP-05",
+      "STATEEXP-06",
+      "STATEEXP-07",
+      "STATEEXP-08",
+      "STATEEXP-09",
+      "STATEEXP-10",
+      "NETEXP-01",
+      "NETEXP-02",
+      "NETEXP-03",
+      "NETEXP-04",
+      "NETEXP-05",
+      "NETEXP-06",
+      "NETEXP-07",
+      "NETEXP-08",
+      "NETEXP-09",
+      "NETEXP-10",
+      "FULLSTACKEXP-01",
+      "FULLSTACKEXP-02",
+      "FULLSTACKEXP-03",
+      "FULLSTACKEXP-04",
+      "FULLSTACKEXP-05",
+      "FULLSTACKEXP-06",
+      "FULLSTACKEXP-07",
+      "FULLSTACKEXP-08",
+      "FULLSTACKEXP-09",
+      "FULLSTACKEXP-10"
     )) {
     Assert-True ($exploitById.ContainsKey($exploitId)) "exploit catalog record missing: $exploitId"
   }
@@ -417,6 +517,39 @@ try {
   Assert-True ($exploitById["ROUTEEXP-07"].exploit_path -match "route desync") "ROUTEEXP-07 must record routing desync"
   Assert-True ($exploitById["ROUTEEXP-08"].exploit_path -match "Misclassify transactions|misclassify transactions") "ROUTEEXP-08 must record transaction misclassification"
   Assert-True ($exploitById["ROUTEEXP-09"].exploit_path -match "fee-class overflow") "ROUTEEXP-09 must record fee-based routing gaming"
+  Assert-True ($exploitById["EXECZONEEXP-01"].exploit_path -match "state roots") "EXECZONEEXP-01 must record execution zone state divergence"
+  Assert-True ($exploitById["EXECZONEEXP-03"].exploit_path -match "local time") "EXECZONEEXP-03 must record AVM determinism violation"
+  Assert-True ($exploitById["EXECZONEEXP-07"].exploit_path -match "partial contract writes") "EXECZONEEXP-07 must record partial rollback"
+  Assert-True ($exploitById["EXECZONEEXP-12"].exploit_path -match "hijack contract upgrade") "EXECZONEEXP-12 must record upgrade hijack"
+  Assert-True ($exploitById["EXECZONEEXP-15"].exploit_path -match "sandbox escape") "EXECZONEEXP-15 must record sandbox escape"
+  Assert-True ($exploitById["SHARDEXP-01"].exploit_path -match "partition imbalance") "SHARDEXP-01 must record shard partition imbalance"
+  Assert-True ($exploitById["SHARDEXP-04"].exploit_path -match "cross-shard inconsistency") "SHARDEXP-04 must record cross-shard inconsistency"
+  Assert-True ($exploitById["SHARDEXP-05"].exploit_path -match "shard activation") "SHARDEXP-05 must record load spoofing for shard activation"
+  Assert-True ($exploitById["SHARDEXP-10"].exploit_path -match "flood shard queues") "SHARDEXP-10 must record queue flooding"
+  Assert-True ($exploitById["MESHEXP-01"].exploit_path -match "cross-zone messages") "MESHEXP-01 must record cross-zone message replay"
+  Assert-True ($exploitById["MESHEXP-04"].exploit_path -match "duplicate asset commitments") "MESHEXP-04 must record asset duplication"
+  Assert-True ($exploitById["MESHEXP-06"].exploit_path -match "forge source proof") "MESHEXP-06 must record proof forgery"
+  Assert-True ($exploitById["MESHEXP-10"].exploit_path -match "stale receipts") "MESHEXP-10 must record stale receipt replay"
+  Assert-True ($exploitById["IDENTEXP-01"].exploit_path -match "overwriting resolver") "IDENTEXP-01 must record resolver overwrite hijack"
+  Assert-True ($exploitById["IDENTEXP-02"].exploit_path -match "expired domain") "IDENTEXP-02 must record expired domain takeover"
+  Assert-True ($exploitById["IDENTEXP-06"].exploit_path -match "reverse lookup") "IDENTEXP-06 must record reverse lookup poisoning"
+  Assert-True ($exploitById["IDENTEXP-10"].exploit_path -match "multi-resolver inconsistency") "IDENTEXP-10 must record multi-resolver inconsistency"
+  Assert-True ($exploitById["GOVEXP-01"].exploit_path -match "voting power") "GOVEXP-01 must record governance capture"
+  Assert-True ($exploitById["GOVEXP-03"].exploit_path -match "emergency parameters") "GOVEXP-03 must record emergency parameter abuse"
+  Assert-True ($exploitById["GOVEXP-04"].exploit_path -match "upgrade plan") "GOVEXP-04 must record upgrade hijack"
+  Assert-True ($exploitById["GOVEXP-09"].exploit_path -match "grief parameters") "GOVEXP-09 must record parameter griefing"
+  Assert-True ($exploitById["STATEEXP-01"].exploit_path -match "malformed genesis") "STATEEXP-01 must record malformed genesis injection"
+  Assert-True ($exploitById["STATEEXP-02"].exploit_path -match "exported state") "STATEEXP-02 must record state export tampering"
+  Assert-True ($exploitById["STATEEXP-06"].exploit_path -match "hidden privileged account") "STATEEXP-06 must record privileged account injection"
+  Assert-True ($exploitById["STATEEXP-10"].exploit_path -match "snapshot") "STATEEXP-10 must record snapshot poisoning"
+  Assert-True ($exploitById["NETEXP-01"].exploit_path -match "Flood mempool|flood mempool") "NETEXP-01 must record mempool flooding"
+  Assert-True ($exploitById["NETEXP-03"].exploit_path -match "gossip") "NETEXP-03 must record gossip poisoning"
+  Assert-True ($exploitById["NETEXP-07"].exploit_path -match "reorder transactions") "NETEXP-07 must record transaction reordering"
+  Assert-True ($exploitById["NETEXP-08"].exploit_path -match "network latency") "NETEXP-08 must record network latency exploitation"
+  Assert-True ($exploitById["FULLSTACKEXP-01"].exploit_path -match "spam bursts") "FULLSTACKEXP-01 must record coordinated spam plus routing"
+  Assert-True ($exploitById["FULLSTACKEXP-03"].exploit_path -match "DEX swaps") "FULLSTACKEXP-03 must record DEX plus mempool plus routing"
+  Assert-True ($exploitById["FULLSTACKEXP-06"].exploit_path -match "identity resolution") "FULLSTACKEXP-06 must record identity plus routing hijack"
+  Assert-True ($exploitById["FULLSTACKEXP-10"].exploit_path -match "full stack|full-stack") "FULLSTACKEXP-10 must record full-stack destabilization"
 
   $campaignSetup = Get-Content -Raw -LiteralPath (Join-Path $result.output_dir "campaign-setup.json") | ConvertFrom-Json
   Assert-True ($campaignSetup.campaign_id -eq $result.campaign_id) "campaign setup campaign id must match summary"

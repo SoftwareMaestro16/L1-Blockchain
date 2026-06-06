@@ -449,6 +449,42 @@ catalog section covers routing bias exploitation, zone congestion targeting,
 compute shard starvation, hot-zone monopolization, deterministic route
 prediction abuse, cross-zone routing loops, routing desync between nodes,
 transaction misclassification, and fee-based routing gaming.
+The execution zone and AVM catalog section covers state divergence between
+zones, cross-zone replay, AVM determinism violations, contract execution
+desync, parallel execution race conditions, state corruption, partial rollback,
+nondeterministic opcode or host behavior, gas exhaustion denial-of-service,
+infinite loop griefing, storage collisions, contract upgrade hijack,
+uninitialized storage, stack overflow, and sandbox escape. The compute shard
+catalog section covers shard partition imbalance, shard starvation, shard
+overflow collapse, cross-shard inconsistency, load spoofing for shard
+activation, shard duplication, state split inconsistency, parallel execution
+collision, scheduling manipulation, and queue flooding.
+The Aether Mesh and cross-zone catalog section covers cross-zone message
+replay, message delay manipulation, message ordering attacks, asset duplication
+across zones, double spends across zones, proof forgery, relay censorship
+simulation, message starvation, finality mismatch, and stale receipt replay.
+The identity and `.aet` catalog section covers resolver overwrite hijack,
+expired domain takeover without auction, auction manipulation, resolver
+spoofing, subdomain collision, reverse lookup poisoning, domain binding races,
+index-layer cache poisoning, fake domain resolution injection, and
+multi-resolver inconsistency.
+The governance catalog section covers voting-power capture, proposal spam,
+emergency parameter abuse, upgrade hijack, delayed execution exploitation,
+governance replay, proposal front-running, staking-loop voting power
+manipulation, and parameter griefing. The genesis, upgrade, and state catalog
+section covers malformed genesis injection, state export tampering, upgrade
+rollback, partial migration corruption, module initialization bypass, hidden
+privileged account injection, `InitGenesis` validation bypass, version mismatch,
+state root collision, and snapshot poisoning. The mempool and network catalog
+section covers mempool flooding, transaction prioritization gaming, gossip
+poisoning, node eclipse simulation, P2P partition simulation, block propagation
+delay, transaction reordering, network latency exploitation, bandwidth
+exhaustion, and peer targeting. The combined full-stack catalog section covers
+coordinated spam plus routing, load plus governance, DEX plus mempool plus
+routing, validator collusion plus slashing delay, cross-zone value extraction,
+identity plus routing hijack, shard overload plus fee manipulation, consensus
+plus mempool denial-of-service, economic plus staking starvation, and
+full-stack destabilization.
 
 The base-chain `x/auth`, `x/bank`, `x/staking`, `x/slashing`, `x/gov`,
 `x/distribution`, `x/fees`, `x/tokenfactory`, `x/dex`, `x/identity`,
