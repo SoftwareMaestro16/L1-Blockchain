@@ -703,6 +703,121 @@ func TestEvidenceSettlementPaysReporterFromObjectiveSlash(t *testing.T) {
 	require.ErrorContains(t, err, "outside slashable window")
 }
 
+func TestStructuredEvidenceTypesMapToSlashPolicies(t *testing.T) {
+	types := StructuredEvidenceTypes()
+	require.Equal(t, []string{
+		EvidenceTypeDoubleSignProof,
+		EvidenceTypeInvalidStateTransitionProof,
+		EvidenceTypeEquivocationProof,
+		EvidenceTypeDowntimeProof,
+		EvidenceTypeInvalidTaskExecutionProof,
+		EvidenceTypeInvalidProofAcceptance,
+		EvidenceTypeFalseCapacityDeclaration,
+		EvidenceTypeInvalidEvidenceSubmission,
+	}, types)
+
+	for _, evidenceType := range types {
+		policy, err := DefaultEvidenceSlashPolicy(evidenceType)
+		require.NoError(t, err)
+		require.Equal(t, evidenceType, policy.EvidenceType)
+		require.True(t, IsSlashableMisbehavior(policy.Misbehavior))
+		require.NotZero(t, policy.SlashFractionBps)
+		require.LessOrEqual(t, policy.SlashFractionBps, BasisPoints)
+	}
+
+	_, err := DefaultEvidenceSlashPolicy("unknown")
+	require.ErrorContains(t, err, "unsupported structured evidence type")
+}
+
+func TestStructuredEvidenceLifecycleFinalizesAndExecutesSlash(t *testing.T) {
+	params := DefaultParams()
+	params.ReporterRewardBps = 500
+	evidence, err := SubmitStructuredEvidence(StructuredEvidenceRecord{
+		EvidenceID:          "evidence-structured-1",
+		EvidenceType:        EvidenceTypeInvalidTaskExecutionProof,
+		ReporterID:          "reporter-a",
+		AccusedValidatorID:  "val-a",
+		SubjectID:           "task/proof/1",
+		EvidenceHash:        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		EvidenceHeight:      101,
+		EvidenceEpoch:       10,
+		SubmittedHeight:     102,
+		VerificationGroupID: "evidence-group-a",
+	})
+	require.NoError(t, err)
+	require.Equal(t, EvidenceStatusSubmitted, evidence.Status)
+	require.Len(t, evidence.StructuredRecordHash, PosHashHexLength)
+
+	verification, err := VerifyStructuredEvidenceBySubset(evidence, []string{"reviewer-a", "reviewer-b", "reviewer-c"}, []EvidenceVerificationVote{
+		{EvidenceID: evidence.EvidenceID, ReviewerID: "reviewer-b", Accepted: true, SignatureHash: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", VoteHeight: 103},
+		{EvidenceID: evidence.EvidenceID, ReviewerID: "reviewer-a", Accepted: true, SignatureHash: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", VoteHeight: 103},
+		{EvidenceID: evidence.EvidenceID, ReviewerID: "reviewer-c", Accepted: true, SignatureHash: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", VoteHeight: 103},
+	}, 6_700)
+	require.NoError(t, err)
+	require.True(t, verification.Accepted)
+	require.Equal(t, EvidenceStatusVerified, verification.Status)
+	require.Equal(t, uint32(10_000), verification.ParticipationBps)
+	require.Len(t, verification.VerificationRoot, PosHashHexLength)
+
+	finality, err := FinalizeStructuredEvidence(evidence, verification, []EvidenceFinalityVote{
+		{EvidenceID: evidence.EvidenceID, ValidatorID: "val-voter-a", Approve: true, VotingPowerBps: 4_000, SignatureHash: "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", FinalityHeight: 104},
+		{EvidenceID: evidence.EvidenceID, ValidatorID: "val-voter-b", Approve: true, VotingPowerBps: 3_000, SignatureHash: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", FinalityHeight: 104},
+		{EvidenceID: evidence.EvidenceID, ValidatorID: "val-voter-c", Approve: false, VotingPowerBps: 1_000, SignatureHash: "1111111111111111111111111111111111111111111111111111111111111111", FinalityHeight: 104},
+	}, 6_700)
+	require.NoError(t, err)
+	require.True(t, finality.Finalized)
+	require.True(t, finality.Accepted)
+	require.Equal(t, EvidenceStatusFinalized, finality.Status)
+	require.Equal(t, uint32(7_000), finality.AcceptedPowerBps)
+	require.Len(t, finality.FinalityVoteRoot, PosHashHexLength)
+
+	settlement, err := ExecuteStructuredEvidenceSlashing(params, 12, evidence, finality, sdkmath.NewInt(1_000), []Nomination{
+		{NominatorID: "nom-a", StakeNaet: sdkmath.NewInt(1_000)},
+	})
+	require.NoError(t, err)
+	require.Equal(t, evidence.EvidenceID, settlement.EvidenceID)
+	require.Equal(t, MisbehaviorInvalidBlock, settlement.Slash.Misbehavior)
+	require.Equal(t, sdkmath.NewInt(150), settlement.Slash.TotalSlashedNaet)
+	require.Equal(t, sdkmath.NewInt(7), settlement.ReporterRewardNaet)
+	require.Equal(t, sdkmath.NewInt(143), settlement.BurnNaet)
+	require.Len(t, settlement.SettlementHash, PosHashHexLength)
+}
+
+func TestStructuredEvidenceLifecycleRejectsUnverifiedOrRejectedEvidence(t *testing.T) {
+	evidence, err := SubmitStructuredEvidence(StructuredEvidenceRecord{
+		EvidenceID:          "evidence-structured-2",
+		EvidenceType:        EvidenceTypeDowntimeProof,
+		ReporterID:          "reporter-a",
+		AccusedValidatorID:  "val-a",
+		SubjectID:           "height/100",
+		EvidenceHash:        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		EvidenceHeight:      100,
+		EvidenceEpoch:       10,
+		SubmittedHeight:     101,
+		VerificationGroupID: "evidence-group-a",
+	})
+	require.NoError(t, err)
+
+	verification, err := VerifyStructuredEvidenceBySubset(evidence, []string{"reviewer-a", "reviewer-b", "reviewer-c"}, []EvidenceVerificationVote{
+		{EvidenceID: evidence.EvidenceID, ReviewerID: "reviewer-a", Accepted: false, SignatureHash: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", VoteHeight: 102},
+		{EvidenceID: evidence.EvidenceID, ReviewerID: "reviewer-b", Accepted: false, SignatureHash: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", VoteHeight: 102},
+		{EvidenceID: evidence.EvidenceID, ReviewerID: "reviewer-c", Accepted: false, SignatureHash: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", VoteHeight: 102},
+	}, 6_700)
+	require.NoError(t, err)
+	require.True(t, verification.Rejected)
+	require.Equal(t, EvidenceStatusRejected, verification.Status)
+
+	_, err = FinalizeStructuredEvidence(evidence, verification, []EvidenceFinalityVote{
+		{EvidenceID: evidence.EvidenceID, ValidatorID: "val-voter-a", Approve: true, VotingPowerBps: 7_000, SignatureHash: "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", FinalityHeight: 103},
+	}, 6_700)
+	require.ErrorContains(t, err, "verified by consensus subset")
+
+	_, err = VerifyStructuredEvidenceBySubset(evidence, []string{"reviewer-a"}, []EvidenceVerificationVote{
+		{EvidenceID: evidence.EvidenceID, ReviewerID: "reviewer-x", Accepted: true, SignatureHash: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", VoteHeight: 102},
+	}, 6_700)
+	require.ErrorContains(t, err, "not assigned")
+}
+
 func TestWorkloadRewardsSplitByRoleAndCompletedUnits(t *testing.T) {
 	settlement, err := SettleWorkloadRewards(WorkloadRewardInput{
 		EpochID:          9,

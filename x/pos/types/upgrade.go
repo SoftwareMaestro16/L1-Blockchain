@@ -180,6 +180,96 @@ type CapacityFaultEvidence struct {
 	Finalized         bool
 }
 
+const (
+	EvidenceTypeDoubleSignProof              = "double_sign_proof"
+	EvidenceTypeInvalidStateTransitionProof  = "invalid_state_transition_proof"
+	EvidenceTypeEquivocationProof            = "equivocation_proof"
+	EvidenceTypeDowntimeProof                = "downtime_proof"
+	EvidenceTypeInvalidTaskExecutionProof    = "invalid_task_execution_proof"
+	EvidenceTypeInvalidProofAcceptance       = "invalid_proof_acceptance"
+	EvidenceTypeFalseCapacityDeclaration     = "false_capacity_declaration"
+	EvidenceTypeInvalidEvidenceSubmission    = "invalid_evidence_submission"
+	EvidenceStatusSubmitted                  = "submitted"
+	EvidenceStatusVerified                   = "verified"
+	EvidenceStatusRejected                   = "rejected"
+	EvidenceStatusFinalized                  = "finalized"
+	EvidenceStatusSlashed                    = "slashed"
+	DefaultEvidenceVerificationQuorumBps     = uint32(6_700)
+	DefaultEvidenceFinalityQuorumBps         = uint32(6_700)
+	DefaultDoubleSignSlashBps                = uint32(5_000)
+	DefaultInvalidStateTransitionSlashBps    = uint32(1_500)
+	DefaultEquivocationSlashBps              = uint32(2_000)
+	DefaultDowntimeSlashBps                  = uint32(100)
+	DefaultInvalidTaskExecutionSlashBps      = uint32(750)
+	DefaultInvalidProofAcceptanceSlashBps    = uint32(1_000)
+	DefaultFalseCapacityDeclarationSlashBps  = uint32(500)
+	DefaultInvalidEvidenceSubmissionSlashBps = uint32(250)
+)
+
+type StructuredEvidenceRecord struct {
+	EvidenceID           string
+	EvidenceType         string
+	ReporterID           string
+	AccusedValidatorID   string
+	SubjectID            string
+	EvidenceHash         string
+	EvidenceHeight       int64
+	EvidenceEpoch        uint64
+	SubmittedHeight      int64
+	VerificationGroupID  string
+	Status               string
+	StructuredRecordHash string
+}
+
+type EvidenceSlashPolicy struct {
+	EvidenceType     string
+	Misbehavior      string
+	SlashFractionBps uint32
+}
+
+type EvidenceVerificationVote struct {
+	EvidenceID    string
+	ReviewerID    string
+	Accepted      bool
+	SignatureHash string
+	VoteHeight    int64
+}
+
+type EvidenceVerificationResult struct {
+	EvidenceID        string
+	AcceptedVotes     uint32
+	RejectedVotes     uint32
+	TotalReviewers    uint32
+	ParticipationBps  uint32
+	QuorumBps         uint32
+	Accepted          bool
+	Rejected          bool
+	Status            string
+	VerificationRoot  string
+	VerificationGroup string
+}
+
+type EvidenceFinalityVote struct {
+	EvidenceID     string
+	ValidatorID    string
+	Approve        bool
+	VotingPowerBps uint32
+	SignatureHash  string
+	FinalityHeight int64
+}
+
+type EvidenceFinalityDecision struct {
+	EvidenceID        string
+	AcceptedPowerBps  uint32
+	RejectedPowerBps  uint32
+	QuorumBps         uint32
+	Finalized         bool
+	Accepted          bool
+	Status            string
+	FinalityVoteRoot  string
+	FinalityVoteCount uint32
+}
+
 type DelegationIntent struct {
 	NominatorID            string
 	ValidatorID            string
@@ -1285,6 +1375,292 @@ func IsSlashableCapacityFault(evidence CapacityFaultEvidence) (bool, error) {
 	return evidence.Finalized && evidence.UsedForAssignment, nil
 }
 
+func StructuredEvidenceTypes() []string {
+	return []string{
+		EvidenceTypeDoubleSignProof,
+		EvidenceTypeInvalidStateTransitionProof,
+		EvidenceTypeEquivocationProof,
+		EvidenceTypeDowntimeProof,
+		EvidenceTypeInvalidTaskExecutionProof,
+		EvidenceTypeInvalidProofAcceptance,
+		EvidenceTypeFalseCapacityDeclaration,
+		EvidenceTypeInvalidEvidenceSubmission,
+	}
+}
+
+func IsStructuredEvidenceType(evidenceType string) bool {
+	switch evidenceType {
+	case EvidenceTypeDoubleSignProof,
+		EvidenceTypeInvalidStateTransitionProof,
+		EvidenceTypeEquivocationProof,
+		EvidenceTypeDowntimeProof,
+		EvidenceTypeInvalidTaskExecutionProof,
+		EvidenceTypeInvalidProofAcceptance,
+		EvidenceTypeFalseCapacityDeclaration,
+		EvidenceTypeInvalidEvidenceSubmission:
+		return true
+	default:
+		return false
+	}
+}
+
+func DefaultEvidenceSlashPolicy(evidenceType string) (EvidenceSlashPolicy, error) {
+	switch evidenceType {
+	case EvidenceTypeDoubleSignProof:
+		return EvidenceSlashPolicy{EvidenceType: evidenceType, Misbehavior: MisbehaviorDoubleSign, SlashFractionBps: DefaultDoubleSignSlashBps}, nil
+	case EvidenceTypeInvalidStateTransitionProof:
+		return EvidenceSlashPolicy{EvidenceType: evidenceType, Misbehavior: MisbehaviorInvalidBlock, SlashFractionBps: DefaultInvalidStateTransitionSlashBps}, nil
+	case EvidenceTypeEquivocationProof:
+		return EvidenceSlashPolicy{EvidenceType: evidenceType, Misbehavior: MisbehaviorDoubleSign, SlashFractionBps: DefaultEquivocationSlashBps}, nil
+	case EvidenceTypeDowntimeProof:
+		return EvidenceSlashPolicy{EvidenceType: evidenceType, Misbehavior: MisbehaviorDowntime, SlashFractionBps: DefaultDowntimeSlashBps}, nil
+	case EvidenceTypeInvalidTaskExecutionProof:
+		return EvidenceSlashPolicy{EvidenceType: evidenceType, Misbehavior: MisbehaviorInvalidBlock, SlashFractionBps: DefaultInvalidTaskExecutionSlashBps}, nil
+	case EvidenceTypeInvalidProofAcceptance:
+		return EvidenceSlashPolicy{EvidenceType: evidenceType, Misbehavior: MisbehaviorInvalidBlock, SlashFractionBps: DefaultInvalidProofAcceptanceSlashBps}, nil
+	case EvidenceTypeFalseCapacityDeclaration:
+		return EvidenceSlashPolicy{EvidenceType: evidenceType, Misbehavior: MisbehaviorInvalidBlock, SlashFractionBps: DefaultFalseCapacityDeclarationSlashBps}, nil
+	case EvidenceTypeInvalidEvidenceSubmission:
+		return EvidenceSlashPolicy{EvidenceType: evidenceType, Misbehavior: MisbehaviorInvalidBlock, SlashFractionBps: DefaultInvalidEvidenceSubmissionSlashBps}, nil
+	default:
+		return EvidenceSlashPolicy{}, fmt.Errorf("unsupported structured evidence type %q", evidenceType)
+	}
+}
+
+func SubmitStructuredEvidence(evidence StructuredEvidenceRecord) (StructuredEvidenceRecord, error) {
+	evidence.EvidenceID = strings.TrimSpace(evidence.EvidenceID)
+	evidence.EvidenceType = strings.TrimSpace(evidence.EvidenceType)
+	evidence.ReporterID = strings.TrimSpace(evidence.ReporterID)
+	evidence.AccusedValidatorID = strings.TrimSpace(evidence.AccusedValidatorID)
+	evidence.SubjectID = strings.TrimSpace(evidence.SubjectID)
+	evidence.EvidenceHash = strings.TrimSpace(evidence.EvidenceHash)
+	evidence.VerificationGroupID = strings.TrimSpace(evidence.VerificationGroupID)
+	evidence.Status = EvidenceStatusSubmitted
+	evidence.StructuredRecordHash = computeStructuredEvidenceHash(evidence)
+	return evidence, evidence.Validate()
+}
+
+func (e StructuredEvidenceRecord) Validate() error {
+	if err := validatePosToken("structured evidence id", e.EvidenceID); err != nil {
+		return err
+	}
+	if !IsStructuredEvidenceType(e.EvidenceType) {
+		return fmt.Errorf("unsupported structured evidence type %q", e.EvidenceType)
+	}
+	if err := validatePosToken("structured evidence reporter id", e.ReporterID); err != nil {
+		return err
+	}
+	if err := validatePosToken("structured evidence accused validator id", e.AccusedValidatorID); err != nil {
+		return err
+	}
+	if err := validatePosToken("structured evidence subject id", e.SubjectID); err != nil {
+		return err
+	}
+	if err := validatePosHash("structured evidence hash", e.EvidenceHash); err != nil {
+		return err
+	}
+	if e.EvidenceHeight < 0 {
+		return errors.New("structured evidence height cannot be negative")
+	}
+	if e.EvidenceEpoch == 0 {
+		return errors.New("structured evidence epoch is required")
+	}
+	if e.SubmittedHeight < 0 {
+		return errors.New("structured evidence submitted height cannot be negative")
+	}
+	if err := validatePosToken("structured evidence verification group id", e.VerificationGroupID); err != nil {
+		return err
+	}
+	if !isEvidenceStatus(e.Status) {
+		return fmt.Errorf("unsupported structured evidence status %q", e.Status)
+	}
+	expectedHash := computeStructuredEvidenceHash(e)
+	if e.StructuredRecordHash != expectedHash {
+		return errors.New("structured evidence record hash mismatch")
+	}
+	return nil
+}
+
+func VerifyStructuredEvidenceBySubset(evidence StructuredEvidenceRecord, reviewers []string, votes []EvidenceVerificationVote, quorumBps uint32) (EvidenceVerificationResult, error) {
+	if quorumBps == 0 {
+		quorumBps = DefaultEvidenceVerificationQuorumBps
+	}
+	if quorumBps > BasisPoints {
+		return EvidenceVerificationResult{}, fmt.Errorf("evidence verification quorum must be <= %d bps", BasisPoints)
+	}
+	if err := evidence.Validate(); err != nil {
+		return EvidenceVerificationResult{}, err
+	}
+	if evidence.Status != EvidenceStatusSubmitted && evidence.Status != EvidenceStatusVerified {
+		return EvidenceVerificationResult{}, errors.New("structured evidence must be submitted before subset verification")
+	}
+	reviewerSet, err := validateEvidenceReviewers(reviewers)
+	if err != nil {
+		return EvidenceVerificationResult{}, err
+	}
+	seen := make(map[string]struct{}, len(votes))
+	accepted := uint32(0)
+	rejected := uint32(0)
+	for _, vote := range votes {
+		if err := vote.Validate(evidence.EvidenceID); err != nil {
+			return EvidenceVerificationResult{}, err
+		}
+		if _, assigned := reviewerSet[vote.ReviewerID]; !assigned {
+			return EvidenceVerificationResult{}, fmt.Errorf("evidence reviewer %q is not assigned to verification subset", vote.ReviewerID)
+		}
+		if _, found := seen[vote.ReviewerID]; found {
+			return EvidenceVerificationResult{}, fmt.Errorf("duplicate evidence verification vote from %q", vote.ReviewerID)
+		}
+		seen[vote.ReviewerID] = struct{}{}
+		if vote.Accepted {
+			accepted++
+		} else {
+			rejected++
+		}
+	}
+	totalReviewers := uint32(len(reviewerSet))
+	acceptedBps := ratioBps(uint64(accepted), uint64(totalReviewers))
+	rejectedBps := ratioBps(uint64(rejected), uint64(totalReviewers))
+	result := EvidenceVerificationResult{
+		EvidenceID:        evidence.EvidenceID,
+		AcceptedVotes:     accepted,
+		RejectedVotes:     rejected,
+		TotalReviewers:    totalReviewers,
+		ParticipationBps:  ratioBps(uint64(len(votes)), uint64(totalReviewers)),
+		QuorumBps:         quorumBps,
+		Accepted:          acceptedBps >= quorumBps,
+		Rejected:          rejectedBps >= quorumBps,
+		Status:            EvidenceStatusSubmitted,
+		VerificationGroup: evidence.VerificationGroupID,
+	}
+	if result.Accepted {
+		result.Status = EvidenceStatusVerified
+	} else if result.Rejected {
+		result.Status = EvidenceStatusRejected
+	}
+	result.VerificationRoot = computeEvidenceVerificationRoot(evidence.EvidenceID, votes)
+	return result, nil
+}
+
+func (v EvidenceVerificationVote) Validate(expectedEvidenceID string) error {
+	if v.EvidenceID != expectedEvidenceID {
+		return errors.New("evidence verification vote id mismatch")
+	}
+	if err := validatePosToken("evidence verification reviewer id", v.ReviewerID); err != nil {
+		return err
+	}
+	if err := validatePosHash("evidence verification signature hash", v.SignatureHash); err != nil {
+		return err
+	}
+	if v.VoteHeight < 0 {
+		return errors.New("evidence verification vote height cannot be negative")
+	}
+	return nil
+}
+
+func FinalizeStructuredEvidence(evidence StructuredEvidenceRecord, verification EvidenceVerificationResult, votes []EvidenceFinalityVote, quorumBps uint32) (EvidenceFinalityDecision, error) {
+	if quorumBps == 0 {
+		quorumBps = DefaultEvidenceFinalityQuorumBps
+	}
+	if quorumBps > BasisPoints {
+		return EvidenceFinalityDecision{}, fmt.Errorf("evidence finality quorum must be <= %d bps", BasisPoints)
+	}
+	if err := evidence.Validate(); err != nil {
+		return EvidenceFinalityDecision{}, err
+	}
+	if verification.EvidenceID != evidence.EvidenceID {
+		return EvidenceFinalityDecision{}, errors.New("evidence finality verification id mismatch")
+	}
+	if !verification.Accepted || verification.Status != EvidenceStatusVerified {
+		return EvidenceFinalityDecision{}, errors.New("evidence must be verified by consensus subset before finality vote")
+	}
+	seen := make(map[string]struct{}, len(votes))
+	acceptedPower := uint64(0)
+	rejectedPower := uint64(0)
+	totalPower := uint64(0)
+	for _, vote := range votes {
+		if err := vote.Validate(evidence.EvidenceID); err != nil {
+			return EvidenceFinalityDecision{}, err
+		}
+		if _, found := seen[vote.ValidatorID]; found {
+			return EvidenceFinalityDecision{}, fmt.Errorf("duplicate evidence finality vote from %q", vote.ValidatorID)
+		}
+		seen[vote.ValidatorID] = struct{}{}
+		totalPower += uint64(vote.VotingPowerBps)
+		if totalPower > uint64(BasisPoints) {
+			return EvidenceFinalityDecision{}, fmt.Errorf("evidence finality voting power must be <= %d bps", BasisPoints)
+		}
+		if vote.Approve {
+			acceptedPower += uint64(vote.VotingPowerBps)
+		} else {
+			rejectedPower += uint64(vote.VotingPowerBps)
+		}
+	}
+	decision := EvidenceFinalityDecision{
+		EvidenceID:        evidence.EvidenceID,
+		AcceptedPowerBps:  uint32(acceptedPower),
+		RejectedPowerBps:  uint32(rejectedPower),
+		QuorumBps:         quorumBps,
+		FinalityVoteRoot:  computeEvidenceFinalityVoteRoot(evidence.EvidenceID, votes),
+		FinalityVoteCount: uint32(len(votes)),
+		Status:            EvidenceStatusVerified,
+	}
+	if uint32(acceptedPower) >= quorumBps {
+		decision.Finalized = true
+		decision.Accepted = true
+		decision.Status = EvidenceStatusFinalized
+	} else if uint32(rejectedPower) >= quorumBps {
+		decision.Finalized = true
+		decision.Status = EvidenceStatusRejected
+	}
+	return decision, nil
+}
+
+func (v EvidenceFinalityVote) Validate(expectedEvidenceID string) error {
+	if v.EvidenceID != expectedEvidenceID {
+		return errors.New("evidence finality vote id mismatch")
+	}
+	if err := validatePosToken("evidence finality validator id", v.ValidatorID); err != nil {
+		return err
+	}
+	if v.VotingPowerBps == 0 || v.VotingPowerBps > BasisPoints {
+		return fmt.Errorf("evidence finality voting power must be within 1..%d bps", BasisPoints)
+	}
+	if err := validatePosHash("evidence finality signature hash", v.SignatureHash); err != nil {
+		return err
+	}
+	if v.FinalityHeight < 0 {
+		return errors.New("evidence finality vote height cannot be negative")
+	}
+	return nil
+}
+
+func ExecuteStructuredEvidenceSlashing(params Params, currentEpoch uint64, evidence StructuredEvidenceRecord, decision EvidenceFinalityDecision, selfStake sdkmath.Int, nominations []Nomination) (EvidenceSettlement, error) {
+	if decision.EvidenceID != evidence.EvidenceID {
+		return EvidenceSettlement{}, errors.New("evidence slashing decision id mismatch")
+	}
+	if !decision.Finalized || !decision.Accepted || decision.Status != EvidenceStatusFinalized {
+		return EvidenceSettlement{}, errors.New("evidence must have accepted finality before slashing")
+	}
+	if err := evidence.Validate(); err != nil {
+		return EvidenceSettlement{}, err
+	}
+	policy, err := DefaultEvidenceSlashPolicy(evidence.EvidenceType)
+	if err != nil {
+		return EvidenceSettlement{}, err
+	}
+	return SettleEvidenceCase(params, currentEpoch, EvidenceCase{
+		EvidenceID:       evidence.EvidenceID,
+		ReporterID:       evidence.ReporterID,
+		ValidatorID:      evidence.AccusedValidatorID,
+		Misbehavior:      policy.Misbehavior,
+		SlashFractionBps: policy.SlashFractionBps,
+		EvidenceHeight:   evidence.EvidenceHeight,
+		EvidenceEpoch:    evidence.EvidenceEpoch,
+		Finalized:        true,
+	}, selfStake, nominations)
+}
+
 func (a TaskAssignment) Validate() error {
 	if err := validatePosToken("assignment task id", a.TaskID); err != nil {
 		return err
@@ -2266,6 +2642,65 @@ func computeEvidenceSettlementHash(settlement EvidenceSettlement) string {
 	})
 }
 
+func computeStructuredEvidenceHash(evidence StructuredEvidenceRecord) string {
+	return posHashRoot("aetheris-pos-structured-evidence-v1", func(w posByteWriter) {
+		posWritePart(w, evidence.EvidenceID)
+		posWritePart(w, evidence.EvidenceType)
+		posWritePart(w, evidence.ReporterID)
+		posWritePart(w, evidence.AccusedValidatorID)
+		posWritePart(w, evidence.SubjectID)
+		posWritePart(w, evidence.EvidenceHash)
+		posWritePart(w, fmt.Sprintf("%d", evidence.EvidenceHeight))
+		posWriteUint64(w, evidence.EvidenceEpoch)
+		posWritePart(w, fmt.Sprintf("%d", evidence.SubmittedHeight))
+		posWritePart(w, evidence.VerificationGroupID)
+		posWritePart(w, evidence.Status)
+	})
+}
+
+func computeEvidenceVerificationRoot(evidenceID string, votes []EvidenceVerificationVote) string {
+	ordered := make([]EvidenceVerificationVote, len(votes))
+	copy(ordered, votes)
+	sort.SliceStable(ordered, func(i, j int) bool {
+		if ordered[i].ReviewerID != ordered[j].ReviewerID {
+			return ordered[i].ReviewerID < ordered[j].ReviewerID
+		}
+		return ordered[i].VoteHeight < ordered[j].VoteHeight
+	})
+	return posHashRoot("aetheris-pos-evidence-verification-root-v1", func(w posByteWriter) {
+		posWritePart(w, evidenceID)
+		posWriteUint64(w, uint64(len(ordered)))
+		for _, vote := range ordered {
+			posWritePart(w, vote.ReviewerID)
+			posWritePart(w, fmt.Sprintf("%t", vote.Accepted))
+			posWritePart(w, vote.SignatureHash)
+			posWritePart(w, fmt.Sprintf("%d", vote.VoteHeight))
+		}
+	})
+}
+
+func computeEvidenceFinalityVoteRoot(evidenceID string, votes []EvidenceFinalityVote) string {
+	ordered := make([]EvidenceFinalityVote, len(votes))
+	copy(ordered, votes)
+	sort.SliceStable(ordered, func(i, j int) bool {
+		if ordered[i].ValidatorID != ordered[j].ValidatorID {
+			return ordered[i].ValidatorID < ordered[j].ValidatorID
+		}
+		return ordered[i].FinalityHeight < ordered[j].FinalityHeight
+	})
+	return posHashRoot("aetheris-pos-evidence-finality-root-v1", func(w posByteWriter) {
+		posWritePart(w, evidenceID)
+		posWriteUint64(w, uint64(len(ordered)))
+		for _, vote := range ordered {
+			posWritePart(w, vote.ValidatorID)
+			posWritePart(w, fmt.Sprintf("%t", vote.Approve))
+			posWriteUint64(w, uint64(vote.VotingPowerBps))
+			posWritePart(w, vote.SignatureHash)
+			posWritePart(w, fmt.Sprintf("%d", vote.FinalityHeight))
+		}
+	})
+}
+
 func computeWorkloadRewardRoot(settlement WorkloadRewardSettlement) string {
 	return posHashRoot("aetheris-pos-workload-reward-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, settlement.EpochID)
@@ -2300,6 +2735,32 @@ func validateRoleRewardWeights(weights []RoleRewardWeight) error {
 		return fmt.Errorf("role reward weights must sum to %d bps", BasisPoints)
 	}
 	return nil
+}
+
+func isEvidenceStatus(status string) bool {
+	switch status {
+	case EvidenceStatusSubmitted, EvidenceStatusVerified, EvidenceStatusRejected, EvidenceStatusFinalized, EvidenceStatusSlashed:
+		return true
+	default:
+		return false
+	}
+}
+
+func validateEvidenceReviewers(reviewers []string) (map[string]struct{}, error) {
+	if len(reviewers) == 0 {
+		return nil, errors.New("evidence verification reviewers are required")
+	}
+	out := make(map[string]struct{}, len(reviewers))
+	for _, reviewerID := range reviewers {
+		if err := validatePosToken("evidence verification reviewer id", reviewerID); err != nil {
+			return nil, err
+		}
+		if _, found := out[reviewerID]; found {
+			return nil, fmt.Errorf("duplicate evidence verification reviewer %q", reviewerID)
+		}
+		out[reviewerID] = struct{}{}
+	}
+	return out, nil
 }
 
 func sortedStringKeys[V any](values map[string]V) []string {
