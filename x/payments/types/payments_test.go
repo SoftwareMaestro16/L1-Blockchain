@@ -209,6 +209,94 @@ func TestBidirectionalCloseAndUpdateRules(t *testing.T) {
 	require.Equal(t, "545", amountFor(settlement.FinalBalances, bob))
 }
 
+func TestUnidirectionalReceiverCloseUsesSinglePayerSignature(t *testing.T) {
+	payer := testAddress(0x3b)
+	receiver := testAddress(0x3c)
+	channel := signedUnidirectionalChannel(t, "uni-close", "1000", payer, receiver, false)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	claim := signedUnidirectionalClaim(t, channel, "320", 2, 80, false)
+	require.Empty(t, claim.ReceiverAckOptional.SignatureHash)
+	require.NoError(t, claim.ValidateForChannel(channel))
+
+	badClaim := claim
+	badClaim.PayerSignature, err = SignatureForClaim(badClaim, receiver)
+	require.NoError(t, err)
+	require.ErrorContains(t, badClaim.ValidateForChannel(channel), "payer signature")
+
+	state, settlement, err := ReceiverClose(state, channel.ChannelID, claim, receiver, 30, "5")
+	require.NoError(t, err)
+	require.Equal(t, ChannelStatusSettled, state.Channels[0].Status)
+	require.Equal(t, claim.Nonce, state.Channels[0].FinalizedNonce)
+	require.Equal(t, claim.StateHash, settlement.StateHash)
+	require.Equal(t, "680", amountFor(settlement.FinalBalances, payer))
+	require.Equal(t, "315", amountFor(settlement.FinalBalances, receiver))
+}
+
+func TestUnidirectionalAcknowledgementModeAndPayerReclaim(t *testing.T) {
+	payer := testAddress(0x3d)
+	receiver := testAddress(0x3e)
+	channel := signedUnidirectionalChannel(t, "uni-ack", "1000", payer, receiver, true)
+
+	claim, err := BuildUnidirectionalClaim(UnidirectionalClaim{
+		ChannelID:           channel.ChannelID,
+		Payer:               payer,
+		Receiver:            receiver,
+		LockedAmount:        channel.Collateral,
+		ClaimedAmount:       "125",
+		Nonce:               2,
+		ExpirationHeight:    80,
+		ExpirationTimestamp: 0,
+	})
+	require.NoError(t, err)
+	claim.PayerSignature, err = SignatureForClaim(claim, payer)
+	require.NoError(t, err)
+	require.ErrorContains(t, claim.ValidateForChannel(channel), "acknowledgement")
+	claim.ReceiverAckOptional, err = SignatureForClaim(claim, receiver)
+	require.NoError(t, err)
+	require.NoError(t, claim.ValidateForChannel(channel))
+
+	state := EmptyState()
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+	_, _, err = PayerReclaim(state, channel.ChannelID, payer, channel.ExpirationHeight+channel.DisputePeriod, "3")
+	require.ErrorContains(t, err, "dispute window")
+	state, settlement, err := PayerReclaim(state, channel.ChannelID, payer, channel.ExpirationHeight+channel.DisputePeriod+1, "3")
+	require.NoError(t, err)
+	require.Equal(t, ChannelStatusSettled, state.Channels[0].Status)
+	require.Equal(t, "997", amountFor(settlement.FinalBalances, payer))
+	require.Equal(t, "0", amountFor(settlement.FinalBalances, receiver))
+}
+
+func TestUnidirectionalStreamingPaymentHelperFormat(t *testing.T) {
+	payer := testAddress(0x3f)
+	receiver := testAddress(0x40)
+	channel := signedUnidirectionalChannel(t, "uni-stream", "1000", payer, receiver, false)
+
+	claim, err := StreamingClaimForChannel(channel, StreamingPaymentFrame{
+		ChannelID:           channel.ChannelID,
+		StreamID:            HashParts("stream", channel.ChannelID),
+		Payer:               payer,
+		Receiver:            receiver,
+		PreviousClaimed:     "10",
+		RatePerBlock:        "5",
+		StartHeight:         20,
+		CurrentHeight:       32,
+		Nonce:               2,
+		ExpirationHeight:    90,
+		ExpirationTimestamp: 0,
+	})
+	require.NoError(t, err)
+	require.Equal(t, "70", claim.ClaimedAmount)
+	claim.PayerSignature, err = SignatureForClaim(claim, payer)
+	require.NoError(t, err)
+	require.NoError(t, claim.ValidateForChannel(channel))
+}
+
 func TestPaymentAssetScopeRejectsNonNaetFeesAndPenalties(t *testing.T) {
 	alice := testAddress(0x35)
 	bob := testAddress(0x36)
@@ -452,6 +540,78 @@ func signedState(t *testing.T, channel ChannelRecord, nonce uint64, previous str
 	state = state.Normalize()
 	require.NoError(t, state.ValidateForChannel(channel, true))
 	return state
+}
+
+func signedUnidirectionalChannel(t *testing.T, salt, collateral, payer, receiver string, ackRequired bool) ChannelRecord {
+	t.Helper()
+
+	channel := ChannelRecord{
+		ChainID:             "aetheris-test-1",
+		ChannelID:           HashParts(salt, payer, receiver),
+		ChannelType:         ChannelTypeUnidirectional,
+		Participants:        []string{payer, receiver},
+		Payer:               payer,
+		Receiver:            receiver,
+		ReceiverAckRequired: ackRequired,
+		Denom:               NativeDenom,
+		Collateral:          collateral,
+		OpenHeight:          10,
+		DisputePeriod:       8,
+		ExpirationHeight:    72,
+		ExpirationTimestamp: 0,
+		Status:              ChannelStatusOpen,
+	}
+	openState, err := BuildState(ChannelState{
+		ChainID:          channel.ChainID,
+		ChannelID:        channel.ChannelID,
+		ChannelType:      channel.ChannelType,
+		Denom:            channel.Denom,
+		Version:          CurrentStateVersion,
+		Epoch:            1,
+		Nonce:            1,
+		Balances:         []Balance{{Participant: payer, Amount: collateral}, {Participant: receiver, Amount: "0"}},
+		TimeoutHeight:    channel.ExpirationHeight,
+		TimeoutTimestamp: channel.ExpirationTimestamp,
+		CloseDelay:       channel.DisputePeriod,
+		FeePolicyID:      NativeDenom,
+	})
+	require.NoError(t, err)
+	for _, signer := range channel.Normalize().Participants {
+		sig, err := SignatureForState(openState, signer)
+		require.NoError(t, err)
+		openState.Signatures = append(openState.Signatures, sig)
+	}
+	channel.LatestState = openState.Normalize()
+	channel.OpeningStateHash = channel.LatestState.StateHash
+	require.NoError(t, channel.Validate())
+	return channel.Normalize()
+}
+
+func signedUnidirectionalClaim(t *testing.T, channel ChannelRecord, claimed string, nonce, expirationHeight uint64, ack bool) UnidirectionalClaim {
+	t.Helper()
+
+	claim, err := BuildUnidirectionalClaim(UnidirectionalClaim{
+		ChannelID:           channel.ChannelID,
+		Payer:               channel.Payer,
+		Receiver:            channel.Receiver,
+		LockedAmount:        channel.Collateral,
+		ClaimedAmount:       claimed,
+		Nonce:               nonce,
+		ExpirationHeight:    expirationHeight,
+		ExpirationTimestamp: channel.ExpirationTimestamp,
+	})
+	require.NoError(t, err)
+	claim.PayerSignature, err = SignatureForClaim(claim, channel.Payer)
+	require.NoError(t, err)
+	if ack {
+		claim.ReceiverAckOptional, err = SignatureForClaim(claim, channel.Receiver)
+		require.NoError(t, err)
+	}
+	claim = claim.Normalize()
+	if !channel.ReceiverAckRequired || ack {
+		require.NoError(t, claim.ValidateForChannel(channel))
+	}
+	return claim
 }
 
 func testAddress(fill byte) string {

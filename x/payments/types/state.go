@@ -205,6 +205,136 @@ func CooperativeClose(state PaymentsState, channelID string, closingState Channe
 	return next, settlement, next.Validate()
 }
 
+func ReceiverClose(state PaymentsState, channelID string, claim UnidirectionalClaim, receiver string, currentHeight uint64, settlementFee string) (PaymentsState, SettlementRecord, error) {
+	state = state.Export()
+	if currentHeight == 0 {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments receiver close height must be positive")
+	}
+	index, channel, found := state.ChannelIndex(channelID)
+	if !found {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments channel not found")
+	}
+	if channel.Status != ChannelStatusOpen {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments channel is not open")
+	}
+	if channel.ChannelType != ChannelTypeUnidirectional {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments receiver close requires unidirectional channel")
+	}
+	receiver = normalizeAddress(receiver)
+	if receiver != channel.Receiver {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments receiver close submitter must be receiver")
+	}
+	claim = claim.Normalize()
+	if err := claim.ValidateForChannel(channel); err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	if err := validateUnidirectionalClaimProgress(channel.LatestClaim, claim); err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	if currentHeight > claim.ExpirationHeight+channel.DisputePeriod {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments receiver close claim has expired")
+	}
+	finalBalances, err := finalBalancesForUnidirectionalClaim(channel, claim, settlementFee, receiver)
+	if err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	settlement := SettlementRecord{
+		ChannelID:          channel.ChannelID,
+		StateHash:          claim.StateHash,
+		Nonce:              claim.Nonce,
+		FinalBalances:      finalBalances,
+		SettlementFeeDenom: NativeDenom,
+		SettlementFee:      settlementFee,
+		SettledHeight:      currentHeight,
+	}
+	settlement.SettlementHash = ComputeSettlementHash(settlement)
+	if err := settlement.ValidateForChannel(channel); err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	nextChannel := channel
+	nextChannel.Status = ChannelStatusSettled
+	nextChannel.FinalizedNonce = settlement.Nonce
+	nextChannel.LatestClaim = claim
+	nextChannel.PendingClose = PendingClose{}
+	next := state.Clone()
+	next.Channels[index] = nextChannel.Normalize()
+	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
+	next.Settlements = append(next.Settlements, settlement)
+	sortChannels(next.Channels)
+	sortSettlements(next.Settlements)
+	return next, settlement, next.Validate()
+}
+
+func PayerReclaim(state PaymentsState, channelID string, payer string, currentHeight uint64, settlementFee string) (PaymentsState, SettlementRecord, error) {
+	state = state.Export()
+	if currentHeight == 0 {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments payer reclaim height must be positive")
+	}
+	index, channel, found := state.ChannelIndex(channelID)
+	if !found {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments channel not found")
+	}
+	if channel.Status != ChannelStatusOpen {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments channel is not open")
+	}
+	if channel.ChannelType != ChannelTypeUnidirectional {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments payer reclaim requires unidirectional channel")
+	}
+	payer = normalizeAddress(payer)
+	if payer != channel.Payer {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments reclaim submitter must be payer")
+	}
+	expirationHeight := channel.ExpirationHeight
+	claim := channel.LatestClaim.Normalize()
+	if !claim.IsZero() {
+		expirationHeight = claim.ExpirationHeight
+	}
+	if currentHeight <= expirationHeight+channel.DisputePeriod {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments reclaim is still in dispute window")
+	}
+	stateHash := channel.OpeningStateHash
+	nonce := channel.LatestState.Nonce
+	var finalBalances []Balance
+	var err error
+	if claim.IsZero() {
+		finalBalances, err = applySettlementAdjustments([]Balance{
+			{Participant: channel.Payer, Amount: channel.Collateral},
+			{Participant: channel.Receiver, Amount: "0"},
+		}, nil, settlementFee, payer)
+	} else {
+		stateHash = claim.StateHash
+		nonce = claim.Nonce
+		finalBalances, err = finalBalancesForUnidirectionalClaim(channel, claim, settlementFee, payer)
+	}
+	if err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	settlement := SettlementRecord{
+		ChannelID:          channel.ChannelID,
+		StateHash:          stateHash,
+		Nonce:              nonce,
+		FinalBalances:      finalBalances,
+		SettlementFeeDenom: NativeDenom,
+		SettlementFee:      settlementFee,
+		SettledHeight:      currentHeight,
+	}
+	settlement.SettlementHash = ComputeSettlementHash(settlement)
+	if err := settlement.ValidateForChannel(channel); err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	nextChannel := channel
+	nextChannel.Status = ChannelStatusSettled
+	nextChannel.FinalizedNonce = settlement.Nonce
+	nextChannel.PendingClose = PendingClose{}
+	next := state.Clone()
+	next.Channels[index] = nextChannel.Normalize()
+	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
+	next.Settlements = append(next.Settlements, settlement)
+	sortChannels(next.Channels)
+	sortSettlements(next.Settlements)
+	return next, settlement, next.Validate()
+}
+
 func DisputeClose(state PaymentsState, channelID string, newerState ChannelState, submitter string, currentHeight uint64) (PaymentsState, error) {
 	state = state.Export()
 	if currentHeight == 0 {
@@ -701,6 +831,24 @@ func applySettlementAdjustments(balances []Balance, penalties []Penalty, feeText
 		out = append(out, Balance{Participant: participant, Amount: amount.String()})
 	}
 	return normalizeBalances(out), nil
+}
+
+func finalBalancesForUnidirectionalClaim(channel ChannelRecord, claim UnidirectionalClaim, settlementFee, feePayer string) ([]Balance, error) {
+	collateral, err := parsePositiveInt("payments channel collateral", channel.Collateral)
+	if err != nil {
+		return nil, err
+	}
+	claimed, err := parseNonNegativeInt("payments claimed amount", claim.ClaimedAmount)
+	if err != nil {
+		return nil, err
+	}
+	if claimed.GT(collateral) {
+		return nil, errors.New("payments claimed amount exceeds locked collateral")
+	}
+	return applySettlementAdjustments([]Balance{
+		{Participant: channel.Payer, Amount: collateral.Sub(claimed).String()},
+		{Participant: channel.Receiver, Amount: claimed.String()},
+	}, nil, settlementFee, feePayer)
 }
 
 func activeEdgesForAmount(edges []ChannelEdge, amount sdkmath.Int, currentHeight uint64) []ChannelEdge {

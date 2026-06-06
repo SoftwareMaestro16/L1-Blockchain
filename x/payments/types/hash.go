@@ -93,6 +93,36 @@ func ComputeSignatureHash(signer, stateHash string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+func ComputeUnidirectionalClaimHash(claim UnidirectionalClaim) string {
+	claim = claim.Normalize()
+	h := sha256.New()
+	writeString(h, "aetheris-payment-unidirectional-claim-v1")
+	writeString(h, claim.ChannelID)
+	writeString(h, claim.Payer)
+	writeString(h, claim.Receiver)
+	writeString(h, claim.LockedAmount)
+	writeString(h, claim.ClaimedAmount)
+	writeUint64(h, claim.Nonce)
+	writeUint64(h, claim.ExpirationHeight)
+	writeInt64(h, claim.ExpirationTimestamp)
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func ClaimSignaturePreimage(signer, claimHash string) []byte {
+	var buf bytes.Buffer
+	writeString(&buf, "aetheris-payment-unidirectional-claim-signature-preimage-v1")
+	writeString(&buf, signer)
+	writeString(&buf, claimHash)
+	return buf.Bytes()
+}
+
+func ComputeClaimSignatureHash(signer, claimHash string) string {
+	h := sha256.New()
+	writeString(h, "aetheris-payment-unidirectional-claim-signature-v1")
+	_, _ = h.Write(ClaimSignaturePreimage(signer, claimHash))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
 func ComputeVirtualChannelAnchor(vc VirtualChannel) string {
 	vc = vc.Normalize()
 	h := sha256.New()

@@ -168,6 +168,30 @@ func (k *Keeper) CooperativeClose(channelID string, closingState paymentstypes.C
 	return settlement, nil
 }
 
+func (k *Keeper) ReceiverClose(channelID string, claim paymentstypes.UnidirectionalClaim, receiver string, currentHeight uint64, settlementFee string) (paymentstypes.SettlementRecord, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	next, settlement, err := paymentstypes.ReceiverClose(k.genesis.State, channelID, claim, receiver, currentHeight, settlementFee)
+	if err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	k.genesis.State = next
+	return settlement, nil
+}
+
+func (k *Keeper) PayerReclaim(channelID string, payer string, currentHeight uint64, settlementFee string) (paymentstypes.SettlementRecord, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	next, settlement, err := paymentstypes.PayerReclaim(k.genesis.State, channelID, payer, currentHeight, settlementFee)
+	if err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	k.genesis.State = next
+	return settlement, nil
+}
+
 func (k *Keeper) DisputeClose(channelID string, newerState paymentstypes.ChannelState, submitter string, currentHeight uint64) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err
