@@ -54,6 +54,7 @@ type UnifiedServiceCall struct {
 	DeadlineHeight    uint64
 	Nonce             uint64
 	Kind              coretypes.ServiceCallKind
+	RetryOf           string
 	StateReadSet      []string
 	StateWriteSet     []string
 	UnifiedCallHash   string
@@ -125,6 +126,7 @@ func NewUnifiedServiceCall(ctx coretypes.ServiceConsensusContext, descriptor Ser
 		DeadlineHeight:    deadline,
 		Nonce:             nonce,
 		Kind:              kind,
+		RetryOf:           "",
 		StateReadSet:      []string{descriptor.ServiceID + "/" + method.MethodID + "/read"},
 		StateWriteSet:     []string{descriptor.ServiceID + "/" + method.MethodID + "/write"},
 	}
@@ -151,6 +153,7 @@ func (call UnifiedServiceCall) ToServiceCallEnvelope() coretypes.ServiceCallEnve
 		CreatedHeight:    call.CreatedHeight,
 		DeadlineHeight:   call.DeadlineHeight,
 		Callback:         call.CallbackTarget != "",
+		RetryOf:          strings.ToLower(strings.TrimSpace(call.RetryOf)),
 		StateReadSet:     append([]string(nil), call.StateReadSet...),
 		StateWriteSet:    append([]string(nil), call.StateWriteSet...),
 	}
@@ -209,6 +212,14 @@ func ValidateUnifiedServiceCallForDescriptor(ctx coretypes.ServiceConsensusConte
 	}
 	if !unifiedCallKindAllowed(descriptor.ServiceType, call.Kind) {
 		return fmt.Errorf("services unified call kind %s is incompatible with %s service", call.Kind, descriptor.ServiceType)
+	}
+	if call.Kind == coretypes.ServiceCallKindRetry {
+		if call.RetryOf == "" {
+			return errors.New("services unified retry call must reference original call id")
+		}
+		if call.IdempotencyKey == "" {
+			return errors.New("services unified retry call requires idempotency key")
+		}
 	}
 	if err := coretypes.NormalizeServiceCall(ctx, call.ToServiceCallEnvelope()).ValidateBasic(ctx); err != nil {
 		return err
@@ -280,6 +291,11 @@ func (call UnifiedServiceCall) ValidateBasic(ctx coretypes.ServiceConsensusConte
 	}
 	if !coretypes.IsServiceCallKind(call.Kind) {
 		return fmt.Errorf("services unified call unknown kind %q", call.Kind)
+	}
+	if call.RetryOf != "" {
+		if err := coretypes.ValidateHash("services unified call retry original id", call.RetryOf); err != nil {
+			return err
+		}
 	}
 	if err := validateUnifiedStateKeys("services unified call read set", call.StateReadSet); err != nil {
 		return err
@@ -438,6 +454,7 @@ func ComputeUnifiedServiceCallHash(call UnifiedServiceCall) string {
 		fmt.Sprint(call.DeadlineHeight),
 		fmt.Sprint(call.Nonce),
 		string(call.Kind),
+		call.RetryOf,
 	}
 	parts = appendStringParts(parts, "reads", call.StateReadSet)
 	parts = appendStringParts(parts, "writes", call.StateWriteSet)
