@@ -19,6 +19,7 @@ type ServicePricingUnit string
 type ServiceStorageModel string
 type ServiceMethodExecutionType string
 type ServiceFailureBehavior string
+type ServiceReceiptPolicy string
 
 const (
 	ZoneTypeCore        ZoneType = "CORE"
@@ -88,6 +89,9 @@ const (
 	ServiceFailureSlashProvider   ServiceFailureBehavior = "SLASH_PROVIDER"
 	ServiceFailureRefund          ServiceFailureBehavior = "REFUND"
 	ServiceFailurePartialSettle   ServiceFailureBehavior = "PARTIAL_SETTLE"
+
+	ServiceReceiptCommitted         ServiceReceiptPolicy = "COMMITTED_RECEIPT"
+	ServiceReceiptCommittedAndProof ServiceReceiptPolicy = "COMMITTED_RECEIPT_AND_PROOF"
 )
 
 type ZoneDescriptor struct {
@@ -166,6 +170,7 @@ type ServiceExecutionDescriptor struct {
 	ProviderPoolID  string
 	Mode            ExecutionMode
 	Deterministic   bool
+	ReceiptPolicy   ServiceReceiptPolicy
 	FailureBehavior ServiceFailureBehavior
 	ResultExpiry    uint64
 	ChallengeWindow uint64
@@ -423,6 +428,15 @@ func IsServiceFailureBehavior(behavior ServiceFailureBehavior) bool {
 	}
 }
 
+func IsServiceReceiptPolicy(policy ServiceReceiptPolicy) bool {
+	switch policy {
+	case ServiceReceiptCommitted, ServiceReceiptCommittedAndProof:
+		return true
+	default:
+		return false
+	}
+}
+
 func CanonicalZoneDescriptor(d ZoneDescriptor) ZoneDescriptor {
 	d.MessageCapabilities = append([]string(nil), d.MessageCapabilities...)
 	d.ProofCapabilities = append([]string(nil), d.ProofCapabilities...)
@@ -461,6 +475,9 @@ func CanonicalServiceDescriptor(d ServiceDescriptor) ServiceDescriptor {
 	}
 	if d.Execution.FailureBehavior == "" {
 		d.Execution.FailureBehavior = ServiceFailureRevert
+	}
+	if d.Execution.ReceiptPolicy == "" {
+		d.Execution.ReceiptPolicy = ServiceReceiptCommitted
 	}
 	d.Interface = CanonicalServiceInterfaceDescriptor(d.Interface)
 	return d
@@ -596,6 +613,9 @@ func (d ServiceExecutionDescriptor) Validate() error {
 	}
 	if !IsServiceFailureBehavior(d.FailureBehavior) {
 		return fmt.Errorf("unknown aethercore service execution failure behavior %q", d.FailureBehavior)
+	}
+	if !IsServiceReceiptPolicy(d.ReceiptPolicy) {
+		return fmt.Errorf("unknown aethercore service receipt policy %q", d.ReceiptPolicy)
 	}
 	switch d.Location {
 	case ServiceLocationModule:
@@ -874,6 +894,7 @@ func ComputeServiceDescriptorHash(d ServiceDescriptor) string {
 		d.Execution.ProviderPoolID,
 		string(d.Execution.Mode),
 		fmt.Sprint(d.Execution.Deterministic),
+		string(d.Execution.ReceiptPolicy),
 		string(d.Execution.FailureBehavior),
 		fmt.Sprint(d.Execution.ResultExpiry),
 		fmt.Sprint(d.Execution.ChallengeWindow),
