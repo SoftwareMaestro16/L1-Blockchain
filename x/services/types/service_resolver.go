@@ -648,13 +648,8 @@ func canonicalResolverSourceRecord(record ServiceResolverSourceRecord) ServiceRe
 }
 
 func sortResolverCandidates(candidates []ServiceResolverSourceRecord) {
-	priority := map[ServiceResolutionSource]int{
-		ServiceResolutionOnChainRegistry: 0,
-		ServiceResolutionIdentityRecord:  1,
-		ServiceResolutionSignedCache:     2,
-		ServiceResolutionOffChainIndex:   3,
-		ServiceResolutionDistributedMesh: 4,
-	}
+	policy, _ := NewServiceResolverFallbackPolicy(nil)
+	priority := serviceResolverFallbackRank(policy)
 	sort.SliceStable(candidates, func(i, j int) bool {
 		if priority[candidates[i].Source] != priority[candidates[j].Source] {
 			return priority[candidates[i].Source] < priority[candidates[j].Source]
