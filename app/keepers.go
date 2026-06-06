@@ -74,6 +74,8 @@ import (
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
 	storagerentkeeper "github.com/sovereign-l1/l1/x/storage-rent/keeper"
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
+	systemregistrykeeper "github.com/sovereign-l1/l1/x/system-registry/keeper"
+	systemregistrytypes "github.com/sovereign-l1/l1/x/system-registry/types"
 	tokenfactorykeeper "github.com/sovereign-l1/l1/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 	zoneskeeper "github.com/sovereign-l1/l1/x/zones/keeper"
@@ -232,8 +234,9 @@ func (app *L1App) initKeepers(
 	epochsKeeper := epochskeeper.NewKeeper(runtime.NewKVStoreService(keys[epochstypes.StoreKey]), appCodec)
 	app.EpochsKeeper = &epochsKeeper
 	app.EpochsKeeper.SetHooks(epochstypes.NewMultiEpochHooks())
-	app.ConfigKeeper = configkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configtypes.StoreKey]))
 	app.ConstitutionKeeper = constitutionkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[constitutiontypes.StoreKey]))
+	app.SystemRegistryKeeper = systemregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[systemregistrytypes.StoreKey]))
+	app.ConfigKeeper = configkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configtypes.StoreKey]))
 
 	app.TokenFactoryKeeper = tokenfactorykeeper.NewKeeper(
 		appCodec,

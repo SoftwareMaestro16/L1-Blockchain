@@ -35,6 +35,7 @@ import (
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
+	systemregistrytypes "github.com/sovereign-l1/l1/x/system-registry/types"
 	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
@@ -62,8 +63,9 @@ var aetherCorePrototypeModules = []string{
 }
 
 var aetherCoreSystemModules = []string{
-	configtypes.ModuleName,
 	constitutiontypes.ModuleName,
+	systemregistrytypes.ModuleName,
+	configtypes.ModuleName,
 }
 
 func AetherCoreRoutingExecutionPoint() RoutingExecutionPoint {
@@ -96,8 +98,9 @@ func AetherCoreSystemModuleNames() []string {
 
 func AetherCoreSystemStoreKeys() []string {
 	return []string{
-		configtypes.StoreKey,
 		constitutiontypes.StoreKey,
+		systemregistrytypes.StoreKey,
+		configtypes.StoreKey,
 	}
 }
 
@@ -116,8 +119,9 @@ func aetherCoreBeginBlockerOrder() []string {
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 		epochstypes.ModuleName,
-		configtypes.ModuleName,
 		constitutiontypes.ModuleName,
+		systemregistrytypes.ModuleName,
+		configtypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,
 		routingtypes.ModuleName,
@@ -140,8 +144,9 @@ func aetherCoreEndBlockerOrder() []string {
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,
 		protocolpooltypes.ModuleName,
-		configtypes.ModuleName,
 		constitutiontypes.ModuleName,
+		systemregistrytypes.ModuleName,
+		configtypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,
 		routingtypes.ModuleName,
@@ -175,6 +180,7 @@ func aetherCoreInitGenesisOrder() []string {
 		epochstypes.ModuleName,
 		protocolpooltypes.ModuleName,
 		constitutiontypes.ModuleName,
+		systemregistrytypes.ModuleName,
 		configtypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,
@@ -212,6 +218,7 @@ func aetherCoreExportGenesisOrder() []string {
 		vestingtypes.ModuleName,
 		epochstypes.ModuleName,
 		constitutiontypes.ModuleName,
+		systemregistrytypes.ModuleName,
 		configtypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,

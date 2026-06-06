@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package l1.systemregistry.v1;
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/systemregistry/v1;systemregistryv1";
+
+message Params {
+  string authority = 1;
+  uint32 max_entities = 2;
+  uint32 max_capabilities = 3;
+  uint32 max_dependencies = 4;
+  uint32 max_module_name_bytes = 5;
+  uint32 max_capability_bytes = 6;
+  uint32 max_dependency_edges = 7;
+  repeated string required_modules = 8;
+}
+
+message SystemEntity {
+  string module_name = 1;
+  string module_account_address = 2;
+  string authority_address = 3;
+  string status = 4;
+  repeated string capabilities = 5;
+  uint64 version = 6;
+  repeated string dependencies = 7;
+  bool required = 8;
+  bool privileged_calls_allowed_while_paused = 9;
+}
+
+message State {
+  repeated SystemEntity entities = 1;
+}
+
+message GenesisState {
+  uint64 version = 1;
+  Params params = 2;
+  State state = 3;
+}

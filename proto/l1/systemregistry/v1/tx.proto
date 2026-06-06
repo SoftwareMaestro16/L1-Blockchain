@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package l1.systemregistry.v1;
+
+import "l1/systemregistry/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/systemregistry/v1;systemregistryv1";
+
+service Msg {
+  rpc RegisterSystemEntity(MsgRegisterSystemEntity) returns (MsgRegisterSystemEntityResponse);
+  rpc UpdateSystemEntity(MsgUpdateSystemEntity) returns (MsgUpdateSystemEntityResponse);
+  rpc PauseSystemEntity(MsgPauseSystemEntity) returns (MsgPauseSystemEntityResponse);
+  rpc ResumeSystemEntity(MsgResumeSystemEntity) returns (MsgResumeSystemEntityResponse);
+  rpc DeprecateSystemEntity(MsgDeprecateSystemEntity) returns (MsgDeprecateSystemEntityResponse);
+}
+
+message MsgRegisterSystemEntity {
+  string authority = 1;
+  SystemEntity entity = 2;
+}
+
+message MsgRegisterSystemEntityResponse {
+  SystemEntity entity = 1;
+}
+
+message MsgUpdateSystemEntity {
+  string authority = 1;
+  SystemEntity entity = 2;
+}
+
+message MsgUpdateSystemEntityResponse {
+  SystemEntity entity = 1;
+}
+
+message MsgPauseSystemEntity {
+  string authority = 1;
+  string module_name = 2;
+  uint64 height = 3;
+  bool allow_privileged_calls_while_paused = 4;
+}
+
+message MsgPauseSystemEntityResponse {
+  SystemEntity entity = 1;
+}
+
+message MsgResumeSystemEntity {
+  string authority = 1;
+  string module_name = 2;
+  uint64 height = 3;
+}
+
+message MsgResumeSystemEntityResponse {
+  SystemEntity entity = 1;
+}
+
+message MsgDeprecateSystemEntity {
+  string authority = 1;
+  string module_name = 2;
+  uint64 height = 3;
+}
+
+message MsgDeprecateSystemEntityResponse {
+  SystemEntity entity = 1;
+}
