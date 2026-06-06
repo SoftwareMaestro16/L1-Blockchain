@@ -389,6 +389,138 @@ func TestConditionalPromiseObjectSignatureReserveAndReplayRules(t *testing.T) {
 	require.ErrorContains(t, wrongSigner.ValidateForChannel(channel), "signer must be source")
 }
 
+func TestHashLockedPreimageRevealResolvesLinkedPromisesAndTracksPreimage(t *testing.T) {
+	alice := testAddress(0x24)
+	bob := testAddress(0x25)
+	channel := signedChannel(t, "promise-reveal", "1000", alice, bob)
+	reserveState := signedReserveState(t, channel, 2, channel.OpeningStateHash, "80", "0", []Balance{
+		{Participant: alice, Amount: "900"},
+		{Participant: bob, Amount: "20"},
+	})
+	require.NoError(t, channel.Validate())
+
+	preimage := "shared-secret"
+	hashLock := HashParts(preimage)
+	first := signedPromiseWithHashLock(t, channel, "reveal-a", alice, bob, "20", "1", 7, 40, hashLock)
+	second := signedPromiseWithHashLock(t, channel, "reveal-b", alice, bob, "10", "1", 8, 40, hashLock)
+
+	state := EmptyState()
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+	state, err = AcceptSignedState(state, channel.ChannelID, reserveState, 20)
+	require.NoError(t, err)
+	freshState := state.Clone()
+
+	state, resolutions, err := RevealPromisePreimage(state, PreimageRevealRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []ConditionalPromise{first, second},
+		Preimage:      preimage,
+		Revealer:      bob,
+		CurrentHeight: 30,
+	})
+	require.NoError(t, err)
+	require.Len(t, resolutions, 2)
+	require.Equal(t, bob, resolutions[0].Recipient)
+	require.Equal(t, first.PromiseID, resolutions[0].ConditionID)
+	require.Len(t, state.ConditionClaims, 2)
+	require.Equal(t, hashLock, state.ConditionClaims[0].PreimageHash)
+	require.Equal(t, hashLock, state.ConditionClaims[1].PreimageHash)
+
+	_, _, err = RevealPromisePreimage(state, PreimageRevealRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []ConditionalPromise{first},
+		Preimage:      preimage,
+		Revealer:      bob,
+		CurrentHeight: 31,
+	})
+	require.ErrorContains(t, err, "already been settled")
+
+	_, _, err = RevealPromisePreimage(freshState.Clone(), PreimageRevealRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []ConditionalPromise{first},
+		Preimage:      "wrong-secret",
+		Revealer:      bob,
+		CurrentHeight: 30,
+	})
+	require.ErrorContains(t, err, "does not satisfy hash lock")
+
+	_, _, err = RevealPromisePreimage(freshState.Clone(), PreimageRevealRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []ConditionalPromise{first},
+		Preimage:      preimage,
+		Revealer:      bob,
+		CurrentHeight: 41,
+	})
+	require.ErrorContains(t, err, "timed out")
+}
+
+func TestTimeoutOrderingAndExpiryResolutionReleaseConditionRoot(t *testing.T) {
+	alice := testAddress(0x26)
+	bob := testAddress(0x27)
+	channel := signedChannel(t, "promise-expiry", "1000", alice, bob)
+	base := signedReserveState(t, channel, 2, channel.OpeningStateHash, "80", "0", []Balance{
+		{Participant: alice, Amount: "900"},
+		{Participant: bob, Amount: "20"},
+	})
+	promiseChannel := channel
+	promiseChannel.LatestState = base
+	hashLock := HashParts("race-preimage")
+	downstreamID := HashParts("promise", channel.ChannelID, "downstream")
+	upstreamID := HashParts("promise", channel.ChannelID, "upstream")
+	downstream := signedLinkedPromise(t, promiseChannel, downstreamID, alice, bob, "20", "1", 9, 40, hashLock, "", upstreamID)
+	upstream := signedLinkedPromise(t, promiseChannel, upstreamID, alice, bob, "15", "1", 10, 70, hashLock, downstreamID, "")
+
+	require.NoError(t, ValidatePromiseTimeoutOrdering(promiseChannel, upstream, downstream, DefaultTimeoutMargin))
+	require.NoError(t, ValidatePromiseTimeoutChain(promiseChannel, []ConditionalPromise{downstream, upstream}, DefaultTimeoutMargin))
+	require.ErrorContains(t, ValidatePromiseTimeoutOrdering(promiseChannel, upstream, downstream, 4), "margin")
+	badUpstream := signedLinkedPromise(t, promiseChannel, HashParts("promise", channel.ChannelID, "bad-upstream"), alice, bob, "15", "1", 11, 50, hashLock, downstreamID, "")
+	require.ErrorContains(t, ValidatePromiseTimeoutOrdering(promiseChannel, badUpstream, downstream, DefaultTimeoutMargin), "downstream timeout")
+
+	state := EmptyState()
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	conditioned, rootUpdate, err := BuildConditionRootUpdateFromPromises(promiseChannel, base, []ConditionalPromise{downstream, upstream}, nil)
+	require.NoError(t, err)
+	require.Equal(t, uint32(2), rootUpdate.ConditionCount)
+	conditioned = resignState(t, channel, conditioned)
+	state, err = AcceptSignedState(state, channel.ChannelID, conditioned, 20)
+	require.NoError(t, err)
+
+	_, _, _, err = ExpireConditionalPromises(state, PromiseExpiryRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []ConditionalPromise{downstream},
+		Resolver:      alice,
+		CurrentHeight: downstream.TimeoutHeight,
+	})
+	require.ErrorContains(t, err, "has not expired")
+
+	state, resolutions, expiryUpdate, err := ExpireConditionalPromises(state, PromiseExpiryRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []ConditionalPromise{downstream},
+		Resolver:      alice,
+		CurrentHeight: downstream.TimeoutHeight + 1,
+	})
+	require.NoError(t, err)
+	require.Len(t, resolutions, 1)
+	require.True(t, resolutions[0].Expired)
+	require.Equal(t, alice, resolutions[0].Recipient)
+	require.Len(t, state.ConditionClaims, 1)
+	require.Equal(t, uint32(1), expiryUpdate.ConditionCount)
+	require.NotEqual(t, rootUpdate.ConditionRoot, expiryUpdate.ConditionRoot)
+
+	_, _, err = RevealPromisePreimage(state, PreimageRevealRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []ConditionalPromise{downstream},
+		Preimage:      "race-preimage",
+		Revealer:      bob,
+		CurrentHeight: downstream.TimeoutHeight + 1,
+	})
+	require.ErrorContains(t, err, "timed out")
+}
+
 func TestDisputeRequestEmitsEventAndAppliesOptionalFraudProof(t *testing.T) {
 	alice := testAddress(0x14)
 	bob := testAddress(0x15)
@@ -1754,6 +1886,14 @@ func signedChannel(t *testing.T, salt, collateral, left, right string) ChannelRe
 	return channel.Normalize()
 }
 
+func EmptyStateWithChannel(t *testing.T, channel ChannelRecord) PaymentsState {
+	t.Helper()
+
+	state, err := OpenChannel(EmptyState(), channel)
+	require.NoError(t, err)
+	return state
+}
+
 func signedState(t *testing.T, channel ChannelRecord, nonce uint64, previous string, balances []Balance) ChannelState {
 	t.Helper()
 
@@ -1815,18 +1955,32 @@ func signedReserveState(t *testing.T, channel ChannelRecord, nonce uint64, previ
 func signedPromise(t *testing.T, channel ChannelRecord, salt, source, destination, amount, fee string, nonce, timeoutHeight uint64) ConditionalPromise {
 	t.Helper()
 
+	return signedLinkedPromise(t, channel, HashParts("promise", channel.ChannelID, salt), source, destination, amount, fee, nonce, timeoutHeight, HashParts("promise-preimage", salt), "", "")
+}
+
+func signedPromiseWithHashLock(t *testing.T, channel ChannelRecord, salt, source, destination, amount, fee string, nonce, timeoutHeight uint64, hashLock string) ConditionalPromise {
+	t.Helper()
+
+	return signedLinkedPromise(t, channel, HashParts("promise", channel.ChannelID, salt), source, destination, amount, fee, nonce, timeoutHeight, hashLock, "", "")
+}
+
+func signedLinkedPromise(t *testing.T, channel ChannelRecord, promiseID, source, destination, amount, fee string, nonce, timeoutHeight uint64, hashLock, previousID, nextID string) ConditionalPromise {
+	t.Helper()
+
 	promise, err := BuildConditionalPromise(ConditionalPromise{
-		PromiseID:        HashParts("promise", channel.ChannelID, salt),
-		ChannelID:        channel.ChannelID,
-		Source:           source,
-		Destination:      destination,
-		Amount:           amount,
-		Fee:              fee,
-		HashLock:         HashParts("promise-preimage", salt),
-		TimeoutHeight:    timeoutHeight,
-		TimeoutTimestamp: int64(timeoutHeight * 10),
-		ConditionType:    ConditionTypeHashLock,
-		Nonce:            nonce,
+		PromiseID:                 promiseID,
+		ChannelID:                 channel.ChannelID,
+		Source:                    source,
+		Destination:               destination,
+		Amount:                    amount,
+		Fee:                       fee,
+		HashLock:                  hashLock,
+		TimeoutHeight:             timeoutHeight,
+		TimeoutTimestamp:          int64(timeoutHeight * 10),
+		ConditionType:             ConditionTypeHashLock,
+		PreviousPromiseIDOptional: previousID,
+		NextPromiseIDOptional:     nextID,
+		Nonce:                     nonce,
 	})
 	require.NoError(t, err)
 	promise.Signature, err = SignatureForPromise(channel, promise, source)

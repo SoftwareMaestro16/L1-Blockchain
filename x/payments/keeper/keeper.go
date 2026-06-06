@@ -168,6 +168,30 @@ func (k *Keeper) RegisterUpdateCheckpoint(req paymentstypes.ChannelUpdateRequest
 	return result, nil
 }
 
+func (k *Keeper) RevealPromisePreimage(req paymentstypes.PreimageRevealRequest) ([]paymentstypes.ConditionResolution, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return nil, err
+	}
+	next, resolutions, err := paymentstypes.RevealPromisePreimage(k.genesis.State, req)
+	if err != nil {
+		return nil, err
+	}
+	k.genesis.State = next
+	return resolutions, nil
+}
+
+func (k *Keeper) ExpireConditionalPromises(req paymentstypes.PromiseExpiryRequest) ([]paymentstypes.ConditionResolution, paymentstypes.ConditionRootUpdate, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return nil, paymentstypes.ConditionRootUpdate{}, err
+	}
+	next, resolutions, update, err := paymentstypes.ExpireConditionalPromises(k.genesis.State, req)
+	if err != nil {
+		return nil, paymentstypes.ConditionRootUpdate{}, err
+	}
+	k.genesis.State = next
+	return resolutions, update, nil
+}
+
 func (k *Keeper) SubmitClose(channelID string, closingState paymentstypes.ChannelState, submitter string, currentHeight uint64, settlementFee string) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err

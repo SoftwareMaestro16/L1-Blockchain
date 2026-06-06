@@ -36,6 +36,7 @@ const (
 	MaxTokenLength           = 128
 	MaxSettlementFeeFraction = int64(10_000)
 	MaxPenaltyRouteBps       = uint32(10_000)
+	DefaultTimeoutMargin     = uint64(16)
 	DefaultReplayHorizon     = uint64(100_000)
 	SignerIsolationProcess   = "process"
 	SignerIsolationHardware  = "hardware"
@@ -390,8 +391,32 @@ type ConditionClaimRecord struct {
 	ChannelID      string
 	ConditionID    string
 	EvidenceHash   string
+	PreimageHash   string
 	ResolvedHeight uint64
 	ExpiresHeight  uint64
+}
+
+type PreimageRevealRequest struct {
+	ChannelID     string
+	Promises      []ConditionalPromise
+	Preimage      string
+	Revealer      string
+	CurrentHeight uint64
+}
+
+type PromiseExpiryRequest struct {
+	ChannelID     string
+	Promises      []ConditionalPromise
+	Resolver      string
+	CurrentHeight uint64
+}
+
+type ConditionRootUpdate struct {
+	ChannelID      string
+	Nonce          uint64
+	ConditionRoot  string
+	ConditionCount uint32
+	Conditions     []ConditionalPayment
 }
 
 type ChannelDisputeRequest struct {
@@ -1907,6 +1932,7 @@ func (r ConditionClaimRecord) Normalize() ConditionClaimRecord {
 	r.ChannelID = normalizeHash(r.ChannelID)
 	r.ConditionID = normalizeHash(r.ConditionID)
 	r.EvidenceHash = normalizeHash(r.EvidenceHash)
+	r.PreimageHash = normalizeOptionalHash(r.PreimageHash)
 	return r
 }
 
@@ -1924,11 +1950,120 @@ func (r ConditionClaimRecord) Validate() error {
 	if err := ValidateHash("payments condition claim evidence hash", r.EvidenceHash); err != nil {
 		return err
 	}
+	if r.PreimageHash != "" {
+		if err := ValidateHash("payments condition claim preimage hash", r.PreimageHash); err != nil {
+			return err
+		}
+	}
 	if r.ResolvedHeight == 0 {
 		return errors.New("payments condition claim resolved height must be positive")
 	}
 	if r.ExpiresHeight <= r.ResolvedHeight {
 		return errors.New("payments condition claim replay horizon must exceed resolution height")
+	}
+	return nil
+}
+
+func (r PreimageRevealRequest) Normalize() PreimageRevealRequest {
+	r.ChannelID = normalizeHash(r.ChannelID)
+	r.Promises = normalizeConditionalPromises(r.Promises)
+	r.Preimage = strings.TrimSpace(r.Preimage)
+	r.Revealer = strings.TrimSpace(r.Revealer)
+	return r
+}
+
+func (r PreimageRevealRequest) ValidateForChannel(channel ChannelRecord, settledClaims []ConditionClaimRecord) error {
+	req := r.Normalize()
+	channel = channel.Normalize()
+	if req.ChannelID != channel.ChannelID {
+		return errors.New("payments preimage reveal channel mismatch")
+	}
+	if err := addressing.ValidateUserAddress("payments preimage revealer", req.Revealer); err != nil {
+		return err
+	}
+	if !containsString(channel.Participants, req.Revealer) {
+		return errors.New("payments preimage revealer must be channel participant")
+	}
+	if req.CurrentHeight == 0 {
+		return errors.New("payments preimage reveal height must be positive")
+	}
+	if req.Preimage == "" {
+		return errors.New("payments preimage reveal preimage is required")
+	}
+	if len(req.Promises) == 0 {
+		return errors.New("payments preimage reveal requires promises")
+	}
+	var hashLock string
+	seen := make(map[string]struct{}, len(req.Promises))
+	for _, promise := range req.Promises {
+		if err := promise.ValidateForChannel(channel); err != nil {
+			return err
+		}
+		if _, found := seen[promise.PromiseID]; found {
+			return errors.New("payments duplicate promise id")
+		}
+		seen[promise.PromiseID] = struct{}{}
+		if promise.ConditionType != ConditionTypeHashLock {
+			return errors.New("payments preimage reveal requires hash-lock promises")
+		}
+		if req.CurrentHeight > promise.TimeoutHeight {
+			return errors.New("payments preimage reveal promise has timed out")
+		}
+		if err := VerifyPromisePreimage(promise, req.Preimage); err != nil {
+			return err
+		}
+		if promiseWasSettled(channel, promise.PromiseID, settledClaims) {
+			return errors.New("payments promise has already been settled")
+		}
+		if hashLock == "" {
+			hashLock = promise.HashLock
+		} else if promise.HashLock != hashLock {
+			return errors.New("payments linked promises must use compatible hash locks")
+		}
+	}
+	return nil
+}
+
+func (r PromiseExpiryRequest) Normalize() PromiseExpiryRequest {
+	r.ChannelID = normalizeHash(r.ChannelID)
+	r.Promises = normalizeConditionalPromises(r.Promises)
+	r.Resolver = strings.TrimSpace(r.Resolver)
+	return r
+}
+
+func (r PromiseExpiryRequest) ValidateForChannel(channel ChannelRecord, settledClaims []ConditionClaimRecord) error {
+	req := r.Normalize()
+	channel = channel.Normalize()
+	if req.ChannelID != channel.ChannelID {
+		return errors.New("payments promise expiry channel mismatch")
+	}
+	if err := addressing.ValidateUserAddress("payments promise expiry resolver", req.Resolver); err != nil {
+		return err
+	}
+	if !containsString(channel.Participants, req.Resolver) {
+		return errors.New("payments promise expiry resolver must be channel participant")
+	}
+	if req.CurrentHeight == 0 {
+		return errors.New("payments promise expiry height must be positive")
+	}
+	if len(req.Promises) == 0 {
+		return errors.New("payments promise expiry requires promises")
+	}
+	seen := make(map[string]struct{}, len(req.Promises))
+	for _, promise := range req.Promises {
+		if err := promise.ValidateForChannel(channel); err != nil {
+			return err
+		}
+		if _, found := seen[promise.PromiseID]; found {
+			return errors.New("payments duplicate promise id")
+		}
+		seen[promise.PromiseID] = struct{}{}
+		if req.CurrentHeight <= promise.TimeoutHeight {
+			return errors.New("payments promise has not expired")
+		}
+		if promiseWasSettled(channel, promise.PromiseID, settledClaims) {
+			return errors.New("payments promise has already been settled")
+		}
 	}
 	return nil
 }
@@ -4161,6 +4296,134 @@ func ValidateConditionalPromisesForChannel(channel ChannelRecord, promises []Con
 		}
 	}
 	return nil
+}
+
+func VerifyPromisePreimage(promise ConditionalPromise, preimage string) error {
+	promise = promise.Normalize()
+	preimage = strings.TrimSpace(preimage)
+	if promise.ConditionType != ConditionTypeHashLock {
+		return errors.New("payments preimage verification requires hash-lock promise")
+	}
+	if preimage == "" {
+		return errors.New("payments preimage is required")
+	}
+	if HashParts(preimage) != promise.HashLock {
+		return errors.New("payments preimage does not satisfy hash lock")
+	}
+	return nil
+}
+
+func ValidatePromiseTimeoutOrdering(channel ChannelRecord, upstream, downstream ConditionalPromise, margin uint64) error {
+	channel = channel.Normalize()
+	upstream = upstream.Normalize()
+	downstream = downstream.Normalize()
+	if margin == 0 {
+		margin = DefaultTimeoutMargin
+	}
+	minMargin := channel.CloseDelay + channel.DisputePeriod
+	if margin < minMargin {
+		return errors.New("payments timeout margin must cover dispute and settlement latency")
+	}
+	if upstream.ChannelID != channel.ChannelID || downstream.ChannelID != channel.ChannelID {
+		return errors.New("payments timeout ordering channel mismatch")
+	}
+	if upstream.HashLock != downstream.HashLock {
+		return errors.New("payments timeout ordering requires compatible hash locks")
+	}
+	if downstream.TimeoutHeight+margin < downstream.TimeoutHeight || downstream.TimeoutHeight+margin > upstream.TimeoutHeight {
+		return errors.New("payments downstream timeout must expire before upstream by margin")
+	}
+	if upstream.PreviousPromiseIDOptional != "" && upstream.PreviousPromiseIDOptional != downstream.PromiseID {
+		return errors.New("payments upstream previous promise link mismatch")
+	}
+	if downstream.NextPromiseIDOptional != "" && downstream.NextPromiseIDOptional != upstream.PromiseID {
+		return errors.New("payments downstream next promise link mismatch")
+	}
+	return nil
+}
+
+func ValidatePromiseTimeoutChain(channel ChannelRecord, promises []ConditionalPromise, margin uint64) error {
+	byID := make(map[string]ConditionalPromise, len(promises))
+	for _, promise := range normalizeConditionalPromises(promises) {
+		byID[promise.PromiseID] = promise
+	}
+	for _, downstream := range byID {
+		if downstream.NextPromiseIDOptional == "" {
+			continue
+		}
+		upstream, found := byID[downstream.NextPromiseIDOptional]
+		if !found {
+			return errors.New("payments timeout chain references unknown upstream promise")
+		}
+		if err := ValidatePromiseTimeoutOrdering(channel, upstream, downstream, margin); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func BuildConditionRootUpdateFromPromises(channel ChannelRecord, base ChannelState, promises []ConditionalPromise, settledClaims []ConditionClaimRecord) (ChannelState, ConditionRootUpdate, error) {
+	channel = channel.Normalize()
+	base = base.Normalize()
+	if err := base.ValidateForChannel(channel, false); err != nil {
+		return ChannelState{}, ConditionRootUpdate{}, err
+	}
+	if err := ValidateConditionalPromisesForChannel(channel, promises, settledClaims); err != nil {
+		return ChannelState{}, ConditionRootUpdate{}, err
+	}
+	conditions := make([]ConditionalPayment, 0, len(promises))
+	for _, promise := range normalizeConditionalPromises(promises) {
+		conditions = append(conditions, promise.ToConditionalPayment())
+	}
+	if err := validateConditions(conditions); err != nil {
+		return ChannelState{}, ConditionRootUpdate{}, err
+	}
+	next := base
+	next.Conditions = conditions
+	next.ConditionRoot = ComputeConditionsRoot(conditions)
+	next.PendingConditionsRoot = next.ConditionRoot
+	next.ConditionCount = uint32(len(conditions))
+	next.SignaturePreimageHash = ComputeStateSignaturePreimageHash(next)
+	next.StateHash = ComputeStateHash(next)
+	return next.Normalize(), ConditionRootUpdate{
+		ChannelID:      channel.ChannelID,
+		Nonce:          next.Nonce,
+		ConditionRoot:  next.ConditionRoot,
+		ConditionCount: next.ConditionCount,
+		Conditions:     next.Conditions,
+	}, nil
+}
+
+func BuildConditionRootAfterExpiry(base ChannelState, expired []ConditionalPromise) (ChannelState, ConditionRootUpdate, error) {
+	base = base.Normalize()
+	expiredByID := make(map[string]struct{}, len(expired))
+	for _, promise := range normalizeConditionalPromises(expired) {
+		expiredByID[promise.PromiseID] = struct{}{}
+	}
+	conditions := make([]ConditionalPayment, 0, len(base.Conditions))
+	for _, condition := range normalizeConditions(base.Conditions) {
+		if _, found := expiredByID[condition.ConditionID]; found {
+			continue
+		}
+		conditions = append(conditions, condition)
+	}
+	if len(conditions) == len(base.Conditions) {
+		return ChannelState{}, ConditionRootUpdate{}, errors.New("payments expiry did not remove any condition")
+	}
+	next := base
+	next.Conditions = conditions
+	next.ConditionRoot = ComputeConditionsRoot(conditions)
+	next.PendingConditionsRoot = next.ConditionRoot
+	next.ConditionCount = uint32(len(conditions))
+	next.SignaturePreimageHash = ComputeStateSignaturePreimageHash(next)
+	next.StateHash = ComputeStateHash(next)
+	return next.Normalize(), ConditionRootUpdate{
+		ChannelID:      next.ChannelID,
+		Nonce:          next.Nonce,
+		ConditionRoot:  next.ConditionRoot,
+		ConditionCount: next.ConditionCount,
+		Conditions:     next.Conditions,
+	}, nil
 }
 
 func validatePromiseTimeoutWindow(channel ChannelRecord, promise ConditionalPromise) error {

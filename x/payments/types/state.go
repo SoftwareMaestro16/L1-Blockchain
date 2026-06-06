@@ -256,6 +256,84 @@ func RegisterUpdateCheckpoint(state PaymentsState, req ChannelUpdateRequest) (Pa
 	return next, result, nil
 }
 
+func RevealPromisePreimage(state PaymentsState, req PreimageRevealRequest) (PaymentsState, []ConditionResolution, error) {
+	state = state.Export()
+	req = req.Normalize()
+	channel, found := state.ChannelByID(req.ChannelID)
+	if !found {
+		return PaymentsState{}, nil, errors.New("payments channel not found")
+	}
+	if err := req.ValidateForChannel(channel, state.ConditionClaims); err != nil {
+		return PaymentsState{}, nil, err
+	}
+	preimageHash := HashParts(req.Preimage)
+	resolutions := make([]ConditionResolution, 0, len(req.Promises))
+	next := state.Clone()
+	for _, promise := range normalizeConditionalPromises(req.Promises) {
+		evidenceHash := HashParts("promise-preimage", promise.PromiseID, preimageHash)
+		resolution := ConditionResolution{
+			ConditionID:  promise.PromiseID,
+			Resolver:     req.Revealer,
+			Recipient:    promise.Destination,
+			Amount:       promise.Amount,
+			Expired:      false,
+			EvidenceHash: evidenceHash,
+		}.Normalize()
+		resolutions = append(resolutions, resolution)
+		next.ConditionClaims = append(next.ConditionClaims, ConditionClaimRecord{
+			ChainID:        channel.ChainID,
+			ChannelID:      channel.ChannelID,
+			ConditionID:    promise.PromiseID,
+			EvidenceHash:   evidenceHash,
+			PreimageHash:   preimageHash,
+			ResolvedHeight: req.CurrentHeight,
+			ExpiresHeight:  req.CurrentHeight + DefaultReplayHorizon,
+		}.Normalize())
+	}
+	sortConditionClaimRecords(next.ConditionClaims)
+	return next, normalizeConditionResolutions(resolutions), next.Validate()
+}
+
+func ExpireConditionalPromises(state PaymentsState, req PromiseExpiryRequest) (PaymentsState, []ConditionResolution, ConditionRootUpdate, error) {
+	state = state.Export()
+	req = req.Normalize()
+	channel, found := state.ChannelByID(req.ChannelID)
+	if !found {
+		return PaymentsState{}, nil, ConditionRootUpdate{}, errors.New("payments channel not found")
+	}
+	if err := req.ValidateForChannel(channel, state.ConditionClaims); err != nil {
+		return PaymentsState{}, nil, ConditionRootUpdate{}, err
+	}
+	_, update, err := BuildConditionRootAfterExpiry(channel.LatestState, req.Promises)
+	if err != nil {
+		return PaymentsState{}, nil, ConditionRootUpdate{}, err
+	}
+	resolutions := make([]ConditionResolution, 0, len(req.Promises))
+	next := state.Clone()
+	for _, promise := range normalizeConditionalPromises(req.Promises) {
+		evidenceHash := HashParts("promise-expiry", promise.PromiseID, fmt.Sprintf("%020d", req.CurrentHeight))
+		resolution := ConditionResolution{
+			ConditionID:  promise.PromiseID,
+			Resolver:     req.Resolver,
+			Recipient:    promise.Source,
+			Amount:       promise.Amount,
+			Expired:      true,
+			EvidenceHash: evidenceHash,
+		}.Normalize()
+		resolutions = append(resolutions, resolution)
+		next.ConditionClaims = append(next.ConditionClaims, ConditionClaimRecord{
+			ChainID:        channel.ChainID,
+			ChannelID:      channel.ChannelID,
+			ConditionID:    promise.PromiseID,
+			EvidenceHash:   evidenceHash,
+			ResolvedHeight: req.CurrentHeight,
+			ExpiresHeight:  req.CurrentHeight + DefaultReplayHorizon,
+		}.Normalize())
+	}
+	sortConditionClaimRecords(next.ConditionClaims)
+	return next, normalizeConditionResolutions(resolutions), update, next.Validate()
+}
+
 func SubmitClose(state PaymentsState, channelID string, closingState ChannelState, submitter string, currentHeight uint64, settlementFee string) (PaymentsState, error) {
 	return SubmitCloseWithRequest(state, ChannelCloseRequest{
 		ChannelID:     channelID,
