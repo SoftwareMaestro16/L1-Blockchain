@@ -45,6 +45,7 @@ import (
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
 	shardingcoordinatortypes "github.com/sovereign-l1/l1/x/sharding-coordinator/types"
+	singlenominatorpooltypes "github.com/sovereign-l1/l1/x/single-nominator-pool/types"
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
 	systemregistrytypes "github.com/sovereign-l1/l1/x/system-registry/types"
 	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
@@ -87,6 +88,7 @@ var aetherCoreSystemModules = []string{
 	nativeevidencetypes.ModuleName,
 	reportertypes.ModuleName,
 	nominatorpooltypes.ModuleName,
+	singlenominatorpooltypes.ModuleName,
 	validatorelectiontypes.ModuleName,
 	validatorregistrytypes.ModuleName,
 	configtypes.ModuleName,
@@ -132,6 +134,7 @@ func AetherCoreSystemStoreKeys() []string {
 		nativeevidencetypes.StoreKey,
 		reportertypes.StoreKey,
 		nominatorpooltypes.StoreKey,
+		singlenominatorpooltypes.StoreKey,
 		validatorelectiontypes.StoreKey,
 		validatorregistrytypes.StoreKey,
 		configtypes.StoreKey,
@@ -158,6 +161,7 @@ func aetherCoreBeginBlockerOrder() []string {
 		nativeevidencetypes.ModuleName,
 		reportertypes.ModuleName,
 		nominatorpooltypes.ModuleName,
+		singlenominatorpooltypes.ModuleName,
 		validatorelectiontypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
@@ -193,6 +197,7 @@ func aetherCoreEndBlockerOrder() []string {
 		nativeevidencetypes.ModuleName,
 		reportertypes.ModuleName,
 		nominatorpooltypes.ModuleName,
+		singlenominatorpooltypes.ModuleName,
 		validatorelectiontypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
@@ -238,6 +243,7 @@ func aetherCoreInitGenesisOrder() []string {
 		nativeevidencetypes.ModuleName,
 		reportertypes.ModuleName,
 		nominatorpooltypes.ModuleName,
+		singlenominatorpooltypes.ModuleName,
 		validatorelectiontypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
@@ -290,6 +296,7 @@ func aetherCoreExportGenesisOrder() []string {
 		nativeevidencetypes.ModuleName,
 		reportertypes.ModuleName,
 		nominatorpooltypes.ModuleName,
+		singlenominatorpooltypes.ModuleName,
 		validatorelectiontypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,

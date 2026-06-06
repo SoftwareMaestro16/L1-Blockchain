@@ -100,6 +100,8 @@ import (
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
 	shardingcoordinatorkeeper "github.com/sovereign-l1/l1/x/sharding-coordinator/keeper"
 	shardingcoordinatortypes "github.com/sovereign-l1/l1/x/sharding-coordinator/types"
+	singlenominatorpoolkeeper "github.com/sovereign-l1/l1/x/single-nominator-pool/keeper"
+	singlenominatorpooltypes "github.com/sovereign-l1/l1/x/single-nominator-pool/types"
 	storagerentkeeper "github.com/sovereign-l1/l1/x/storage-rent/keeper"
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
 	systemregistrykeeper "github.com/sovereign-l1/l1/x/system-registry/keeper"
@@ -218,6 +220,7 @@ type L1App struct {
 	NativeEvidenceKeeper      nativeevidencekeeper.Keeper
 	ReporterKeeper            reporterkeeper.Keeper
 	NominatorPoolKeeper       nominatorpoolkeeper.Keeper
+	SingleNominatorPoolKeeper singlenominatorpoolkeeper.Keeper
 	ValidatorElectionKeeper   validatorelectionkeeper.Keeper
 	ValidatorRegistryKeeper   validatorregistrykeeper.Keeper
 
@@ -324,6 +327,7 @@ func NewL1App(
 		nativeevidencetypes.StoreKey,
 		reportertypes.StoreKey,
 		nominatorpooltypes.StoreKey,
+		singlenominatorpooltypes.StoreKey,
 		validatorelectiontypes.StoreKey,
 		validatorregistrytypes.StoreKey,
 		configtypes.StoreKey,

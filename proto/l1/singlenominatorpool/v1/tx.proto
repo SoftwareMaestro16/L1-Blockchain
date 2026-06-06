@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package l1.singlenominatorpool.v1;
+
+import "l1/singlenominatorpool/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/singlenominatorpool/v1;singlenominatorpoolv1";
+
+service Msg {
+  rpc CreateSingleNominatorPool(MsgCreateSingleNominatorPool) returns (MsgCreateSingleNominatorPoolResponse);
+  rpc DepositSingleNominator(MsgDepositSingleNominator) returns (MsgDepositSingleNominatorResponse);
+  rpc WithdrawSingleNominator(MsgWithdrawSingleNominator) returns (MsgWithdrawSingleNominatorResponse);
+  rpc ClaimSingleNominatorRewards(MsgClaimSingleNominatorRewards) returns (MsgClaimSingleNominatorRewardsResponse);
+  rpc EmergencyLockSingleNominator(MsgEmergencyLockSingleNominator) returns (MsgEmergencyLockSingleNominatorResponse);
+  rpc ChangeSingleNominatorValidator(MsgChangeSingleNominatorValidator) returns (MsgChangeSingleNominatorValidatorResponse);
+}
+
+message MsgCreateSingleNominatorPool {
+  string authority = 1;
+  string pool_address = 2;
+  string owner = 3;
+  string validator = 4;
+  string validator_status = 5;
+  uint64 height = 6;
+}
+
+message MsgCreateSingleNominatorPoolResponse {
+  SingleNominatorPool pool = 1;
+}
+
+message MsgDepositSingleNominator {
+  string authority = 1;
+  string pool_address = 2;
+  string owner = 3;
+  uint64 amount = 4;
+  uint64 height = 5;
+}
+
+message MsgDepositSingleNominatorResponse {
+  SingleNominatorPool pool = 1;
+}
+
+message MsgWithdrawSingleNominator {
+  string authority = 1;
+  string pool_address = 2;
+  string owner = 3;
+  uint64 amount = 4;
+  uint64 height = 5;
+}
+
+message MsgWithdrawSingleNominatorResponse {
+  PendingWithdrawal withdrawal = 1;
+}
+
+message MsgClaimSingleNominatorRewards {
+  string authority = 1;
+  string pool_address = 2;
+  string owner = 3;
+  uint64 height = 4;
+}
+
+message MsgClaimSingleNominatorRewardsResponse {
+  uint64 reward_amount = 1;
+}
+
+message MsgEmergencyLockSingleNominator {
+  string authority = 1;
+  string pool_address = 2;
+  string owner = 3;
+  bool locked = 4;
+  uint64 height = 5;
+}
+
+message MsgEmergencyLockSingleNominatorResponse {
+  SingleNominatorPool pool = 1;
+}
+
+message MsgChangeSingleNominatorValidator {
+  string authority = 1;
+  string pool_address = 2;
+  string owner = 3;
+  string validator = 4;
+  string validator_status = 5;
+  uint64 height = 6;
+}
+
+message MsgChangeSingleNominatorValidatorResponse {
+  SingleNominatorPool pool = 1;
+}

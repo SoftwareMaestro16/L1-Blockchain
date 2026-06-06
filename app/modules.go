@@ -56,6 +56,7 @@ import (
 	routingmodule "github.com/sovereign-l1/l1/x/routing"
 	schedulermodule "github.com/sovereign-l1/l1/x/scheduler"
 	shardingcoordinatormodule "github.com/sovereign-l1/l1/x/sharding-coordinator"
+	singlenominatorpoolmodule "github.com/sovereign-l1/l1/x/single-nominator-pool"
 	storagerentmodule "github.com/sovereign-l1/l1/x/storage-rent"
 	systemregistrymodule "github.com/sovereign-l1/l1/x/system-registry"
 	tokenfactorymodule "github.com/sovereign-l1/l1/x/tokenfactory"
@@ -93,6 +94,7 @@ func (app *L1App) initModules(
 		nativeevidencemodule.NewAppModule(&app.NativeEvidenceKeeper),
 		reportermodule.NewAppModule(&app.ReporterKeeper),
 		nominatorpoolmodule.NewAppModule(&app.NominatorPoolKeeper),
+		singlenominatorpoolmodule.NewAppModule(&app.SingleNominatorPoolKeeper),
 		validatorelectionmodule.NewAppModule(&app.ValidatorElectionKeeper),
 		validatorregistrymodule.NewAppModule(&app.ValidatorRegistryKeeper),
 		configmodule.NewAppModule(&app.ConfigKeeper),

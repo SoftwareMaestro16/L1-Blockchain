@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package l1.singlenominatorpool.v1;
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/singlenominatorpool/v1;singlenominatorpoolv1";
+
+message Params {
+  string authority = 1;
+  uint32 max_pools = 2;
+  uint32 max_pool_id_bytes = 3;
+  uint64 unbonding_blocks = 4;
+}
+
+message PendingWithdrawal {
+  uint64 amount = 1;
+  uint64 request_height = 2;
+  uint64 complete_height = 3;
+  string status = 4;
+}
+
+message SingleNominatorPool {
+  string pool_address = 1;
+  string owner = 2;
+  string validator = 3;
+  uint64 bonded_stake = 4;
+  PendingWithdrawal pending_withdrawal = 5;
+  uint64 reward_balance = 6;
+  bool emergency_lock = 7;
+  string status = 8;
+}
+
+message State {
+  repeated SingleNominatorPool pools = 1;
+}
+
+message GenesisState {
+  uint64 version = 1;
+  Params params = 2;
+  State state = 3;
+}

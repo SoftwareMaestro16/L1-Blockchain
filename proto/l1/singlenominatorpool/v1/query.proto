@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package l1.singlenominatorpool.v1;
+
+import "l1/singlenominatorpool/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/singlenominatorpool/v1;singlenominatorpoolv1";
+
+service Query {
+  rpc SingleNominatorPool(QuerySingleNominatorPoolRequest) returns (QuerySingleNominatorPoolResponse);
+  rpc SingleNominatorPools(QuerySingleNominatorPoolsRequest) returns (QuerySingleNominatorPoolsResponse);
+  rpc SingleNominatorRewards(QuerySingleNominatorRewardsRequest) returns (QuerySingleNominatorRewardsResponse);
+}
+
+message QuerySingleNominatorPoolRequest {
+  string pool_address = 1;
+}
+
+message QuerySingleNominatorPoolResponse {
+  SingleNominatorPool pool = 1;
+}
+
+message QuerySingleNominatorPoolsRequest {}
+
+message QuerySingleNominatorPoolsResponse {
+  repeated SingleNominatorPool pools = 1;
+}
+
+message QuerySingleNominatorRewardsRequest {
+  string pool_address = 1;
+}
+
+message QuerySingleNominatorRewardsResponse {
+  uint64 reward_balance = 1;
+}
