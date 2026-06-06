@@ -90,26 +90,27 @@ type UniversalMessageCommitment struct {
 }
 
 type UniversalProofEnvelope struct {
-	ProofType        UniversalProofType
-	ProofVersion     uint64
-	ChainID          string
-	Height           uint64
-	AppHash          string
-	RootType         RootType
-	ZoneID           ZoneID
-	ShardID          ShardID
-	Key              []byte
-	Value            []byte
-	AbsenceMarker    []byte
-	StoreProof       UniversalStoreProof
-	ZoneCommitment   ZoneCommitment
-	HasZoneCommit    bool
-	ShardCommitment  UniversalShardCommitment
-	HasShardCommit   bool
-	MessageCommit    UniversalMessageCommitment
-	HasMessageCommit bool
-	VerificationPath []UniversalRootStep
-	ProofHash        string
+	ProofType          UniversalProofType
+	ProofVersion       uint64
+	ChainID            string
+	Height             uint64
+	AppHash            string
+	RootType           RootType
+	ZoneID             ZoneID
+	ShardID            ShardID
+	Key                []byte
+	Value              []byte
+	AbsenceMarker      []byte
+	ObjectExpiryHeight uint64
+	StoreProof         UniversalStoreProof
+	ZoneCommitment     ZoneCommitment
+	HasZoneCommit      bool
+	ShardCommitment    UniversalShardCommitment
+	HasShardCommit     bool
+	MessageCommit      UniversalMessageCommitment
+	HasMessageCommit   bool
+	VerificationPath   []UniversalRootStep
+	ProofHash          string
 }
 
 type UniversalProofVerificationResult struct {
@@ -565,6 +566,7 @@ func ComputeUniversalProofEnvelopeHash(proof UniversalProofEnvelope) string {
 		writeBytes(w, proof.Key)
 		writeBytes(w, proof.Value)
 		writeBytes(w, proof.AbsenceMarker)
+		writeUint64(w, proof.ObjectExpiryHeight)
 		writePart(w, proof.StoreProof.ProofHash)
 		writeBool(w, proof.HasZoneCommit)
 		if proof.HasZoneCommit {
@@ -706,6 +708,9 @@ func verifyUniversalObjectRules(proof UniversalProofEnvelope) error {
 	if proof.Height == 0 {
 		return errors.New("aethercore universal proof object height is unavailable")
 	}
+	if proof.ObjectExpiryHeight != 0 && proof.Height > proof.ObjectExpiryHeight {
+		return errors.New("aethercore universal proof object expired at proof height")
+	}
 	return nil
 }
 
@@ -721,6 +726,9 @@ func failureCodeForProofError(proof UniversalProofEnvelope, err error) Universal
 	}
 	if proof.ProofType == ProofTypeMessageInclusion {
 		return ProofFailureMessageNotIncluded
+	}
+	if proof.ObjectExpiryHeight != 0 && proof.Height > proof.ObjectExpiryHeight {
+		return ProofFailureObjectExpired
 	}
 	return ProofFailureRootMismatch
 }
