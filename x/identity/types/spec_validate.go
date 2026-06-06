@@ -20,7 +20,7 @@ func (s IdentityState) Validate() error {
 	if err := validateDomainCommits(s.Commits); err != nil {
 		return err
 	}
-	if err := validateResolvers(s.Resolvers); err != nil {
+	if err := validateResolvers(s.Resolvers, s.Domains); err != nil {
 		return err
 	}
 	if err := validateReverseRecords(s.ReverseRecords); err != nil {
@@ -167,11 +167,18 @@ func validateDomainCommit(commit DomainCommit) error {
 	return nil
 }
 
-func validateResolvers(records []ResolverRecord) error {
+func validateResolvers(records []ResolverRecord, domains []Domain) error {
 	seen := make(map[string]struct{}, len(records))
 	for i, record := range records {
 		if err := ValidateResolverRecord(record); err != nil {
 			return err
+		}
+		authority, found := findResolverAuthorityDomain(IdentityState{Domains: domains}, record.Domain)
+		if !found {
+			return errors.New("identity resolver authority domain not found")
+		}
+		if !bytes.Equal(record.Owner, authority.Owner) {
+			return errors.New("identity resolver owner must match registry owner")
 		}
 		if _, found := seen[record.Domain]; found {
 			return errors.New("duplicate identity resolver")

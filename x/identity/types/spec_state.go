@@ -302,8 +302,8 @@ func TransferDomainNFT(state IdentityState, name string, actor sdk.AccAddress, n
 	next := state.Clone()
 	next.Domains = upsertDomain(next.Domains, domain)
 	next.DomainNFTs = transferNFT(next.DomainNFTs, domain.NFTID, newOwner, height)
-	next.Resolvers = transferResolverOwnership(next.Resolvers, domain.Name, newOwner, height)
-	next.PendingResolverUpdates = removePendingResolverUpdates(next.PendingResolverUpdates, domain.Name)
+	next.Resolvers = transferResolverOwnership(next.Resolvers, state.Domains, domain.Name, newOwner, height)
+	next.PendingResolverUpdates = removePendingResolverUpdates(next.PendingResolverUpdates, state.Domains, domain.Name)
 	sortIdentityState(&next)
 	return next, domain, next.Validate()
 }

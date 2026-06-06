@@ -125,10 +125,11 @@ func transferNFT(nfts []DomainNFT, id string, newOwner sdk.AccAddress, height ui
 	return out
 }
 
-func transferResolverOwnership(records []ResolverRecord, domain string, newOwner sdk.AccAddress, height uint64) []ResolverRecord {
+func transferResolverOwnership(records []ResolverRecord, domains []Domain, domain string, newOwner sdk.AccAddress, height uint64) []ResolverRecord {
 	out := cloneResolvers(records)
 	for i := range out {
-		if out[i].Domain == domain {
+		authority, found := findResolverAuthorityDomain(IdentityState{Domains: domains}, out[i].Domain)
+		if found && authority.Name == domain {
 			out[i].Owner = cloneSpecAddress(newOwner)
 			out[i].UpdatedAtUnix = int64(height)
 		}
@@ -136,10 +137,14 @@ func transferResolverOwnership(records []ResolverRecord, domain string, newOwner
 	return out
 }
 
-func removePendingResolverUpdates(intents []ResolverUpdateIntent, domain string) []ResolverUpdateIntent {
+func removePendingResolverUpdates(intents []ResolverUpdateIntent, domains []Domain, domain string) []ResolverUpdateIntent {
 	out := make([]ResolverUpdateIntent, 0, len(intents))
 	for _, intent := range intents {
-		if intent.Domain == domain {
+		authority, found := findResolverAuthorityDomain(IdentityState{Domains: domains}, intent.Domain)
+		if found && authority.Name == domain {
+			continue
+		}
+		if !found && domainMatchesOrBelow(intent.Domain, domain) {
 			continue
 		}
 		out = append(out, cloneResolverIntent(intent))
