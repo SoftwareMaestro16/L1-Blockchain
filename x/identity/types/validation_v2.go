@@ -173,6 +173,9 @@ func ValidateResolverUpdateAuthorizationV2(domain DomainRecordV2, actor sdk.AccA
 	if recordKey == "" {
 		return errors.New("identity v2 resolver update record key is required")
 	}
+	if domain.Flags&DomainRecordV2FlagRestricted != 0 {
+		return errors.New("identity v2 broken nft binding blocks resolver changes until repaired")
+	}
 	if isExpiredForResolverUpdateV2(domain, height) {
 		if !addressesEqual(actor, domain.Owner) || recordKey != ResolverRecoveryMetadataKeyV2 {
 			return errors.New("identity v2 expired domain owner cannot update resolver except recovery metadata")

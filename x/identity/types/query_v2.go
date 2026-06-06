@@ -70,6 +70,7 @@ type IdentityQueryResponseV2 struct {
 	Subdomains     []SubdomainRecord
 	Delegations    []DelegationRecordV2
 	Auction        *AuctionRecordV2
+	Consistency    *IdentityConsistencyAuditResultV2
 	ProofResult    *IdentityResolution
 	Lifecycle      DomainLifecycleStatus
 	Params         *IdentityParams
@@ -414,6 +415,23 @@ func (q IdentityQueryServiceV2) QueryIdentityParams() IdentityQueryResponseV2 {
 	resp := q.ok()
 	resp.Params = &params
 	resp.RecordVersion = 1
+	return resp
+}
+
+func (q IdentityQueryServiceV2) QueryPeriodicConsistencyAudit() IdentityQueryResponseV2 {
+	audit := QueryIdentityPeriodicConsistencyAuditV2(IdentityConsistencyAuditRequestV2{
+		State:       q.ctx.State,
+		Height:      q.ctx.Height,
+		Delegations: q.ctx.Delegations,
+	})
+	resp := q.ok()
+	resp.Consistency = &audit
+	if !audit.Valid {
+		resp.Code = IdentityQueryVerificationFailed
+		if len(audit.Issues) > 0 {
+			resp.Error = audit.Issues[0].Message
+		}
+	}
 	return resp
 }
 
