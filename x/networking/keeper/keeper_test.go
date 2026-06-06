@@ -46,14 +46,7 @@ func TestKeeperRegistersNodeAndSessionWhenEnabled(t *testing.T) {
 	require.Zero(t, page.NextOffset)
 	require.Len(t, records, 2)
 
-	session, err := networkingtypes.NegotiateSession(local, remote, networkingtypes.SessionRequest{
-		LocalNodeID:      local.NodeID,
-		RemoteNodeID:     remote.NodeID,
-		ProtocolVersions: []string{networkingtypes.DefaultProtocolVersion},
-		OpenedHeight:     20,
-		ExpiresHeight:    50,
-		Nonce:            []byte("keeper-session"),
-	})
+	session, err := networkingtypes.NegotiateSession(local, remote, keeperSessionRequest(local, remote, 20, 50, "keeper-session"))
 	require.NoError(t, err)
 	require.NoError(t, k.OpenSession(session, 21))
 
@@ -113,4 +106,18 @@ func signedKeeperNode(t *testing.T, seed byte, salt []byte, expiresHeight uint64
 	}, privateKey, salt)
 	require.NoError(t, err)
 	return record
+}
+
+func keeperSessionRequest(local, remote networkingtypes.NodeRecord, openedHeight, expiresHeight uint64, nonce string) networkingtypes.SessionRequest {
+	return networkingtypes.SessionRequest{
+		LocalNodeID:                 local.NodeID,
+		RemoteNodeID:                remote.NodeID,
+		ProtocolVersions:            []string{networkingtypes.DefaultProtocolVersion},
+		LocalEphemeralPubKey:        bytes.Repeat([]byte{0xc1}, networkingtypes.SessionEphemeralKeyBytes),
+		RemoteEphemeralPubKey:       bytes.Repeat([]byte{0xd2}, networkingtypes.SessionEphemeralKeyBytes),
+		SessionSecretCommitmentHash: networkingtypes.HashParts("keeper-session-secret", local.NodeID, remote.NodeID, nonce),
+		OpenedHeight:                openedHeight,
+		ExpiresHeight:               expiresHeight,
+		Nonce:                       []byte(nonce),
+	}
 }

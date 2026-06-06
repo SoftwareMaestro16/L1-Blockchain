@@ -100,14 +100,7 @@ func TestSignedIdentityTransitionRotatesNodeIdentity(t *testing.T) {
 	require.NoError(t, err)
 	state, err = RegisterNodeRecord(state, remote, salt, 10)
 	require.NoError(t, err)
-	session, err := NegotiateSession(oldRecord, remote, SessionRequest{
-		LocalNodeID:      oldRecord.NodeID,
-		RemoteNodeID:     remote.NodeID,
-		ProtocolVersions: []string{DefaultProtocolVersion},
-		OpenedHeight:     11,
-		ExpiresHeight:    50,
-		Nonce:            []byte("rotation-session"),
-	})
+	session, err := NegotiateSession(oldRecord, remote, testSessionRequest(oldRecord, remote, 11, 50, "rotation-session", nil))
 	require.NoError(t, err)
 	state, err = OpenSession(state, session, 12)
 	require.NoError(t, err)
@@ -131,11 +124,12 @@ func TestSignedIdentityTransitionRotatesNodeIdentity(t *testing.T) {
 }
 
 func TestNetworkAddressHashCanonicalizesOffchainAddresses(t *testing.T) {
-	left, err := HashNetworkAddresses([]string{
+	addresses := []string{
 		"tcp://10.0.0.2:26656",
 		"tcp://10.0.0.1:26656",
 		"tcp://10.0.0.1:26656",
-	})
+	}
+	left, err := HashNetworkAddresses(addresses)
 	require.NoError(t, err)
 	right, err := HashNetworkAddresses([]string{
 		"tcp://10.0.0.1:26656",
@@ -144,6 +138,15 @@ func TestNetworkAddressHashCanonicalizesOffchainAddresses(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, left, right)
+
+	salt := []byte("aetheris-test-network")
+	record := signedNodeRecord(t, 0x19, salt, 100, NodeRoleFull)
+	record.NetworkAddressesHash = left
+	payload, err := record.SigningPayload()
+	require.NoError(t, err)
+	record.Signature = ed25519.Sign(deterministicPrivateKey(0x19), payload)
+	require.NoError(t, VerifyNodeRecordAddresses(record, addresses))
+	require.ErrorContains(t, VerifyNodeRecordAddresses(record, []string{"tcp://10.0.0.3:26656"}), "address list")
 }
 
 func TestSessionNegotiationCreatesDeterministicStreams(t *testing.T) {
@@ -151,29 +154,28 @@ func TestSessionNegotiationCreatesDeterministicStreams(t *testing.T) {
 	local := signedNodeRecord(t, 0x21, salt, 100, NodeRoleFull)
 	remote := signedNodeRecord(t, 0x22, salt, 100, NodeRoleService)
 
-	req := SessionRequest{
-		LocalNodeID:      local.NodeID,
-		RemoteNodeID:     remote.NodeID,
-		ProtocolVersions: []string{DefaultProtocolVersion},
-		ChannelClasses:   []ChannelClass{ChannelService, ChannelConsensus, ChannelData},
-		OpenedHeight:     10,
-		ExpiresHeight:    50,
-		Nonce:            []byte("session-nonce"),
-		QOSPolicy:        QoSPolicyConsensusFirst,
-	}
-	session, err := NegotiateSession(local, remote, req)
+	req := testSessionRequest(local, remote, 10, 50, "session-nonce", []ChannelClass{ChannelService, ChannelConsensus, ChannelData})
+	req.QOSPolicy = QoSPolicyConsensusFirst
+	session, err := NegotiateVerifiedSession(local, remote, req, salt, 10)
 	require.NoError(t, err)
 	require.NoError(t, session.Validate())
 	require.Equal(t, ChannelConsensus, session.Streams[0].Channel)
 	require.Equal(t, ChannelData, session.Streams[len(session.Streams)-1].Channel)
+	require.Equal(t, session.CipherSuite, session.SessionKeys.CipherSuite)
+	require.Equal(t, session.OpenedHeight, session.SessionKeys.EstablishedHeight)
+	require.NotEmpty(t, session.SessionKeys.TranscriptHash)
 
-	again, err := NegotiateSession(local, remote, req)
+	again, err := NegotiateVerifiedSession(local, remote, req, salt, 10)
 	require.NoError(t, err)
 	require.Equal(t, session, again)
 
 	req.ProtocolVersions = []string{"unsupported"}
-	_, err = NegotiateSession(local, remote, req)
+	_, err = NegotiateVerifiedSession(local, remote, req, salt, 10)
 	require.ErrorContains(t, err, "protocol")
+
+	req = testSessionRequest(local, remote, 10, 101, "expired-session", nil)
+	_, err = NegotiateVerifiedSession(local, remote, req, salt, 101)
+	require.ErrorContains(t, err, "expired")
 }
 
 func TestConsensusEnvelopeOutranksServiceAndBulkData(t *testing.T) {
@@ -337,14 +339,7 @@ func TestNetworkingStateRegistersNodesAndSessionsCanonically(t *testing.T) {
 	require.Len(t, state.NodeRecords, 2)
 	require.Less(t, state.NodeRecords[0].NodeID, state.NodeRecords[1].NodeID)
 
-	session, err := NegotiateSession(local, remote, SessionRequest{
-		LocalNodeID:      local.NodeID,
-		RemoteNodeID:     remote.NodeID,
-		ProtocolVersions: []string{DefaultProtocolVersion},
-		OpenedHeight:     11,
-		ExpiresHeight:    50,
-		Nonce:            []byte("nonce"),
-	})
+	session, err := NegotiateSession(local, remote, testSessionRequest(local, remote, 11, 50, "nonce", nil))
 	require.NoError(t, err)
 	state, err = OpenSession(state, session, 12)
 	require.NoError(t, err)
@@ -740,6 +735,21 @@ func l0AlertCodes(alerts []L0Alert) []string {
 		codes[i] = alert.Code
 	}
 	return codes
+}
+
+func testSessionRequest(local, remote NodeRecord, openedHeight, expiresHeight uint64, nonce string, channels []ChannelClass) SessionRequest {
+	return SessionRequest{
+		LocalNodeID:                 local.NodeID,
+		RemoteNodeID:                remote.NodeID,
+		ProtocolVersions:            []string{DefaultProtocolVersion},
+		ChannelClasses:              channels,
+		LocalEphemeralPubKey:        bytes.Repeat([]byte{0xa1}, SessionEphemeralKeyBytes),
+		RemoteEphemeralPubKey:       bytes.Repeat([]byte{0xb2}, SessionEphemeralKeyBytes),
+		SessionSecretCommitmentHash: HashParts("session-secret", local.NodeID, remote.NodeID, nonce),
+		OpenedHeight:                openedHeight,
+		ExpiresHeight:               expiresHeight,
+		Nonce:                       []byte(nonce),
+	}
 }
 
 func signedNodeRecord(t *testing.T, seed byte, salt []byte, expiresHeight uint64, roles ...NodeRole) NodeRecord {

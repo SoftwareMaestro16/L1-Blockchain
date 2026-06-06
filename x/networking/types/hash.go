@@ -43,6 +43,14 @@ func ComputeTransportEnvelopeID(envelope TransportEnvelope) string {
 func ComputeSessionID(req SessionRequest, cipher CipherSuite, protocols []string, channels []ChannelClass) string {
 	h := sha256.New()
 	writeString(h, "aetheris-session-v1")
+	writeString(h, ComputeSessionTranscriptHash(req, cipher, protocols, channels))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func ComputeSessionTranscriptHash(req SessionRequest, cipher CipherSuite, protocols []string, channels []ChannelClass) string {
+	req = req.Normalize()
+	h := sha256.New()
+	writeString(h, "aetheris-session-transcript-v1")
 	writeString(h, req.LocalNodeID)
 	writeString(h, req.RemoteNodeID)
 	writeUint64(h, uint64(req.HandshakeVersion))
@@ -56,6 +64,9 @@ func ComputeSessionID(req SessionRequest, cipher CipherSuite, protocols []string
 	writeUint64(h, req.OpenedHeight)
 	writeUint64(h, req.ExpiresHeight)
 	writeBytes(h, req.Nonce)
+	writeBytes(h, req.LocalEphemeralPubKey)
+	writeBytes(h, req.RemoteEphemeralPubKey)
+	writeString(h, req.SessionSecretCommitmentHash)
 	return hex.EncodeToString(h.Sum(nil))
 }
 

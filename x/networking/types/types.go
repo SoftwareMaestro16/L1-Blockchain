@@ -1,6 +1,7 @@
 package types
 
 import (
+	"bytes"
 	"crypto/ed25519"
 	"crypto/sha256"
 	"encoding/json"
@@ -11,29 +12,30 @@ import (
 )
 
 const (
-	HashHexLength           = 64
-	BasisPoints             = uint32(10_000)
-	MaxRolesPerNode         = 16
-	MaxZonesPerNode         = 128
-	MaxServicesPerNode      = 128
-	MaxProtocolsPerNode     = 32
-	MaxNetworkAddressBytes  = 256
-	MaxProtocolIDBytes      = 64
-	MaxServiceIDBytes       = 96
-	MaxZoneIDBytes          = 64
-	MaxNonceBytes           = 64
-	MaxChannelPolicies      = 32
-	MaxStreamsPerSession    = 32
-	MaxPayloadChunks        = 65_536
-	MaxChunkBytes           = 4 << 20
-	MaxStreamMessageBytes   = 64 << 20
-	DefaultMaxMessageBytes  = 1 << 20
-	DefaultFlowWindowBytes  = 4 << 20
-	DefaultHandshakeVersion = uint32(1)
-	DefaultProtocolVersion  = "aetheris-networking-v1"
-	DefaultCipherSuite      = CipherSuiteEd25519X25519ChaCha20Poly1305
-	DefaultCompressionMode  = CompressionModeNone
-	DefaultQoSPolicy        = QoSPolicyBalanced
+	HashHexLength            = 64
+	BasisPoints              = uint32(10_000)
+	MaxRolesPerNode          = 16
+	MaxZonesPerNode          = 128
+	MaxServicesPerNode       = 128
+	MaxProtocolsPerNode      = 32
+	MaxNetworkAddressBytes   = 256
+	MaxProtocolIDBytes       = 64
+	MaxServiceIDBytes        = 96
+	MaxZoneIDBytes           = 64
+	MaxNonceBytes            = 64
+	MaxChannelPolicies       = 32
+	MaxStreamsPerSession     = 32
+	SessionEphemeralKeyBytes = 32
+	MaxPayloadChunks         = 65_536
+	MaxChunkBytes            = 4 << 20
+	MaxStreamMessageBytes    = 64 << 20
+	DefaultMaxMessageBytes   = 1 << 20
+	DefaultFlowWindowBytes   = 4 << 20
+	DefaultHandshakeVersion  = uint32(1)
+	DefaultProtocolVersion   = "aetheris-networking-v1"
+	DefaultCipherSuite       = CipherSuiteEd25519X25519ChaCha20Poly1305
+	DefaultCompressionMode   = CompressionModeNone
+	DefaultQoSPolicy         = QoSPolicyBalanced
 )
 
 type NodeRole string
@@ -118,16 +120,19 @@ type StreamSpec struct {
 }
 
 type SessionRequest struct {
-	LocalNodeID      string
-	RemoteNodeID     string
-	HandshakeVersion uint32
-	CipherSuites     []CipherSuite
-	ProtocolVersions []string
-	ChannelClasses   []ChannelClass
-	OpenedHeight     uint64
-	ExpiresHeight    uint64
-	Nonce            []byte
-	QOSPolicy        QoSPolicy
+	LocalNodeID                 string
+	RemoteNodeID                string
+	HandshakeVersion            uint32
+	CipherSuites                []CipherSuite
+	ProtocolVersions            []string
+	ChannelClasses              []ChannelClass
+	LocalEphemeralPubKey        []byte
+	RemoteEphemeralPubKey       []byte
+	SessionSecretCommitmentHash string
+	OpenedHeight                uint64
+	ExpiresHeight               uint64
+	Nonce                       []byte
+	QOSPolicy                   QoSPolicy
 }
 
 type SessionChannel struct {
@@ -139,8 +144,20 @@ type SessionChannel struct {
 	ProtocolVersions []string
 	OpenedHeight     uint64
 	ExpiresHeight    uint64
+	SessionKeys      SessionKeySet
 	Streams          []StreamSpec
 	QOSPolicy        QoSPolicy
+}
+
+type SessionKeySet struct {
+	KeyID                 string
+	CipherSuite           CipherSuite
+	LocalEphemeralPubKey  []byte
+	RemoteEphemeralPubKey []byte
+	TranscriptHash        string
+	SecretCommitmentHash  string
+	EstablishedHeight     uint64
+	ExpiresHeight         uint64
 }
 
 type TransportEnvelope struct {
@@ -339,6 +356,21 @@ func (r NodeRecord) Validate(networkSalt []byte, currentHeight uint64) error {
 	return nil
 }
 
+func VerifyNodeRecordAddresses(record NodeRecord, addresses []string) error {
+	record = NormalizeNodeRecord(record)
+	if err := record.ValidateBasic(); err != nil {
+		return err
+	}
+	addressHash, err := HashNetworkAddresses(addresses)
+	if err != nil {
+		return err
+	}
+	if addressHash != record.NetworkAddressesHash {
+		return errors.New("networking network address list does not match signed node record hash")
+	}
+	return nil
+}
+
 func ValidateChannelPolicies(policies []ChannelPolicy) error {
 	if len(policies) == 0 {
 		return errors.New("networking channel policies are required")
@@ -417,6 +449,9 @@ func (req SessionRequest) Normalize() SessionRequest {
 	}
 	req.ProtocolVersions, _ = normalizeStringSet("protocol", req.ProtocolVersions, MaxProtocolIDBytes)
 	req.ChannelClasses = normalizeChannels(req.ChannelClasses)
+	req.LocalEphemeralPubKey = cloneBytes(req.LocalEphemeralPubKey)
+	req.RemoteEphemeralPubKey = cloneBytes(req.RemoteEphemeralPubKey)
+	req.SessionSecretCommitmentHash = strings.ToLower(strings.TrimSpace(req.SessionSecretCommitmentHash))
 	req.Nonce = cloneBytes(req.Nonce)
 	if req.QOSPolicy == "" {
 		req.QOSPolicy = DefaultQoSPolicy
@@ -473,6 +508,10 @@ func NegotiateSession(local, remote NodeRecord, req SessionRequest) (SessionChan
 	if err := validateChannels(channels); err != nil {
 		return SessionChannel{}, err
 	}
+	sessionKeys, err := BuildSessionKeySet(req, cipher, protocols, channels)
+	if err != nil {
+		return SessionChannel{}, err
+	}
 	session := SessionChannel{
 		LocalNodeID:      req.LocalNodeID,
 		RemoteNodeID:     req.RemoteNodeID,
@@ -481,6 +520,7 @@ func NegotiateSession(local, remote NodeRecord, req SessionRequest) (SessionChan
 		ProtocolVersions: protocols,
 		OpenedHeight:     req.OpenedHeight,
 		ExpiresHeight:    req.ExpiresHeight,
+		SessionKeys:      sessionKeys,
 		Streams:          defaultStreams(channels),
 		QOSPolicy:        req.QOSPolicy,
 	}
@@ -515,6 +555,15 @@ func (s SessionChannel) Validate() error {
 	if s.OpenedHeight == 0 || s.ExpiresHeight <= s.OpenedHeight {
 		return errors.New("networking session height range is invalid")
 	}
+	if err := s.SessionKeys.Validate(); err != nil {
+		return err
+	}
+	if s.SessionKeys.CipherSuite != s.CipherSuite {
+		return errors.New("networking session key cipher suite mismatch")
+	}
+	if s.SessionKeys.EstablishedHeight != s.OpenedHeight || s.SessionKeys.ExpiresHeight != s.ExpiresHeight {
+		return errors.New("networking session key height range mismatch")
+	}
 	if len(s.ProtocolVersions) == 0 {
 		return errors.New("networking session requires protocol versions")
 	}
@@ -538,6 +587,74 @@ func (s SessionChannel) Validate() error {
 		return fmt.Errorf("unknown networking qos policy %q", s.QOSPolicy)
 	}
 	return nil
+}
+
+func BuildSessionKeySet(req SessionRequest, cipher CipherSuite, protocols []string, channels []ChannelClass) (SessionKeySet, error) {
+	req = req.Normalize()
+	if !IsCipherSuite(cipher) {
+		return SessionKeySet{}, fmt.Errorf("unknown networking cipher suite %q", cipher)
+	}
+	if len(req.LocalEphemeralPubKey) != SessionEphemeralKeyBytes || len(req.RemoteEphemeralPubKey) != SessionEphemeralKeyBytes {
+		return SessionKeySet{}, fmt.Errorf("networking session ephemeral public keys must be %d bytes", SessionEphemeralKeyBytes)
+	}
+	if err := ValidateHash("networking session secret commitment hash", req.SessionSecretCommitmentHash); err != nil {
+		return SessionKeySet{}, err
+	}
+	transcriptHash := ComputeSessionTranscriptHash(req, cipher, protocols, channels)
+	keySet := SessionKeySet{
+		KeyID:                 HashParts("session-key", transcriptHash, req.SessionSecretCommitmentHash),
+		CipherSuite:           cipher,
+		LocalEphemeralPubKey:  cloneBytes(req.LocalEphemeralPubKey),
+		RemoteEphemeralPubKey: cloneBytes(req.RemoteEphemeralPubKey),
+		TranscriptHash:        transcriptHash,
+		SecretCommitmentHash:  req.SessionSecretCommitmentHash,
+		EstablishedHeight:     req.OpenedHeight,
+		ExpiresHeight:         req.ExpiresHeight,
+	}
+	return keySet, keySet.Validate()
+}
+
+func (s SessionKeySet) Validate() error {
+	keyID := strings.ToLower(strings.TrimSpace(s.KeyID))
+	transcriptHash := strings.ToLower(strings.TrimSpace(s.TranscriptHash))
+	secretCommitmentHash := strings.ToLower(strings.TrimSpace(s.SecretCommitmentHash))
+	if err := ValidateHash("networking session key id", keyID); err != nil {
+		return err
+	}
+	if !IsCipherSuite(s.CipherSuite) {
+		return fmt.Errorf("unknown networking session key cipher suite %q", s.CipherSuite)
+	}
+	if len(s.LocalEphemeralPubKey) != SessionEphemeralKeyBytes || len(s.RemoteEphemeralPubKey) != SessionEphemeralKeyBytes {
+		return fmt.Errorf("networking session ephemeral public keys must be %d bytes", SessionEphemeralKeyBytes)
+	}
+	if bytes.Equal(s.LocalEphemeralPubKey, s.RemoteEphemeralPubKey) {
+		return errors.New("networking session ephemeral public keys must differ")
+	}
+	if err := ValidateHash("networking session transcript hash", transcriptHash); err != nil {
+		return err
+	}
+	if err := ValidateHash("networking session secret commitment hash", secretCommitmentHash); err != nil {
+		return err
+	}
+	if HashParts("session-key", transcriptHash, secretCommitmentHash) != keyID {
+		return errors.New("networking session key id mismatch")
+	}
+	if s.EstablishedHeight == 0 || s.ExpiresHeight <= s.EstablishedHeight {
+		return errors.New("networking session key height range is invalid")
+	}
+	return nil
+}
+
+func NegotiateVerifiedSession(local, remote NodeRecord, req SessionRequest, networkSalt []byte, currentHeight uint64) (SessionChannel, error) {
+	local = NormalizeNodeRecord(local)
+	remote = NormalizeNodeRecord(remote)
+	if err := local.Validate(networkSalt, currentHeight); err != nil {
+		return SessionChannel{}, err
+	}
+	if err := remote.Validate(networkSalt, currentHeight); err != nil {
+		return SessionChannel{}, err
+	}
+	return NegotiateSession(local, remote, req)
 }
 
 func (e TransportEnvelope) Normalize() TransportEnvelope {

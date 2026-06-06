@@ -310,6 +310,7 @@ func cloneSession(session SessionChannel) SessionChannel {
 	session.LocalNodeID = normalizeHashText(session.LocalNodeID)
 	session.RemoteNodeID = normalizeHashText(session.RemoteNodeID)
 	session.SessionID = normalizeHashText(session.SessionID)
+	session.SessionKeys = cloneSessionKeySet(session.SessionKeys)
 	session.ProtocolVersions = append([]string(nil), session.ProtocolVersions...)
 	sortStrings(session.ProtocolVersions)
 	session.Streams = append([]StreamSpec(nil), session.Streams...)
@@ -325,6 +326,15 @@ func cloneSession(session SessionChannel) SessionChannel {
 		return session.Streams[i].StreamID < session.Streams[j].StreamID
 	})
 	return session
+}
+
+func cloneSessionKeySet(keys SessionKeySet) SessionKeySet {
+	keys.KeyID = normalizeHashText(keys.KeyID)
+	keys.LocalEphemeralPubKey = cloneBytes(keys.LocalEphemeralPubKey)
+	keys.RemoteEphemeralPubKey = cloneBytes(keys.RemoteEphemeralPubKey)
+	keys.TranscriptHash = normalizeHashText(keys.TranscriptHash)
+	keys.SecretCommitmentHash = normalizeHashText(keys.SecretCommitmentHash)
+	return keys
 }
 
 func cloneIdentityTransitions(transitions []IdentityTransitionRecord) []IdentityTransitionRecord {
