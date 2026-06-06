@@ -4173,6 +4173,201 @@ func TestSecurityModelUsesPenaltyAndConditionEnforcement(t *testing.T) {
 	require.ErrorContains(t, err, "does not satisfy hash lock")
 }
 
+func TestEconomicFinalityRequirementsChallengeSizingAndReport(t *testing.T) {
+	alice := testAddress(0xfa)
+	bob := testAddress(0xfb)
+	channel := signedChannel(t, "economic-finality", "1000", alice, bob)
+	state := EmptyStateWithChannel(t, channel)
+	sizing := ChallengePeriodSizing{
+		MessagePropagationDelay: 1,
+		WatchServiceReaction:    2,
+		CongestionBuffer:        1,
+		MultiHopTimeoutMargin:   1,
+	}
+
+	require.NoError(t, ValidateEconomicFinalityRequirements(DefaultEconomicFinalityRequirements()))
+	require.NoError(t, ValidateChallengePeriodSizing(channel.DisputePeriod, sizing))
+	require.ErrorContains(t, ValidateChallengePeriodSizing(sizing.TotalRequired(), sizing), "must exceed")
+
+	report, err := BuildEconomicFinalityReport(state, 20, sizing)
+	require.NoError(t, err)
+	require.NoError(t, report.Validate())
+	require.Equal(t, sizing.TotalRequired(), report.RequiredChallengeSize)
+
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "450"},
+		{Participant: bob, Amount: "550"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+	report, err = BuildEconomicFinalityReport(state, 21, sizing)
+	require.NoError(t, err)
+	require.NoError(t, report.Validate())
+
+	early := state.Clone()
+	early.Channels[0].Finality = ChannelFinalityFinalizable
+	_, err = BuildEconomicFinalityReport(early, 21, sizing)
+	require.ErrorContains(t, err, string(EconomicFinalityUnilateral))
+}
+
+func TestEconomicFinalityReportCoversVirtualAndPenaltySettlement(t *testing.T) {
+	alice := testAddress(0xfc)
+	router := testAddress(0xfd)
+	bob := testAddress(0xfe)
+	sizing := ChallengePeriodSizing{
+		MessagePropagationDelay: 1,
+		WatchServiceReaction:    2,
+		CongestionBuffer:        1,
+		MultiHopTimeoutMargin:   1,
+	}
+
+	state, _, _ := virtualChannelFixture(t, "economic-finality-virtual", alice, router, bob, "100", 40)
+	report, err := BuildEconomicFinalityReport(state, 25, sizing)
+	require.NoError(t, err)
+	require.NoError(t, report.Validate())
+
+	channel := state.Channels[0]
+	closeState := signedState(t, channel, 3, channel.LatestState.StateHash, []Balance{
+		{Participant: channel.Participants[0], Amount: "450"},
+		{Participant: channel.Participants[1], Amount: "450"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, closeState, channel.Participants[0], 26, "0")
+	require.NoError(t, err)
+	conflicting := signedState(t, channel, 3, channel.LatestState.StateHash, []Balance{
+		{Participant: channel.Participants[0], Amount: "440"},
+		{Participant: channel.Participants[1], Amount: "460"},
+	})
+	proofID := HashParts("economic-finality-penalty", channel.ChannelID)
+	state, err = SubmitFraudProof(state, channel.ChannelID, FraudProof{
+		ProofID:         proofID,
+		ProofType:       FraudProofTypeDoubleSign,
+		SubmittedBy:     channel.Participants[1],
+		OffendingSigner: channel.Participants[0],
+		StateA:          closeState,
+		StateB:          conflicting,
+		EvidenceHash:    ComputeDisputeProofHash(FraudProof{ProofID: proofID, ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
+		PenaltyAmount:   "10",
+	}, 27)
+	require.NoError(t, err)
+	require.Equal(t, ChannelFinalityPenalized, state.Channels[0].Finality)
+	report, err = BuildEconomicFinalityReport(state, 27, sizing)
+	require.NoError(t, err)
+	require.NoError(t, report.Validate())
+}
+
+func TestDisputePriorityPolicyNearExpiryFraudAndStressInclusion(t *testing.T) {
+	first := HashParts("priority-channel-first")
+	second := HashParts("priority-channel-second")
+	policy := DefaultDisputePriorityPolicy()
+	require.NoError(t, policy.Validate())
+
+	normal, err := ComputeDisputeTransactionPriority(policy, DisputePriorityRequest{
+		Operation:         SettlementArbitrationDispute,
+		ChannelID:         first,
+		SubmittedHeight:   20,
+		CurrentHeight:     21,
+		SettleAfterHeight: 28,
+		FeePaid:           "4",
+		RequiredFee:       "4",
+		EstimatedGas:      10,
+	})
+	require.NoError(t, err)
+	critical, err := ComputeDisputeTransactionPriority(policy, DisputePriorityRequest{
+		Operation:         SettlementArbitrationFraudProof,
+		ChannelID:         second,
+		SubmittedHeight:   20,
+		CurrentHeight:     27,
+		SettleAfterHeight: 28,
+		HasFraudProof:     true,
+		FeePaid:           "4",
+		RequiredFee:       "4",
+		EstimatedGas:      10,
+		CongestionBps:     9_000,
+	})
+	require.NoError(t, err)
+	require.True(t, critical.PriorityScore > normal.PriorityScore)
+	require.True(t, critical.NearExpiry)
+	require.True(t, critical.Deterministic)
+
+	repeated, err := ComputeDisputeTransactionPriority(policy, DisputePriorityRequest{
+		Operation:         SettlementArbitrationFraudProof,
+		ChannelID:         second,
+		SubmittedHeight:   20,
+		CurrentHeight:     27,
+		SettleAfterHeight: 28,
+		HasFraudProof:     true,
+		FeePaid:           "4",
+		RequiredFee:       "4",
+		EstimatedGas:      10,
+		CongestionBps:     9_000,
+	})
+	require.NoError(t, err)
+	require.Equal(t, critical.DecisionHash, repeated.DecisionHash)
+
+	stress, err := SimulateDisputeInclusionStress(policy, []DisputePriorityRequest{
+		{Operation: SettlementArbitrationDispute, ChannelID: first, SubmittedHeight: 20, CurrentHeight: 21, SettleAfterHeight: 28, FeePaid: "4", RequiredFee: "4", EstimatedGas: 10},
+		{Operation: SettlementArbitrationFraudProof, ChannelID: second, SubmittedHeight: 20, CurrentHeight: 27, SettleAfterHeight: 28, HasFraudProof: true, FeePaid: "4", RequiredFee: "4", EstimatedGas: 10, CongestionBps: 9_000},
+		{Operation: SettlementArbitrationDispute, ChannelID: first, SubmittedHeight: 20, CurrentHeight: 26, SettleAfterHeight: 28, FeePaid: "0", RequiredFee: "4", EstimatedGas: 10},
+	}, 20)
+	require.NoError(t, err)
+	require.Len(t, stress.Included, 2)
+	require.Len(t, stress.Deferred, 1)
+	require.Equal(t, "insufficient dispute fee", stress.Deferred[0].DeferredReason)
+	require.False(t, stress.ConflictFree)
+	require.NotEmpty(t, stress.Conflicts)
+
+	parallel, err := SimulateDisputeInclusionStress(policy, []DisputePriorityRequest{
+		{Operation: SettlementArbitrationDispute, ChannelID: first, SubmittedHeight: 20, CurrentHeight: 21, SettleAfterHeight: 28, FeePaid: "4", RequiredFee: "4", EstimatedGas: 10},
+		{Operation: SettlementArbitrationFraudProof, ChannelID: second, SubmittedHeight: 20, CurrentHeight: 27, SettleAfterHeight: 28, HasFraudProof: true, FeePaid: "4", RequiredFee: "4", EstimatedGas: 10},
+	}, 20)
+	require.NoError(t, err)
+	require.True(t, parallel.ConflictFree)
+	require.Empty(t, parallel.Conflicts)
+}
+
+func TestNearExpiryDisputeMonitoringAndValidatorWatcherFormat(t *testing.T) {
+	alice := testAddress(0xaa)
+	bob := testAddress(0xab)
+	validator := testAddress(0xac)
+	service := testAddress(0xad)
+	channel := signedChannel(t, "near-expiry-monitor", "1000", alice, bob)
+	state := EmptyStateWithChannel(t, channel)
+
+	var err error
+	state, err = RegisterValidatorPaymentService(state, ValidatorPaymentServiceMetadata{
+		ValidatorAddress: validator,
+		ServiceAddress:   service,
+		WatchEndpoint:    "https://validator.example/watch",
+		PublicKey:        "validator-watch-key",
+		MinDelegation:    "10",
+		Active:           true,
+		UpdatedHeight:    12,
+	})
+	require.NoError(t, err)
+	state, err = RegisterValidatorWatchService(state, ValidatorWatchRegistration{
+		ValidatorAddress: validator,
+		Delegator:        bob,
+		RegisteredHeight: 13,
+	})
+	require.NoError(t, err)
+	require.Equal(t, service, state.ValidatorWatchRegistries[0].ServiceAddress)
+	require.Equal(t, state.ValidatorPaymentServices[0].MetadataHash, state.ValidatorWatchRegistries[0].MetadataHash)
+
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "500"},
+		{Participant: bob, Amount: "500"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+	alerts, err := MonitorNearExpiryDisputes(state, 27, 2)
+	require.NoError(t, err)
+	require.Len(t, alerts, 1)
+	require.Equal(t, channel.ChannelID, alerts[0].ChannelID)
+	require.Equal(t, uint64(1), alerts[0].BlocksRemaining)
+	require.Equal(t, "critical", alerts[0].Severity)
+	require.NotEmpty(t, alerts[0].EvidenceHash)
+}
+
 func signedChannel(t *testing.T, salt, collateral, left, right string) ChannelRecord {
 	t.Helper()
 
