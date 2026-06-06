@@ -4133,6 +4133,76 @@ func TestXNetworkStateRejectsInvalidKeysMessagesAndConsensusReputation(t *testin
 	require.ErrorContains(t, err, "evidence hash")
 }
 
+func TestNetworkingImplementationRoadmapValidatesPhasesTasksAndExitCriteria(t *testing.T) {
+	roadmap := DefaultNetworkingImplementationRoadmap()
+	require.NoError(t, ValidateNetworkingImplementationRoadmap(roadmap))
+	require.Len(t, roadmap.Phases, 3)
+	require.Equal(t, ComputeNetworkingRoadmapRoot(roadmap), roadmap.RoadmapRoot)
+
+	phase0 := roadmap.Phases[0]
+	require.Equal(t, RoadmapPhaseBaselineInstrumentation, phase0.Phase)
+	require.Contains(t, phase0.Tasks, RoadmapTaskInventoryCometBFTP2P)
+	require.Contains(t, phase0.Tasks, RoadmapTaskNetworkParameterSchema)
+	require.Contains(t, phase0.ExitCriteria, ExitCurrentBehaviorMeasurable)
+
+	broken := roadmap
+	broken.Phases[0].Tasks = broken.Phases[0].Tasks[:len(broken.Phases[0].Tasks)-1]
+	broken.RoadmapRoot = ComputeNetworkingRoadmapRoot(broken)
+	require.ErrorContains(t, ValidateNetworkingImplementationRoadmap(broken), "missing task")
+
+	broken = roadmap
+	broken.RoadmapRoot = HashParts("wrong-roadmap-root")
+	require.ErrorContains(t, ValidateNetworkingImplementationRoadmap(broken), "root mismatch")
+}
+
+func TestNetworkingRoadmapReadinessForPhasesZeroToTwo(t *testing.T) {
+	evidence := testRoadmapEvidence(t)
+
+	phase0, err := EvaluateRoadmapPhaseReadiness(RoadmapPhaseBaselineInstrumentation, evidence)
+	require.NoError(t, err)
+	require.True(t, phase0.Ready)
+	require.Contains(t, phase0.SatisfiedExitCriteria, ExitCurrentBehaviorMeasurable)
+	require.Contains(t, phase0.SatisfiedExitCriteria, ExitBaselineMetricsExist)
+	require.NotEmpty(t, phase0.ReportHash)
+
+	phase1, err := EvaluateRoadmapPhaseReadiness(RoadmapPhaseAetherNetworkingAdapter, evidence)
+	require.NoError(t, err)
+	require.True(t, phase1.Ready)
+	require.Contains(t, phase1.SatisfiedExitCriteria, ExitConsensusProtectedPriority)
+	require.Contains(t, phase1.SatisfiedExitCriteria, ExitPeerScoringChannelMetrics)
+	require.Contains(t, phase1.SatisfiedExitCriteria, ExitServiceCannotStarveConsensus)
+
+	phase2, err := EvaluateRoadmapPhaseReadiness(RoadmapPhaseNodeIdentitySessions, evidence)
+	require.NoError(t, err)
+	require.True(t, phase2.Ready)
+	require.Contains(t, phase2.SatisfiedExitCriteria, ExitCryptographicNodeAuth)
+	require.Contains(t, phase2.SatisfiedExitCriteria, ExitLogicalStreamsShareSession)
+	require.Contains(t, phase2.SatisfiedExitCriteria, ExitExpiredForgedRecordsRejected)
+}
+
+func TestNetworkingRoadmapReadinessRejectsMissingEvidence(t *testing.T) {
+	evidence := testRoadmapEvidence(t)
+	evidence.PerformanceSnapshot.ChannelBandwidth = nil
+	phase0, err := EvaluateRoadmapPhaseReadiness(RoadmapPhaseBaselineInstrumentation, evidence)
+	require.NoError(t, err)
+	require.False(t, phase0.Ready)
+	require.NotContains(t, phase0.SatisfiedExitCriteria, ExitBaselineMetricsExist)
+
+	evidence = testRoadmapEvidence(t)
+	evidence.PerformanceSnapshot.ServiceTrafficIsolated = false
+	phase1, err := EvaluateRoadmapPhaseReadiness(RoadmapPhaseAetherNetworkingAdapter, evidence)
+	require.NoError(t, err)
+	require.False(t, phase1.Ready)
+	require.NotContains(t, phase1.SatisfiedExitCriteria, ExitServiceCannotStarveConsensus)
+
+	evidence = testRoadmapEvidence(t)
+	evidence.HandshakeReplayRejected = false
+	phase2, err := EvaluateRoadmapPhaseReadiness(RoadmapPhaseNodeIdentitySessions, evidence)
+	require.NoError(t, err)
+	require.False(t, phase2.Ready)
+	require.NotContains(t, phase2.SatisfiedExitCriteria, ExitExpiredForgedRecordsRejected)
+}
+
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 	metrics := PeerMetrics{LatencyMillis: 25, ReliabilityBps: 9_900, ThroughputBytesPerSec: 32 << 20}
 	score, err := ComputePeerScore(metrics)
@@ -4495,6 +4565,58 @@ func testPerformanceStreamPlan() StreamParallelFetchPlan {
 			{StreamID: streamID, ChunkIndex: 0, RangeStart: 0, RangeEnd: 256, ChunkSize: 256, AssignedPeer: "peer-a"},
 			{StreamID: streamID, ChunkIndex: 1, RangeStart: 256, RangeEnd: 512, ChunkSize: 256, AssignedPeer: "peer-b"},
 		},
+	}
+}
+
+func testRoadmapEvidence(t *testing.T) NetworkingRoadmapEvidence {
+	t.Helper()
+
+	salt := []byte("aetheris-roadmap")
+	local := signedNodeRecord(t, 0x88, salt, 100, NodeRoleFull, NodeRoleRouting)
+	remote := signedNodeRecordWithCapabilities(t, 0x89, salt, 100, []NodeRole{NodeRoleService, NodeRoleRouting}, []string{"zone-roadmap"}, []string{"svc.roadmap"})
+	adapter := DefaultAetherNetworkingAdapter()
+	envelopes := []TransportEnvelope{
+		testEnvelope(ChannelConsensus, 512, 10, 1, "roadmap-consensus"),
+		testEnvelope(ChannelMempool, 512, 10, 2, "roadmap-mempool"),
+		testEnvelope(ChannelService, 512, 10, 3, "roadmap-service"),
+	}
+	schedule, err := ScheduleL0Propagation(adapter, envelopes, 4, PeerScore{ScoreBps: 8_000}, 10)
+	require.NoError(t, err)
+	channelBandwidth, err := ComputeChannelBandwidthMetrics(schedule.Metrics)
+	require.NoError(t, err)
+
+	session, err := NegotiateSession(local, remote, testSessionRequest(local, remote, 10, 80, "roadmap-session", []ChannelClass{ChannelConsensus, ChannelService, ChannelData}))
+	require.NoError(t, err)
+	discovery := testSignedDiscoveryObjectRecord(t, remote, 0x89, salt, DRTObjectServiceEndpoint, HashParts("roadmap-target"), HashParts("roadmap-ad"), "", "svc.roadmap", "", 90)
+	return NetworkingRoadmapEvidence{
+		CometBFTInventory: adapter,
+		PerformanceSnapshot: PerformanceMetricsSnapshot{
+			ChannelBandwidth: channelBandwidth,
+			BlockBenchmark: BlockPropagationBenchmark{
+				HeaderLatencyMillis:  10,
+				ReconstructionMillis: 20,
+				ChunkCount:           2,
+				HeaderFirst:          true,
+			},
+			PeerScoreDistribution: PeerScoreDistributionMetric{
+				Count:      2,
+				AverageBps: 8_000,
+			},
+			MessagePropagationLatency: PerformanceLatencySummary{
+				Count:         2,
+				MinMillis:     5,
+				MaxMillis:     15,
+				AverageMillis: 10,
+			},
+			ServiceTrafficIsolated: true,
+		},
+		L0Schedule:              schedule,
+		XNetworkParams:          DefaultXNetworkParams(salt),
+		Session:                 session,
+		NodeRecords:             []NodeRecord{local, remote},
+		SignedDiscoveryRecords:  []DiscoveryRecord{discovery},
+		HandshakeReplayRejected: true,
+		KeyRotationAvailable:    true,
 	}
 }
 
