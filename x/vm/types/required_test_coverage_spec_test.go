@@ -12,7 +12,7 @@ func TestAVMRequiredTestCoverageSpecMatchesSection20(t *testing.T) {
 	require.NoError(t, spec.Validate())
 	require.Equal(t, "AVM required test coverage", spec.SpecName)
 	require.Equal(t, ComputeAVMRequiredTestCoverageSpecHash(spec), spec.SpecHash)
-	require.Len(t, spec.Groups, 2)
+	require.Len(t, spec.Groups, 4)
 
 	byCategory := map[AVMRequiredTestCoverageCategory]AVMRequiredTestCoverageGroup{}
 	for _, group := range spec.Groups {
@@ -21,6 +21,8 @@ func TestAVMRequiredTestCoverageSpecMatchesSection20(t *testing.T) {
 	}
 	require.Len(t, byCategory[AVMTestCoverageCategoryUnit].Cases, 11)
 	require.Len(t, byCategory[AVMTestCoverageCategoryIntegration].Cases, 10)
+	require.Len(t, byCategory[AVMTestCoverageCategoryInvariant].Cases, 9)
+	require.Len(t, byCategory[AVMTestCoverageCategoryFuzz].Cases, 9)
 }
 
 func TestAVMRequiredUnitCoverageMatchesSection201(t *testing.T) {
@@ -91,6 +93,68 @@ func TestAVMRequiredIntegrationCoverageMatchesSection202(t *testing.T) {
 	}, group.Cases)
 }
 
+func TestAVMRequiredInvariantCoverageMatchesSection203(t *testing.T) {
+	group, err := NewAVMRequiredTestCoverageGroup(AVMRequiredTestCoverageGroup{
+		Category: AVMTestCoverageCategoryInvariant,
+		Cases: []AVMRequiredTestCoverageCase{
+			AVMInvariantCoverageExecutedMessageOneReceipt,
+			AVMInvariantCoverageQueuedMessageStoredRecord,
+			AVMInvariantCoverageConsumedMessageNoReplay,
+			AVMInvariantCoverageExpiredMessageCannotExecute,
+			AVMInvariantCoverageBounceCannotOverRefund,
+			AVMInvariantCoverageZoneRootQueueContinuationRoots,
+			AVMInvariantCoverageActorMailboxOrderDeterministic,
+			AVMInvariantCoverageActorStateIsolationEnforced,
+			AVMInvariantCoverageContractStoragePrefixIsolated,
+		},
+	})
+	require.NoError(t, err)
+	require.NoError(t, group.Validate())
+	require.Equal(t, ComputeAVMRequiredTestCoverageGroupHash(group), group.GroupHash)
+	require.ElementsMatch(t, []AVMRequiredTestCoverageCase{
+		AVMInvariantCoverageExecutedMessageOneReceipt,
+		AVMInvariantCoverageQueuedMessageStoredRecord,
+		AVMInvariantCoverageConsumedMessageNoReplay,
+		AVMInvariantCoverageExpiredMessageCannotExecute,
+		AVMInvariantCoverageBounceCannotOverRefund,
+		AVMInvariantCoverageZoneRootQueueContinuationRoots,
+		AVMInvariantCoverageActorMailboxOrderDeterministic,
+		AVMInvariantCoverageActorStateIsolationEnforced,
+		AVMInvariantCoverageContractStoragePrefixIsolated,
+	}, group.Cases)
+}
+
+func TestAVMRequiredFuzzCoverageMatchesSection204(t *testing.T) {
+	group, err := NewAVMRequiredTestCoverageGroup(AVMRequiredTestCoverageGroup{
+		Category: AVMTestCoverageCategoryFuzz,
+		Cases: []AVMRequiredTestCoverageCase{
+			AVMFuzzCoverageMalformedAsyncMessages,
+			AVMFuzzCoverageRandomNonceOrdering,
+			AVMFuzzCoverageQueuePriorityEdgeCases,
+			AVMFuzzCoverageRetryExpiryBoundaries,
+			AVMFuzzCoverageBouncePayloadLimits,
+			AVMFuzzCoverageActorHandlerFailures,
+			AVMFuzzCoverageContinuationStatePayloads,
+			AVMFuzzCoverageContractStorageKeys,
+			AVMFuzzCoverageInterfaceSchemaPayloads,
+		},
+	})
+	require.NoError(t, err)
+	require.NoError(t, group.Validate())
+	require.Equal(t, ComputeAVMRequiredTestCoverageGroupHash(group), group.GroupHash)
+	require.ElementsMatch(t, []AVMRequiredTestCoverageCase{
+		AVMFuzzCoverageMalformedAsyncMessages,
+		AVMFuzzCoverageRandomNonceOrdering,
+		AVMFuzzCoverageQueuePriorityEdgeCases,
+		AVMFuzzCoverageRetryExpiryBoundaries,
+		AVMFuzzCoverageBouncePayloadLimits,
+		AVMFuzzCoverageActorHandlerFailures,
+		AVMFuzzCoverageContinuationStatePayloads,
+		AVMFuzzCoverageContractStorageKeys,
+		AVMFuzzCoverageInterfaceSchemaPayloads,
+	}, group.Cases)
+}
+
 func TestAVMRequiredCoverageRejectsMissingDuplicateCrossCategoryAndHashMismatch(t *testing.T) {
 	spec, err := DefaultAVMRequiredTestCoverageSpec()
 	require.NoError(t, err)
@@ -108,8 +172,15 @@ func TestAVMRequiredCoverageRejectsMissingDuplicateCrossCategoryAndHashMismatch(
 
 	spec, err = DefaultAVMRequiredTestCoverageSpec()
 	require.NoError(t, err)
+	invariant := coverageGroupForTest(t, spec, AVMTestCoverageCategoryInvariant)
+	invariant.Cases[0] = AVMFuzzCoverageMalformedAsyncMessages
+	invariant.GroupHash = ComputeAVMRequiredTestCoverageGroupHash(invariant)
+	require.ErrorContains(t, invariant.Validate(), "case")
+
+	spec, err = DefaultAVMRequiredTestCoverageSpec()
+	require.NoError(t, err)
 	duplicate := spec
-	duplicate.Groups = []AVMRequiredTestCoverageGroup{spec.Groups[0], spec.Groups[0]}
+	duplicate.Groups[1] = spec.Groups[0]
 	duplicate.SpecHash = ComputeAVMRequiredTestCoverageSpecHash(duplicate)
 	require.ErrorContains(t, duplicate.Validate(), "duplicate")
 
@@ -135,4 +206,15 @@ func TestAVMRequiredCoverageRejectsInvalidNames(t *testing.T) {
 		Groups:   []AVMRequiredTestCoverageGroup{},
 	})
 	require.ErrorContains(t, err, "invalid character")
+}
+
+func coverageGroupForTest(t *testing.T, spec AVMRequiredTestCoverageSpec, category AVMRequiredTestCoverageCategory) AVMRequiredTestCoverageGroup {
+	t.Helper()
+	for _, group := range spec.Groups {
+		if group.Category == category {
+			return group
+		}
+	}
+	t.Fatalf("missing coverage group %s", category)
+	return AVMRequiredTestCoverageGroup{}
 }

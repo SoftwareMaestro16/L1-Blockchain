@@ -12,6 +12,8 @@ import (
 const (
 	AVMTestCoverageCategoryUnit        AVMRequiredTestCoverageCategory = "unit"
 	AVMTestCoverageCategoryIntegration AVMRequiredTestCoverageCategory = "integration"
+	AVMTestCoverageCategoryInvariant   AVMRequiredTestCoverageCategory = "invariant"
+	AVMTestCoverageCategoryFuzz        AVMRequiredTestCoverageCategory = "fuzz"
 
 	AVMUnitCoverageMessageIDDerivation       AVMRequiredTestCoverageCase = "message_id_derivation"
 	AVMUnitCoverageSenderNonceValidation     AVMRequiredTestCoverageCase = "sender_nonce_validation"
@@ -35,6 +37,26 @@ const (
 	AVMIntegrationCoverageContinuationResume        AVMRequiredTestCoverageCase = "continuation_resume"
 	AVMIntegrationCoverageContractEmitsAsyncMessage AVMRequiredTestCoverageCase = "contract_emits_async_message"
 	AVMIntegrationCoverageInterfaceDescriptorQuery  AVMRequiredTestCoverageCase = "interface_descriptor_queried_by_client"
+
+	AVMInvariantCoverageExecutedMessageOneReceipt      AVMRequiredTestCoverageCase = "every_executed_message_has_one_receipt"
+	AVMInvariantCoverageQueuedMessageStoredRecord      AVMRequiredTestCoverageCase = "every_queued_message_has_stored_message_record"
+	AVMInvariantCoverageConsumedMessageNoReplay        AVMRequiredTestCoverageCase = "consumed_message_cannot_be_replayed"
+	AVMInvariantCoverageExpiredMessageCannotExecute    AVMRequiredTestCoverageCase = "expired_message_cannot_execute"
+	AVMInvariantCoverageBounceCannotOverRefund         AVMRequiredTestCoverageCase = "bounce_cannot_over_refund_value"
+	AVMInvariantCoverageZoneRootQueueContinuationRoots AVMRequiredTestCoverageCase = "zone_root_includes_queue_and_continuation_roots"
+	AVMInvariantCoverageActorMailboxOrderDeterministic AVMRequiredTestCoverageCase = "actor_mailbox_order_is_deterministic"
+	AVMInvariantCoverageActorStateIsolationEnforced    AVMRequiredTestCoverageCase = "actor_state_isolation_is_enforced"
+	AVMInvariantCoverageContractStoragePrefixIsolated  AVMRequiredTestCoverageCase = "contract_storage_key_prefix_is_isolated"
+
+	AVMFuzzCoverageMalformedAsyncMessages    AVMRequiredTestCoverageCase = "malformed_async_messages"
+	AVMFuzzCoverageRandomNonceOrdering       AVMRequiredTestCoverageCase = "random_nonce_ordering"
+	AVMFuzzCoverageQueuePriorityEdgeCases    AVMRequiredTestCoverageCase = "queue_priority_edge_cases"
+	AVMFuzzCoverageRetryExpiryBoundaries     AVMRequiredTestCoverageCase = "retry_and_expiry_boundary_conditions"
+	AVMFuzzCoverageBouncePayloadLimits       AVMRequiredTestCoverageCase = "bounce_payload_limits"
+	AVMFuzzCoverageActorHandlerFailures      AVMRequiredTestCoverageCase = "actor_handler_failures"
+	AVMFuzzCoverageContinuationStatePayloads AVMRequiredTestCoverageCase = "continuation_state_payloads"
+	AVMFuzzCoverageContractStorageKeys       AVMRequiredTestCoverageCase = "contract_storage_keys"
+	AVMFuzzCoverageInterfaceSchemaPayloads   AVMRequiredTestCoverageCase = "interface_schema_payloads"
 
 	MaxAVMRequiredTestCoverageCategories = 8
 	MaxAVMRequiredTestCoverageCases      = 64
@@ -87,6 +109,34 @@ func DefaultAVMRequiredTestCoverageSpec() (AVMRequiredTestCoverageSpec, error) {
 				AVMIntegrationCoverageContinuationResume,
 				AVMIntegrationCoverageContractEmitsAsyncMessage,
 				AVMIntegrationCoverageInterfaceDescriptorQuery,
+			},
+		},
+		{
+			Category: AVMTestCoverageCategoryInvariant,
+			Cases: []AVMRequiredTestCoverageCase{
+				AVMInvariantCoverageExecutedMessageOneReceipt,
+				AVMInvariantCoverageQueuedMessageStoredRecord,
+				AVMInvariantCoverageConsumedMessageNoReplay,
+				AVMInvariantCoverageExpiredMessageCannotExecute,
+				AVMInvariantCoverageBounceCannotOverRefund,
+				AVMInvariantCoverageZoneRootQueueContinuationRoots,
+				AVMInvariantCoverageActorMailboxOrderDeterministic,
+				AVMInvariantCoverageActorStateIsolationEnforced,
+				AVMInvariantCoverageContractStoragePrefixIsolated,
+			},
+		},
+		{
+			Category: AVMTestCoverageCategoryFuzz,
+			Cases: []AVMRequiredTestCoverageCase{
+				AVMFuzzCoverageMalformedAsyncMessages,
+				AVMFuzzCoverageRandomNonceOrdering,
+				AVMFuzzCoverageQueuePriorityEdgeCases,
+				AVMFuzzCoverageRetryExpiryBoundaries,
+				AVMFuzzCoverageBouncePayloadLimits,
+				AVMFuzzCoverageActorHandlerFailures,
+				AVMFuzzCoverageContinuationStatePayloads,
+				AVMFuzzCoverageContractStorageKeys,
+				AVMFuzzCoverageInterfaceSchemaPayloads,
 			},
 		},
 	}
@@ -175,14 +225,14 @@ func (s AVMRequiredTestCoverageSpec) Validate() error {
 }
 
 func AllAVMRequiredTestCoverageCategories() []AVMRequiredTestCoverageCategory {
-	categories := []AVMRequiredTestCoverageCategory{AVMTestCoverageCategoryIntegration, AVMTestCoverageCategoryUnit}
+	categories := []AVMRequiredTestCoverageCategory{AVMTestCoverageCategoryFuzz, AVMTestCoverageCategoryIntegration, AVMTestCoverageCategoryInvariant, AVMTestCoverageCategoryUnit}
 	sort.Slice(categories, func(i, j int) bool { return categories[i] < categories[j] })
 	return categories
 }
 
 func IsAVMRequiredTestCoverageCategory(category AVMRequiredTestCoverageCategory) bool {
 	switch category {
-	case AVMTestCoverageCategoryUnit, AVMTestCoverageCategoryIntegration:
+	case AVMTestCoverageCategoryUnit, AVMTestCoverageCategoryIntegration, AVMTestCoverageCategoryInvariant, AVMTestCoverageCategoryFuzz:
 		return true
 	default:
 		return false
@@ -290,6 +340,30 @@ func requiredAVMRequiredTestCoverageCases(category AVMRequiredTestCoverageCatego
 			AVMIntegrationCoverageContinuationResume,
 			AVMIntegrationCoverageContractEmitsAsyncMessage,
 			AVMIntegrationCoverageInterfaceDescriptorQuery,
+		}
+	case AVMTestCoverageCategoryInvariant:
+		return []AVMRequiredTestCoverageCase{
+			AVMInvariantCoverageExecutedMessageOneReceipt,
+			AVMInvariantCoverageQueuedMessageStoredRecord,
+			AVMInvariantCoverageConsumedMessageNoReplay,
+			AVMInvariantCoverageExpiredMessageCannotExecute,
+			AVMInvariantCoverageBounceCannotOverRefund,
+			AVMInvariantCoverageZoneRootQueueContinuationRoots,
+			AVMInvariantCoverageActorMailboxOrderDeterministic,
+			AVMInvariantCoverageActorStateIsolationEnforced,
+			AVMInvariantCoverageContractStoragePrefixIsolated,
+		}
+	case AVMTestCoverageCategoryFuzz:
+		return []AVMRequiredTestCoverageCase{
+			AVMFuzzCoverageMalformedAsyncMessages,
+			AVMFuzzCoverageRandomNonceOrdering,
+			AVMFuzzCoverageQueuePriorityEdgeCases,
+			AVMFuzzCoverageRetryExpiryBoundaries,
+			AVMFuzzCoverageBouncePayloadLimits,
+			AVMFuzzCoverageActorHandlerFailures,
+			AVMFuzzCoverageContinuationStatePayloads,
+			AVMFuzzCoverageContractStorageKeys,
+			AVMFuzzCoverageInterfaceSchemaPayloads,
 		}
 	default:
 		return nil
