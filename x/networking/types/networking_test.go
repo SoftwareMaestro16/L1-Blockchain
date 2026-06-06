@@ -4515,6 +4515,114 @@ func TestRoutingAndStateTransitionHardRules(t *testing.T) {
 	}), "forbidden")
 }
 
+func TestNetworkingNonGoalsDefineSectionEighteenBoundary(t *testing.T) {
+	spec := DefaultNetworkingNonGoalSpec()
+	require.NoError(t, ValidateNetworkingNonGoalSpec(spec))
+	require.Len(t, spec.NonGoals, 7)
+	require.NotEmpty(t, spec.SpecRoot)
+	require.Contains(t, networkingNonGoalIDs(spec.NonGoals), NetworkingNonGoalApplicationLogic)
+	require.Contains(t, networkingNonGoalIDs(spec.NonGoals), NetworkingNonGoalReplaceCometBFTConsensus)
+	require.Contains(t, networkingNonGoalIDs(spec.NonGoals), NetworkingNonGoalExternalDiscoveryServices)
+	require.Contains(t, networkingNonGoalIDs(spec.NonGoals), NetworkingNonGoalLiveMetricsConsensusAuthority)
+	require.Contains(t, networkingNonGoalIDs(spec.NonGoals), NetworkingNonGoalOffChainServiceConsensusLogic)
+
+	missing := spec
+	missing.NonGoals = append([]NetworkingNonGoal(nil), spec.NonGoals[:len(spec.NonGoals)-1]...)
+	missing.SpecRoot = ComputeNetworkingNonGoalSpecRoot(missing)
+	require.ErrorContains(t, ValidateNetworkingNonGoalSpec(missing), "must define 7 non-goals")
+
+	unknown := spec
+	unknown.NonGoals = append([]NetworkingNonGoal(nil), spec.NonGoals...)
+	unknown.NonGoals[0] = NetworkingNonGoal("ship_social_network")
+	unknown.SpecRoot = ComputeNetworkingNonGoalSpecRoot(unknown)
+	require.ErrorContains(t, ValidateNetworkingNonGoalSpec(unknown), "unknown networking non-goal")
+}
+
+func TestNetworkingScopeBoundaryRejectsNonGoalViolations(t *testing.T) {
+	boundary := DefaultNetworkingScopeBoundary()
+	require.NoError(t, ValidateNetworkingScopeBoundary(boundary))
+	require.NotEmpty(t, boundary.BoundaryRoot)
+
+	cases := []struct {
+		name    string
+		mutate  func(NetworkingScopeBoundary) NetworkingScopeBoundary
+		wantErr string
+	}{
+		{
+			name: "application logic",
+			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
+				boundary.ImplementsApplicationLogic = true
+				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
+				return boundary
+			},
+			wantErr: "application logic",
+		},
+		{
+			name: "replace cometbft",
+			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
+				boundary.ReplacesCometBFTConsensus = true
+				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
+				return boundary
+			},
+			wantErr: "replace CometBFT consensus",
+		},
+		{
+			name: "centralized routing",
+			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
+				boundary.RequiresCentralizedRouting = true
+				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
+				return boundary
+			},
+			wantErr: "centralized routing",
+		},
+		{
+			name: "external discovery",
+			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
+				boundary.RequiresExternalDiscoveryServices = true
+				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
+				return boundary
+			},
+			wantErr: "external discovery services",
+		},
+		{
+			name: "messaging social",
+			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
+				boundary.IntroducesMessagingSocialLayer = true
+				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
+				return boundary
+			},
+			wantErr: "messaging or social network",
+		},
+		{
+			name: "live metrics authoritative",
+			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
+				boundary.LiveMetricsConsensusAuthoritative = true
+				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
+				return boundary
+			},
+			wantErr: "live network metrics consensus-authoritative",
+		},
+		{
+			name: "offchain service logic",
+			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
+				boundary.OffChainServiceLogicInConsensus = true
+				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
+				return boundary
+			},
+			wantErr: "off-chain service logic inside consensus",
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			require.ErrorContains(t, ValidateNetworkingScopeBoundary(tc.mutate(boundary)), tc.wantErr)
+		})
+	}
+
+	tampered := boundary
+	tampered.BoundaryRoot = HashParts("wrong-non-goal-boundary")
+	require.ErrorContains(t, ValidateNetworkingScopeBoundary(tampered), "boundary root mismatch")
+}
+
 func TestNetworkRoleConsensusScopeRequiresBondedCommitment(t *testing.T) {
 	salt := []byte("aetheris-test-network")
 	record := signedNodeRecord(t, 0x61, salt, 100, NodeRoleService, NodeRoleRouting, NodeRoleStorageProvider)
@@ -5369,6 +5477,12 @@ func networkingAlertRuleIDs(rules []NetworkingAlertRule) []NetworkingObservableA
 		out[i] = NormalizeNetworkingAlertRule(rule).Alert
 	}
 	sortObservableAlerts(out)
+	return out
+}
+
+func networkingNonGoalIDs(nonGoals []NetworkingNonGoal) []NetworkingNonGoal {
+	out := append([]NetworkingNonGoal(nil), nonGoals...)
+	sortNetworkingNonGoals(out)
 	return out
 }
 
