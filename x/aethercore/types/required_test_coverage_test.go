@@ -1,214 +1,165 @@
 package types
 
-import (
-	"testing"
+import "testing"
 
-	"github.com/stretchr/testify/require"
-)
-
-func TestRequiredTestCoverageManifestCoversSection16(t *testing.T) {
-	manifest, err := DefaultRequiredTestCoverageManifest()
-	require.NoError(t, err)
-	require.NoError(t, manifest.Validate())
-	require.Len(t, manifest.UnitTests, 12)
-	require.Len(t, manifest.IntegrationTests, 8)
-	require.Len(t, manifest.InvariantTests, 9)
-	require.Len(t, manifest.SimulationTests, 8)
-	require.Len(t, manifest.PerformanceTests, 9)
-	require.Equal(t, ComputeRequiredTestCoverageManifestHash(manifest), manifest.ManifestHash)
-
-	for _, id := range RequiredUnitTestCoverageIDs() {
-		spec, found := RequiredUnitTestCoverageByID(manifest, id)
-		require.True(t, found, id)
-		require.Equal(t, TestCoverageKindUnit, spec.Kind)
-		require.True(t, IsRequiredCosmosSDKModule(spec.ModuleName), id)
-		require.True(t, IsImplementationRoadmapPhaseID(spec.PhaseID), id)
-		require.NotEmpty(t, spec.CoverageTarget, id)
-		require.NotEmpty(t, spec.Assertions, id)
-		require.Equal(t, ComputeRequiredTestCoverageSpecHash(spec), spec.SpecHash)
+func TestRequiredTestCoverageCoversSectionSeventeen(t *testing.T) {
+	spec, err := DefaultRequiredTestCoverageSpec()
+	if err != nil {
+		t.Fatalf("default required test coverage: %v", err)
+	}
+	if err := spec.Validate(); err != nil {
+		t.Fatalf("validate required test coverage: %v", err)
+	}
+	if err := ValidateRequiredTestCoverage(); err != nil {
+		t.Fatalf("required test coverage completeness: %v", err)
 	}
 
-	for _, id := range RequiredIntegrationTestCoverageIDs() {
-		spec, found := RequiredIntegrationTestCoverageByID(manifest, id)
-		require.True(t, found, id)
-		require.Equal(t, TestCoverageKindIntegration, spec.Kind)
-		require.True(t, IsRequiredCosmosSDKModule(spec.ModuleName), id)
-		require.True(t, IsImplementationRoadmapPhaseID(spec.PhaseID), id)
-		require.NotEmpty(t, spec.CoverageTarget, id)
-		require.NotEmpty(t, spec.Assertions, id)
-		require.Equal(t, ComputeRequiredTestCoverageSpecHash(spec), spec.SpecHash)
+	counts := map[RequiredCoverageKind]int{}
+	byID := map[RequiredCoverageID]RequiredTestCase{}
+	for _, test := range spec.Tests {
+		counts[test.Kind]++
+		byID[test.TestID] = test
 	}
-
-	for _, id := range RequiredInvariantTestCoverageIDs() {
-		spec, found := RequiredInvariantTestCoverageByID(manifest, id)
-		require.True(t, found, id)
-		require.Equal(t, TestCoverageKindInvariant, spec.Kind)
-		require.True(t, IsRequiredCosmosSDKModule(spec.ModuleName), id)
-		require.True(t, IsImplementationRoadmapPhaseID(spec.PhaseID), id)
-		require.NotEmpty(t, spec.CoverageTarget, id)
-		require.NotEmpty(t, spec.Assertions, id)
-		require.Equal(t, ComputeRequiredTestCoverageSpecHash(spec), spec.SpecHash)
+	if counts[RequiredCoverageDeterminism] != 5 {
+		t.Fatalf("expected 5 determinism tests, got %d", counts[RequiredCoverageDeterminism])
 	}
-
-	for _, id := range RequiredSimulationTestCoverageIDs() {
-		spec, found := RequiredSimulationTestCoverageByID(manifest, id)
-		require.True(t, found, id)
-		require.Equal(t, TestCoverageKindSimulation, spec.Kind)
-		require.True(t, IsRequiredCosmosSDKModule(spec.ModuleName), id)
-		require.True(t, IsImplementationRoadmapPhaseID(spec.PhaseID), id)
-		require.NotEmpty(t, spec.CoverageTarget, id)
-		require.NotEmpty(t, spec.Assertions, id)
-		require.Equal(t, ComputeRequiredTestCoverageSpecHash(spec), spec.SpecHash)
+	if counts[RequiredCoverageInvariant] != 8 {
+		t.Fatalf("expected 8 invariant tests, got %d", counts[RequiredCoverageInvariant])
 	}
-
-	for _, id := range RequiredPerformanceTestCoverageIDs() {
-		spec, found := RequiredPerformanceTestCoverageByID(manifest, id)
-		require.True(t, found, id)
-		require.Equal(t, TestCoverageKindPerformance, spec.Kind)
-		require.True(t, IsRequiredCosmosSDKModule(spec.ModuleName), id)
-		require.True(t, IsImplementationRoadmapPhaseID(spec.PhaseID), id)
-		require.NotEmpty(t, spec.CoverageTarget, id)
-		require.NotEmpty(t, spec.Assertions, id)
-		require.Equal(t, ComputeRequiredTestCoverageSpecHash(spec), spec.SpecHash)
+	if counts[RequiredCoverageSimulation] != 8 {
+		t.Fatalf("expected 8 simulation tests, got %d", counts[RequiredCoverageSimulation])
 	}
-
-	messageID, found := RequiredUnitTestCoverageByID(manifest, UnitCoverageMessageIDDerivation)
-	require.True(t, found)
-	require.Equal(t, CosmosModuleMessages, messageID.ModuleName)
-	require.Equal(t, RoadmapPhaseCrossZoneMessages, messageID.PhaseID)
-	require.Contains(t, messageID.Assertions, "same canonical envelope derives identical id")
-
-	rootEncoding, found := RequiredUnitTestCoverageByID(manifest, UnitCoverageRootEncoding)
-	require.True(t, found)
-	require.Equal(t, CosmosModuleAetherCore, rootEncoding.ModuleName)
-
-	payment, found := RequiredIntegrationTestCoverageByID(manifest, IntegrationCoverageCrossZoneIdentityBoundPayment)
-	require.True(t, found)
-	require.Equal(t, CosmosModulePayments, payment.ModuleName)
-	require.Equal(t, RoadmapPhaseIdentityPaymentIntegration, payment.PhaseID)
-
-	contractOutbound, found := RequiredIntegrationTestCoverageByID(manifest, IntegrationCoverageContractOutboundMessageFinancial)
-	require.True(t, found)
-	require.Equal(t, CosmosModuleContracts, contractOutbound.ModuleName)
-	require.Equal(t, RoadmapPhaseVMRuntime, contractOutbound.PhaseID)
-
-	globalRootInvariant, found := RequiredInvariantTestCoverageByID(manifest, InvariantCoverageGlobalRootIncludesEnabledZones)
-	require.True(t, found)
-	require.Equal(t, CosmosModuleAetherCore, globalRootInvariant.ModuleName)
-	require.Equal(t, RoadmapPhaseKernelRootModel, globalRootInvariant.PhaseID)
-
-	escrowInvariant, found := RequiredInvariantTestCoverageByID(manifest, InvariantCoveragePaymentSettlementWithinEscrow)
-	require.True(t, found)
-	require.Equal(t, CosmosModulePayments, escrowInvariant.ModuleName)
-	require.Equal(t, RoadmapPhaseIdentityPaymentIntegration, escrowInvariant.PhaseID)
-
-	blockSTMSimulation, found := RequiredSimulationTestCoverageByID(manifest, SimulationCoverageMixedZoneExecutionUnderBlockSTM)
-	require.True(t, found)
-	require.Equal(t, CosmosModuleZones, blockSTMSimulation.ModuleName)
-	require.Equal(t, RoadmapPhasePerformanceHardening, blockSTMSimulation.PhaseID)
-
-	rootAggregationPerf, found := RequiredPerformanceTestCoverageByID(manifest, PerformanceCoverageRootAggregationCostPerZone)
-	require.True(t, found)
-	require.Equal(t, CosmosModuleAetherCore, rootAggregationPerf.ModuleName)
-	require.Equal(t, RoadmapPhasePerformanceHardening, rootAggregationPerf.PhaseID)
-
-	serviceLookupPerf, found := RequiredPerformanceTestCoverageByID(manifest, PerformanceCoverageServiceLookupLatency)
-	require.True(t, found)
-	require.Equal(t, CosmosModuleServices, serviceLookupPerf.ModuleName)
-	require.Equal(t, RoadmapPhasePerformanceHardening, serviceLookupPerf.PhaseID)
+	if counts[RequiredCoveragePerformance] != 8 {
+		t.Fatalf("expected 8 performance tests, got %d", counts[RequiredCoveragePerformance])
+	}
+	if byID[RequiredCoverageSameBlockZoneRoots].Target != "block replay harness" {
+		t.Fatalf("unexpected zone root determinism target: %s", byID[RequiredCoverageSameBlockZoneRoots].Target)
+	}
+	if byID[RequiredCoverageOutboxReceiptOrPending].Kind != RequiredCoverageInvariant {
+		t.Fatal("expected outbox receipt coverage to be an invariant")
+	}
+	if byID[RequiredCoverageShardSplitPreservesKeys].Target != "shard split migration invariant" {
+		t.Fatalf("unexpected shard split target: %s", byID[RequiredCoverageShardSplitPreservesKeys].Target)
+	}
+	if byID[RequiredCoverageShardMergePreservesKeys].Target != "shard merge migration invariant" {
+		t.Fatalf("unexpected shard merge target: %s", byID[RequiredCoverageShardMergePreservesKeys].Target)
+	}
+	if byID[RequiredCoverageAdaptiveSyncActiveQueues].Target != "AdaptiveSync queue recovery simulator" {
+		t.Fatalf("unexpected AdaptiveSync simulation target: %s", byID[RequiredCoverageAdaptiveSyncActiveQueues].Target)
+	}
+	if byID[RequiredCoverageStoreV2ProofLatency].Target != "Store v2 proof benchmark" {
+		t.Fatalf("unexpected Store v2 benchmark target: %s", byID[RequiredCoverageStoreV2ProofLatency].Target)
+	}
 }
 
-func TestRequiredTestCoverageManifestRejectsMissingDuplicateAndMalformedCoverage(t *testing.T) {
-	manifest, err := DefaultRequiredTestCoverageManifest()
-	require.NoError(t, err)
-
-	missingUnit := manifest
-	missingUnit.UnitTests = append([]RequiredTestCoverageSpec(nil), manifest.UnitTests[1:]...)
-	missingUnit.ManifestHash = ComputeRequiredTestCoverageManifestHash(missingUnit)
-	require.ErrorContains(t, missingUnit.Validate(), "must include 12 required coverage areas")
-
-	duplicateIntegration := manifest
-	duplicateIntegration.IntegrationTests = append([]RequiredTestCoverageSpec(nil), manifest.IntegrationTests...)
-	duplicateIntegration.IntegrationTests[len(duplicateIntegration.IntegrationTests)-1] = duplicateIntegration.IntegrationTests[0]
-	duplicateIntegration.ManifestHash = ComputeRequiredTestCoverageManifestHash(duplicateIntegration)
-	require.ErrorContains(t, duplicateIntegration.Validate(), "duplicate")
-
-	unknownModule := manifest
-	unknownModule.UnitTests = append([]RequiredTestCoverageSpec(nil), manifest.UnitTests...)
-	unknownModule.UnitTests[0].ModuleName = CosmosSDKModuleName("dex")
-	unknownModule.UnitTests[0].SpecHash = ComputeRequiredTestCoverageSpecHash(unknownModule.UnitTests[0])
-	unknownModule.ManifestHash = ComputeRequiredTestCoverageManifestHash(unknownModule)
-	require.ErrorContains(t, unknownModule.Validate(), "unknown module")
-
-	unknownPhase := manifest
-	unknownPhase.IntegrationTests = append([]RequiredTestCoverageSpec(nil), manifest.IntegrationTests...)
-	unknownPhase.IntegrationTests[0].PhaseID = ImplementationRoadmapPhaseID("phase-99")
-	unknownPhase.IntegrationTests[0].SpecHash = ComputeRequiredTestCoverageSpecHash(unknownPhase.IntegrationTests[0])
-	unknownPhase.ManifestHash = ComputeRequiredTestCoverageManifestHash(unknownPhase)
-	require.ErrorContains(t, unknownPhase.Validate(), "unknown roadmap phase")
-
-	missingInvariant := manifest
-	missingInvariant.InvariantTests = append([]RequiredTestCoverageSpec(nil), manifest.InvariantTests[1:]...)
-	missingInvariant.ManifestHash = ComputeRequiredTestCoverageManifestHash(missingInvariant)
-	require.ErrorContains(t, missingInvariant.Validate(), "must include 9 required coverage areas")
-
-	duplicateSimulation := manifest
-	duplicateSimulation.SimulationTests = append([]RequiredTestCoverageSpec(nil), manifest.SimulationTests...)
-	duplicateSimulation.SimulationTests[len(duplicateSimulation.SimulationTests)-1] = duplicateSimulation.SimulationTests[0]
-	duplicateSimulation.ManifestHash = ComputeRequiredTestCoverageManifestHash(duplicateSimulation)
-	require.ErrorContains(t, duplicateSimulation.Validate(), "duplicate")
-
-	missingPerformance := manifest
-	missingPerformance.PerformanceTests = append([]RequiredTestCoverageSpec(nil), manifest.PerformanceTests[1:]...)
-	missingPerformance.ManifestHash = ComputeRequiredTestCoverageManifestHash(missingPerformance)
-	require.ErrorContains(t, missingPerformance.Validate(), "must include 9 required coverage areas")
-
-	noAssertions := manifest
-	noAssertions.UnitTests = append([]RequiredTestCoverageSpec(nil), manifest.UnitTests...)
-	noAssertions.UnitTests[0].Assertions = nil
-	noAssertions.UnitTests[0].SpecHash = ComputeRequiredTestCoverageSpecHash(noAssertions.UnitTests[0])
-	noAssertions.ManifestHash = ComputeRequiredTestCoverageManifestHash(noAssertions)
-	require.ErrorContains(t, noAssertions.Validate(), "assertions are required")
-
-	hashMismatch := manifest
-	hashMismatch.UnitTests = append([]RequiredTestCoverageSpec(nil), manifest.UnitTests...)
-	hashMismatch.UnitTests[0].Assertions = append([]string(nil), hashMismatch.UnitTests[0].Assertions...)
-	hashMismatch.UnitTests[0].Assertions[0] = "tampered assertion"
-	hashMismatch.ManifestHash = ComputeRequiredTestCoverageManifestHash(hashMismatch)
-	require.ErrorContains(t, hashMismatch.Validate(), "spec hash mismatch")
-}
-
-func TestRequiredTestCoverageManifestHashIsCanonical(t *testing.T) {
-	manifest, err := DefaultRequiredTestCoverageManifest()
-	require.NoError(t, err)
-
-	reversedUnits := reverseCoverageSpecs(manifest.UnitTests)
-	reversedIntegration := reverseCoverageSpecs(manifest.IntegrationTests)
-	reversedInvariants := reverseCoverageSpecs(manifest.InvariantTests)
-	reversedSimulations := reverseCoverageSpecs(manifest.SimulationTests)
-	reversedPerformance := reverseCoverageSpecs(manifest.PerformanceTests)
-	reordered, err := NewRequiredTestCoverageManifest(reversedUnits, reversedIntegration, reversedInvariants, reversedSimulations, reversedPerformance)
-	require.NoError(t, err)
-	require.Equal(t, manifest.ManifestHash, reordered.ManifestHash)
-	require.Equal(t, manifest.UnitTests, reordered.UnitTests)
-	require.Equal(t, manifest.IntegrationTests, reordered.IntegrationTests)
-	require.Equal(t, manifest.InvariantTests, reordered.InvariantTests)
-	require.Equal(t, manifest.SimulationTests, reordered.SimulationTests)
-	require.Equal(t, manifest.PerformanceTests, reordered.PerformanceTests)
-
-	tampered := manifest
-	tampered.IntegrationTests = append([]RequiredTestCoverageSpec(nil), manifest.IntegrationTests...)
-	tampered.IntegrationTests[0].CoverageTarget = "tampered target"
-	tampered.IntegrationTests[0].SpecHash = ComputeRequiredTestCoverageSpecHash(tampered.IntegrationTests[0])
-	tampered.ManifestHash = ComputeRequiredTestCoverageManifestHash(tampered)
-	require.NoError(t, tampered.Validate())
-	require.NotEqual(t, manifest.ManifestHash, tampered.ManifestHash)
-}
-
-func reverseCoverageSpecs(specs []RequiredTestCoverageSpec) []RequiredTestCoverageSpec {
-	out := make([]RequiredTestCoverageSpec, len(specs))
-	for i := range specs {
-		out[i] = specs[len(specs)-1-i]
+func TestRequiredTestCoverageRootCanonicalAndRejectsTamper(t *testing.T) {
+	defaultSpec, err := DefaultRequiredTestCoverageSpec()
+	if err != nil {
+		t.Fatalf("default required test coverage: %v", err)
 	}
-	return out
+
+	reordered := append([]RequiredTestCase{}, InvariantTestCases()...)
+	reordered = append(reordered, PerformanceTestCases()...)
+	reordered = append(reordered, DeterminismTestCases()...)
+	reordered = append(reordered, SimulationTestCases()...)
+	reorderedSpec, err := BuildRequiredTestCoverageSpec(reordered)
+	if err != nil {
+		t.Fatalf("reordered required test coverage: %v", err)
+	}
+	if reorderedSpec.Root != defaultSpec.Root {
+		t.Fatalf("canonical required coverage root mismatch: %s != %s", reorderedSpec.Root, defaultSpec.Root)
+	}
+
+	if _, err := BuildRequiredTestCoverageSpec([]RequiredTestCase{defaultSpec.Tests[0], defaultSpec.Tests[0]}); err == nil {
+		t.Fatal("expected duplicate required coverage item to fail")
+	}
+
+	tampered := defaultSpec
+	tampered.Tests[0].DescriptorHash = hashParts("tampered required coverage test")
+	if err := tampered.Validate(); err == nil {
+		t.Fatal("expected tampered required coverage descriptor hash to fail")
+	}
+}
+
+func TestRequiredTestCoverageRejectsWrongKindAndMissingAssertion(t *testing.T) {
+	wrongKind := requiredTest(RequiredCoverageInvariant, RequiredCoverageSameVMOutput, "Same VM bytecode produces identical output.", "AVM determinism tests", "Compare outputs.")
+	if err := wrongKind.Validate(); err == nil {
+		t.Fatal("expected wrong kind for determinism coverage to fail")
+	}
+
+	missingAssertion := requiredTest(RequiredCoverageDeterminism, RequiredCoverageSameVMOutput, "Same VM bytecode produces identical output.", "AVM determinism tests", "Compare outputs.")
+	missingAssertion.Assertion = ""
+	missingAssertion.DescriptorHash = ComputeRequiredTestCaseHash(missingAssertion)
+	if err := missingAssertion.Validate(); err == nil {
+		t.Fatal("expected missing assertion to fail")
+	}
+
+	badHash := requiredTest(RequiredCoverageDeterminism, RequiredCoverageSameVMOutput, "Same VM bytecode produces identical output.", "AVM determinism tests", "Compare outputs.")
+	badHash.DescriptorHash = hashParts("wrong required coverage hash")
+	if err := badHash.Validate(); err == nil {
+		t.Fatal("expected wrong descriptor hash to fail")
+	}
+}
+
+func TestRequiredTestCoverageEvidenceRequiresAllCoverageGroupsToPass(t *testing.T) {
+	evidence := validRequiredTestCoverageEvidence(t)
+	if err := evidence.Validate(); err != nil {
+		t.Fatalf("required coverage evidence should validate: %v", err)
+	}
+
+	noDeterminism := evidence
+	noDeterminism.DeterminismTestsPassed = false
+	noDeterminism.EvidenceHash = ComputeRequiredTestCoverageEvidenceHash(noDeterminism)
+	if err := noDeterminism.Validate(); err == nil {
+		t.Fatal("expected evidence without determinism pass to fail")
+	}
+
+	noInvariants := evidence
+	noInvariants.InvariantTestsPassed = false
+	noInvariants.EvidenceHash = ComputeRequiredTestCoverageEvidenceHash(noInvariants)
+	if err := noInvariants.Validate(); err == nil {
+		t.Fatal("expected evidence without invariant pass to fail")
+	}
+
+	noSimulation := evidence
+	noSimulation.SimulationTestsPassed = false
+	noSimulation.EvidenceHash = ComputeRequiredTestCoverageEvidenceHash(noSimulation)
+	if err := noSimulation.Validate(); err == nil {
+		t.Fatal("expected evidence without simulation pass to fail")
+	}
+
+	noPerformance := evidence
+	noPerformance.PerformanceTestsPassed = false
+	noPerformance.EvidenceHash = ComputeRequiredTestCoverageEvidenceHash(noPerformance)
+	if err := noPerformance.Validate(); err == nil {
+		t.Fatal("expected evidence without performance pass to fail")
+	}
+
+	tampered := evidence
+	tampered.EvidenceHash = hashParts("tampered required coverage evidence")
+	if err := tampered.Validate(); err == nil {
+		t.Fatal("expected tampered required coverage evidence hash to fail")
+	}
+}
+
+func validRequiredTestCoverageEvidence(t *testing.T) RequiredTestCoverageEvidence {
+	t.Helper()
+	spec, err := DefaultRequiredTestCoverageSpec()
+	if err != nil {
+		t.Fatalf("default required test coverage: %v", err)
+	}
+	evidence := RequiredTestCoverageEvidence{
+		CoverageRoot:           spec.Root,
+		DeterminismVectorRoot:  hashParts("determinism vectors"),
+		InvariantVectorRoot:    hashParts("invariant vectors"),
+		SimulationVectorRoot:   hashParts("simulation vectors"),
+		PerformanceVectorRoot:  hashParts("performance vectors"),
+		ReplayHarnessRoot:      hashParts("replay harness"),
+		DeterminismTestsPassed: true,
+		InvariantTestsPassed:   true,
+		SimulationTestsPassed:  true,
+		PerformanceTestsPassed: true,
+	}
+	evidence.EvidenceHash = ComputeRequiredTestCoverageEvidenceHash(evidence)
+	return evidence
 }
