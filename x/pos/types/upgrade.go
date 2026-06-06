@@ -731,6 +731,43 @@ type PerformanceDampeningResult struct {
 	CollatorAssignmentProbabilityBps uint32
 }
 
+type EconomicSecurityInput struct {
+	Validators              []ScoredValidator
+	RiskWindows             []RiskWindowRecord
+	StakeAtRiskNaet         sdkmath.Int
+	TopN                    uint32
+	ParticipatingValidators uint64
+	EligibleValidators      uint64
+	AcceptedSlashEvents     uint64
+	DetectedFaultEvents     uint64
+	AcceptedEvidence        uint64
+	SubmittedEvidence       uint64
+	CompletedTasks          uint64
+	ExpectedTasks           uint64
+}
+
+type DelegationRiskBucket struct {
+	ValidatorAddress string
+	ExposureNaet     sdkmath.Int
+	RiskWindowCount  uint64
+}
+
+type EconomicSecurityMetrics struct {
+	TotalBondedStakeNaet            sdkmath.Int
+	EffectiveStakeNaet              sdkmath.Int
+	TotalStakeAtRiskNaet            sdkmath.Int
+	StakeSaturationRatioBps         uint32
+	TopN                            uint32
+	TopNVotingPowerConcentrationBps uint32
+	ParticipationRateBps            uint32
+	SlashingEfficiencyBps           uint32
+	EvidenceAcceptanceRateBps       uint32
+	AverageValidatorScore           sdkmath.Int
+	DelegationRiskDistribution      []DelegationRiskBucket
+	TaskCompletionRateBps           uint32
+	SecurityNaet                    sdkmath.Int
+}
+
 type PosLayer string
 
 const (
@@ -1374,6 +1411,177 @@ func ApplyPerformanceDampening(input PerformanceDampeningInput) (PerformanceDamp
 		result.CollatorAssignmentProbabilityBps = input.CollatorAssignmentProbabilityBps
 	}
 	return result, nil
+}
+
+func ComputeEconomicSecurityMetrics(input EconomicSecurityInput) (EconomicSecurityMetrics, error) {
+	if len(input.Validators) == 0 {
+		return EconomicSecurityMetrics{}, errors.New("economic security validators are required")
+	}
+	if input.TopN == 0 {
+		return EconomicSecurityMetrics{}, errors.New("economic security top-n must be positive")
+	}
+	if input.ParticipatingValidators > input.EligibleValidators {
+		return EconomicSecurityMetrics{}, errors.New("participating validators cannot exceed eligible validators")
+	}
+	if input.AcceptedSlashEvents > input.DetectedFaultEvents {
+		return EconomicSecurityMetrics{}, errors.New("accepted slash events cannot exceed detected fault events")
+	}
+	if input.AcceptedEvidence > input.SubmittedEvidence {
+		return EconomicSecurityMetrics{}, errors.New("accepted evidence cannot exceed submitted evidence")
+	}
+	if input.StakeAtRiskNaet.IsNil() {
+		input.StakeAtRiskNaet = sdkmath.ZeroInt()
+	}
+	if input.StakeAtRiskNaet.IsNegative() {
+		return EconomicSecurityMetrics{}, errors.New("stake at risk cannot be negative")
+	}
+	taskCompletion, err := ComputeTaskCompletionRate(TaskCompletionRateInput{
+		CompletedAssignedTasks: input.CompletedTasks,
+		ExpectedAssignedTasks:  input.ExpectedTasks,
+	})
+	if err != nil {
+		return EconomicSecurityMetrics{}, err
+	}
+
+	totalBonded := sdkmath.ZeroInt()
+	effectiveStake := sdkmath.ZeroInt()
+	saturatedStake := sdkmath.ZeroInt()
+	totalScore := sdkmath.ZeroInt()
+	totalVotingPower := sdkmath.ZeroInt()
+	for _, validator := range input.Validators {
+		if err := validateScoredValidatorForSecurity(validator); err != nil {
+			return EconomicSecurityMetrics{}, err
+		}
+		totalBonded = totalBonded.Add(validator.TotalStakeNaet)
+		effectiveStake = effectiveStake.Add(validator.EffectiveStakeNaet)
+		saturatedStake = saturatedStake.Add(validator.ScoreComponents.SaturatedStakeNaet)
+		totalScore = totalScore.Add(validator.Score)
+		totalVotingPower = totalVotingPower.Add(validator.VotingPowerNaet)
+	}
+
+	stakeAtRisk := input.StakeAtRiskNaet
+	riskDistribution, riskExposure, err := BuildDelegationRiskDistribution(input.RiskWindows)
+	if err != nil {
+		return EconomicSecurityMetrics{}, err
+	}
+	if !stakeAtRisk.IsPositive() {
+		stakeAtRisk = riskExposure
+	}
+	if !stakeAtRisk.IsPositive() {
+		stakeAtRisk = totalBonded
+	}
+
+	participation := ratioBps(input.ParticipatingValidators, input.EligibleValidators)
+	slashingEfficiency := ratioBps(input.AcceptedSlashEvents, input.DetectedFaultEvents)
+	security := mulIntBps(stakeAtRisk, participation)
+	security = mulIntBps(security, slashingEfficiency)
+
+	return EconomicSecurityMetrics{
+		TotalBondedStakeNaet:            totalBonded,
+		EffectiveStakeNaet:              effectiveStake,
+		TotalStakeAtRiskNaet:            stakeAtRisk,
+		StakeSaturationRatioBps:         intRatioBps(saturatedStake, totalBonded),
+		TopN:                            input.TopN,
+		TopNVotingPowerConcentrationBps: TopNVotingPowerConcentrationBps(input.Validators, input.TopN),
+		ParticipationRateBps:            participation,
+		SlashingEfficiencyBps:           slashingEfficiency,
+		EvidenceAcceptanceRateBps:       ratioBps(input.AcceptedEvidence, input.SubmittedEvidence),
+		AverageValidatorScore:           totalScore.QuoRaw(int64(len(input.Validators))),
+		DelegationRiskDistribution:      riskDistribution,
+		TaskCompletionRateBps:           taskCompletion,
+		SecurityNaet:                    security,
+	}, nil
+}
+
+func BuildDelegationRiskDistribution(windows []RiskWindowRecord) ([]DelegationRiskBucket, sdkmath.Int, error) {
+	byValidator := make(map[string]DelegationRiskBucket)
+	totalExposure := sdkmath.ZeroInt()
+	for _, window := range windows {
+		if err := window.Validate(); err != nil {
+			return nil, sdkmath.Int{}, err
+		}
+		if window.Status == RiskWindowStatusExpired {
+			continue
+		}
+		bucket := byValidator[window.ValidatorAddress]
+		bucket.ValidatorAddress = window.ValidatorAddress
+		if bucket.ExposureNaet.IsNil() {
+			bucket.ExposureNaet = sdkmath.ZeroInt()
+		}
+		bucket.ExposureNaet = bucket.ExposureNaet.Add(window.AmountNaet)
+		bucket.RiskWindowCount++
+		byValidator[window.ValidatorAddress] = bucket
+		totalExposure = totalExposure.Add(window.AmountNaet)
+	}
+	distribution := make([]DelegationRiskBucket, 0, len(byValidator))
+	for _, bucket := range byValidator {
+		distribution = append(distribution, bucket)
+	}
+	sort.SliceStable(distribution, func(i, j int) bool {
+		if !distribution[i].ExposureNaet.Equal(distribution[j].ExposureNaet) {
+			return distribution[i].ExposureNaet.GT(distribution[j].ExposureNaet)
+		}
+		return distribution[i].ValidatorAddress < distribution[j].ValidatorAddress
+	})
+	return distribution, totalExposure, nil
+}
+
+func TopNVotingPowerConcentrationBps(validators []ScoredValidator, topN uint32) uint32 {
+	if len(validators) == 0 || topN == 0 {
+		return 0
+	}
+	ordered := make([]ScoredValidator, len(validators))
+	copy(ordered, validators)
+	sort.SliceStable(ordered, func(i, j int) bool {
+		if !ordered[i].VotingPowerNaet.Equal(ordered[j].VotingPowerNaet) {
+			return ordered[i].VotingPowerNaet.GT(ordered[j].VotingPowerNaet)
+		}
+		return ordered[i].ValidatorID < ordered[j].ValidatorID
+	})
+	total := sdkmath.ZeroInt()
+	for _, validator := range ordered {
+		if validator.VotingPowerNaet.IsNil() || !validator.VotingPowerNaet.IsPositive() {
+			continue
+		}
+		total = total.Add(validator.VotingPowerNaet)
+	}
+	if !total.IsPositive() {
+		return 0
+	}
+	limit := int(topN)
+	if limit > len(ordered) {
+		limit = len(ordered)
+	}
+	top := sdkmath.ZeroInt()
+	for i := 0; i < limit; i++ {
+		if ordered[i].VotingPowerNaet.IsNil() || !ordered[i].VotingPowerNaet.IsPositive() {
+			continue
+		}
+		top = top.Add(ordered[i].VotingPowerNaet)
+	}
+	return intRatioBps(top, total)
+}
+
+func validateScoredValidatorForSecurity(validator ScoredValidator) error {
+	if err := validatePosToken("economic security validator id", validator.ValidatorID); err != nil {
+		return err
+	}
+	if validator.TotalStakeNaet.IsNil() || validator.TotalStakeNaet.IsNegative() {
+		return errors.New("validator total stake cannot be nil or negative")
+	}
+	if validator.EffectiveStakeNaet.IsNil() || validator.EffectiveStakeNaet.IsNegative() {
+		return errors.New("validator effective stake cannot be nil or negative")
+	}
+	if validator.VotingPowerNaet.IsNil() || validator.VotingPowerNaet.IsNegative() {
+		return errors.New("validator voting power cannot be nil or negative")
+	}
+	if validator.Score.IsNil() || validator.Score.IsNegative() {
+		return errors.New("validator score cannot be nil or negative")
+	}
+	if validator.ScoreComponents.SaturatedStakeNaet.IsNil() || validator.ScoreComponents.SaturatedStakeNaet.IsNegative() {
+		return errors.New("validator saturated stake cannot be nil or negative")
+	}
+	return nil
 }
 
 func reliabilityPenalty(input ReliabilityIndexInput) (uint64, error) {
@@ -5151,6 +5359,19 @@ func ratioBps(numerator uint64, denominator uint64) uint32 {
 		return BasisPoints
 	}
 	return uint32((uint64(BasisPoints) * numerator) / denominator)
+}
+
+func intRatioBps(numerator sdkmath.Int, denominator sdkmath.Int) uint32 {
+	if denominator.IsNil() || !denominator.IsPositive() {
+		return BasisPoints
+	}
+	if numerator.IsNil() || !numerator.IsPositive() {
+		return 0
+	}
+	if numerator.GTE(denominator) {
+		return BasisPoints
+	}
+	return uint32(numerator.MulRaw(int64(BasisPoints)).Quo(denominator).Uint64())
 }
 
 func validatePosToken(fieldName string, value string) error {

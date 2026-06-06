@@ -398,6 +398,112 @@ func TestRiskWindowRecordKeepsRedelegationSourceExposure(t *testing.T) {
 	require.True(t, result.ExposureNaet.IsZero())
 }
 
+func TestEconomicSecurityMetricsComputeFormulaAndRequiredMetrics(t *testing.T) {
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	params.StakeSaturationThresholdNaet = sdkmath.NewInt(1_000)
+	params.StakeSaturationCapFactorBps = BasisPoints
+	validators := scoredCandidates(t, params, []Candidate{
+		candidate("val-a", 2_000, 0),
+		candidate("val-b", 1_000, 0),
+		candidate("val-c", 500, 0),
+	})
+	windows := []RiskWindowRecord{
+		riskWindow("delegator-a", "val-a", 600, RiskWindowStatusActive),
+		riskWindow("delegator-b", "val-b", 400, RiskWindowStatusExited),
+		riskWindow("delegator-c", "val-c", 300, RiskWindowStatusExpired),
+	}
+
+	metrics, err := ComputeEconomicSecurityMetrics(EconomicSecurityInput{
+		Validators:              validators,
+		RiskWindows:             windows,
+		TopN:                    1,
+		ParticipatingValidators: 2,
+		EligibleValidators:      3,
+		AcceptedSlashEvents:     3,
+		DetectedFaultEvents:     4,
+		AcceptedEvidence:        5,
+		SubmittedEvidence:       8,
+		CompletedTasks:          9,
+		ExpectedTasks:           12,
+	})
+	require.NoError(t, err)
+	require.Equal(t, sdkmath.NewInt(3_500), metrics.TotalBondedStakeNaet)
+	require.Equal(t, sdkmath.NewInt(2_500), metrics.EffectiveStakeNaet)
+	require.Equal(t, sdkmath.NewInt(1_000), metrics.TotalStakeAtRiskNaet)
+	require.Equal(t, uint32(2_857), metrics.StakeSaturationRatioBps)
+	require.Equal(t, uint32(4_000), metrics.TopNVotingPowerConcentrationBps)
+	require.Equal(t, uint32(6_666), metrics.ParticipationRateBps)
+	require.Equal(t, uint32(7_500), metrics.SlashingEfficiencyBps)
+	require.Equal(t, uint32(6_250), metrics.EvidenceAcceptanceRateBps)
+	require.Equal(t, sdkmath.NewInt(833), metrics.AverageValidatorScore)
+	require.Equal(t, uint32(7_500), metrics.TaskCompletionRateBps)
+	require.Equal(t, sdkmath.NewInt(499), metrics.SecurityNaet)
+	require.Equal(t, []DelegationRiskBucket{
+		{ValidatorAddress: "val-a", ExposureNaet: sdkmath.NewInt(600), RiskWindowCount: 1},
+		{ValidatorAddress: "val-b", ExposureNaet: sdkmath.NewInt(400), RiskWindowCount: 1},
+	}, metrics.DelegationRiskDistribution)
+
+	override, err := ComputeEconomicSecurityMetrics(EconomicSecurityInput{
+		Validators:              validators,
+		RiskWindows:             windows,
+		StakeAtRiskNaet:         sdkmath.NewInt(2_000),
+		TopN:                    2,
+		ParticipatingValidators: 3,
+		EligibleValidators:      3,
+		AcceptedSlashEvents:     1,
+		DetectedFaultEvents:     2,
+		CompletedTasks:          1,
+		ExpectedTasks:           1,
+	})
+	require.NoError(t, err)
+	require.Equal(t, sdkmath.NewInt(2_000), override.TotalStakeAtRiskNaet)
+	require.Equal(t, uint32(8_000), override.TopNVotingPowerConcentrationBps)
+	require.Equal(t, sdkmath.NewInt(1_000), override.SecurityNaet)
+}
+
+func TestEconomicSecurityMetricsRejectsManipulatedInputs(t *testing.T) {
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	validators := scoredCandidates(t, params, []Candidate{candidate("val-a", 1_000, 0)})
+	windows := []RiskWindowRecord{riskWindow("delegator-a", "val-a", 1_000, RiskWindowStatusActive)}
+	input := EconomicSecurityInput{
+		Validators:              validators,
+		RiskWindows:             windows,
+		TopN:                    1,
+		ParticipatingValidators: 1,
+		EligibleValidators:      1,
+		AcceptedSlashEvents:     1,
+		DetectedFaultEvents:     1,
+		AcceptedEvidence:        1,
+		SubmittedEvidence:       1,
+		CompletedTasks:          1,
+		ExpectedTasks:           1,
+	}
+	_, err := ComputeEconomicSecurityMetrics(input)
+	require.NoError(t, err)
+
+	tampered := input
+	tampered.ParticipatingValidators = 2
+	require.ErrorContains(t, computeSecurity(tampered), "participating validators")
+
+	tampered = input
+	tampered.AcceptedSlashEvents = 2
+	require.ErrorContains(t, computeSecurity(tampered), "accepted slash events")
+
+	tampered = input
+	tampered.AcceptedEvidence = 2
+	require.ErrorContains(t, computeSecurity(tampered), "accepted evidence")
+
+	tampered = input
+	tampered.CompletedTasks = 2
+	require.ErrorContains(t, computeSecurity(tampered), "completed assigned tasks")
+
+	tampered = input
+	tampered.RiskWindows[0].AmountNaet = sdkmath.NewInt(2_000)
+	require.ErrorContains(t, computeSecurity(tampered), "history root")
+}
+
 func TestMaxValidatorSetChangesUsesConfiguredRate(t *testing.T) {
 	params := DefaultParams()
 	params.MaxValidatorSetChangeRateBps = 1_000
@@ -1750,6 +1856,25 @@ func scoredCandidates(t *testing.T, params Params, candidates []Candidate) []Sco
 		validators[i] = scored
 	}
 	return validators
+}
+
+func riskWindow(stakeOwner string, validatorAddress string, amount int64, status string) RiskWindowRecord {
+	window := RiskWindowRecord{
+		StakeOwner:          stakeOwner,
+		ValidatorAddress:    validatorAddress,
+		AmountNaet:          sdkmath.NewInt(amount),
+		StartEpoch:          10,
+		EndEpoch:            20,
+		SlashableUntilEpoch: 24,
+		Status:              status,
+	}
+	window.RiskHistoryRoot = ComputeRiskWindowRoot(window)
+	return window
+}
+
+func computeSecurity(input EconomicSecurityInput) error {
+	_, err := ComputeEconomicSecurityMetrics(input)
+	return err
 }
 
 func posLayerSpecsByLayer(architecture LayeredPosArchitecture) map[PosLayer]PosLayerSpec {
