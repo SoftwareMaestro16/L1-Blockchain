@@ -62,6 +62,20 @@ type EpochPhaseDurations struct {
 	SettlementSeconds       uint64
 }
 
+type EpochSeedSource string
+
+const (
+	EpochSeedSourcePreviousSeedValidatorSet EpochSeedSource = "previous_seed_validator_set"
+	EpochSeedSourceCometBFTBlockID          EpochSeedSource = "cometbft_block_id"
+	EpochSeedSourceExternalBeacon           EpochSeedSource = "external_beacon"
+)
+
+type EpochLifecycleStep struct {
+	Phase       EpochPhase
+	Name        string
+	DurationKey string
+}
+
 type EpochRecord struct {
 	EpochID          uint64
 	StartHeight      uint64
@@ -360,6 +374,103 @@ func ComputeLayeredPosArchitectureRoot(layers []PosLayerSpec) string {
 	})
 }
 
+func DefaultEpochLifecycle() []EpochLifecycleStep {
+	return []EpochLifecycleStep{
+		{Phase: EpochPhaseDelegation, Name: "delegation phase", DurationKey: "delegation_phase_duration"},
+		{Phase: EpochPhaseElection, Name: "validator election", DurationKey: "election_phase_duration"},
+		{Phase: EpochPhaseAssignment, Name: "task group assignment", DurationKey: "assignment_phase_duration"},
+		{Phase: EpochPhaseActive, Name: "active validation", DurationKey: "active_validation_duration"},
+		{Phase: EpochPhaseSettlement, Name: "settlement + reward + slash finality", DurationKey: "settlement_phase_duration"},
+	}
+}
+
+func ValidateEpochLifecycle(lifecycle []EpochLifecycleStep) error {
+	expected := DefaultEpochLifecycle()
+	if len(lifecycle) != len(expected) {
+		return errors.New("epoch lifecycle must define every active phase")
+	}
+	seen := make(map[EpochPhase]struct{}, len(lifecycle))
+	for i, step := range lifecycle {
+		if step.Phase != expected[i].Phase {
+			return fmt.Errorf("epoch lifecycle step %d must be %s", i, expected[i].Phase)
+		}
+		if _, found := seen[step.Phase]; found {
+			return fmt.Errorf("duplicate epoch lifecycle phase %s", step.Phase)
+		}
+		seen[step.Phase] = struct{}{}
+		if strings.TrimSpace(step.Name) != step.Name || step.Name == "" {
+			return fmt.Errorf("epoch lifecycle phase %s name is required", step.Phase)
+		}
+		if strings.TrimSpace(step.DurationKey) != step.DurationKey || step.DurationKey == "" {
+			return fmt.Errorf("epoch lifecycle phase %s duration key is required", step.Phase)
+		}
+	}
+	return nil
+}
+
+func NextEpochPhase(phase EpochPhase) (EpochPhase, bool, error) {
+	switch phase {
+	case EpochPhaseDelegation:
+		return EpochPhaseElection, false, nil
+	case EpochPhaseElection:
+		return EpochPhaseAssignment, false, nil
+	case EpochPhaseAssignment:
+		return EpochPhaseActive, false, nil
+	case EpochPhaseActive:
+		return EpochPhaseSettlement, false, nil
+	case EpochPhaseSettlement:
+		return EpochPhaseClosed, true, nil
+	case EpochPhaseClosed:
+		return EpochPhaseClosed, true, nil
+	default:
+		return "", false, fmt.Errorf("unsupported epoch phase %q", phase)
+	}
+}
+
+func ValidateEpochPhaseTransition(from EpochPhase, to EpochPhase) error {
+	next, _, err := NextEpochPhase(from)
+	if err != nil {
+		return err
+	}
+	if next != to {
+		return fmt.Errorf("invalid epoch phase transition from %s to %s", from, to)
+	}
+	return nil
+}
+
+func (s EpochSeedSource) Validate() error {
+	switch s {
+	case EpochSeedSourcePreviousSeedValidatorSet, EpochSeedSourceCometBFTBlockID, EpochSeedSourceExternalBeacon:
+		return nil
+	default:
+		return fmt.Errorf("unsupported epoch seed source %q", s)
+	}
+}
+
+func (p Params) EffectiveEpochSeedSource() EpochSeedSource {
+	if p.EpochSeedSource == "" {
+		return EpochSeedSourcePreviousSeedValidatorSet
+	}
+	return p.EpochSeedSource
+}
+
+func MaxValidatorSetChanges(params Params, activeValidatorCount uint32) (uint32, error) {
+	if err := params.Validate(); err != nil {
+		return 0, err
+	}
+	if activeValidatorCount == 0 {
+		return 0, errors.New("active validator count must be positive")
+	}
+	changes := (uint64(activeValidatorCount)*uint64(params.MaxValidatorSetChangeRateBps) + uint64(BasisPoints) - 1) / uint64(BasisPoints)
+	if changes == 0 {
+		return 1, nil
+	}
+	if changes > uint64(activeValidatorCount) {
+		return activeValidatorCount, nil
+	}
+	return uint32(changes), nil
+}
+
 func DefaultEpochPhaseDurations(epochDurationSeconds uint64) EpochPhaseDurations {
 	delegation := epochDurationSeconds / 4
 	election := epochDurationSeconds / 12
@@ -466,7 +577,7 @@ func NewEpochRecord(params Params, epochID uint64, startHeight uint64, endHeight
 	if err != nil {
 		return EpochRecord{}, err
 	}
-	seed, err := DeriveEpochSeed(epochID, startHeight, previousSeed, validatorSetHash)
+	seed, err := DeriveEpochSeedWithSource(params.EffectiveEpochSeedSource(), epochID, startHeight, previousSeed, validatorSetHash)
 	if err != nil {
 		return EpochRecord{}, err
 	}
@@ -584,6 +695,13 @@ func ComputeValidatorSetHash(validators []ScoredValidator) (string, error) {
 }
 
 func DeriveEpochSeed(epochID uint64, startHeight uint64, previousSeed string, validatorSetHash string) (string, error) {
+	return DeriveEpochSeedWithSource(EpochSeedSourcePreviousSeedValidatorSet, epochID, startHeight, previousSeed, validatorSetHash)
+}
+
+func DeriveEpochSeedWithSource(source EpochSeedSource, epochID uint64, startHeight uint64, previousSeed string, validatorSetHash string) (string, error) {
+	if err := source.Validate(); err != nil {
+		return "", err
+	}
 	if startHeight == 0 {
 		return "", errors.New("epoch seed start height must be positive")
 	}
@@ -597,6 +715,7 @@ func DeriveEpochSeed(epochID uint64, startHeight uint64, previousSeed string, va
 		return "", err
 	}
 	return posHashRoot("aetheris-pos-epoch-seed-v1", func(w posByteWriter) {
+		posWritePart(w, string(source))
 		posWriteUint64(w, epochID)
 		posWriteUint64(w, startHeight)
 		posWritePart(w, previousSeed)

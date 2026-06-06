@@ -74,6 +74,58 @@ func TestLayeredPoSArchitectureRejectsReorderedOrUpwardDependencies(t *testing.T
 	require.ErrorContains(t, architecture.Validate(), "lower layers")
 }
 
+func TestEpochDefinitionDefaultsMatchLifecycleParameters(t *testing.T) {
+	params := DefaultParams()
+
+	require.NoError(t, params.Validate())
+	require.Equal(t, uint64(43_200), params.EpochDurationSeconds)
+	require.GreaterOrEqual(t, params.EpochDurationSeconds, MinEpochDurationSeconds)
+	require.LessOrEqual(t, params.EpochDurationSeconds, MaxEpochDurationSeconds)
+	require.Equal(t, EpochSeedSourcePreviousSeedValidatorSet, params.EffectiveEpochSeedSource())
+	require.Equal(t, DefaultMaxValidatorSetChangeRateBps, params.MaxValidatorSetChangeRateBps)
+
+	durations := params.EffectivePhaseDurations()
+	require.Equal(t, params.EpochDurationSeconds, durations.TotalSeconds())
+	require.Positive(t, durations.DelegationSeconds)
+	require.Positive(t, durations.ElectionSeconds)
+	require.Positive(t, durations.AssignmentSeconds)
+	require.Positive(t, durations.ActiveValidationSeconds)
+	require.Positive(t, durations.SettlementSeconds)
+
+	params.EpochSeedSource = "unknown"
+	require.ErrorContains(t, params.Validate(), "seed source")
+
+	params = DefaultParams()
+	params.MaxValidatorSetChangeRateBps = 0
+	require.ErrorContains(t, params.Validate(), "validator set change rate")
+}
+
+func TestEpochLifecycleTransitionsFollowTargetOrder(t *testing.T) {
+	lifecycle := DefaultEpochLifecycle()
+	require.NoError(t, ValidateEpochLifecycle(lifecycle))
+	require.Equal(t, []EpochLifecycleStep{
+		{Phase: EpochPhaseDelegation, Name: "delegation phase", DurationKey: "delegation_phase_duration"},
+		{Phase: EpochPhaseElection, Name: "validator election", DurationKey: "election_phase_duration"},
+		{Phase: EpochPhaseAssignment, Name: "task group assignment", DurationKey: "assignment_phase_duration"},
+		{Phase: EpochPhaseActive, Name: "active validation", DurationKey: "active_validation_duration"},
+		{Phase: EpochPhaseSettlement, Name: "settlement + reward + slash finality", DurationKey: "settlement_phase_duration"},
+	}, lifecycle)
+
+	next, closes, err := NextEpochPhase(EpochPhaseDelegation)
+	require.NoError(t, err)
+	require.False(t, closes)
+	require.Equal(t, EpochPhaseElection, next)
+	require.NoError(t, ValidateEpochPhaseTransition(EpochPhaseElection, EpochPhaseAssignment))
+	require.NoError(t, ValidateEpochPhaseTransition(EpochPhaseAssignment, EpochPhaseActive))
+	require.NoError(t, ValidateEpochPhaseTransition(EpochPhaseActive, EpochPhaseSettlement))
+
+	next, closes, err = NextEpochPhase(EpochPhaseSettlement)
+	require.NoError(t, err)
+	require.True(t, closes)
+	require.Equal(t, EpochPhaseClosed, next)
+	require.ErrorContains(t, ValidateEpochPhaseTransition(EpochPhaseDelegation, EpochPhaseActive), "invalid epoch phase transition")
+}
+
 func TestEpochLifecyclePhasesAndSeedAreDeterministic(t *testing.T) {
 	params := DefaultParams()
 	params.MinStakeNaet = sdkmath.NewInt(100)
@@ -103,10 +155,43 @@ func TestEpochLifecyclePhasesAndSeedAreDeterministic(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEqual(t, left.Seed, next.Seed)
 
+	sourceParams := params
+	sourceParams.EpochSeedSource = EpochSeedSourceCometBFTBlockID
+	sourceRecord, err := NewEpochRecord(sourceParams, 7, 100, 199, EpochPhaseAssignment, "", validators)
+	require.NoError(t, err)
+	require.NotEqual(t, left.Seed, sourceRecord.Seed)
+
 	closed, err := CloseEpochRecord(left, PosEmptyRootHash, PosEmptyRootHash, PosEmptyRootHash)
 	require.NoError(t, err)
 	require.Equal(t, EpochPhaseClosed, closed.Phase)
 	require.Equal(t, SettlementStatusFinalized, closed.SettlementStatus)
+}
+
+func TestMaxValidatorSetChangesUsesConfiguredRate(t *testing.T) {
+	params := DefaultParams()
+	params.MaxValidatorSetChangeRateBps = 1_000
+
+	changes, err := MaxValidatorSetChanges(params, 75)
+	require.NoError(t, err)
+	require.Equal(t, uint32(8), changes)
+
+	params.MaxValidatorSetChangeRateBps = BasisPoints
+	changes, err = MaxValidatorSetChanges(params, 75)
+	require.NoError(t, err)
+	require.Equal(t, uint32(75), changes)
+
+	_, err = MaxValidatorSetChanges(params, 0)
+	require.ErrorContains(t, err, "active validator count")
+}
+
+func TestEpochLifecycleValidationRejectsReorderedOrDuplicatePhases(t *testing.T) {
+	lifecycle := DefaultEpochLifecycle()
+	slices.Reverse(lifecycle)
+	require.ErrorContains(t, ValidateEpochLifecycle(lifecycle), "lifecycle step 0")
+
+	lifecycle = DefaultEpochLifecycle()
+	lifecycle[1] = lifecycle[0]
+	require.ErrorContains(t, ValidateEpochLifecycle(lifecycle), "lifecycle step 1")
 }
 
 func TestScoreCandidateAppliesLatencyAndReliabilityFactors(t *testing.T) {

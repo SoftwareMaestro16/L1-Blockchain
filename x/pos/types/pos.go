@@ -30,6 +30,8 @@ const (
 	DefaultTargetCommitMillis  = uint32(1_500)
 	MaxTargetCommitMillis      = uint32(2_000)
 
+	DefaultMaxValidatorSetChangeRateBps = uint32(1_000)
+
 	DefaultPerformanceUptimeWeightBps      = uint32(4_000)
 	DefaultPerformanceLatencyWeightBps     = uint32(3_000)
 	DefaultPerformanceCorrectnessWeightBps = uint32(3_000)
@@ -40,24 +42,26 @@ const (
 )
 
 type Params struct {
-	MinActiveValidators        uint32
-	MaxActiveValidators        uint32
-	EpochDurationSeconds       uint64
-	PhaseDurations             EpochPhaseDurations
-	DelegationActivationEpochs uint64
-	EvidenceWindowEpochs       uint64
-	MinStakeNaet               sdkmath.Int
-	MaxCommissionBps           uint32
-	MaxVotingPowerBps          uint32
-	MinUptimeBps               uint32
-	InactiveAfterEpochs        uint64
-	StakeDecayBps              uint32
-	UnbondingSeconds           uint64
-	TargetCommitMillis         uint32
-	MinTaskGroupValidators     uint32
-	MaxTaskGroupValidators     uint32
-	ReporterRewardBps          uint32
-	PerformanceWeights         PerformanceWeights
+	MinActiveValidators          uint32
+	MaxActiveValidators          uint32
+	EpochDurationSeconds         uint64
+	PhaseDurations               EpochPhaseDurations
+	EpochSeedSource              EpochSeedSource
+	MaxValidatorSetChangeRateBps uint32
+	DelegationActivationEpochs   uint64
+	EvidenceWindowEpochs         uint64
+	MinStakeNaet                 sdkmath.Int
+	MaxCommissionBps             uint32
+	MaxVotingPowerBps            uint32
+	MinUptimeBps                 uint32
+	InactiveAfterEpochs          uint64
+	StakeDecayBps                uint32
+	UnbondingSeconds             uint64
+	TargetCommitMillis           uint32
+	MinTaskGroupValidators       uint32
+	MaxTaskGroupValidators       uint32
+	ReporterRewardBps            uint32
+	PerformanceWeights           PerformanceWeights
 }
 
 type PerformanceSignals struct {
@@ -162,23 +166,25 @@ type NominatorSlash struct {
 
 func DefaultParams() Params {
 	return Params{
-		MinActiveValidators:        DefaultMinActiveValidators,
-		MaxActiveValidators:        DefaultMaxActiveValidators,
-		EpochDurationSeconds:       DefaultEpochDurationSeconds,
-		PhaseDurations:             DefaultEpochPhaseDurations(DefaultEpochDurationSeconds),
-		DelegationActivationEpochs: DefaultDelegationActivationEpochs,
-		EvidenceWindowEpochs:       DefaultEvidenceWindowEpochs,
-		MinStakeNaet:               sdkmath.NewInt(1_000_000_000),
-		MaxCommissionBps:           DefaultMaxCommissionBps,
-		MaxVotingPowerBps:          DefaultMaxVotingPowerBps,
-		MinUptimeBps:               DefaultMinUptimeBps,
-		InactiveAfterEpochs:        DefaultInactiveAfterEpochs,
-		StakeDecayBps:              DefaultStakeDecayBps,
-		UnbondingSeconds:           DefaultUnbondingSeconds,
-		TargetCommitMillis:         DefaultTargetCommitMillis,
-		MinTaskGroupValidators:     DefaultMinTaskGroupValidators,
-		MaxTaskGroupValidators:     DefaultMaxTaskGroupValidators,
-		ReporterRewardBps:          DefaultReporterRewardBps,
+		MinActiveValidators:          DefaultMinActiveValidators,
+		MaxActiveValidators:          DefaultMaxActiveValidators,
+		EpochDurationSeconds:         DefaultEpochDurationSeconds,
+		PhaseDurations:               DefaultEpochPhaseDurations(DefaultEpochDurationSeconds),
+		EpochSeedSource:              EpochSeedSourcePreviousSeedValidatorSet,
+		MaxValidatorSetChangeRateBps: DefaultMaxValidatorSetChangeRateBps,
+		DelegationActivationEpochs:   DefaultDelegationActivationEpochs,
+		EvidenceWindowEpochs:         DefaultEvidenceWindowEpochs,
+		MinStakeNaet:                 sdkmath.NewInt(1_000_000_000),
+		MaxCommissionBps:             DefaultMaxCommissionBps,
+		MaxVotingPowerBps:            DefaultMaxVotingPowerBps,
+		MinUptimeBps:                 DefaultMinUptimeBps,
+		InactiveAfterEpochs:          DefaultInactiveAfterEpochs,
+		StakeDecayBps:                DefaultStakeDecayBps,
+		UnbondingSeconds:             DefaultUnbondingSeconds,
+		TargetCommitMillis:           DefaultTargetCommitMillis,
+		MinTaskGroupValidators:       DefaultMinTaskGroupValidators,
+		MaxTaskGroupValidators:       DefaultMaxTaskGroupValidators,
+		ReporterRewardBps:            DefaultReporterRewardBps,
 		PerformanceWeights: PerformanceWeights{
 			UptimeWeightBps:      DefaultPerformanceUptimeWeightBps,
 			LatencyWeightBps:     DefaultPerformanceLatencyWeightBps,
@@ -205,6 +211,12 @@ func (p Params) Validate() error {
 	}
 	if err := p.EffectivePhaseDurations().Validate(p.EpochDurationSeconds); err != nil {
 		return err
+	}
+	if err := p.EffectiveEpochSeedSource().Validate(); err != nil {
+		return err
+	}
+	if p.MaxValidatorSetChangeRateBps == 0 || p.MaxValidatorSetChangeRateBps > BasisPoints {
+		return fmt.Errorf("max validator set change rate must be within 1..%d bps", BasisPoints)
 	}
 	if p.DelegationActivationEpochs == 0 {
 		return errors.New("delegation activation delay must be positive")
