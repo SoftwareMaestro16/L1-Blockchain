@@ -4287,6 +4287,72 @@ func TestNetworkingRoadmapReadinessRejectsMissingEvidence(t *testing.T) {
 	require.NotContains(t, phase8.SatisfiedExitCriteria, ExitDiscoveryPoisoningDetected)
 }
 
+func TestRequiredNetworkingTestCoverageValidatesUnitAndIntegrationMatrix(t *testing.T) {
+	coverage := DefaultRequiredNetworkingTestCoverage()
+	require.NoError(t, ValidateRequiredNetworkingTestCoverage(coverage))
+	require.NotEmpty(t, ComputeNetworkingTestCoverageRoot(coverage))
+
+	var unitCount, integrationCount int
+	for _, spec := range coverage {
+		switch spec.Category {
+		case NetworkingTestCoverageUnit:
+			unitCount++
+		case NetworkingTestCoverageIntegration:
+			integrationCount++
+		}
+	}
+	require.Equal(t, 10, unitCount)
+	require.Equal(t, 9, integrationCount)
+	require.Contains(t, requiredCoverageTests(coverage), RequiredTestNodeIDDerivation)
+	require.Contains(t, requiredCoverageTests(coverage), RequiredTestBroadcastDeduplication)
+	require.Contains(t, requiredCoverageTests(coverage), RequiredTestHeaderFirstPropagation)
+
+	missing := append([]NetworkingTestCoverageSpec(nil), coverage[:len(coverage)-1]...)
+	require.ErrorContains(t, ValidateRequiredNetworkingTestCoverage(missing), "must define 19 areas")
+
+	wrongCategory := append([]NetworkingTestCoverageSpec(nil), coverage...)
+	for i := range wrongCategory {
+		if wrongCategory[i].Test == RequiredTestCrossZoneDelivery {
+			wrongCategory[i].Category = NetworkingTestCoverageUnit
+			break
+		}
+	}
+	require.ErrorContains(t, ValidateRequiredNetworkingTestCoverage(wrongCategory), "must be integration")
+}
+
+func TestNetworkingTestCoverageReportRequiresAllRequiredEvidence(t *testing.T) {
+	evidence := testRequiredNetworkingCoverageEvidence()
+	report, err := EvaluateNetworkingTestCoverage(evidence)
+	require.NoError(t, err)
+	require.True(t, report.Ready)
+	require.Empty(t, report.Missing)
+	require.Empty(t, report.Failed)
+	require.NotEmpty(t, report.ReportHash)
+
+	missing := make([]NetworkingTestCoverageEvidence, 0, len(evidence)-1)
+	for _, item := range evidence {
+		if item.Test != RequiredTestBroadcastDeduplication {
+			missing = append(missing, item)
+		}
+	}
+	report, err = EvaluateNetworkingTestCoverage(missing)
+	require.NoError(t, err)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Missing, RequiredTestBroadcastDeduplication)
+
+	failed := append([]NetworkingTestCoverageEvidence(nil), evidence...)
+	for i := range failed {
+		if failed[i].Test == RequiredTestCrossZoneDelivery {
+			failed[i].Passed = false
+			break
+		}
+	}
+	report, err = EvaluateNetworkingTestCoverage(failed)
+	require.NoError(t, err)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, RequiredTestCrossZoneDelivery)
+}
+
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 	metrics := PeerMetrics{LatencyMillis: 25, ReliabilityBps: 9_900, ThroughputBytesPerSec: 32 << 20}
 	score, err := ComputePeerScore(metrics)
@@ -5118,6 +5184,134 @@ func adaptivePeerIDs(peers []AdaptivePeer) []string {
 	}
 	sortStrings(out)
 	return out
+}
+
+func requiredCoverageTests(specs []NetworkingTestCoverageSpec) []NetworkingRequiredTest {
+	out := make([]NetworkingRequiredTest, len(specs))
+	for i, spec := range specs {
+		out[i] = spec.Test
+	}
+	sortRequiredTests(out)
+	return out
+}
+
+func testRequiredNetworkingCoverageEvidence() []NetworkingTestCoverageEvidence {
+	return []NetworkingTestCoverageEvidence{
+		{
+			Test:      RequiredTestNodeIDDerivation,
+			Category:  NetworkingTestCoverageUnit,
+			TestNames: []string{"TestNodeRecordSignatureIdentityAndExpiry"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestNodeRecordSignature,
+			Category:  NetworkingTestCoverageUnit,
+			TestNames: []string{"TestNodeRecordSignatureIdentityAndExpiry", "TestANAValidatesSignedPeerRoleAdvertisements"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestSessionHandshake,
+			Category:  NetworkingTestCoverageUnit,
+			TestNames: []string{"TestSessionHandshakeRejectsReplayExpiredRecordsAndMismatches", "TestSessionHandshakeNegotiatesEncryptedMultiplexedStreams"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestStreamPriority,
+			Category:  NetworkingTestCoverageUnit,
+			TestNames: []string{"TestAetherMeshMessageTypesMapToChannels", "TestStreamPayloadTypeMapsToRL2AndRejectsInvalidBounds"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestOverlayMembership,
+			Category:  NetworkingTestCoverageUnit,
+			TestNames: []string{"TestOverlayMembershipProofAuthorizesServiceStakeAndSignedRecords", "TestOverlayManagerFormsZoneAndServiceOverlays"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestRouteCost,
+			Category:  NetworkingTestCoverageUnit,
+			TestNames: []string{"TestRoutingGraphBuildsDeterministicCommittedRoutesAndFallback", "TestAetherMeshRouteUsesOverlayAndServicePeers"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestNetworkMessageID,
+			Category:  NetworkingTestCoverageUnit,
+			TestNames: []string{"TestNetworkMessageHardRulesRequireReplaySafeCommitments", "TestAetherMeshCrossZoneAndConsensusProofRules"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestDiscoveryRecordExpiry,
+			Category:  NetworkingTestCoverageUnit,
+			TestNames: []string{"TestDiscoveryRecordMustBeSignedExpiringAndProofChecked", "TestSignedDiscoveryRecordStoreFindRenewAndRevoke"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestChunkHashVerification,
+			Category:  NetworkingTestCoverageUnit,
+			TestNames: []string{"TestChunkPayloadRoundTripAndCorruptionDetection", "TestRL2ChunkDescriptorsVerifyOrderedMerkleRootAndChunkBytes"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestBroadcastDeduplication,
+			Category:  NetworkingTestCoverageUnit,
+			TestNames: []string{"TestBroadcastMessageSignsDeduplicatesAndRejectsForgedOrExpired", "TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestCometBFTANAConsensus,
+			Category:  NetworkingTestCoverageIntegration,
+			TestNames: []string{"TestANAPropagationKeepsConsensusOnCometBFTAndFanoutForService", "TestL0ScheduleKeepsConsensusAheadOfServiceAndBulkTraffic"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestMultiplexedSessionStreams,
+			Category:  NetworkingTestCoverageIntegration,
+			TestNames: []string{"TestSessionHandshakeNegotiatesEncryptedMultiplexedStreams", "TestNetworkSecurityReplayChannelBindingAndQoSIsolation"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestZoneOverlayFormation,
+			Category:  NetworkingTestCoverageIntegration,
+			TestNames: []string{"TestOverlayManagerFormsZoneAndServiceOverlays", "TestOverlayRouteBuildsZoneLocalAndFallbackPlans"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestServiceOverlayFormation,
+			Category:  NetworkingTestCoverageIntegration,
+			TestNames: []string{"TestOverlayManagerFormsZoneAndServiceOverlays", "TestAetherMeshRouteUsesOverlayAndServicePeers"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestCrossZoneDelivery,
+			Category:  NetworkingTestCoverageIntegration,
+			TestNames: []string{"TestCrossZoneSequenceTrackerAssignsAndRejectsReplayAndGaps", "TestReceiptDeliveryProtocolAcknowledgesAndFeedsMetrics"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestRL2BlockChunkTransfer,
+			Category:  NetworkingTestCoverageIntegration,
+			TestNames: []string{"TestRL2OfferStateMachineResumesInterruptedTransferAndCompletes", "TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestResumableStateSnapshot,
+			Category:  NetworkingTestCoverageIntegration,
+			TestNames: []string{"TestRL2MissingChunksRequestUsesVerifiedBitmapResumeToken", "TestRL2OfferStateMachineResumesInterruptedTransferAndCompletes"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestDiscoveryProofLookup,
+			Category:  NetworkingTestCoverageIntegration,
+			TestNames: []string{"TestDiscoveryResponseSignsResultsAndProofAttachment", "TestNetworkingAPIIntegrationBuildsDiagnosticsProofsAndRouteHints"},
+			Passed:    true,
+		},
+		{
+			Test:      RequiredTestHeaderFirstPropagation,
+			Category:  NetworkingTestCoverageIntegration,
+			TestNames: []string{"TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs", "TestBroadcastForwardingUsesTreeThenGossipFallbackAndOverlayFanout"},
+			Passed:    true,
+		},
+	}
 }
 
 func testSessionRequest(local, remote NodeRecord, openedHeight, expiresHeight uint64, nonce string, channels []ChannelClass) SessionRequest {
