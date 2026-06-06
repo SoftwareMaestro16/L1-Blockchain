@@ -3531,6 +3531,211 @@ func TestPerformanceMetricsRejectInvalidBenchmarksAndServiceIsolationFailures(t 
 	require.Equal(t, uint32(5_000), bandwidth[0].UsageBps)
 }
 
+func TestCosmosCometBFTCompatibilityPlanPreservesRequiredSurfaces(t *testing.T) {
+	plan := DefaultCosmosCometBFTCompatibilityPlan()
+	require.NoError(t, ValidateCosmosCometBFTCompatibilityPlan(plan))
+
+	plan.PreserveCometBFTConsensusMessages = false
+	require.ErrorContains(t, ValidateCosmosCometBFTCompatibilityPlan(plan), "consensus messages")
+
+	plan = DefaultCosmosCometBFTCompatibilityPlan()
+	plan.Surfaces = plan.Surfaces[:len(plan.Surfaces)-1]
+	require.ErrorContains(t, ValidateCosmosCometBFTCompatibilityPlan(plan), "state_sync_snapshots")
+}
+
+func TestABCICompatibilityPipelineUsesCommittedSchedulesAndRoots(t *testing.T) {
+	overlayID := HashParts("abci-compat-overlay")
+	origin := HashParts("abci-compat-origin")
+	destination := HashParts("abci-compat-destination")
+	mesh, err := NewAetherMeshMessage(AetherMeshMessage{
+		Type:            MeshMessageExecution,
+		Payload:         []byte("abci-compat-execution-message"),
+		Origin:          origin,
+		Destination:     destination,
+		Priority:        2,
+		TTL:             50,
+		OverlayID:       overlayID,
+		DestinationZone: "zone-a",
+		Sequence:        10,
+	})
+	require.NoError(t, err)
+	schedule, err := NewExecutionMessageSchedule(ExecutionMessageSchedule{
+		ZoneID:            "zone-a",
+		ShardID:           "shard-1",
+		RoutingClass:      ExecutionRoutingExecutionOverlay,
+		Committed:         true,
+		Ordered:           true,
+		MessageIDs:        []string{mesh.MessageID},
+		FirstZoneSequence: 10,
+		LastZoneSequence:  10,
+	})
+	require.NoError(t, err)
+	hint := ANAProposalHint{
+		HintID:                HashParts("abci-compat-hint"),
+		ScheduleID:            schedule.ScheduleID,
+		ScheduleHash:          schedule.ScheduleHash,
+		ZoneID:                schedule.ZoneID,
+		ShardID:               schedule.ShardID,
+		DeterminismSource:     DeterminismCommittedState,
+		CommittedStateDerived: true,
+		UsedForOrdering:       true,
+		Priority:              1,
+		BlockSTMGroupID:       HashParts("abci-compat-blockstm"),
+	}
+
+	prepared, err := BuildPrepareProposalCompatibility(ABCIPrepareProposalInput{
+		Height:    50,
+		Adapter:   DefaultAetherNetworkingAdapter(),
+		Schedules: []ExecutionMessageSchedule{schedule},
+		Hints:     []ANAProposalHint{hint},
+	})
+	require.NoError(t, err)
+	require.Equal(t, ABCIPrepareProposal, prepared.Phase)
+	require.Equal(t, uint64(1), prepared.MessageCount)
+	require.Equal(t, hint.BlockSTMGroupID, prepared.Groups[0].BlockSTMGroupID)
+	require.Equal(t, ComputeABCIProposalScheduleRoot(prepared.Groups), prepared.ScheduleRoot)
+	require.Equal(t, ComputeABCIOrderingCommitment(prepared.Groups), prepared.OrderingCommitment)
+
+	processed, err := ProcessProposalCompatibility(ABCIProcessProposalInput{
+		Height:                     50,
+		Proposal:                   prepared,
+		ExpectedScheduleRoot:       prepared.ScheduleRoot,
+		ExpectedOrderingCommitment: prepared.OrderingCommitment,
+		VerifiesOrderingCommitment: true,
+	})
+	require.NoError(t, err)
+	require.Equal(t, ABCIProcessProposal, processed.Phase)
+
+	execMsg := ExecutionZoneMessage{
+		Message:                mesh,
+		RoutingClass:           ExecutionRoutingExecutionOverlay,
+		ZoneID:                 schedule.ZoneID,
+		ShardID:                schedule.ShardID,
+		ExecutionOverlayID:     overlayID,
+		ZoneSequence:           10,
+		ConsensusScheduleID:    schedule.ScheduleID,
+		ConsensusScheduleHash:  schedule.ScheduleHash,
+		ConsensusScheduleOrder: 1,
+		DeterministicOrdering:  true,
+		BlockSTMGroupID:        hint.BlockSTMGroupID,
+	}
+	result, err := FinalizeBlockCompatibility(ABCIFinalizeBlockInput{
+		Height:            50,
+		Proposal:          processed,
+		ExecutionMessages: []ExecutionZoneMessage{execMsg},
+	})
+	require.NoError(t, err)
+	require.Equal(t, []string{mesh.MessageID}, result.ExecutedMessageIDs)
+	require.Equal(t, prepared.ScheduleRoot, result.ScheduleRoot)
+	require.NotEmpty(t, result.ExecutionRoot)
+	require.NotEmpty(t, result.ReceiptsRoot)
+}
+
+func TestABCICompatibilityRejectsPeerLocalOrderingUncommittedAndLiveState(t *testing.T) {
+	overlayID := HashParts("abci-reject-overlay")
+	origin := HashParts("abci-reject-origin")
+	destination := HashParts("abci-reject-destination")
+	mesh, err := NewAetherMeshMessage(AetherMeshMessage{
+		Type:            MeshMessageExecution,
+		Payload:         []byte("abci-reject-execution-message"),
+		Origin:          origin,
+		Destination:     destination,
+		Priority:        2,
+		TTL:             50,
+		OverlayID:       overlayID,
+		DestinationZone: "zone-b",
+		Sequence:        11,
+	})
+	require.NoError(t, err)
+	schedule, err := NewExecutionMessageSchedule(ExecutionMessageSchedule{
+		ZoneID:            "zone-b",
+		ShardID:           "shard-1",
+		RoutingClass:      ExecutionRoutingExecutionOverlay,
+		Committed:         true,
+		Ordered:           true,
+		MessageIDs:        []string{mesh.MessageID},
+		FirstZoneSequence: 11,
+		LastZoneSequence:  11,
+	})
+	require.NoError(t, err)
+
+	_, err = BuildPrepareProposalCompatibility(ABCIPrepareProposalInput{
+		Height:    60,
+		Adapter:   DefaultAetherNetworkingAdapter(),
+		Schedules: []ExecutionMessageSchedule{schedule},
+		Hints: []ANAProposalHint{{
+			HintID:                HashParts("abci-peer-local-hint"),
+			ScheduleID:            schedule.ScheduleID,
+			ScheduleHash:          schedule.ScheduleHash,
+			ZoneID:                schedule.ZoneID,
+			ShardID:               schedule.ShardID,
+			DeterminismSource:     DeterminismAdvisoryPeerMetric,
+			CommittedStateDerived: false,
+			PeerLocal:             true,
+			UsedForOrdering:       true,
+		}},
+	})
+	require.ErrorContains(t, err, "peer-local")
+
+	uncommitted := schedule
+	uncommitted.Committed = false
+	uncommitted.ScheduleHash = ComputeExecutionMessageScheduleHash(uncommitted)
+	uncommitted.ScheduleID = ComputeExecutionMessageScheduleID(uncommitted)
+	_, err = BuildPrepareProposalCompatibility(ABCIPrepareProposalInput{
+		Height:    60,
+		Adapter:   DefaultAetherNetworkingAdapter(),
+		Schedules: []ExecutionMessageSchedule{uncommitted},
+	})
+	require.ErrorContains(t, err, "committed deterministic")
+
+	prepared, err := BuildPrepareProposalCompatibility(ABCIPrepareProposalInput{
+		Height:    60,
+		Adapter:   DefaultAetherNetworkingAdapter(),
+		Schedules: []ExecutionMessageSchedule{schedule},
+	})
+	require.NoError(t, err)
+	_, err = ProcessProposalCompatibility(ABCIProcessProposalInput{
+		Height:                     60,
+		Proposal:                   prepared,
+		ExpectedScheduleRoot:       prepared.ScheduleRoot,
+		ExpectedOrderingCommitment: prepared.OrderingCommitment,
+		DependsOnPeerLocalData:     true,
+		VerifiesOrderingCommitment: true,
+	})
+	require.ErrorContains(t, err, "peer-local")
+
+	_, err = ProcessProposalCompatibility(ABCIProcessProposalInput{
+		Height:                     60,
+		Proposal:                   prepared,
+		ExpectedScheduleRoot:       prepared.ScheduleRoot,
+		ExpectedOrderingCommitment: prepared.OrderingCommitment,
+		VerifiesOrderingCommitment: false,
+	})
+	require.ErrorContains(t, err, "ordering commitments")
+
+	_, err = FinalizeBlockCompatibility(ABCIFinalizeBlockInput{
+		Height:               60,
+		Proposal:             prepared,
+		LiveNetworkStateRead: true,
+	})
+	require.ErrorContains(t, err, "live network state")
+
+	uncommittedExec := ExecutionZoneMessage{
+		Message:            mesh,
+		RoutingClass:       ExecutionRoutingExecutionOverlay,
+		ZoneID:             schedule.ZoneID,
+		ShardID:            schedule.ShardID,
+		ExecutionOverlayID: overlayID,
+		ZoneSequence:       11,
+	}
+	_, err = FinalizeBlockCompatibility(ABCIFinalizeBlockInput{
+		Height:            60,
+		Proposal:          prepared,
+		ExecutionMessages: []ExecutionZoneMessage{uncommittedExec},
+	})
+	require.ErrorContains(t, err, "committed messages only")
+}
+
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 	metrics := PeerMetrics{LatencyMillis: 25, ReliabilityBps: 9_900, ThroughputBytesPerSec: 32 << 20}
 	score, err := ComputePeerScore(metrics)
