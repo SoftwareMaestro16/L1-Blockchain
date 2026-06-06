@@ -1,0 +1,72 @@
+syntax = "proto3";
+package l1.shardingcoordinator.v1;
+
+import "l1/shardingcoordinator/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/sharding-coordinator/types";
+
+message MsgRegisterShard {
+  string authority = 1;
+  Shard shard = 2;
+}
+
+message MsgRegisterShardResponse {
+  Shard shard = 1;
+}
+
+message MsgUpdateShardStatus {
+  string authority = 1;
+  string shard_id = 2;
+  string status = 3;
+  uint64 height = 4;
+}
+
+message MsgUpdateShardStatusResponse {
+  Shard shard = 1;
+}
+
+message MsgAssignValidatorsToShard {
+  string authority = 1;
+  ShardValidatorAssignment assignment = 2;
+}
+
+message MsgAssignValidatorsToShardResponse {
+  ShardValidatorAssignment assignment = 1;
+}
+
+message MsgSubmitShardLoad {
+  string reporter = 1;
+  ShardLoadMetric load = 2;
+}
+
+message MsgSubmitShardLoadResponse {
+  ShardLoadMetric load = 1;
+}
+
+message MsgProposeShardRebalance {
+  string authority = 1;
+  RebalanceProposal proposal = 2;
+}
+
+message MsgProposeShardRebalanceResponse {
+  RebalanceProposal proposal = 1;
+}
+
+message MsgExecuteShardRebalance {
+  string authority = 1;
+  string proposal_id = 2;
+  uint64 height = 3;
+}
+
+message MsgExecuteShardRebalanceResponse {
+  RebalanceProposal proposal = 1;
+}
+
+service Msg {
+  rpc RegisterShard(MsgRegisterShard) returns (MsgRegisterShardResponse);
+  rpc UpdateShardStatus(MsgUpdateShardStatus) returns (MsgUpdateShardStatusResponse);
+  rpc AssignValidatorsToShard(MsgAssignValidatorsToShard) returns (MsgAssignValidatorsToShardResponse);
+  rpc SubmitShardLoad(MsgSubmitShardLoad) returns (MsgSubmitShardLoadResponse);
+  rpc ProposeShardRebalance(MsgProposeShardRebalance) returns (MsgProposeShardRebalanceResponse);
+  rpc ExecuteShardRebalance(MsgExecuteShardRebalance) returns (MsgExecuteShardRebalanceResponse);
+}
