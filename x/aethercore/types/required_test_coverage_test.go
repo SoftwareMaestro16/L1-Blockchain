@@ -12,6 +12,8 @@ func TestRequiredTestCoverageManifestCoversSection16(t *testing.T) {
 	require.NoError(t, manifest.Validate())
 	require.Len(t, manifest.UnitTests, 12)
 	require.Len(t, manifest.IntegrationTests, 8)
+	require.Len(t, manifest.InvariantTests, 9)
+	require.Len(t, manifest.SimulationTests, 8)
 	require.Equal(t, ComputeRequiredTestCoverageManifestHash(manifest), manifest.ManifestHash)
 
 	for _, id := range RequiredUnitTestCoverageIDs() {
@@ -29,6 +31,28 @@ func TestRequiredTestCoverageManifestCoversSection16(t *testing.T) {
 		spec, found := RequiredIntegrationTestCoverageByID(manifest, id)
 		require.True(t, found, id)
 		require.Equal(t, TestCoverageKindIntegration, spec.Kind)
+		require.True(t, IsRequiredCosmosSDKModule(spec.ModuleName), id)
+		require.True(t, IsImplementationRoadmapPhaseID(spec.PhaseID), id)
+		require.NotEmpty(t, spec.CoverageTarget, id)
+		require.NotEmpty(t, spec.Assertions, id)
+		require.Equal(t, ComputeRequiredTestCoverageSpecHash(spec), spec.SpecHash)
+	}
+
+	for _, id := range RequiredInvariantTestCoverageIDs() {
+		spec, found := RequiredInvariantTestCoverageByID(manifest, id)
+		require.True(t, found, id)
+		require.Equal(t, TestCoverageKindInvariant, spec.Kind)
+		require.True(t, IsRequiredCosmosSDKModule(spec.ModuleName), id)
+		require.True(t, IsImplementationRoadmapPhaseID(spec.PhaseID), id)
+		require.NotEmpty(t, spec.CoverageTarget, id)
+		require.NotEmpty(t, spec.Assertions, id)
+		require.Equal(t, ComputeRequiredTestCoverageSpecHash(spec), spec.SpecHash)
+	}
+
+	for _, id := range RequiredSimulationTestCoverageIDs() {
+		spec, found := RequiredSimulationTestCoverageByID(manifest, id)
+		require.True(t, found, id)
+		require.Equal(t, TestCoverageKindSimulation, spec.Kind)
 		require.True(t, IsRequiredCosmosSDKModule(spec.ModuleName), id)
 		require.True(t, IsImplementationRoadmapPhaseID(spec.PhaseID), id)
 		require.NotEmpty(t, spec.CoverageTarget, id)
@@ -55,6 +79,21 @@ func TestRequiredTestCoverageManifestCoversSection16(t *testing.T) {
 	require.True(t, found)
 	require.Equal(t, CosmosModuleContracts, contractOutbound.ModuleName)
 	require.Equal(t, RoadmapPhaseVMRuntime, contractOutbound.PhaseID)
+
+	globalRootInvariant, found := RequiredInvariantTestCoverageByID(manifest, InvariantCoverageGlobalRootIncludesEnabledZones)
+	require.True(t, found)
+	require.Equal(t, CosmosModuleAetherCore, globalRootInvariant.ModuleName)
+	require.Equal(t, RoadmapPhaseKernelRootModel, globalRootInvariant.PhaseID)
+
+	escrowInvariant, found := RequiredInvariantTestCoverageByID(manifest, InvariantCoveragePaymentSettlementWithinEscrow)
+	require.True(t, found)
+	require.Equal(t, CosmosModulePayments, escrowInvariant.ModuleName)
+	require.Equal(t, RoadmapPhaseIdentityPaymentIntegration, escrowInvariant.PhaseID)
+
+	blockSTMSimulation, found := RequiredSimulationTestCoverageByID(manifest, SimulationCoverageMixedZoneExecutionUnderBlockSTM)
+	require.True(t, found)
+	require.Equal(t, CosmosModuleZones, blockSTMSimulation.ModuleName)
+	require.Equal(t, RoadmapPhasePerformanceHardening, blockSTMSimulation.PhaseID)
 }
 
 func TestRequiredTestCoverageManifestRejectsMissingDuplicateAndMalformedCoverage(t *testing.T) {
@@ -86,6 +125,17 @@ func TestRequiredTestCoverageManifestRejectsMissingDuplicateAndMalformedCoverage
 	unknownPhase.ManifestHash = ComputeRequiredTestCoverageManifestHash(unknownPhase)
 	require.ErrorContains(t, unknownPhase.Validate(), "unknown roadmap phase")
 
+	missingInvariant := manifest
+	missingInvariant.InvariantTests = append([]RequiredTestCoverageSpec(nil), manifest.InvariantTests[1:]...)
+	missingInvariant.ManifestHash = ComputeRequiredTestCoverageManifestHash(missingInvariant)
+	require.ErrorContains(t, missingInvariant.Validate(), "must include 9 required coverage areas")
+
+	duplicateSimulation := manifest
+	duplicateSimulation.SimulationTests = append([]RequiredTestCoverageSpec(nil), manifest.SimulationTests...)
+	duplicateSimulation.SimulationTests[len(duplicateSimulation.SimulationTests)-1] = duplicateSimulation.SimulationTests[0]
+	duplicateSimulation.ManifestHash = ComputeRequiredTestCoverageManifestHash(duplicateSimulation)
+	require.ErrorContains(t, duplicateSimulation.Validate(), "duplicate")
+
 	noAssertions := manifest
 	noAssertions.UnitTests = append([]RequiredTestCoverageSpec(nil), manifest.UnitTests...)
 	noAssertions.UnitTests[0].Assertions = nil
@@ -107,11 +157,15 @@ func TestRequiredTestCoverageManifestHashIsCanonical(t *testing.T) {
 
 	reversedUnits := reverseCoverageSpecs(manifest.UnitTests)
 	reversedIntegration := reverseCoverageSpecs(manifest.IntegrationTests)
-	reordered, err := NewRequiredTestCoverageManifest(reversedUnits, reversedIntegration)
+	reversedInvariants := reverseCoverageSpecs(manifest.InvariantTests)
+	reversedSimulations := reverseCoverageSpecs(manifest.SimulationTests)
+	reordered, err := NewRequiredTestCoverageManifest(reversedUnits, reversedIntegration, reversedInvariants, reversedSimulations)
 	require.NoError(t, err)
 	require.Equal(t, manifest.ManifestHash, reordered.ManifestHash)
 	require.Equal(t, manifest.UnitTests, reordered.UnitTests)
 	require.Equal(t, manifest.IntegrationTests, reordered.IntegrationTests)
+	require.Equal(t, manifest.InvariantTests, reordered.InvariantTests)
+	require.Equal(t, manifest.SimulationTests, reordered.SimulationTests)
 
 	tampered := manifest
 	tampered.IntegrationTests = append([]RequiredTestCoverageSpec(nil), manifest.IntegrationTests...)

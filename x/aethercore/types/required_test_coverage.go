@@ -10,10 +10,14 @@ import (
 type RequiredTestCoverageKind string
 type RequiredUnitTestCoverageID string
 type RequiredIntegrationTestCoverageID string
+type RequiredInvariantTestCoverageID string
+type RequiredSimulationTestCoverageID string
 
 const (
 	TestCoverageKindUnit        RequiredTestCoverageKind = "unit"
 	TestCoverageKindIntegration RequiredTestCoverageKind = "integration"
+	TestCoverageKindInvariant   RequiredTestCoverageKind = "invariant"
+	TestCoverageKindSimulation  RequiredTestCoverageKind = "simulation"
 
 	UnitCoverageMessageIDDerivation              RequiredUnitTestCoverageID = "message-id-derivation"
 	UnitCoverageMessageNonceValidation           RequiredUnitTestCoverageID = "message-nonce-validation"
@@ -36,6 +40,25 @@ const (
 	IntegrationCoverageCrossZoneIdentityBoundPayment       RequiredIntegrationTestCoverageID = "cross-zone-identity-bound-payment"
 	IntegrationCoverageContractOutboundMessageFinancial    RequiredIntegrationTestCoverageID = "contract-outbound-message-to-financial-zone"
 	IntegrationCoverageApplicationSchedulerToContract      RequiredIntegrationTestCoverageID = "application-scheduler-emits-message-to-contract-zone"
+
+	InvariantCoverageGlobalRootIncludesEnabledZones   RequiredInvariantTestCoverageID = "global-root-includes-enabled-zone-roots"
+	InvariantCoverageZoneRootIncludesLocalModules     RequiredInvariantTestCoverageID = "zone-root-includes-local-module-roots"
+	InvariantCoverageConsumedMessageHasOneReceipt     RequiredInvariantTestCoverageID = "consumed-message-has-one-receipt"
+	InvariantCoverageMessageValueConserved            RequiredInvariantTestCoverageID = "message-value-conserved-across-bounce-settlement"
+	InvariantCoverageReplayTombstonesRejectDuplicates RequiredInvariantTestCoverageID = "replay-tombstones-reject-duplicates"
+	InvariantCoverageActiveIdentityBindingValidOwner  RequiredInvariantTestCoverageID = "active-identity-binding-valid-owner"
+	InvariantCoverageStorageObjectSizeEqualsChunkSum  RequiredInvariantTestCoverageID = "storage-object-size-equals-chunk-sum"
+	InvariantCoveragePaymentSettlementWithinEscrow    RequiredInvariantTestCoverageID = "payment-settlement-within-escrow"
+	InvariantCoverageServiceInterfaceHashMatchesDesc  RequiredInvariantTestCoverageID = "service-interface-hash-matches-descriptor"
+
+	SimulationCoverageHighVolumePerSenderQueues       RequiredSimulationTestCoverageID = "high-volume-per-sender-queues"
+	SimulationCoverageCrossZoneCongestion             RequiredSimulationTestCoverageID = "cross-zone-congestion"
+	SimulationCoverageRoutingTableEpochChanges        RequiredSimulationTestCoverageID = "routing-table-epoch-changes"
+	SimulationCoverageServiceLookupCacheExpiry        RequiredSimulationTestCoverageID = "service-lookup-cache-expiry"
+	SimulationCoverageStorageLazyFetchReceiptLoad     RequiredSimulationTestCoverageID = "storage-lazy-fetch-receipt-load"
+	SimulationCoveragePaymentConditionTimeout         RequiredSimulationTestCoverageID = "payment-condition-timeout"
+	SimulationCoverageIdentityResolverChurn           RequiredSimulationTestCoverageID = "identity-resolver-churn"
+	SimulationCoverageMixedZoneExecutionUnderBlockSTM RequiredSimulationTestCoverageID = "mixed-zone-execution-under-blockstm"
 )
 
 type RequiredTestCoverageSpec struct {
@@ -51,6 +74,8 @@ type RequiredTestCoverageSpec struct {
 type RequiredTestCoverageManifest struct {
 	UnitTests        []RequiredTestCoverageSpec
 	IntegrationTests []RequiredTestCoverageSpec
+	InvariantTests   []RequiredTestCoverageSpec
+	SimulationTests  []RequiredTestCoverageSpec
 	ManifestHash     string
 }
 
@@ -80,14 +105,37 @@ func DefaultRequiredTestCoverageManifest() (RequiredTestCoverageManifest, error)
 			testCoverageSpec(string(IntegrationCoverageContractOutboundMessageFinancial), TestCoverageKindIntegration, CosmosModuleContracts, RoadmapPhaseVMRuntime, "contract outbound message to Financial Zone", "contract emits outbound settlement message", "contract cannot directly mutate financial state"),
 			testCoverageSpec(string(IntegrationCoverageApplicationSchedulerToContract), TestCoverageKindIntegration, CosmosModuleZones, RoadmapPhaseCanonicalZones, "Application scheduler emits message to Contract Zone", "scheduler emits ordered contract-zone message", "contract zone receipt is queryable"),
 		},
+		InvariantTests: []RequiredTestCoverageSpec{
+			testCoverageSpec(string(InvariantCoverageGlobalRootIncludesEnabledZones), TestCoverageKindInvariant, CosmosModuleAetherCore, RoadmapPhaseKernelRootModel, "global root includes all enabled zone roots", "disabled zones are excluded from aggregation", "each enabled zone commitment participates in global root"),
+			testCoverageSpec(string(InvariantCoverageZoneRootIncludesLocalModules), TestCoverageKindInvariant, CosmosModuleZones, RoadmapPhaseCanonicalZones, "zone root includes local module roots", "local module roots are ordered by module id", "tampered module root changes zone root"),
+			testCoverageSpec(string(InvariantCoverageConsumedMessageHasOneReceipt), TestCoverageKindInvariant, CosmosModuleMessages, RoadmapPhaseCrossZoneMessages, "every consumed message has one receipt", "consumed message id maps to exactly one receipt", "missing and duplicate receipts are rejected"),
+			testCoverageSpec(string(InvariantCoverageMessageValueConserved), TestCoverageKindInvariant, CosmosModulePayments, RoadmapPhaseIdentityPaymentIntegration, "message value is conserved across bounce and settlement", "bounced value plus charged fee equals source debit", "settled value equals destination credit plus fee"),
+			testCoverageSpec(string(InvariantCoverageReplayTombstonesRejectDuplicates), TestCoverageKindInvariant, CosmosModuleMessages, RoadmapPhaseCrossZoneMessages, "replay tombstones reject duplicate messages", "duplicate message id is rejected after tombstone creation", "proof horizon preserves tombstone lookup"),
+			testCoverageSpec(string(InvariantCoverageActiveIdentityBindingValidOwner), TestCoverageKindInvariant, CosmosModuleIdentity, RoadmapPhaseIdentityPaymentIntegration, "active identity binding has valid owner", "binding owner matches active identity record", "expired binding is unavailable for routing"),
+			testCoverageSpec(string(InvariantCoverageStorageObjectSizeEqualsChunkSum), TestCoverageKindInvariant, CosmosModuleStorage, RoadmapPhaseServiceStorageRouting, "storage object size equals chunk sum", "registered object size equals ordered chunk descriptor sizes", "chunk sum overflow is rejected"),
+			testCoverageSpec(string(InvariantCoveragePaymentSettlementWithinEscrow), TestCoverageKindInvariant, CosmosModulePayments, RoadmapPhaseIdentityPaymentIntegration, "payment settlement cannot exceed escrow", "settlement amount is bounded by escrow balance", "partial settlements preserve remaining escrow"),
+			testCoverageSpec(string(InvariantCoverageServiceInterfaceHashMatchesDesc), TestCoverageKindInvariant, CosmosModuleServices, RoadmapPhaseServiceStorageRouting, "service interface hash matches descriptor", "interface descriptor bytes hash to advertised hash", "descriptor mismatch blocks registration"),
+		},
+		SimulationTests: []RequiredTestCoverageSpec{
+			testCoverageSpec(string(SimulationCoverageHighVolumePerSenderQueues), TestCoverageKindSimulation, CosmosModuleMessages, RoadmapPhasePerformanceHardening, "high-volume per-sender queues", "large sender queues drain in nonce order", "bounded drain limit preserves deterministic backlog"),
+			testCoverageSpec(string(SimulationCoverageCrossZoneCongestion), TestCoverageKindSimulation, CosmosModuleRouting, RoadmapPhasePerformanceHardening, "cross-zone congestion", "committed congestion snapshot affects route cost", "congested routes are deprioritized deterministically"),
+			testCoverageSpec(string(SimulationCoverageRoutingTableEpochChanges), TestCoverageKindSimulation, CosmosModuleRouting, RoadmapPhasePerformanceHardening, "routing table epoch changes", "epoch transition preserves proofable old routes", "new epoch route selection is deterministic"),
+			testCoverageSpec(string(SimulationCoverageServiceLookupCacheExpiry), TestCoverageKindSimulation, CosmosModuleServices, RoadmapPhasePerformanceHardening, "service lookup cache expiry", "expired cache entries are ignored", "fresh lookup result uses committed service index"),
+			testCoverageSpec(string(SimulationCoverageStorageLazyFetchReceiptLoad), TestCoverageKindSimulation, CosmosModuleStorage, RoadmapPhasePerformanceHardening, "storage lazy fetch receipt load", "lazy fetch receipts remain bounded per block", "receipt root is stable under high load"),
+			testCoverageSpec(string(SimulationCoveragePaymentConditionTimeout), TestCoverageKindSimulation, CosmosModulePayments, RoadmapPhasePerformanceHardening, "payment condition timeout", "expired conditions cannot settle", "timeout receipts release escrow deterministically"),
+			testCoverageSpec(string(SimulationCoverageIdentityResolverChurn), TestCoverageKindSimulation, CosmosModuleIdentity, RoadmapPhasePerformanceHardening, "identity resolver churn", "rapid resolver updates produce deterministic identity root", "stale resolver proof is rejected after update"),
+			testCoverageSpec(string(SimulationCoverageMixedZoneExecutionUnderBlockSTM), TestCoverageKindSimulation, CosmosModuleZones, RoadmapPhasePerformanceHardening, "mixed zone execution under BlockSTM", "independent zone workloads keep identical roots with BlockSTM grouping", "conflicting workloads fall back to deterministic serial order"),
+		},
 	}
-	return NewRequiredTestCoverageManifest(manifest.UnitTests, manifest.IntegrationTests)
+	return NewRequiredTestCoverageManifest(manifest.UnitTests, manifest.IntegrationTests, manifest.InvariantTests, manifest.SimulationTests)
 }
 
-func NewRequiredTestCoverageManifest(unitTests, integrationTests []RequiredTestCoverageSpec) (RequiredTestCoverageManifest, error) {
+func NewRequiredTestCoverageManifest(unitTests, integrationTests, invariantTests, simulationTests []RequiredTestCoverageSpec) (RequiredTestCoverageManifest, error) {
 	manifest := RequiredTestCoverageManifest{
 		UnitTests:        normalizeTestCoverageSpecs(unitTests, TestCoverageKindUnit),
 		IntegrationTests: normalizeTestCoverageSpecs(integrationTests, TestCoverageKindIntegration),
+		InvariantTests:   normalizeTestCoverageSpecs(invariantTests, TestCoverageKindInvariant),
+		SimulationTests:  normalizeTestCoverageSpecs(simulationTests, TestCoverageKindSimulation),
 	}
 	if err := manifest.ValidateFormat(); err != nil {
 		return RequiredTestCoverageManifest{}, err
@@ -97,6 +145,12 @@ func NewRequiredTestCoverageManifest(unitTests, integrationTests []RequiredTestC
 	}
 	for i := range manifest.IntegrationTests {
 		manifest.IntegrationTests[i].SpecHash = ComputeRequiredTestCoverageSpecHash(manifest.IntegrationTests[i])
+	}
+	for i := range manifest.InvariantTests {
+		manifest.InvariantTests[i].SpecHash = ComputeRequiredTestCoverageSpecHash(manifest.InvariantTests[i])
+	}
+	for i := range manifest.SimulationTests {
+		manifest.SimulationTests[i].SpecHash = ComputeRequiredTestCoverageSpecHash(manifest.SimulationTests[i])
 	}
 	manifest.ManifestHash = ComputeRequiredTestCoverageManifestHash(manifest)
 	return manifest, manifest.Validate()
@@ -132,13 +186,48 @@ func RequiredIntegrationTestCoverageIDs() []RequiredIntegrationTestCoverageID {
 	}
 }
 
+func RequiredInvariantTestCoverageIDs() []RequiredInvariantTestCoverageID {
+	return []RequiredInvariantTestCoverageID{
+		InvariantCoverageGlobalRootIncludesEnabledZones,
+		InvariantCoverageZoneRootIncludesLocalModules,
+		InvariantCoverageConsumedMessageHasOneReceipt,
+		InvariantCoverageMessageValueConserved,
+		InvariantCoverageReplayTombstonesRejectDuplicates,
+		InvariantCoverageActiveIdentityBindingValidOwner,
+		InvariantCoverageStorageObjectSizeEqualsChunkSum,
+		InvariantCoveragePaymentSettlementWithinEscrow,
+		InvariantCoverageServiceInterfaceHashMatchesDesc,
+	}
+}
+
+func RequiredSimulationTestCoverageIDs() []RequiredSimulationTestCoverageID {
+	return []RequiredSimulationTestCoverageID{
+		SimulationCoverageHighVolumePerSenderQueues,
+		SimulationCoverageCrossZoneCongestion,
+		SimulationCoverageRoutingTableEpochChanges,
+		SimulationCoverageServiceLookupCacheExpiry,
+		SimulationCoverageStorageLazyFetchReceiptLoad,
+		SimulationCoveragePaymentConditionTimeout,
+		SimulationCoverageIdentityResolverChurn,
+		SimulationCoverageMixedZoneExecutionUnderBlockSTM,
+	}
+}
+
 func (manifest RequiredTestCoverageManifest) ValidateFormat() error {
 	manifest.UnitTests = normalizeTestCoverageSpecs(manifest.UnitTests, TestCoverageKindUnit)
 	manifest.IntegrationTests = normalizeTestCoverageSpecs(manifest.IntegrationTests, TestCoverageKindIntegration)
+	manifest.InvariantTests = normalizeTestCoverageSpecs(manifest.InvariantTests, TestCoverageKindInvariant)
+	manifest.SimulationTests = normalizeTestCoverageSpecs(manifest.SimulationTests, TestCoverageKindSimulation)
 	if err := validateCoverageSpecSet("aethercore unit test coverage", manifest.UnitTests, requiredUnitCoverageIDStrings(), TestCoverageKindUnit); err != nil {
 		return err
 	}
 	if err := validateCoverageSpecSet("aethercore integration test coverage", manifest.IntegrationTests, requiredIntegrationCoverageIDStrings(), TestCoverageKindIntegration); err != nil {
+		return err
+	}
+	if err := validateCoverageSpecSet("aethercore invariant test coverage", manifest.InvariantTests, requiredInvariantCoverageIDStrings(), TestCoverageKindInvariant); err != nil {
+		return err
+	}
+	if err := validateCoverageSpecSet("aethercore simulation test coverage", manifest.SimulationTests, requiredSimulationCoverageIDStrings(), TestCoverageKindSimulation); err != nil {
 		return err
 	}
 	if manifest.ManifestHash != "" {
@@ -150,6 +239,8 @@ func (manifest RequiredTestCoverageManifest) ValidateFormat() error {
 func (manifest RequiredTestCoverageManifest) Validate() error {
 	manifest.UnitTests = normalizeTestCoverageSpecs(manifest.UnitTests, TestCoverageKindUnit)
 	manifest.IntegrationTests = normalizeTestCoverageSpecs(manifest.IntegrationTests, TestCoverageKindIntegration)
+	manifest.InvariantTests = normalizeTestCoverageSpecs(manifest.InvariantTests, TestCoverageKindInvariant)
+	manifest.SimulationTests = normalizeTestCoverageSpecs(manifest.SimulationTests, TestCoverageKindSimulation)
 	if err := manifest.ValidateFormat(); err != nil {
 		return err
 	}
@@ -163,6 +254,16 @@ func (manifest RequiredTestCoverageManifest) Validate() error {
 			return err
 		}
 	}
+	for _, spec := range manifest.InvariantTests {
+		if err := spec.Validate(); err != nil {
+			return err
+		}
+	}
+	for _, spec := range manifest.SimulationTests {
+		if err := spec.Validate(); err != nil {
+			return err
+		}
+	}
 	if manifest.ManifestHash != ComputeRequiredTestCoverageManifestHash(manifest) {
 		return errors.New("aethercore required test coverage manifest hash mismatch")
 	}
@@ -171,7 +272,7 @@ func (manifest RequiredTestCoverageManifest) Validate() error {
 
 func (spec RequiredTestCoverageSpec) ValidateFormat() error {
 	spec = normalizeTestCoverageSpec(spec, spec.Kind)
-	if spec.Kind != TestCoverageKindUnit && spec.Kind != TestCoverageKindIntegration {
+	if spec.Kind != TestCoverageKindUnit && spec.Kind != TestCoverageKindIntegration && spec.Kind != TestCoverageKindInvariant && spec.Kind != TestCoverageKindSimulation {
 		return fmt.Errorf("unknown aethercore required test coverage kind %q", spec.Kind)
 	}
 	if err := validatePolicyID("aethercore required test coverage id", spec.ID); err != nil {
@@ -214,6 +315,14 @@ func RequiredIntegrationTestCoverageByID(manifest RequiredTestCoverageManifest, 
 	return requiredTestCoverageByID(manifest.IntegrationTests, string(id))
 }
 
+func RequiredInvariantTestCoverageByID(manifest RequiredTestCoverageManifest, id RequiredInvariantTestCoverageID) (RequiredTestCoverageSpec, bool) {
+	return requiredTestCoverageByID(manifest.InvariantTests, string(id))
+}
+
+func RequiredSimulationTestCoverageByID(manifest RequiredTestCoverageManifest, id RequiredSimulationTestCoverageID) (RequiredTestCoverageSpec, bool) {
+	return requiredTestCoverageByID(manifest.SimulationTests, string(id))
+}
+
 func ComputeRequiredTestCoverageSpecHash(spec RequiredTestCoverageSpec) string {
 	spec = normalizeTestCoverageSpec(spec, spec.Kind)
 	return hashRoot("aetheris-aek-required-test-coverage-spec-v1", func(w byteWriter) {
@@ -229,13 +338,23 @@ func ComputeRequiredTestCoverageSpecHash(spec RequiredTestCoverageSpec) string {
 func ComputeRequiredTestCoverageManifestHash(manifest RequiredTestCoverageManifest) string {
 	manifest.UnitTests = normalizeTestCoverageSpecs(manifest.UnitTests, TestCoverageKindUnit)
 	manifest.IntegrationTests = normalizeTestCoverageSpecs(manifest.IntegrationTests, TestCoverageKindIntegration)
-	return hashRoot("aetheris-aek-required-test-coverage-manifest-v1", func(w byteWriter) {
+	manifest.InvariantTests = normalizeTestCoverageSpecs(manifest.InvariantTests, TestCoverageKindInvariant)
+	manifest.SimulationTests = normalizeTestCoverageSpecs(manifest.SimulationTests, TestCoverageKindSimulation)
+	return hashRoot("aetheris-aek-required-test-coverage-manifest-v2", func(w byteWriter) {
 		writeUint64(w, uint64(len(manifest.UnitTests)))
 		for _, spec := range manifest.UnitTests {
 			writePart(w, spec.SpecHash)
 		}
 		writeUint64(w, uint64(len(manifest.IntegrationTests)))
 		for _, spec := range manifest.IntegrationTests {
+			writePart(w, spec.SpecHash)
+		}
+		writeUint64(w, uint64(len(manifest.InvariantTests)))
+		for _, spec := range manifest.InvariantTests {
+			writePart(w, spec.SpecHash)
+		}
+		writeUint64(w, uint64(len(manifest.SimulationTests)))
+		for _, spec := range manifest.SimulationTests {
 			writePart(w, spec.SpecHash)
 		}
 	})
@@ -354,6 +473,26 @@ func requiredUnitCoverageIDStrings() []string {
 
 func requiredIntegrationCoverageIDStrings() []string {
 	ids := RequiredIntegrationTestCoverageIDs()
+	out := make([]string, len(ids))
+	for i, id := range ids {
+		out[i] = string(id)
+	}
+	sort.Strings(out)
+	return out
+}
+
+func requiredInvariantCoverageIDStrings() []string {
+	ids := RequiredInvariantTestCoverageIDs()
+	out := make([]string, len(ids))
+	for i, id := range ids {
+		out[i] = string(id)
+	}
+	sort.Strings(out)
+	return out
+}
+
+func requiredSimulationCoverageIDStrings() []string {
+	ids := RequiredSimulationTestCoverageIDs()
 	out := make([]string, len(ids))
 	for i, id := range ids {
 		out[i] = string(id)
