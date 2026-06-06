@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestImplementationBacklogReportPassesHighAndMediumPriorityTasks(t *testing.T) {
+func TestImplementationBacklogReportPassesAllPriorityTasks(t *testing.T) {
 	report := BuildImplementationBacklogReport(validImplementationBacklogInput())
 	require.True(t, report.Passed, report.Failed)
 	require.Empty(t, report.Failed)
@@ -31,6 +31,25 @@ func TestImplementationBacklogReportRejectsNondeterministicMediumTask(t *testing
 	report := BuildImplementationBacklogReport(input)
 	require.False(t, report.Passed)
 	require.Contains(t, report.Failed, "medium_priority_backlog")
+}
+
+func TestImplementationBacklogReportRequiresAllLowerPriorityTasks(t *testing.T) {
+	input := validImplementationBacklogInput()
+	input.LowerPriority = input.LowerPriority[:len(input.LowerPriority)-1]
+
+	report := BuildImplementationBacklogReport(input)
+	require.False(t, report.Passed)
+	require.Contains(t, report.Failed, "lower_priority_backlog")
+	require.NoError(t, report.Validate())
+}
+
+func TestImplementationBacklogReportRejectsNondeterministicLowerPriorityTask(t *testing.T) {
+	input := validImplementationBacklogInput()
+	input.LowerPriority[0].Deterministic = false
+
+	report := BuildImplementationBacklogReport(input)
+	require.False(t, report.Passed)
+	require.Contains(t, report.Failed, "lower_priority_backlog")
 }
 
 func TestImplementationBacklogReportRejectsUnexpectedTask(t *testing.T) {
@@ -65,6 +84,14 @@ func validImplementationBacklogInput() ImplementationBacklogInput {
 			backlogTask(BacklogTaskAVMBytecodeGasTable, ImplementationBacklogMedium, "x_aetherisvm_avm"),
 			backlogTask(BacklogTaskPaymentSettlementState, ImplementationBacklogMedium, "x_payments_state"),
 			backlogTask(BacklogTaskCrossZoneIdentityLookup, ImplementationBacklogMedium, "x_identity_lookup"),
+		},
+		LowerPriority: []ImplementationBacklogTaskCheck{
+			backlogTask(BacklogTaskDynamicRouteCapacityScoring, ImplementationBacklogLower, "x_routing_capacity"),
+			backlogTask(BacklogTaskVirtualPaymentChannels, ImplementationBacklogLower, "x_payments_virtual_channels"),
+			backlogTask(BacklogTaskAdvancedABIIntrospection, ImplementationBacklogLower, "x_aetherisvm_abi"),
+			backlogTask(BacklogTaskVMNativeResolverContracts, ImplementationBacklogLower, "x_aetherisvm_resolvers"),
+			backlogTask(BacklogTaskValidatorServiceMetadata, ImplementationBacklogLower, "x_services_metadata"),
+			backlogTask(BacklogTaskZoneStateRentPolicies, ImplementationBacklogLower, "x_zones_state_rent"),
 		},
 	}
 }

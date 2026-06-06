@@ -12,6 +12,7 @@ type ImplementationBacklogPriority string
 const (
 	ImplementationBacklogHigh   ImplementationBacklogPriority = "HIGH"
 	ImplementationBacklogMedium ImplementationBacklogPriority = "MEDIUM"
+	ImplementationBacklogLower  ImplementationBacklogPriority = "LOWER"
 )
 
 const (
@@ -33,6 +34,13 @@ const (
 	BacklogTaskAVMBytecodeGasTable      = "avm_bytecode_gas_table"
 	BacklogTaskPaymentSettlementState   = "payment_settlement_state"
 	BacklogTaskCrossZoneIdentityLookup  = "cross_zone_identity_lookup"
+
+	BacklogTaskDynamicRouteCapacityScoring = "dynamic_route_capacity_scoring"
+	BacklogTaskVirtualPaymentChannels      = "virtual_payment_channels"
+	BacklogTaskAdvancedABIIntrospection    = "advanced_abi_introspection"
+	BacklogTaskVMNativeResolverContracts   = "vm_native_resolver_contracts"
+	BacklogTaskValidatorServiceMetadata    = "validator_service_metadata"
+	BacklogTaskZoneStateRentPolicies       = "zone_state_rent_policies"
 )
 
 var requiredHighPriorityBacklogTasks = map[string]struct{}{
@@ -58,6 +66,15 @@ var requiredMediumPriorityBacklogTasks = map[string]struct{}{
 	BacklogTaskCrossZoneIdentityLookup:  {},
 }
 
+var requiredLowerPriorityBacklogTasks = map[string]struct{}{
+	BacklogTaskDynamicRouteCapacityScoring: {},
+	BacklogTaskVirtualPaymentChannels:      {},
+	BacklogTaskAdvancedABIIntrospection:    {},
+	BacklogTaskVMNativeResolverContracts:   {},
+	BacklogTaskValidatorServiceMetadata:    {},
+	BacklogTaskZoneStateRentPolicies:       {},
+}
+
 type ImplementationBacklogTaskCheck struct {
 	TaskID        string
 	Priority      ImplementationBacklogPriority
@@ -72,6 +89,7 @@ type ImplementationBacklogInput struct {
 	BacklogVersion string
 	HighPriority   []ImplementationBacklogTaskCheck
 	MediumPriority []ImplementationBacklogTaskCheck
+	LowerPriority  []ImplementationBacklogTaskCheck
 }
 
 type ImplementationBacklogReport struct {
@@ -101,6 +119,11 @@ func BuildImplementationBacklogReport(input ImplementationBacklogInput) Implemen
 	} else {
 		evidence = append(evidence, "medium_priority_backlog:"+hashBacklogTaskChecks(ImplementationBacklogMedium, input.MediumPriority))
 	}
+	if err := validateBacklogTaskSet(ImplementationBacklogLower, input.LowerPriority, requiredLowerPriorityBacklogTasks); err != nil {
+		failed = append(failed, "lower_priority_backlog")
+	} else {
+		evidence = append(evidence, "lower_priority_backlog:"+hashBacklogTaskChecks(ImplementationBacklogLower, input.LowerPriority))
+	}
 	report := ImplementationBacklogReport{
 		BacklogVersion: input.BacklogVersion,
 		Passed:         len(failed) == 0,
@@ -124,6 +147,12 @@ func (i ImplementationBacklogInput) Normalize() ImplementationBacklogInput {
 	}
 	sort.SliceStable(i.MediumPriority, func(left, right int) bool {
 		return i.MediumPriority[left].TaskID < i.MediumPriority[right].TaskID
+	})
+	for idx := range i.LowerPriority {
+		i.LowerPriority[idx] = i.LowerPriority[idx].Normalize()
+	}
+	sort.SliceStable(i.LowerPriority, func(left, right int) bool {
+		return i.LowerPriority[left].TaskID < i.LowerPriority[right].TaskID
 	})
 	return i
 }
@@ -175,7 +204,7 @@ func (r ImplementationBacklogReport) Validate() error {
 
 func IsImplementationBacklogPriority(priority ImplementationBacklogPriority) bool {
 	switch priority {
-	case ImplementationBacklogHigh, ImplementationBacklogMedium:
+	case ImplementationBacklogHigh, ImplementationBacklogMedium, ImplementationBacklogLower:
 		return true
 	default:
 		return false
