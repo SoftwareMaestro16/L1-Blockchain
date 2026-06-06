@@ -39,6 +39,32 @@ func TestIdentityGovernanceParamsV2DefaultsCoverSection16(t *testing.T) {
 	require.Equal(t, sdkmath.NewInt(DefaultIdentitySpamSubdomainCreationFeeNaet), params.PricingParams.SubdomainCreationFee)
 	require.Equal(t, sdkmath.NewInt(DefaultIdentityPricingDetachedSubdomainFeeNaet), params.PricingParams.DetachedSubdomainFee)
 	require.Equal(t, DefaultDomainParams().LowStartPrice, params.PricingParams.AuctionMinimumBid)
+	require.Equal(t, uint64(MaxUnifiedPayloadBytesV2), params.ResolverParams.MaximumResolverRecordBytes)
+	require.Equal(t, uint32(MaxUnifiedContractTargets), params.ResolverParams.MaximumContractTargets)
+	require.Equal(t, uint32(MaxUnifiedServiceEndpoints), params.ResolverParams.MaximumServiceEndpoints)
+	require.Equal(t, uint32(MaxUnifiedInterfaceDescriptors), params.ResolverParams.MaximumInterfaceDescriptors)
+	require.Equal(t, uint64(MaxUnifiedRoutingMetadataBytes), params.ResolverParams.MaximumRoutingMetadataBytes)
+	require.Equal(t, uint64(MaxInterfaceInlineSchemaBytesV2), params.ResolverParams.MaximumInlineSchemaBytes)
+	require.Equal(t, uint64(1), params.ResolverParams.MinimumResolverTTL)
+	require.Equal(t, IdentityGovernanceMaximumResolverTTLV2, params.ResolverParams.MaximumResolverTTL)
+	require.ElementsMatch(t, []string{"aetheris", "grpcs", "https", "ipfs", "wss"}, params.ResolverParams.AllowedEndpointSchemes)
+
+	require.Equal(t, IdentityGovernanceMaximumDelegationDurationV2, params.DelegationParams.MaximumDelegationDuration)
+	require.Equal(t, IdentityGovernanceMaximumScopedDelegatesPerDomain, params.DelegationParams.MaximumScopedDelegatesPerDomain)
+	require.Equal(t, IdentityGovernanceMaximumZonePolicyBytesV2, params.DelegationParams.MaximumZonePolicySizeBytes)
+	require.True(t, params.DelegationParams.DetachedSubdomainAllowed)
+	require.True(t, params.DelegationParams.TimeLockedDelegationAllowed)
+
+	require.Equal(t, DefaultAuctionCommitBlocks, params.AuctionParams.CommitPhaseDuration)
+	require.Equal(t, DefaultAuctionRevealBlocks, params.AuctionParams.RevealPhaseDuration)
+	require.Equal(t, sdkmath.NewInt(DefaultIdentitySpamAuctionBidDepositNaet), params.AuctionParams.BidDepositMinimum)
+	require.Equal(t, DefaultIdentityAuctionUnrevealedForfeitBps, params.AuctionParams.UnrevealedBidPenaltyBps)
+	require.Equal(t, IdentityAuctionTieBreakEarliestRevealThenCommitmentV2, params.AuctionParams.TieBreakRule)
+	require.Equal(t, IdentityGovernanceAuctionFinalizationDelayV2, params.AuctionParams.AuctionFinalizationDelay)
+	require.Equal(t, uint32(3_000), params.AuctionParams.FeeBurnBps)
+	require.Equal(t, uint32(3_000), params.AuctionParams.FeeTreasuryBps)
+	require.Equal(t, uint32(2_000), params.AuctionParams.FeeRewardsBps)
+	require.Equal(t, uint32(2_000), params.AuctionParams.FeeCommunityPoolBps)
 	require.NotEmpty(t, params.ParamsHash)
 }
 
@@ -59,9 +85,16 @@ func TestIdentityGovernanceParamsV2ApplyToRuntime(t *testing.T) {
 	params.PricingParams.SubdomainCreationFee = sdkmath.NewInt(9)
 	params.PricingParams.DetachedSubdomainFee = sdkmath.NewInt(11)
 	params.PricingParams.AuctionMinimumBid = sdkmath.NewInt(456)
+	params.AuctionParams.BidDepositMinimum = sdkmath.NewInt(55)
+	params.AuctionParams.UnrevealedBidPenaltyBps = 1_000
+	params.AuctionParams.TieBreakRule = IdentityAuctionTieBreakCommitmentHashV2
+	params.AuctionParams.FeeBurnBps = 2_500
+	params.AuctionParams.FeeTreasuryBps = 2_500
+	params.AuctionParams.FeeRewardsBps = 2_500
+	params.AuctionParams.FeeCommunityPoolBps = 2_500
 	params.ParamsHash = ComputeIdentityGovernanceParamsHashV2(params)
 
-	identityParams, pricing, spam, err := ApplyIdentityGovernanceParamsToRuntimeV2(params)
+	identityParams, pricing, spam, auction, err := ApplyIdentityGovernanceParamsToRuntimeV2(params)
 	require.NoError(t, err)
 	require.Equal(t, uint64(1_000), identityParams.RegistrationPeriodBlocks)
 	require.Equal(t, uint64(100), identityParams.RenewalWindowBlocks)
@@ -79,6 +112,13 @@ func TestIdentityGovernanceParamsV2ApplyToRuntime(t *testing.T) {
 	require.Equal(t, sdkmath.NewInt(456), pricing.AntiSquattingParams.DomainParams.HighStartPrice)
 	require.Equal(t, pricing, spam.PricingParams)
 	require.Equal(t, sdkmath.NewInt(9), spam.SubdomainCreationFee)
+	require.Equal(t, sdkmath.NewInt(55), auction.BidDeposit)
+	require.Equal(t, uint32(1_000), auction.UnrevealedForfeitBps)
+	require.Equal(t, IdentityAuctionTieBreakCommitmentHashV2, auction.TieBreakRule)
+	require.Equal(t, uint32(2_500), auction.FeeBurnBps)
+	require.Equal(t, uint32(2_500), auction.FeeTreasuryBps)
+	require.Equal(t, uint32(2_500), auction.FeeRewardsBps)
+	require.Equal(t, uint32(2_500), auction.FeeCommunityPoolBps)
 }
 
 func TestIdentityGovernanceParamsV2RejectsInvalidNameLifecyclePricing(t *testing.T) {
@@ -128,4 +168,59 @@ func TestIdentityGovernanceParamsV2RejectsInvalidNameLifecyclePricing(t *testing
 	tampered := params
 	tampered.PricingParams.SubdomainCreationFee = sdkmath.NewInt(99)
 	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(tampered), "hash mismatch")
+}
+
+func TestIdentityGovernanceParamsV2RejectsInvalidResolverDelegationAuction(t *testing.T) {
+	params, err := DefaultIdentityGovernanceParamsV2()
+	require.NoError(t, err)
+
+	badResolverBytes := params
+	badResolverBytes.ResolverParams.MaximumResolverRecordBytes = MaxUnifiedPayloadBytesV2 + 1
+	badResolverBytes.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badResolverBytes)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badResolverBytes), "maximum record bytes")
+
+	badTTL := params
+	badTTL.ResolverParams.MaximumResolverTTL = badTTL.ResolverParams.MinimumResolverTTL - 1
+	badTTL.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badTTL)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badTTL), "maximum ttl")
+
+	badSchemeOrder := params
+	badSchemeOrder.ResolverParams.AllowedEndpointSchemes = []string{"https", "aetheris"}
+	badSchemeOrder.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badSchemeOrder)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badSchemeOrder), "schemes must be sorted")
+
+	badScheme := params
+	badScheme.ResolverParams.AllowedEndpointSchemes = []string{"ftp"}
+	badScheme.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badScheme)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badScheme), "unsupported")
+
+	badDelegationDuration := params
+	badDelegationDuration.DelegationParams.MaximumDelegationDuration = 0
+	badDelegationDuration.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badDelegationDuration)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badDelegationDuration), "maximum duration")
+
+	badDelegates := params
+	badDelegates.DelegationParams.MaximumScopedDelegatesPerDomain = 0
+	badDelegates.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badDelegates)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badDelegates), "maximum scoped delegates")
+
+	badAuctionDuration := params
+	badAuctionDuration.AuctionParams.CommitPhaseDuration = 0
+	badAuctionDuration.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badAuctionDuration)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badAuctionDuration), "commit phase duration")
+
+	badPenalty := params
+	badPenalty.AuctionParams.UnrevealedBidPenaltyBps = DomainDistributionDenominatorBps + 1
+	badPenalty.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badPenalty)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badPenalty), "unrevealed bid penalty")
+
+	badTieBreak := params
+	badTieBreak.AuctionParams.TieBreakRule = IdentityAuctionTieBreakRuleV2("random")
+	badTieBreak.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badTieBreak)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badTieBreak), "tie-break")
+
+	badSplit := params
+	badSplit.AuctionParams.FeeRewardsBps++
+	badSplit.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badSplit)
+	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badSplit), "fee split")
 }

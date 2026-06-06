@@ -13,6 +13,11 @@ const (
 	IdentityGovernanceCommitmentTombstoneRetentionV2  uint64 = DefaultCommitTTLBlocks * 30
 	IdentityGovernanceExpiryProcessingLimitV2         uint32 = 100
 	IdentityGovernanceMinimumRegistrationDurationV2   uint64 = DefaultRegistrationPeriodBlocks / 12
+	IdentityGovernanceMaximumResolverTTLV2            uint64 = DefaultRegistrationPeriodBlocks
+	IdentityGovernanceMaximumDelegationDurationV2     uint64 = DefaultRegistrationPeriodBlocks
+	IdentityGovernanceMaximumScopedDelegatesPerDomain uint32 = 64
+	IdentityGovernanceMaximumZonePolicyBytesV2        uint64 = 4 * 1024
+	IdentityGovernanceAuctionFinalizationDelayV2      uint64 = 1
 )
 
 type IdentityGovernanceNameParamsV2 struct {
@@ -47,11 +52,47 @@ type IdentityGovernancePricingParamsV2 struct {
 	AuctionMinimumBid          sdkmath.Int
 }
 
+type IdentityGovernanceResolverParamsV2 struct {
+	MaximumResolverRecordBytes  uint64
+	MaximumContractTargets      uint32
+	MaximumServiceEndpoints     uint32
+	MaximumInterfaceDescriptors uint32
+	MaximumRoutingMetadataBytes uint64
+	MaximumInlineSchemaBytes    uint64
+	MinimumResolverTTL          uint64
+	MaximumResolverTTL          uint64
+	AllowedEndpointSchemes      []string
+}
+
+type IdentityGovernanceDelegationParamsV2 struct {
+	MaximumDelegationDuration       uint64
+	MaximumScopedDelegatesPerDomain uint32
+	MaximumZonePolicySizeBytes      uint64
+	DetachedSubdomainAllowed        bool
+	TimeLockedDelegationAllowed     bool
+}
+
+type IdentityGovernanceAuctionParamsV2 struct {
+	CommitPhaseDuration      uint64
+	RevealPhaseDuration      uint64
+	BidDepositMinimum        sdkmath.Int
+	UnrevealedBidPenaltyBps  uint32
+	TieBreakRule             IdentityAuctionTieBreakRuleV2
+	AuctionFinalizationDelay uint64
+	FeeBurnBps               uint32
+	FeeTreasuryBps           uint32
+	FeeRewardsBps            uint32
+	FeeCommunityPoolBps      uint32
+}
+
 type IdentityGovernanceParamsV2 struct {
-	NameParams      IdentityGovernanceNameParamsV2
-	LifecycleParams IdentityGovernanceLifecycleParamsV2
-	PricingParams   IdentityGovernancePricingParamsV2
-	ParamsHash      string
+	NameParams       IdentityGovernanceNameParamsV2
+	LifecycleParams  IdentityGovernanceLifecycleParamsV2
+	PricingParams    IdentityGovernancePricingParamsV2
+	ResolverParams   IdentityGovernanceResolverParamsV2
+	DelegationParams IdentityGovernanceDelegationParamsV2
+	AuctionParams    IdentityGovernanceAuctionParamsV2
+	ParamsHash       string
 }
 
 func DefaultIdentityGovernanceNameParamsV2() IdentityGovernanceNameParamsV2 {
@@ -97,11 +138,54 @@ func DefaultIdentityGovernancePricingParamsV2() IdentityGovernancePricingParamsV
 	}
 }
 
+func DefaultIdentityGovernanceResolverParamsV2() IdentityGovernanceResolverParamsV2 {
+	return IdentityGovernanceResolverParamsV2{
+		MaximumResolverRecordBytes:  MaxUnifiedPayloadBytesV2,
+		MaximumContractTargets:      MaxUnifiedContractTargets,
+		MaximumServiceEndpoints:     MaxUnifiedServiceEndpoints,
+		MaximumInterfaceDescriptors: MaxUnifiedInterfaceDescriptors,
+		MaximumRoutingMetadataBytes: MaxUnifiedRoutingMetadataBytes,
+		MaximumInlineSchemaBytes:    MaxInterfaceInlineSchemaBytesV2,
+		MinimumResolverTTL:          1,
+		MaximumResolverTTL:          IdentityGovernanceMaximumResolverTTLV2,
+		AllowedEndpointSchemes:      []string{"aetheris", "grpcs", "https", "ipfs", "wss"},
+	}
+}
+
+func DefaultIdentityGovernanceDelegationParamsV2() IdentityGovernanceDelegationParamsV2 {
+	return IdentityGovernanceDelegationParamsV2{
+		MaximumDelegationDuration:       IdentityGovernanceMaximumDelegationDurationV2,
+		MaximumScopedDelegatesPerDomain: IdentityGovernanceMaximumScopedDelegatesPerDomain,
+		MaximumZonePolicySizeBytes:      IdentityGovernanceMaximumZonePolicyBytesV2,
+		DetachedSubdomainAllowed:        true,
+		TimeLockedDelegationAllowed:     true,
+	}
+}
+
+func DefaultIdentityGovernanceAuctionParamsV2() IdentityGovernanceAuctionParamsV2 {
+	fairness := DefaultIdentityAuctionFairnessParamsV2("aetheris-local-1")
+	return IdentityGovernanceAuctionParamsV2{
+		CommitPhaseDuration:      DefaultAuctionCommitBlocks,
+		RevealPhaseDuration:      DefaultAuctionRevealBlocks,
+		BidDepositMinimum:        fairness.BidDeposit,
+		UnrevealedBidPenaltyBps:  fairness.UnrevealedForfeitBps,
+		TieBreakRule:             fairness.TieBreakRule,
+		AuctionFinalizationDelay: IdentityGovernanceAuctionFinalizationDelayV2,
+		FeeBurnBps:               fairness.FeeBurnBps,
+		FeeTreasuryBps:           fairness.FeeTreasuryBps,
+		FeeRewardsBps:            fairness.FeeRewardsBps,
+		FeeCommunityPoolBps:      fairness.FeeCommunityPoolBps,
+	}
+}
+
 func DefaultIdentityGovernanceParamsV2() (IdentityGovernanceParamsV2, error) {
 	params := IdentityGovernanceParamsV2{
-		NameParams:      DefaultIdentityGovernanceNameParamsV2(),
-		LifecycleParams: DefaultIdentityGovernanceLifecycleParamsV2(),
-		PricingParams:   DefaultIdentityGovernancePricingParamsV2(),
+		NameParams:       DefaultIdentityGovernanceNameParamsV2(),
+		LifecycleParams:  DefaultIdentityGovernanceLifecycleParamsV2(),
+		PricingParams:    DefaultIdentityGovernancePricingParamsV2(),
+		ResolverParams:   DefaultIdentityGovernanceResolverParamsV2(),
+		DelegationParams: DefaultIdentityGovernanceDelegationParamsV2(),
+		AuctionParams:    DefaultIdentityGovernanceAuctionParamsV2(),
 	}
 	params.ParamsHash = ComputeIdentityGovernanceParamsHashV2(params)
 	return params, ValidateIdentityGovernanceParamsV2(params)
@@ -115,6 +199,15 @@ func ValidateIdentityGovernanceParamsV2(params IdentityGovernanceParamsV2) error
 		return err
 	}
 	if err := ValidateIdentityGovernancePricingParamsV2(params.PricingParams); err != nil {
+		return err
+	}
+	if err := ValidateIdentityGovernanceResolverParamsV2(params.ResolverParams); err != nil {
+		return err
+	}
+	if err := ValidateIdentityGovernanceDelegationParamsV2(params.DelegationParams); err != nil {
+		return err
+	}
+	if err := ValidateIdentityGovernanceAuctionParamsV2(params.AuctionParams); err != nil {
 		return err
 	}
 	if params.LifecycleParams.RenewalWindowDuration >= params.LifecycleParams.MaximumRegistrationDuration {
@@ -210,9 +303,77 @@ func ValidateIdentityGovernancePricingParamsV2(params IdentityGovernancePricingP
 	return nil
 }
 
-func ApplyIdentityGovernanceParamsToRuntimeV2(params IdentityGovernanceParamsV2) (IdentityParams, IdentityPricingParamsV2, IdentitySpamCostParamsV2, error) {
+func ValidateIdentityGovernanceResolverParamsV2(params IdentityGovernanceResolverParamsV2) error {
+	if params.MaximumResolverRecordBytes == 0 || params.MaximumResolverRecordBytes > MaxUnifiedPayloadBytesV2 {
+		return fmt.Errorf("identity governance resolver maximum record bytes must be in 1..%d", MaxUnifiedPayloadBytesV2)
+	}
+	if params.MaximumContractTargets == 0 || params.MaximumContractTargets > MaxUnifiedContractTargets {
+		return fmt.Errorf("identity governance resolver maximum contract targets must be in 1..%d", MaxUnifiedContractTargets)
+	}
+	if params.MaximumServiceEndpoints == 0 || params.MaximumServiceEndpoints > MaxUnifiedServiceEndpoints {
+		return fmt.Errorf("identity governance resolver maximum service endpoints must be in 1..%d", MaxUnifiedServiceEndpoints)
+	}
+	if params.MaximumInterfaceDescriptors == 0 || params.MaximumInterfaceDescriptors > MaxUnifiedInterfaceDescriptors {
+		return fmt.Errorf("identity governance resolver maximum interface descriptors must be in 1..%d", MaxUnifiedInterfaceDescriptors)
+	}
+	if params.MaximumRoutingMetadataBytes == 0 || params.MaximumRoutingMetadataBytes > MaxUnifiedRoutingMetadataBytes {
+		return fmt.Errorf("identity governance resolver maximum routing metadata bytes must be in 1..%d", MaxUnifiedRoutingMetadataBytes)
+	}
+	if params.MaximumInlineSchemaBytes == 0 || params.MaximumInlineSchemaBytes > MaxInterfaceInlineSchemaBytesV2 {
+		return fmt.Errorf("identity governance resolver maximum inline schema bytes must be in 1..%d", MaxInterfaceInlineSchemaBytesV2)
+	}
+	if params.MinimumResolverTTL == 0 {
+		return errors.New("identity governance resolver minimum ttl is required")
+	}
+	if params.MaximumResolverTTL < params.MinimumResolverTTL {
+		return errors.New("identity governance resolver maximum ttl must cover minimum ttl")
+	}
+	return validateGovernanceEndpointSchemesV2(params.AllowedEndpointSchemes)
+}
+
+func ValidateIdentityGovernanceDelegationParamsV2(params IdentityGovernanceDelegationParamsV2) error {
+	if params.MaximumDelegationDuration == 0 {
+		return errors.New("identity governance delegation maximum duration is required")
+	}
+	if params.MaximumScopedDelegatesPerDomain == 0 {
+		return errors.New("identity governance maximum scoped delegates per domain is required")
+	}
+	if params.MaximumZonePolicySizeBytes == 0 {
+		return errors.New("identity governance maximum zone policy size is required")
+	}
+	return nil
+}
+
+func ValidateIdentityGovernanceAuctionParamsV2(params IdentityGovernanceAuctionParamsV2) error {
+	if params.CommitPhaseDuration == 0 {
+		return errors.New("identity governance auction commit phase duration is required")
+	}
+	if params.RevealPhaseDuration == 0 {
+		return errors.New("identity governance auction reveal phase duration is required")
+	}
+	if params.BidDepositMinimum.IsNil() || params.BidDepositMinimum.IsNegative() {
+		return errors.New("identity governance auction bid deposit minimum must not be negative")
+	}
+	if params.UnrevealedBidPenaltyBps > DomainDistributionDenominatorBps {
+		return errors.New("identity governance auction unrevealed bid penalty must be <= 10000")
+	}
+	switch params.TieBreakRule {
+	case IdentityAuctionTieBreakEarliestRevealThenCommitmentV2, IdentityAuctionTieBreakCommitmentHashV2:
+	default:
+		return fmt.Errorf("unsupported identity governance auction tie-break rule %q", params.TieBreakRule)
+	}
+	if params.AuctionFinalizationDelay == 0 {
+		return errors.New("identity governance auction finalization delay is required")
+	}
+	if params.FeeBurnBps+params.FeeTreasuryBps+params.FeeRewardsBps+params.FeeCommunityPoolBps != DomainDistributionDenominatorBps {
+		return errors.New("identity governance auction fee split weights must sum to 10000")
+	}
+	return nil
+}
+
+func ApplyIdentityGovernanceParamsToRuntimeV2(params IdentityGovernanceParamsV2) (IdentityParams, IdentityPricingParamsV2, IdentitySpamCostParamsV2, IdentityAuctionFairnessParamsV2, error) {
 	if err := ValidateIdentityGovernanceParamsV2(params); err != nil {
-		return IdentityParams{}, IdentityPricingParamsV2{}, IdentitySpamCostParamsV2{}, err
+		return IdentityParams{}, IdentityPricingParamsV2{}, IdentitySpamCostParamsV2{}, IdentityAuctionFairnessParamsV2{}, err
 	}
 	identityParams := DefaultIdentityParams()
 	identityParams.RegistrationPeriodBlocks = params.LifecycleParams.MinimumRegistrationDuration
@@ -236,13 +397,25 @@ func ApplyIdentityGovernanceParamsToRuntimeV2(params IdentityGovernanceParamsV2)
 	spam := DefaultIdentitySpamCostParamsV2()
 	spam.PricingParams = pricing
 	spam.SubdomainCreationFee = params.PricingParams.SubdomainCreationFee
-	return identityParams, pricing, spam, nil
+
+	auction := DefaultIdentityAuctionFairnessParamsV2("aetheris-local-1")
+	auction.BidDeposit = params.AuctionParams.BidDepositMinimum
+	auction.UnrevealedForfeitBps = params.AuctionParams.UnrevealedBidPenaltyBps
+	auction.TieBreakRule = params.AuctionParams.TieBreakRule
+	auction.FeeBurnBps = params.AuctionParams.FeeBurnBps
+	auction.FeeTreasuryBps = params.AuctionParams.FeeTreasuryBps
+	auction.FeeRewardsBps = params.AuctionParams.FeeRewardsBps
+	auction.FeeCommunityPoolBps = params.AuctionParams.FeeCommunityPoolBps
+	return identityParams, pricing, spam, auction, nil
 }
 
 func ComputeIdentityGovernanceParamsHashV2(params IdentityGovernanceParamsV2) string {
 	name := params.NameParams
 	lifecycle := params.LifecycleParams
 	pricing := params.PricingParams
+	resolver := params.ResolverParams
+	delegation := params.DelegationParams
+	auction := params.AuctionParams
 	parts := []string{
 		"identity-governance-params-v2",
 		fmt.Sprint(name.MaximumLabels),
@@ -267,8 +440,32 @@ func ComputeIdentityGovernanceParamsHashV2(params IdentityGovernanceParamsV2) st
 		pricing.SubdomainCreationFee.String(),
 		pricing.DetachedSubdomainFee.String(),
 		pricing.AuctionMinimumBid.String(),
+		fmt.Sprint(resolver.MaximumResolverRecordBytes),
+		fmt.Sprint(resolver.MaximumContractTargets),
+		fmt.Sprint(resolver.MaximumServiceEndpoints),
+		fmt.Sprint(resolver.MaximumInterfaceDescriptors),
+		fmt.Sprint(resolver.MaximumRoutingMetadataBytes),
+		fmt.Sprint(resolver.MaximumInlineSchemaBytes),
+		fmt.Sprint(resolver.MinimumResolverTTL),
+		fmt.Sprint(resolver.MaximumResolverTTL),
+		fmt.Sprint(delegation.MaximumDelegationDuration),
+		fmt.Sprint(delegation.MaximumScopedDelegatesPerDomain),
+		fmt.Sprint(delegation.MaximumZonePolicySizeBytes),
+		fmt.Sprint(delegation.DetachedSubdomainAllowed),
+		fmt.Sprint(delegation.TimeLockedDelegationAllowed),
+		fmt.Sprint(auction.CommitPhaseDuration),
+		fmt.Sprint(auction.RevealPhaseDuration),
+		auction.BidDepositMinimum.String(),
+		fmt.Sprint(auction.UnrevealedBidPenaltyBps),
+		string(auction.TieBreakRule),
+		fmt.Sprint(auction.AuctionFinalizationDelay),
+		fmt.Sprint(auction.FeeBurnBps),
+		fmt.Sprint(auction.FeeTreasuryBps),
+		fmt.Sprint(auction.FeeRewardsBps),
+		fmt.Sprint(auction.FeeCommunityPoolBps),
 	}
 	parts = append(parts, sortedBreakdownStringsV2(name.ReservedLabels)...)
+	parts = append(parts, sortedBreakdownStringsV2(resolver.AllowedEndpointSchemes)...)
 	return identityHash(parts...)
 }
 
@@ -302,6 +499,31 @@ func validateGovernanceReservedLabelsV2(labels []string) error {
 		}
 		if !found {
 			return fmt.Errorf("identity governance reserved labels missing %q", required)
+		}
+	}
+	return nil
+}
+
+func validateGovernanceEndpointSchemesV2(schemes []string) error {
+	if len(schemes) == 0 {
+		return errors.New("identity governance resolver allowed endpoint schemes are required")
+	}
+	ordered := append([]string(nil), schemes...)
+	sort.Strings(ordered)
+	for i, scheme := range ordered {
+		if scheme == "" {
+			return errors.New("identity governance resolver allowed endpoint scheme is required")
+		}
+		if scheme != schemes[i] {
+			return errors.New("identity governance resolver allowed endpoint schemes must be sorted")
+		}
+		if i > 0 && ordered[i-1] == scheme {
+			return fmt.Errorf("duplicate identity governance endpoint scheme %q", scheme)
+		}
+		switch scheme {
+		case "aetheris", "grpcs", "https", "ipfs", "wss":
+		default:
+			return fmt.Errorf("unsupported identity governance endpoint scheme %q", scheme)
 		}
 	}
 	return nil
