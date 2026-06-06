@@ -2282,6 +2282,88 @@ func TestDiscoveryQueryOperationsCoverNodeZoneStorageAndEndpoint(t *testing.T) {
 	require.ErrorContains(t, err, "storage provider role")
 }
 
+func TestDiscoveryResponseSignsResultsAndProofAttachment(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	source := signedNodeRecord(t, 0x62, salt, 120, NodeRoleRouting)
+	service := signedNodeRecordWithCapabilities(t, 0x63, salt, 120, []NodeRole{NodeRoleService}, nil, []string{"svc.search"})
+	record := testSignedDiscoveryObjectRecord(t, service, 0x63, salt, DRTObjectServiceEndpoint, HashParts("target", "svc.search"), HashParts("endpoint", "svc.search"), "", "svc.search", "", 90)
+	table := EmptyDistributedRoutingTable()
+	var err error
+	table, err = table.Store(record, salt, 20)
+	require.NoError(t, err)
+
+	query := DRTQuery{ObjectType: DRTObjectServiceEndpoint, ServiceID: "svc.search", CurrentHeight: 20}
+	advisory, err := BuildDiscoveryResponse(table, query, source, deterministicPrivateKey(0x62), salt, DiscoveryOnChainProof{}, 20)
+	require.NoError(t, err)
+	require.True(t, advisory.AdvisoryOnly)
+	require.Len(t, advisory.MatchedRecords, 1)
+	require.Equal(t, ComputeDiscoveryResponseID(advisory), advisory.ResponseID)
+	require.NoError(t, advisory.Validate(source.NodePubKey, salt, 20))
+
+	resultHash, err := ComputeDiscoveryResponseResultHash(advisory.MatchedRecords)
+	require.NoError(t, err)
+	stateRoot := HashParts("state-root", "services")
+	proof := DiscoveryOnChainProof{
+		ProofHeight: 20,
+		StateRoot:   stateRoot,
+		ProofHash:   ComputeDiscoveryOnChainProofHash(resultHash, stateRoot, 20),
+	}
+	proven, err := BuildDiscoveryResponse(table, query, source, deterministicPrivateKey(0x62), salt, proof, 20)
+	require.NoError(t, err)
+	require.False(t, proven.AdvisoryOnly)
+	require.NoError(t, proven.Validate(source.NodePubKey, salt, 20))
+
+	forged := proven
+	forged.SourceSignature = cloneBytes(proven.SourceSignature)
+	forged.SourceSignature[0] ^= 0xff
+	require.ErrorContains(t, forged.Validate(source.NodePubKey, salt, 20), "source signature")
+
+	badProof := proven
+	badProof.OnChainProof.ProofHash = HashParts("wrong-proof")
+	badProof.ResponseID = ComputeDiscoveryResponseID(badProof)
+	payload, err := DiscoveryResponseSigningPayload(badProof)
+	require.NoError(t, err)
+	badProof.SourceSignature = ed25519.Sign(deterministicPrivateKey(0x62), payload)
+	require.ErrorContains(t, badProof.Validate(source.NodePubKey, salt, 20), "proof mismatch")
+}
+
+func TestDiscoveryResponseRejectsExpiredForgedAndReplayedRecords(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	source := signedNodeRecord(t, 0x64, salt, 120, NodeRoleRouting)
+	service := signedNodeRecordWithCapabilities(t, 0x65, salt, 120, []NodeRole{NodeRoleService}, nil, []string{"svc.replay"})
+	record := testSignedDiscoveryObjectRecord(t, service, 0x65, salt, DRTObjectServiceEndpoint, HashParts("target", "svc.replay"), HashParts("endpoint", "svc.replay"), "", "svc.replay", "", 40)
+	table := EmptyDistributedRoutingTable()
+	var err error
+	table, err = table.Store(record, salt, 20)
+	require.NoError(t, err)
+
+	response, err := BuildDiscoveryResponse(table, DRTQuery{ObjectType: DRTObjectServiceEndpoint, ServiceID: "svc.replay", CurrentHeight: 20}, source, deterministicPrivateKey(0x64), salt, DiscoveryOnChainProof{}, 20)
+	require.NoError(t, err)
+	require.NoError(t, response.Validate(source.NodePubKey, salt, 39))
+	require.ErrorContains(t, response.Validate(source.NodePubKey, salt, 41), "expired")
+
+	replayed := response
+	replayed.GeneratedHeight = 45
+	replayed.ResponseID = ComputeDiscoveryResponseID(replayed)
+	payload, err := DiscoveryResponseSigningPayload(replayed)
+	require.NoError(t, err)
+	replayed.SourceSignature = ed25519.Sign(deterministicPrivateKey(0x64), payload)
+	require.ErrorContains(t, replayed.Validate(source.NodePubKey, salt, 45), "heights")
+
+	forgedRecord := response
+	forgedRecord.MatchedRecords = cloneDiscoveryRecords(response.MatchedRecords)
+	forgedRecord.MatchedRecords[0].Signature = cloneBytes(forgedRecord.MatchedRecords[0].Signature)
+	forgedRecord.MatchedRecords[0].Signature[0] ^= 0xff
+	resultHash, err := ComputeDiscoveryResponseResultHash(forgedRecord.MatchedRecords)
+	require.NoError(t, err)
+	forgedRecord.ResultHash = resultHash
+	forgedRecord.ResponseID = ComputeDiscoveryResponseID(forgedRecord)
+	payload, err = DiscoveryResponseSigningPayload(forgedRecord)
+	require.NoError(t, err)
+	forgedRecord.SourceSignature = ed25519.Sign(deterministicPrivateKey(0x64), payload)
+	require.ErrorContains(t, forgedRecord.Validate(source.NodePubKey, salt, 20), "signature")
+}
+
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 	metrics := PeerMetrics{LatencyMillis: 25, ReliabilityBps: 9_900, ThroughputBytesPerSec: 32 << 20}
 	score, err := ComputePeerScore(metrics)

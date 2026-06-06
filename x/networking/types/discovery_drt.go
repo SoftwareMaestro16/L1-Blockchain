@@ -74,6 +74,32 @@ type DiscoveryRevocation struct {
 	Signature         []byte
 }
 
+type DiscoverySignatureChainEntry struct {
+	NodeID    string
+	PublicKey []byte
+	Signature []byte
+}
+
+type DiscoveryOnChainProof struct {
+	ProofHash   string
+	ProofHeight uint64
+	StateRoot   string
+}
+
+type DiscoveryResponse struct {
+	ResponseID      string
+	QueryHash       string
+	MatchedRecords  []DiscoveryRecord
+	SignatureChain  []DiscoverySignatureChainEntry
+	OnChainProof    DiscoveryOnChainProof
+	ExpiryHeight    uint64
+	SourceNodeID    string
+	SourceSignature []byte
+	ResultHash      string
+	AdvisoryOnly    bool
+	GeneratedHeight uint64
+}
+
 func EmptyDistributedRoutingTable() DistributedRoutingTable {
 	return DistributedRoutingTable{}
 }
@@ -259,6 +285,249 @@ func ValidateSignedDiscoveryRecord(record DiscoveryRecord, networkSalt []byte, c
 	}
 	if !ed25519.Verify(record.Record.NodePubKey, payload, record.Signature) {
 		return errors.New("networking discovery record signature verification failed")
+	}
+	return nil
+}
+
+func NewDiscoveryResponse(response DiscoveryResponse, sourcePrivateKey ed25519.PrivateKey, networkSalt []byte) (DiscoveryResponse, error) {
+	if len(sourcePrivateKey) != ed25519.PrivateKeySize {
+		return DiscoveryResponse{}, errors.New("networking discovery response private key must be ed25519")
+	}
+	response = NormalizeDiscoveryResponse(response)
+	sourcePubKey, ok := sourcePrivateKey.Public().(ed25519.PublicKey)
+	if !ok {
+		return DiscoveryResponse{}, errors.New("networking discovery response public key must be ed25519")
+	}
+	if response.SourceNodeID == "" {
+		response.SourceNodeID = ComputeNodeID(sourcePubKey, networkSalt)
+	}
+	if response.ExpiryHeight == 0 {
+		response.ExpiryHeight = minDiscoveryRecordExpiry(response.MatchedRecords)
+	}
+	if response.ResultHash == "" {
+		resultHash, err := ComputeDiscoveryResponseResultHash(response.MatchedRecords)
+		if err != nil {
+			return DiscoveryResponse{}, err
+		}
+		response.ResultHash = resultHash
+	}
+	if response.ResponseID == "" {
+		response.ResponseID = ComputeDiscoveryResponseID(response)
+	}
+	payload, err := DiscoveryResponseSigningPayload(response)
+	if err != nil {
+		return DiscoveryResponse{}, err
+	}
+	response.SourceSignature = ed25519.Sign(sourcePrivateKey, payload)
+	if err := response.Validate(sourcePubKey, networkSalt, response.GeneratedHeight); err != nil {
+		return DiscoveryResponse{}, err
+	}
+	return response, nil
+}
+
+func BuildDiscoveryResponse(table DistributedRoutingTable, query DRTQuery, source NodeRecord, sourcePrivateKey ed25519.PrivateKey, networkSalt []byte, onChainProof DiscoveryOnChainProof, currentHeight uint64) (DiscoveryResponse, error) {
+	records := table.findRecordsForQuery(query, currentHeight)
+	response := DiscoveryResponse{
+		QueryHash:       ComputeDRTQueryHash(query),
+		MatchedRecords:  records,
+		SignatureChain:  DiscoverySignatureChain(records),
+		OnChainProof:    NormalizeDiscoveryOnChainProof(onChainProof),
+		SourceNodeID:    source.NodeID,
+		AdvisoryOnly:    onChainProof.ProofHash == "",
+		GeneratedHeight: currentHeight,
+	}
+	return NewDiscoveryResponse(response, sourcePrivateKey, networkSalt)
+}
+
+func NormalizeDiscoveryResponse(response DiscoveryResponse) DiscoveryResponse {
+	response.ResponseID = normalizeHashText(response.ResponseID)
+	response.QueryHash = normalizeHashText(response.QueryHash)
+	response.MatchedRecords = cloneDiscoveryRecords(response.MatchedRecords)
+	response.SignatureChain = cloneDiscoverySignatureChain(response.SignatureChain)
+	response.OnChainProof = NormalizeDiscoveryOnChainProof(response.OnChainProof)
+	response.SourceNodeID = normalizeHashText(response.SourceNodeID)
+	response.SourceSignature = cloneBytes(response.SourceSignature)
+	response.ResultHash = normalizeHashText(response.ResultHash)
+	return response
+}
+
+func NormalizeDiscoverySignatureChainEntry(entry DiscoverySignatureChainEntry) DiscoverySignatureChainEntry {
+	entry.NodeID = normalizeHashText(entry.NodeID)
+	entry.PublicKey = cloneBytes(entry.PublicKey)
+	entry.Signature = cloneBytes(entry.Signature)
+	return entry
+}
+
+func NormalizeDiscoveryOnChainProof(proof DiscoveryOnChainProof) DiscoveryOnChainProof {
+	proof.ProofHash = normalizeHashText(proof.ProofHash)
+	proof.StateRoot = normalizeHashText(proof.StateRoot)
+	return proof
+}
+
+func ComputeDiscoveryResponseResultHash(records []DiscoveryRecord) (string, error) {
+	records = cloneDiscoveryRecords(records)
+	parts := []string{"discovery-response-result"}
+	for _, record := range records {
+		if err := ValidateHash("networking discovery response record id", record.RecordID); err != nil {
+			return "", err
+		}
+		parts = append(parts, record.RecordID)
+	}
+	return HashParts(parts...), nil
+}
+
+func ComputeDiscoveryResponseID(response DiscoveryResponse) string {
+	response = NormalizeDiscoveryResponse(response)
+	return HashParts(
+		"discovery-response",
+		response.QueryHash,
+		response.ResultHash,
+		fmt.Sprintf("%d", response.ExpiryHeight),
+		response.SourceNodeID,
+		response.OnChainProof.ProofHash,
+		response.OnChainProof.StateRoot,
+		fmt.Sprintf("%t", response.AdvisoryOnly),
+		fmt.Sprintf("%d", response.GeneratedHeight),
+	)
+}
+
+func ComputeDRTQueryHash(query DRTQuery) string {
+	query = normalizeDRTQuery(query)
+	return HashParts(
+		"drt-query",
+		string(query.ObjectType),
+		query.ObjectID,
+		query.OverlayID,
+		query.ZoneID,
+		query.ServiceID,
+		fmt.Sprintf("%d", query.MinStakeWeight),
+		fmt.Sprintf("%d", query.Limit),
+		fmt.Sprintf("%d", query.CurrentHeight),
+	)
+}
+
+func DiscoveryResponseSigningPayload(response DiscoveryResponse) ([]byte, error) {
+	response = NormalizeDiscoveryResponse(response)
+	response.SourceSignature = nil
+	return json.Marshal(response)
+}
+
+func (response DiscoveryResponse) Validate(sourcePubKey ed25519.PublicKey, networkSalt []byte, currentHeight uint64) error {
+	response = NormalizeDiscoveryResponse(response)
+	if err := ValidateHash("networking discovery response id", response.ResponseID); err != nil {
+		return err
+	}
+	if response.ResponseID != ComputeDiscoveryResponseID(response) {
+		return errors.New("networking discovery response id mismatch")
+	}
+	if err := ValidateHash("networking discovery response query hash", response.QueryHash); err != nil {
+		return err
+	}
+	if len(sourcePubKey) != ed25519.PublicKeySize {
+		return fmt.Errorf("networking discovery response source public key must be %d bytes", ed25519.PublicKeySize)
+	}
+	expectedSource := ComputeNodeID(sourcePubKey, networkSalt)
+	if response.SourceNodeID != expectedSource {
+		return errors.New("networking discovery response source node mismatch")
+	}
+	if response.GeneratedHeight == 0 || response.ExpiryHeight == 0 || response.GeneratedHeight > response.ExpiryHeight {
+		return errors.New("networking discovery response heights are invalid")
+	}
+	if currentHeight > 0 && currentHeight > response.ExpiryHeight {
+		return errors.New("networking discovery response is expired")
+	}
+	resultHash, err := ComputeDiscoveryResponseResultHash(response.MatchedRecords)
+	if err != nil {
+		return err
+	}
+	if response.ResultHash != resultHash {
+		return errors.New("networking discovery response result hash mismatch")
+	}
+	if response.ExpiryHeight > minDiscoveryRecordExpiry(response.MatchedRecords) {
+		return errors.New("networking discovery response expiry exceeds matched records")
+	}
+	for _, record := range response.MatchedRecords {
+		if err := ValidateSignedDiscoveryRecord(record, networkSalt, currentHeight); err != nil {
+			return err
+		}
+	}
+	if err := ValidateDiscoverySignatureChain(response.SignatureChain, response.MatchedRecords); err != nil {
+		return err
+	}
+	if response.OnChainProof.ProofHash != "" {
+		if err := response.OnChainProof.Validate(response.ResultHash, response.ExpiryHeight, currentHeight); err != nil {
+			return err
+		}
+	} else if !response.AdvisoryOnly {
+		return errors.New("networking unproofed discovery response must be advisory")
+	}
+	if len(response.SourceSignature) != ed25519.SignatureSize {
+		return fmt.Errorf("networking discovery response source signature must be %d bytes", ed25519.SignatureSize)
+	}
+	payload, err := DiscoveryResponseSigningPayload(response)
+	if err != nil {
+		return err
+	}
+	if !ed25519.Verify(sourcePubKey, payload, response.SourceSignature) {
+		return errors.New("networking discovery response source signature verification failed")
+	}
+	return nil
+}
+
+func (proof DiscoveryOnChainProof) Validate(resultHash string, expiryHeight, currentHeight uint64) error {
+	proof = NormalizeDiscoveryOnChainProof(proof)
+	if err := ValidateHash("networking discovery response proof hash", proof.ProofHash); err != nil {
+		return err
+	}
+	if err := ValidateHash("networking discovery response proof state root", proof.StateRoot); err != nil {
+		return err
+	}
+	if proof.ProofHeight == 0 {
+		return errors.New("networking discovery response proof height must be positive")
+	}
+	if expiryHeight > 0 && proof.ProofHeight > expiryHeight {
+		return errors.New("networking discovery response proof cannot outlive response")
+	}
+	if currentHeight > 0 && proof.ProofHeight > currentHeight {
+		return errors.New("networking discovery response proof height is in the future")
+	}
+	expected := ComputeDiscoveryOnChainProofHash(resultHash, proof.StateRoot, proof.ProofHeight)
+	if proof.ProofHash != expected {
+		return errors.New("networking discovery response proof mismatch")
+	}
+	return nil
+}
+
+func DiscoverySignatureChain(records []DiscoveryRecord) []DiscoverySignatureChainEntry {
+	records = cloneDiscoveryRecords(records)
+	chain := make([]DiscoverySignatureChainEntry, len(records))
+	for i, record := range records {
+		chain[i] = DiscoverySignatureChainEntry{
+			NodeID:    record.OwnerNodeID,
+			PublicKey: cloneBytes(record.Record.NodePubKey),
+			Signature: cloneBytes(record.Signature),
+		}
+	}
+	return chain
+}
+
+func ValidateDiscoverySignatureChain(chain []DiscoverySignatureChainEntry, records []DiscoveryRecord) error {
+	records = cloneDiscoveryRecords(records)
+	if len(chain) != len(records) {
+		return errors.New("networking discovery signature chain length mismatch")
+	}
+	normalized := cloneDiscoverySignatureChain(chain)
+	for i, record := range records {
+		entry := normalized[i]
+		if entry.NodeID != record.OwnerNodeID {
+			return errors.New("networking discovery signature chain owner mismatch")
+		}
+		if string(entry.PublicKey) != string(record.Record.NodePubKey) {
+			return errors.New("networking discovery signature chain public key mismatch")
+		}
+		if string(entry.Signature) != string(record.Signature) {
+			return errors.New("networking discovery signature chain signature mismatch")
+		}
 	}
 	return nil
 }
@@ -540,6 +809,28 @@ func (table DistributedRoutingTable) FindEndpoint(advertisementHash string, curr
 func (table DistributedRoutingTable) FindStorageProvider(currentHeight uint64) []DiscoveryRecord {
 	return table.findRecords(func(record DiscoveryRecord) bool {
 		return record.RecordType == DRTObjectStorageProvider
+	}, currentHeight)
+}
+
+func (table DistributedRoutingTable) findRecordsForQuery(query DRTQuery, currentHeight uint64) []DiscoveryRecord {
+	query = normalizeDRTQuery(query)
+	return table.findRecords(func(record DiscoveryRecord) bool {
+		if query.ObjectType != "" && record.RecordType != query.ObjectType {
+			return false
+		}
+		if query.ObjectID != "" && record.TargetID != query.ObjectID {
+			return false
+		}
+		if query.OverlayID != "" && record.OverlayID != query.OverlayID {
+			return false
+		}
+		if query.ZoneID != "" && record.ZoneID != query.ZoneID {
+			return false
+		}
+		if query.ServiceID != "" && record.ServiceID != query.ServiceID {
+			return false
+		}
+		return true
 	}, currentHeight)
 }
 
@@ -892,6 +1183,20 @@ func cloneDiscoveryRevocations(revocations []DiscoveryRevocation) []DiscoveryRev
 	return out
 }
 
+func cloneDiscoverySignatureChain(chain []DiscoverySignatureChainEntry) []DiscoverySignatureChainEntry {
+	out := make([]DiscoverySignatureChainEntry, len(chain))
+	for i, entry := range chain {
+		out[i] = NormalizeDiscoverySignatureChainEntry(entry)
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].NodeID != out[j].NodeID {
+			return out[i].NodeID < out[j].NodeID
+		}
+		return string(out[i].Signature) < string(out[j].Signature)
+	})
+	return out
+}
+
 func sortDRTAdvertisements(advertisements []DRTAdvertisement) {
 	sort.SliceStable(advertisements, func(i, j int) bool {
 		return drtAdvertisementKey(advertisements[i]) < drtAdvertisementKey(advertisements[j])
@@ -979,6 +1284,30 @@ func (table DistributedRoutingTable) findRecords(match func(DiscoveryRecord) boo
 	}
 	sortDiscoveryRecords(out)
 	return out
+}
+
+func minDiscoveryRecordExpiry(records []DiscoveryRecord) uint64 {
+	if len(records) == 0 {
+		return 1
+	}
+	min := uint64(0)
+	for _, record := range records {
+		record = NormalizeDiscoveryRecord(record)
+		if record.ExpiresHeight == 0 {
+			continue
+		}
+		if min == 0 || record.ExpiresHeight < min {
+			min = record.ExpiresHeight
+		}
+	}
+	if min == 0 {
+		return 1
+	}
+	return min
+}
+
+func ComputeDiscoveryOnChainProofHash(resultHash, stateRoot string, proofHeight uint64) string {
+	return HashParts("discovery-on-chain-proof", normalizeHashText(resultHash), normalizeHashText(stateRoot), fmt.Sprintf("%d", proofHeight))
 }
 
 func drtBucketID(localNodeID, remoteNodeID string, bucketCount uint32) uint32 {
