@@ -412,6 +412,125 @@ func TestStateRentChargesLongLivedStateAndFundsCleanup(t *testing.T) {
 	require.Equal(t, sdkmath.NewInt(480), rent.BurnableRentNaet)
 }
 
+func TestEvaluateValidatorIncentivesPricesConcentrationAndReliability(t *testing.T) {
+	report, err := EvaluateValidatorIncentives(ValidatorIncentiveInput{
+		ValidatorStakeBps:           4_000,
+		CommissionBps:               500,
+		UptimeBps:                   9_700,
+		MissedBlockRateBps:          100,
+		RepeatedFaultCount:          2,
+		ReporterRewardBps:           500,
+		ReporterRewardsWired:        true,
+		SelectionEconomyLinked:      true,
+		PerformanceRiskSignals:      true,
+		StakeConcentrationDampening: true,
+	})
+	require.NoError(t, err)
+	require.False(t, report.Healthy)
+	require.Equal(t, int64(299), report.ConcentrationPenaltyBps)
+	require.Equal(t, int64(750), report.ReliabilityPenaltyBps)
+	require.Equal(t, int64(8_951), report.RewardMultiplierBps)
+	require.ElementsMatch(t, []string{
+		"stake_concentration_reward_dampened",
+		"soft_reliability_failure_priced",
+	}, report.Findings)
+}
+
+func TestEvaluateValidatorIncentivesSupportsNewValidatorBootstrap(t *testing.T) {
+	report, err := EvaluateValidatorIncentives(ValidatorIncentiveInput{
+		ValidatorStakeBps:           50,
+		CommissionBps:               500,
+		UptimeBps:                   BasisPoints,
+		ReporterRewardBps:           500,
+		ReporterRewardsWired:        true,
+		SelectionEconomyLinked:      true,
+		PerformanceRiskSignals:      true,
+		StakeConcentrationDampening: true,
+		BootstrapSupportEnabled:     true,
+		NewValidator:                true,
+	})
+	require.NoError(t, err)
+	require.True(t, report.Healthy)
+	require.Equal(t, DefaultValidatorBootstrapBonusBps, report.BootstrapBonusBps)
+	require.Equal(t, BasisPoints+DefaultValidatorBootstrapBonusBps, report.RewardMultiplierBps)
+	require.Empty(t, report.Findings)
+}
+
+func TestEvaluateValidatorIncentivesReportsMissingEconomicWiring(t *testing.T) {
+	report, err := EvaluateValidatorIncentives(ValidatorIncentiveInput{
+		ValidatorStakeBps: 4_000,
+		CommissionBps:     MinCommissionBps,
+		UptimeBps:         BasisPoints,
+		NewValidator:      true,
+	})
+	require.NoError(t, err)
+	require.False(t, report.Healthy)
+	require.ElementsMatch(t, []string{
+		"stake_concentration_not_dampened",
+		"validator_behavior_not_visible_to_delegators",
+		"reporter_rewards_not_wired",
+		"validator_selection_not_linked_to_economics",
+		"commission_below_sustainable_floor",
+		"new_validator_bootstrap_disadvantage",
+	}, report.Findings)
+}
+
+func TestEvaluateStakingCentralizationAcceptsDiverseDelegation(t *testing.T) {
+	report, err := EvaluateStakingCentralization(StakingCentralizationInput{
+		ValidatorStakeBps:              []int64{1_600, 1_400, 1_200, 1_000, 900, 800},
+		CommissionBps:                  []int64{500, 700},
+		SelfDelegationRequirementBps:   500,
+		RedelegationLagBlocks:          100,
+		DelegatorRiskSignalCoverageBps: MinDelegatorRiskSignalCoverageBps,
+		GovernanceVotingPowerBps:       2_000,
+	})
+	require.NoError(t, err)
+	require.True(t, report.Healthy)
+	require.Equal(t, int64(1_600), report.TopValidatorStakeBps)
+	require.Equal(t, int64(6_100), report.TopValidatorsStakeBps)
+	require.Equal(t, int64(841), report.VotingPowerHHIBps)
+	require.Empty(t, report.Risks)
+}
+
+func TestEvaluateStakingCentralizationReportsDelegationAndGovernanceRisks(t *testing.T) {
+	report, err := EvaluateStakingCentralization(StakingCentralizationInput{
+		ValidatorStakeBps:              []int64{4_000, 2_000, 1_000, 900, 800},
+		CommissionBps:                  []int64{MinCommissionBps, 400},
+		SelfDelegationRequirementBps:   DefaultMaxSelfDelegationBps + 1,
+		RedelegationLagBlocks:          DefaultMaxRedelegationLagBlocks + 1,
+		DelegatorRiskSignalCoverageBps: MinDelegatorRiskSignalCoverageBps - 1,
+		GovernanceVotingPowerBps:       DefaultGovernanceCaptureThresholdBps + 1,
+	})
+	require.NoError(t, err)
+	require.False(t, report.Healthy)
+	require.Equal(t, int64(4_000), report.TopValidatorStakeBps)
+	require.Equal(t, int64(8_700), report.TopValidatorsStakeBps)
+	require.Equal(t, int64(2_245), report.VotingPowerHHIBps)
+	require.ElementsMatch(t, []string{
+		"delegation_concentrated_in_top_validator",
+		"delegation_concentrated_in_visible_validators",
+		"commission_race_to_unsustainable_pricing",
+		"self_delegation_requirement_reduces_operator_diversity",
+		"redelegation_lags_validator_risk",
+		"delegator_risk_information_incomplete",
+		"voting_power_governance_capture_risk",
+	}, report.Risks)
+}
+
+func TestEvaluateStakingCentralizationReportsWeakSelfDelegation(t *testing.T) {
+	report, err := EvaluateStakingCentralization(StakingCentralizationInput{
+		TopValidatorStakeBps:           1_000,
+		TopValidatorsStakeBps:          3_000,
+		CommissionBps:                  []int64{500},
+		SelfDelegationRequirementBps:   DefaultMinSelfDelegationBps - 1,
+		DelegatorRiskSignalCoverageBps: MinDelegatorRiskSignalCoverageBps,
+		GovernanceVotingPowerBps:       1_000,
+	})
+	require.NoError(t, err)
+	require.False(t, report.Healthy)
+	require.ElementsMatch(t, []string{"self_delegation_requirement_too_low"}, report.Risks)
+}
+
 func TestEvaluateOptimalEconomicStateAcceptsHealthyControlLoop(t *testing.T) {
 	state, err := EvaluateOptimalEconomicState(OptimalEconomicStateInput{
 		StakeRatioBps:                  DefaultTargetStakeBps,

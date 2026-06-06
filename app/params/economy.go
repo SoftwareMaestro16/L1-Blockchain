@@ -2,6 +2,7 @@ package params
 
 import (
 	"fmt"
+	"sort"
 
 	sdkmath "cosmossdk.io/math"
 )
@@ -46,6 +47,18 @@ const (
 	DefaultCircuitBreakerFailedTxRateBps    = int64(2_000)
 	DefaultInflationNoiseToleranceBps       = int64(500)
 	DefaultCleanupRewardBps                 = int64(2_000)
+	DefaultValidatorReliabilityTargetBps    = int64(9_900)
+	DefaultSoftFaultPenaltyStepBps          = int64(250)
+	MaxValidatorRewardDampeningBps          = int64(3_000)
+	DefaultValidatorBootstrapBonusBps       = int64(500)
+	DefaultMaxBootstrapStakeBps             = int64(100)
+	DefaultMinSustainableCommissionBps      = int64(300)
+	DefaultMinSelfDelegationBps             = int64(100)
+	DefaultMaxSelfDelegationBps             = int64(2_500)
+	DefaultTopNConcentrationThresholdBps    = int64(6_700)
+	DefaultGovernanceCaptureThresholdBps    = int64(3_334)
+	DefaultMaxVotingPowerHHIBps             = int64(1_800)
+	DefaultMaxRedelegationLagBlocks         = uint64(43_200)
 )
 
 type ValidatorIncomeInput struct {
@@ -278,6 +291,61 @@ type StateRentOutput struct {
 	RentNaet          sdkmath.Int
 	CleanupRewardNaet sdkmath.Int
 	BurnableRentNaet  sdkmath.Int
+}
+
+type ValidatorIncentiveInput struct {
+	ValidatorStakeBps           int64
+	CommissionBps               int64
+	UptimeBps                   int64
+	MissedBlockRateBps          int64
+	RepeatedFaultCount          uint64
+	ReporterRewardBps           int64
+	ReporterRewardsWired        bool
+	SelectionEconomyLinked      bool
+	PerformanceRiskSignals      bool
+	StakeConcentrationDampening bool
+	BootstrapSupportEnabled     bool
+	NewValidator                bool
+	ReliabilityTargetBps        int64
+	MaxConcentrationBps         int64
+	BootstrapStakeBps           int64
+	BootstrapBonusBps           int64
+}
+
+type ValidatorIncentiveReport struct {
+	Healthy                 bool
+	RewardMultiplierBps     int64
+	ConcentrationPenaltyBps int64
+	ReliabilityPenaltyBps   int64
+	BootstrapBonusBps       int64
+	Findings                []string
+}
+
+type StakingCentralizationInput struct {
+	ValidatorStakeBps              []int64
+	TopValidatorStakeBps           int64
+	TopValidatorsStakeBps          int64
+	TopValidatorCount              int
+	CommissionBps                  []int64
+	SelfDelegationRequirementBps   int64
+	RedelegationLagBlocks          uint64
+	DelegatorRiskSignalCoverageBps int64
+	GovernanceVotingPowerBps       int64
+	MinSelfDelegationBps           int64
+	MaxSelfDelegationBps           int64
+	MaxTopValidatorStakeBps        int64
+	TopNConcentrationThresholdBps  int64
+	MaxRedelegationLagBlocks       uint64
+	MaxGovernanceVotingPowerBps    int64
+	MaxVotingPowerHHIBps           int64
+}
+
+type StakingCentralizationReport struct {
+	Healthy               bool
+	TopValidatorStakeBps  int64
+	TopValidatorsStakeBps int64
+	VotingPowerHHIBps     int64
+	Risks                 []string
 }
 
 func DefaultBalanceControllerParams() BalanceControllerParams {
@@ -567,6 +635,214 @@ func ComputeStateRent(input StateRentInput) (StateRentOutput, error) {
 		RentNaet:          rent,
 		CleanupRewardNaet: cleanupReward,
 		BurnableRentNaet:  rent.Sub(cleanupReward),
+	}, nil
+}
+
+func EvaluateValidatorIncentives(input ValidatorIncentiveInput) (ValidatorIncentiveReport, error) {
+	if input.ReliabilityTargetBps == 0 {
+		input.ReliabilityTargetBps = DefaultValidatorReliabilityTargetBps
+	}
+	if input.MaxConcentrationBps == 0 {
+		input.MaxConcentrationBps = MaxTopValidatorConcentrationBps
+	}
+	if input.BootstrapStakeBps == 0 {
+		input.BootstrapStakeBps = DefaultMaxBootstrapStakeBps
+	}
+	if input.BootstrapBonusBps == 0 {
+		input.BootstrapBonusBps = DefaultValidatorBootstrapBonusBps
+	}
+	for _, item := range []struct {
+		name  string
+		value int64
+	}{
+		{name: "validator_stake_bps", value: input.ValidatorStakeBps},
+		{name: "uptime_bps", value: input.UptimeBps},
+		{name: "missed_block_rate_bps", value: input.MissedBlockRateBps},
+		{name: "reporter_reward_bps", value: input.ReporterRewardBps},
+		{name: "reliability_target_bps", value: input.ReliabilityTargetBps},
+		{name: "max_concentration_bps", value: input.MaxConcentrationBps},
+		{name: "bootstrap_stake_bps", value: input.BootstrapStakeBps},
+		{name: "bootstrap_bonus_bps", value: input.BootstrapBonusBps},
+	} {
+		if err := validateBps(item.name, item.value, 0, BasisPoints); err != nil {
+			return ValidatorIncentiveReport{}, err
+		}
+	}
+	if err := ValidateCommissionBounds(input.CommissionBps, 0); err != nil {
+		return ValidatorIncentiveReport{}, err
+	}
+
+	findings := make([]string, 0, 8)
+	concentrationPenalty := int64(0)
+	if input.ValidatorStakeBps > input.MaxConcentrationBps {
+		if input.StakeConcentrationDampening {
+			over := input.ValidatorStakeBps - input.MaxConcentrationBps
+			denom := BasisPoints - input.MaxConcentrationBps
+			if denom > 0 {
+				concentrationPenalty = clampInt64(over*MaxValidatorRewardDampeningBps/denom, 0, MaxValidatorRewardDampeningBps)
+			}
+			findings = append(findings, "stake_concentration_reward_dampened")
+		} else {
+			findings = append(findings, "stake_concentration_not_dampened")
+		}
+	}
+
+	reliabilityPenalty := int64(0)
+	if input.UptimeBps < input.ReliabilityTargetBps {
+		reliabilityPenalty += input.ReliabilityTargetBps - input.UptimeBps
+	}
+	reliabilityPenalty += input.MissedBlockRateBps / 2
+	repeatedPenalty := int64(input.RepeatedFaultCount)
+	if repeatedPenalty > DefaultMaxLoadMultiplierBps/DefaultSoftFaultPenaltyStepBps {
+		repeatedPenalty = DefaultMaxLoadMultiplierBps / DefaultSoftFaultPenaltyStepBps
+	}
+	reliabilityPenalty += repeatedPenalty * DefaultSoftFaultPenaltyStepBps
+	reliabilityPenalty = clampInt64(reliabilityPenalty, 0, MaxValidatorRewardDampeningBps)
+	if reliabilityPenalty > 0 {
+		findings = append(findings, "soft_reliability_failure_priced")
+	}
+	if !input.PerformanceRiskSignals {
+		findings = append(findings, "validator_behavior_not_visible_to_delegators")
+	}
+	if !input.ReporterRewardsWired || input.ReporterRewardBps == 0 {
+		findings = append(findings, "reporter_rewards_not_wired")
+	}
+	if !input.SelectionEconomyLinked {
+		findings = append(findings, "validator_selection_not_linked_to_economics")
+	}
+	if input.CommissionBps < DefaultMinSustainableCommissionBps {
+		findings = append(findings, "commission_below_sustainable_floor")
+	}
+
+	bootstrapBonus := int64(0)
+	if input.NewValidator {
+		if input.BootstrapSupportEnabled && input.ValidatorStakeBps <= input.BootstrapStakeBps {
+			bootstrapBonus = input.BootstrapBonusBps
+		} else {
+			findings = append(findings, "new_validator_bootstrap_disadvantage")
+		}
+	}
+	rewardMultiplier := clampInt64(BasisPoints-concentrationPenalty-reliabilityPenalty+bootstrapBonus, 0, BasisPoints+input.BootstrapBonusBps)
+	return ValidatorIncentiveReport{
+		Healthy:                 len(findings) == 0,
+		RewardMultiplierBps:     rewardMultiplier,
+		ConcentrationPenaltyBps: concentrationPenalty,
+		ReliabilityPenaltyBps:   reliabilityPenalty,
+		BootstrapBonusBps:       bootstrapBonus,
+		Findings:                findings,
+	}, nil
+}
+
+func EvaluateStakingCentralization(input StakingCentralizationInput) (StakingCentralizationReport, error) {
+	if input.TopValidatorCount == 0 {
+		input.TopValidatorCount = 5
+	}
+	if input.MinSelfDelegationBps == 0 {
+		input.MinSelfDelegationBps = DefaultMinSelfDelegationBps
+	}
+	if input.MaxSelfDelegationBps == 0 {
+		input.MaxSelfDelegationBps = DefaultMaxSelfDelegationBps
+	}
+	if input.MaxTopValidatorStakeBps == 0 {
+		input.MaxTopValidatorStakeBps = MaxTopValidatorConcentrationBps
+	}
+	if input.TopNConcentrationThresholdBps == 0 {
+		input.TopNConcentrationThresholdBps = DefaultTopNConcentrationThresholdBps
+	}
+	if input.MaxRedelegationLagBlocks == 0 {
+		input.MaxRedelegationLagBlocks = DefaultMaxRedelegationLagBlocks
+	}
+	if input.MaxGovernanceVotingPowerBps == 0 {
+		input.MaxGovernanceVotingPowerBps = DefaultGovernanceCaptureThresholdBps
+	}
+	if input.MaxVotingPowerHHIBps == 0 {
+		input.MaxVotingPowerHHIBps = DefaultMaxVotingPowerHHIBps
+	}
+	for _, item := range []struct {
+		name  string
+		value int64
+	}{
+		{name: "top_validator_stake_bps", value: input.TopValidatorStakeBps},
+		{name: "top_validators_stake_bps", value: input.TopValidatorsStakeBps},
+		{name: "self_delegation_requirement_bps", value: input.SelfDelegationRequirementBps},
+		{name: "delegator_risk_signal_coverage_bps", value: input.DelegatorRiskSignalCoverageBps},
+		{name: "governance_voting_power_bps", value: input.GovernanceVotingPowerBps},
+		{name: "min_self_delegation_bps", value: input.MinSelfDelegationBps},
+		{name: "max_self_delegation_bps", value: input.MaxSelfDelegationBps},
+		{name: "max_top_validator_stake_bps", value: input.MaxTopValidatorStakeBps},
+		{name: "top_n_concentration_threshold_bps", value: input.TopNConcentrationThresholdBps},
+		{name: "max_governance_voting_power_bps", value: input.MaxGovernanceVotingPowerBps},
+		{name: "max_voting_power_hhi_bps", value: input.MaxVotingPowerHHIBps},
+	} {
+		if err := validateBps(item.name, item.value, 0, BasisPoints); err != nil {
+			return StakingCentralizationReport{}, err
+		}
+	}
+	if input.MinSelfDelegationBps > input.MaxSelfDelegationBps {
+		return StakingCentralizationReport{}, fmt.Errorf("min_self_delegation_bps must be <= max_self_delegation_bps")
+	}
+	if input.TopValidatorCount < 0 {
+		return StakingCentralizationReport{}, fmt.Errorf("top_validator_count must not be negative")
+	}
+	stakes := append([]int64(nil), input.ValidatorStakeBps...)
+	stakeSum := int64(0)
+	for i, stake := range stakes {
+		if err := validateBps(fmt.Sprintf("validator_stake_bps[%d]", i), stake, 0, BasisPoints); err != nil {
+			return StakingCentralizationReport{}, err
+		}
+		stakeSum += stake
+	}
+	if stakeSum > BasisPoints {
+		return StakingCentralizationReport{}, fmt.Errorf("validator_stake_bps sum must be <= 10000")
+	}
+	for i, commission := range input.CommissionBps {
+		if err := ValidateCommissionBounds(commission, 0); err != nil {
+			return StakingCentralizationReport{}, fmt.Errorf("commission_bps[%d]: %w", i, err)
+		}
+	}
+
+	topValidator := input.TopValidatorStakeBps
+	topValidators := input.TopValidatorsStakeBps
+	hhi := int64(0)
+	if len(stakes) > 0 {
+		sort.Slice(stakes, func(i, j int) bool { return stakes[i] > stakes[j] })
+		topValidator = stakes[0]
+		topValidators = sumTopBps(stakes, input.TopValidatorCount)
+		hhi = votingPowerHHIBps(stakes)
+	}
+
+	risks := make([]string, 0, 8)
+	if topValidator > input.MaxTopValidatorStakeBps {
+		risks = append(risks, "delegation_concentrated_in_top_validator")
+	}
+	if topValidators > input.TopNConcentrationThresholdBps {
+		risks = append(risks, "delegation_concentrated_in_visible_validators")
+	}
+	if hasUnsustainableCommission(input.CommissionBps) {
+		risks = append(risks, "commission_race_to_unsustainable_pricing")
+	}
+	if input.SelfDelegationRequirementBps > input.MaxSelfDelegationBps {
+		risks = append(risks, "self_delegation_requirement_reduces_operator_diversity")
+	}
+	if input.SelfDelegationRequirementBps < input.MinSelfDelegationBps {
+		risks = append(risks, "self_delegation_requirement_too_low")
+	}
+	if input.RedelegationLagBlocks > input.MaxRedelegationLagBlocks {
+		risks = append(risks, "redelegation_lags_validator_risk")
+	}
+	if input.DelegatorRiskSignalCoverageBps < MinDelegatorRiskSignalCoverageBps {
+		risks = append(risks, "delegator_risk_information_incomplete")
+	}
+	if input.GovernanceVotingPowerBps > input.MaxGovernanceVotingPowerBps || hhi > input.MaxVotingPowerHHIBps {
+		risks = append(risks, "voting_power_governance_capture_risk")
+	}
+
+	return StakingCentralizationReport{
+		Healthy:               len(risks) == 0,
+		TopValidatorStakeBps:  topValidator,
+		TopValidatorsStakeBps: topValidators,
+		VotingPowerHHIBps:     hhi,
+		Risks:                 risks,
 	}, nil
 }
 
@@ -1066,6 +1342,37 @@ func activityVolatilityBps(values []int64) int64 {
 		}
 	}
 	return maxValue - minValue
+}
+
+func sumTopBps(values []int64, count int) int64 {
+	if count <= 0 || len(values) == 0 {
+		return 0
+	}
+	if count > len(values) {
+		count = len(values)
+	}
+	sum := int64(0)
+	for i := 0; i < count; i++ {
+		sum += values[i]
+	}
+	return sum
+}
+
+func votingPowerHHIBps(values []int64) int64 {
+	hhi := int64(0)
+	for _, value := range values {
+		hhi += value * value / BasisPoints
+	}
+	return hhi
+}
+
+func hasUnsustainableCommission(values []int64) bool {
+	for _, value := range values {
+		if value < DefaultMinSustainableCommissionBps {
+			return true
+		}
+	}
+	return false
 }
 
 func normalizeInt(value sdkmath.Int) sdkmath.Int {

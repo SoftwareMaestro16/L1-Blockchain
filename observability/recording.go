@@ -93,6 +93,19 @@ func RecordEconomicRiskControls(weaknessControlsReady bool, missingControlCount,
 	SetGauge(MetricEconomyCircuitBreakerReasons, nil, float64(circuitBreakerReasonCount))
 }
 
+func RecordValidatorEconomics(validatorIncentivesHealthy bool, validatorIncentiveFindingCount int, stakingCentralizationHealthy bool, stakingCentralizationRiskCount int) {
+	if validatorIncentiveFindingCount < 0 {
+		validatorIncentiveFindingCount = 0
+	}
+	if stakingCentralizationRiskCount < 0 {
+		stakingCentralizationRiskCount = 0
+	}
+	SetGauge(MetricValidatorIncentivesHealthy, nil, boolFloat(validatorIncentivesHealthy))
+	SetGauge(MetricValidatorIncentiveFindings, nil, float64(validatorIncentiveFindingCount))
+	SetGauge(MetricStakingCentralizationHealthy, nil, boolFloat(stakingCentralizationHealthy))
+	SetGauge(MetricStakingCentralizationRisks, nil, float64(stakingCentralizationRiskCount))
+}
+
 func (r *Registry) collectRuntime() {
 	var mem runtime.MemStats
 	runtime.ReadMemStats(&mem)

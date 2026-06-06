@@ -36,6 +36,10 @@ const (
 	MetricEconomyInflationRiskCount    = "aetheris_economy_inflation_risk_count"
 	MetricEconomyCircuitBreakerActive  = "aetheris_economy_circuit_breaker_active"
 	MetricEconomyCircuitBreakerReasons = "aetheris_economy_circuit_breaker_reasons"
+	MetricValidatorIncentivesHealthy   = "aetheris_validator_incentives_healthy"
+	MetricValidatorIncentiveFindings   = "aetheris_validator_incentive_findings"
+	MetricStakingCentralizationHealthy = "aetheris_staking_centralization_healthy"
+	MetricStakingCentralizationRisks   = "aetheris_staking_centralization_risks"
 	MetricLocalnetHealth               = "aetheris_localnet_health"
 	MetricProcessUptimeSeconds         = "aetheris_process_uptime_seconds"
 	MetricProcessMemoryBytes           = "aetheris_process_memory_bytes"
@@ -85,6 +89,10 @@ var Definitions = []Definition{
 	{MetricEconomyInflationRiskCount, "Number of inflation model risks in the last evaluation.", kindGauge},
 	{MetricEconomyCircuitBreakerActive, "Whether the economic circuit breaker is active.", kindGauge},
 	{MetricEconomyCircuitBreakerReasons, "Number of active economic circuit breaker reasons.", kindGauge},
+	{MetricValidatorIncentivesHealthy, "Whether the last validator incentive evaluation found no weaknesses.", kindGauge},
+	{MetricValidatorIncentiveFindings, "Number of validator incentive findings in the last evaluation.", kindGauge},
+	{MetricStakingCentralizationHealthy, "Whether the last staking centralization evaluation found no risks.", kindGauge},
+	{MetricStakingCentralizationRisks, "Number of staking centralization risks in the last evaluation.", kindGauge},
 	{MetricLocalnetHealth, "Localnet metrics endpoint health marker.", kindGauge},
 	{MetricProcessUptimeSeconds, "Aetheris process uptime in seconds.", kindGauge},
 	{MetricProcessMemoryBytes, "Go runtime memory allocation bytes.", kindGauge},
