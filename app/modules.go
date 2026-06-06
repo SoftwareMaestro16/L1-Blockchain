@@ -41,6 +41,7 @@ import (
 	constitutionmodule "github.com/sovereign-l1/l1/x/constitution"
 	crosschainregistrymodule "github.com/sovereign-l1/l1/x/cross-chain-registry"
 	dexmodule "github.com/sovereign-l1/l1/x/dex"
+	dynamiccommissionmodule "github.com/sovereign-l1/l1/x/dynamic-commission"
 	nativeevidencemodule "github.com/sovereign-l1/l1/x/evidence"
 	feecollectormodule "github.com/sovereign-l1/l1/x/fee-collector"
 	feesmodule "github.com/sovereign-l1/l1/x/fees"
@@ -107,6 +108,7 @@ func (app *L1App) initModules(
 		shardingcoordinatormodule.NewAppModule(&app.ShardingCoordinatorKeeper),
 		tokenfactorymodule.NewAppModule(appCodec, app.TokenFactoryKeeper),
 		dexmodule.NewAppModule(appCodec, app.DexKeeper),
+		dynamiccommissionmodule.NewAppModule(appCodec, app.DynamicCommissionKeeper),
 		feecollectormodule.NewAppModule(appCodec, app.FeeCollectorKeeper),
 		feesmodule.NewAppModule(appCodec, app.FeesKeeper),
 	)

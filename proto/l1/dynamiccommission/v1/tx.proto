@@ -1,0 +1,57 @@
+syntax = "proto3";
+package l1.dynamiccommission.v1;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "l1/dynamiccommission/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/dynamic-commission/types";
+
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  rpc SetBaseCommission(MsgSetBaseCommission) returns (MsgSetBaseCommissionResponse);
+  rpc UpdateCommissionParams(MsgUpdateCommissionParams) returns (MsgUpdateCommissionParamsResponse);
+  rpc RecomputeEffectiveCommission(MsgRecomputeEffectiveCommission) returns (MsgRecomputeEffectiveCommissionResponse);
+}
+
+message MsgSetBaseCommission {
+  option (cosmos.msg.v1.signer) = "validator_address";
+  option (amino.name) = "l1/dynamiccommission/MsgSetBaseCommission";
+
+  string validator_address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint32 base_commission_bps = 2;
+  uint64 height = 3;
+}
+
+message MsgSetBaseCommissionResponse {
+  ValidatorCommission commission = 1 [(gogoproto.nullable) = false];
+}
+
+message MsgUpdateCommissionParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "l1/dynamiccommission/MsgUpdateCommissionParams";
+
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  Params params = 2 [(gogoproto.nullable) = false];
+}
+
+message MsgUpdateCommissionParamsResponse {}
+
+message MsgRecomputeEffectiveCommission {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "l1/dynamiccommission/MsgRecomputeEffectiveCommission";
+
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string validator_address = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint32 performance_score_bps = 3;
+  uint32 reputation_score_bps = 4;
+  bool jailed = 5;
+  uint64 height = 6;
+}
+
+message MsgRecomputeEffectiveCommissionResponse {
+  ValidatorCommission commission = 1 [(gogoproto.nullable) = false];
+}

@@ -64,6 +64,8 @@ import (
 	crosschainregistrytypes "github.com/sovereign-l1/l1/x/cross-chain-registry/types"
 	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
+	dynamiccommissionkeeper "github.com/sovereign-l1/l1/x/dynamic-commission/keeper"
+	dynamiccommissiontypes "github.com/sovereign-l1/l1/x/dynamic-commission/types"
 	nativeevidencekeeper "github.com/sovereign-l1/l1/x/evidence/keeper"
 	nativeevidencetypes "github.com/sovereign-l1/l1/x/evidence/types"
 	feecollectorkeeper "github.com/sovereign-l1/l1/x/fee-collector/keeper"
@@ -270,6 +272,11 @@ func (app *L1App) initKeepers(
 		appCodec,
 		runtime.NewKVStoreService(keys[dextypes.StoreKey]),
 		app.BankKeeper,
+		govAuthority,
+	)
+	app.DynamicCommissionKeeper = dynamiccommissionkeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(keys[dynamiccommissiontypes.StoreKey]),
 		govAuthority,
 	)
 	app.FeeCollectorKeeper = feecollectorkeeper.NewKeeper(

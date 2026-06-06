@@ -1,0 +1,44 @@
+syntax = "proto3";
+package l1.dynamiccommission.v1;
+
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "l1/dynamiccommission/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/dynamic-commission/types";
+
+service Query {
+  rpc ValidatorCommission(QueryValidatorCommissionRequest) returns (QueryValidatorCommissionResponse) {
+    option (google.api.http).get = "/l1/dynamiccommission/v1/validators/{validator_address}/commission";
+  }
+
+  rpc CommissionHistory(QueryCommissionHistoryRequest) returns (QueryCommissionHistoryResponse) {
+    option (google.api.http).get = "/l1/dynamiccommission/v1/validators/{validator_address}/history";
+  }
+
+  rpc CommissionParams(QueryCommissionParamsRequest) returns (QueryCommissionParamsResponse) {
+    option (google.api.http).get = "/l1/dynamiccommission/v1/params";
+  }
+}
+
+message QueryValidatorCommissionRequest {
+  string validator_address = 1;
+}
+
+message QueryValidatorCommissionResponse {
+  ValidatorCommission commission = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryCommissionHistoryRequest {
+  string validator_address = 1;
+}
+
+message QueryCommissionHistoryResponse {
+  repeated CommissionHistoryEntry history = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryCommissionParamsRequest {}
+
+message QueryCommissionParamsResponse {
+  Params params = 1 [(gogoproto.nullable) = false];
+}

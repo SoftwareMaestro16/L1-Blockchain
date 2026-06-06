@@ -30,6 +30,7 @@ import (
 	constitutiontypes "github.com/sovereign-l1/l1/x/constitution/types"
 	crosschainregistrytypes "github.com/sovereign-l1/l1/x/cross-chain-registry/types"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
+	dynamiccommissiontypes "github.com/sovereign-l1/l1/x/dynamic-commission/types"
 	nativeevidencetypes "github.com/sovereign-l1/l1/x/evidence/types"
 	feecollectortypes "github.com/sovereign-l1/l1/x/fee-collector/types"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
@@ -242,6 +243,7 @@ func aetherCoreInitGenesisOrder() []string {
 		bridgehubtypes.ModuleName,
 		crosschainregistrytypes.ModuleName,
 		shardingcoordinatortypes.ModuleName,
+		dynamiccommissiontypes.ModuleName,
 		feecollectortypes.ModuleName,
 		feestypes.ModuleName,
 		tokenfactorytypes.ModuleName,
@@ -289,6 +291,7 @@ func aetherCoreExportGenesisOrder() []string {
 		bridgehubtypes.ModuleName,
 		crosschainregistrytypes.ModuleName,
 		shardingcoordinatortypes.ModuleName,
+		dynamiccommissiontypes.ModuleName,
 		feecollectortypes.ModuleName,
 		feestypes.ModuleName,
 		tokenfactorytypes.ModuleName,

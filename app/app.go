@@ -70,6 +70,8 @@ import (
 	crosschainregistrytypes "github.com/sovereign-l1/l1/x/cross-chain-registry/types"
 	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
+	dynamiccommissionkeeper "github.com/sovereign-l1/l1/x/dynamic-commission/keeper"
+	dynamiccommissiontypes "github.com/sovereign-l1/l1/x/dynamic-commission/types"
 	nativeevidencekeeper "github.com/sovereign-l1/l1/x/evidence/keeper"
 	nativeevidencetypes "github.com/sovereign-l1/l1/x/evidence/types"
 	feecollectorkeeper "github.com/sovereign-l1/l1/x/fee-collector/keeper"
@@ -178,6 +180,7 @@ type L1App struct {
 	ConstitutionKeeper        constitutionkeeper.Keeper
 	TokenFactoryKeeper        tokenfactorykeeper.Keeper
 	DexKeeper                 dexkeeper.Keeper
+	DynamicCommissionKeeper   dynamiccommissionkeeper.Keeper
 	FeeCollectorKeeper        feecollectorkeeper.Keeper
 	FeesKeeper                feeskeeper.Keeper
 	AetherCoreKeeper          aethercorekeeper.Keeper
@@ -307,6 +310,7 @@ func NewL1App(
 		configvotingtypes.StoreKey,
 		tokenfactorytypes.StoreKey,
 		dextypes.StoreKey,
+		dynamiccommissiontypes.StoreKey,
 		feecollectortypes.StoreKey,
 		feestypes.StoreKey,
 		aethercoretypes.StoreKey,
