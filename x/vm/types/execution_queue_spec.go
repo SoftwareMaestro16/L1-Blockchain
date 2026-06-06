@@ -53,6 +53,15 @@ type AVMZoneQueueSelection struct {
 	Budget    zonestypes.ZoneExecutionBudget
 }
 
+type AVMZoneQueueProof struct {
+	ZoneID    zonestypes.ZoneID
+	Lane      AVMQueueLane
+	MessageID string
+	SortKey   string
+	StateKey  string
+	QueueRoot string
+}
+
 func NewAVMZoneQueue(queue AVMZoneQueue) (AVMZoneQueue, error) {
 	queue = canonicalAVMZoneQueue(queue)
 	queue.QueueRoot = ComputeAVMZoneQueueRoot(queue)
@@ -254,6 +263,219 @@ func SelectAVMZoneQueueWork(queue AVMZoneQueue, messages []AVMAsyncMessage, heig
 	return selection, nil
 }
 
+func AdmitAVMZoneQueueMessage(queue AVMZoneQueue, msg AVMAsyncMessage, height uint64, maxDepth uint32) (AVMZoneQueue, AVMZoneQueueEntry, error) {
+	if height == 0 {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, errors.New("AVM queue admission height must be positive")
+	}
+	queue = canonicalAVMZoneQueue(queue)
+	queue.QueueRoot = ComputeAVMZoneQueueRoot(queue)
+	if err := queue.Validate(); err != nil {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, err
+	}
+	msg = canonicalAVMAsyncMessage(msg)
+	if err := msg.Validate(); err != nil {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, err
+	}
+	if msg.DestinationZone != queue.ZoneID {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, errors.New("AVM queue admission zone mismatch")
+	}
+	if height > msg.ExpiryHeight {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, errors.New("AVM queue admission message is expired")
+	}
+	if maxDepth > 0 && uint32(len(allAVMQueueEntries(queue))) >= maxDepth {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, errors.New("AVM queue admission exceeds max queue depth")
+	}
+	if _, found := findAVMQueueEntry(queue, msg.ID); found {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, fmt.Errorf("duplicate AVM queued message %q", msg.ID)
+	}
+	lane := AVMQueueLanePriority
+	if height < AVMMessageScheduledHeight(msg) {
+		lane = AVMQueueLaneDelayed
+	}
+	entry, err := NewAVMZoneQueueEntry(lane, msg, 0)
+	if err != nil {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, err
+	}
+	next := appendAVMQueueEntry(queue, entry)
+	next, err = NewAVMZoneQueue(next)
+	return next, entry, err
+}
+
+func AdmitAVMZoneRetryMessage(queue AVMZoneQueue, msg AVMAsyncMessage, retryHeight uint64, maxDepth uint32) (AVMZoneQueue, AVMZoneQueueEntry, error) {
+	if retryHeight == 0 {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, errors.New("AVM retry queue height must be positive")
+	}
+	queue = canonicalAVMZoneQueue(queue)
+	queue.QueueRoot = ComputeAVMZoneQueueRoot(queue)
+	if err := queue.Validate(); err != nil {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, err
+	}
+	msg = canonicalAVMAsyncMessage(msg)
+	if err := msg.Validate(); err != nil {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, err
+	}
+	if msg.DestinationZone != queue.ZoneID {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, errors.New("AVM retry queue zone mismatch")
+	}
+	if retryHeight > msg.ExpiryHeight {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, errors.New("AVM retry queue cannot exceed message expiry")
+	}
+	if maxDepth > 0 && uint32(len(allAVMQueueEntries(queue))) >= maxDepth {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, errors.New("AVM retry queue exceeds max queue depth")
+	}
+	if _, found := findAVMQueueEntry(queue, msg.ID); found {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, fmt.Errorf("duplicate AVM queued message %q", msg.ID)
+	}
+	entry, err := NewAVMZoneQueueEntry(AVMQueueLaneRetry, msg, retryHeight)
+	if err != nil {
+		return AVMZoneQueue{}, AVMZoneQueueEntry{}, err
+	}
+	next := appendAVMQueueEntry(queue, entry)
+	next, err = NewAVMZoneQueue(next)
+	return next, entry, err
+}
+
+func PromoteAVMZoneQueue(queue AVMZoneQueue, height uint64, maxMessages uint32) (AVMZoneQueue, []AVMZoneQueueEntry, error) {
+	if height == 0 {
+		return AVMZoneQueue{}, nil, errors.New("AVM queue promotion height must be positive")
+	}
+	if maxMessages == 0 {
+		return AVMZoneQueue{}, nil, errors.New("AVM queue promotion max messages must be positive")
+	}
+	queue = canonicalAVMZoneQueue(queue)
+	queue.QueueRoot = ComputeAVMZoneQueueRoot(queue)
+	if err := queue.Validate(); err != nil {
+		return AVMZoneQueue{}, nil, err
+	}
+
+	due := append([]AVMZoneQueueEntry(nil), queue.DelayedQueue...)
+	due = append(due, queue.RetryQueue...)
+	sort.SliceStable(due, func(i, j int) bool {
+		return compareAVMQueueEntries(due[i], due[j]) < 0
+	})
+	promoteIDs := make(map[string]struct{})
+	promoted := make([]AVMZoneQueueEntry, 0, maxMessages)
+	for _, entry := range due {
+		if entry.ScheduledHeight > height || uint32(len(promoted)) >= maxMessages {
+			continue
+		}
+		promotedEntry := entry
+		promotedEntry.Lane = AVMQueueLanePriority
+		promoted = append(promoted, promotedEntry)
+		promoteIDs[entry.MessageID] = struct{}{}
+	}
+
+	keep := func(entries []AVMZoneQueueEntry) []AVMZoneQueueEntry {
+		out := make([]AVMZoneQueueEntry, 0, len(entries))
+		for _, entry := range entries {
+			if _, found := promoteIDs[entry.MessageID]; found {
+				continue
+			}
+			out = append(out, entry)
+		}
+		return out
+	}
+	queue.DelayedQueue = keep(queue.DelayedQueue)
+	queue.RetryQueue = keep(queue.RetryQueue)
+	queue.PriorityQueue = append(queue.PriorityQueue, promoted...)
+	next, err := NewAVMZoneQueue(queue)
+	return next, promoted, err
+}
+
+func DeadLetterAVMZoneQueueMessage(queue AVMZoneQueue, msg AVMAsyncMessage, receipt AVMExecutionReceipt, reason string, failedAttempts uint32, refundAmountOptional uint64) (AVMZoneQueue, AVMDeadLetterRecord, error) {
+	queue = canonicalAVMZoneQueue(queue)
+	queue.QueueRoot = ComputeAVMZoneQueueRoot(queue)
+	if err := queue.Validate(); err != nil {
+		return AVMZoneQueue{}, AVMDeadLetterRecord{}, err
+	}
+	msg = canonicalAVMAsyncMessage(msg)
+	if err := msg.Validate(); err != nil {
+		return AVMZoneQueue{}, AVMDeadLetterRecord{}, err
+	}
+	if msg.DestinationZone != queue.ZoneID {
+		return AVMZoneQueue{}, AVMDeadLetterRecord{}, errors.New("AVM dead letter queue zone mismatch")
+	}
+	record, err := NewAVMDeadLetterRecord(AVMDeadLetterRecord{
+		MessageID:            msg.ID,
+		ZoneID:               queue.ZoneID,
+		Reason:               reason,
+		FailedAttempts:       failedAttempts,
+		LastErrorCode:        receipt.ErrorCodeOptional,
+		FinalHeight:          receipt.CreatedHeight,
+		RefundAmountOptional: refundAmountOptional,
+		ReceiptID:            receipt.ReceiptID,
+	})
+	if err != nil {
+		return AVMZoneQueue{}, AVMDeadLetterRecord{}, err
+	}
+	if err := record.ValidateWithReceipt(receipt); err != nil {
+		return AVMZoneQueue{}, AVMDeadLetterRecord{}, err
+	}
+	failedEntry, err := NewAVMZoneQueueEntry(AVMQueueLaneFailed, msg, receipt.CreatedHeight)
+	if err != nil {
+		return AVMZoneQueue{}, AVMDeadLetterRecord{}, err
+	}
+	removeIDs := map[string]struct{}{msg.ID: {}}
+	queue = removeAVMZoneQueueMessages(queue, removeIDs, nil)
+	queue.FailedQueue = append(queue.FailedQueue, failedEntry)
+	next, err := NewAVMZoneQueue(queue)
+	return next, record, err
+}
+
+func QueryAVMZoneQueueProof(queue AVMZoneQueue, lane AVMQueueLane, messageID string) (AVMZoneQueueProof, error) {
+	queue = canonicalAVMZoneQueue(queue)
+	queue.QueueRoot = ComputeAVMZoneQueueRoot(queue)
+	if err := queue.Validate(); err != nil {
+		return AVMZoneQueueProof{}, err
+	}
+	messageID = strings.TrimSpace(messageID)
+	entries, err := queueEntriesForLane(queue, lane)
+	if err != nil {
+		return AVMZoneQueueProof{}, err
+	}
+	for _, entry := range entries {
+		if entry.MessageID != messageID {
+			continue
+		}
+		proof := AVMZoneQueueProof{
+			ZoneID:    queue.ZoneID,
+			Lane:      lane,
+			MessageID: entry.MessageID,
+			SortKey:   entry.SortKey,
+			StateKey:  entry.StateKey(),
+			QueueRoot: queue.QueueRoot,
+		}
+		return proof, proof.Validate()
+	}
+	return AVMZoneQueueProof{}, fmt.Errorf("AVM queue message %q not found in %s lane", messageID, lane)
+}
+
+func (p AVMZoneQueueProof) Validate() error {
+	p.MessageID = strings.TrimSpace(p.MessageID)
+	p.SortKey = strings.TrimSpace(p.SortKey)
+	p.StateKey = strings.TrimSpace(p.StateKey)
+	p.QueueRoot = strings.TrimSpace(p.QueueRoot)
+	if err := zonestypes.ValidateZoneID(p.ZoneID); err != nil {
+		return err
+	}
+	if !IsAVMQueueLane(p.Lane) {
+		return fmt.Errorf("invalid AVM queue proof lane %q", p.Lane)
+	}
+	if err := zonestypes.ValidateHash("AVM queue proof message id", p.MessageID); err != nil {
+		return err
+	}
+	if p.SortKey == "" || !strings.Contains(p.SortKey, p.MessageID) {
+		return errors.New("AVM queue proof sort key must reference message id")
+	}
+	if err := validateAVMQueueStateKey("AVM queue proof state key", p.StateKey); err != nil {
+		return err
+	}
+	if !strings.HasSuffix(p.StateKey, p.SortKey) {
+		return errors.New("AVM queue proof state key must end with sort key")
+	}
+	return zonestypes.ValidateHash("AVM queue proof root", p.QueueRoot)
+}
+
 func ComputeAVMZoneQueueRoot(queue AVMZoneQueue) string {
 	queue = canonicalAVMZoneQueue(queue)
 	h := sha256.New()
@@ -327,11 +549,15 @@ func removeAVMZoneQueueMessages(queue AVMZoneQueue, readyIDs, expiredIDs map[str
 	remove := func(entries []AVMZoneQueueEntry) []AVMZoneQueueEntry {
 		out := make([]AVMZoneQueueEntry, 0, len(entries))
 		for _, entry := range entries {
-			if _, found := readyIDs[entry.MessageID]; found {
-				continue
+			if readyIDs != nil {
+				if _, found := readyIDs[entry.MessageID]; found {
+					continue
+				}
 			}
-			if _, found := expiredIDs[entry.MessageID]; found {
-				continue
+			if expiredIDs != nil {
+				if _, found := expiredIDs[entry.MessageID]; found {
+					continue
+				}
 			}
 			out = append(out, entry)
 		}
@@ -343,6 +569,45 @@ func removeAVMZoneQueueMessages(queue AVMZoneQueue, readyIDs, expiredIDs map[str
 	queue.FailedQueue = remove(queue.FailedQueue)
 	queue.QueueRoot = ComputeAVMZoneQueueRoot(queue)
 	return queue
+}
+
+func appendAVMQueueEntry(queue AVMZoneQueue, entry AVMZoneQueueEntry) AVMZoneQueue {
+	switch entry.Lane {
+	case AVMQueueLanePriority:
+		queue.PriorityQueue = append(queue.PriorityQueue, entry)
+	case AVMQueueLaneDelayed:
+		queue.DelayedQueue = append(queue.DelayedQueue, entry)
+	case AVMQueueLaneRetry:
+		queue.RetryQueue = append(queue.RetryQueue, entry)
+	case AVMQueueLaneFailed:
+		queue.FailedQueue = append(queue.FailedQueue, entry)
+	}
+	return queue
+}
+
+func findAVMQueueEntry(queue AVMZoneQueue, messageID string) (AVMZoneQueueEntry, bool) {
+	messageID = strings.TrimSpace(messageID)
+	for _, entry := range allAVMQueueEntries(queue) {
+		if entry.MessageID == messageID {
+			return entry, true
+		}
+	}
+	return AVMZoneQueueEntry{}, false
+}
+
+func queueEntriesForLane(queue AVMZoneQueue, lane AVMQueueLane) ([]AVMZoneQueueEntry, error) {
+	switch lane {
+	case AVMQueueLanePriority:
+		return queue.PriorityQueue, nil
+	case AVMQueueLaneDelayed:
+		return queue.DelayedQueue, nil
+	case AVMQueueLaneRetry:
+		return queue.RetryQueue, nil
+	case AVMQueueLaneFailed:
+		return queue.FailedQueue, nil
+	default:
+		return nil, fmt.Errorf("invalid AVM queue lane %q", lane)
+	}
 }
 
 func canonicalAVMZoneQueue(queue AVMZoneQueue) AVMZoneQueue {

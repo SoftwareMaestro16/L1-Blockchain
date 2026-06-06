@@ -121,6 +121,92 @@ func TestAVMZoneQueueRejectsInvalidEntriesAndIgnoresFailedLaneForExecution(t *te
 	require.Len(t, selection.Remaining.FailedQueue, 1)
 }
 
+func TestAVMZoneQueueAdmissionValidatesDepthDuplicateAndDelayLane(t *testing.T) {
+	queue, err := NewAVMZoneQueue(AVMZoneQueue{ZoneID: zonestypes.ZoneIDContract})
+	require.NoError(t, err)
+	delayedMsg, err := NewAVMAsyncMessage(testAVMQueueMessage("alice", 1, 10, 3, 5, 100, 10))
+	require.NoError(t, err)
+
+	queue, entry, err := AdmitAVMZoneQueueMessage(queue, delayedMsg, 12, 2)
+	require.NoError(t, err)
+	require.Equal(t, AVMQueueLaneDelayed, entry.Lane)
+	require.Empty(t, queue.PriorityQueue)
+	require.Len(t, queue.DelayedQueue, 1)
+
+	_, _, err = AdmitAVMZoneQueueMessage(queue, delayedMsg, 12, 2)
+	require.ErrorContains(t, err, "duplicate")
+
+	readyMsg, err := NewAVMAsyncMessage(testAVMQueueMessage("bob", 1, 10, 3, 0, 100, 10))
+	require.NoError(t, err)
+	queue, entry, err = AdmitAVMZoneQueueMessage(queue, readyMsg, 12, 2)
+	require.NoError(t, err)
+	require.Equal(t, AVMQueueLanePriority, entry.Lane)
+	require.Len(t, queue.PriorityQueue, 1)
+
+	third, err := NewAVMAsyncMessage(testAVMQueueMessage("carol", 1, 10, 3, 0, 100, 10))
+	require.NoError(t, err)
+	_, _, err = AdmitAVMZoneQueueMessage(queue, third, 12, 2)
+	require.ErrorContains(t, err, "max queue depth")
+}
+
+func TestAVMZoneQueuePromotesDelayedAndRetryQueuesBounded(t *testing.T) {
+	queue, err := NewAVMZoneQueue(AVMZoneQueue{ZoneID: zonestypes.ZoneIDContract})
+	require.NoError(t, err)
+	delayedDue, err := NewAVMAsyncMessage(testAVMQueueMessage("delayed-due", 1, 10, 4, 5, 100, 10))
+	require.NoError(t, err)
+	delayedFuture, err := NewAVMAsyncMessage(testAVMQueueMessage("delayed-future", 1, 10, 4, 20, 100, 10))
+	require.NoError(t, err)
+	retryDue, err := NewAVMAsyncMessage(testAVMQueueMessage("retry-due", 1, 10, 5, 0, 100, 10))
+	require.NoError(t, err)
+
+	queue, _, err = AdmitAVMZoneQueueMessage(queue, delayedDue, 12, 10)
+	require.NoError(t, err)
+	queue, _, err = AdmitAVMZoneQueueMessage(queue, delayedFuture, 12, 10)
+	require.NoError(t, err)
+	queue, _, err = AdmitAVMZoneRetryMessage(queue, retryDue, 15, 10)
+	require.NoError(t, err)
+
+	next, promoted, err := PromoteAVMZoneQueue(queue, 15, 1)
+	require.NoError(t, err)
+	require.Len(t, promoted, 1)
+	require.Equal(t, retryDue.ID, promoted[0].MessageID)
+	require.Equal(t, AVMQueueLanePriority, promoted[0].Lane)
+	require.Len(t, next.PriorityQueue, 1)
+	require.Len(t, next.DelayedQueue, 2)
+	require.Empty(t, next.RetryQueue)
+
+	next, promoted, err = PromoteAVMZoneQueue(next, 15, 10)
+	require.NoError(t, err)
+	require.Len(t, promoted, 1)
+	require.Len(t, next.PriorityQueue, 2)
+	require.Len(t, next.DelayedQueue, 1)
+	require.Empty(t, next.RetryQueue)
+}
+
+func TestAVMZoneQueueDeadLettersToFailedQueueAndProvidesProof(t *testing.T) {
+	queue, err := NewAVMZoneQueue(AVMZoneQueue{ZoneID: zonestypes.ZoneIDContract})
+	require.NoError(t, err)
+	msg, err := NewAVMAsyncMessage(testAVMQueueMessage("alice", 1, 10, 5, 0, 100, 10))
+	require.NoError(t, err)
+	queue, _, err = AdmitAVMZoneQueueMessage(queue, msg, 12, 10)
+	require.NoError(t, err)
+	receipt := testAVMDeadLetterReceipt(t, msg, 14)
+
+	next, record, err := DeadLetterAVMZoneQueueMessage(queue, msg, receipt, "handler failed permanently", 3, 1)
+	require.NoError(t, err)
+	require.NoError(t, record.ValidateWithReceipt(receipt))
+	require.Empty(t, next.PriorityQueue)
+	require.Len(t, next.FailedQueue, 1)
+	require.Equal(t, msg.ID, next.FailedQueue[0].MessageID)
+
+	proof, err := QueryAVMZoneQueueProof(next, AVMQueueLaneFailed, msg.ID)
+	require.NoError(t, err)
+	require.NoError(t, proof.Validate())
+	require.Equal(t, next.QueueRoot, proof.QueueRoot)
+	require.Equal(t, next.FailedQueue[0].StateKey(), proof.StateKey)
+	require.Equal(t, AVMDeadLetterProofKey(msg.DestinationZone, msg.ID), record.ProofKey())
+}
+
 func testAVMQueueMessage(source string, nonce, createdHeight uint64, priority uint8, delayHeight, expiryHeight, gasLimit uint64) AVMAsyncMessage {
 	msg := testAVMAsyncMessage(source, zonestypes.ZoneIDApplication, "contract", zonestypes.ZoneIDContract, nonce, createdHeight)
 	msg.Priority = priority
