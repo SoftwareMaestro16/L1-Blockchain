@@ -12,12 +12,28 @@ const (
 	DefaultMaximumPromiseAmountRatioBps       = uint32(10_000)
 	DefaultMaximumPromiseLifetime             = uint64(10_000)
 	DefaultExpiredPromiseCleanupLimitPerBlock = uint64(256)
+	DefaultMaxVirtualChannelsPerParentChannel = uint64(128)
+	DefaultMaximumVirtualChannelDepth         = uint64(MaxRoutingHops)
+	DefaultMinimumParentTimeoutMargin         = uint64(DefaultTimeoutMargin)
+	DefaultVirtualChannelReservationExpiry    = uint64(256)
+	DefaultMultiSegmentVirtualMaxSegments     = uint64(MaxParentChannels)
+	DefaultStaleClosePenalty                  = "10"
+	DefaultSameNonceDoubleSignPenalty         = "20"
+	DefaultInvalidConditionPenalty            = "8"
+	DefaultReplayAttemptPenalty               = "8"
+	DefaultInvalidFraudProofDeposit           = "1"
+	DefaultReporterRewardPercentageBps        = uint32(1_000)
+	DefaultReporterRewardCap                  = "5"
+	DefaultPenaltyBurnAllocationBps           = uint32(2_500)
+	DefaultSecurityReserveAllocationBps       = uint32(2_500)
 )
 
 type PaymentGovernanceParams struct {
-	Channel     PaymentChannelGovernanceParams
-	Conditional PaymentConditionalGovernanceParams
-	ParamsHash  string
+	Channel      PaymentChannelGovernanceParams
+	Conditional  PaymentConditionalGovernanceParams
+	Virtual      PaymentVirtualChannelGovernanceParams
+	FraudPenalty PaymentFraudPenaltyGovernanceParams
+	ParamsHash   string
 }
 
 type PaymentChannelGovernanceParams struct {
@@ -43,6 +59,28 @@ type PaymentConditionalGovernanceParams struct {
 	ExpiredPromiseCleanupLimitPerBlock uint64
 }
 
+type PaymentVirtualChannelGovernanceParams struct {
+	MaximumVirtualChannelsPerParentChannel uint64
+	MaximumVirtualChannelDepth             uint64
+	MinimumParentTimeoutMargin             uint64
+	VirtualChannelAnchorFee                string
+	VirtualChannelReservationExpiry        uint64
+	MultiSegmentVirtualChannelMaxSegments  uint64
+}
+
+type PaymentFraudPenaltyGovernanceParams struct {
+	StaleClosePenalty                string
+	SameNonceDoubleSignPenalty       string
+	InvalidConditionPenalty          string
+	ReplayAttemptPenalty             string
+	InvalidFraudProofDeposit         string
+	ReporterRewardPercentageBps      uint32
+	ReporterRewardCap                string
+	PenaltyBurnAllocationBps         uint32
+	SecurityReserveAllocationBps     uint32
+	CounterpartyCompensationPriority bool
+}
+
 func DefaultPaymentGovernanceParams() PaymentGovernanceParams {
 	feeSchedule := DefaultPaymentFeeSchedule().Normalize()
 	params := PaymentGovernanceParams{
@@ -66,6 +104,26 @@ func DefaultPaymentGovernanceParams() PaymentGovernanceParams {
 			BatchResolutionMaximumSize:         MaxSettlementBatchOps,
 			PromiseStorageFee:                  feeSchedule.ConditionalPromiseSettlementFee,
 			ExpiredPromiseCleanupLimitPerBlock: DefaultExpiredPromiseCleanupLimitPerBlock,
+		},
+		Virtual: PaymentVirtualChannelGovernanceParams{
+			MaximumVirtualChannelsPerParentChannel: DefaultMaxVirtualChannelsPerParentChannel,
+			MaximumVirtualChannelDepth:             DefaultMaximumVirtualChannelDepth,
+			MinimumParentTimeoutMargin:             DefaultMinimumParentTimeoutMargin,
+			VirtualChannelAnchorFee:                feeSchedule.VirtualChannelAnchorFee,
+			VirtualChannelReservationExpiry:        DefaultVirtualChannelReservationExpiry,
+			MultiSegmentVirtualChannelMaxSegments:  DefaultMultiSegmentVirtualMaxSegments,
+		},
+		FraudPenalty: PaymentFraudPenaltyGovernanceParams{
+			StaleClosePenalty:                DefaultStaleClosePenalty,
+			SameNonceDoubleSignPenalty:       DefaultSameNonceDoubleSignPenalty,
+			InvalidConditionPenalty:          DefaultInvalidConditionPenalty,
+			ReplayAttemptPenalty:             DefaultReplayAttemptPenalty,
+			InvalidFraudProofDeposit:         DefaultInvalidFraudProofDeposit,
+			ReporterRewardPercentageBps:      DefaultReporterRewardPercentageBps,
+			ReporterRewardCap:                DefaultReporterRewardCap,
+			PenaltyBurnAllocationBps:         DefaultPenaltyBurnAllocationBps,
+			SecurityReserveAllocationBps:     DefaultSecurityReserveAllocationBps,
+			CounterpartyCompensationPriority: true,
 		},
 	}
 	params = params.Normalize()
@@ -94,6 +152,22 @@ func ComputePaymentGovernanceParamsHash(params PaymentGovernanceParams) string {
 		fmt.Sprintf("%020d", params.Conditional.BatchResolutionMaximumSize),
 		params.Conditional.PromiseStorageFee,
 		fmt.Sprintf("%020d", params.Conditional.ExpiredPromiseCleanupLimitPerBlock),
+		fmt.Sprintf("%020d", params.Virtual.MaximumVirtualChannelsPerParentChannel),
+		fmt.Sprintf("%020d", params.Virtual.MaximumVirtualChannelDepth),
+		fmt.Sprintf("%020d", params.Virtual.MinimumParentTimeoutMargin),
+		params.Virtual.VirtualChannelAnchorFee,
+		fmt.Sprintf("%020d", params.Virtual.VirtualChannelReservationExpiry),
+		fmt.Sprintf("%020d", params.Virtual.MultiSegmentVirtualChannelMaxSegments),
+		params.FraudPenalty.StaleClosePenalty,
+		params.FraudPenalty.SameNonceDoubleSignPenalty,
+		params.FraudPenalty.InvalidConditionPenalty,
+		params.FraudPenalty.ReplayAttemptPenalty,
+		params.FraudPenalty.InvalidFraudProofDeposit,
+		fmt.Sprintf("%010d", params.FraudPenalty.ReporterRewardPercentageBps),
+		params.FraudPenalty.ReporterRewardCap,
+		fmt.Sprintf("%010d", params.FraudPenalty.PenaltyBurnAllocationBps),
+		fmt.Sprintf("%010d", params.FraudPenalty.SecurityReserveAllocationBps),
+		fmt.Sprintf("%t", params.FraudPenalty.CounterpartyCompensationPriority),
 	)
 }
 
@@ -107,6 +181,7 @@ func BuildGovernedPaymentFeeSchedule(params PaymentGovernanceParams) (PaymentFee
 	schedule.OpenFeeMin = params.Channel.ChannelOpenBaseFee
 	schedule.StorageByteFee = params.Channel.ChannelStorageFeePerByte
 	schedule.ConditionalPromiseSettlementFee = params.Conditional.PromiseStorageFee
+	schedule.VirtualChannelAnchorFee = params.Virtual.VirtualChannelAnchorFee
 	return schedule.Normalize(), schedule.Validate()
 }
 
@@ -219,6 +294,8 @@ func (p PaymentGovernanceParams) Normalize() PaymentGovernanceParams {
 	defaults := DefaultPaymentGovernanceParamsNoHash()
 	p.Channel = p.Channel.Normalize(defaults.Channel)
 	p.Conditional = p.Conditional.Normalize(defaults.Conditional)
+	p.Virtual = p.Virtual.Normalize(defaults.Virtual)
+	p.FraudPenalty = p.FraudPenalty.Normalize(defaults.FraudPenalty)
 	p.ParamsHash = normalizeOptionalHash(p.ParamsHash)
 	return p
 }
@@ -235,6 +312,12 @@ func (p PaymentGovernanceParams) Validate() error {
 		return err
 	}
 	if err := params.Conditional.Validate(); err != nil {
+		return err
+	}
+	if err := params.Virtual.Validate(); err != nil {
+		return err
+	}
+	if err := params.FraudPenalty.Validate(); err != nil {
 		return err
 	}
 	if err := ValidateHash("payments governance params hash", params.ParamsHash); err != nil {
@@ -269,6 +352,26 @@ func DefaultPaymentGovernanceParamsNoHash() PaymentGovernanceParams {
 			BatchResolutionMaximumSize:         MaxSettlementBatchOps,
 			PromiseStorageFee:                  feeSchedule.ConditionalPromiseSettlementFee,
 			ExpiredPromiseCleanupLimitPerBlock: DefaultExpiredPromiseCleanupLimitPerBlock,
+		},
+		Virtual: PaymentVirtualChannelGovernanceParams{
+			MaximumVirtualChannelsPerParentChannel: DefaultMaxVirtualChannelsPerParentChannel,
+			MaximumVirtualChannelDepth:             DefaultMaximumVirtualChannelDepth,
+			MinimumParentTimeoutMargin:             DefaultMinimumParentTimeoutMargin,
+			VirtualChannelAnchorFee:                feeSchedule.VirtualChannelAnchorFee,
+			VirtualChannelReservationExpiry:        DefaultVirtualChannelReservationExpiry,
+			MultiSegmentVirtualChannelMaxSegments:  DefaultMultiSegmentVirtualMaxSegments,
+		},
+		FraudPenalty: PaymentFraudPenaltyGovernanceParams{
+			StaleClosePenalty:                DefaultStaleClosePenalty,
+			SameNonceDoubleSignPenalty:       DefaultSameNonceDoubleSignPenalty,
+			InvalidConditionPenalty:          DefaultInvalidConditionPenalty,
+			ReplayAttemptPenalty:             DefaultReplayAttemptPenalty,
+			InvalidFraudProofDeposit:         DefaultInvalidFraudProofDeposit,
+			ReporterRewardPercentageBps:      DefaultReporterRewardPercentageBps,
+			ReporterRewardCap:                DefaultReporterRewardCap,
+			PenaltyBurnAllocationBps:         DefaultPenaltyBurnAllocationBps,
+			SecurityReserveAllocationBps:     DefaultSecurityReserveAllocationBps,
+			CounterpartyCompensationPriority: true,
 		},
 	}
 }
@@ -424,6 +527,318 @@ func (p PaymentConditionalGovernanceParams) ValidatePromiseWindow(channel Channe
 		return errors.New("payments promise timeout does not leave governance timeout margin")
 	}
 	return nil
+}
+
+func ValidateVirtualChannelWithGovernance(state PaymentsState, vc VirtualChannel, params PaymentGovernanceParams) error {
+	state = state.Export()
+	params = params.Normalize()
+	vc = vc.Normalize()
+	if err := params.Validate(); err != nil {
+		return err
+	}
+	if err := state.Validate(); err != nil {
+		return err
+	}
+	if err := vc.ValidateCore(); err != nil {
+		return err
+	}
+	if uint64(len(vc.ParentChannelIDs)) > params.Virtual.MultiSegmentVirtualChannelMaxSegments {
+		return fmt.Errorf("payments virtual parent segments exceed governance maximum %d", params.Virtual.MultiSegmentVirtualChannelMaxSegments)
+	}
+	if VirtualChannelDepth(vc) > params.Virtual.MaximumVirtualChannelDepth {
+		return fmt.Errorf("payments virtual channel depth exceeds governance maximum %d", params.Virtual.MaximumVirtualChannelDepth)
+	}
+	anchorFeePaid, err := parseNonNegativeInt("payments virtual anchor fee paid", vc.AnchorFeePaid)
+	if err != nil {
+		return err
+	}
+	requiredAnchorFee, err := parseNonNegativeInt("payments governance virtual anchor fee", params.Virtual.VirtualChannelAnchorFee)
+	if err != nil {
+		return err
+	}
+	if anchorFeePaid.LT(requiredAnchorFee) {
+		return errors.New("payments virtual channel anchor fee below governance minimum")
+	}
+	parentCounts := activeVirtualChannelsByParent(state)
+	for _, parentID := range vc.ParentChannelIDs {
+		if parentCounts[parentID] >= params.Virtual.MaximumVirtualChannelsPerParentChannel {
+			return fmt.Errorf("payments parent channel %s exceeds governance virtual channel limit", parentID)
+		}
+		parent, found := state.ChannelByID(parentID)
+		if !found {
+			return errors.New("payments virtual parent channel not found")
+		}
+		if err := params.Virtual.ValidateParentTimeoutMargin(parent, vc); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func ValidateVirtualActivationProofWithGovernance(state PaymentsState, proof VirtualActivationProof, params PaymentGovernanceParams) error {
+	proof = proof.Normalize()
+	if err := ValidateVirtualChannelWithGovernance(state, proof.VirtualChannel, params); err != nil {
+		return err
+	}
+	if uint64(len(proof.ParentReserves)) > params.Normalize().Virtual.MultiSegmentVirtualChannelMaxSegments {
+		return fmt.Errorf("payments virtual reserves exceed governance maximum %d", params.Normalize().Virtual.MultiSegmentVirtualChannelMaxSegments)
+	}
+	for _, reserve := range proof.ParentReserves {
+		reserve = reserve.Normalize()
+		if reserve.Signature.ExpirationHeight == 0 {
+			return errors.New("payments virtual reservation expiration height is required")
+		}
+		if reserve.Signature.ExpirationHeight > proof.VirtualChannel.ExpiresHeight {
+			return errors.New("payments virtual reservation expiry must not exceed virtual channel expiry")
+		}
+		if proof.RouteTimeoutHeight > 0 && reserve.Signature.ExpirationHeight+params.Normalize().Virtual.MinimumParentTimeoutMargin > proof.RouteTimeoutHeight {
+			return errors.New("payments virtual reservation expiry does not leave parent timeout margin")
+		}
+	}
+	return nil
+}
+
+func VirtualChannelReservationExpiryHeight(currentHeight uint64, params PaymentGovernanceParams) (uint64, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return 0, err
+	}
+	if currentHeight == 0 {
+		return 0, errors.New("payments virtual reservation current height must be positive")
+	}
+	if currentHeight+params.Virtual.VirtualChannelReservationExpiry < currentHeight {
+		return 0, errors.New("payments virtual reservation expiry overflows height")
+	}
+	return currentHeight + params.Virtual.VirtualChannelReservationExpiry, nil
+}
+
+func VirtualChannelDepth(vc VirtualChannel) uint64 {
+	vc = vc.Normalize()
+	depth := uint64(len(vc.Intermediaries) + 1)
+	if segmentDepth := uint64(len(vc.ParentChannelIDs)); segmentDepth > depth {
+		depth = segmentDepth
+	}
+	return depth
+}
+
+func BuildGovernedPenaltyMatrix(params PaymentGovernanceParams) ([]PenaltyMatrixEntry, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return nil, err
+	}
+	fraud := params.FraudPenalty
+	matrix := []PenaltyMatrixEntry{
+		fraud.matrixEntry(PenaltyClassInvalidClose, FraudProofTypeInvalidClose, PenaltySourceChannelBalance, fraud.StaleClosePenalty),
+		fraud.matrixEntry(PenaltyClassInvalidClose, FraudProofTypeInvalidBalance, PenaltySourceChannelBalance, fraud.StaleClosePenalty),
+		fraud.matrixEntry(PenaltyClassStaleClose, FraudProofTypeStaleClose, PenaltySourceChannelBalance, fraud.StaleClosePenalty),
+		fraud.matrixEntry(PenaltyClassDoubleSign, FraudProofTypeDoubleSign, PenaltySourceParticipantBond, fraud.SameNonceDoubleSignPenalty),
+		fraud.matrixEntry(PenaltyClassInvalidCondition, FraudProofTypeInvalidCondition, PenaltySourceChannelBalance, fraud.InvalidConditionPenalty),
+		fraud.matrixEntry(PenaltyClassReplayAttempt, FraudProofTypeReplayAttempt, PenaltySourceChannelBalance, fraud.ReplayAttemptPenalty),
+		fraud.matrixEntry(PenaltyClassAsyncOverexposure, FraudProofTypeAsyncOverexposure, PenaltySourceParticipantBond, fraud.SameNonceDoubleSignPenalty),
+		{
+			Class:                    PenaltyClassInvalidFraudProof,
+			Source:                   PenaltySourceFraudProofDeposit,
+			BasePenalty:              fraud.InvalidFraudProofDeposit,
+			InvalidProofVerifierCost: fraud.InvalidFraudProofDeposit,
+			Bounded:                  true,
+		},
+	}
+	for _, entry := range matrix {
+		if err := entry.Validate(); err != nil {
+			return nil, err
+		}
+	}
+	return normalizePenaltyMatrix(matrix), nil
+}
+
+func BuildGovernedFraudPenaltyPolicy(params PaymentGovernanceParams) (FraudPenaltyPolicy, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return FraudPenaltyPolicy{}, err
+	}
+	counterpartyBps := uint32(0)
+	if params.FraudPenalty.CounterpartyCompensationPriority {
+		counterpartyBps = MaxPenaltyRouteBps
+	}
+	policy := FraudPenaltyPolicy{
+		ReporterRewardCap:       params.FraudPenalty.ReporterRewardCap,
+		CounterpartyRewardBps:   counterpartyBps,
+		BurnShareBps:            params.FraudPenalty.PenaltyBurnAllocationBps,
+		SecurityReserveShareBps: params.FraudPenalty.SecurityReserveAllocationBps,
+		CommunityPoolShareBps:   MaxPenaltyRouteBps - params.FraudPenalty.PenaltyBurnAllocationBps - params.FraudPenalty.SecurityReserveAllocationBps,
+		SecurityReserveHook:     params.FraudPenalty.SecurityReserveAllocationBps > 0,
+	}.Normalize()
+	return policy, policy.Validate()
+}
+
+func GovernedReporterRewardAmount(penaltyAmount string, params PaymentGovernanceParams) (string, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return "", err
+	}
+	available, err := parseNonNegativeInt("payments governance reporter reward penalty", penaltyAmount)
+	if err != nil {
+		return "", err
+	}
+	reward, err := cappedPenaltyPortion(available, params.FraudPenalty.ReporterRewardCap, params.FraudPenalty.ReporterRewardPercentageBps)
+	if err != nil {
+		return "", err
+	}
+	return reward.String(), nil
+}
+
+func (p PaymentVirtualChannelGovernanceParams) Normalize(defaults PaymentVirtualChannelGovernanceParams) PaymentVirtualChannelGovernanceParams {
+	if p.MaximumVirtualChannelsPerParentChannel == 0 {
+		p.MaximumVirtualChannelsPerParentChannel = defaults.MaximumVirtualChannelsPerParentChannel
+	}
+	if p.MaximumVirtualChannelDepth == 0 {
+		p.MaximumVirtualChannelDepth = defaults.MaximumVirtualChannelDepth
+	}
+	if p.MinimumParentTimeoutMargin == 0 {
+		p.MinimumParentTimeoutMargin = defaults.MinimumParentTimeoutMargin
+	}
+	p.VirtualChannelAnchorFee = normalizeAmountOrDefault(p.VirtualChannelAnchorFee, defaults.VirtualChannelAnchorFee)
+	if p.VirtualChannelReservationExpiry == 0 {
+		p.VirtualChannelReservationExpiry = defaults.VirtualChannelReservationExpiry
+	}
+	if p.MultiSegmentVirtualChannelMaxSegments == 0 {
+		p.MultiSegmentVirtualChannelMaxSegments = defaults.MultiSegmentVirtualChannelMaxSegments
+	}
+	return p
+}
+
+func (p PaymentVirtualChannelGovernanceParams) Validate() error {
+	params := p.Normalize(DefaultPaymentGovernanceParamsNoHash().Virtual)
+	if params.MaximumVirtualChannelsPerParentChannel == 0 {
+		return errors.New("payments governance maximum virtual channels per parent must be positive")
+	}
+	if params.MaximumVirtualChannelDepth == 0 || params.MaximumVirtualChannelDepth > MaxRoutingHops {
+		return fmt.Errorf("payments governance virtual channel depth must be between 1 and %d", MaxRoutingHops)
+	}
+	if params.MinimumParentTimeoutMargin == 0 {
+		return errors.New("payments governance parent timeout margin must be positive")
+	}
+	if err := validateNonNegativeInt("payments governance virtual anchor fee", params.VirtualChannelAnchorFee); err != nil {
+		return err
+	}
+	if params.VirtualChannelReservationExpiry == 0 {
+		return errors.New("payments governance virtual reservation expiry must be positive")
+	}
+	if params.MultiSegmentVirtualChannelMaxSegments == 0 || params.MultiSegmentVirtualChannelMaxSegments > MaxParentChannels {
+		return fmt.Errorf("payments governance virtual max segments must be between 1 and %d", MaxParentChannels)
+	}
+	return nil
+}
+
+func (p PaymentVirtualChannelGovernanceParams) ValidateParentTimeoutMargin(parent ChannelRecord, vc VirtualChannel) error {
+	params := p.Normalize(DefaultPaymentGovernanceParamsNoHash().Virtual)
+	parent = parent.Normalize()
+	vc = vc.Normalize()
+	maxHeight := parent.LatestState.Normalize().TimeoutHeight
+	if maxHeight == 0 {
+		maxHeight = parent.OpenHeight + parent.CloseDelay + parent.DisputePeriod
+	}
+	if vc.ExpiresHeight+params.MinimumParentTimeoutMargin < vc.ExpiresHeight || vc.ExpiresHeight+params.MinimumParentTimeoutMargin > maxHeight {
+		return errors.New("payments virtual expiry does not leave governance parent timeout margin")
+	}
+	return nil
+}
+
+func (p PaymentFraudPenaltyGovernanceParams) Normalize(defaults PaymentFraudPenaltyGovernanceParams) PaymentFraudPenaltyGovernanceParams {
+	p.StaleClosePenalty = normalizeAmountOrDefault(p.StaleClosePenalty, defaults.StaleClosePenalty)
+	p.SameNonceDoubleSignPenalty = normalizeAmountOrDefault(p.SameNonceDoubleSignPenalty, defaults.SameNonceDoubleSignPenalty)
+	p.InvalidConditionPenalty = normalizeAmountOrDefault(p.InvalidConditionPenalty, defaults.InvalidConditionPenalty)
+	p.ReplayAttemptPenalty = normalizeAmountOrDefault(p.ReplayAttemptPenalty, defaults.ReplayAttemptPenalty)
+	p.InvalidFraudProofDeposit = normalizeAmountOrDefault(p.InvalidFraudProofDeposit, defaults.InvalidFraudProofDeposit)
+	if p.ReporterRewardPercentageBps == 0 {
+		p.ReporterRewardPercentageBps = defaults.ReporterRewardPercentageBps
+	}
+	p.ReporterRewardCap = normalizeAmountOrDefault(p.ReporterRewardCap, defaults.ReporterRewardCap)
+	if p.PenaltyBurnAllocationBps == 0 && defaults.PenaltyBurnAllocationBps > 0 {
+		p.PenaltyBurnAllocationBps = defaults.PenaltyBurnAllocationBps
+	}
+	if p.SecurityReserveAllocationBps == 0 && defaults.SecurityReserveAllocationBps > 0 {
+		p.SecurityReserveAllocationBps = defaults.SecurityReserveAllocationBps
+	}
+	return p
+}
+
+func (p PaymentFraudPenaltyGovernanceParams) Validate() error {
+	params := p.Normalize(DefaultPaymentGovernanceParamsNoHash().FraudPenalty)
+	for _, item := range []struct {
+		name   string
+		amount string
+	}{
+		{"payments governance stale close penalty", params.StaleClosePenalty},
+		{"payments governance double sign penalty", params.SameNonceDoubleSignPenalty},
+		{"payments governance invalid condition penalty", params.InvalidConditionPenalty},
+		{"payments governance replay attempt penalty", params.ReplayAttemptPenalty},
+		{"payments governance invalid fraud proof deposit", params.InvalidFraudProofDeposit},
+	} {
+		if err := validatePositiveInt(item.name, item.amount); err != nil {
+			return err
+		}
+	}
+	if params.ReporterRewardPercentageBps == 0 || params.ReporterRewardPercentageBps > MaxPenaltyRouteBps {
+		return errors.New("payments governance reporter reward percentage must be between 1 and 10000 bps")
+	}
+	if err := validateNonNegativeInt("payments governance reporter reward cap", params.ReporterRewardCap); err != nil {
+		return err
+	}
+	if params.PenaltyBurnAllocationBps+params.SecurityReserveAllocationBps > MaxPenaltyRouteBps {
+		return errors.New("payments governance penalty burn and security reserve allocations exceed 10000 bps")
+	}
+	return nil
+}
+
+func (p PaymentFraudPenaltyGovernanceParams) matrixEntry(class PaymentPenaltyClass, proofType FraudProofType, source PenaltySource, penalty string) PenaltyMatrixEntry {
+	reporterCap, _ := governedReporterRewardCapFromPenalty(penalty, p)
+	counterpartyComp := "0"
+	if p.CounterpartyCompensationPriority {
+		counterpartyComp = penalty
+	}
+	return PenaltyMatrixEntry{
+		Class:                    class,
+		ProofType:                proofType,
+		Source:                   source,
+		BasePenalty:              penalty,
+		ReporterRewardCap:        reporterCap,
+		CounterpartyCompensation: counterpartyComp,
+		BurnShareBps:             p.PenaltyBurnAllocationBps,
+		SecurityReserveShareBps:  p.SecurityReserveAllocationBps,
+		CommunityPoolShareBps:    MaxPenaltyRouteBps - p.PenaltyBurnAllocationBps - p.SecurityReserveAllocationBps,
+		Bounded:                  true,
+	}
+}
+
+func activeVirtualChannelsByParent(state PaymentsState) map[string]uint64 {
+	counts := map[string]uint64{}
+	for _, vc := range state.VirtualChannels {
+		vc = vc.Normalize()
+		if vc.Status != VirtualChannelStatusOpen {
+			continue
+		}
+		for _, parentID := range vc.ParentChannelIDs {
+			counts[parentID]++
+		}
+	}
+	return counts
+}
+
+func governedReporterRewardCapFromPenalty(penaltyAmount string, params PaymentFraudPenaltyGovernanceParams) (string, error) {
+	penalty, err := parseNonNegativeInt("payments governance penalty amount", penaltyAmount)
+	if err != nil {
+		return "", err
+	}
+	reward := penalty.MulRaw(int64(params.ReporterRewardPercentageBps)).QuoRaw(int64(MaxPenaltyRouteBps))
+	capAmount, err := parseNonNegativeInt("payments governance reporter reward cap", params.ReporterRewardCap)
+	if err != nil {
+		return "", err
+	}
+	if reward.GT(capAmount) {
+		reward = capAmount
+	}
+	return reward.String(), nil
 }
 
 func normalizeAmountOrDefault(value, fallback string) string {

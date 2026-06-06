@@ -988,6 +988,141 @@ func TestPaymentGovernanceParametersValidateChannelAndConditionalBounds(t *testi
 	require.ErrorContains(t, params.Conditional.ValidatePromiseWindow(windowChannel, tooLong), "lifetime exceeds")
 }
 
+func TestPaymentGovernanceParametersValidateVirtualAndFraudPenaltyBounds(t *testing.T) {
+	alice := testAddress(0xe2)
+	router := testAddress(0xe3)
+	bob := testAddress(0xe4)
+
+	state, vc, proof := virtualChannelFixture(t, "governance-virtual", alice, router, bob, "100", 40)
+	base := state.Clone()
+	base.VirtualChannels = nil
+	base.FeeCharges = nil
+
+	params := DefaultPaymentGovernanceParams()
+	params.Virtual.MaximumVirtualChannelsPerParentChannel = 2
+	params.Virtual.MaximumVirtualChannelDepth = 4
+	params.Virtual.MinimumParentTimeoutMargin = 10
+	params.Virtual.VirtualChannelAnchorFee = "0"
+	params.Virtual.VirtualChannelReservationExpiry = 5
+	params.Virtual.MultiSegmentVirtualChannelMaxSegments = 2
+	params.FraudPenalty.StaleClosePenalty = "11"
+	params.FraudPenalty.SameNonceDoubleSignPenalty = "22"
+	params.FraudPenalty.InvalidConditionPenalty = "13"
+	params.FraudPenalty.ReplayAttemptPenalty = "14"
+	params.FraudPenalty.InvalidFraudProofDeposit = "6"
+	params.FraudPenalty.ReporterRewardPercentageBps = 2_000
+	params.FraudPenalty.ReporterRewardCap = "5"
+	params.FraudPenalty.PenaltyBurnAllocationBps = 3_000
+	params.FraudPenalty.SecurityReserveAllocationBps = 4_000
+	params.FraudPenalty.CounterpartyCompensationPriority = true
+	params = params.WithHash()
+	require.NoError(t, params.Validate())
+
+	schedule, err := BuildGovernedPaymentFeeSchedule(params)
+	require.NoError(t, err)
+	require.Equal(t, "0", schedule.VirtualChannelAnchorFee)
+
+	require.NoError(t, ValidateVirtualChannelWithGovernance(base, vc, params))
+	require.NoError(t, ValidateVirtualActivationProofWithGovernance(base, proof, params))
+	expiry, err := VirtualChannelReservationExpiryHeight(20, params)
+	require.NoError(t, err)
+	require.Equal(t, uint64(25), expiry)
+	require.Equal(t, uint64(2), VirtualChannelDepth(vc))
+
+	secondVC := signedVirtualChannel(t, VirtualChannel{
+		VirtualChannelID: HashParts("governance-virtual-second", alice, bob),
+		ParentChannelIDs: vc.ParentChannelIDs,
+		Endpoints:        []string{alice, bob},
+		Intermediaries:   []string{router},
+		Capacity:         "100",
+		BalanceA:         "100",
+		BalanceB:         "0",
+		ExpiresHeight:    40,
+	}, vc.ChainID)
+	perParentLimited := params
+	perParentLimited.Virtual.MaximumVirtualChannelsPerParentChannel = 1
+	perParentLimited = perParentLimited.WithHash()
+	require.ErrorContains(t, ValidateVirtualChannelWithGovernance(state, secondVC, perParentLimited), "virtual channel limit")
+
+	depthLimited := params
+	depthLimited.Virtual.MaximumVirtualChannelDepth = 1
+	depthLimited = depthLimited.WithHash()
+	require.ErrorContains(t, ValidateVirtualChannelWithGovernance(base, vc, depthLimited), "depth exceeds")
+
+	segmentLimited := params
+	segmentLimited.Virtual.MultiSegmentVirtualChannelMaxSegments = 1
+	segmentLimited = segmentLimited.WithHash()
+	require.ErrorContains(t, ValidateVirtualChannelWithGovernance(base, vc, segmentLimited), "parent segments exceed")
+
+	feeRequired := params
+	feeRequired.Virtual.VirtualChannelAnchorFee = "1"
+	feeRequired = feeRequired.WithHash()
+	require.ErrorContains(t, ValidateVirtualChannelWithGovernance(base, vc, feeRequired), "anchor fee below")
+
+	timeoutVC := signedVirtualChannel(t, VirtualChannel{
+		VirtualChannelID: HashParts("governance-virtual-timeout", alice, bob),
+		ParentChannelIDs: vc.ParentChannelIDs,
+		Endpoints:        []string{alice, bob},
+		Intermediaries:   []string{router},
+		Capacity:         "100",
+		BalanceA:         "100",
+		BalanceB:         "0",
+		ExpiresHeight:    81,
+	}, vc.ChainID)
+	require.ErrorContains(t, ValidateVirtualChannelWithGovernance(base, timeoutVC, params), "parent timeout margin")
+
+	matrix, err := BuildGovernedPenaltyMatrix(params)
+	require.NoError(t, err)
+	doubleSign, err := PenaltyMatrixEntryForProof(FraudProofTypeDoubleSign, matrix)
+	require.NoError(t, err)
+	require.Equal(t, PenaltyClassDoubleSign, doubleSign.Class)
+	require.Equal(t, "22", doubleSign.BasePenalty)
+	require.Equal(t, "4", doubleSign.ReporterRewardCap)
+	require.Equal(t, "22", doubleSign.CounterpartyCompensation)
+	require.Equal(t, uint32(3_000), doubleSign.BurnShareBps)
+	require.Equal(t, uint32(4_000), doubleSign.SecurityReserveShareBps)
+	require.Equal(t, uint32(3_000), doubleSign.CommunityPoolShareBps)
+
+	stale, err := PenaltyMatrixEntryForProof(FraudProofTypeStaleClose, matrix)
+	require.NoError(t, err)
+	require.Equal(t, "11", stale.BasePenalty)
+	invalidCondition, err := PenaltyMatrixEntryForProof(FraudProofTypeInvalidCondition, matrix)
+	require.NoError(t, err)
+	require.Equal(t, "13", invalidCondition.BasePenalty)
+	replay, err := PenaltyMatrixEntryForProof(FraudProofTypeReplayAttempt, matrix)
+	require.NoError(t, err)
+	require.Equal(t, "14", replay.BasePenalty)
+
+	invalidDeposit := PenaltyMatrixEntry{}
+	for _, entry := range matrix {
+		if entry.Class == PenaltyClassInvalidFraudProof {
+			invalidDeposit = entry
+			break
+		}
+	}
+	require.Equal(t, PenaltyClassInvalidFraudProof, invalidDeposit.Class)
+	require.Equal(t, "6", invalidDeposit.InvalidProofVerifierCost)
+
+	policy, err := BuildGovernedFraudPenaltyPolicy(params)
+	require.NoError(t, err)
+	require.Equal(t, "5", policy.ReporterRewardCap)
+	require.Equal(t, uint32(10_000), policy.CounterpartyRewardBps)
+	require.Equal(t, uint32(3_000), policy.BurnShareBps)
+	require.Equal(t, uint32(4_000), policy.SecurityReserveShareBps)
+	require.Equal(t, uint32(3_000), policy.CommunityPoolShareBps)
+	require.True(t, policy.SecurityReserveHook)
+
+	reward, err := GovernedReporterRewardAmount("100", params)
+	require.NoError(t, err)
+	require.Equal(t, "5", reward)
+
+	badAlloc := params
+	badAlloc.FraudPenalty.PenaltyBurnAllocationBps = 8_000
+	badAlloc.FraudPenalty.SecurityReserveAllocationBps = 3_000
+	badAlloc = badAlloc.WithHash()
+	require.ErrorContains(t, badAlloc.Validate(), "exceed 10000")
+}
+
 func TestSettlementArbitrationBoundaryRejectsNonDeterministicInputs(t *testing.T) {
 	alice := testAddress(0x12)
 	bob := testAddress(0x13)
