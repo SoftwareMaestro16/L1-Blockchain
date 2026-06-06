@@ -359,10 +359,15 @@ func lightClientTargetFromRecordV2(record UnifiedResolutionRecordV2, request Ide
 		target.Address = cloneSpecAddress(record.PrimaryAddress)
 	case IdentityResolutionTargetContract:
 		for _, contract := range record.ContractTargets {
-			if request.TargetKey == "" || contract.Key == request.TargetKey {
-				if len(contract.Address) > 0 {
-					target.Address = cloneSpecAddress(contract.Address)
-					target.TargetKey = contract.Key
+			if !contractTargetEnabledV2(contract) {
+				continue
+			}
+			targetID := contractTargetIDV2(contract)
+			if request.TargetKey == "" || targetID == request.TargetKey {
+				address := contractTargetAddressV2(contract)
+				if len(address) > 0 {
+					target.Address = cloneSpecAddress(address)
+					target.TargetKey = targetID
 					return target, nil
 				}
 			}
@@ -398,8 +403,15 @@ func lightClientTargetFromRecordV2(record UnifiedResolutionRecordV2, request Ide
 			return target, nil
 		}
 		for _, contract := range record.ContractTargets {
-			if contract.Key == request.TargetKey && len(contract.Address) > 0 {
-				target.Address = cloneSpecAddress(contract.Address)
+			if !contractTargetEnabledV2(contract) {
+				continue
+			}
+			if contractTargetIDV2(contract) == request.TargetKey {
+				address := contractTargetAddressV2(contract)
+				if len(address) == 0 {
+					continue
+				}
+				target.Address = cloneSpecAddress(address)
 				return target, nil
 			}
 		}
@@ -450,7 +462,10 @@ func lightClientForwardContainsAddressV2(record UnifiedResolutionRecordV2, addre
 	}
 	allowed := stringSet(authorizedAliasKeys)
 	for _, target := range record.ContractTargets {
-		if _, found := allowed[target.Key]; found && addressesEqual(target.Address, address) {
+		if !contractTargetEnabledV2(target) {
+			continue
+		}
+		if _, found := allowed[contractTargetIDV2(target)]; found && addressesEqual(contractTargetAddressV2(target), address) {
 			return true
 		}
 	}

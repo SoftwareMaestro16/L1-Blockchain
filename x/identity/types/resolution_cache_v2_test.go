@@ -76,11 +76,14 @@ func validUnifiedResolutionRecordV2(t *testing.T, name string) UnifiedResolution
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
 		NameHash:        nameHash,
+		Owner:           addr(1),
 		PrimaryAddress:  addr(2),
 		RecordVersion:   1,
 		RecordTTL:       30,
 		UpdatedAtHeight: 12,
-		ContractTargets: []ContractTargetV2{{Key: ResolverKeyContract, Address: addr(3)}},
+		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
+		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		ContractTargets: []ContractTargetV2{NewContractTargetV2(ResolverKeyContract, addr(3), 12)},
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 	return record

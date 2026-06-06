@@ -666,12 +666,21 @@ func (e *identityProofBinaryEncoderV2) writeUnifiedResolutionRecords(records []U
 
 func (e *identityProofBinaryEncoderV2) writeUnifiedResolutionRecord(record UnifiedResolutionRecordV2) {
 	e.writeString(record.NameHash)
+	e.writeAddress(record.Owner)
 	e.writeAddress(record.PrimaryAddress)
 	e.writeUint64(uint64(len(record.ContractTargets)))
 	for _, target := range record.ContractTargets {
 		e.writeString(target.Key)
 		e.writeAddress(target.Address)
 		e.writeString(target.CodeID)
+		e.writeString(target.TargetID)
+		e.writeAddress(target.ContractAddress)
+		e.writeString(target.Entrypoint)
+		e.writeString(target.InterfaceHash)
+		e.writeString(target.RequiredFundsPolicy)
+		e.writeUint64(target.GasHint)
+		e.writeBool(target.Enabled)
+		e.writeUint64(target.UpdatedAtHeight)
 	}
 	e.writeUint64(uint64(len(record.ServiceEndpoints)))
 	for _, endpoint := range record.ServiceEndpoints {
@@ -695,6 +704,8 @@ func (e *identityProofBinaryEncoderV2) writeUnifiedResolutionRecord(record Unifi
 	e.writeUint64(record.RecordVersion)
 	e.writeUint64(record.RecordTTL)
 	e.writeUint64(record.UpdatedAtHeight)
+	e.writeUint64(record.MaxPayloadBytes)
+	e.writeUint64(record.SchemaVersion)
 	e.writeBytes(record.OwnerSignatureOptional)
 }
 

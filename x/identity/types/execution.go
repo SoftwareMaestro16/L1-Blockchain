@@ -31,6 +31,7 @@ type UnifiedResolverView struct {
 	QueryDomain     string
 	ResolverDomain  string
 	AuthorityDomain string
+	AuthorityOwner  sdk.AccAddress
 	Primary         sdk.AccAddress
 	Contract        sdk.AccAddress
 	ZoneEndpoint    string
@@ -75,6 +76,7 @@ func BuildUnifiedResolverView(state IdentityState, name string, height uint64) (
 		QueryDomain:     resolution.QueryDomain,
 		ResolverDomain:  resolution.ResolverDomain,
 		AuthorityDomain: resolution.AuthorityDomain.Name,
+		AuthorityOwner:  cloneSpecAddress(resolution.AuthorityDomain.Owner),
 		Primary:         cloneSpecAddress(resolution.Record.Primary),
 		Contract:        cloneSpecAddress(resolution.Record.Contract),
 		ZoneEndpoint:    resolution.Record.ZoneEndpoint,

@@ -131,6 +131,35 @@ func TestIdentityResolutionProofLightClientV2VerifiesRecursivePath(t *testing.T)
 	requireLightClientCodeV2(t, req, IdentityLightClientErrProofInvalid)
 }
 
+func TestIdentityResolutionProofLightClientV2SkipsDisabledContractTargets(t *testing.T) {
+	nameHash, err := DomainRecordV2NameHash("alice.aet")
+	require.NoError(t, err)
+	record := UnifiedResolutionRecordV2{
+		NameHash: nameHash,
+		Owner:    addr(1),
+		ContractTargets: []ContractTargetV2{{
+			TargetID:        "swap",
+			ContractAddress: addr(3),
+			Enabled:         false,
+			UpdatedAtHeight: 12,
+		}},
+		RecordVersion:   1,
+		RecordTTL:       30,
+		UpdatedAtHeight: 12,
+		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
+		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+	}
+	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
+
+	_, err = lightClientTargetFromRecordV2(record, IdentityLightClientVerificationRequestV2{
+		TargetType: IdentityResolutionTargetContract,
+		TargetKey:  "swap",
+	})
+	code, ok := IdentityLightClientFailureCodeFromErrorV2(err)
+	require.True(t, ok)
+	require.Equal(t, IdentityLightClientErrTargetNotFound, code)
+}
+
 func buildLightClientFormatProofV2(t *testing.T, state IdentityState, name string, queryType IdentityProofQueryTypeV2, height uint64, ttl uint64, reverseAddress []byte) IdentityResolutionProofFormatV2 {
 	t.Helper()
 	appHash, err := IdentityStateRoot(state)

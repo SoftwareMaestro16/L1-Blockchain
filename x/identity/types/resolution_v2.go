@@ -22,14 +22,28 @@ const (
 	MaxUnifiedRoutingMetadataBytes = 256
 	MaxUnifiedOwnerSignatureBytes  = 128
 	MaxContractCodeIDBytesV2       = 64
+	MaxContractEntrypointBytesV2   = 64
+	MaxRequiredFundsPolicyBytesV2  = 64
+	MaxUnifiedPayloadBytesV2       = 64 * 1024
+	MaxContractGasHintV2           = 100_000_000
+
+	UnifiedResolutionSchemaVersionV2 uint64 = 1
 
 	InterfaceDescriptorHashPrefixV2 = "sha256:"
 )
 
 type ContractTargetV2 struct {
-	Key     string
-	Address sdk.AccAddress
-	CodeID  string
+	Key                 string
+	Address             sdk.AccAddress
+	CodeID              string
+	TargetID            string
+	ContractAddress     sdk.AccAddress
+	Entrypoint          string
+	InterfaceHash       string
+	RequiredFundsPolicy string
+	GasHint             uint64
+	Enabled             bool
+	UpdatedAtHeight     uint64
 }
 
 type ServiceEndpointV2 struct {
@@ -56,6 +70,7 @@ type ExecutionHintV2 struct {
 
 type UnifiedResolutionRecordV2 struct {
 	NameHash               string
+	Owner                  sdk.AccAddress
 	PrimaryAddress         sdk.AccAddress
 	ContractTargets        []ContractTargetV2
 	ServiceEndpoints       []ServiceEndpointV2
@@ -65,6 +80,8 @@ type UnifiedResolutionRecordV2 struct {
 	RecordVersion          uint64
 	RecordTTL              uint64
 	UpdatedAtHeight        uint64
+	MaxPayloadBytes        uint64
+	SchemaVersion          uint64
 	OwnerSignatureOptional []byte
 }
 
@@ -88,17 +105,20 @@ func BuildUnifiedResolutionRecordV2(state IdentityState, name string, height uin
 	}
 	record := UnifiedResolutionRecordV2{
 		NameHash:        nameHash,
+		Owner:           cloneSpecAddress(view.AuthorityOwner),
 		PrimaryAddress:  cloneSpecAddress(view.Primary),
 		RoutingMetadata: routeV2FromExecutionRoute(view.Route),
 		RecordVersion:   1,
 		RecordTTL:       ttl,
 		UpdatedAtHeight: height,
+		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
+		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
 	}
 	if len(view.Contract) > 0 {
-		record.ContractTargets = append(record.ContractTargets, ContractTargetV2{Key: ResolverKeyContract, Address: cloneSpecAddress(view.Contract)})
+		record.ContractTargets = append(record.ContractTargets, NewContractTargetV2(ResolverKeyContract, view.Contract, height))
 	}
 	for _, addressRecord := range view.Records {
-		record.ContractTargets = append(record.ContractTargets, ContractTargetV2{Key: addressRecord.Key, Address: cloneSpecAddress(addressRecord.Address)})
+		record.ContractTargets = append(record.ContractTargets, NewContractTargetV2(addressRecord.Key, addressRecord.Address, height))
 	}
 	for _, entry := range view.Metadata {
 		switch {
@@ -130,6 +150,9 @@ func ValidateUnifiedResolutionRecordV2(record UnifiedResolutionRecordV2) error {
 	if err := validateHexHash("identity v2 unified resolution name hash", record.NameHash); err != nil {
 		return err
 	}
+	if err := validateSpecAddress("identity v2 unified owner", record.Owner); err != nil {
+		return err
+	}
 	if len(record.PrimaryAddress) > 0 {
 		if err := validateSpecAddress("identity v2 unified primary address", record.PrimaryAddress); err != nil {
 			return err
@@ -147,7 +170,7 @@ func ValidateUnifiedResolutionRecordV2(record UnifiedResolutionRecordV2) error {
 	if len(record.ExecutionHints) > MaxUnifiedExecutionHints {
 		return fmt.Errorf("identity v2 execution hints must not exceed %d", MaxUnifiedExecutionHints)
 	}
-	if err := validateContractTargetsV2(record.ContractTargets); err != nil {
+	if err := validateContractTargetsV2(record.ContractTargets, record.InterfaceDescriptors); err != nil {
 		return err
 	}
 	if err := validateServiceEndpointsV2(record.ServiceEndpoints); err != nil {
@@ -171,10 +194,30 @@ func ValidateUnifiedResolutionRecordV2(record UnifiedResolutionRecordV2) error {
 	if record.UpdatedAtHeight == 0 {
 		return errors.New("identity v2 unified updated_at_height is required")
 	}
+	if record.MaxPayloadBytes == 0 {
+		return errors.New("identity v2 unified max_payload_bytes is required")
+	}
+	if record.MaxPayloadBytes > MaxUnifiedPayloadBytesV2 {
+		return fmt.Errorf("identity v2 unified max_payload_bytes must not exceed %d", MaxUnifiedPayloadBytesV2)
+	}
+	if record.SchemaVersion != UnifiedResolutionSchemaVersionV2 {
+		return fmt.Errorf("unsupported identity v2 unified schema_version %d", record.SchemaVersion)
+	}
 	if len(record.OwnerSignatureOptional) > MaxUnifiedOwnerSignatureBytes {
 		return fmt.Errorf("identity v2 owner signature must not exceed %d bytes", MaxUnifiedOwnerSignatureBytes)
 	}
 	return nil
+}
+
+func NewContractTargetV2(targetID string, contractAddress sdk.AccAddress, updatedAtHeight uint64) ContractTargetV2 {
+	return ContractTargetV2{
+		Key:             targetID,
+		Address:         cloneSpecAddress(contractAddress),
+		TargetID:        targetID,
+		ContractAddress: cloneSpecAddress(contractAddress),
+		Enabled:         true,
+		UpdatedAtHeight: updatedAtHeight,
+	}
 }
 
 func ValidateResolverRecordVersionForUpdateV2(currentVersion uint64, expectedVersion uint64) error {
@@ -340,7 +383,9 @@ func forwardResolutionContainsAddress(record ResolverRecord, address sdk.AccAddr
 }
 
 func sortUnifiedResolutionRecordV2(record *UnifiedResolutionRecordV2) {
-	sort.SliceStable(record.ContractTargets, func(i, j int) bool { return record.ContractTargets[i].Key < record.ContractTargets[j].Key })
+	sort.SliceStable(record.ContractTargets, func(i, j int) bool {
+		return contractTargetIDV2(record.ContractTargets[i]) < contractTargetIDV2(record.ContractTargets[j])
+	})
 	sort.SliceStable(record.ServiceEndpoints, func(i, j int) bool { return record.ServiceEndpoints[i].Key < record.ServiceEndpoints[j].Key })
 	sort.SliceStable(record.InterfaceDescriptors, func(i, j int) bool {
 		return record.InterfaceDescriptors[i].InterfaceID < record.InterfaceDescriptors[j].InterfaceID
@@ -366,37 +411,99 @@ func isResolverRouteMetadataKey(key string) bool {
 	}
 }
 
-func validateContractTargetsV2(targets []ContractTargetV2) error {
+func validateContractTargetsV2(targets []ContractTargetV2, descriptors []InterfaceDescriptorV2) error {
 	seen := map[string]struct{}{}
+	descriptorHashes := map[string]struct{}{}
+	for _, descriptor := range descriptors {
+		descriptorHashes[descriptor.Descriptor] = struct{}{}
+	}
 	for i, target := range targets {
-		if err := validateUnifiedRecordKey("identity v2 contract target key", target.Key); err != nil {
+		targetID := contractTargetIDV2(target)
+		if err := validateUnifiedRecordKey("identity v2 contract target_id", targetID); err != nil {
 			return err
 		}
-		if len(target.Address) == 0 && target.CodeID == "" {
-			return errors.New("identity v2 contract target requires address or code_id")
+		if target.Key != "" && target.TargetID != "" && target.Key != target.TargetID {
+			return errors.New("identity v2 contract target key and target_id must match when both are set")
 		}
-		if len(target.Address) > 0 && target.CodeID != "" {
-			return errors.New("identity v2 contract target must use address or code_id, not both")
+		address := contractTargetAddressV2(target)
+		if len(address) == 0 && target.CodeID == "" {
+			return errors.New("identity v2 contract target requires contract_address or code_id")
 		}
-		if len(target.Address) > 0 {
-			if err := validateSpecAddress("identity v2 contract target", target.Address); err != nil {
+		if len(address) > 0 {
+			if err := validateSpecAddress("identity v2 contract target contract_address", address); err != nil {
 				return err
 			}
+		}
+		if len(target.Address) > 0 && len(target.ContractAddress) > 0 && !addressesEqual(target.Address, target.ContractAddress) {
+			return errors.New("identity v2 contract target address and contract_address must match when both are set")
 		}
 		if target.CodeID != "" {
 			if err := validateContractCodeIDV2(target.CodeID); err != nil {
 				return err
 			}
 		}
-		if _, found := seen[target.Key]; found {
-			return fmt.Errorf("duplicate identity v2 contract target %q", target.Key)
+		if target.Entrypoint != "" {
+			if err := validateContractEntrypointV2(target.Entrypoint); err != nil {
+				return err
+			}
 		}
-		seen[target.Key] = struct{}{}
-		if i > 0 && targets[i-1].Key >= target.Key {
+		if target.InterfaceHash != "" {
+			if err := ValidateInterfaceDescriptorHashFormatV2(target.InterfaceHash); err != nil {
+				return err
+			}
+			if len(descriptorHashes) > 0 {
+				if _, found := descriptorHashes[target.InterfaceHash]; !found {
+					return errors.New("identity v2 contract target interface_hash must match an interface descriptor")
+				}
+			}
+		}
+		if target.RequiredFundsPolicy != "" {
+			if err := validateUnifiedRecordValue("identity v2 contract target required_funds_policy", target.RequiredFundsPolicy, MaxRequiredFundsPolicyBytesV2); err != nil {
+				return err
+			}
+		}
+		if target.GasHint > MaxContractGasHintV2 {
+			return fmt.Errorf("identity v2 contract target gas_hint is advisory and must not exceed %d", MaxContractGasHintV2)
+		}
+		if target.UpdatedAtHeight == 0 && (target.TargetID != "" || len(target.ContractAddress) > 0 || target.Entrypoint != "" || target.InterfaceHash != "" || target.RequiredFundsPolicy != "" || target.GasHint != 0) {
+			return errors.New("identity v2 contract target updated_at_height is required")
+		}
+		if _, found := seen[targetID]; found {
+			return fmt.Errorf("duplicate identity v2 contract target %q", targetID)
+		}
+		seen[targetID] = struct{}{}
+		if i > 0 && contractTargetIDV2(targets[i-1]) >= targetID {
 			return errors.New("identity v2 contract targets must be sorted canonically")
 		}
 	}
 	return nil
+}
+
+func contractTargetIDV2(target ContractTargetV2) string {
+	if target.TargetID != "" {
+		return target.TargetID
+	}
+	return target.Key
+}
+
+func contractTargetAddressV2(target ContractTargetV2) sdk.AccAddress {
+	if len(target.ContractAddress) > 0 {
+		return target.ContractAddress
+	}
+	return target.Address
+}
+
+func contractTargetEnabledV2(target ContractTargetV2) bool {
+	if target.TargetID == "" &&
+		len(target.ContractAddress) == 0 &&
+		target.Entrypoint == "" &&
+		target.InterfaceHash == "" &&
+		target.RequiredFundsPolicy == "" &&
+		target.GasHint == 0 &&
+		target.UpdatedAtHeight == 0 {
+		return true
+	}
+	return target.Enabled
 }
 
 func validateServiceEndpointsV2(endpoints []ServiceEndpointV2) error {
@@ -418,6 +525,23 @@ func validateServiceEndpointsV2(endpoints []ServiceEndpointV2) error {
 		if i > 0 && endpoints[i-1].Key >= endpoint.Key {
 			return errors.New("identity v2 service endpoints must be sorted canonically")
 		}
+	}
+	return nil
+}
+
+func validateContractEntrypointV2(entrypoint string) error {
+	if entrypoint == "" {
+		return nil
+	}
+	if len(entrypoint) > MaxContractEntrypointBytesV2 {
+		return fmt.Errorf("identity v2 contract target entrypoint must not exceed %d bytes", MaxContractEntrypointBytesV2)
+	}
+	for i := 0; i < len(entrypoint); i++ {
+		c := entrypoint[i]
+		if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-' || c == '.' || c == ':' {
+			continue
+		}
+		return fmt.Errorf("identity v2 contract target entrypoint contains unsupported character %q", c)
 	}
 	return nil
 }

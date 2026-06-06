@@ -117,17 +117,33 @@ func ComputeResolvedRecordHashV2(record UnifiedResolutionRecordV2) (string, erro
 	parts := []string{
 		"identity-v2-resolved-record",
 		record.NameHash,
+		hex.EncodeToString(record.Owner),
 		hex.EncodeToString(record.PrimaryAddress),
 		fmt.Sprintf("%020d", record.RecordVersion),
 		fmt.Sprintf("%020d", record.RecordTTL),
 		fmt.Sprintf("%020d", record.UpdatedAtHeight),
+		fmt.Sprintf("%020d", record.MaxPayloadBytes),
+		fmt.Sprintf("%020d", record.SchemaVersion),
 		record.RoutingMetadata.ZoneID,
 		record.RoutingMetadata.ShardID,
 		record.RoutingMetadata.VM,
 		record.RoutingMetadata.Entrypoint,
 	}
 	for _, target := range record.ContractTargets {
-		parts = append(parts, "contract", target.Key, hex.EncodeToString(target.Address), target.CodeID)
+		parts = append(parts,
+			"contract",
+			target.Key,
+			hex.EncodeToString(target.Address),
+			target.CodeID,
+			target.TargetID,
+			hex.EncodeToString(target.ContractAddress),
+			target.Entrypoint,
+			target.InterfaceHash,
+			target.RequiredFundsPolicy,
+			fmt.Sprintf("%020d", target.GasHint),
+			fmt.Sprintf("%t", target.Enabled),
+			fmt.Sprintf("%020d", target.UpdatedAtHeight),
+		)
 	}
 	for _, endpoint := range record.ServiceEndpoints {
 		parts = append(parts, "service", endpoint.Key, endpoint.Endpoint)

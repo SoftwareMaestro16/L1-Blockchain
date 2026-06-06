@@ -40,10 +40,11 @@ func TestUnifiedResolutionRecordV2BuildsFromResolverView(t *testing.T) {
 	expectedHash, err := DomainRecordV2NameHash("alice.aet")
 	require.NoError(t, err)
 	require.Equal(t, expectedHash, record.NameHash)
+	require.Equal(t, addr(1), record.Owner)
 	require.Equal(t, addr(2), record.PrimaryAddress)
 	require.Equal(t, []ContractTargetV2{
-		{Key: ResolverKeyContract, Address: addr(3)},
-		{Key: ResolverKeyWallet, Address: addr(4)},
+		NewContractTargetV2(ResolverKeyContract, addr(3), 13),
+		NewContractTargetV2(ResolverKeyWallet, addr(4), 13),
 	}, record.ContractTargets)
 	require.Equal(t, []ServiceEndpointV2{{Key: "rpc", Endpoint: "https://rpc.aet"}}, record.ServiceEndpoints)
 	expectedDescriptorHash, err := InterfaceDescriptorHashV2("wallet-v1")
@@ -54,6 +55,8 @@ func TestUnifiedResolutionRecordV2BuildsFromResolverView(t *testing.T) {
 	require.Equal(t, uint64(1), record.RecordVersion)
 	require.Equal(t, uint64(30), record.RecordTTL)
 	require.Equal(t, uint64(13), record.UpdatedAtHeight)
+	require.Equal(t, uint64(MaxUnifiedPayloadBytesV2), record.MaxPayloadBytes)
+	require.Equal(t, UnifiedResolutionSchemaVersionV2, record.SchemaVersion)
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 }
 
@@ -62,10 +65,13 @@ func TestUnifiedResolutionRecordV2RejectsNonCanonicalAndTTL(t *testing.T) {
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
 		NameHash:        nameHash,
+		Owner:           addr(1),
 		PrimaryAddress:  addr(2),
 		RecordVersion:   1,
 		RecordTTL:       10,
 		UpdatedAtHeight: 1,
+		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
+		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
 		ContractTargets: []ContractTargetV2{
 			{Key: ResolverKeyWallet, Address: addr(4)},
 			{Key: ResolverKeyContract, Address: addr(3)},
@@ -85,6 +91,7 @@ func TestUnifiedResolutionRecordV2ResolverValidationLimitsAndFormats(t *testing.
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
 		NameHash:             nameHash,
+		Owner:                addr(1),
 		PrimaryAddress:       addr(2),
 		ContractTargets:      []ContractTargetV2{{Key: ResolverKeyContract, CodeID: "avm:swap-v1"}},
 		ServiceEndpoints:     []ServiceEndpointV2{{Key: "rpc", Endpoint: "https://rpc.aet"}},
@@ -94,6 +101,8 @@ func TestUnifiedResolutionRecordV2ResolverValidationLimitsAndFormats(t *testing.
 		RecordVersion:        7,
 		RecordTTL:            10,
 		UpdatedAtHeight:      12,
+		MaxPayloadBytes:      MaxUnifiedPayloadBytesV2,
+		SchemaVersion:        UnifiedResolutionSchemaVersionV2,
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 
@@ -113,6 +122,55 @@ func TestUnifiedResolutionRecordV2ResolverValidationLimitsAndFormats(t *testing.
 	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(record), "routing metadata")
 	require.NoError(t, ValidateResolverRecordVersionForUpdateV2(7, 7))
 	require.ErrorContains(t, ValidateResolverRecordVersionForUpdateV2(8, 7), "version conflict")
+}
+
+func TestUnifiedResolutionRecordV2ContractTargetSchemaValidation(t *testing.T) {
+	nameHash, err := DomainRecordV2NameHash("alice.aet")
+	require.NoError(t, err)
+	descriptorHash, err := InterfaceDescriptorHashV2("wallet-v1")
+	require.NoError(t, err)
+	record := UnifiedResolutionRecordV2{
+		NameHash:             nameHash,
+		Owner:                addr(1),
+		PrimaryAddress:       addr(2),
+		InterfaceDescriptors: []InterfaceDescriptorV2{{InterfaceID: "aw5", Descriptor: descriptorHash}},
+		ContractTargets: []ContractTargetV2{{
+			TargetID:            "swap",
+			ContractAddress:     addr(3),
+			Entrypoint:          "execute_swap",
+			InterfaceHash:       descriptorHash,
+			RequiredFundsPolicy: "optional",
+			GasHint:             500_000,
+			Enabled:             true,
+			UpdatedAtHeight:     12,
+		}},
+		RecordVersion:   7,
+		RecordTTL:       10,
+		UpdatedAtHeight: 12,
+		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
+		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+	}
+	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
+
+	duplicate := record
+	duplicate.ContractTargets = append([]ContractTargetV2(nil), record.ContractTargets...)
+	duplicate.ContractTargets = append(duplicate.ContractTargets, record.ContractTargets[0])
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(duplicate), "duplicate")
+
+	badEntrypoint := record
+	badEntrypoint.ContractTargets = append([]ContractTargetV2(nil), record.ContractTargets...)
+	badEntrypoint.ContractTargets[0].Entrypoint = "bad entry"
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badEntrypoint), "entrypoint")
+
+	badInterface := record
+	badInterface.ContractTargets = append([]ContractTargetV2(nil), record.ContractTargets...)
+	badInterface.ContractTargets[0].InterfaceHash = InterfaceDescriptorHashPrefixV2 + strings.Repeat("a", 64)
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badInterface), "interface_hash")
+
+	badGas := record
+	badGas.ContractTargets = append([]ContractTargetV2(nil), record.ContractTargets...)
+	badGas.ContractTargets[0].GasHint = MaxContractGasHintV2 + 1
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badGas), "gas_hint")
 }
 
 func TestReverseResolutionRecordV2VerifiedPrimaryAndAlias(t *testing.T) {
