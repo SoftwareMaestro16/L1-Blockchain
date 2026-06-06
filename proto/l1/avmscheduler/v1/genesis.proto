@@ -1,0 +1,105 @@
+syntax = "proto3";
+package l1.avmscheduler.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/avm-scheduler/types";
+
+message GenesisState {
+  uint64 version = 1;
+  Params params = 2 [(gogoproto.nullable) = false];
+  AVMSchedulerParams scheduler_params = 3 [(gogoproto.nullable) = false];
+  AVMSchedulerState state = 4 [(gogoproto.nullable) = false];
+}
+
+message Params {
+  bool enabled = 1;
+  bool testnet_profile = 2;
+  string production_version_gate = 3;
+  string authority = 4;
+  uint64 default_query_limit = 5;
+  uint64 max_query_limit = 6;
+}
+
+message AVMSchedulerParams {
+  uint32 max_executions_per_block = 1;
+  uint32 max_parallelism = 2;
+  uint32 max_queue_depth = 3;
+  uint32 max_read_set_keys = 4;
+  uint32 max_write_set_keys = 5;
+  uint32 max_receipts = 6;
+}
+
+message AVMSchedulerState {
+  repeated AVMExecutionBatch execution_queue = 1 [(gogoproto.nullable) = false];
+  repeated AVMDependencyGraph dependency_graphs = 2 [(gogoproto.nullable) = false];
+  repeated AVMExecutionReceipt execution_receipts = 3 [(gogoproto.nullable) = false];
+  repeated AVMConflictCounter conflict_counters = 4 [(gogoproto.nullable) = false];
+  uint64 last_finalized_height = 5;
+}
+
+message AVMExecutionBatch {
+  string batch_id = 1;
+  uint64 submitted_height = 2;
+  string initial_state_root = 3;
+  string status = 4;
+  repeated AVMExecutionTask tasks = 5 [(gogoproto.nullable) = false];
+}
+
+message AVMExecutionTask {
+  string task_id = 1;
+  string contract_address = 2;
+  string mailbox = 3;
+  repeated string read_set = 4;
+  repeated string write_set = 5;
+  repeated AVMStateWrite state_writes = 6 [(gogoproto.nullable) = false];
+  uint64 gas_limit = 7;
+}
+
+message AVMStateWrite {
+  string key = 1;
+  string value = 2;
+}
+
+message AVMDependencyGraph {
+  string batch_id = 1;
+  repeated AVMDependencyNode nodes = 2 [(gogoproto.nullable) = false];
+  repeated AVMExecutionGroup parallel_groups = 3 [(gogoproto.nullable) = false];
+  bool fallback_serial = 4;
+  string graph_hash = 5;
+}
+
+message AVMDependencyNode {
+  string task_id = 1;
+  string contract_address = 2;
+  string mailbox = 3;
+  repeated string read_set = 4;
+  repeated string write_set = 5;
+  repeated string dependencies = 6;
+}
+
+message AVMExecutionGroup {
+  uint32 group_index = 1;
+  repeated string task_ids = 2;
+}
+
+message AVMExecutionReceipt {
+  string receipt_id = 1;
+  string batch_id = 2;
+  string task_id = 3;
+  string contract_address = 4;
+  uint64 height = 5;
+  uint32 order = 6;
+  string status = 7;
+  uint64 gas_used = 8;
+  string state_root_before = 9;
+  string state_root_after = 10;
+  string error = 11;
+  bool fallback_serial = 12;
+}
+
+message AVMConflictCounter {
+  string contract_address = 1;
+  uint64 conflict_count = 2;
+  uint64 last_conflict_height = 3;
+}

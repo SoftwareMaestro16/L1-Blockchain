@@ -33,6 +33,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 
 	aethercoremodule "github.com/sovereign-l1/l1/x/aethercore"
+	avmschedulermodule "github.com/sovereign-l1/l1/x/avm-scheduler"
 	configmodule "github.com/sovereign-l1/l1/x/config"
 	dexmodule "github.com/sovereign-l1/l1/x/dex"
 	feesmodule "github.com/sovereign-l1/l1/x/fees"
@@ -78,6 +79,7 @@ func (app *L1App) initModules(
 		networkingmodule.NewAppModule(app.NetworkingKeeper),
 		paymentsmodule.NewAppModule(app.PaymentsKeeper),
 		schedulermodule.NewAppModule(&app.SchedulerKeeper),
+		avmschedulermodule.NewAppModule(&app.AVMSchedulerKeeper),
 		tokenfactorymodule.NewAppModule(appCodec, app.TokenFactoryKeeper),
 		dexmodule.NewAppModule(appCodec, app.DexKeeper),
 		feesmodule.NewAppModule(appCodec, app.FeesKeeper),

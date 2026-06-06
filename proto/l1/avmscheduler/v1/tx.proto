@@ -1,0 +1,38 @@
+syntax = "proto3";
+package l1.avmscheduler.v1;
+
+import "l1/avmscheduler/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/avm-scheduler/types";
+
+message MsgSubmitAVMExecutionBatch {
+  string authority = 1;
+  AVMExecutionBatch batch = 2;
+}
+
+message MsgSubmitAVMExecutionBatchResponse {}
+
+message MsgFinalizeAVMExecutionBatch {
+  string authority = 1;
+  string batch_id = 2;
+  uint64 height = 3;
+  bool force_serial = 4;
+  repeated string failed_task_ids = 5;
+}
+
+message MsgFinalizeAVMExecutionBatchResponse {
+  repeated AVMExecutionReceipt receipts = 1;
+}
+
+message MsgUpdateAVMSchedulerParams {
+  string authority = 1;
+  AVMSchedulerParams scheduler_params = 2;
+}
+
+message MsgUpdateAVMSchedulerParamsResponse {}
+
+service Msg {
+  rpc SubmitAVMExecutionBatch(MsgSubmitAVMExecutionBatch) returns (MsgSubmitAVMExecutionBatchResponse);
+  rpc FinalizeAVMExecutionBatch(MsgFinalizeAVMExecutionBatch) returns (MsgFinalizeAVMExecutionBatchResponse);
+  rpc UpdateAVMSchedulerParams(MsgUpdateAVMSchedulerParams) returns (MsgUpdateAVMSchedulerParamsResponse);
+}

@@ -1,0 +1,47 @@
+syntax = "proto3";
+package l1.avmscheduler.v1;
+
+import "l1/avmscheduler/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/avm-scheduler/types";
+
+message QueryAVMExecutionQueueRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+}
+
+message QueryAVMExecutionQueueResponse {
+  repeated AVMExecutionBatch batches = 1;
+  uint64 next_offset = 2;
+}
+
+message QueryAVMExecutionReceiptRequest {
+  string batch_id = 1;
+  string task_id = 2;
+}
+
+message QueryAVMExecutionReceiptResponse {
+  AVMExecutionReceipt receipt = 1;
+}
+
+message QueryAVMDependencyGraphRequest {
+  string batch_id = 1;
+}
+
+message QueryAVMDependencyGraphResponse {
+  AVMDependencyGraph graph = 1;
+}
+
+message QueryAVMSchedulerParamsRequest {}
+
+message QueryAVMSchedulerParamsResponse {
+  Params params = 1;
+  AVMSchedulerParams scheduler_params = 2;
+}
+
+service Query {
+  rpc AVMExecutionQueue(QueryAVMExecutionQueueRequest) returns (QueryAVMExecutionQueueResponse);
+  rpc AVMExecutionReceipt(QueryAVMExecutionReceiptRequest) returns (QueryAVMExecutionReceiptResponse);
+  rpc AVMDependencyGraph(QueryAVMDependencyGraphRequest) returns (QueryAVMDependencyGraphResponse);
+  rpc AVMSchedulerParams(QueryAVMSchedulerParamsRequest) returns (QueryAVMSchedulerParamsResponse);
+}

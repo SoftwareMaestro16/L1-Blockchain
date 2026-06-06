@@ -22,6 +22,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	aethercoretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
@@ -52,6 +53,7 @@ var aetherCorePrototypeModules = []string{
 	networkingtypes.ModuleName,
 	paymentstypes.ModuleName,
 	schedulertypes.ModuleName,
+	avmschedulertypes.ModuleName,
 }
 
 var aetherCoreSystemModules = []string{
@@ -76,6 +78,7 @@ func AetherCorePrototypeStoreKeys() []string {
 		networkingtypes.StoreKey,
 		paymentstypes.StoreKey,
 		schedulertypes.StoreKey,
+		avmschedulertypes.StoreKey,
 	}
 }
 
@@ -113,6 +116,7 @@ func aetherCoreBeginBlockerOrder() []string {
 		networkingtypes.ModuleName,
 		paymentstypes.ModuleName,
 		schedulertypes.ModuleName,
+		avmschedulertypes.ModuleName,
 	}
 }
 
@@ -133,6 +137,7 @@ func aetherCoreEndBlockerOrder() []string {
 		networkingtypes.ModuleName,
 		paymentstypes.ModuleName,
 		schedulertypes.ModuleName,
+		avmschedulertypes.ModuleName,
 	}
 }
 
@@ -163,6 +168,7 @@ func aetherCoreInitGenesisOrder() []string {
 		networkingtypes.ModuleName,
 		paymentstypes.ModuleName,
 		schedulertypes.ModuleName,
+		avmschedulertypes.ModuleName,
 		feestypes.ModuleName,
 		tokenfactorytypes.ModuleName,
 		dextypes.ModuleName,
@@ -196,6 +202,7 @@ func aetherCoreExportGenesisOrder() []string {
 		networkingtypes.ModuleName,
 		paymentstypes.ModuleName,
 		schedulertypes.ModuleName,
+		avmschedulertypes.ModuleName,
 		feestypes.ModuleName,
 		tokenfactorytypes.ModuleName,
 		dextypes.ModuleName,

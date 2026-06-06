@@ -48,6 +48,8 @@ import (
 	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
 	aethercorekeeper "github.com/sovereign-l1/l1/x/aethercore/keeper"
 	aethercoretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	avmschedulerkeeper "github.com/sovereign-l1/l1/x/avm-scheduler/keeper"
+	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	configkeeper "github.com/sovereign-l1/l1/x/config/keeper"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
 	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
@@ -254,5 +256,6 @@ func (app *L1App) initKeepers(
 	app.NetworkingKeeper = networkingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[networkingtypes.StoreKey]))
 	app.PaymentsKeeper = paymentskeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[paymentstypes.StoreKey]))
 	app.SchedulerKeeper = schedulerkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[schedulertypes.StoreKey]))
+	app.AVMSchedulerKeeper = avmschedulerkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[avmschedulertypes.StoreKey]))
 	return txConfig
 }
