@@ -31,10 +31,35 @@ type CosmosModuleSurface struct {
 	GenesisExport    bool
 	GenesisImport    bool
 	Invariants       bool
+	KeeperIsolation  KeeperIsolationPolicy
+	IBCBoundary      IBCReadyBoundary
 	Events           []string
 	TypedErrors      []string
 	RootContribution RootContribution
 	SurfaceHash      string
+}
+
+type KeeperIsolationPolicy struct {
+	StoreKey                         string
+	ReadableStoreKeys                []string
+	WritableStoreKeys                []string
+	GrantedCapabilities              []string
+	CrossZoneWritesProhibited        bool
+	CrossZoneMessagesModule          CosmosSDKModuleName
+	DirectCallsLimitedToLocalHelpers bool
+	SharedStateReadOnlyOrProofBacked bool
+}
+
+type IBCReadyBoundary struct {
+	StateExportable             bool
+	ReceiptsProofVerifiable     bool
+	CanonicalBoundaryMessages   bool
+	TimeoutRulesExplicit        bool
+	ReplayRulesExplicit         bool
+	DeterministicChannelRouting bool
+	BoundaryMessageEncoding     string
+	TimeoutPolicyID             string
+	ReplayPolicyID              string
 }
 
 type CosmosModuleRequirementManifest struct {
@@ -82,6 +107,12 @@ func (surface CosmosModuleSurface) ValidateFormat() error {
 	}
 	if !surface.MsgServer || !surface.QueryServer || !surface.Keeper || !surface.Params || !surface.GenesisExport || !surface.GenesisImport || !surface.Invariants {
 		return fmt.Errorf("aethercore Cosmos module %s is missing required module surface", surface.ModuleName)
+	}
+	if err := surface.KeeperIsolation.Validate(surface.ModuleName); err != nil {
+		return err
+	}
+	if err := surface.IBCBoundary.Validate(surface.ModuleName); err != nil {
+		return err
 	}
 	if err := validateSortedRequirementTokens("aethercore Cosmos module event", surface.Events); err != nil {
 		return err
@@ -196,6 +227,29 @@ func ComputeCosmosModuleSurfaceHash(surface CosmosModuleSurface) string {
 		writePart(w, fmt.Sprint(surface.GenesisExport))
 		writePart(w, fmt.Sprint(surface.GenesisImport))
 		writePart(w, fmt.Sprint(surface.Invariants))
+		writePart(w, surface.KeeperIsolation.StoreKey)
+		for _, storeKey := range surface.KeeperIsolation.ReadableStoreKeys {
+			writePart(w, storeKey)
+		}
+		for _, storeKey := range surface.KeeperIsolation.WritableStoreKeys {
+			writePart(w, storeKey)
+		}
+		for _, capability := range surface.KeeperIsolation.GrantedCapabilities {
+			writePart(w, capability)
+		}
+		writePart(w, fmt.Sprint(surface.KeeperIsolation.CrossZoneWritesProhibited))
+		writePart(w, string(surface.KeeperIsolation.CrossZoneMessagesModule))
+		writePart(w, fmt.Sprint(surface.KeeperIsolation.DirectCallsLimitedToLocalHelpers))
+		writePart(w, fmt.Sprint(surface.KeeperIsolation.SharedStateReadOnlyOrProofBacked))
+		writePart(w, fmt.Sprint(surface.IBCBoundary.StateExportable))
+		writePart(w, fmt.Sprint(surface.IBCBoundary.ReceiptsProofVerifiable))
+		writePart(w, fmt.Sprint(surface.IBCBoundary.CanonicalBoundaryMessages))
+		writePart(w, fmt.Sprint(surface.IBCBoundary.TimeoutRulesExplicit))
+		writePart(w, fmt.Sprint(surface.IBCBoundary.ReplayRulesExplicit))
+		writePart(w, fmt.Sprint(surface.IBCBoundary.DeterministicChannelRouting))
+		writePart(w, surface.IBCBoundary.BoundaryMessageEncoding)
+		writePart(w, surface.IBCBoundary.TimeoutPolicyID)
+		writePart(w, surface.IBCBoundary.ReplayPolicyID)
 		for _, event := range surface.Events {
 			writePart(w, event)
 		}
@@ -228,6 +282,8 @@ func cosmosModuleSurface(moduleName CosmosSDKModuleName, path string, rootType R
 		GenesisExport:    true,
 		GenesisImport:    true,
 		Invariants:       true,
+		KeeperIsolation:  DefaultKeeperIsolationPolicy(moduleName, string(moduleName)),
+		IBCBoundary:      DefaultIBCReadyBoundary(),
 		Events:           events,
 		TypedErrors:      typedErrors,
 		RootContribution: root,
@@ -239,6 +295,8 @@ func normalizeCosmosModuleSurface(surface CosmosModuleSurface) CosmosModuleSurfa
 	surface.ModulePath = strings.TrimSpace(surface.ModulePath)
 	surface.Events = append([]string(nil), surface.Events...)
 	surface.TypedErrors = append([]string(nil), surface.TypedErrors...)
+	surface.KeeperIsolation = normalizeKeeperIsolationPolicy(surface.KeeperIsolation)
+	surface.IBCBoundary = normalizeIBCReadyBoundary(surface.IBCBoundary)
 	sort.Strings(surface.Events)
 	sort.Strings(surface.TypedErrors)
 	surface.RootContribution = normalizeRootContribution(surface.RootContribution)
@@ -262,6 +320,129 @@ func normalizeCosmosModuleSurfaces(surfaces []CosmosModuleSurface) []CosmosModul
 		return out[i].ModuleName < out[j].ModuleName
 	})
 	return out
+}
+
+func DefaultKeeperIsolationPolicy(moduleName CosmosSDKModuleName, storeKey string) KeeperIsolationPolicy {
+	storeKey = strings.TrimSpace(storeKey)
+	return KeeperIsolationPolicy{
+		StoreKey:                         storeKey,
+		ReadableStoreKeys:                []string{storeKey},
+		WritableStoreKeys:                []string{storeKey},
+		CrossZoneWritesProhibited:        true,
+		CrossZoneMessagesModule:          CosmosModuleMessages,
+		DirectCallsLimitedToLocalHelpers: true,
+		SharedStateReadOnlyOrProofBacked: true,
+	}
+}
+
+func (policy KeeperIsolationPolicy) Validate(moduleName CosmosSDKModuleName) error {
+	policy = normalizeKeeperIsolationPolicy(policy)
+	if err := validateToken("aethercore keeper isolation store key", policy.StoreKey, MaxScopeLength); err != nil {
+		return err
+	}
+	if !IsRequiredCosmosSDKModule(moduleName) {
+		return fmt.Errorf("unknown keeper isolation module %q", moduleName)
+	}
+	if len(policy.WritableStoreKeys) != 1 || policy.WritableStoreKeys[0] != policy.StoreKey {
+		return fmt.Errorf("aethercore keeper isolation for %s must write only its own store key", moduleName)
+	}
+	if !containsString(policy.ReadableStoreKeys, policy.StoreKey) {
+		return fmt.Errorf("aethercore keeper isolation for %s must read its own store key", moduleName)
+	}
+	for _, storeKey := range policy.ReadableStoreKeys {
+		if err := validateToken("aethercore keeper readable store key", storeKey, MaxScopeLength); err != nil {
+			return err
+		}
+		if storeKey != policy.StoreKey && !containsString(policy.GrantedCapabilities, "read:"+storeKey) {
+			return fmt.Errorf("aethercore keeper isolation for %s reads %s without explicit capability", moduleName, storeKey)
+		}
+	}
+	for _, storeKey := range policy.WritableStoreKeys {
+		if err := validateToken("aethercore keeper writable store key", storeKey, MaxScopeLength); err != nil {
+			return err
+		}
+	}
+	if err := validateCapabilitiesForField("aethercore keeper capability", policy.GrantedCapabilities); err != nil {
+		return err
+	}
+	if !policy.CrossZoneWritesProhibited {
+		return fmt.Errorf("aethercore keeper isolation for %s must prohibit cross-zone writes", moduleName)
+	}
+	if policy.CrossZoneMessagesModule != CosmosModuleMessages {
+		return fmt.Errorf("aethercore keeper isolation for %s must route cross-zone interactions through x/messages", moduleName)
+	}
+	if !policy.DirectCallsLimitedToLocalHelpers {
+		return fmt.Errorf("aethercore keeper isolation for %s must limit direct calls to same-zone local helpers", moduleName)
+	}
+	if !policy.SharedStateReadOnlyOrProofBacked {
+		return fmt.Errorf("aethercore keeper isolation for %s must keep shared state read-only or proof-backed", moduleName)
+	}
+	return nil
+}
+
+func DefaultIBCReadyBoundary() IBCReadyBoundary {
+	return IBCReadyBoundary{
+		StateExportable:             true,
+		ReceiptsProofVerifiable:     true,
+		CanonicalBoundaryMessages:   true,
+		TimeoutRulesExplicit:        true,
+		ReplayRulesExplicit:         true,
+		DeterministicChannelRouting: true,
+		BoundaryMessageEncoding:     "aetheris.canonical.binary.v1",
+		TimeoutPolicyID:             "explicit-height-deadline-v1",
+		ReplayPolicyID:              "nonce-and-tombstone-v1",
+	}
+}
+
+func (boundary IBCReadyBoundary) Validate(moduleName CosmosSDKModuleName) error {
+	boundary = normalizeIBCReadyBoundary(boundary)
+	if !IsRequiredCosmosSDKModule(moduleName) {
+		return fmt.Errorf("unknown IBC boundary module %q", moduleName)
+	}
+	if !boundary.StateExportable {
+		return fmt.Errorf("aethercore IBC boundary for %s must export module state", moduleName)
+	}
+	if !boundary.ReceiptsProofVerifiable {
+		return fmt.Errorf("aethercore IBC boundary for %s must make receipts proof-verifiable", moduleName)
+	}
+	if !boundary.CanonicalBoundaryMessages {
+		return fmt.Errorf("aethercore IBC boundary for %s must use canonical packet-like messages", moduleName)
+	}
+	if !boundary.TimeoutRulesExplicit {
+		return fmt.Errorf("aethercore IBC boundary for %s must have explicit timeout rules", moduleName)
+	}
+	if !boundary.ReplayRulesExplicit {
+		return fmt.Errorf("aethercore IBC boundary for %s must have explicit replay rules", moduleName)
+	}
+	if !boundary.DeterministicChannelRouting {
+		return fmt.Errorf("aethercore IBC boundary for %s must not depend on nondeterministic node routing state", moduleName)
+	}
+	if err := validateToken("aethercore IBC boundary encoding", boundary.BoundaryMessageEncoding, MaxScopeLength); err != nil {
+		return err
+	}
+	if err := validatePolicyID("aethercore IBC timeout policy id", boundary.TimeoutPolicyID); err != nil {
+		return err
+	}
+	return validatePolicyID("aethercore IBC replay policy id", boundary.ReplayPolicyID)
+}
+
+func normalizeKeeperIsolationPolicy(policy KeeperIsolationPolicy) KeeperIsolationPolicy {
+	policy.StoreKey = strings.TrimSpace(policy.StoreKey)
+	policy.ReadableStoreKeys = append([]string(nil), policy.ReadableStoreKeys...)
+	policy.WritableStoreKeys = append([]string(nil), policy.WritableStoreKeys...)
+	policy.GrantedCapabilities = append([]string(nil), policy.GrantedCapabilities...)
+	sort.Strings(policy.ReadableStoreKeys)
+	sort.Strings(policy.WritableStoreKeys)
+	sort.Strings(policy.GrantedCapabilities)
+	policy.CrossZoneMessagesModule = CosmosSDKModuleName(strings.TrimSpace(string(policy.CrossZoneMessagesModule)))
+	return policy
+}
+
+func normalizeIBCReadyBoundary(boundary IBCReadyBoundary) IBCReadyBoundary {
+	boundary.BoundaryMessageEncoding = strings.TrimSpace(boundary.BoundaryMessageEncoding)
+	boundary.TimeoutPolicyID = strings.TrimSpace(boundary.TimeoutPolicyID)
+	boundary.ReplayPolicyID = strings.TrimSpace(boundary.ReplayPolicyID)
+	return boundary
 }
 
 func validateSortedRequirementTokens(field string, values []string) error {
