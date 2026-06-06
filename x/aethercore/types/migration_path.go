@@ -13,12 +13,14 @@ type MigrationTaskID string
 type MigrationExitCriterionID string
 
 const (
-	MigrationPhaseBaselineHardening MigrationPhaseID = "phase-0-baseline-hardening"
-	MigrationPhaseCoreCommitments   MigrationPhaseID = "phase-1-core-commitments"
-	MigrationPhaseMessageBus        MigrationPhaseID = "phase-2-message-bus"
-	MigrationPhaseZoneExtraction    MigrationPhaseID = "phase-3-zone-extraction"
-	MigrationPhaseShardingRuntime   MigrationPhaseID = "phase-4-sharding-runtime"
-	MigrationPhaseAVM20             MigrationPhaseID = "phase-5-avm-2.0"
+	MigrationPhaseBaselineHardening    MigrationPhaseID = "phase-0-baseline-hardening"
+	MigrationPhaseCoreCommitments      MigrationPhaseID = "phase-1-core-commitments"
+	MigrationPhaseMessageBus           MigrationPhaseID = "phase-2-message-bus"
+	MigrationPhaseZoneExtraction       MigrationPhaseID = "phase-3-zone-extraction"
+	MigrationPhaseShardingRuntime      MigrationPhaseID = "phase-4-sharding-runtime"
+	MigrationPhaseAVM20                MigrationPhaseID = "phase-5-avm-2.0"
+	MigrationPhaseIdentityPayments     MigrationPhaseID = "phase-6-identity-payment-integration"
+	MigrationPhasePerformanceHardening MigrationPhaseID = "phase-7-performance-hardening"
 
 	MigrationTaskModuleBoundaryDocs        MigrationTaskID = "module-boundary-documentation"
 	MigrationTaskStateExportValidation     MigrationTaskID = "state-export-validation"
@@ -64,6 +66,21 @@ const (
 	MigrationTaskProofVerificationSyscalls MigrationTaskID = "proof-verification-syscalls"
 	MigrationTaskABIRegistry               MigrationTaskID = "abi-registry"
 
+	MigrationTaskIdentityProofActivation   MigrationTaskID = "identity-proof-activation"
+	MigrationTaskCrossZoneIdentityLookup   MigrationTaskID = "cross-zone-identity-lookup-messages"
+	MigrationTaskPaymentChannelSettlement  MigrationTaskID = "payment-channel-settlement"
+	MigrationTaskConditionalPaymentRouting MigrationTaskID = "conditional-payment-routing"
+	MigrationTaskPaymentProofAPIs          MigrationTaskID = "payment-proof-apis"
+	MigrationTaskWalletSDKIdentityPayment  MigrationTaskID = "wallet-sdk-identity-payment-helpers"
+
+	MigrationTaskBlockSTMZoneShardWorkloads MigrationTaskID = "blockstm-zone-shard-workloads"
+	MigrationTaskConflictProfiling          MigrationTaskID = "conflict-profiling"
+	MigrationTaskStoreV2Benchmarks          MigrationTaskID = "store-v2-benchmarks"
+	MigrationTaskMempoolLanes               MigrationTaskID = "mempool-lanes"
+	MigrationTaskCongestionAwareRouting     MigrationTaskID = "congestion-aware-routing"
+	MigrationTaskAdaptiveSyncRecoveryTests  MigrationTaskID = "adaptivesync-recovery-tests"
+	MigrationTaskMultiZoneLoadSimulation    MigrationTaskID = "multi-zone-traffic-load-simulation"
+
 	MigrationExitSingleChainReproducibleExport MigrationExitCriterionID = "single-chain-state-reproducible-exportable"
 	MigrationExitLegacyInvariantCoverage       MigrationExitCriterionID = "legacy-module-invariant-coverage"
 	MigrationExitSafePrefixMigration           MigrationExitCriterionID = "safe-prefix-migration-upgrade-handlers"
@@ -87,6 +104,14 @@ const (
 	MigrationExitContractZoneDeterministic    MigrationExitCriterionID = "contract-zone-runs-deterministic-contracts"
 	MigrationExitContractsEmitAsyncMessages   MigrationExitCriterionID = "contracts-emit-async-messages"
 	MigrationExitContractStateProofsAvailable MigrationExitCriterionID = "contract-state-proofs-available"
+
+	MigrationExitNamesResolveProofBacked           MigrationExitCriterionID = "names-resolve-proof-backed-identity-zone"
+	MigrationExitPaymentsSettleTrustlessly         MigrationExitCriterionID = "payments-settle-trustlessly-financial-zone"
+	MigrationExitContractsUseIdentityPaymentsAsync MigrationExitCriterionID = "contracts-use-identity-payment-messages-async"
+
+	MigrationExitParallelismScales              MigrationExitCriterionID = "zone-shard-execution-scales-with-parallelism"
+	MigrationExitStateSyncRecoversCommitments   MigrationExitCriterionID = "state-sync-recovers-zone-shard-commitments"
+	MigrationExitRoutingDeterministicCongestion MigrationExitCriterionID = "routing-deterministic-under-congestion"
 )
 
 type MigrationTaskDescriptor struct {
@@ -208,6 +233,33 @@ type AVM20MigrationEvidence struct {
 	EvidenceHash            string
 }
 
+type IdentityPaymentIntegrationEvidence struct {
+	IdentityProofRoot            string
+	IdentityLookupMessageRoot    string
+	PaymentChannelSettlementRoot string
+	ConditionalPaymentRouteRoot  string
+	PaymentProofAPIRoot          string
+	WalletSDKHelperRoot          string
+	ProofBackedNames             bool
+	TrustlessPayments            bool
+	AsyncContractMessages        bool
+	EvidenceHash                 string
+}
+
+type PerformanceHardeningMigrationEvidence struct {
+	BlockSTMWorkloadRoot     string
+	ConflictProfileRoot      string
+	StoreV2BenchmarkRoot     string
+	MempoolLaneRoot          string
+	CongestionRoutingRoot    string
+	AdaptiveSyncRecoveryRoot string
+	LoadSimulationRoot       string
+	ParallelismScales        bool
+	StateSyncRecoversRoots   bool
+	CongestionDeterministic  bool
+	EvidenceHash             string
+}
+
 func DefaultMigrationPathSpec() (MigrationPathSpec, error) {
 	return BuildMigrationPathSpec([]MigrationPhase{
 		migrationPhase(MigrationPhaseBaselineHardening, "Phase 0: Baseline Hardening", MigrationPhase0Tasks(), MigrationPhase0ExitCriteria()),
@@ -216,6 +268,8 @@ func DefaultMigrationPathSpec() (MigrationPathSpec, error) {
 		migrationPhase(MigrationPhaseZoneExtraction, "Phase 3: Zone Extraction", MigrationPhase3Tasks(), MigrationPhase3ExitCriteria()),
 		migrationPhase(MigrationPhaseShardingRuntime, "Phase 4: Sharding Runtime", MigrationPhase4Tasks(), MigrationPhase4ExitCriteria()),
 		migrationPhase(MigrationPhaseAVM20, "Phase 5: AVM 2.0", MigrationPhase5Tasks(), MigrationPhase5ExitCriteria()),
+		migrationPhase(MigrationPhaseIdentityPayments, "Phase 6: Identity and Payment Integration", MigrationPhase6Tasks(), MigrationPhase6ExitCriteria()),
+		migrationPhase(MigrationPhasePerformanceHardening, "Phase 7: Performance Hardening", MigrationPhase7Tasks(), MigrationPhase7ExitCriteria()),
 	})
 }
 
@@ -299,6 +353,29 @@ func MigrationPhase5Tasks() []MigrationTaskDescriptor {
 	}
 }
 
+func MigrationPhase6Tasks() []MigrationTaskDescriptor {
+	return []MigrationTaskDescriptor{
+		migrationTask(MigrationPhaseIdentityPayments, MigrationTaskIdentityProofActivation, "Activate .aet identity proofs.", "Identity Zone proof API", "domain ownership;resolver;reverse;delegation;expiry proof roots"),
+		migrationTask(MigrationPhaseIdentityPayments, MigrationTaskCrossZoneIdentityLookup, "Add cross-zone identity lookup messages.", "MsgResolveIdentity and MsgIdentityResolutionResult", "async requests;proof-required replies;receipt-backed results"),
+		migrationTask(MigrationPhaseIdentityPayments, MigrationTaskPaymentChannelSettlement, "Add payment channel settlement.", "Financial Zone payment channels", "collateral escrow;latest signed state;challenge period;settlement proof"),
+		migrationTask(MigrationPhaseIdentityPayments, MigrationTaskConditionalPaymentRouting, "Add conditional payment routing.", "conditional payment routes", "hash locks;timeouts;route commitments;linked condition settlement"),
+		migrationTask(MigrationPhaseIdentityPayments, MigrationTaskPaymentProofAPIs, "Add payment proof APIs.", "payment proof queries", "channel;condition;route;settlement;dispute;receipt proofs"),
+		migrationTask(MigrationPhaseIdentityPayments, MigrationTaskWalletSDKIdentityPayment, "Add wallet SDK helpers for identity and payment flows.", "wallet SDK", "send-by-name;invoke-by-name;proof-bound payment routes"),
+	}
+}
+
+func MigrationPhase7Tasks() []MigrationTaskDescriptor {
+	return []MigrationTaskDescriptor{
+		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskBlockSTMZoneShardWorkloads, "Enable BlockSTM workloads for zone and shard batches.", "BlockSTM execution planner", "disjoint zone and shard batches;conflict keys;parallel execution metrics"),
+		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskConflictProfiling, "Add conflict profiling.", "conflict profiler", "state access conflicts;hot object counters;committed conflict profile root"),
+		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskStoreV2Benchmarks, "Add Store v2 benchmarks.", "Store v2 benchmark suite", "balance;identity;contract;message;payment;DEX;proof generation benchmarks"),
+		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskMempoolLanes, "Add mempool lanes.", "zonemempool lanes", "zone lanes;shard sublanes;message class priority;DoS limits"),
+		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskCongestionAwareRouting, "Add congestion-aware routing.", "routing cost model", "committed congestion metrics;deterministic scoring;bounded fairness"),
+		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskAdaptiveSyncRecoveryTests, "Add AdaptiveSync recovery tests.", "state sync recovery", "zone and shard commitment replay;root snapshot recovery"),
+		migrationTask(MigrationPhasePerformanceHardening, MigrationTaskMultiZoneLoadSimulation, "Add load simulation for multi-zone traffic.", "load simulator", "cross-zone messages;payments;identity;contracts;congestion and expiry traffic"),
+	}
+}
+
 func MigrationPhase0ExitCriteria() []MigrationExitCriterion {
 	return []MigrationExitCriterion{
 		migrationExitCriterion(MigrationPhaseBaselineHardening, MigrationExitSingleChainReproducibleExport, "Existing single-chain state is reproducible and exportable.", "state export manifest and genesis import hashes match after replay"),
@@ -347,6 +424,22 @@ func MigrationPhase5ExitCriteria() []MigrationExitCriterion {
 	}
 }
 
+func MigrationPhase6ExitCriteria() []MigrationExitCriterion {
+	return []MigrationExitCriterion{
+		migrationExitCriterion(MigrationPhaseIdentityPayments, MigrationExitNamesResolveProofBacked, "Names resolve through proof-backed Identity Zone data.", "resolver replies include Identity Zone proof roots or committed identity receipts"),
+		migrationExitCriterion(MigrationPhaseIdentityPayments, MigrationExitPaymentsSettleTrustlessly, "Payments settle trustlessly through Financial Zone.", "payment channels, conditions, disputes, refunds, and settlement proofs bind to Financial Zone roots"),
+		migrationExitCriterion(MigrationPhaseIdentityPayments, MigrationExitContractsUseIdentityPaymentsAsync, "Contracts can use identity and payment messages asynchronously.", "AVM contracts emit identity lookup and payment route messages and consume receipt-backed replies"),
+	}
+}
+
+func MigrationPhase7ExitCriteria() []MigrationExitCriterion {
+	return []MigrationExitCriterion{
+		migrationExitCriterion(MigrationPhasePerformanceHardening, MigrationExitParallelismScales, "Independent zone and shard execution scales with available parallelism.", "BlockSTM and load simulation metrics show disjoint batches scaling without global write locks"),
+		migrationExitCriterion(MigrationPhasePerformanceHardening, MigrationExitStateSyncRecoversCommitments, "State sync can recover zone and shard commitments.", "AdaptiveSync recovery tests replay root snapshots, zone roots, shard roots, and proof registry metadata"),
+		migrationExitCriterion(MigrationPhasePerformanceHardening, MigrationExitRoutingDeterministicCongestion, "Routing remains deterministic under congestion.", "routing decisions use committed congestion metrics and deterministic tie-breaks under load"),
+	}
+}
+
 func (s MigrationPathSpec) Normalize() MigrationPathSpec {
 	if s.Version == 0 {
 		s.Version = MigrationPathSpecVersion
@@ -361,8 +454,8 @@ func (s MigrationPathSpec) ValidateFormat() error {
 	if s.Version != MigrationPathSpecVersion {
 		return fmt.Errorf("aethercore migration path spec version must be %d", MigrationPathSpecVersion)
 	}
-	if len(s.Phases) != 6 {
-		return errors.New("aethercore migration path spec requires phases 0 through 5")
+	if len(s.Phases) != 8 {
+		return errors.New("aethercore migration path spec requires phases 0 through 7")
 	}
 	seen := make(map[MigrationPhaseID]struct{}, len(s.Phases))
 	var previous MigrationPhaseID
@@ -396,6 +489,12 @@ func (s MigrationPathSpec) ValidateFormat() error {
 	}
 	if _, found := seen[MigrationPhaseAVM20]; !found {
 		return errors.New("aethercore migration path missing phase 5 AVM 2.0")
+	}
+	if _, found := seen[MigrationPhaseIdentityPayments]; !found {
+		return errors.New("aethercore migration path missing phase 6 identity and payment integration")
+	}
+	if _, found := seen[MigrationPhasePerformanceHardening]; !found {
+		return errors.New("aethercore migration path missing phase 7 performance hardening")
 	}
 	if s.Root != "" {
 		if err := ValidateHash("aethercore migration path spec root", s.Root); err != nil {
@@ -968,6 +1067,130 @@ func (e AVM20MigrationEvidence) Validate() error {
 	return nil
 }
 
+func (e IdentityPaymentIntegrationEvidence) Normalize() IdentityPaymentIntegrationEvidence {
+	e.IdentityProofRoot = normalizePerformanceHash(e.IdentityProofRoot)
+	e.IdentityLookupMessageRoot = normalizePerformanceHash(e.IdentityLookupMessageRoot)
+	e.PaymentChannelSettlementRoot = normalizePerformanceHash(e.PaymentChannelSettlementRoot)
+	e.ConditionalPaymentRouteRoot = normalizePerformanceHash(e.ConditionalPaymentRouteRoot)
+	e.PaymentProofAPIRoot = normalizePerformanceHash(e.PaymentProofAPIRoot)
+	e.WalletSDKHelperRoot = normalizePerformanceHash(e.WalletSDKHelperRoot)
+	e.EvidenceHash = normalizePerformanceHash(e.EvidenceHash)
+	return e
+}
+
+func (e IdentityPaymentIntegrationEvidence) ValidateFormat() error {
+	e = e.Normalize()
+	hashes := []struct {
+		name  string
+		value string
+	}{
+		{"aethercore migration identity proof root", e.IdentityProofRoot},
+		{"aethercore migration identity lookup message root", e.IdentityLookupMessageRoot},
+		{"aethercore migration payment channel settlement root", e.PaymentChannelSettlementRoot},
+		{"aethercore migration conditional payment route root", e.ConditionalPaymentRouteRoot},
+		{"aethercore migration payment proof API root", e.PaymentProofAPIRoot},
+		{"aethercore migration wallet SDK helper root", e.WalletSDKHelperRoot},
+	}
+	for _, item := range hashes {
+		if err := ValidateHash(item.name, item.value); err != nil {
+			return err
+		}
+	}
+	if !e.ProofBackedNames {
+		return errors.New("aethercore migration identity/payment evidence requires proof-backed name resolution")
+	}
+	if !e.TrustlessPayments {
+		return errors.New("aethercore migration identity/payment evidence requires trustless Financial Zone settlement")
+	}
+	if !e.AsyncContractMessages {
+		return errors.New("aethercore migration identity/payment evidence requires async contract identity and payment messages")
+	}
+	if e.EvidenceHash != "" {
+		if err := ValidateHash("aethercore migration identity/payment evidence hash", e.EvidenceHash); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (e IdentityPaymentIntegrationEvidence) Validate() error {
+	e = e.Normalize()
+	if err := e.ValidateFormat(); err != nil {
+		return err
+	}
+	if e.EvidenceHash == "" {
+		return errors.New("aethercore migration identity/payment evidence hash is required")
+	}
+	expected := ComputeIdentityPaymentIntegrationEvidenceHash(e)
+	if e.EvidenceHash != expected {
+		return fmt.Errorf("aethercore migration identity/payment evidence hash mismatch: expected %s", expected)
+	}
+	return nil
+}
+
+func (e PerformanceHardeningMigrationEvidence) Normalize() PerformanceHardeningMigrationEvidence {
+	e.BlockSTMWorkloadRoot = normalizePerformanceHash(e.BlockSTMWorkloadRoot)
+	e.ConflictProfileRoot = normalizePerformanceHash(e.ConflictProfileRoot)
+	e.StoreV2BenchmarkRoot = normalizePerformanceHash(e.StoreV2BenchmarkRoot)
+	e.MempoolLaneRoot = normalizePerformanceHash(e.MempoolLaneRoot)
+	e.CongestionRoutingRoot = normalizePerformanceHash(e.CongestionRoutingRoot)
+	e.AdaptiveSyncRecoveryRoot = normalizePerformanceHash(e.AdaptiveSyncRecoveryRoot)
+	e.LoadSimulationRoot = normalizePerformanceHash(e.LoadSimulationRoot)
+	e.EvidenceHash = normalizePerformanceHash(e.EvidenceHash)
+	return e
+}
+
+func (e PerformanceHardeningMigrationEvidence) ValidateFormat() error {
+	e = e.Normalize()
+	hashes := []struct {
+		name  string
+		value string
+	}{
+		{"aethercore migration BlockSTM workload root", e.BlockSTMWorkloadRoot},
+		{"aethercore migration conflict profile root", e.ConflictProfileRoot},
+		{"aethercore migration Store v2 benchmark root", e.StoreV2BenchmarkRoot},
+		{"aethercore migration mempool lane root", e.MempoolLaneRoot},
+		{"aethercore migration congestion routing root", e.CongestionRoutingRoot},
+		{"aethercore migration AdaptiveSync recovery root", e.AdaptiveSyncRecoveryRoot},
+		{"aethercore migration load simulation root", e.LoadSimulationRoot},
+	}
+	for _, item := range hashes {
+		if err := ValidateHash(item.name, item.value); err != nil {
+			return err
+		}
+	}
+	if !e.ParallelismScales {
+		return errors.New("aethercore migration performance evidence requires parallelism scaling")
+	}
+	if !e.StateSyncRecoversRoots {
+		return errors.New("aethercore migration performance evidence requires state sync commitment recovery")
+	}
+	if !e.CongestionDeterministic {
+		return errors.New("aethercore migration performance evidence requires deterministic congestion routing")
+	}
+	if e.EvidenceHash != "" {
+		if err := ValidateHash("aethercore migration performance evidence hash", e.EvidenceHash); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (e PerformanceHardeningMigrationEvidence) Validate() error {
+	e = e.Normalize()
+	if err := e.ValidateFormat(); err != nil {
+		return err
+	}
+	if e.EvidenceHash == "" {
+		return errors.New("aethercore migration performance evidence hash is required")
+	}
+	expected := ComputePerformanceHardeningMigrationEvidenceHash(e)
+	if e.EvidenceHash != expected {
+		return fmt.Errorf("aethercore migration performance evidence hash mismatch: expected %s", expected)
+	}
+	return nil
+}
+
 func ValidateMigrationPathCoverage() error {
 	spec, err := DefaultMigrationPathSpec()
 	if err != nil {
@@ -1024,6 +1247,23 @@ func ValidateMigrationPathCoverage() error {
 			MigrationTaskProofVerificationSyscalls,
 			MigrationTaskABIRegistry,
 		},
+		MigrationPhaseIdentityPayments: {
+			MigrationTaskIdentityProofActivation,
+			MigrationTaskCrossZoneIdentityLookup,
+			MigrationTaskPaymentChannelSettlement,
+			MigrationTaskConditionalPaymentRouting,
+			MigrationTaskPaymentProofAPIs,
+			MigrationTaskWalletSDKIdentityPayment,
+		},
+		MigrationPhasePerformanceHardening: {
+			MigrationTaskBlockSTMZoneShardWorkloads,
+			MigrationTaskConflictProfiling,
+			MigrationTaskStoreV2Benchmarks,
+			MigrationTaskMempoolLanes,
+			MigrationTaskCongestionAwareRouting,
+			MigrationTaskAdaptiveSyncRecoveryTests,
+			MigrationTaskMultiZoneLoadSimulation,
+		},
 	}
 	requiredCriteria := map[MigrationPhaseID][]MigrationExitCriterionID{
 		MigrationPhaseBaselineHardening: {
@@ -1055,6 +1295,16 @@ func ValidateMigrationPathCoverage() error {
 			MigrationExitContractZoneDeterministic,
 			MigrationExitContractsEmitAsyncMessages,
 			MigrationExitContractStateProofsAvailable,
+		},
+		MigrationPhaseIdentityPayments: {
+			MigrationExitNamesResolveProofBacked,
+			MigrationExitPaymentsSettleTrustlessly,
+			MigrationExitContractsUseIdentityPaymentsAsync,
+		},
+		MigrationPhasePerformanceHardening: {
+			MigrationExitParallelismScales,
+			MigrationExitStateSyncRecoversCommitments,
+			MigrationExitRoutingDeterministicCongestion,
 		},
 	}
 	phaseByID := make(map[MigrationPhaseID]MigrationPhase, len(spec.Phases))
@@ -1095,7 +1345,7 @@ func ValidateMigrationPathCoverage() error {
 }
 
 func IsMigrationPhaseID(id MigrationPhaseID) bool {
-	return id == MigrationPhaseBaselineHardening || id == MigrationPhaseCoreCommitments || id == MigrationPhaseMessageBus || id == MigrationPhaseZoneExtraction || id == MigrationPhaseShardingRuntime || id == MigrationPhaseAVM20
+	return id == MigrationPhaseBaselineHardening || id == MigrationPhaseCoreCommitments || id == MigrationPhaseMessageBus || id == MigrationPhaseZoneExtraction || id == MigrationPhaseShardingRuntime || id == MigrationPhaseAVM20 || id == MigrationPhaseIdentityPayments || id == MigrationPhasePerformanceHardening
 }
 
 func IsMigrationTaskID(phaseID MigrationPhaseID, taskID MigrationTaskID) bool {
@@ -1264,6 +1514,37 @@ func ComputeAVM20MigrationEvidenceHash(e AVM20MigrationEvidence) string {
 	})
 }
 
+func ComputeIdentityPaymentIntegrationEvidenceHash(e IdentityPaymentIntegrationEvidence) string {
+	e = e.Normalize()
+	return hashRoot("aetheris-aek-migration-identity-payment-evidence-v1", func(w byteWriter) {
+		writePart(w, e.IdentityProofRoot)
+		writePart(w, e.IdentityLookupMessageRoot)
+		writePart(w, e.PaymentChannelSettlementRoot)
+		writePart(w, e.ConditionalPaymentRouteRoot)
+		writePart(w, e.PaymentProofAPIRoot)
+		writePart(w, e.WalletSDKHelperRoot)
+		writeBoolPart(w, e.ProofBackedNames)
+		writeBoolPart(w, e.TrustlessPayments)
+		writeBoolPart(w, e.AsyncContractMessages)
+	})
+}
+
+func ComputePerformanceHardeningMigrationEvidenceHash(e PerformanceHardeningMigrationEvidence) string {
+	e = e.Normalize()
+	return hashRoot("aetheris-aek-migration-performance-hardening-evidence-v1", func(w byteWriter) {
+		writePart(w, e.BlockSTMWorkloadRoot)
+		writePart(w, e.ConflictProfileRoot)
+		writePart(w, e.StoreV2BenchmarkRoot)
+		writePart(w, e.MempoolLaneRoot)
+		writePart(w, e.CongestionRoutingRoot)
+		writePart(w, e.AdaptiveSyncRecoveryRoot)
+		writePart(w, e.LoadSimulationRoot)
+		writeBoolPart(w, e.ParallelismScales)
+		writeBoolPart(w, e.StateSyncRecoversRoots)
+		writeBoolPart(w, e.CongestionDeterministic)
+	})
+}
+
 func migrationPhase(phaseID MigrationPhaseID, title string, tasks []MigrationTaskDescriptor, criteria []MigrationExitCriterion) MigrationPhase {
 	phase := MigrationPhase{
 		PhaseID:      phaseID,
@@ -1389,6 +1670,25 @@ func phaseTasksForID(phaseID MigrationPhaseID) []MigrationTaskID {
 			MigrationTaskProofVerificationSyscalls,
 			MigrationTaskABIRegistry,
 		}
+	case MigrationPhaseIdentityPayments:
+		return []MigrationTaskID{
+			MigrationTaskIdentityProofActivation,
+			MigrationTaskCrossZoneIdentityLookup,
+			MigrationTaskPaymentChannelSettlement,
+			MigrationTaskConditionalPaymentRouting,
+			MigrationTaskPaymentProofAPIs,
+			MigrationTaskWalletSDKIdentityPayment,
+		}
+	case MigrationPhasePerformanceHardening:
+		return []MigrationTaskID{
+			MigrationTaskBlockSTMZoneShardWorkloads,
+			MigrationTaskConflictProfiling,
+			MigrationTaskStoreV2Benchmarks,
+			MigrationTaskMempoolLanes,
+			MigrationTaskCongestionAwareRouting,
+			MigrationTaskAdaptiveSyncRecoveryTests,
+			MigrationTaskMultiZoneLoadSimulation,
+		}
 	default:
 		return nil
 	}
@@ -1431,6 +1731,18 @@ func phaseExitCriteriaForID(phaseID MigrationPhaseID) []MigrationExitCriterionID
 			MigrationExitContractZoneDeterministic,
 			MigrationExitContractsEmitAsyncMessages,
 			MigrationExitContractStateProofsAvailable,
+		}
+	case MigrationPhaseIdentityPayments:
+		return []MigrationExitCriterionID{
+			MigrationExitNamesResolveProofBacked,
+			MigrationExitPaymentsSettleTrustlessly,
+			MigrationExitContractsUseIdentityPaymentsAsync,
+		}
+	case MigrationPhasePerformanceHardening:
+		return []MigrationExitCriterionID{
+			MigrationExitParallelismScales,
+			MigrationExitStateSyncRecoversCommitments,
+			MigrationExitRoutingDeterministicCongestion,
 		}
 	default:
 		return nil

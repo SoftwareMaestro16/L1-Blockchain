@@ -2,7 +2,7 @@ package types
 
 import "testing"
 
-func TestMigrationPathSpecCoversPhaseZeroThroughFive(t *testing.T) {
+func TestMigrationPathSpecCoversPhaseZeroThroughSeven(t *testing.T) {
 	spec, err := DefaultMigrationPathSpec()
 	if err != nil {
 		t.Fatalf("default migration path spec: %v", err)
@@ -13,8 +13,8 @@ func TestMigrationPathSpecCoversPhaseZeroThroughFive(t *testing.T) {
 	if err := ValidateMigrationPathCoverage(); err != nil {
 		t.Fatalf("migration path coverage: %v", err)
 	}
-	if len(spec.Phases) != 6 {
-		t.Fatalf("expected 6 phases, got %d", len(spec.Phases))
+	if len(spec.Phases) != 8 {
+		t.Fatalf("expected 8 phases, got %d", len(spec.Phases))
 	}
 
 	phaseByID := map[MigrationPhaseID]MigrationPhase{}
@@ -69,6 +69,22 @@ func TestMigrationPathSpecCoversPhaseZeroThroughFive(t *testing.T) {
 	if len(phase5.ExitCriteria) != 3 {
 		t.Fatalf("expected phase 5 to cover 3 exit criteria, got %d", len(phase5.ExitCriteria))
 	}
+
+	phase6 := phaseByID[MigrationPhaseIdentityPayments]
+	if len(phase6.Tasks) != 6 {
+		t.Fatalf("expected phase 6 to cover 6 tasks, got %d", len(phase6.Tasks))
+	}
+	if len(phase6.ExitCriteria) != 3 {
+		t.Fatalf("expected phase 6 to cover 3 exit criteria, got %d", len(phase6.ExitCriteria))
+	}
+
+	phase7 := phaseByID[MigrationPhasePerformanceHardening]
+	if len(phase7.Tasks) != 7 {
+		t.Fatalf("expected phase 7 to cover 7 tasks, got %d", len(phase7.Tasks))
+	}
+	if len(phase7.ExitCriteria) != 3 {
+		t.Fatalf("expected phase 7 to cover 3 exit criteria, got %d", len(phase7.ExitCriteria))
+	}
 }
 
 func TestMigrationPathSpecRootCanonicalAndRejectsTamper(t *testing.T) {
@@ -80,8 +96,10 @@ func TestMigrationPathSpecRootCanonicalAndRejectsTamper(t *testing.T) {
 	reordered, err := BuildMigrationPathSpec([]MigrationPhase{
 		migrationPhase(MigrationPhaseAVM20, "Phase 5: AVM 2.0", MigrationPhase5Tasks(), MigrationPhase5ExitCriteria()),
 		migrationPhase(MigrationPhaseZoneExtraction, "Phase 3: Zone Extraction", MigrationPhase3Tasks(), MigrationPhase3ExitCriteria()),
+		migrationPhase(MigrationPhasePerformanceHardening, "Phase 7: Performance Hardening", MigrationPhase7Tasks(), MigrationPhase7ExitCriteria()),
 		migrationPhase(MigrationPhaseBaselineHardening, "Phase 0: Baseline Hardening", MigrationPhase0Tasks(), MigrationPhase0ExitCriteria()),
 		migrationPhase(MigrationPhaseShardingRuntime, "Phase 4: Sharding Runtime", MigrationPhase4Tasks(), MigrationPhase4ExitCriteria()),
+		migrationPhase(MigrationPhaseIdentityPayments, "Phase 6: Identity and Payment Integration", MigrationPhase6Tasks(), MigrationPhase6ExitCriteria()),
 		migrationPhase(MigrationPhaseMessageBus, "Phase 2: Message Bus", MigrationPhase2Tasks(), MigrationPhase2ExitCriteria()),
 		migrationPhase(MigrationPhaseCoreCommitments, "Phase 1: Core Commitments", MigrationPhase1Tasks(), MigrationPhase1ExitCriteria()),
 	})
@@ -308,6 +326,74 @@ func TestAVM20MigrationEvidenceRequiresDeterministicContractsMessagesAndProofs(t
 	}
 }
 
+func TestIdentityPaymentIntegrationEvidenceRequiresProofNamesSettlementAndAsyncMessages(t *testing.T) {
+	evidence := validIdentityPaymentIntegrationEvidence()
+	if err := evidence.Validate(); err != nil {
+		t.Fatalf("identity/payment evidence should validate: %v", err)
+	}
+
+	noProofNames := evidence
+	noProofNames.ProofBackedNames = false
+	noProofNames.EvidenceHash = ComputeIdentityPaymentIntegrationEvidenceHash(noProofNames)
+	if err := noProofNames.Validate(); err == nil {
+		t.Fatal("expected missing proof-backed names evidence to fail")
+	}
+
+	noTrustlessPayments := evidence
+	noTrustlessPayments.TrustlessPayments = false
+	noTrustlessPayments.EvidenceHash = ComputeIdentityPaymentIntegrationEvidenceHash(noTrustlessPayments)
+	if err := noTrustlessPayments.Validate(); err == nil {
+		t.Fatal("expected missing trustless payment settlement evidence to fail")
+	}
+
+	noAsyncMessages := evidence
+	noAsyncMessages.AsyncContractMessages = false
+	noAsyncMessages.EvidenceHash = ComputeIdentityPaymentIntegrationEvidenceHash(noAsyncMessages)
+	if err := noAsyncMessages.Validate(); err == nil {
+		t.Fatal("expected missing async contract identity/payment message evidence to fail")
+	}
+
+	tamperedHash := evidence
+	tamperedHash.EvidenceHash = hashParts("different identity payment evidence")
+	if err := tamperedHash.Validate(); err == nil {
+		t.Fatal("expected tampered identity/payment evidence hash to fail")
+	}
+}
+
+func TestPerformanceHardeningMigrationEvidenceRequiresScalingSyncAndCongestionDeterminism(t *testing.T) {
+	evidence := validPerformanceHardeningMigrationEvidence()
+	if err := evidence.Validate(); err != nil {
+		t.Fatalf("performance evidence should validate: %v", err)
+	}
+
+	noScaling := evidence
+	noScaling.ParallelismScales = false
+	noScaling.EvidenceHash = ComputePerformanceHardeningMigrationEvidenceHash(noScaling)
+	if err := noScaling.Validate(); err == nil {
+		t.Fatal("expected missing parallelism scaling evidence to fail")
+	}
+
+	noRecovery := evidence
+	noRecovery.StateSyncRecoversRoots = false
+	noRecovery.EvidenceHash = ComputePerformanceHardeningMigrationEvidenceHash(noRecovery)
+	if err := noRecovery.Validate(); err == nil {
+		t.Fatal("expected missing state sync recovery evidence to fail")
+	}
+
+	nondeterministicRouting := evidence
+	nondeterministicRouting.CongestionDeterministic = false
+	nondeterministicRouting.EvidenceHash = ComputePerformanceHardeningMigrationEvidenceHash(nondeterministicRouting)
+	if err := nondeterministicRouting.Validate(); err == nil {
+		t.Fatal("expected non-deterministic congestion routing evidence to fail")
+	}
+
+	tamperedHash := evidence
+	tamperedHash.EvidenceHash = hashParts("different performance evidence")
+	if err := tamperedHash.Validate(); err == nil {
+		t.Fatal("expected tampered performance evidence hash to fail")
+	}
+}
+
 func validBaselineHardeningEvidence() BaselineHardeningEvidence {
 	evidence := BaselineHardeningEvidence{
 		ModuleBoundaryDocsRoot:   hashParts("module boundary docs"),
@@ -411,5 +497,38 @@ func validAVM20MigrationEvidence() AVM20MigrationEvidence {
 		ContractProofsAvailable: true,
 	}
 	evidence.EvidenceHash = ComputeAVM20MigrationEvidenceHash(evidence)
+	return evidence
+}
+
+func validIdentityPaymentIntegrationEvidence() IdentityPaymentIntegrationEvidence {
+	evidence := IdentityPaymentIntegrationEvidence{
+		IdentityProofRoot:            hashParts("identity proof activation"),
+		IdentityLookupMessageRoot:    hashParts("cross zone identity lookup messages"),
+		PaymentChannelSettlementRoot: hashParts("payment channel settlement"),
+		ConditionalPaymentRouteRoot:  hashParts("conditional payment routing"),
+		PaymentProofAPIRoot:          hashParts("payment proof APIs"),
+		WalletSDKHelperRoot:          hashParts("wallet SDK identity payment helpers"),
+		ProofBackedNames:             true,
+		TrustlessPayments:            true,
+		AsyncContractMessages:        true,
+	}
+	evidence.EvidenceHash = ComputeIdentityPaymentIntegrationEvidenceHash(evidence)
+	return evidence
+}
+
+func validPerformanceHardeningMigrationEvidence() PerformanceHardeningMigrationEvidence {
+	evidence := PerformanceHardeningMigrationEvidence{
+		BlockSTMWorkloadRoot:     hashParts("BlockSTM zone shard workloads"),
+		ConflictProfileRoot:      hashParts("conflict profiling"),
+		StoreV2BenchmarkRoot:     hashParts("Store v2 benchmarks"),
+		MempoolLaneRoot:          hashParts("mempool lanes"),
+		CongestionRoutingRoot:    hashParts("congestion aware routing"),
+		AdaptiveSyncRecoveryRoot: hashParts("AdaptiveSync recovery tests"),
+		LoadSimulationRoot:       hashParts("multi zone traffic load simulation"),
+		ParallelismScales:        true,
+		StateSyncRecoversRoots:   true,
+		CongestionDeterministic:  true,
+	}
+	evidence.EvidenceHash = ComputePerformanceHardeningMigrationEvidenceHash(evidence)
 	return evidence
 }
