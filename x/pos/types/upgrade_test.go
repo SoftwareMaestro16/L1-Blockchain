@@ -560,6 +560,88 @@ func TestPosRequiredTestCoverageManifestRejectsMissingDuplicateAndInvalidCoverag
 	require.ErrorContains(t, rootMismatch.Validate(compatibility, migration), "root mismatch")
 }
 
+func TestPosObservabilityManifestCoversMetricsAndEvents(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	manifest := DefaultPosObservabilityManifest()
+	require.NoError(t, manifest.Validate(compatibility))
+	require.Equal(t, ComputePosObservabilityRoot(manifest), manifest.Root)
+	require.Len(t, manifest.Metrics, len(RequiredPosMetricNames()))
+	require.Len(t, manifest.Events, len(RequiredPosEventNames()))
+
+	for _, name := range RequiredPosMetricNames() {
+		metric, found := PosMetricByName(manifest, name)
+		require.True(t, found, name)
+		require.NotEmpty(t, metric.Labels)
+	}
+	for _, name := range RequiredPosEventNames() {
+		event, found := PosEventByName(manifest, name)
+		require.True(t, found, name)
+		require.NotEmpty(t, event.Attributes)
+	}
+
+	epoch, found := PosMetricByName(manifest, "current_epoch")
+	require.True(t, found)
+	require.Equal(t, "epoch", epoch.ModuleName)
+	require.Equal(t, "gauge", epoch.MetricType)
+	require.Equal(t, "latest", epoch.Aggregation)
+
+	multiplier, found := PosMetricByName(manifest, "performance_reward_multiplier_distribution")
+	require.True(t, found)
+	require.Equal(t, "performance", multiplier.ModuleName)
+	require.Equal(t, "histogram", multiplier.MetricType)
+	require.Contains(t, multiplier.Labels, "role")
+
+	slashed, found := PosEventByName(manifest, "validator_slashed")
+	require.True(t, found)
+	require.Equal(t, "slashing", slashed.ModuleName)
+	require.Contains(t, slashed.Attributes, "severity")
+	require.Contains(t, slashed.Attributes, "slash_amount")
+
+	risk, found := PosEventByName(manifest, "delegation_risk_profile_updated")
+	require.True(t, found)
+	require.Equal(t, "delegation_market", risk.ModuleName)
+	require.Contains(t, risk.Attributes, "activation_epoch")
+}
+
+func TestPosObservabilityManifestRejectsMissingDuplicateAndInvalidSpecs(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	manifest := DefaultPosObservabilityManifest()
+
+	missingMetric := manifest
+	missingMetric.Metrics = append([]PosMetricSpec{}, manifest.Metrics...)
+	missingMetric.Metrics = missingMetric.Metrics[1:]
+	missingMetric.Root = ComputePosObservabilityRoot(missingMetric)
+	require.ErrorContains(t, missingMetric.Validate(compatibility), "current_epoch")
+
+	duplicateEvent := manifest
+	duplicateEvent.Events = append([]PosEventSpec{}, manifest.Events...)
+	duplicateEvent.Events = append(duplicateEvent.Events, manifest.Events[0])
+	duplicateEvent.Root = ComputePosObservabilityRoot(duplicateEvent)
+	require.ErrorContains(t, duplicateEvent.Validate(compatibility), "duplicate pos event")
+
+	unknownModule := manifest
+	unknownModule.Metrics = append([]PosMetricSpec{}, manifest.Metrics...)
+	unknownModule.Metrics[0].ModuleName = "unknown_module"
+	unknownModule.Root = ComputePosObservabilityRoot(unknownModule)
+	require.ErrorContains(t, unknownModule.Validate(compatibility), "unknown module")
+
+	badMetricType := manifest
+	badMetricType.Metrics = append([]PosMetricSpec{}, manifest.Metrics...)
+	badMetricType.Metrics[0].MetricType = "summary"
+	badMetricType.Root = ComputePosObservabilityRoot(badMetricType)
+	require.ErrorContains(t, badMetricType.Validate(compatibility), "invalid")
+
+	missingAttributes := manifest
+	missingAttributes.Events = append([]PosEventSpec{}, manifest.Events...)
+	missingAttributes.Events[0].Attributes = nil
+	missingAttributes.Root = ComputePosObservabilityRoot(missingAttributes)
+	require.ErrorContains(t, missingAttributes.Validate(compatibility), "attributes")
+
+	rootMismatch := manifest
+	rootMismatch.Root = PosEmptyRootHash
+	require.ErrorContains(t, rootMismatch.Validate(compatibility), "root mismatch")
+}
+
 func TestKeeperIntegrationManifestCoversSDKKeepersHooksAndExportImport(t *testing.T) {
 	compatibility := DefaultCosmosSDKCompatibilityManifest()
 	boundaries := DefaultPoSModuleBoundaryManifest()

@@ -1034,6 +1034,26 @@ type PosRequiredTestCoverageManifest struct {
 	Root             string
 }
 
+type PosMetricSpec struct {
+	Name        string
+	ModuleName  string
+	MetricType  string
+	Aggregation string
+	Labels      []string
+}
+
+type PosEventSpec struct {
+	Name       string
+	ModuleName string
+	Attributes []string
+}
+
+type PosObservabilityManifest struct {
+	Metrics []PosMetricSpec
+	Events  []PosEventSpec
+	Root    string
+}
+
 type KeeperIntegrationManifest struct {
 	KeeperInterfaces      []KeeperInterfaceSpec
 	StakingLifecycleHooks []KeeperHookSpec
@@ -2401,6 +2421,249 @@ func posTestCoverageByName(specs []PosTestCoverageSpec, name string) (PosTestCov
 		}
 	}
 	return PosTestCoverageSpec{}, false
+}
+
+func DefaultPosObservabilityManifest() PosObservabilityManifest {
+	manifest := PosObservabilityManifest{
+		Metrics: []PosMetricSpec{
+			{Name: "current_epoch", ModuleName: "epoch", MetricType: "gauge", Aggregation: "latest", Labels: []string{"chain_id"}},
+			{Name: "current_epoch_phase", ModuleName: "epoch", MetricType: "gauge", Aggregation: "latest", Labels: []string{"chain_id", "phase"}},
+			{Name: "active_validator_count", ModuleName: "staking", MetricType: "gauge", Aggregation: "latest", Labels: []string{"chain_id"}},
+			{Name: "average_validator_score", ModuleName: "validator_economy", MetricType: "gauge", Aggregation: "average", Labels: []string{"chain_id", "epoch_id"}},
+			{Name: "effective_stake_total", ModuleName: "validator_economy", MetricType: "gauge", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id"}},
+			{Name: "raw_stake_total", ModuleName: "staking", MetricType: "gauge", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id"}},
+			{Name: "saturated_stake_amount", ModuleName: "validator_economy", MetricType: "gauge", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id"}},
+			{Name: "top_n_voting_power_concentration", ModuleName: "security_metrics", MetricType: "gauge", Aggregation: "latest", Labels: []string{"chain_id", "top_n"}},
+			{Name: "task_groups_active", ModuleName: "taskgroups", MetricType: "gauge", Aggregation: "latest", Labels: []string{"chain_id", "epoch_id", "workload_type"}},
+			{Name: "average_task_completion_rate", ModuleName: "performance", MetricType: "gauge", Aggregation: "average", Labels: []string{"chain_id", "epoch_id", "role"}},
+			{Name: "evidence_submitted", ModuleName: "evidence", MetricType: "counter", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "evidence_type"}},
+			{Name: "evidence_accepted", ModuleName: "evidence", MetricType: "counter", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "evidence_type"}},
+			{Name: "evidence_rejected", ModuleName: "evidence", MetricType: "counter", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "evidence_type"}},
+			{Name: "slashed_amount_by_severity", ModuleName: "slashing", MetricType: "counter", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "severity"}},
+			{Name: "reporter_rewards_paid", ModuleName: "evidence", MetricType: "counter", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "reporter_type"}},
+			{Name: "performance_reward_multiplier_distribution", ModuleName: "performance", MetricType: "histogram", Aggregation: "distribution", Labels: []string{"chain_id", "epoch_id", "role"}},
+			{Name: "unbonding_slash_exposure", ModuleName: "staking", MetricType: "gauge", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "validator"}},
+		},
+		Events: []PosEventSpec{
+			{Name: "epoch_started", ModuleName: "epoch", Attributes: []string{"epoch_id", "start_height", "seed"}},
+			{Name: "epoch_phase_advanced", ModuleName: "epoch", Attributes: []string{"epoch_id", "from_phase", "to_phase"}},
+			{Name: "epoch_settled", ModuleName: "epoch", Attributes: []string{"epoch_id", "reward_root", "slash_root"}},
+			{Name: "validator_score_updated", ModuleName: "validator_economy", Attributes: []string{"epoch_id", "validator", "validator_score"}},
+			{Name: "validator_saturated", ModuleName: "validator_economy", Attributes: []string{"epoch_id", "validator", "saturated_stake_amount"}},
+			{Name: "task_group_assigned", ModuleName: "taskgroups", Attributes: []string{"epoch_id", "task_group_id", "workload_id"}},
+			{Name: "proposer_selected", ModuleName: "taskgroups", Attributes: []string{"epoch_id", "slot", "task_group_id", "validator"}},
+			{Name: "verification_receipt_submitted", ModuleName: "taskgroups", Attributes: []string{"epoch_id", "task_group_id", "validator", "result"}},
+			{Name: "evidence_submitted", ModuleName: "evidence", Attributes: []string{"evidence_id", "evidence_type", "accused_validator", "reporter"}},
+			{Name: "evidence_accepted", ModuleName: "evidence", Attributes: []string{"evidence_id", "penalty_id", "decision_height"}},
+			{Name: "evidence_rejected", ModuleName: "evidence", Attributes: []string{"evidence_id", "decision_height", "deposit_routing"}},
+			{Name: "validator_slashed", ModuleName: "slashing", Attributes: []string{"penalty_id", "validator", "severity", "slash_amount"}},
+			{Name: "reporter_reward_paid", ModuleName: "evidence", Attributes: []string{"evidence_id", "reporter", "reward_amount"}},
+			{Name: "performance_record_finalized", ModuleName: "performance", Attributes: []string{"epoch_id", "operator", "role", "reward_multiplier"}},
+			{Name: "delegation_risk_profile_updated", ModuleName: "delegation_market", Attributes: []string{"delegator", "validator", "activation_epoch"}},
+		},
+	}
+	manifest.Root = ComputePosObservabilityRoot(manifest)
+	return manifest
+}
+
+func RequiredPosMetricNames() []string {
+	return []string{
+		"current_epoch",
+		"current_epoch_phase",
+		"active_validator_count",
+		"average_validator_score",
+		"effective_stake_total",
+		"raw_stake_total",
+		"saturated_stake_amount",
+		"top_n_voting_power_concentration",
+		"task_groups_active",
+		"average_task_completion_rate",
+		"evidence_submitted",
+		"evidence_accepted",
+		"evidence_rejected",
+		"slashed_amount_by_severity",
+		"reporter_rewards_paid",
+		"performance_reward_multiplier_distribution",
+		"unbonding_slash_exposure",
+	}
+}
+
+func RequiredPosEventNames() []string {
+	return []string{
+		"epoch_started",
+		"epoch_phase_advanced",
+		"epoch_settled",
+		"validator_score_updated",
+		"validator_saturated",
+		"task_group_assigned",
+		"proposer_selected",
+		"verification_receipt_submitted",
+		"evidence_submitted",
+		"evidence_accepted",
+		"evidence_rejected",
+		"validator_slashed",
+		"reporter_reward_paid",
+		"performance_record_finalized",
+		"delegation_risk_profile_updated",
+	}
+}
+
+func (m PosObservabilityManifest) Validate(compatibility CosmosSDKCompatibilityManifest) error {
+	if err := compatibility.Validate(); err != nil {
+		return err
+	}
+	knownModules := knownPoSModuleNames(compatibility)
+	if err := validatePosMetricSpecs(m.Metrics, RequiredPosMetricNames(), knownModules); err != nil {
+		return err
+	}
+	if err := validatePosEventSpecs(m.Events, RequiredPosEventNames(), knownModules); err != nil {
+		return err
+	}
+	if err := validatePosHash("pos observability root", m.Root); err != nil {
+		return err
+	}
+	if expected := ComputePosObservabilityRoot(m); expected != m.Root {
+		return errors.New("pos observability root mismatch")
+	}
+	return nil
+}
+
+func validatePosMetricSpecs(specs []PosMetricSpec, required []string, knownModules map[string]struct{}) error {
+	if len(specs) == 0 {
+		return errors.New("pos metrics are required")
+	}
+	seen := make(map[string]struct{}, len(specs))
+	for _, spec := range specs {
+		if err := spec.Validate(knownModules); err != nil {
+			return err
+		}
+		if _, found := seen[spec.Name]; found {
+			return fmt.Errorf("duplicate pos metric %s", spec.Name)
+		}
+		seen[spec.Name] = struct{}{}
+	}
+	for _, name := range required {
+		if _, found := seen[name]; !found {
+			return fmt.Errorf("required pos metric %s is missing", name)
+		}
+	}
+	return nil
+}
+
+func validatePosEventSpecs(specs []PosEventSpec, required []string, knownModules map[string]struct{}) error {
+	if len(specs) == 0 {
+		return errors.New("pos events are required")
+	}
+	seen := make(map[string]struct{}, len(specs))
+	for _, spec := range specs {
+		if err := spec.Validate(knownModules); err != nil {
+			return err
+		}
+		if _, found := seen[spec.Name]; found {
+			return fmt.Errorf("duplicate pos event %s", spec.Name)
+		}
+		seen[spec.Name] = struct{}{}
+	}
+	for _, name := range required {
+		if _, found := seen[name]; !found {
+			return fmt.Errorf("required pos event %s is missing", name)
+		}
+	}
+	return nil
+}
+
+func (s PosMetricSpec) Validate(knownModules map[string]struct{}) error {
+	if err := validatePosToken("pos metric name", s.Name); err != nil {
+		return err
+	}
+	if err := validatePosToken("pos metric module", s.ModuleName); err != nil {
+		return err
+	}
+	if _, found := knownModules[s.ModuleName]; !found {
+		return fmt.Errorf("pos metric %s references unknown module %s", s.Name, s.ModuleName)
+	}
+	if err := validatePosMetricType(s.MetricType); err != nil {
+		return err
+	}
+	if err := validatePosToken("pos metric aggregation", s.Aggregation); err != nil {
+		return err
+	}
+	if len(s.Labels) == 0 {
+		return fmt.Errorf("pos metric %s must define labels", s.Name)
+	}
+	for _, label := range s.Labels {
+		if err := validatePosToken("pos metric label", label); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s PosEventSpec) Validate(knownModules map[string]struct{}) error {
+	if err := validatePosToken("pos event name", s.Name); err != nil {
+		return err
+	}
+	if err := validatePosToken("pos event module", s.ModuleName); err != nil {
+		return err
+	}
+	if _, found := knownModules[s.ModuleName]; !found {
+		return fmt.Errorf("pos event %s references unknown module %s", s.Name, s.ModuleName)
+	}
+	if len(s.Attributes) == 0 {
+		return fmt.Errorf("pos event %s must define attributes", s.Name)
+	}
+	for _, attr := range s.Attributes {
+		if err := validatePosToken("pos event attribute", attr); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validatePosMetricType(metricType string) error {
+	switch metricType {
+	case "counter", "gauge", "histogram":
+		return nil
+	default:
+		return fmt.Errorf("pos metric type %s is invalid", metricType)
+	}
+}
+
+func ComputePosObservabilityRoot(manifest PosObservabilityManifest) string {
+	return posHashRoot("aetheris-pos-observability-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(manifest.Metrics)))
+		for _, metric := range manifest.Metrics {
+			posWritePart(w, metric.Name)
+			posWritePart(w, metric.ModuleName)
+			posWritePart(w, metric.MetricType)
+			posWritePart(w, metric.Aggregation)
+			posWriteStringSlice(w, metric.Labels)
+		}
+		posWriteUint64(w, uint64(len(manifest.Events)))
+		for _, event := range manifest.Events {
+			posWritePart(w, event.Name)
+			posWritePart(w, event.ModuleName)
+			posWriteStringSlice(w, event.Attributes)
+		}
+	})
+}
+
+func PosMetricByName(manifest PosObservabilityManifest, name string) (PosMetricSpec, bool) {
+	for _, metric := range manifest.Metrics {
+		if metric.Name == name {
+			return metric, true
+		}
+	}
+	return PosMetricSpec{}, false
+}
+
+func PosEventByName(manifest PosObservabilityManifest, name string) (PosEventSpec, bool) {
+	for _, event := range manifest.Events {
+		if event.Name == name {
+			return event, true
+		}
+	}
+	return PosEventSpec{}, false
 }
 
 func DefaultKeeperIntegrationManifest() KeeperIntegrationManifest {
