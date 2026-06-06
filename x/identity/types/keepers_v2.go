@@ -221,7 +221,7 @@ func (RoutingIntegrationKeeperV2) ResolveServiceMetadata(state IdentityState, na
 		return ServiceEndpointV2{}, err
 	}
 	for _, endpoint := range record.ServiceEndpoints {
-		if endpoint.Key == serviceKey {
+		if serviceEndpointIDV2(endpoint) == serviceKey {
 			return endpoint, nil
 		}
 	}

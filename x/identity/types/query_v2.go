@@ -211,7 +211,7 @@ func (q IdentityQueryServiceV2) QueryResolveService(name string, service string)
 	}
 	record.RecordVersion = q.resolverRecordVersionForName(name, record.RecordVersion)
 	for _, endpoint := range record.ServiceEndpoints {
-		if endpoint.Key == service {
+		if serviceEndpointIDV2(endpoint) == service {
 			resp := q.ok()
 			resp.Service = &endpoint
 			resp.RecordVersion = record.RecordVersion

@@ -12,20 +12,32 @@ import (
 )
 
 const (
-	MaxUnifiedContractTargets      = 16
-	MaxUnifiedServiceEndpoints     = 16
-	MaxUnifiedInterfaceDescriptors = 16
-	MaxUnifiedExecutionHints       = 16
-	MaxUnifiedRecordKeyBytes       = 48
-	MaxUnifiedRecordValueBytes     = 128
-	MaxUnifiedEndpointBytes        = 128
-	MaxUnifiedRoutingMetadataBytes = 256
-	MaxUnifiedOwnerSignatureBytes  = 128
-	MaxContractCodeIDBytesV2       = 64
-	MaxContractEntrypointBytesV2   = 64
-	MaxRequiredFundsPolicyBytesV2  = 64
-	MaxUnifiedPayloadBytesV2       = 64 * 1024
-	MaxContractGasHintV2           = 100_000_000
+	MaxUnifiedContractTargets       = 16
+	MaxUnifiedServiceEndpoints      = 16
+	MaxUnifiedInterfaceDescriptors  = 16
+	MaxUnifiedExecutionHints        = 16
+	MaxUnifiedRecordKeyBytes        = 48
+	MaxUnifiedRecordValueBytes      = 128
+	MaxUnifiedEndpointBytes         = 128
+	MaxUnifiedRoutingMetadataBytes  = 256
+	MaxUnifiedOwnerSignatureBytes   = 128
+	MaxContractCodeIDBytesV2        = 64
+	MaxContractEntrypointBytesV2    = 64
+	MaxRequiredFundsPolicyBytesV2   = 64
+	MaxUnifiedPayloadBytesV2        = 64 * 1024
+	MaxContractGasHintV2            = 100_000_000
+	MaxServiceTypeBytesV2           = 48
+	MaxServiceTransportBytesV2      = 24
+	MaxServiceAuthPolicyBytesV2     = 48
+	MaxServiceHealthPathBytesV2     = 96
+	MaxServicePriorityV2            = 1_000
+	MaxServiceWeightV2              = 1_000_000
+	MaxInterfaceSchemaURIBytesV2    = 128
+	MaxInterfaceInlineSchemaBytesV2 = 2 * 1024
+	MaxInterfaceVersionBytesV2      = 32
+	MaxInterfaceRenderPolicyBytesV2 = 48
+	MaxInterfacePermissionBytesV2   = 48
+	MaxInterfacePermissionsV2       = 16
 
 	UnifiedResolutionSchemaVersionV2 uint64 = 1
 
@@ -47,13 +59,30 @@ type ContractTargetV2 struct {
 }
 
 type ServiceEndpointV2 struct {
-	Key      string
-	Endpoint string
+	Key                string
+	Endpoint           string
+	ServiceID          string
+	ServiceType        string
+	Transport          string
+	AuthPolicy         string
+	HealthPathOptional string
+	Priority           uint32
+	Weight             uint32
+	TTL                uint64
+	SchemaHashOptional string
 }
 
 type InterfaceDescriptorV2 struct {
-	InterfaceID string
-	Descriptor  string
+	InterfaceID              string
+	Descriptor               string
+	SchemaHash               string
+	SchemaURIOptional        string
+	SchemaInlineOptional     string
+	Version                  string
+	RenderPolicy             string
+	PermissionsRequired      []string
+	ContractTargetIDOptional string
+	ServiceIDOptional        string
 }
 
 type RoutingMetadataV2 struct {
@@ -123,18 +152,34 @@ func BuildUnifiedResolutionRecordV2(state IdentityState, name string, height uin
 	for _, entry := range view.Metadata {
 		switch {
 		case strings.HasPrefix(entry.Key, ResolverMetadataServicePrefix):
+			serviceID := strings.TrimPrefix(entry.Key, ResolverMetadataServicePrefix)
+			transport, err := serviceEndpointTransportV2(entry.Value)
+			if err != nil {
+				return UnifiedResolutionRecordV2{}, err
+			}
 			record.ServiceEndpoints = append(record.ServiceEndpoints, ServiceEndpointV2{
-				Key:      strings.TrimPrefix(entry.Key, ResolverMetadataServicePrefix),
-				Endpoint: entry.Value,
+				Key:         serviceID,
+				Endpoint:    entry.Value,
+				ServiceID:   serviceID,
+				ServiceType: "service.v1",
+				Transport:   transport,
+				AuthPolicy:  "none",
+				Priority:    100,
+				Weight:      1,
+				TTL:         ttl,
 			})
 		case strings.HasPrefix(entry.Key, ResolverMetadataInterfacePrefix):
+			interfaceID := strings.TrimPrefix(entry.Key, ResolverMetadataInterfacePrefix)
 			descriptorHash, err := InterfaceDescriptorHashV2(entry.Value)
 			if err != nil {
 				return UnifiedResolutionRecordV2{}, err
 			}
 			record.InterfaceDescriptors = append(record.InterfaceDescriptors, InterfaceDescriptorV2{
-				InterfaceID: strings.TrimPrefix(entry.Key, ResolverMetadataInterfacePrefix),
-				Descriptor:  descriptorHash,
+				InterfaceID:  interfaceID,
+				Descriptor:   descriptorHash,
+				SchemaHash:   descriptorHash,
+				Version:      "v1",
+				RenderPolicy: "wallet_confirm",
 			})
 		case isResolverRouteMetadataKey(entry.Key):
 			continue
@@ -173,7 +218,7 @@ func ValidateUnifiedResolutionRecordV2(record UnifiedResolutionRecordV2) error {
 	if err := validateContractTargetsV2(record.ContractTargets, record.InterfaceDescriptors); err != nil {
 		return err
 	}
-	if err := validateServiceEndpointsV2(record.ServiceEndpoints); err != nil {
+	if err := validateServiceEndpointsV2(record.ServiceEndpoints, record.RecordTTL); err != nil {
 		return err
 	}
 	if err := validateInterfaceDescriptorsV2(record.InterfaceDescriptors); err != nil {
@@ -386,7 +431,9 @@ func sortUnifiedResolutionRecordV2(record *UnifiedResolutionRecordV2) {
 	sort.SliceStable(record.ContractTargets, func(i, j int) bool {
 		return contractTargetIDV2(record.ContractTargets[i]) < contractTargetIDV2(record.ContractTargets[j])
 	})
-	sort.SliceStable(record.ServiceEndpoints, func(i, j int) bool { return record.ServiceEndpoints[i].Key < record.ServiceEndpoints[j].Key })
+	sort.SliceStable(record.ServiceEndpoints, func(i, j int) bool {
+		return serviceEndpointIDV2(record.ServiceEndpoints[i]) < serviceEndpointIDV2(record.ServiceEndpoints[j])
+	})
 	sort.SliceStable(record.InterfaceDescriptors, func(i, j int) bool {
 		return record.InterfaceDescriptors[i].InterfaceID < record.InterfaceDescriptors[j].InterfaceID
 	})
@@ -415,7 +462,9 @@ func validateContractTargetsV2(targets []ContractTargetV2, descriptors []Interfa
 	seen := map[string]struct{}{}
 	descriptorHashes := map[string]struct{}{}
 	for _, descriptor := range descriptors {
-		descriptorHashes[descriptor.Descriptor] = struct{}{}
+		if hash := interfaceDescriptorSchemaHashV2(descriptor); hash != "" {
+			descriptorHashes[hash] = struct{}{}
+		}
 	}
 	for i, target := range targets {
 		targetID := contractTargetIDV2(target)
@@ -506,11 +555,15 @@ func contractTargetEnabledV2(target ContractTargetV2) bool {
 	return target.Enabled
 }
 
-func validateServiceEndpointsV2(endpoints []ServiceEndpointV2) error {
+func validateServiceEndpointsV2(endpoints []ServiceEndpointV2, recordTTL uint64) error {
 	seen := map[string]struct{}{}
 	for i, endpoint := range endpoints {
-		if err := validateUnifiedRecordKey("identity v2 service endpoint key", endpoint.Key); err != nil {
+		serviceID := serviceEndpointIDV2(endpoint)
+		if err := validateUnifiedRecordKey("identity v2 service_id", serviceID); err != nil {
 			return err
+		}
+		if endpoint.Key != "" && endpoint.ServiceID != "" && endpoint.Key != endpoint.ServiceID {
+			return errors.New("identity v2 service endpoint key and service_id must match when both are set")
 		}
 		if err := validateUnifiedRecordValue("identity v2 service endpoint", endpoint.Endpoint, MaxUnifiedEndpointBytes); err != nil {
 			return err
@@ -518,11 +571,50 @@ func validateServiceEndpointsV2(endpoints []ServiceEndpointV2) error {
 		if err := validateServiceEndpointSchemeV2(endpoint.Endpoint); err != nil {
 			return err
 		}
-		if _, found := seen[endpoint.Key]; found {
-			return fmt.Errorf("duplicate identity v2 service endpoint %q", endpoint.Key)
+		if err := validateVersionedServiceTypeV2(endpoint.ServiceType); err != nil {
+			return err
 		}
-		seen[endpoint.Key] = struct{}{}
-		if i > 0 && endpoints[i-1].Key >= endpoint.Key {
+		if err := validateUnifiedRecordValue("identity v2 service transport", endpoint.Transport, MaxServiceTransportBytesV2); err != nil {
+			return err
+		}
+		if endpoint.AuthPolicy != "" {
+			if err := validateUnifiedRecordValue("identity v2 service auth_policy", endpoint.AuthPolicy, MaxServiceAuthPolicyBytesV2); err != nil {
+				return err
+			}
+		}
+		if endpoint.HealthPathOptional != "" {
+			if len(endpoint.HealthPathOptional) > MaxServiceHealthPathBytesV2 {
+				return fmt.Errorf("identity v2 service health_path_optional must not exceed %d bytes", MaxServiceHealthPathBytesV2)
+			}
+			if !strings.HasPrefix(endpoint.HealthPathOptional, "/") {
+				return errors.New("identity v2 service health_path_optional must start with /")
+			}
+			if err := validateASCIIValueV2("identity v2 service health_path_optional", endpoint.HealthPathOptional); err != nil {
+				return err
+			}
+		}
+		if endpoint.Priority > MaxServicePriorityV2 {
+			return fmt.Errorf("identity v2 service priority must not exceed %d", MaxServicePriorityV2)
+		}
+		if endpoint.Weight == 0 || endpoint.Weight > MaxServiceWeightV2 {
+			return fmt.Errorf("identity v2 service weight must be between 1 and %d", MaxServiceWeightV2)
+		}
+		if endpoint.TTL == 0 {
+			return errors.New("identity v2 service ttl is required")
+		}
+		if recordTTL > 0 && endpoint.TTL > recordTTL {
+			return errors.New("identity v2 service ttl must not exceed resolver record ttl")
+		}
+		if endpoint.SchemaHashOptional != "" {
+			if err := ValidateInterfaceDescriptorHashFormatV2(endpoint.SchemaHashOptional); err != nil {
+				return err
+			}
+		}
+		if _, found := seen[serviceID]; found {
+			return fmt.Errorf("duplicate identity v2 service endpoint %q", serviceID)
+		}
+		seen[serviceID] = struct{}{}
+		if i > 0 && serviceEndpointIDV2(endpoints[i-1]) >= serviceID {
 			return errors.New("identity v2 service endpoints must be sorted canonically")
 		}
 	}
@@ -552,11 +644,54 @@ func validateInterfaceDescriptorsV2(descriptors []InterfaceDescriptorV2) error {
 		if err := validateUnifiedRecordKey("identity v2 interface id", descriptor.InterfaceID); err != nil {
 			return err
 		}
-		if err := validateUnifiedRecordValue("identity v2 interface descriptor", descriptor.Descriptor, MaxUnifiedRecordValueBytes); err != nil {
+		schemaHash := interfaceDescriptorSchemaHashV2(descriptor)
+		if err := validateUnifiedRecordValue("identity v2 interface schema_hash", schemaHash, MaxUnifiedRecordValueBytes); err != nil {
 			return err
 		}
-		if err := ValidateInterfaceDescriptorHashFormatV2(descriptor.Descriptor); err != nil {
+		if err := ValidateInterfaceDescriptorHashFormatV2(schemaHash); err != nil {
 			return err
+		}
+		if descriptor.Descriptor != "" && descriptor.SchemaHash != "" && descriptor.Descriptor != descriptor.SchemaHash {
+			return errors.New("identity v2 interface descriptor and schema_hash must match when both are set")
+		}
+		if descriptor.SchemaURIOptional != "" {
+			if err := validateInterfaceSchemaURIV2(descriptor.SchemaURIOptional); err != nil {
+				return err
+			}
+		}
+		if descriptor.SchemaInlineOptional != "" {
+			if len(descriptor.SchemaInlineOptional) > MaxInterfaceInlineSchemaBytesV2 {
+				return fmt.Errorf("identity v2 interface inline schema must not exceed %d bytes", MaxInterfaceInlineSchemaBytesV2)
+			}
+			if err := validateASCIIValueV2("identity v2 interface inline schema", descriptor.SchemaInlineOptional); err != nil {
+				return err
+			}
+			inlineHash, err := InterfaceDescriptorHashV2(descriptor.SchemaInlineOptional)
+			if err != nil {
+				return err
+			}
+			if inlineHash != schemaHash {
+				return errors.New("identity v2 interface inline schema hash mismatch")
+			}
+		}
+		if err := validateVersionedInterfaceVersionV2(descriptor.Version); err != nil {
+			return err
+		}
+		if err := validateUnifiedRecordValue("identity v2 interface render_policy", descriptor.RenderPolicy, MaxInterfaceRenderPolicyBytesV2); err != nil {
+			return err
+		}
+		if err := validateInterfacePermissionsRequiredV2(descriptor.PermissionsRequired); err != nil {
+			return err
+		}
+		if descriptor.ContractTargetIDOptional != "" {
+			if err := validateUnifiedRecordKey("identity v2 interface contract_target_id_optional", descriptor.ContractTargetIDOptional); err != nil {
+				return err
+			}
+		}
+		if descriptor.ServiceIDOptional != "" {
+			if err := validateUnifiedRecordKey("identity v2 interface service_id_optional", descriptor.ServiceIDOptional); err != nil {
+				return err
+			}
 		}
 		if _, found := seen[descriptor.InterfaceID]; found {
 			return fmt.Errorf("duplicate identity v2 interface descriptor %q", descriptor.InterfaceID)
@@ -564,6 +699,103 @@ func validateInterfaceDescriptorsV2(descriptors []InterfaceDescriptorV2) error {
 		seen[descriptor.InterfaceID] = struct{}{}
 		if i > 0 && descriptors[i-1].InterfaceID >= descriptor.InterfaceID {
 			return errors.New("identity v2 interface descriptors must be sorted canonically")
+		}
+	}
+	return nil
+}
+
+func serviceEndpointIDV2(endpoint ServiceEndpointV2) string {
+	if endpoint.ServiceID != "" {
+		return endpoint.ServiceID
+	}
+	return endpoint.Key
+}
+
+func serviceEndpointTransportV2(endpoint string) (string, error) {
+	scheme, _, found := strings.Cut(endpoint, "://")
+	if !found || scheme == "" {
+		return "", errors.New("identity v2 service endpoint must include an allowed scheme")
+	}
+	if err := validateServiceEndpointSchemeV2(endpoint); err != nil {
+		return "", err
+	}
+	return scheme, nil
+}
+
+func validateVersionedServiceTypeV2(serviceType string) error {
+	if err := validateUnifiedRecordValue("identity v2 service_type", serviceType, MaxServiceTypeBytesV2); err != nil {
+		return err
+	}
+	if strings.Contains(serviceType, ".v") || strings.Contains(serviceType, ":v") || strings.Contains(serviceType, "-v") {
+		return nil
+	}
+	return errors.New("identity v2 service_type must be versioned")
+}
+
+func interfaceDescriptorSchemaHashV2(descriptor InterfaceDescriptorV2) string {
+	if descriptor.SchemaHash != "" {
+		return descriptor.SchemaHash
+	}
+	return descriptor.Descriptor
+}
+
+func validateInterfaceSchemaURIV2(uri string) error {
+	if len(uri) > MaxInterfaceSchemaURIBytesV2 {
+		return fmt.Errorf("identity v2 interface schema_uri_optional must not exceed %d bytes", MaxInterfaceSchemaURIBytesV2)
+	}
+	if err := validateASCIIValueV2("identity v2 interface schema_uri_optional", uri); err != nil {
+		return err
+	}
+	scheme, rest, found := strings.Cut(uri, "://")
+	if !found || rest == "" {
+		return errors.New("identity v2 interface schema_uri_optional must include an allowed scheme")
+	}
+	switch scheme {
+	case "https", "ipfs", "ar", "aetheris":
+		return nil
+	default:
+		return fmt.Errorf("identity v2 interface schema_uri_optional scheme %q is not allowed", scheme)
+	}
+}
+
+func validateVersionedInterfaceVersionV2(version string) error {
+	if err := validateUnifiedRecordValue("identity v2 interface version", version, MaxInterfaceVersionBytesV2); err != nil {
+		return err
+	}
+	if strings.HasPrefix(version, "v") || strings.Contains(version, ".v") {
+		return nil
+	}
+	return errors.New("identity v2 interface version must be versioned")
+}
+
+func validateInterfacePermissionsRequiredV2(permissions []string) error {
+	if len(permissions) > MaxInterfacePermissionsV2 {
+		return fmt.Errorf("identity v2 interface permissions_required must not exceed %d entries", MaxInterfacePermissionsV2)
+	}
+	seen := map[string]struct{}{}
+	for i, permission := range permissions {
+		if err := validateUnifiedRecordValue("identity v2 interface permission", permission, MaxInterfacePermissionBytesV2); err != nil {
+			return err
+		}
+		switch {
+		case permission == "execute", permission == "sign", strings.HasPrefix(permission, "execute."), strings.HasPrefix(permission, "grant."):
+			return errors.New("identity v2 interface descriptors cannot grant execution permission")
+		}
+		if _, found := seen[permission]; found {
+			return fmt.Errorf("duplicate identity v2 interface permission %q", permission)
+		}
+		seen[permission] = struct{}{}
+		if i > 0 && permissions[i-1] >= permission {
+			return errors.New("identity v2 interface permissions_required must be sorted canonically")
+		}
+	}
+	return nil
+}
+
+func validateASCIIValueV2(field string, value string) error {
+	for i := 0; i < len(value); i++ {
+		if value[i] > 0x7f {
+			return fmt.Errorf("%s must be ASCII", field)
 		}
 	}
 	return nil

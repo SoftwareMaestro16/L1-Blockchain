@@ -46,10 +46,26 @@ func TestUnifiedResolutionRecordV2BuildsFromResolverView(t *testing.T) {
 		NewContractTargetV2(ResolverKeyContract, addr(3), 13),
 		NewContractTargetV2(ResolverKeyWallet, addr(4), 13),
 	}, record.ContractTargets)
-	require.Equal(t, []ServiceEndpointV2{{Key: "rpc", Endpoint: "https://rpc.aet"}}, record.ServiceEndpoints)
+	require.Equal(t, []ServiceEndpointV2{{
+		Key:         "rpc",
+		Endpoint:    "https://rpc.aet",
+		ServiceID:   "rpc",
+		ServiceType: "service.v1",
+		Transport:   "https",
+		AuthPolicy:  "none",
+		Priority:    100,
+		Weight:      1,
+		TTL:         30,
+	}}, record.ServiceEndpoints)
 	expectedDescriptorHash, err := InterfaceDescriptorHashV2("wallet-v1")
 	require.NoError(t, err)
-	require.Equal(t, []InterfaceDescriptorV2{{InterfaceID: "aw5", Descriptor: expectedDescriptorHash}}, record.InterfaceDescriptors)
+	require.Equal(t, []InterfaceDescriptorV2{{
+		InterfaceID:  "aw5",
+		Descriptor:   expectedDescriptorHash,
+		SchemaHash:   expectedDescriptorHash,
+		Version:      "v1",
+		RenderPolicy: "wallet_confirm",
+	}}, record.InterfaceDescriptors)
 	require.Equal(t, RoutingMetadataV2{ZoneID: "CONTRACT_ZONE", ShardID: "0:1", VM: "AVM", Entrypoint: "swap"}, record.RoutingMetadata)
 	require.Equal(t, []ExecutionHintV2{{Key: "hint.priority", Value: "fast"}}, record.ExecutionHints)
 	require.Equal(t, uint64(1), record.RecordVersion)
@@ -90,19 +106,32 @@ func TestUnifiedResolutionRecordV2ResolverValidationLimitsAndFormats(t *testing.
 	descriptorHash, err := InterfaceDescriptorHashV2("wallet-v1")
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:             nameHash,
-		Owner:                addr(1),
-		PrimaryAddress:       addr(2),
-		ContractTargets:      []ContractTargetV2{{Key: ResolverKeyContract, CodeID: "avm:swap-v1"}},
-		ServiceEndpoints:     []ServiceEndpointV2{{Key: "rpc", Endpoint: "https://rpc.aet"}},
-		InterfaceDescriptors: []InterfaceDescriptorV2{{InterfaceID: "aw5", Descriptor: descriptorHash}},
-		RoutingMetadata:      RoutingMetadataV2{ZoneID: "zone-a", ShardID: "shard-1", VM: "avm", Entrypoint: "swap"},
-		ExecutionHints:       []ExecutionHintV2{{Key: "hint.priority", Value: "fast"}},
-		RecordVersion:        7,
-		RecordTTL:            10,
-		UpdatedAtHeight:      12,
-		MaxPayloadBytes:      MaxUnifiedPayloadBytesV2,
-		SchemaVersion:        UnifiedResolutionSchemaVersionV2,
+		NameHash:        nameHash,
+		Owner:           addr(1),
+		PrimaryAddress:  addr(2),
+		ContractTargets: []ContractTargetV2{{Key: ResolverKeyContract, CodeID: "avm:swap-v1"}},
+		ServiceEndpoints: []ServiceEndpointV2{{
+			ServiceID:   "rpc",
+			ServiceType: "rpc.v1",
+			Endpoint:    "https://rpc.aet",
+			Transport:   "https",
+			AuthPolicy:  "none",
+			Weight:      1,
+			TTL:         10,
+		}},
+		InterfaceDescriptors: []InterfaceDescriptorV2{{
+			InterfaceID:  "aw5",
+			SchemaHash:   descriptorHash,
+			Version:      "v1",
+			RenderPolicy: "wallet_confirm",
+		}},
+		RoutingMetadata: RoutingMetadataV2{ZoneID: "zone-a", ShardID: "shard-1", VM: "avm", Entrypoint: "swap"},
+		ExecutionHints:  []ExecutionHintV2{{Key: "hint.priority", Value: "fast"}},
+		RecordVersion:   7,
+		RecordTTL:       10,
+		UpdatedAtHeight: 12,
+		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
+		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 
@@ -110,9 +139,9 @@ func TestUnifiedResolutionRecordV2ResolverValidationLimitsAndFormats(t *testing.
 	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(record), "scheme")
 	record.ServiceEndpoints[0].Endpoint = "https://rpc.aet"
 
-	record.InterfaceDescriptors[0].Descriptor = "wallet-v1"
+	record.InterfaceDescriptors[0].SchemaHash = "wallet-v1"
 	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(record), "sha256:<64 hex>")
-	record.InterfaceDescriptors[0].Descriptor = descriptorHash
+	record.InterfaceDescriptors[0].SchemaHash = descriptorHash
 
 	record.ExecutionHints[0].Key = "exec.required"
 	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(record), "advisory")
@@ -133,7 +162,7 @@ func TestUnifiedResolutionRecordV2ContractTargetSchemaValidation(t *testing.T) {
 		NameHash:             nameHash,
 		Owner:                addr(1),
 		PrimaryAddress:       addr(2),
-		InterfaceDescriptors: []InterfaceDescriptorV2{{InterfaceID: "aw5", Descriptor: descriptorHash}},
+		InterfaceDescriptors: []InterfaceDescriptorV2{{InterfaceID: "aw5", SchemaHash: descriptorHash, Version: "v1", RenderPolicy: "wallet_confirm"}},
 		ContractTargets: []ContractTargetV2{{
 			TargetID:            "swap",
 			ContractAddress:     addr(3),
@@ -171,6 +200,91 @@ func TestUnifiedResolutionRecordV2ContractTargetSchemaValidation(t *testing.T) {
 	badGas.ContractTargets = append([]ContractTargetV2(nil), record.ContractTargets...)
 	badGas.ContractTargets[0].GasHint = MaxContractGasHintV2 + 1
 	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badGas), "gas_hint")
+}
+
+func TestUnifiedResolutionRecordV2ServiceEndpointSchemaValidation(t *testing.T) {
+	nameHash, err := DomainRecordV2NameHash("alice.aet")
+	require.NoError(t, err)
+	schemaHash, err := InterfaceDescriptorHashV2("rpc-service-v1")
+	require.NoError(t, err)
+	record := UnifiedResolutionRecordV2{
+		NameHash:       nameHash,
+		Owner:          addr(1),
+		PrimaryAddress: addr(2),
+		ServiceEndpoints: []ServiceEndpointV2{{
+			ServiceID:          "rpc",
+			ServiceType:        "rpc.v1",
+			Endpoint:           "https://rpc.aet",
+			Transport:          "https",
+			AuthPolicy:         "none",
+			HealthPathOptional: "/healthz",
+			Priority:           100,
+			Weight:             1,
+			TTL:                10,
+			SchemaHashOptional: schemaHash,
+		}},
+		RecordVersion:   7,
+		RecordTTL:       10,
+		UpdatedAtHeight: 12,
+		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
+		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+	}
+	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
+
+	badType := record
+	badType.ServiceEndpoints = append([]ServiceEndpointV2(nil), record.ServiceEndpoints...)
+	badType.ServiceEndpoints[0].ServiceType = "rpc"
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badType), "versioned")
+
+	badTTL := record
+	badTTL.ServiceEndpoints = append([]ServiceEndpointV2(nil), record.ServiceEndpoints...)
+	badTTL.ServiceEndpoints[0].TTL = 11
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badTTL), "ttl")
+
+	badScheme := record
+	badScheme.ServiceEndpoints = append([]ServiceEndpointV2(nil), record.ServiceEndpoints...)
+	badScheme.ServiceEndpoints[0].Endpoint = "ftp://rpc.aet"
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badScheme), "scheme")
+}
+
+func TestUnifiedResolutionRecordV2InterfaceDescriptorSchemaValidation(t *testing.T) {
+	nameHash, err := DomainRecordV2NameHash("alice.aet")
+	require.NoError(t, err)
+	inline := `{"type":"wallet","version":"v1"}`
+	schemaHash, err := InterfaceDescriptorHashV2(inline)
+	require.NoError(t, err)
+	record := UnifiedResolutionRecordV2{
+		NameHash:       nameHash,
+		Owner:          addr(1),
+		PrimaryAddress: addr(2),
+		InterfaceDescriptors: []InterfaceDescriptorV2{{
+			InterfaceID:              "aw5",
+			SchemaHash:               schemaHash,
+			SchemaURIOptional:        "https://schema.aet/wallet-v1.json",
+			SchemaInlineOptional:     inline,
+			Version:                  "v1",
+			RenderPolicy:             "wallet_confirm",
+			PermissionsRequired:      []string{"read.balance"},
+			ContractTargetIDOptional: "swap",
+			ServiceIDOptional:        "rpc",
+		}},
+		RecordVersion:   7,
+		RecordTTL:       10,
+		UpdatedAtHeight: 12,
+		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
+		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+	}
+	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
+
+	badInline := record
+	badInline.InterfaceDescriptors = append([]InterfaceDescriptorV2(nil), record.InterfaceDescriptors...)
+	badInline.InterfaceDescriptors[0].SchemaInlineOptional = `{"type":"different"}`
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badInline), "inline schema")
+
+	badPermission := record
+	badPermission.InterfaceDescriptors = append([]InterfaceDescriptorV2(nil), record.InterfaceDescriptors...)
+	badPermission.InterfaceDescriptors[0].PermissionsRequired = []string{"execute"}
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badPermission), "cannot grant execution")
 }
 
 func TestReverseResolutionRecordV2VerifiedPrimaryAndAlias(t *testing.T) {

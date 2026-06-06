@@ -262,7 +262,7 @@ func verifyUnifiedTargetExistsV2(record UnifiedResolutionRecordV2, opts Determin
 			return errors.New("identity v2 deterministic service target key is required")
 		}
 		for _, endpoint := range record.ServiceEndpoints {
-			if endpoint.Key == opts.TargetKey {
+			if serviceEndpointIDV2(endpoint) == opts.TargetKey {
 				return nil
 			}
 		}

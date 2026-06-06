@@ -146,10 +146,35 @@ func ComputeResolvedRecordHashV2(record UnifiedResolutionRecordV2) (string, erro
 		)
 	}
 	for _, endpoint := range record.ServiceEndpoints {
-		parts = append(parts, "service", endpoint.Key, endpoint.Endpoint)
+		parts = append(parts,
+			"service",
+			endpoint.Key,
+			endpoint.Endpoint,
+			endpoint.ServiceID,
+			endpoint.ServiceType,
+			endpoint.Transport,
+			endpoint.AuthPolicy,
+			endpoint.HealthPathOptional,
+			fmt.Sprintf("%020d", endpoint.Priority),
+			fmt.Sprintf("%020d", endpoint.Weight),
+			fmt.Sprintf("%020d", endpoint.TTL),
+			endpoint.SchemaHashOptional,
+		)
 	}
 	for _, descriptor := range record.InterfaceDescriptors {
-		parts = append(parts, "interface", descriptor.InterfaceID, descriptor.Descriptor)
+		parts = append(parts,
+			"interface",
+			descriptor.InterfaceID,
+			descriptor.Descriptor,
+			descriptor.SchemaHash,
+			descriptor.SchemaURIOptional,
+			descriptor.SchemaInlineOptional,
+			descriptor.Version,
+			descriptor.RenderPolicy,
+			fmt.Sprintf("%020d", len(descriptor.PermissionsRequired)),
+		)
+		parts = append(parts, descriptor.PermissionsRequired...)
+		parts = append(parts, descriptor.ContractTargetIDOptional, descriptor.ServiceIDOptional)
 	}
 	for _, hint := range record.ExecutionHints {
 		parts = append(parts, "hint", hint.Key, hint.Value)

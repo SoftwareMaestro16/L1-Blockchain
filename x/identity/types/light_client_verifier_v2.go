@@ -375,8 +375,10 @@ func lightClientTargetFromRecordV2(record UnifiedResolutionRecordV2, request Ide
 		return IdentityLightClientVerifiedTargetV2{}, lightClientFailV2(IdentityLightClientErrTargetNotFound, "contract target is missing", nil)
 	case IdentityResolutionTargetService:
 		for _, endpoint := range record.ServiceEndpoints {
-			if endpoint.Key == request.TargetKey {
+			endpointID := serviceEndpointIDV2(endpoint)
+			if endpointID == request.TargetKey {
 				target.Endpoint = endpoint.Endpoint
+				target.TargetKey = endpointID
 				return target, nil
 			}
 		}
@@ -384,7 +386,7 @@ func lightClientTargetFromRecordV2(record UnifiedResolutionRecordV2, request Ide
 	case IdentityResolutionTargetInterface:
 		for _, descriptor := range record.InterfaceDescriptors {
 			if descriptor.InterfaceID == request.TargetKey {
-				target.Descriptor = descriptor.Descriptor
+				target.Descriptor = interfaceDescriptorSchemaHashV2(descriptor)
 				return target, nil
 			}
 		}

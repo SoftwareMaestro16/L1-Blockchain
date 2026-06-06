@@ -686,11 +686,28 @@ func (e *identityProofBinaryEncoderV2) writeUnifiedResolutionRecord(record Unifi
 	for _, endpoint := range record.ServiceEndpoints {
 		e.writeString(endpoint.Key)
 		e.writeString(endpoint.Endpoint)
+		e.writeString(endpoint.ServiceID)
+		e.writeString(endpoint.ServiceType)
+		e.writeString(endpoint.Transport)
+		e.writeString(endpoint.AuthPolicy)
+		e.writeString(endpoint.HealthPathOptional)
+		e.writeUint64(uint64(endpoint.Priority))
+		e.writeUint64(uint64(endpoint.Weight))
+		e.writeUint64(endpoint.TTL)
+		e.writeString(endpoint.SchemaHashOptional)
 	}
 	e.writeUint64(uint64(len(record.InterfaceDescriptors)))
 	for _, descriptor := range record.InterfaceDescriptors {
 		e.writeString(descriptor.InterfaceID)
 		e.writeString(descriptor.Descriptor)
+		e.writeString(descriptor.SchemaHash)
+		e.writeString(descriptor.SchemaURIOptional)
+		e.writeString(descriptor.SchemaInlineOptional)
+		e.writeString(descriptor.Version)
+		e.writeString(descriptor.RenderPolicy)
+		e.writeStringSlice(descriptor.PermissionsRequired)
+		e.writeString(descriptor.ContractTargetIDOptional)
+		e.writeString(descriptor.ServiceIDOptional)
 	}
 	e.writeString(record.RoutingMetadata.ZoneID)
 	e.writeString(record.RoutingMetadata.ShardID)
