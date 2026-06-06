@@ -420,6 +420,89 @@ func TestPosMigrationStrategyRejectsUnsafeOrIncompletePhases(t *testing.T) {
 	require.ErrorContains(t, rootMismatch.Validate(compatibility), "root mismatch")
 }
 
+func TestPosRequiredTestCoverageManifestCoversUnitAndIntegrationCases(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	migration := DefaultPosMigrationStrategyManifest()
+	manifest := DefaultPosRequiredTestCoverageManifest()
+	require.NoError(t, manifest.Validate(compatibility, migration))
+	require.Equal(t, ComputePosRequiredTestCoverageRoot(manifest), manifest.Root)
+	require.Len(t, manifest.UnitTests, len(RequiredPosUnitTestCoverageNames()))
+	require.Len(t, manifest.IntegrationTests, len(RequiredPosIntegrationTestCoverageNames()))
+
+	for _, name := range RequiredPosUnitTestCoverageNames() {
+		spec, found := PosUnitTestCoverageByName(manifest, name)
+		require.True(t, found, name)
+		require.Equal(t, "unit", spec.TestType)
+		require.NotEmpty(t, spec.Assertions)
+		require.NotEmpty(t, spec.MigrationPhases)
+	}
+	for _, name := range RequiredPosIntegrationTestCoverageNames() {
+		spec, found := PosIntegrationTestCoverageByName(manifest, name)
+		require.True(t, found, name)
+		require.Equal(t, "integration", spec.TestType)
+		require.NotEmpty(t, spec.Assertions)
+		require.NotEmpty(t, spec.MigrationPhases)
+	}
+
+	score, found := PosUnitTestCoverageByName(manifest, "validator score calculation")
+	require.True(t, found)
+	require.Equal(t, "validator_economy", score.ModuleName)
+	require.Equal(t, []uint32{1}, score.MigrationPhases)
+	require.Contains(t, score.Assertions, "score is deterministic")
+
+	rewards, found := PosIntegrationTestCoverageByName(manifest, "distribution rewards use performance multiplier")
+	require.True(t, found)
+	require.Equal(t, "distribution", rewards.ModuleName)
+	require.Equal(t, []uint32{3}, rewards.MigrationPhases)
+	require.Contains(t, rewards.Assertions, "reward delta is bounded and deterministic")
+
+	evidence, found := PosIntegrationTestCoverageByName(manifest, "valid evidence triggers penalty")
+	require.True(t, found)
+	require.Equal(t, "evidence", evidence.ModuleName)
+	require.Equal(t, []uint32{4}, evidence.MigrationPhases)
+	require.Contains(t, evidence.Assertions, "accepted evidence maps to one penalty")
+}
+
+func TestPosRequiredTestCoverageManifestRejectsMissingDuplicateAndInvalidCoverage(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	migration := DefaultPosMigrationStrategyManifest()
+	manifest := DefaultPosRequiredTestCoverageManifest()
+
+	missingUnit := manifest
+	missingUnit.UnitTests = append([]PosTestCoverageSpec{}, manifest.UnitTests...)
+	missingUnit.UnitTests = missingUnit.UnitTests[1:]
+	missingUnit.Root = ComputePosRequiredTestCoverageRoot(missingUnit)
+	require.ErrorContains(t, missingUnit.Validate(compatibility, migration), "epoch phase transition")
+
+	duplicateIntegration := manifest
+	duplicateIntegration.IntegrationTests = append([]PosTestCoverageSpec{}, manifest.IntegrationTests...)
+	duplicateIntegration.IntegrationTests = append(duplicateIntegration.IntegrationTests, manifest.IntegrationTests[0])
+	duplicateIntegration.Root = ComputePosRequiredTestCoverageRoot(duplicateIntegration)
+	require.ErrorContains(t, duplicateIntegration.Validate(compatibility, migration), "duplicate pos integration test coverage")
+
+	unknownModule := manifest
+	unknownModule.UnitTests = append([]PosTestCoverageSpec{}, manifest.UnitTests...)
+	unknownModule.UnitTests[0].ModuleName = "unknown_module"
+	unknownModule.Root = ComputePosRequiredTestCoverageRoot(unknownModule)
+	require.ErrorContains(t, unknownModule.Validate(compatibility, migration), "unknown module")
+
+	unknownPhase := manifest
+	unknownPhase.IntegrationTests = append([]PosTestCoverageSpec{}, manifest.IntegrationTests...)
+	unknownPhase.IntegrationTests[0].MigrationPhases = []uint32{99}
+	unknownPhase.Root = ComputePosRequiredTestCoverageRoot(unknownPhase)
+	require.ErrorContains(t, unknownPhase.Validate(compatibility, migration), "unknown migration phase")
+
+	missingAssertions := manifest
+	missingAssertions.UnitTests = append([]PosTestCoverageSpec{}, manifest.UnitTests...)
+	missingAssertions.UnitTests[0].Assertions = nil
+	missingAssertions.Root = ComputePosRequiredTestCoverageRoot(missingAssertions)
+	require.ErrorContains(t, missingAssertions.Validate(compatibility, migration), "assertions")
+
+	rootMismatch := manifest
+	rootMismatch.Root = PosEmptyRootHash
+	require.ErrorContains(t, rootMismatch.Validate(compatibility, migration), "root mismatch")
+}
+
 func TestKeeperIntegrationManifestCoversSDKKeepersHooksAndExportImport(t *testing.T) {
 	compatibility := DefaultCosmosSDKCompatibilityManifest()
 	boundaries := DefaultPoSModuleBoundaryManifest()

@@ -1016,6 +1016,21 @@ type PosMigrationStrategyManifest struct {
 	Root   string
 }
 
+type PosTestCoverageSpec struct {
+	Name            string
+	TestType        string
+	ModuleName      string
+	CoverageTarget  string
+	Assertions      []string
+	MigrationPhases []uint32
+}
+
+type PosRequiredTestCoverageManifest struct {
+	UnitTests        []PosTestCoverageSpec
+	IntegrationTests []PosTestCoverageSpec
+	Root             string
+}
+
 type KeeperIntegrationManifest struct {
 	KeeperInterfaces      []KeeperInterfaceSpec
 	StakingLifecycleHooks []KeeperHookSpec
@@ -2119,6 +2134,177 @@ func PosMigrationPhaseByName(manifest PosMigrationStrategyManifest, phaseName st
 		}
 	}
 	return PosMigrationPhaseSpec{}, false
+}
+
+func DefaultPosRequiredTestCoverageManifest() PosRequiredTestCoverageManifest {
+	manifest := PosRequiredTestCoverageManifest{
+		UnitTests: []PosTestCoverageSpec{
+			{Name: "epoch phase transition", TestType: "unit", ModuleName: "epoch", CoverageTarget: "epoch lifecycle transition rules", Assertions: []string{"valid transition order", "invalid transition rejection"}, MigrationPhases: []uint32{1}},
+			{Name: "epoch seed derivation", TestType: "unit", ModuleName: "epoch", CoverageTarget: "deterministic epoch seed derivation", Assertions: []string{"same inputs produce same seed", "validator set changes alter seed"}, MigrationPhases: []uint32{1}},
+			{Name: "validator score calculation", TestType: "unit", ModuleName: "validator_economy", CoverageTarget: "fixed point validator score calculation", Assertions: []string{"stake performance uptime latency and reliability are applied", "score is deterministic"}, MigrationPhases: []uint32{1}},
+			{Name: "effective stake saturation", TestType: "unit", ModuleName: "validator_economy", CoverageTarget: "stake saturation soft cap", Assertions: []string{"effective stake never exceeds raw stake", "saturation status is queryable"}, MigrationPhases: []uint32{1, 4}},
+			{Name: "reward multiplier calculation", TestType: "unit", ModuleName: "performance", CoverageTarget: "performance reward multiplier", Assertions: []string{"multiplier uses deterministic metrics", "multiplier stays within configured bounds"}, MigrationPhases: []uint32{3}},
+			{Name: "task assignment function", TestType: "unit", ModuleName: "taskgroups", CoverageTarget: "deterministic task assignment", Assertions: []string{"assignment is reproducible from epoch seed", "capacity and minimum group size are enforced"}, MigrationPhases: []uint32{2}},
+			{Name: "proposer priority calculation", TestType: "unit", ModuleName: "taskgroups", CoverageTarget: "proposer priority and fallback order", Assertions: []string{"one canonical proposer per slot", "fallback order is deterministic"}, MigrationPhases: []uint32{2}},
+			{Name: "evidence id derivation", TestType: "unit", ModuleName: "evidence", CoverageTarget: "structured evidence id derivation", Assertions: []string{"same evidence payload derives same id", "duplicate evidence is rejected"}, MigrationPhases: []uint32{4}},
+			{Name: "penalty scaling", TestType: "unit", ModuleName: "slashing", CoverageTarget: "severity based penalty scaling", Assertions: []string{"severity stake exposure and role weight are applied", "repeat offense multiplier is bounded"}, MigrationPhases: []uint32{4}},
+			{Name: "slash routing", TestType: "unit", ModuleName: "slashing", CoverageTarget: "penalty routing accounting", Assertions: []string{"routing sums exactly to penalty amount", "balances never become negative"}, MigrationPhases: []uint32{4}},
+			{Name: "risk window calculation", TestType: "unit", ModuleName: "staking", CoverageTarget: "slashable risk window calculation", Assertions: []string{"unbonding remains slashable for historical faults", "redelegation does not erase exposure"}, MigrationPhases: []uint32{1, 4}},
+		},
+		IntegrationTests: []PosTestCoverageSpec{
+			{Name: "existing staking state migrates into epoch system", TestType: "integration", ModuleName: "epoch", CoverageTarget: "staking to epoch migration", Assertions: []string{"existing validators remain bonded", "epoch records are initialized without staking mutation"}, MigrationPhases: []uint32{1}},
+			{Name: "delegation affects future epoch only after activation delay", TestType: "integration", ModuleName: "staking", CoverageTarget: "delegation activation delay", Assertions: []string{"current epoch election weight is unchanged", "future epoch applies activated delegation"}, MigrationPhases: []uint32{1}},
+			{Name: "validator election ranking is deterministic", TestType: "integration", ModuleName: "validator_economy", CoverageTarget: "deterministic election ranking", Assertions: []string{"ranking is stable across replay", "ties use deterministic ordering"}, MigrationPhases: []uint32{1, 4}},
+			{Name: "task groups are reproducible from epoch seed", TestType: "integration", ModuleName: "taskgroups", CoverageTarget: "task group reproducibility", Assertions: []string{"same epoch seed yields same groups", "assignment root is reproducible"}, MigrationPhases: []uint32{2}},
+			{Name: "proposer fallback works", TestType: "integration", ModuleName: "taskgroups", CoverageTarget: "proposer fallback", Assertions: []string{"missed proposer activates fallback", "fallback eligibility proof is deterministic"}, MigrationPhases: []uint32{2}},
+			{Name: "verification receipts aggregate correctly", TestType: "integration", ModuleName: "taskgroups", CoverageTarget: "verification receipt aggregation", Assertions: []string{"valid receipts are counted once", "invalid and unavailable receipts affect participation"}, MigrationPhases: []uint32{2}},
+			{Name: "valid evidence triggers penalty", TestType: "integration", ModuleName: "evidence", CoverageTarget: "evidence to slashing path", Assertions: []string{"accepted evidence maps to one penalty", "penalty is executed through slashing"}, MigrationPhases: []uint32{4}},
+			{Name: "invalid evidence burns reporter deposit", TestType: "integration", ModuleName: "evidence", CoverageTarget: "invalid evidence deposit handling", Assertions: []string{"invalid evidence is rejected", "reporter deposit burn or redirect is exact"}, MigrationPhases: []uint32{4}},
+			{Name: "unbonding stake is slashed for historical fault", TestType: "integration", ModuleName: "staking", CoverageTarget: "historical fault slash exposure", Assertions: []string{"fault epoch inside window is slashable", "expired exposure is not slashable"}, MigrationPhases: []uint32{4}},
+			{Name: "distribution rewards use performance multiplier", TestType: "integration", ModuleName: "distribution", CoverageTarget: "distribution reward multiplier integration", Assertions: []string{"distribution reads performance multiplier", "reward delta is bounded and deterministic"}, MigrationPhases: []uint32{3}},
+		},
+	}
+	manifest.Root = ComputePosRequiredTestCoverageRoot(manifest)
+	return manifest
+}
+
+func RequiredPosUnitTestCoverageNames() []string {
+	return []string{
+		"epoch phase transition",
+		"epoch seed derivation",
+		"validator score calculation",
+		"effective stake saturation",
+		"reward multiplier calculation",
+		"task assignment function",
+		"proposer priority calculation",
+		"evidence id derivation",
+		"penalty scaling",
+		"slash routing",
+		"risk window calculation",
+	}
+}
+
+func RequiredPosIntegrationTestCoverageNames() []string {
+	return []string{
+		"existing staking state migrates into epoch system",
+		"delegation affects future epoch only after activation delay",
+		"validator election ranking is deterministic",
+		"task groups are reproducible from epoch seed",
+		"proposer fallback works",
+		"verification receipts aggregate correctly",
+		"valid evidence triggers penalty",
+		"invalid evidence burns reporter deposit",
+		"unbonding stake is slashed for historical fault",
+		"distribution rewards use performance multiplier",
+	}
+}
+
+func (m PosRequiredTestCoverageManifest) Validate(compatibility CosmosSDKCompatibilityManifest, migration PosMigrationStrategyManifest) error {
+	if err := compatibility.Validate(); err != nil {
+		return err
+	}
+	if err := migration.Validate(compatibility); err != nil {
+		return err
+	}
+	knownModules := knownPoSModuleNames(compatibility)
+	knownPhases := make(map[uint32]struct{}, len(migration.Phases))
+	for _, phase := range migration.Phases {
+		knownPhases[phase.PhaseID] = struct{}{}
+	}
+	if err := validatePosCoverageSet("unit", m.UnitTests, RequiredPosUnitTestCoverageNames(), knownModules, knownPhases); err != nil {
+		return err
+	}
+	if err := validatePosCoverageSet("integration", m.IntegrationTests, RequiredPosIntegrationTestCoverageNames(), knownModules, knownPhases); err != nil {
+		return err
+	}
+	if err := validatePosHash("pos required test coverage root", m.Root); err != nil {
+		return err
+	}
+	if expected := ComputePosRequiredTestCoverageRoot(m); expected != m.Root {
+		return errors.New("pos required test coverage root mismatch")
+	}
+	return nil
+}
+
+func validatePosCoverageSet(testType string, specs []PosTestCoverageSpec, required []string, knownModules map[string]struct{}, knownPhases map[uint32]struct{}) error {
+	if len(specs) == 0 {
+		return fmt.Errorf("pos %s test coverage is required", testType)
+	}
+	seen := make(map[string]struct{}, len(specs))
+	for _, spec := range specs {
+		if err := spec.Validate(testType, knownModules, knownPhases); err != nil {
+			return err
+		}
+		if _, found := seen[spec.Name]; found {
+			return fmt.Errorf("duplicate pos %s test coverage %s", testType, spec.Name)
+		}
+		seen[spec.Name] = struct{}{}
+	}
+	for _, name := range required {
+		if _, found := seen[name]; !found {
+			return fmt.Errorf("required pos %s test coverage %s is missing", testType, name)
+		}
+	}
+	return nil
+}
+
+func (s PosTestCoverageSpec) Validate(expectedType string, knownModules map[string]struct{}, knownPhases map[uint32]struct{}) error {
+	if err := validatePosResponsibility("pos test coverage name", s.Name); err != nil {
+		return err
+	}
+	if s.TestType != expectedType {
+		return fmt.Errorf("pos test coverage %s must be %s", s.Name, expectedType)
+	}
+	if err := validatePosToken("pos test coverage module", s.ModuleName); err != nil {
+		return err
+	}
+	if _, found := knownModules[s.ModuleName]; !found {
+		return fmt.Errorf("pos test coverage %s references unknown module %s", s.Name, s.ModuleName)
+	}
+	if err := validatePosResponsibility("pos test coverage target", s.CoverageTarget); err != nil {
+		return err
+	}
+	if len(s.Assertions) == 0 {
+		return fmt.Errorf("pos test coverage %s must define assertions", s.Name)
+	}
+	for _, assertion := range s.Assertions {
+		if err := validatePosResponsibility("pos test coverage assertion", assertion); err != nil {
+			return err
+		}
+	}
+	if len(s.MigrationPhases) == 0 {
+		return fmt.Errorf("pos test coverage %s must reference migration phases", s.Name)
+	}
+	for _, phaseID := range s.MigrationPhases {
+		if _, found := knownPhases[phaseID]; !found {
+			return fmt.Errorf("pos test coverage %s references unknown migration phase %d", s.Name, phaseID)
+		}
+	}
+	return nil
+}
+
+func ComputePosRequiredTestCoverageRoot(manifest PosRequiredTestCoverageManifest) string {
+	return posHashRoot("aetheris-pos-required-test-coverage-v1", func(w posByteWriter) {
+		posWriteCoverageSpecs(w, manifest.UnitTests)
+		posWriteCoverageSpecs(w, manifest.IntegrationTests)
+	})
+}
+
+func PosUnitTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
+	return posTestCoverageByName(manifest.UnitTests, name)
+}
+
+func PosIntegrationTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
+	return posTestCoverageByName(manifest.IntegrationTests, name)
+}
+
+func posTestCoverageByName(specs []PosTestCoverageSpec, name string) (PosTestCoverageSpec, bool) {
+	for _, spec := range specs {
+		if spec.Name == name {
+			return spec, true
+		}
+	}
+	return PosTestCoverageSpec{}, false
 }
 
 func DefaultKeeperIntegrationManifest() KeeperIntegrationManifest {
@@ -7991,6 +8177,21 @@ func posWriteStringSlice(w posByteWriter, values []string) {
 	posWriteUint64(w, uint64(len(values)))
 	for _, value := range values {
 		posWritePart(w, value)
+	}
+}
+
+func posWriteCoverageSpecs(w posByteWriter, specs []PosTestCoverageSpec) {
+	posWriteUint64(w, uint64(len(specs)))
+	for _, spec := range specs {
+		posWritePart(w, spec.Name)
+		posWritePart(w, spec.TestType)
+		posWritePart(w, spec.ModuleName)
+		posWritePart(w, spec.CoverageTarget)
+		posWriteStringSlice(w, spec.Assertions)
+		posWriteUint64(w, uint64(len(spec.MigrationPhases)))
+		for _, phaseID := range spec.MigrationPhases {
+			posWriteUint64(w, uint64(phaseID))
+		}
 	}
 }
 
