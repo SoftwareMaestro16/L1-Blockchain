@@ -481,6 +481,79 @@ func TestKeeperLiquidityOptimizationModuleReservationsForecastsAndDecay(t *testi
 	require.Len(t, exported.Liquidity.Reservations, 1)
 }
 
+func TestKeeperFraudProofVerificationModuleRecordsRewardsAndDedup(t *testing.T) {
+	k := NewKeeper()
+	gs := DefaultGenesis()
+	gs.Params = prototype.TestnetParams()
+	require.NoError(t, k.InitGenesis(gs))
+
+	alice := keeperAddress(0x7b)
+	bob := keeperAddress(0x7c)
+	channel := keeperSignedChannel(t, "keeper-fraud-proof-verification", "100", alice, bob)
+	require.NoError(t, k.OpenChannel(channel))
+	closeState := keeperSignedState(t, channel, 2, channel.OpeningStateHash, []paymentstypes.Balance{
+		{Participant: alice, Amount: "50"},
+		{Participant: bob, Amount: "50"},
+	})
+	require.NoError(t, k.SubmitClose(channel.ChannelID, closeState, alice, 20, "0"))
+	conflicting := keeperSignedState(t, channel, 2, channel.OpeningStateHash, []paymentstypes.Balance{
+		{Participant: alice, Amount: "40"},
+		{Participant: bob, Amount: "60"},
+	})
+	proof := paymentstypes.FraudProof{
+		ProofID:         paymentstypes.HashParts("keeper-fraud-proof", channel.ChannelID),
+		ProofType:       paymentstypes.FraudProofTypeDoubleSign,
+		SubmittedBy:     bob,
+		OffendingSigner: alice,
+		StateA:          closeState,
+		StateB:          conflicting,
+		EvidenceHash:    paymentstypes.HashParts("keeper-fraud-proof-evidence", closeState.StateHash, conflicting.StateHash),
+		PenaltyDenom:    paymentstypes.NativeDenom,
+		PenaltyAmount:   "20",
+	}
+	fraud, err := k.HandleFraudProofVerificationMessage(paymentstypes.MsgSubmitDoubleSignProof{Input: paymentstypes.FraudProofSubmission{
+		ChannelID:     channel.ChannelID,
+		Proof:         proof,
+		CurrentHeight: 21,
+		Policy:        paymentstypes.FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: paymentstypes.MaxPenaltyRouteBps},
+		GasLimit:      100_000_000,
+	}})
+	require.NoError(t, err)
+	require.Len(t, fraud.EvidenceRecords, 1)
+	require.Len(t, fraud.PenaltyRecords, 1)
+	require.Len(t, fraud.ReporterRewards, 1)
+	require.Len(t, fraud.DoubleSignEvidence, 1)
+	debug, err := k.QueryStateHash(channel.ChannelID)
+	require.NoError(t, err)
+	require.Equal(t, paymentstypes.ChannelStatusPendingClose, debug.Status)
+
+	duplicate := proof
+	duplicate.ProofID = paymentstypes.HashParts("keeper-fraud-proof-duplicate", channel.ChannelID)
+	duplicate.StateA = conflicting
+	duplicate.StateB = closeState
+	duplicate.EvidenceHash = paymentstypes.HashParts("keeper-fraud-proof-duplicate-evidence", conflicting.StateHash, closeState.StateHash)
+	_, err = k.HandleFraudProofVerificationMessage(paymentstypes.MsgSubmitDoubleSignProof{Input: paymentstypes.FraudProofSubmission{
+		ChannelID:     channel.ChannelID,
+		Proof:         duplicate,
+		CurrentHeight: 22,
+		Policy:        paymentstypes.FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: paymentstypes.MaxPenaltyRouteBps},
+		GasLimit:      100_000_000,
+	}})
+	require.ErrorContains(t, err, "duplicate fraud evidence")
+
+	fraud, err = k.HandleFraudProofVerificationMessage(paymentstypes.MsgClaimReporterReward{
+		RewardID:      fraud.ReporterRewards[0].RewardID,
+		Reporter:      bob,
+		CurrentHeight: 23,
+	})
+	require.NoError(t, err)
+	require.True(t, fraud.ReporterRewards[0].Claimed)
+
+	exported := k.ExportGenesis()
+	require.Len(t, exported.FraudProofs.EvidenceRecords, 1)
+	require.True(t, exported.FraudProofs.ReporterRewards[0].Claimed)
+}
+
 func TestKeeperValidatorAssistedWatchDispute(t *testing.T) {
 	k := NewKeeper()
 	gs := DefaultGenesis()

@@ -1306,6 +1306,123 @@ func TestFraudProofVerificationFeeRefundsWhenAccepted(t *testing.T) {
 	require.Equal(t, state.FeeRefunds[0].FeeID, fraudFee.FeeID)
 }
 
+func TestFraudProofVerificationModuleDedupGasPenaltyAndRewardClaim(t *testing.T) {
+	alice := testAddress(0xb1)
+	bob := testAddress(0xb2)
+	channel := signedChannel(t, "fraud-verification-module", "100", alice, bob)
+	state := EmptyStateWithChannel(t, channel)
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "50"},
+		{Participant: bob, Amount: "50"},
+	})
+	var err error
+	state, err = SubmitClose(state, channel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+	conflicting := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "40"},
+		{Participant: bob, Amount: "60"},
+	})
+	proofID := HashParts("fraud-module-proof", channel.ChannelID)
+	proof := FraudProof{
+		ProofID:         proofID,
+		ProofType:       FraudProofTypeDoubleSign,
+		SubmittedBy:     bob,
+		OffendingSigner: alice,
+		StateA:          closeState,
+		StateB:          conflicting,
+		EvidenceHash:    HashParts("fraud-module-evidence", closeState.StateHash, conflicting.StateHash),
+		PenaltyDenom:    NativeDenom,
+		PenaltyAmount:   "20",
+	}
+	module := EmptyFraudProofVerificationState()
+	state, module, err = ApplyFraudProofVerificationMessage(state, module, MsgSubmitDoubleSignProof{Input: FraudProofSubmission{
+		ChannelID:     channel.ChannelID,
+		Proof:         proof,
+		CurrentHeight: 21,
+		Policy:        FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: MaxPenaltyRouteBps},
+		GasLimit:      100_000_000,
+	}})
+	require.NoError(t, err)
+	require.Len(t, module.EvidenceRecords, 1)
+	require.Len(t, module.PenaltyRecords, 1)
+	require.Len(t, module.ReporterRewards, 1)
+	require.Len(t, module.DoubleSignEvidence, 1)
+	require.Equal(t, "4", module.ReporterRewards[0].Amount)
+	require.Len(t, state.Channels[0].PendingClose.FraudProofs, 1)
+
+	reordered := proof
+	reordered.ProofID = HashParts("fraud-module-proof-reordered", channel.ChannelID)
+	reordered.StateA = conflicting
+	reordered.StateB = closeState
+	reordered.EvidenceHash = HashParts("fraud-module-evidence-reordered", conflicting.StateHash, closeState.StateHash)
+	_, _, err = ApplyFraudProofVerificationMessage(state, module, MsgSubmitDoubleSignProof{Input: FraudProofSubmission{
+		ChannelID:     channel.ChannelID,
+		Proof:         reordered,
+		CurrentHeight: 22,
+		Policy:        FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: MaxPenaltyRouteBps},
+		GasLimit:      100_000_000,
+	}})
+	require.ErrorContains(t, err, "duplicate fraud evidence")
+
+	_, _, err = ApplyFraudProofVerificationMessage(state, EmptyFraudProofVerificationState(), MsgSubmitDoubleSignProof{Input: FraudProofSubmission{
+		ChannelID:     channel.ChannelID,
+		Proof:         reordered,
+		CurrentHeight: 22,
+		Policy:        FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: MaxPenaltyRouteBps},
+		GasLimit:      1,
+	}})
+	require.ErrorContains(t, err, "gas limit")
+
+	_, _, err = ApplyFraudProofVerificationMessage(state, EmptyFraudProofVerificationState(), MsgSubmitDoubleSignProof{Input: FraudProofSubmission{
+		ChannelID:     channel.ChannelID,
+		Proof:         FraudProof{ProofID: HashParts("fraud-module-too-large"), ProofType: FraudProofTypeDoubleSign, SubmittedBy: bob, OffendingSigner: alice, StateA: closeState, StateB: conflicting, EvidenceHash: HashParts("fraud-module-too-large"), PenaltyDenom: NativeDenom, PenaltyAmount: "80"},
+		CurrentHeight: 22,
+		Policy:        FraudPenaltyPolicy{ReporterRewardCap: "80"},
+		GasLimit:      100_000_000,
+	}})
+	require.ErrorContains(t, err, "exceeds available balance")
+
+	_, module, err = ApplyFraudProofVerificationMessage(state, module, MsgClaimReporterReward{
+		RewardID:      module.ReporterRewards[0].RewardID,
+		Reporter:      bob,
+		CurrentHeight: 23,
+	})
+	require.NoError(t, err)
+	require.True(t, module.ReporterRewards[0].Claimed)
+	_, _, err = ApplyFraudProofVerificationMessage(state, module, MsgClaimReporterReward{
+		RewardID:      module.ReporterRewards[0].RewardID,
+		Reporter:      bob,
+		CurrentHeight: 24,
+	})
+	require.ErrorContains(t, err, "already claimed")
+}
+
+func FuzzCanonicalFraudEvidenceHashMalformedInputs(f *testing.F) {
+	f.Add("bad-chain", "bad-channel", uint64(0), uint64(0))
+	f.Add("aetheris-test-1", HashParts("fuzz-channel"), uint64(1), uint64(2))
+	f.Fuzz(func(t *testing.T, chainID, channelID string, epoch, nonce uint64) {
+		alice := testAddress(0xb3)
+		bob := testAddress(0xb4)
+		channel := signedChannel(t, "fraud-fuzz", "100", alice, bob)
+		channel.ChainID = chainID
+		if len(channelID) == 64 {
+			channel.ChannelID = channelID
+		}
+		proof := FraudProof{
+			ProofID:         HashParts("fraud-fuzz-proof", channel.ChannelID),
+			ProofType:       FraudProofTypeDoubleSign,
+			SubmittedBy:     bob,
+			OffendingSigner: alice,
+			StateA:          ChannelState{ChainID: chainID, ChannelID: channel.ChannelID, Epoch: epoch, Nonce: nonce, StateHash: HashParts("left", chainID, channel.ChannelID)},
+			StateB:          ChannelState{ChainID: chainID, ChannelID: channel.ChannelID, Epoch: epoch, Nonce: nonce, StateHash: HashParts("right", chainID, channel.ChannelID)},
+			EvidenceHash:    HashParts("fraud-fuzz-evidence", chainID, channel.ChannelID),
+			PenaltyDenom:    NativeDenom,
+			PenaltyAmount:   "20",
+		}
+		require.NoError(t, ValidateHash("fuzz canonical fraud evidence", ComputeCanonicalFraudEvidenceHash(channel, proof)))
+	})
+}
+
 func TestSettlementGasCostsAndInclusionLatencyMonitoring(t *testing.T) {
 	alice := testAddress(0xa4)
 	bob := testAddress(0xa5)
