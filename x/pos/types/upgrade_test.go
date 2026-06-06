@@ -315,6 +315,117 @@ func TestStateModelRejectsAmbiguousPrefixesAndPathInjection(t *testing.T) {
 	require.ErrorContains(t, err, "surrounding whitespace")
 }
 
+func TestRootCommitmentsComputeRequiredRootsAndStateInvariantsPass(t *testing.T) {
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	params.MinTaskGroupValidators = 2
+	validators := scoredCandidates(t, params, []Candidate{candidate("val-a", 1_000, 0), candidate("val-b", 1_000, 0)})
+	scoreRecords := stateScoreRecords(validators, 9)
+	epoch, err := NewEpochRecord(params, 9, 90, 99, EpochPhaseAssignment, "", validators)
+	require.NoError(t, err)
+	taskGroup := stateTaskGroup(t, 9, epoch.Seed, []string{"val-a", "val-b"}, 2)
+	evidence := stateEvidenceRecord(t, "evidence-a", "val-a", "penalty-a", taskGroup.TaskGroupID, taskGroup.EpochID)
+	verificationGroup := stateEvidenceGroup(t, evidence, []string{"val-b"}, []string{"val-a"})
+	slashing := stateSlashingRecord(t, evidence.EvidenceID, evidence.PenaltyIDOptional, evidence.AccusedValidator)
+	performance, err := BuildPerformanceRecord(PerformanceRecordInput{
+		EpochID:             9,
+		OperatorAddress:     "val-a",
+		Role:                ValidatorRoleVerifier,
+		AssignedTasks:       4,
+		CompletedTasks:      4,
+		UptimeScoreBps:      BasisPoints,
+		LatencyScoreBps:     BasisPoints,
+		CorrectnessScoreBps: BasisPoints,
+	})
+	require.NoError(t, err)
+	risk := riskWindow("delegator-a", "val-a", 1_000, RiskWindowStatusActive)
+	epochRoot, err := ComputeEpochRoot([]EpochRecord{epoch})
+	require.NoError(t, err)
+	scoreRoot, err := ComputeValidatorScoreRoot(scoreRecords)
+	require.NoError(t, err)
+	taskGroupRoot := ComputeTaskGroupRoot(9, epoch.Seed, []TaskGroup{taskGroup})
+	evidenceRoot, err := ComputeEvidenceRoot([]EvidenceRecord{evidence}, []EvidenceVerificationGroup{verificationGroup})
+	require.NoError(t, err)
+	performanceRoot, err := ComputePerformanceRoot([]PerformanceRecord{performance})
+	require.NoError(t, err)
+	slashingRoot, err := ComputeSlashingRoot([]SlashingRecord{slashing})
+	require.NoError(t, err)
+	riskRoot, err := ComputeRiskWindowSetRoot([]RiskWindowRecord{risk})
+	require.NoError(t, err)
+
+	manifest := DefaultRootCommitmentManifest()
+	require.NoError(t, manifest.Validate())
+	require.Equal(t, ComputeRootCommitmentManifestRoot(manifest), manifest.Root)
+	require.NoError(t, StateRootCommitments{
+		EpochRoot:          epochRoot,
+		ValidatorScoreRoot: scoreRoot,
+		TaskGroupRoot:      taskGroupRoot,
+		EvidenceRoot:       evidenceRoot,
+		PerformanceRoot:    performanceRoot,
+		SlashingRoot:       slashingRoot,
+		RiskWindowRoot:     riskRoot,
+	}.Validate())
+
+	report, err := ValidateStateInvariants(StateInvariantInput{
+		ActiveEpochID:              9,
+		ActiveValidators:           validators,
+		ScoreRecords:               scoreRecords,
+		TaskGroups:                 []TaskGroup{taskGroup},
+		EvidenceRecords:            []EvidenceRecord{evidence},
+		EvidenceVerificationGroups: []EvidenceVerificationGroup{verificationGroup},
+		SlashingRecords:            []SlashingRecord{slashing},
+		RiskWindows:                []RiskWindowRecord{risk},
+		RiskWindowFaultChecks:      []RiskWindowFaultCheck{{StakeOwner: "delegator-a", ValidatorAddress: "val-a", FaultEpoch: 12, EvidenceEpoch: 20}},
+	})
+	require.NoError(t, err)
+	require.True(t, report.Passed)
+	require.Empty(t, report.FailedInvariants)
+}
+
+func TestStateInvariantsReportRequiredViolations(t *testing.T) {
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	validators := scoredCandidates(t, params, []Candidate{candidate("val-a", 1_000, 0), candidate("val-b", 1_000, 0)})
+	scoreRecords := []PosStateValidatorScoreRecord{{
+		EpochID:          9,
+		ValidatorAddress: "val-a",
+		RawStakeNaet:     sdkmath.NewInt(1_000),
+		EffectiveStake:   sdkmath.NewInt(2_000),
+		Score:            sdkmath.NewInt(1_000),
+	}}
+	taskGroupBadMember := stateTaskGroup(t, 9, PosEmptyRootHash, []string{"val-a", "val-c"}, 2)
+	taskGroupTooSmall := stateTaskGroup(t, 9, PosEmptyRootHash, []string{"val-a", "val-b"}, 3)
+	evidence := stateEvidenceRecord(t, "evidence-a", "val-a", "penalty-a", taskGroupBadMember.TaskGroupID, 9)
+	verificationGroup := stateEvidenceGroup(t, evidence, []string{"val-a", "val-b"}, []string{})
+	slashing := stateSlashingRecord(t, evidence.EvidenceID, evidence.PenaltyIDOptional, evidence.AccusedValidator)
+	secondSlashing := stateSlashingRecord(t, evidence.EvidenceID, "penalty-b", evidence.AccusedValidator)
+	badRouting := stateSlashingRecord(t, "evidence-b", "penalty-c", evidence.AccusedValidator)
+	badRouting.Routing.BurnNaet = badRouting.Routing.BurnNaet.AddRaw(1)
+	risk := riskWindow("delegator-a", "val-a", 1_000, RiskWindowStatusExpired)
+
+	report, err := ValidateStateInvariants(StateInvariantInput{
+		ActiveEpochID:              9,
+		ActiveValidators:           validators,
+		ScoreRecords:               scoreRecords,
+		TaskGroups:                 []TaskGroup{taskGroupBadMember, taskGroupTooSmall},
+		EvidenceRecords:            []EvidenceRecord{evidence},
+		EvidenceVerificationGroups: []EvidenceVerificationGroup{verificationGroup},
+		SlashingRecords:            []SlashingRecord{slashing, secondSlashing, badRouting},
+		RiskWindows:                []RiskWindowRecord{risk},
+		RiskWindowFaultChecks:      []RiskWindowFaultCheck{{StakeOwner: "delegator-a", ValidatorAddress: "val-a", FaultEpoch: 12, EvidenceEpoch: 20}},
+	})
+	require.NoError(t, err)
+	require.False(t, report.Passed)
+	require.Contains(t, report.FailedInvariants, "effective_stake_not_greater_than_raw_stake")
+	require.Contains(t, report.FailedInvariants, "active_validator_has_score_record")
+	require.Contains(t, report.FailedInvariants, "task_group_members_are_active_validators")
+	require.Contains(t, report.FailedInvariants, "task_group_size_meets_minimum")
+	require.Contains(t, report.FailedInvariants, "accused_validator_excluded_from_evidence_verification_group")
+	require.Contains(t, report.FailedInvariants, "accepted_evidence_maps_to_exactly_one_penalty_decision")
+	require.Contains(t, report.FailedInvariants, "slash_routing_sums_to_penalty_amount")
+	require.Contains(t, report.FailedInvariants, "unbonding_stake_remains_slashable_within_risk_window")
+}
+
 func TestEpochDefinitionDefaultsMatchLifecycleParameters(t *testing.T) {
 	params := DefaultParams()
 
@@ -2313,4 +2424,94 @@ func mustStateKey(t *testing.T, build func() (string, error)) string {
 	key, err := build()
 	require.NoError(t, err)
 	return key
+}
+
+func stateScoreRecords(validators []ScoredValidator, epochID uint64) []PosStateValidatorScoreRecord {
+	records := make([]PosStateValidatorScoreRecord, len(validators))
+	for i, validator := range validators {
+		records[i] = PosStateValidatorScoreRecord{
+			EpochID:          epochID,
+			ValidatorAddress: validator.ValidatorID,
+			RawStakeNaet:     validator.TotalStakeNaet,
+			EffectiveStake:   validator.EffectiveStakeNaet,
+			Score:            validator.Score,
+		}
+	}
+	return records
+}
+
+func stateTaskGroup(t *testing.T, epochID uint64, seed string, members []string, minimum uint32) TaskGroup {
+	t.Helper()
+	group := TaskGroup{
+		EpochID:          epochID,
+		WorkloadID:       "workload-a",
+		WorkloadType:     WorkloadTypeGlobalConsensus,
+		ValidatorMembers: append([]string{}, members...),
+		ProposerOrder:    append([]string{}, members...),
+		VerifierSet:      append([]string{}, members...),
+		MinimumGroupSize: minimum,
+		StakeWeightRoot:  PosEmptyRootHash,
+		AssignmentSeed:   seed,
+		ActivationHeight: 100,
+		ExpiryHeight:     120,
+	}
+	group.TaskGroupID = ComputeTaskGroupID(group)
+	return group
+}
+
+func stateEvidenceRecord(t *testing.T, evidenceID string, accused string, penaltyID string, taskGroupID string, epochID uint64) EvidenceRecord {
+	t.Helper()
+	record, err := NewEvidenceRecord(EvidenceRecord{
+		EvidenceID:          evidenceID,
+		EvidenceType:        EvidenceTypeDoubleSignProof,
+		AccusedValidator:    accused,
+		Reporter:            "reporter-a",
+		EpochID:             epochID,
+		TaskGroupIDOptional: taskGroupID,
+		ObjectHash:          PosEmptyRootHash,
+		ProofPayloadHash:    PosEmptyRootHash,
+		SubmittedHeight:     100,
+		Status:              EvidenceStatusAccepted,
+		VerificationGroupID: "verification-group-a",
+		DecisionHeight:      101,
+		PenaltyIDOptional:   penaltyID,
+	})
+	require.NoError(t, err)
+	return record
+}
+
+func stateEvidenceGroup(t *testing.T, evidence EvidenceRecord, members []string, excluded []string) EvidenceVerificationGroup {
+	t.Helper()
+	group := EvidenceVerificationGroup{
+		EvidenceID:           evidence.EvidenceID,
+		EpochID:              evidence.EpochID,
+		Members:              append([]string{}, members...),
+		ExcludedValidators:   append([]string{}, excluded...),
+		MinimumGroupSize:     uint32(len(members)),
+		DecisionThresholdBps: DefaultEvidenceVerificationQuorumBps,
+		AssignmentSeed:       PosEmptyRootHash,
+	}
+	group.VerificationGroupID = computeEvidenceVerificationGroupID(group)
+	group.GroupHash = computeEvidenceVerificationGroupHash(group)
+	return group
+}
+
+func stateSlashingRecord(t *testing.T, evidenceID string, penaltyID string, validatorID string) SlashingRecord {
+	t.Helper()
+	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
+		PenaltyID:         penaltyID,
+		ValidatorID:       validatorID,
+		SeverityLevel:     SlashSeverityMinorLivenessFault,
+		StakeExposureNaet: sdkmath.NewInt(1_000),
+		SelfStakeNaet:     sdkmath.NewInt(1_000),
+		EvidenceHeight:    100,
+	})
+	require.NoError(t, err)
+	routing, err := RouteSlashingPenalty(SlashingPenaltyRoutingInput{
+		Penalty:                penalty,
+		ReporterID:             "reporter-a",
+		AffectedPoolIDOptional: "pool-a",
+	})
+	require.NoError(t, err)
+	return NewSlashingRecord(evidenceID, penalty, routing, 9, 102)
 }

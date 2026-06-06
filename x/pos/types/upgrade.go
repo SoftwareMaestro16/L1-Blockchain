@@ -999,6 +999,59 @@ type StateModelManifest struct {
 	Root string
 }
 
+type RootCommitmentSpec struct {
+	Name       string
+	StateModel string
+	Source     string
+}
+
+type RootCommitmentManifest struct {
+	Roots []RootCommitmentSpec
+	Root  string
+}
+
+type StateRootCommitments struct {
+	EpochRoot          string
+	ValidatorScoreRoot string
+	TaskGroupRoot      string
+	EvidenceRoot       string
+	PerformanceRoot    string
+	SlashingRoot       string
+	RiskWindowRoot     string
+}
+
+type PosStateValidatorScoreRecord struct {
+	EpochID          uint64
+	ValidatorAddress string
+	RawStakeNaet     sdkmath.Int
+	EffectiveStake   sdkmath.Int
+	Score            sdkmath.Int
+}
+
+type RiskWindowFaultCheck struct {
+	StakeOwner       string
+	ValidatorAddress string
+	FaultEpoch       uint64
+	EvidenceEpoch    uint64
+}
+
+type StateInvariantInput struct {
+	ActiveEpochID              uint64
+	ActiveValidators           []ScoredValidator
+	ScoreRecords               []PosStateValidatorScoreRecord
+	TaskGroups                 []TaskGroup
+	EvidenceRecords            []EvidenceRecord
+	EvidenceVerificationGroups []EvidenceVerificationGroup
+	SlashingRecords            []SlashingRecord
+	RiskWindows                []RiskWindowRecord
+	RiskWindowFaultChecks      []RiskWindowFaultCheck
+}
+
+type StateInvariantReport struct {
+	Passed           bool
+	FailedInvariants []string
+}
+
 func (p CentralizationControlParams) Validate() error {
 	checks := []struct {
 		name  string
@@ -2014,6 +2067,375 @@ func RiskRedelegationKey(delegator string, sourceValidator string, destinationVa
 }
 func RiskExposureKey(epochID uint64, validator string, delegator string) (string, error) {
 	return stateKeyChecked("risk", "exposure", uint64StateComponent(epochID), validator, delegator)
+}
+
+func DefaultRootCommitmentManifest() RootCommitmentManifest {
+	manifest := RootCommitmentManifest{Roots: []RootCommitmentSpec{
+		{Name: "epoch_root", StateModel: "epoch", Source: "epoch records current phase and seed"},
+		{Name: "validator_score_root", StateModel: "validator_economy", Source: "validator score records"},
+		{Name: "task_group_root", StateModel: "taskgroups", Source: "task group set"},
+		{Name: "evidence_root", StateModel: "evidence", Source: "structured evidence records and verification groups"},
+		{Name: "performance_root", StateModel: "performance", Source: "performance records"},
+		{Name: "slashing_root", StateModel: "slashing", Source: "slashing records and penalty routing"},
+		{Name: "risk_window_root", StateModel: "risk", Source: "unbonding redelegation and exposure windows"},
+	}}
+	manifest.Root = ComputeRootCommitmentManifestRoot(manifest)
+	return manifest
+}
+
+func (m RootCommitmentManifest) Validate() error {
+	if len(m.Roots) == 0 {
+		return errors.New("root commitment specs are required")
+	}
+	seen := make(map[string]struct{}, len(m.Roots))
+	for _, root := range m.Roots {
+		if err := root.Validate(); err != nil {
+			return err
+		}
+		if _, found := seen[root.Name]; found {
+			return fmt.Errorf("duplicate root commitment %s", root.Name)
+		}
+		seen[root.Name] = struct{}{}
+	}
+	for _, required := range []string{"epoch_root", "validator_score_root", "task_group_root", "evidence_root", "performance_root", "slashing_root", "risk_window_root"} {
+		if _, found := seen[required]; !found {
+			return fmt.Errorf("required root commitment %s is missing", required)
+		}
+	}
+	if err := validatePosHash("root commitment manifest root", m.Root); err != nil {
+		return err
+	}
+	if expected := ComputeRootCommitmentManifestRoot(m); expected != m.Root {
+		return errors.New("root commitment manifest root mismatch")
+	}
+	return nil
+}
+
+func (s RootCommitmentSpec) Validate() error {
+	if err := validatePosToken("root commitment name", s.Name); err != nil {
+		return err
+	}
+	if err := validatePosToken("root commitment state model", s.StateModel); err != nil {
+		return err
+	}
+	return validatePosResponsibility("root commitment source", s.Source)
+}
+
+func ComputeRootCommitmentManifestRoot(manifest RootCommitmentManifest) string {
+	return posHashRoot("aetheris-pos-root-commitments-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(manifest.Roots)))
+		for _, root := range manifest.Roots {
+			posWritePart(w, root.Name)
+			posWritePart(w, root.StateModel)
+			posWritePart(w, root.Source)
+		}
+	})
+}
+
+func (r StateRootCommitments) Validate() error {
+	for _, item := range []struct {
+		name  string
+		value string
+	}{
+		{name: "epoch root", value: r.EpochRoot},
+		{name: "validator score root", value: r.ValidatorScoreRoot},
+		{name: "task group root", value: r.TaskGroupRoot},
+		{name: "evidence root", value: r.EvidenceRoot},
+		{name: "performance root", value: r.PerformanceRoot},
+		{name: "slashing root", value: r.SlashingRoot},
+		{name: "risk window root", value: r.RiskWindowRoot},
+	} {
+		if err := validatePosHash(item.name, item.value); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func ComputeEpochRoot(records []EpochRecord) (string, error) {
+	ordered := make([]EpochRecord, len(records))
+	copy(ordered, records)
+	sort.SliceStable(ordered, func(i, j int) bool {
+		return ordered[i].EpochID < ordered[j].EpochID
+	})
+	for _, record := range ordered {
+		if err := record.Validate(); err != nil {
+			return "", err
+		}
+	}
+	return posHashRoot("aetheris-pos-epoch-root-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(ordered)))
+		for _, record := range ordered {
+			posWriteUint64(w, record.EpochID)
+			posWriteUint64(w, record.StartHeight)
+			posWriteUint64(w, record.EndHeight)
+			posWritePart(w, string(record.Phase))
+			posWritePart(w, record.Seed)
+			posWritePart(w, record.ValidatorSetHash)
+			posWritePart(w, record.TaskGroupRoot)
+			posWritePart(w, record.PerformanceRoot)
+			posWritePart(w, record.RewardRoot)
+			posWritePart(w, record.SlashRoot)
+			posWritePart(w, string(record.SettlementStatus))
+		}
+	}), nil
+}
+
+func ComputeValidatorScoreRoot(records []PosStateValidatorScoreRecord) (string, error) {
+	ordered := make([]PosStateValidatorScoreRecord, len(records))
+	copy(ordered, records)
+	sort.SliceStable(ordered, func(i, j int) bool {
+		if ordered[i].EpochID != ordered[j].EpochID {
+			return ordered[i].EpochID < ordered[j].EpochID
+		}
+		return ordered[i].ValidatorAddress < ordered[j].ValidatorAddress
+	})
+	for _, record := range ordered {
+		if err := record.Validate(); err != nil {
+			return "", err
+		}
+	}
+	return posHashRoot("aetheris-pos-validator-score-root-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(ordered)))
+		for _, record := range ordered {
+			posWriteUint64(w, record.EpochID)
+			posWritePart(w, record.ValidatorAddress)
+			posWritePart(w, record.RawStakeNaet.String())
+			posWritePart(w, record.EffectiveStake.String())
+			posWritePart(w, record.Score.String())
+		}
+	}), nil
+}
+
+func (r PosStateValidatorScoreRecord) Validate() error {
+	if r.EpochID == 0 {
+		return errors.New("validator score record epoch id is required")
+	}
+	if err := validatePosToken("validator score record validator", r.ValidatorAddress); err != nil {
+		return err
+	}
+	if r.RawStakeNaet.IsNil() || r.RawStakeNaet.IsNegative() {
+		return errors.New("validator score raw stake cannot be negative")
+	}
+	if r.EffectiveStake.IsNil() || r.EffectiveStake.IsNegative() {
+		return errors.New("validator score effective stake cannot be negative")
+	}
+	if r.Score.IsNil() || r.Score.IsNegative() {
+		return errors.New("validator score cannot be negative")
+	}
+	if r.EffectiveStake.GT(r.RawStakeNaet) {
+		return errors.New("validator score effective stake cannot exceed raw stake")
+	}
+	return nil
+}
+
+func ComputeEvidenceRoot(records []EvidenceRecord, groups []EvidenceVerificationGroup) (string, error) {
+	orderedRecords := make([]EvidenceRecord, len(records))
+	copy(orderedRecords, records)
+	sort.SliceStable(orderedRecords, func(i, j int) bool { return orderedRecords[i].EvidenceID < orderedRecords[j].EvidenceID })
+	orderedGroups := make([]EvidenceVerificationGroup, len(groups))
+	copy(orderedGroups, groups)
+	sort.SliceStable(orderedGroups, func(i, j int) bool {
+		if orderedGroups[i].EvidenceID != orderedGroups[j].EvidenceID {
+			return orderedGroups[i].EvidenceID < orderedGroups[j].EvidenceID
+		}
+		return orderedGroups[i].VerificationGroupID < orderedGroups[j].VerificationGroupID
+	})
+	for _, record := range orderedRecords {
+		if err := record.Validate(); err != nil {
+			return "", err
+		}
+	}
+	for _, group := range orderedGroups {
+		if err := group.Validate(); err != nil {
+			return "", err
+		}
+	}
+	return posHashRoot("aetheris-pos-evidence-root-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(orderedRecords)))
+		for _, record := range orderedRecords {
+			posWritePart(w, computeEvidenceRecordHash(record))
+		}
+		posWriteUint64(w, uint64(len(orderedGroups)))
+		for _, group := range orderedGroups {
+			posWritePart(w, group.GroupHash)
+		}
+	}), nil
+}
+
+func ComputePerformanceRoot(records []PerformanceRecord) (string, error) {
+	ordered := make([]PerformanceRecord, len(records))
+	copy(ordered, records)
+	sort.SliceStable(ordered, func(i, j int) bool {
+		if ordered[i].EpochID != ordered[j].EpochID {
+			return ordered[i].EpochID < ordered[j].EpochID
+		}
+		if ordered[i].OperatorAddress != ordered[j].OperatorAddress {
+			return ordered[i].OperatorAddress < ordered[j].OperatorAddress
+		}
+		return ordered[i].Role < ordered[j].Role
+	})
+	for _, record := range ordered {
+		if err := record.Validate(); err != nil {
+			return "", err
+		}
+	}
+	return posHashRoot("aetheris-pos-performance-root-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(ordered)))
+		for _, record := range ordered {
+			posWriteUint64(w, record.EpochID)
+			posWritePart(w, record.OperatorAddress)
+			posWritePart(w, string(record.Role))
+			posWriteUint64(w, record.AssignedTasks)
+			posWriteUint64(w, record.CompletedTasks)
+			posWriteUint64(w, record.MissedTasks)
+			posWriteUint64(w, record.InvalidTasks)
+			posWriteUint64(w, uint64(record.RewardMultiplierBps))
+		}
+	}), nil
+}
+
+func ComputeSlashingRoot(records []SlashingRecord) (string, error) {
+	ordered := make([]SlashingRecord, len(records))
+	copy(ordered, records)
+	sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].PenaltyID < ordered[j].PenaltyID })
+	for _, record := range ordered {
+		if err := record.Validate(); err != nil {
+			return "", err
+		}
+	}
+	return posHashRoot("aetheris-pos-slashing-root-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(ordered)))
+		for _, record := range ordered {
+			posWritePart(w, record.RecordHash)
+		}
+	}), nil
+}
+
+func ComputeRiskWindowSetRoot(records []RiskWindowRecord) (string, error) {
+	ordered := make([]RiskWindowRecord, len(records))
+	copy(ordered, records)
+	sort.SliceStable(ordered, func(i, j int) bool {
+		if ordered[i].StartEpoch != ordered[j].StartEpoch {
+			return ordered[i].StartEpoch < ordered[j].StartEpoch
+		}
+		if ordered[i].ValidatorAddress != ordered[j].ValidatorAddress {
+			return ordered[i].ValidatorAddress < ordered[j].ValidatorAddress
+		}
+		return ordered[i].StakeOwner < ordered[j].StakeOwner
+	})
+	for _, record := range ordered {
+		if err := record.Validate(); err != nil {
+			return "", err
+		}
+	}
+	return posHashRoot("aetheris-pos-risk-window-root-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(ordered)))
+		for _, record := range ordered {
+			posWritePart(w, record.RiskHistoryRoot)
+		}
+	}), nil
+}
+
+func ValidateStateInvariants(input StateInvariantInput) (StateInvariantReport, error) {
+	if input.ActiveEpochID == 0 {
+		return StateInvariantReport{}, errors.New("state invariant active epoch id is required")
+	}
+	failed := make([]string, 0)
+	active := make(map[string]ScoredValidator, len(input.ActiveValidators))
+	for _, validator := range input.ActiveValidators {
+		if err := validateScoredValidatorForSecurity(validator); err != nil {
+			return StateInvariantReport{}, err
+		}
+		active[validator.ValidatorID] = validator
+	}
+	scoreByValidator := make(map[string]PosStateValidatorScoreRecord, len(input.ScoreRecords))
+	for _, record := range input.ScoreRecords {
+		if err := record.Validate(); err != nil {
+			if strings.Contains(err.Error(), "effective stake cannot exceed raw stake") {
+				failed = appendUnique(failed, "effective_stake_not_greater_than_raw_stake")
+				continue
+			}
+			return StateInvariantReport{}, err
+		}
+		if record.EpochID == input.ActiveEpochID {
+			scoreByValidator[record.ValidatorAddress] = record
+		}
+	}
+	for validatorID := range active {
+		if _, found := scoreByValidator[validatorID]; !found {
+			failed = appendUnique(failed, "active_validator_has_score_record")
+		}
+	}
+	for _, group := range input.TaskGroups {
+		if err := group.Validate(); err != nil {
+			if strings.Contains(err.Error(), "minimum group size") {
+				failed = appendUnique(failed, "task_group_size_meets_minimum")
+				continue
+			}
+			return StateInvariantReport{}, err
+		}
+		if len(group.ValidatorMembers) < int(group.MinimumGroupSize) {
+			failed = appendUnique(failed, "task_group_size_meets_minimum")
+		}
+		for _, member := range group.ValidatorMembers {
+			if _, found := active[member]; !found {
+				failed = appendUnique(failed, "task_group_members_are_active_validators")
+			}
+		}
+	}
+	groupByEvidence := make(map[string]EvidenceVerificationGroup, len(input.EvidenceVerificationGroups))
+	for _, group := range input.EvidenceVerificationGroups {
+		if err := group.Validate(); err != nil {
+			if strings.Contains(err.Error(), "excluded") {
+				failed = appendUnique(failed, "accused_validator_excluded_from_evidence_verification_group")
+				continue
+			}
+			return StateInvariantReport{}, err
+		}
+		groupByEvidence[group.EvidenceID] = group
+	}
+	slashingByEvidence := make(map[string][]SlashingRecord)
+	for _, record := range input.SlashingRecords {
+		if err := record.Validate(); err != nil {
+			if strings.Contains(err.Error(), "routing") || strings.Contains(err.Error(), "sum") {
+				failed = appendUnique(failed, "slash_routing_sums_to_penalty_amount")
+				continue
+			}
+			return StateInvariantReport{}, err
+		}
+		slashingByEvidence[record.EvidenceID] = append(slashingByEvidence[record.EvidenceID], record)
+	}
+	for _, evidence := range input.EvidenceRecords {
+		if err := evidence.Validate(); err != nil {
+			return StateInvariantReport{}, err
+		}
+		if group, found := groupByEvidence[evidence.EvidenceID]; found {
+			if isExcludedValidator(evidence.AccusedValidator, group.Members) || !isExcludedValidator(evidence.AccusedValidator, group.ExcludedValidators) {
+				failed = appendUnique(failed, "accused_validator_excluded_from_evidence_verification_group")
+			}
+		}
+		if evidence.Status == EvidenceStatusAccepted || evidence.Status == EvidenceStatusSlashed {
+			if len(slashingByEvidence[evidence.EvidenceID]) != 1 {
+				failed = appendUnique(failed, "accepted_evidence_maps_to_exactly_one_penalty_decision")
+			}
+		}
+	}
+	for _, check := range input.RiskWindowFaultChecks {
+		result, err := QuerySlashExposure(input.RiskWindows, SlashExposureQuery{
+			StakeOwner:       check.StakeOwner,
+			ValidatorAddress: check.ValidatorAddress,
+			FaultEpoch:       check.FaultEpoch,
+			EvidenceEpoch:    check.EvidenceEpoch,
+		})
+		if err != nil {
+			return StateInvariantReport{}, err
+		}
+		if !result.ExposureNaet.IsPositive() {
+			failed = appendUnique(failed, "unbonding_stake_remains_slashable_within_risk_window")
+		}
+	}
+	return StateInvariantReport{Passed: len(failed) == 0, FailedInvariants: failed}, nil
 }
 
 func (a LayeredPosArchitecture) Validate() error {
@@ -6919,6 +7341,15 @@ func validateStateKeyComponent(fieldName string, value string) error {
 		return fmt.Errorf("%s must not contain path separator", fieldName)
 	}
 	return nil
+}
+
+func appendUnique(values []string, value string) []string {
+	for _, existing := range values {
+		if existing == value {
+			return values
+		}
+	}
+	return append(values, value)
 }
 
 func validatePosToken(fieldName string, value string) error {
