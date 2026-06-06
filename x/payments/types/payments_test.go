@@ -331,12 +331,12 @@ func TestPaymentAPISurfaceVirtualChannelMessagesAndQueries(t *testing.T) {
 	require.Equal(t, string(PaymentAPIEventFraudProofRejected), rejected.EventType)
 }
 
-func TestPaymentRoadmapPhase0ThroughPhase4VectorsAndExitCriteria(t *testing.T) {
+func TestPaymentRoadmapPhase0ThroughPhase6VectorsAndExitCriteria(t *testing.T) {
 	report := BuildPaymentImplementationRoadmap()
 	require.NoError(t, ValidatePaymentImplementationRoadmap(report))
 	require.Equal(t, report.TotalTaskCount, report.CompletedTaskCount)
-	require.Equal(t, uint64(36), report.TotalTaskCount)
-	require.Equal(t, uint64(16), report.ExitCriteriaCount)
+	require.Equal(t, uint64(49), report.TotalTaskCount)
+	require.Equal(t, uint64(22), report.ExitCriteriaCount)
 
 	alice := testAddress(0x46)
 	router := testAddress(0x47)
@@ -475,6 +475,63 @@ func TestPaymentRoadmapPhase0ThroughPhase4VectorsAndExitCriteria(t *testing.T) {
 	routingVector, err := BuildPaymentRoadmapRoutingVector(route, attempt, failure)
 	require.NoError(t, err)
 	require.NoError(t, routingVector.Validate())
+
+	virtualState, virtualBase, activation := virtualChannelFixture(t, "roadmap-phase5-virtual", alice, router, bob, "100", 60)
+	endpointUpdate := signedVirtualEndpointUpdate(t, virtualBase, 2, "85", "15")
+	virtualState, err = AcceptVirtualChannelUpdate(virtualState, endpointUpdate, 25)
+	require.NoError(t, err)
+	disputeState := signedVirtualEndpointUpdate(t, endpointUpdate, 3, "80", "20")
+	disputeProof, err := BuildVirtualChannelDisputeProof(disputeState, virtualReserveCommitments(activation), router)
+	require.NoError(t, err)
+	virtualState, err = SubmitVirtualChannelDispute(virtualState, disputeProof, 30)
+	require.NoError(t, err)
+	opsVirtualState := virtualState
+	finalVirtualState := signedVirtualEndpointUpdate(t, disputeState, 4, "75", "25")
+	closeProof, err := BuildVirtualCloseProof(finalVirtualState, VirtualCloseModeDisputed, virtualReserveCommitments(activation), router, 31)
+	require.NoError(t, err)
+	_, _, releases, err := CloseVirtualChannelWithProof(virtualState, closeProof, 31)
+	require.NoError(t, err)
+	virtualVector, err := BuildPaymentRoadmapVirtualVector(virtualBase, activation, closeProof, disputeProof, releases, endpointUpdate)
+	require.NoError(t, err)
+	require.NoError(t, virtualVector.Validate())
+	require.Len(t, virtualVector.ParentChannelIDs, 2)
+	require.Len(t, virtualVector.ReserveReleaseHashes, 2)
+
+	cleanupChannel := signedChannel(t, "roadmap-cleanup-channel", "1000", alice, bob)
+	cleanupBase := signedReserveState(t, cleanupChannel, 2, cleanupChannel.OpeningStateHash, "20", "0", []Balance{
+		{Participant: alice, Amount: "970"},
+		{Participant: bob, Amount: "10"},
+	})
+	cleanupPromiseChannel := cleanupChannel
+	cleanupPromiseChannel.LatestState = cleanupBase
+	cleanupPromise := signedLinkedPromise(t, cleanupPromiseChannel, HashParts("roadmap-cleanup-promise", cleanupChannel.ChannelID), alice, bob, "10", "0", 3, 40, HashParts("roadmap-cleanup-preimage"), "", "")
+	cleanupConditioned, _, err := BuildConditionRootUpdateFromPromises(cleanupPromiseChannel, cleanupBase, []ConditionalPromise{cleanupPromise}, nil)
+	require.NoError(t, err)
+	cleanupConditioned = resignState(t, cleanupChannel, cleanupConditioned)
+	cleanupState := EmptyState()
+	cleanupState, err = OpenChannel(cleanupState, cleanupChannel)
+	require.NoError(t, err)
+	cleanupState, err = AcceptSignedState(cleanupState, cleanupChannel.ChannelID, cleanupConditioned, 20)
+	require.NoError(t, err)
+	cleanupState, _, err = EnqueueExpiredPromise(cleanupState, cleanupPromise, alice, 21)
+	require.NoError(t, err)
+	_, cleanupResult, err := ProcessAsyncExecutionQueues(cleanupState, 41, 0, 1)
+	require.NoError(t, err)
+	require.NotEmpty(t, cleanupResult.EmittedCompletionIDs)
+
+	layout, err := BuildStoreV2Layout(opsVirtualState)
+	require.NoError(t, err)
+	require.NoError(t, layout.Validate())
+	snapshot, err := BuildAdaptiveSyncSnapshot(opsVirtualState, 50)
+	require.NoError(t, err)
+	recovery, err := RecoverAdaptiveSyncSafety(snapshot)
+	require.NoError(t, err)
+	require.Contains(t, recovery.VirtualChannelIDs, virtualBase.VirtualChannelID)
+	require.NotEmpty(t, recovery.WatcherReplayEventIDs)
+	opsVector, err := BuildPaymentRoadmapOperationsVector(layout, blockPlan, snapshot, recovery, cleanupResult)
+	require.NoError(t, err)
+	require.NoError(t, opsVector.Validate())
+	require.Equal(t, uint64(len(snapshot.WatcherReplayEvents)), opsVector.WatcherReplayCount)
 }
 
 func TestSettlementArbitrationBoundaryRejectsNonDeterministicInputs(t *testing.T) {

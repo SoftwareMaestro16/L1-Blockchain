@@ -17,6 +17,8 @@ const (
 	PaymentRoadmapPhase2 PaymentRoadmapPhaseID = "phase_2_fraud_proofs_and_penalties"
 	PaymentRoadmapPhase3 PaymentRoadmapPhaseID = "phase_3_conditional_payments"
 	PaymentRoadmapPhase4 PaymentRoadmapPhaseID = "phase_4_routing_engine"
+	PaymentRoadmapPhase5 PaymentRoadmapPhaseID = "phase_5_virtual_channels"
+	PaymentRoadmapPhase6 PaymentRoadmapPhaseID = "phase_6_performance_and_operations"
 )
 
 type PaymentRoadmapTask struct {
@@ -106,6 +108,31 @@ type PaymentRoadmapRoutingVector struct {
 	FailureAware       bool
 	StructuredFailures bool
 	EvidenceHash       string
+}
+
+type PaymentRoadmapVirtualVector struct {
+	VectorID             string
+	VirtualChannelID     string
+	ParentChannelIDs     []string
+	ActivationProofHash  string
+	CloseProofHash       string
+	DisputeEvidenceHash  string
+	ReserveReleaseHashes []string
+	EndpointUpdateHash   string
+	Capacity             string
+	EvidenceHash         string
+}
+
+type PaymentRoadmapOperationsVector struct {
+	VectorID             string
+	StoreV2LayoutHash    string
+	BlockSTMPlanHash     string
+	AdaptiveSnapshotHash string
+	RecoveryHash         string
+	WatcherReplayCount   uint64
+	CleanupCompletionIDs []string
+	MetricsHash          string
+	EvidenceHash         string
 }
 
 func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
@@ -202,6 +229,41 @@ func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 				roadmapCriterion("phase4_structured_failures", "Route attempts produce structured failure data.", "RouteFailureReport", "RouteAttempt", "RetryRoutingEnginePath"),
 			},
 		},
+		{
+			PhaseID: PaymentRoadmapPhase5,
+			Title:   "Virtual Channels",
+			Tasks: []PaymentRoadmapTask{
+				roadmapTask("phase5_virtual_channel_state", "Implement virtual channel state.", "VirtualChannel", "BuildVirtualChannel", "ComputeVirtualChannelStateHash"),
+				roadmapTask("phase5_parent_reservation_accounting", "Implement parent-channel reservation accounting.", "VirtualParentReserve", "BuildVirtualParentReserve", "validateVirtualParentAccounting"),
+				roadmapTask("phase5_virtual_open_proof", "Implement virtual open proof.", "VirtualActivationProof", "BuildVirtualActivationProof", "OpenVirtualChannelWithProof"),
+				roadmapTask("phase5_endpoint_updates", "Implement endpoint updates.", "AcceptVirtualChannelUpdate", "SignatureForVirtualChannel", "validateVirtualEndpointUpdate"),
+				roadmapTask("phase5_virtual_close", "Implement virtual close.", "BuildVirtualCloseProof", "CloseVirtualChannelWithProof"),
+				roadmapTask("phase5_virtual_dispute", "Implement virtual dispute.", "BuildVirtualChannelDisputeProof", "SubmitVirtualChannelDispute"),
+				roadmapTask("phase5_parent_reserve_release", "Implement parent reserve release.", "VirtualReserveRelease", "virtualReserveReleasesFromClose"),
+			},
+			ExitCriteria: []PaymentRoadmapExitCriterion{
+				roadmapCriterion("phase5_no_direct_channel", "Endpoints transact without direct on-chain channel.", "virtualChannelFixture", "AcceptVirtualChannelUpdate"),
+				roadmapCriterion("phase5_parent_reserve_capacity", "Parent channel reserves enforce virtual capacity.", "validateVirtualParentAccounting", "parentReservedCapacity"),
+				roadmapCriterion("phase5_parent_commitment_disputes", "Virtual disputes resolve through parent commitments.", "BuildVirtualChannelDisputeProof", "ComputeVirtualDisputeEvidenceHash"),
+			},
+		},
+		{
+			PhaseID: PaymentRoadmapPhase6,
+			Title:   "Performance and Operations",
+			Tasks: []PaymentRoadmapTask{
+				roadmapTask("phase6_store_v2_layout_benchmarks", "Add Store v2 layout benchmarks.", "BuildStoreV2Layout", "StoreV2Layout.Validate"),
+				roadmapTask("phase6_blockstm_batch_benchmarks", "Add BlockSTM settlement batch benchmarks.", "BuildPaymentRoadmapBlockSTMPlan", "ProfileBlockSTMConflicts"),
+				roadmapTask("phase6_adaptive_sync_recovery_tests", "Add AdaptiveSync recovery tests.", "BuildAdaptiveSyncSnapshot", "RecoverAdaptiveSyncSafety"),
+				roadmapTask("phase6_watcher_event_replay", "Add watcher event replay.", "AdaptiveSyncWatcherReplayEvent", "WatcherReplayEvents"),
+				roadmapTask("phase6_cleanup_queues", "Add cleanup queues for expired promises and finalizable channels.", "ProcessAsyncExecutionQueues", "AsyncFinalizationJob", "AsyncPromiseExpiryJob"),
+				roadmapTask("phase6_operational_metrics_alerts", "Add operational metrics and alerts.", "SettlementInclusionLatency", "DisputePriorityDecision", "PaymentEvent"),
+			},
+			ExitCriteria: []PaymentRoadmapExitCriterion{
+				roadmapCriterion("phase6_parallel_blockstm_ops", "Independent channel operations parallelize under BlockSTM.", "BlockSTMConflictProfile.ParallelizableGroups", "PaymentRoadmapBlockSTMPlan.ConflictCount"),
+				roadmapCriterion("phase6_adaptive_recovery", "Recovering nodes reconstruct active payment state from snapshots.", "RecoverAdaptiveSyncSafety", "AdaptiveSyncRecoveryState"),
+				roadmapCriterion("phase6_watcher_resync", "Watch services can resync from events and queries.", "WatcherReplayEvents", "QueryActiveDisputes", "QueryPendingFinalizations"),
+			},
+		},
 	}
 	report := PaymentRoadmapReport{Phases: phases}
 	for _, phase := range phases {
@@ -219,8 +281,8 @@ func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 
 func ValidatePaymentImplementationRoadmap(report PaymentRoadmapReport) error {
 	report = report.Normalize()
-	if len(report.Phases) != 5 {
-		return errors.New("payments roadmap requires phases 0 through 4")
+	if len(report.Phases) != 7 {
+		return errors.New("payments roadmap requires phases 0 through 6")
 	}
 	seenPhases := map[PaymentRoadmapPhaseID]struct{}{}
 	for _, phase := range report.Phases {
@@ -261,7 +323,7 @@ func ValidatePaymentImplementationRoadmap(report PaymentRoadmapReport) error {
 			}
 		}
 	}
-	for _, required := range []PaymentRoadmapPhaseID{PaymentRoadmapPhase0, PaymentRoadmapPhase1, PaymentRoadmapPhase2, PaymentRoadmapPhase3, PaymentRoadmapPhase4} {
+	for _, required := range []PaymentRoadmapPhaseID{PaymentRoadmapPhase0, PaymentRoadmapPhase1, PaymentRoadmapPhase2, PaymentRoadmapPhase3, PaymentRoadmapPhase4, PaymentRoadmapPhase5, PaymentRoadmapPhase6} {
 		if _, found := seenPhases[required]; !found {
 			return fmt.Errorf("payments roadmap missing phase %q", required)
 		}
@@ -668,6 +730,240 @@ func (v PaymentRoadmapRoutingVector) Validate() error {
 		return errors.New("payments roadmap routing vector is missing required route signals")
 	}
 	return ValidateHash("payments roadmap routing evidence", vector.EvidenceHash)
+}
+
+func BuildPaymentRoadmapVirtualVector(vc VirtualChannel, activation VirtualActivationProof, closeProof VirtualCloseProof, dispute VirtualChannelDisputeProof, releases []VirtualReserveRelease, endpointUpdate VirtualChannel) (PaymentRoadmapVirtualVector, error) {
+	vc = vc.Normalize()
+	activation = activation.Normalize()
+	closeProof = closeProof.Normalize()
+	dispute = dispute.Normalize()
+	endpointUpdate = endpointUpdate.Normalize()
+	if vc.StateHash == "" {
+		built, err := BuildVirtualChannel(vc)
+		if err != nil {
+			return PaymentRoadmapVirtualVector{}, err
+		}
+		vc = built.Normalize()
+	}
+	if endpointUpdate.StateHash == "" {
+		built, err := BuildVirtualChannel(endpointUpdate)
+		if err != nil {
+			return PaymentRoadmapVirtualVector{}, err
+		}
+		endpointUpdate = built.Normalize()
+	}
+	if err := vc.ValidateCore(); err != nil {
+		return PaymentRoadmapVirtualVector{}, err
+	}
+	if activation.ProofHash == "" {
+		activation.ProofHash = ComputeVirtualActivationProofHash(activation)
+	}
+	if closeProof.ProofHash == "" {
+		closeProof.ProofHash = ComputeVirtualCloseProofHash(closeProof)
+	}
+	if dispute.EvidenceHash == "" {
+		dispute.EvidenceHash = ComputeVirtualDisputeEvidenceHash(dispute)
+	}
+	releaseHashes := make([]string, 0, len(releases))
+	for _, release := range releases {
+		release = release.Normalize()
+		if release.ReleaseHash == "" {
+			release.ReleaseHash = HashParts("virtual-reserve-release", release.SegmentID, release.VirtualChannelID, release.ParentChannelID, release.ReserveCommitment, release.Capacity, release.BalanceA, release.BalanceB, release.FeeAmount, fmt.Sprintf("%020d", release.ReleaseHeight))
+		}
+		releaseHashes = append(releaseHashes, release.ReleaseHash)
+	}
+	sort.Strings(releaseHashes)
+	vector := PaymentRoadmapVirtualVector{
+		VectorID:             HashParts("payments-roadmap-virtual-vector", vc.VirtualChannelID, activation.ProofHash, closeProof.ProofHash, dispute.EvidenceHash),
+		VirtualChannelID:     vc.VirtualChannelID,
+		ParentChannelIDs:     normalizeHashSlice(vc.ParentChannelIDs),
+		ActivationProofHash:  activation.ProofHash,
+		CloseProofHash:       closeProof.ProofHash,
+		DisputeEvidenceHash:  dispute.EvidenceHash,
+		ReserveReleaseHashes: releaseHashes,
+		EndpointUpdateHash:   endpointUpdate.StateHash,
+		Capacity:             vc.Capacity,
+		EvidenceHash:         HashParts("payments-roadmap-virtual-evidence", vc.StateHash, endpointUpdate.StateHash, activation.ProofHash, closeProof.ProofHash, dispute.EvidenceHash, strings.Join(releaseHashes, "|")),
+	}
+	vector = vector.Normalize()
+	return vector, vector.Validate()
+}
+
+func (v PaymentRoadmapVirtualVector) Normalize() PaymentRoadmapVirtualVector {
+	v.VectorID = normalizeOptionalHash(v.VectorID)
+	v.VirtualChannelID = normalizeHash(v.VirtualChannelID)
+	v.ParentChannelIDs = normalizeHashSlice(v.ParentChannelIDs)
+	v.ActivationProofHash = normalizeHash(v.ActivationProofHash)
+	v.CloseProofHash = normalizeHash(v.CloseProofHash)
+	v.DisputeEvidenceHash = normalizeHash(v.DisputeEvidenceHash)
+	for i := range v.ReserveReleaseHashes {
+		v.ReserveReleaseHashes[i] = normalizeHash(v.ReserveReleaseHashes[i])
+	}
+	sort.Strings(v.ReserveReleaseHashes)
+	v.EndpointUpdateHash = normalizeHash(v.EndpointUpdateHash)
+	v.Capacity = strings.TrimSpace(v.Capacity)
+	v.EvidenceHash = normalizeOptionalHash(v.EvidenceHash)
+	return v
+}
+
+func (v PaymentRoadmapVirtualVector) Validate() error {
+	vector := v.Normalize()
+	if err := ValidateHash("payments roadmap virtual vector id", vector.VectorID); err != nil {
+		return err
+	}
+	if err := ValidateHash("payments roadmap virtual channel id", vector.VirtualChannelID); err != nil {
+		return err
+	}
+	if len(vector.ParentChannelIDs) == 0 || len(vector.ReserveReleaseHashes) == 0 {
+		return errors.New("payments roadmap virtual vector requires parent channels and reserve releases")
+	}
+	if _, err := parsePositiveInt("payments roadmap virtual capacity", vector.Capacity); err != nil {
+		return err
+	}
+	for _, parentID := range vector.ParentChannelIDs {
+		if err := ValidateHash("payments roadmap virtual parent channel id", parentID); err != nil {
+			return err
+		}
+	}
+	for _, releaseHash := range vector.ReserveReleaseHashes {
+		if err := ValidateHash("payments roadmap virtual release hash", releaseHash); err != nil {
+			return err
+		}
+	}
+	for name, value := range map[string]string{
+		"activation proof": vector.ActivationProofHash,
+		"close proof":      vector.CloseProofHash,
+		"dispute evidence": vector.DisputeEvidenceHash,
+		"endpoint update":  vector.EndpointUpdateHash,
+		"virtual evidence": vector.EvidenceHash,
+	} {
+		if err := ValidateHash("payments roadmap virtual "+name, value); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func BuildPaymentRoadmapOperationsVector(layout StoreV2Layout, blockPlan PaymentRoadmapBlockSTMPlan, snapshot AdaptiveSyncSnapshot, recovery AdaptiveSyncRecoveryState, cleanup AsyncExecutionResult) (PaymentRoadmapOperationsVector, error) {
+	layout = layout.Normalize()
+	if err := layout.Validate(); err != nil {
+		return PaymentRoadmapOperationsVector{}, err
+	}
+	if err := ValidateHash("payments roadmap blockstm plan hash", blockPlan.PlanHash); err != nil {
+		return PaymentRoadmapOperationsVector{}, err
+	}
+	snapshot = snapshot.Normalize()
+	if err := snapshot.Validate(); err != nil {
+		return PaymentRoadmapOperationsVector{}, err
+	}
+	if recovery.RecoveredFromSnapshotHash != snapshot.SnapshotHash {
+		return PaymentRoadmapOperationsVector{}, errors.New("payments roadmap recovery hash does not match snapshot")
+	}
+	cleanupIDs := normalizeHashSlice(cleanup.EmittedCompletionIDs)
+	layoutHash := computePaymentRoadmapStoreV2LayoutHash(layout)
+	recoveryHash := computePaymentRoadmapRecoveryHash(recovery)
+	vector := PaymentRoadmapOperationsVector{
+		VectorID:             HashParts("payments-roadmap-operations-vector", layoutHash, blockPlan.PlanHash, snapshot.SnapshotHash, recoveryHash),
+		StoreV2LayoutHash:    layoutHash,
+		BlockSTMPlanHash:     blockPlan.PlanHash,
+		AdaptiveSnapshotHash: snapshot.SnapshotHash,
+		RecoveryHash:         recoveryHash,
+		WatcherReplayCount:   uint64(len(snapshot.WatcherReplayEvents)),
+		CleanupCompletionIDs: cleanupIDs,
+		MetricsHash:          HashParts("payments-roadmap-ops-metrics", layoutHash, blockPlan.PlanHash, snapshot.SnapshotHash, fmt.Sprintf("%020d", len(snapshot.WatcherReplayEvents)), fmt.Sprintf("%020d", cleanup.ProcessedFinalizations), fmt.Sprintf("%020d", cleanup.ProcessedPromiseExpiries)),
+		EvidenceHash:         HashParts("payments-roadmap-operations-evidence", layoutHash, blockPlan.PlanHash, snapshot.SnapshotHash, recoveryHash, strings.Join(cleanupIDs, "|")),
+	}
+	vector = vector.Normalize()
+	return vector, vector.Validate()
+}
+
+func (v PaymentRoadmapOperationsVector) Normalize() PaymentRoadmapOperationsVector {
+	v.VectorID = normalizeOptionalHash(v.VectorID)
+	v.StoreV2LayoutHash = normalizeHash(v.StoreV2LayoutHash)
+	v.BlockSTMPlanHash = normalizeHash(v.BlockSTMPlanHash)
+	v.AdaptiveSnapshotHash = normalizeHash(v.AdaptiveSnapshotHash)
+	v.RecoveryHash = normalizeHash(v.RecoveryHash)
+	v.CleanupCompletionIDs = normalizeHashSlice(v.CleanupCompletionIDs)
+	v.MetricsHash = normalizeHash(v.MetricsHash)
+	v.EvidenceHash = normalizeOptionalHash(v.EvidenceHash)
+	return v
+}
+
+func (v PaymentRoadmapOperationsVector) Validate() error {
+	vector := v.Normalize()
+	for name, value := range map[string]string{
+		"vector id":         vector.VectorID,
+		"store v2 layout":   vector.StoreV2LayoutHash,
+		"blockstm plan":     vector.BlockSTMPlanHash,
+		"adaptive snapshot": vector.AdaptiveSnapshotHash,
+		"recovery":          vector.RecoveryHash,
+		"metrics":           vector.MetricsHash,
+		"evidence":          vector.EvidenceHash,
+	} {
+		if err := ValidateHash("payments roadmap operations "+name, value); err != nil {
+			return err
+		}
+	}
+	if vector.WatcherReplayCount == 0 {
+		return errors.New("payments roadmap operations vector requires watcher replay events")
+	}
+	if len(vector.CleanupCompletionIDs) == 0 {
+		return errors.New("payments roadmap operations vector requires cleanup completion evidence")
+	}
+	for _, id := range vector.CleanupCompletionIDs {
+		if err := ValidateHash("payments roadmap operations cleanup completion", id); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func computePaymentRoadmapStoreV2LayoutHash(layout StoreV2Layout) string {
+	layout = layout.Normalize()
+	parts := []string{
+		"payments-roadmap-store-v2-layout",
+		fmt.Sprintf("%020d", layout.Version),
+		fmt.Sprintf("%020d", len(layout.Channels)),
+		fmt.Sprintf("%020d", len(layout.ChannelStates)),
+		fmt.Sprintf("%020d", len(layout.PendingCloses)),
+		fmt.Sprintf("%020d", len(layout.Conditions)),
+		fmt.Sprintf("%020d", len(layout.VirtualChannels)),
+		fmt.Sprintf("%020d", len(layout.ParticipantChannels)),
+		fmt.Sprintf("%020d", len(layout.SettlementTombstones)),
+		fmt.Sprintf("%020d", len(layout.FeeAccumulators)),
+		fmt.Sprintf("%020d", len(layout.FraudProofs)),
+	}
+	for _, record := range layout.Channels {
+		parts = append(parts, record.Key, record.ChannelID, record.LatestStateHash)
+	}
+	for _, record := range layout.VirtualChannels {
+		parts = append(parts, record.Key, record.VirtualChannelID, record.AnchorHash)
+	}
+	for _, record := range layout.ParticipantChannels {
+		parts = append(parts, record.Key, record.Participant, record.ChannelID)
+	}
+	return HashParts(parts...)
+}
+
+func computePaymentRoadmapRecoveryHash(recovery AdaptiveSyncRecoveryState) string {
+	sortStrings(recovery.ActiveChannelIDs)
+	sortStrings(recovery.PendingCloseChannelIDs)
+	sortStrings(recovery.UnresolvedConditionIDs)
+	sortStrings(recovery.VirtualChannelIDs)
+	sortStrings(recovery.SettlementTombstoneIDs)
+	sortStrings(recovery.ActiveDisputeChannelIDs)
+	sortStrings(recovery.PendingFinalizationIDs)
+	sortStrings(recovery.WatcherReplayEventIDs)
+	parts := []string{"payments-roadmap-adaptive-recovery", recovery.RecoveredFromSnapshotHash}
+	parts = append(parts, recovery.ActiveChannelIDs...)
+	parts = append(parts, recovery.PendingCloseChannelIDs...)
+	parts = append(parts, recovery.UnresolvedConditionIDs...)
+	parts = append(parts, recovery.VirtualChannelIDs...)
+	parts = append(parts, recovery.SettlementTombstoneIDs...)
+	parts = append(parts, recovery.ActiveDisputeChannelIDs...)
+	parts = append(parts, recovery.PendingFinalizationIDs...)
+	parts = append(parts, recovery.WatcherReplayEventIDs...)
+	return HashParts(parts...)
 }
 
 func roadmapTask(id PaymentRoadmapTaskID, description string, evidence ...string) PaymentRoadmapTask {
