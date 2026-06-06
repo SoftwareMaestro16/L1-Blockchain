@@ -2484,6 +2484,115 @@ func TestBroadcastPriorityOrderingAndOverlayMismatch(t *testing.T) {
 	require.ErrorContains(t, err, "overlay mismatch")
 }
 
+func TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	key := deterministicPrivateKey(0x6e)
+	peer := signedNodeRecord(t, 0x6f, salt, 100, NodeRoleRouting)
+	desc := defaultOverlayByType(t, OverlayTypeRouting)
+	msg, err := SignBroadcastMessage(BroadcastMessage{
+		OverlayID:   desc.OverlayID,
+		PayloadHash: HashParts("broadcast", "dedupe"),
+		PayloadType: BroadcastPayloadRouting,
+		Height:      40,
+		TTL:         10,
+		Priority:    2,
+	}, key, salt)
+	require.NoError(t, err)
+
+	cache := NewBroadcastDedupCache(2)
+	cache, decision, err := cache.Accept(msg, peer.NodeID, 40)
+	require.NoError(t, err)
+	require.True(t, decision.Accepted)
+	require.Len(t, cache.Entries, 1)
+	require.Equal(t, msg.BroadcastID, cache.Entries[0].BroadcastID)
+	require.Equal(t, msg.PayloadHash, cache.Entries[0].PayloadHash)
+
+	cache, decision, err = cache.Accept(msg, peer.NodeID, 41)
+	require.NoError(t, err)
+	require.True(t, decision.DroppedDuplicate)
+
+	conflict := msg
+	conflict.PayloadHash = HashParts("broadcast", "conflicting-payload")
+	conflict.Signature = nil
+	cache, decision, err = cache.Accept(conflict, peer.NodeID, 41)
+	require.NoError(t, err)
+	require.False(t, decision.Accepted)
+	require.NotEmpty(t, decision.FaultEvidence.EvidenceHash)
+	require.Equal(t, msg.BroadcastID, decision.FaultEvidence.BroadcastID)
+	require.Equal(t, msg.PayloadHash, decision.FaultEvidence.ExpectedPayloadHash)
+	require.Equal(t, conflict.PayloadHash, decision.FaultEvidence.ConflictingPayloadHash)
+
+	pruned := cache.Prune(43)
+	require.Empty(t, pruned.Entries)
+	require.Len(t, pruned.Faults, 1)
+}
+
+func TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs(t *testing.T) {
+	salt := []byte("aetheris-test-network")
+	proposerKey := deterministicPrivateKey(0x70)
+	validatorKey := deterministicPrivateKey(0x71).Public().(ed25519.PublicKey)
+	addressHash, err := HashNetworkAddresses([]string{"tcp://127.0.0.70:26656"})
+	require.NoError(t, err)
+	proposer, err := SignNodeRecord(NodeRecord{
+		ValidatorPubKey:      validatorKey,
+		Roles:                []NodeRole{NodeRoleValidator},
+		NetworkAddressesHash: addressHash,
+		ProtocolVersions:     []string{DefaultProtocolVersion},
+		ExpiresHeight:        100,
+	}, proposerKey, salt)
+	require.NoError(t, err)
+
+	blockBytes := bytes.Repeat([]byte("aetheris-block-body"), 32)
+	chunks, err := ChunkPayload(blockBytes, 96)
+	require.NoError(t, err)
+	chunkRoot, err := ComputeRL2ChunkRoot(chunks)
+	require.NoError(t, err)
+	proofHashes := []string{HashParts("block-proof", "commit"), HashParts("block-proof", "availability")}
+	proofRoot := HashParts(append([]string{"block-proof-set"}, proofHashes...)...)
+	headerHash := HashParts("block-header", "height-42")
+	blockRoot := ComputeBlockRoot(headerHash, chunkRoot, proofRoot)
+	header, err := NewBlockBroadcastHeader(BlockBroadcastHeader{
+		Height:                   42,
+		ProposerNodeID:           proposer.NodeID,
+		HeaderHash:               headerHash,
+		ChunkSetRoot:             chunkRoot,
+		ProofSetRoot:             proofRoot,
+		BlockRoot:                blockRoot,
+		ChunkCount:               uint32(len(chunks)),
+		AvailabilityMetadataHash: HashParts("availability", "metadata"),
+	})
+	require.NoError(t, err)
+	proofSet := BlockProofSet{BlockID: header.BlockID, ProofRoot: proofRoot, ProofHashes: proofHashes}
+	metadata, metadataRoot, err := NewBlockChunkMetadata(header.BlockID, chunks)
+	require.NoError(t, err)
+	require.Equal(t, header.ChunkSetRoot, metadataRoot)
+
+	session, err := StartBlockPropagation(header, proofSet, proposer, 42)
+	require.NoError(t, err)
+	_, err = ReconstructBlock(session, metadata)
+	require.ErrorContains(t, err, "all chunks")
+
+	corrupt := chunks[0]
+	corrupt.Bytes = cloneBytes(corrupt.Bytes)
+	corrupt.Bytes[0] ^= 0xff
+	_, err = AcceptBlockChunk(session, metadata[0], corrupt)
+	require.ErrorContains(t, err, "chunk hash")
+
+	for i, chunk := range chunks {
+		session, err = AcceptBlockChunk(session, metadata[i], chunk)
+		require.NoError(t, err)
+	}
+	require.Len(t, session.ReceivedChunks, len(chunks))
+	reconstructed, err := ReconstructBlock(session, metadata)
+	require.NoError(t, err)
+	require.Equal(t, blockBytes, reconstructed)
+
+	badProof := proofSet
+	badProof.ProofRoot = HashParts("wrong-proof-root")
+	_, err = StartBlockPropagation(header, badProof, proposer, 42)
+	require.ErrorContains(t, err, "proof set root")
+}
+
 func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 	metrics := PeerMetrics{LatencyMillis: 25, ReliabilityBps: 9_900, ThroughputBytesPerSec: 32 << 20}
 	score, err := ComputePeerScore(metrics)
