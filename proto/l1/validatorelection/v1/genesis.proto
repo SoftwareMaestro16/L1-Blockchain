@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package l1.validatorelection.v1;
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/validatorelection/v1;validatorelectionv1";
+
+message Params {
+  string authority = 1;
+  uint32 max_candidates = 2;
+  uint32 max_validator_set_size = 3;
+  uint64 max_validator_power = 4;
+  uint64 max_total_voting_power = 5;
+  uint64 election_window_blocks = 6;
+  uint64 withdraw_deadline_blocks = 7;
+  uint64 frozen_stake_unlock_blocks = 8;
+  uint32 max_transition_history = 9;
+}
+
+message ValidatorPower {
+  string operator_address = 1;
+  string consensus_public_key = 2;
+  uint64 voting_power = 3;
+  string validator_status = 4;
+}
+
+message ElectionWindow {
+  uint64 start_height = 1;
+  uint64 end_height = 2;
+  uint64 withdraw_deadline_height = 3;
+}
+
+message CandidateApplication {
+  string operator_address = 1;
+  string consensus_public_key = 2;
+  uint64 requested_power = 3;
+  uint64 self_bond = 4;
+  string validator_status = 5;
+  string status = 6;
+  uint64 applied_height = 7;
+  uint64 updated_height = 8;
+}
+
+message FrozenStake {
+  string operator_address = 1;
+  uint64 amount = 2;
+  uint64 frozen_at_height = 3;
+  uint64 unlock_height = 4;
+  bool released = 5;
+}
+
+message PendingExit {
+  string operator_address = 1;
+  uint64 requested_height = 2;
+  string status = 3;
+}
+
+message ValidatorPowerCap {
+  string operator_address = 1;
+  uint64 max_voting_power = 2;
+}
+
+message ElectionResult {
+  uint64 epoch = 1;
+  uint64 height = 2;
+  repeated ValidatorPower next_set = 3;
+  bool committed = 4;
+  bool finalized = 5;
+}
+
+message RewardDistributionSnapshot {
+  uint64 epoch = 1;
+  uint64 height = 2;
+  repeated ValidatorPower validator_powers = 3;
+  uint64 total_voting_power = 4;
+}
+
+message ValidatorSetTransition {
+  uint64 epoch = 1;
+  uint64 height = 2;
+  repeated ValidatorPower previous_set = 3;
+  repeated ValidatorPower current_set = 4;
+  repeated ValidatorPower next_set = 5;
+}
+
+message State {
+  repeated ValidatorPower previous_validator_set = 1;
+  repeated ValidatorPower current_validator_set = 2;
+  repeated ValidatorPower next_validator_set = 3;
+  uint64 election_epoch = 4;
+  ElectionWindow election_window = 5;
+  repeated CandidateApplication candidate_applications = 6;
+  repeated FrozenStake frozen_stakes = 7;
+  repeated PendingExit pending_exits = 8;
+  repeated ValidatorPowerCap validator_power_caps = 9;
+  repeated ElectionResult election_results = 10;
+  repeated RewardDistributionSnapshot reward_distribution_snapshots = 11;
+  repeated ValidatorSetTransition transition_history = 12;
+}
+
+message GenesisState {
+  uint64 version = 1;
+  Params params = 2;
+  State state = 3;
+}

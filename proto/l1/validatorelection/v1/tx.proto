@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package l1.validatorelection.v1;
+
+import "l1/validatorelection/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/validatorelection/v1;validatorelectionv1";
+
+service Msg {
+  rpc ApplyForValidatorSet(MsgApplyForValidatorSet) returns (MsgApplyForValidatorSetResponse);
+  rpc WithdrawApplication(MsgWithdrawApplication) returns (MsgWithdrawApplicationResponse);
+  rpc CommitElection(MsgCommitElection) returns (MsgCommitElectionResponse);
+  rpc FinalizeElection(MsgFinalizeElection) returns (MsgFinalizeElectionResponse);
+  rpc RequestValidatorExit(MsgRequestValidatorExit) returns (MsgRequestValidatorExitResponse);
+  rpc CancelValidatorExit(MsgCancelValidatorExit) returns (MsgCancelValidatorExitResponse);
+}
+
+message MsgApplyForValidatorSet {
+  string authority = 1;
+  CandidateApplication application = 2;
+  uint64 height = 3;
+}
+
+message MsgApplyForValidatorSetResponse {
+  CandidateApplication application = 1;
+}
+
+message MsgWithdrawApplication {
+  string authority = 1;
+  string operator_address = 2;
+  uint64 height = 3;
+}
+
+message MsgWithdrawApplicationResponse {
+  CandidateApplication application = 1;
+}
+
+message MsgCommitElection {
+  string authority = 1;
+  uint64 height = 2;
+}
+
+message MsgCommitElectionResponse {
+  ElectionResult result = 1;
+}
+
+message MsgFinalizeElection {
+  string authority = 1;
+  uint64 height = 2;
+}
+
+message MsgFinalizeElectionResponse {
+  ValidatorSetTransition transition = 1;
+}
+
+message MsgRequestValidatorExit {
+  string authority = 1;
+  string operator_address = 2;
+  uint64 height = 3;
+}
+
+message MsgRequestValidatorExitResponse {
+  PendingExit exit = 1;
+}
+
+message MsgCancelValidatorExit {
+  string authority = 1;
+  string operator_address = 2;
+  uint64 height = 3;
+}
+
+message MsgCancelValidatorExitResponse {
+  PendingExit exit = 1;
+}

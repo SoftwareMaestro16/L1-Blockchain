@@ -50,6 +50,7 @@ import (
 	storagerentmodule "github.com/sovereign-l1/l1/x/storage-rent"
 	systemregistrymodule "github.com/sovereign-l1/l1/x/system-registry"
 	tokenfactorymodule "github.com/sovereign-l1/l1/x/tokenfactory"
+	validatorelectionmodule "github.com/sovereign-l1/l1/x/validator-election"
 	validatorregistrymodule "github.com/sovereign-l1/l1/x/validator-registry"
 	zonesmodule "github.com/sovereign-l1/l1/x/zones"
 )
@@ -79,6 +80,7 @@ func (app *L1App) initModules(
 		protocolpool.NewAppModule(app.ProtocolPoolKeeper, app.AccountKeeper, app.BankKeeper),
 		constitutionmodule.NewAppModule(&app.ConstitutionKeeper),
 		systemregistrymodule.NewAppModule(&app.SystemRegistryKeeper),
+		validatorelectionmodule.NewAppModule(&app.ValidatorElectionKeeper),
 		validatorregistrymodule.NewAppModule(&app.ValidatorRegistryKeeper),
 		configmodule.NewAppModule(&app.ConfigKeeper),
 		aethercoremodule.NewAppModule(app.AetherCoreKeeper),

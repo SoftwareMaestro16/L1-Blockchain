@@ -88,6 +88,8 @@ import (
 	systemregistrytypes "github.com/sovereign-l1/l1/x/system-registry/types"
 	tokenfactorykeeper "github.com/sovereign-l1/l1/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
+	validatorelectionkeeper "github.com/sovereign-l1/l1/x/validator-election/keeper"
+	validatorelectiontypes "github.com/sovereign-l1/l1/x/validator-election/types"
 	validatorregistrykeeper "github.com/sovereign-l1/l1/x/validator-registry/keeper"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
 	zoneskeeper "github.com/sovereign-l1/l1/x/zones/keeper"
@@ -177,6 +179,7 @@ type L1App struct {
 	IdentityRootKeeper      identityrootkeeper.Keeper
 	BridgeHubKeeper         bridgehubkeeper.Keeper
 	SystemRegistryKeeper    systemregistrykeeper.Keeper
+	ValidatorElectionKeeper validatorelectionkeeper.Keeper
 	ValidatorRegistryKeeper validatorregistrykeeper.Keeper
 
 	// the module manager
@@ -279,6 +282,7 @@ func NewL1App(
 		protocolpooltypes.StoreKey,
 		constitutiontypes.StoreKey,
 		systemregistrytypes.StoreKey,
+		validatorelectiontypes.StoreKey,
 		validatorregistrytypes.StoreKey,
 		configtypes.StoreKey,
 		tokenfactorytypes.StoreKey,

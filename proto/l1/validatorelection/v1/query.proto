@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package l1.validatorelection.v1;
+
+import "l1/validatorelection/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/validatorelection/v1;validatorelectionv1";
+
+service Query {
+  rpc PreviousValidatorSet(QueryPreviousValidatorSetRequest) returns (QueryValidatorSetResponse);
+  rpc CurrentValidatorSet(QueryCurrentValidatorSetRequest) returns (QueryValidatorSetResponse);
+  rpc NextValidatorSet(QueryNextValidatorSetRequest) returns (QueryValidatorSetResponse);
+  rpc Election(QueryElectionRequest) returns (QueryElectionResponse);
+  rpc ElectionCandidates(QueryElectionCandidatesRequest) returns (QueryElectionCandidatesResponse);
+  rpc FrozenStake(QueryFrozenStakeRequest) returns (QueryFrozenStakeResponse);
+  rpc ValidatorSetTransition(QueryValidatorSetTransitionRequest) returns (QueryValidatorSetTransitionResponse);
+}
+
+message QueryPreviousValidatorSetRequest {}
+
+message QueryCurrentValidatorSetRequest {}
+
+message QueryNextValidatorSetRequest {}
+
+message QueryValidatorSetResponse {
+  repeated ValidatorPower validators = 1;
+}
+
+message QueryElectionRequest {}
+
+message QueryElectionResponse {
+  State election = 1;
+}
+
+message QueryElectionCandidatesRequest {}
+
+message QueryElectionCandidatesResponse {
+  repeated CandidateApplication candidates = 1;
+}
+
+message QueryFrozenStakeRequest {
+  string operator_address = 1;
+}
+
+message QueryFrozenStakeResponse {
+  repeated FrozenStake frozen_stakes = 1;
+}
+
+message QueryValidatorSetTransitionRequest {
+  uint64 epoch = 1;
+}
+
+message QueryValidatorSetTransitionResponse {
+  ValidatorSetTransition transition = 1;
+}
