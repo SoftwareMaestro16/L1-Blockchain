@@ -999,6 +999,23 @@ type ModuleExportImportSpec struct {
 	DeterministicEncoding bool
 }
 
+type PosMigrationPhaseSpec struct {
+	PhaseID                  uint32
+	Name                     string
+	Scope                    string
+	Modules                  []string
+	Tasks                    []string
+	ExitCriteria             []string
+	PreservesExistingStaking bool
+	ReadOnlyUntilExit        bool
+	DependsOn                []uint32
+}
+
+type PosMigrationStrategyManifest struct {
+	Phases []PosMigrationPhaseSpec
+	Root   string
+}
+
 type KeeperIntegrationManifest struct {
 	KeeperInterfaces      []KeeperInterfaceSpec
 	StakingLifecycleHooks []KeeperHookSpec
@@ -1885,6 +1902,180 @@ func PosQueryByName(manifest PosMessageQueryManifest, moduleName string, queryNa
 		}
 	}
 	return PosQuerySpec{}, false
+}
+
+func DefaultPosMigrationStrategyManifest() PosMigrationStrategyManifest {
+	manifest := PosMigrationStrategyManifest{Phases: []PosMigrationPhaseSpec{
+		{
+			PhaseID: 1,
+			Name:    "scoring_epoch_simulation",
+			Scope:   "scoring and epoch simulation",
+			Modules: []string{"staking", "epoch", "validator_economy", "performance"},
+			Tasks: []string{
+				"keep Cosmos staking unchanged",
+				"add x/epoch",
+				"add read-only validator scoring",
+				"add effective stake simulation",
+				"add performance metric collection",
+				"add score and saturation queries",
+			},
+			ExitCriteria: []string{
+				"existing staking behavior is unchanged",
+				"validator scores can be computed and compared",
+				"epoch simulation matches deterministic replay",
+			},
+			PreservesExistingStaking: true,
+			ReadOnlyUntilExit:        true,
+		},
+		{
+			PhaseID: 2,
+			Name:    "task_groups_and_roles",
+			Scope:   "task groups and roles",
+			Modules: []string{"staking", "taskgroups", "validator_economy", "performance"},
+			Tasks: []string{
+				"add x/taskgroups",
+				"add workload registry",
+				"add task group assignment",
+				"add role records",
+				"add proposer priority records",
+				"add verification receipts",
+			},
+			ExitCriteria: []string{
+				"validators can be deterministically assigned to workload groups",
+				"roles and task groups are queryable",
+				"assignment roots are reproducible",
+			},
+			PreservesExistingStaking: true,
+			ReadOnlyUntilExit:        false,
+			DependsOn:                []uint32{1},
+		},
+	}}
+	manifest.Root = ComputePosMigrationStrategyRoot(manifest)
+	return manifest
+}
+
+func RequiredPosMigrationPhaseNames() []string {
+	return []string{"scoring_epoch_simulation", "task_groups_and_roles"}
+}
+
+func (m PosMigrationStrategyManifest) Validate(compatibility CosmosSDKCompatibilityManifest) error {
+	if err := compatibility.Validate(); err != nil {
+		return err
+	}
+	if len(m.Phases) == 0 {
+		return errors.New("pos migration phases are required")
+	}
+	knownModules := knownPoSModuleNames(compatibility)
+	seenIDs := make(map[uint32]struct{}, len(m.Phases))
+	seenNames := make(map[string]struct{}, len(m.Phases))
+	for i, phase := range m.Phases {
+		if err := phase.Validate(knownModules, seenIDs); err != nil {
+			return err
+		}
+		if phase.PhaseID != uint32(i+1) {
+			return fmt.Errorf("pos migration phase %s must be ordered at position %d", phase.Name, i+1)
+		}
+		if _, found := seenIDs[phase.PhaseID]; found {
+			return fmt.Errorf("duplicate pos migration phase id %d", phase.PhaseID)
+		}
+		seenIDs[phase.PhaseID] = struct{}{}
+		if _, found := seenNames[phase.Name]; found {
+			return fmt.Errorf("duplicate pos migration phase %s", phase.Name)
+		}
+		seenNames[phase.Name] = struct{}{}
+	}
+	for _, required := range RequiredPosMigrationPhaseNames() {
+		if _, found := seenNames[required]; !found {
+			return fmt.Errorf("required pos migration phase %s is missing", required)
+		}
+	}
+	if err := validatePosHash("pos migration strategy root", m.Root); err != nil {
+		return err
+	}
+	if expected := ComputePosMigrationStrategyRoot(m); expected != m.Root {
+		return errors.New("pos migration strategy root mismatch")
+	}
+	return nil
+}
+
+func (p PosMigrationPhaseSpec) Validate(knownModules map[string]struct{}, priorPhases map[uint32]struct{}) error {
+	if p.PhaseID == 0 {
+		return errors.New("pos migration phase id is required")
+	}
+	if err := validatePosToken("pos migration phase name", p.Name); err != nil {
+		return err
+	}
+	if err := validatePosResponsibility("pos migration phase scope", p.Scope); err != nil {
+		return err
+	}
+	if len(p.Modules) == 0 {
+		return fmt.Errorf("pos migration phase %s must reference modules", p.Name)
+	}
+	for _, moduleName := range p.Modules {
+		if err := validatePosToken("pos migration phase module", moduleName); err != nil {
+			return err
+		}
+		if _, found := knownModules[moduleName]; !found {
+			return fmt.Errorf("pos migration phase %s references unknown module %s", p.Name, moduleName)
+		}
+	}
+	if len(p.Tasks) == 0 {
+		return fmt.Errorf("pos migration phase %s must define tasks", p.Name)
+	}
+	for _, task := range p.Tasks {
+		if err := validatePosResponsibility("pos migration phase task", task); err != nil {
+			return err
+		}
+	}
+	if len(p.ExitCriteria) == 0 {
+		return fmt.Errorf("pos migration phase %s must define exit criteria", p.Name)
+	}
+	for _, criterion := range p.ExitCriteria {
+		if err := validatePosResponsibility("pos migration phase exit criterion", criterion); err != nil {
+			return err
+		}
+	}
+	if !p.PreservesExistingStaking {
+		return fmt.Errorf("pos migration phase %s must preserve existing staking behavior", p.Name)
+	}
+	for _, dependency := range p.DependsOn {
+		if dependency == 0 {
+			return fmt.Errorf("pos migration phase %s dependency id is required", p.Name)
+		}
+		if _, found := priorPhases[dependency]; !found {
+			return fmt.Errorf("pos migration phase %s dependency %d must be an earlier phase", p.Name, dependency)
+		}
+	}
+	return nil
+}
+
+func ComputePosMigrationStrategyRoot(manifest PosMigrationStrategyManifest) string {
+	return posHashRoot("aetheris-pos-migration-strategy-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(manifest.Phases)))
+		for _, phase := range manifest.Phases {
+			posWriteUint64(w, uint64(phase.PhaseID))
+			posWritePart(w, phase.Name)
+			posWritePart(w, phase.Scope)
+			posWriteStringSlice(w, phase.Modules)
+			posWriteStringSlice(w, phase.Tasks)
+			posWriteStringSlice(w, phase.ExitCriteria)
+			posWriteUint64(w, boolAsUint64(phase.PreservesExistingStaking))
+			posWriteUint64(w, boolAsUint64(phase.ReadOnlyUntilExit))
+			posWriteUint64(w, uint64(len(phase.DependsOn)))
+			for _, dependency := range phase.DependsOn {
+				posWriteUint64(w, uint64(dependency))
+			}
+		}
+	})
+}
+
+func PosMigrationPhaseByName(manifest PosMigrationStrategyManifest, phaseName string) (PosMigrationPhaseSpec, bool) {
+	for _, phase := range manifest.Phases {
+		if phase.Name == phaseName {
+			return phase, true
+		}
+	}
+	return PosMigrationPhaseSpec{}, false
 }
 
 func DefaultKeeperIntegrationManifest() KeeperIntegrationManifest {

@@ -282,6 +282,92 @@ func TestPosMessageQueryManifestRejectsMissingDuplicateAndUnknownEntries(t *test
 	require.ErrorContains(t, rootMismatch.Validate(compatibility, boundaries), "root mismatch")
 }
 
+func TestPosMigrationStrategyCoversScoringSimulationAndTaskGroupPhases(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	manifest := DefaultPosMigrationStrategyManifest()
+	require.NoError(t, manifest.Validate(compatibility))
+	require.Equal(t, ComputePosMigrationStrategyRoot(manifest), manifest.Root)
+	require.Equal(t, RequiredPosMigrationPhaseNames(), posMigrationPhaseNames(manifest))
+
+	phase1, found := PosMigrationPhaseByName(manifest, "scoring_epoch_simulation")
+	require.True(t, found)
+	require.Equal(t, uint32(1), phase1.PhaseID)
+	require.True(t, phase1.PreservesExistingStaking)
+	require.True(t, phase1.ReadOnlyUntilExit)
+	require.Contains(t, phase1.Modules, "staking")
+	require.Contains(t, phase1.Modules, "epoch")
+	require.Contains(t, phase1.Modules, "validator_economy")
+	require.Contains(t, phase1.Modules, "performance")
+	require.Equal(t, []string{
+		"keep Cosmos staking unchanged",
+		"add x/epoch",
+		"add read-only validator scoring",
+		"add effective stake simulation",
+		"add performance metric collection",
+		"add score and saturation queries",
+	}, phase1.Tasks)
+	require.Equal(t, []string{
+		"existing staking behavior is unchanged",
+		"validator scores can be computed and compared",
+		"epoch simulation matches deterministic replay",
+	}, phase1.ExitCriteria)
+
+	phase2, found := PosMigrationPhaseByName(manifest, "task_groups_and_roles")
+	require.True(t, found)
+	require.Equal(t, uint32(2), phase2.PhaseID)
+	require.True(t, phase2.PreservesExistingStaking)
+	require.False(t, phase2.ReadOnlyUntilExit)
+	require.Equal(t, []uint32{1}, phase2.DependsOn)
+	require.Contains(t, phase2.Modules, "taskgroups")
+	require.Equal(t, []string{
+		"add x/taskgroups",
+		"add workload registry",
+		"add task group assignment",
+		"add role records",
+		"add proposer priority records",
+		"add verification receipts",
+	}, phase2.Tasks)
+	require.Equal(t, []string{
+		"validators can be deterministically assigned to workload groups",
+		"roles and task groups are queryable",
+		"assignment roots are reproducible",
+	}, phase2.ExitCriteria)
+}
+
+func TestPosMigrationStrategyRejectsUnsafeOrIncompletePhases(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	manifest := DefaultPosMigrationStrategyManifest()
+
+	reordered := manifest
+	reordered.Phases = append([]PosMigrationPhaseSpec{}, manifest.Phases...)
+	reordered.Phases[0], reordered.Phases[1] = reordered.Phases[1], reordered.Phases[0]
+	reordered.Root = ComputePosMigrationStrategyRoot(reordered)
+	require.ErrorContains(t, reordered.Validate(compatibility), "earlier phase")
+
+	unknownModule := manifest
+	unknownModule.Phases = append([]PosMigrationPhaseSpec{}, manifest.Phases...)
+	unknownModule.Phases[0].Modules = append([]string{}, unknownModule.Phases[0].Modules...)
+	unknownModule.Phases[0].Modules = append(unknownModule.Phases[0].Modules, "unknown_module")
+	unknownModule.Root = ComputePosMigrationStrategyRoot(unknownModule)
+	require.ErrorContains(t, unknownModule.Validate(compatibility), "unknown module")
+
+	missingCriteria := manifest
+	missingCriteria.Phases = append([]PosMigrationPhaseSpec{}, manifest.Phases...)
+	missingCriteria.Phases[1].ExitCriteria = nil
+	missingCriteria.Root = ComputePosMigrationStrategyRoot(missingCriteria)
+	require.ErrorContains(t, missingCriteria.Validate(compatibility), "exit criteria")
+
+	breaksStaking := manifest
+	breaksStaking.Phases = append([]PosMigrationPhaseSpec{}, manifest.Phases...)
+	breaksStaking.Phases[0].PreservesExistingStaking = false
+	breaksStaking.Root = ComputePosMigrationStrategyRoot(breaksStaking)
+	require.ErrorContains(t, breaksStaking.Validate(compatibility), "preserve existing staking behavior")
+
+	rootMismatch := manifest
+	rootMismatch.Root = PosEmptyRootHash
+	require.ErrorContains(t, rootMismatch.Validate(compatibility), "root mismatch")
+}
+
 func TestKeeperIntegrationManifestCoversSDKKeepersHooksAndExportImport(t *testing.T) {
 	compatibility := DefaultCosmosSDKCompatibilityManifest()
 	boundaries := DefaultPoSModuleBoundaryManifest()
@@ -2487,6 +2573,14 @@ func posBoundaryModuleNames(manifest PosModuleBoundaryManifest) []string {
 
 func requiredPosQueryModule(queryName string) string {
 	return strings.Split(requiredPosQueryKey(queryName), "/")[0]
+}
+
+func posMigrationPhaseNames(manifest PosMigrationStrategyManifest) []string {
+	out := make([]string, len(manifest.Phases))
+	for i, phase := range manifest.Phases {
+		out[i] = phase.Name
+	}
+	return out
 }
 
 func keeperInterfacesByName(manifest KeeperIntegrationManifest) map[string]KeeperInterfaceSpec {
