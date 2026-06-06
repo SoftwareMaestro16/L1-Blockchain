@@ -6,11 +6,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDefaultImplementationRoadmapCoversPhaseZeroThroughFive(t *testing.T) {
+func TestDefaultImplementationRoadmapCoversPhaseZeroThroughSeven(t *testing.T) {
 	roadmap, err := DefaultImplementationRoadmap()
 	require.NoError(t, err)
 	require.NoError(t, roadmap.Validate())
-	require.Len(t, roadmap.Phases, 6)
+	require.Len(t, roadmap.Phases, 8)
 	require.Equal(t, RoadmapPhaseBaselineAudit, roadmap.Phases[0].PhaseID)
 	require.Equal(t, uint32(0), roadmap.Phases[0].PhaseNumber)
 	require.Equal(t, RoadmapPhaseKernelRootModel, roadmap.Phases[1].PhaseID)
@@ -23,6 +23,10 @@ func TestDefaultImplementationRoadmapCoversPhaseZeroThroughFive(t *testing.T) {
 	require.Equal(t, uint32(4), roadmap.Phases[4].PhaseNumber)
 	require.Equal(t, RoadmapPhaseIdentityPaymentIntegration, roadmap.Phases[5].PhaseID)
 	require.Equal(t, uint32(5), roadmap.Phases[5].PhaseNumber)
+	require.Equal(t, RoadmapPhaseVMRuntime, roadmap.Phases[6].PhaseID)
+	require.Equal(t, uint32(6), roadmap.Phases[6].PhaseNumber)
+	require.Equal(t, RoadmapPhasePerformanceHardening, roadmap.Phases[7].PhaseID)
+	require.Equal(t, uint32(7), roadmap.Phases[7].PhaseNumber)
 	require.Equal(t, ComputeImplementationRoadmapHash(roadmap), roadmap.RoadmapHash)
 
 	phase0 := roadmap.Phases[0]
@@ -155,6 +159,48 @@ func TestDefaultImplementationRoadmapCoversPhaseZeroThroughFive(t *testing.T) {
 	require.True(t, phase5.Evidence.IdentityResolvesAllOutputTypes)
 	require.True(t, phase5.Evidence.PaymentsSettleThroughFinancialZone)
 	require.True(t, phase5.Evidence.PaymentDisputesDeterministicReplay)
+
+	phase6 := roadmap.Phases[6]
+	requireRoadmapTask(t, phase6, "implement-x-contracts")
+	requireRoadmapTask(t, phase6, "add-avm-ready-bytecode-interface")
+	requireRoadmapTask(t, phase6, "add-cosmwasm-adapter-boundary")
+	requireRoadmapTask(t, phase6, "add-vm-storage-adapter")
+	requireRoadmapTask(t, phase6, "add-vm-outbound-message-support")
+	requireRoadmapTask(t, phase6, "add-contract-receipts-and-proofs")
+	requireRoadmapExit(t, phase6, "contract-execution-message-driven")
+	requireRoadmapExit(t, phase6, "contracts-cannot-directly-mutate-other-zones")
+	requireRoadmapExit(t, phase6, "contract-state-root-proof-verifiable")
+	require.True(t, phase6.Evidence.ContractsModuleImplemented)
+	require.True(t, phase6.Evidence.AVMBytecodeInterfaceAdded)
+	require.True(t, phase6.Evidence.CosmWasmAdapterBoundaryAdded)
+	require.True(t, phase6.Evidence.VMStorageAdapterAdded)
+	require.True(t, phase6.Evidence.VMOutboundMessageSupportAdded)
+	require.True(t, phase6.Evidence.ContractReceiptsProofsAdded)
+	require.True(t, phase6.Evidence.ContractExecutionMessageDriven)
+	require.True(t, phase6.Evidence.ContractsNoDirectZoneMutation)
+	require.True(t, phase6.Evidence.ContractStateRootProofVerifiable)
+
+	phase7 := roadmap.Phases[7]
+	requireRoadmapTask(t, phase7, "add-blockstm-aware-workload-grouping")
+	requireRoadmapTask(t, phase7, "add-store-v2-optimization-for-root-heavy-reads")
+	requireRoadmapTask(t, phase7, "add-queue-draining-benchmarks")
+	requireRoadmapTask(t, phase7, "add-service-lookup-benchmarks")
+	requireRoadmapTask(t, phase7, "add-storage-proof-benchmarks")
+	requireRoadmapTask(t, phase7, "add-routing-simulation-tests")
+	requireRoadmapTask(t, phase7, "add-adaptivesync-recovery-tests")
+	requireRoadmapExit(t, phase7, "independent-zone-workloads-parallelize")
+	requireRoadmapExit(t, phase7, "root-generation-remains-bounded")
+	requireRoadmapExit(t, phase7, "nodes-recover-and-serve-proof-queries-after-sync")
+	require.True(t, phase7.Evidence.BlockSTMAwareGroupingAdded)
+	require.True(t, phase7.Evidence.StoreV2RootReadOptimizationAdded)
+	require.True(t, phase7.Evidence.QueueDrainingBenchmarksAdded)
+	require.True(t, phase7.Evidence.ServiceLookupBenchmarksAdded)
+	require.True(t, phase7.Evidence.StorageProofBenchmarksAdded)
+	require.True(t, phase7.Evidence.RoutingSimulationTestsAdded)
+	require.True(t, phase7.Evidence.AdaptiveSyncRecoveryTestsAdded)
+	require.True(t, phase7.Evidence.IndependentZoneWorkloadsParallelize)
+	require.True(t, phase7.Evidence.RootGenerationBounded)
+	require.True(t, phase7.Evidence.NodesRecoverServeProofQueriesAfterSync)
 }
 
 func TestImplementationRoadmapInventoryIsDerivedFromModuleManifest(t *testing.T) {
@@ -352,11 +398,86 @@ func TestImplementationRoadmapRejectsIncompletePhaseFiveEvidence(t *testing.T) {
 	require.ErrorContains(t, noDeterministicDisputes.Validate(), "deterministic replay payment disputes")
 }
 
+func TestImplementationRoadmapRejectsIncompletePhaseSixEvidence(t *testing.T) {
+	roadmap, err := DefaultImplementationRoadmap()
+	require.NoError(t, err)
+
+	noContracts := roadmap
+	noContracts.Phases = append([]ImplementationRoadmapPhase(nil), roadmap.Phases...)
+	noContracts.Phases[6].Evidence.ContractsModuleImplemented = false
+	noContracts.Phases[6].PhaseHash = ComputeRoadmapPhaseHash(noContracts.Phases[6])
+	noContracts.RoadmapHash = ComputeImplementationRoadmapHash(noContracts)
+	require.ErrorContains(t, noContracts.Validate(), "x/contracts")
+
+	noCosmWasmBoundary := roadmap
+	noCosmWasmBoundary.Phases = append([]ImplementationRoadmapPhase(nil), roadmap.Phases...)
+	noCosmWasmBoundary.Phases[6].Evidence.CosmWasmAdapterBoundaryAdded = false
+	noCosmWasmBoundary.Phases[6].PhaseHash = ComputeRoadmapPhaseHash(noCosmWasmBoundary.Phases[6])
+	noCosmWasmBoundary.RoadmapHash = ComputeImplementationRoadmapHash(noCosmWasmBoundary)
+	require.ErrorContains(t, noCosmWasmBoundary.Validate(), "CosmWasm adapter boundary")
+
+	directZoneMutation := roadmap
+	directZoneMutation.Phases = append([]ImplementationRoadmapPhase(nil), roadmap.Phases...)
+	directZoneMutation.Phases[6].Evidence.ContractsNoDirectZoneMutation = false
+	directZoneMutation.Phases[6].PhaseHash = ComputeRoadmapPhaseHash(directZoneMutation.Phases[6])
+	directZoneMutation.RoadmapHash = ComputeImplementationRoadmapHash(directZoneMutation)
+	require.ErrorContains(t, directZoneMutation.Validate(), "direct mutation of other zones")
+
+	noStateProof := roadmap
+	noStateProof.Phases = append([]ImplementationRoadmapPhase(nil), roadmap.Phases...)
+	noStateProof.Phases[6].Evidence.ContractStateRootProofVerifiable = false
+	noStateProof.Phases[6].PhaseHash = ComputeRoadmapPhaseHash(noStateProof.Phases[6])
+	noStateProof.RoadmapHash = ComputeImplementationRoadmapHash(noStateProof)
+	require.ErrorContains(t, noStateProof.Validate(), "proof-verifiable contract state root")
+}
+
+func TestImplementationRoadmapRejectsIncompletePhaseSevenEvidence(t *testing.T) {
+	roadmap, err := DefaultImplementationRoadmap()
+	require.NoError(t, err)
+
+	noBlockSTM := roadmap
+	noBlockSTM.Phases = append([]ImplementationRoadmapPhase(nil), roadmap.Phases...)
+	noBlockSTM.Phases[7].Evidence.BlockSTMAwareGroupingAdded = false
+	noBlockSTM.Phases[7].PhaseHash = ComputeRoadmapPhaseHash(noBlockSTM.Phases[7])
+	noBlockSTM.RoadmapHash = ComputeImplementationRoadmapHash(noBlockSTM)
+	require.ErrorContains(t, noBlockSTM.Validate(), "BlockSTM-aware workload grouping")
+
+	noStorageBench := roadmap
+	noStorageBench.Phases = append([]ImplementationRoadmapPhase(nil), roadmap.Phases...)
+	noStorageBench.Phases[7].Evidence.StorageProofBenchmarksAdded = false
+	noStorageBench.Phases[7].PhaseHash = ComputeRoadmapPhaseHash(noStorageBench.Phases[7])
+	noStorageBench.RoadmapHash = ComputeImplementationRoadmapHash(noStorageBench)
+	require.ErrorContains(t, noStorageBench.Validate(), "storage proof benchmarks")
+
+	noParallelism := roadmap
+	noParallelism.Phases = append([]ImplementationRoadmapPhase(nil), roadmap.Phases...)
+	noParallelism.Phases[7].Evidence.IndependentZoneWorkloadsParallelize = false
+	noParallelism.Phases[7].PhaseHash = ComputeRoadmapPhaseHash(noParallelism.Phases[7])
+	noParallelism.RoadmapHash = ComputeImplementationRoadmapHash(noParallelism)
+	require.ErrorContains(t, noParallelism.Validate(), "independent zone workloads to parallelize")
+
+	noSyncProofQueries := roadmap
+	noSyncProofQueries.Phases = append([]ImplementationRoadmapPhase(nil), roadmap.Phases...)
+	noSyncProofQueries.Phases[7].Evidence.NodesRecoverServeProofQueriesAfterSync = false
+	noSyncProofQueries.Phases[7].PhaseHash = ComputeRoadmapPhaseHash(noSyncProofQueries.Phases[7])
+	noSyncProofQueries.RoadmapHash = ComputeImplementationRoadmapHash(noSyncProofQueries)
+	require.ErrorContains(t, noSyncProofQueries.Validate(), "serve proof queries after sync")
+}
+
 func TestImplementationRoadmapHashIsCanonical(t *testing.T) {
 	roadmap, err := DefaultImplementationRoadmap()
 	require.NoError(t, err)
 
-	reversed, err := NewImplementationRoadmap([]ImplementationRoadmapPhase{roadmap.Phases[5], roadmap.Phases[4], roadmap.Phases[3], roadmap.Phases[2], roadmap.Phases[1], roadmap.Phases[0]})
+	reversed, err := NewImplementationRoadmap([]ImplementationRoadmapPhase{
+		roadmap.Phases[7],
+		roadmap.Phases[6],
+		roadmap.Phases[5],
+		roadmap.Phases[4],
+		roadmap.Phases[3],
+		roadmap.Phases[2],
+		roadmap.Phases[1],
+		roadmap.Phases[0],
+	})
 	require.NoError(t, err)
 	require.Equal(t, roadmap.RoadmapHash, reversed.RoadmapHash)
 	require.Equal(t, roadmap.Phases, reversed.Phases)

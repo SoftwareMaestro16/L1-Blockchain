@@ -16,6 +16,8 @@ const (
 	RoadmapPhaseCanonicalZones             ImplementationRoadmapPhaseID = "phase-3-canonical-zones"
 	RoadmapPhaseServiceStorageRouting      ImplementationRoadmapPhaseID = "phase-4-services-storage-routing"
 	RoadmapPhaseIdentityPaymentIntegration ImplementationRoadmapPhaseID = "phase-5-identity-payment-integration"
+	RoadmapPhaseVMRuntime                  ImplementationRoadmapPhaseID = "phase-6-vm-runtime"
+	RoadmapPhasePerformanceHardening       ImplementationRoadmapPhaseID = "phase-7-performance-hardening"
 )
 
 type ImplementationRoadmap struct {
@@ -40,62 +42,81 @@ type RoadmapChecklistItem struct {
 }
 
 type RoadmapEvidence struct {
-	ModuleInventory                    []RoadmapModuleInventoryEntry
-	CanonicalZones                     []RoadmapCanonicalZoneEntry
-	IdentityResolverOutputs            []string
-	CrossModuleDirectWritesAudited     bool
-	ExportImportTestsAdded             bool
-	ModuleInvariantHarnessAdded        bool
-	RootContributionInterfaceDesign    bool
-	CurrentStateReproducible           bool
-	ModuleBoundariesDocumented         bool
-	MigrationRiskListComplete          bool
-	AetherCoreModuleImplemented        bool
-	ZonesModuleImplemented             bool
-	ZoneRegistryImplemented            bool
-	GlobalStateRootImplemented         bool
-	BlockCommitmentMetadataQueries     bool
-	DefaultZoneRunnable                bool
-	DefaultZoneRootIncluded            bool
-	ExportImportPreservesRootMeta      bool
-	MessagesModuleImplemented          bool
-	MessageEnvelopeAdded               bool
-	FIFOPerSenderQueuesAdded           bool
-	NonceReplayProtectionAdded         bool
-	MessageReceiptsAdded               bool
-	BounceAndExpiryAdded               bool
-	MessageReceiptRootsAdded           bool
-	SameChainAsyncDeterministic        bool
-	MessageReceiptProofsAvailable      bool
-	ReplayAttemptsRejected             bool
-	FinancialZoneBoundaryMoved         bool
-	IdentityZoneActivated              bool
-	ApplicationZoneSchedulerBoundary   bool
-	ContractZoneSkeletonAdded          bool
-	ZoneSpecificQueriesRoots           bool
-	FourCanonicalZonesExist            bool
-	CanonicalZoneSurfacesComplete      bool
-	CrossZoneMutationMessagesOnly      bool
-	ServicesModuleImplemented          bool
-	StorageModuleImplemented           bool
-	RoutingModuleImplemented           bool
-	ServiceDescriptorsAdded            bool
-	StorageObjectCommitmentsAdded      bool
-	NodeRecordsRoutingEpochsAdded      bool
-	ProofAttachedLookupQueriesAdded    bool
-	ServiceDiscoveryDeterministic      bool
-	StorageCommitmentsProofVerifiable  bool
-	RoutingTableCommittedQueryable     bool
-	AETResolverOutputsUpgraded         bool
-	IdentityGraphAdded                 bool
-	CrossZoneIdentityBindingAdded      bool
-	PaymentsModuleImplemented          bool
-	PaymentEnvelopeAdded               bool
-	ConditionalTransfersAdded          bool
-	FinancialZoneSettlementAdded       bool
-	IdentityResolvesAllOutputTypes     bool
-	PaymentsSettleThroughFinancialZone bool
-	PaymentDisputesDeterministicReplay bool
+	ModuleInventory                        []RoadmapModuleInventoryEntry
+	CanonicalZones                         []RoadmapCanonicalZoneEntry
+	IdentityResolverOutputs                []string
+	CrossModuleDirectWritesAudited         bool
+	ExportImportTestsAdded                 bool
+	ModuleInvariantHarnessAdded            bool
+	RootContributionInterfaceDesign        bool
+	CurrentStateReproducible               bool
+	ModuleBoundariesDocumented             bool
+	MigrationRiskListComplete              bool
+	AetherCoreModuleImplemented            bool
+	ZonesModuleImplemented                 bool
+	ZoneRegistryImplemented                bool
+	GlobalStateRootImplemented             bool
+	BlockCommitmentMetadataQueries         bool
+	DefaultZoneRunnable                    bool
+	DefaultZoneRootIncluded                bool
+	ExportImportPreservesRootMeta          bool
+	MessagesModuleImplemented              bool
+	MessageEnvelopeAdded                   bool
+	FIFOPerSenderQueuesAdded               bool
+	NonceReplayProtectionAdded             bool
+	MessageReceiptsAdded                   bool
+	BounceAndExpiryAdded                   bool
+	MessageReceiptRootsAdded               bool
+	SameChainAsyncDeterministic            bool
+	MessageReceiptProofsAvailable          bool
+	ReplayAttemptsRejected                 bool
+	FinancialZoneBoundaryMoved             bool
+	IdentityZoneActivated                  bool
+	ApplicationZoneSchedulerBoundary       bool
+	ContractZoneSkeletonAdded              bool
+	ZoneSpecificQueriesRoots               bool
+	FourCanonicalZonesExist                bool
+	CanonicalZoneSurfacesComplete          bool
+	CrossZoneMutationMessagesOnly          bool
+	ServicesModuleImplemented              bool
+	StorageModuleImplemented               bool
+	RoutingModuleImplemented               bool
+	ServiceDescriptorsAdded                bool
+	StorageObjectCommitmentsAdded          bool
+	NodeRecordsRoutingEpochsAdded          bool
+	ProofAttachedLookupQueriesAdded        bool
+	ServiceDiscoveryDeterministic          bool
+	StorageCommitmentsProofVerifiable      bool
+	RoutingTableCommittedQueryable         bool
+	AETResolverOutputsUpgraded             bool
+	IdentityGraphAdded                     bool
+	CrossZoneIdentityBindingAdded          bool
+	PaymentsModuleImplemented              bool
+	PaymentEnvelopeAdded                   bool
+	ConditionalTransfersAdded              bool
+	FinancialZoneSettlementAdded           bool
+	IdentityResolvesAllOutputTypes         bool
+	PaymentsSettleThroughFinancialZone     bool
+	PaymentDisputesDeterministicReplay     bool
+	ContractsModuleImplemented             bool
+	AVMBytecodeInterfaceAdded              bool
+	CosmWasmAdapterBoundaryAdded           bool
+	VMStorageAdapterAdded                  bool
+	VMOutboundMessageSupportAdded          bool
+	ContractReceiptsProofsAdded            bool
+	ContractExecutionMessageDriven         bool
+	ContractsNoDirectZoneMutation          bool
+	ContractStateRootProofVerifiable       bool
+	BlockSTMAwareGroupingAdded             bool
+	StoreV2RootReadOptimizationAdded       bool
+	QueueDrainingBenchmarksAdded           bool
+	ServiceLookupBenchmarksAdded           bool
+	StorageProofBenchmarksAdded            bool
+	RoutingSimulationTestsAdded            bool
+	AdaptiveSyncRecoveryTestsAdded         bool
+	IndependentZoneWorkloadsParallelize    bool
+	RootGenerationBounded                  bool
+	NodesRecoverServeProofQueriesAfterSync bool
 }
 
 type RoadmapModuleInventoryEntry struct {
@@ -129,6 +150,8 @@ func DefaultImplementationRoadmap() (ImplementationRoadmap, error) {
 		roadmapPhaseThree(inventory),
 		roadmapPhaseFour(inventory),
 		roadmapPhaseFive(inventory),
+		roadmapPhaseSix(inventory),
+		roadmapPhaseSeven(inventory),
 	}
 	return NewImplementationRoadmap(phases)
 }
@@ -163,8 +186,8 @@ func BuildRoadmapModuleInventory(manifest CosmosModuleRequirementManifest) []Roa
 
 func (roadmap ImplementationRoadmap) ValidateFormat() error {
 	roadmap.Phases = normalizeRoadmapPhases(roadmap.Phases)
-	if len(roadmap.Phases) != 6 {
-		return errors.New("aethercore implementation roadmap must include phases 0 through 5")
+	if len(roadmap.Phases) != 8 {
+		return errors.New("aethercore implementation roadmap must include phases 0 through 7")
 	}
 	if roadmap.Phases[0].PhaseID != RoadmapPhaseBaselineAudit || roadmap.Phases[0].PhaseNumber != 0 {
 		return errors.New("aethercore implementation roadmap phase 0 baseline audit is required")
@@ -183,6 +206,12 @@ func (roadmap ImplementationRoadmap) ValidateFormat() error {
 	}
 	if roadmap.Phases[5].PhaseID != RoadmapPhaseIdentityPaymentIntegration || roadmap.Phases[5].PhaseNumber != 5 {
 		return errors.New("aethercore implementation roadmap phase 5 identity payment integration is required")
+	}
+	if roadmap.Phases[6].PhaseID != RoadmapPhaseVMRuntime || roadmap.Phases[6].PhaseNumber != 6 {
+		return errors.New("aethercore implementation roadmap phase 6 VM runtime is required")
+	}
+	if roadmap.Phases[7].PhaseID != RoadmapPhasePerformanceHardening || roadmap.Phases[7].PhaseNumber != 7 {
+		return errors.New("aethercore implementation roadmap phase 7 performance hardening is required")
 	}
 	for _, phase := range roadmap.Phases {
 		if err := phase.ValidateFormat(); err != nil {
@@ -233,6 +262,12 @@ func (phase ImplementationRoadmapPhase) ValidateFormat() error {
 	}
 	if phase.PhaseID == RoadmapPhaseIdentityPaymentIntegration && phase.PhaseNumber != 5 {
 		return errors.New("aethercore identity payment integration phase number must be 5")
+	}
+	if phase.PhaseID == RoadmapPhaseVMRuntime && phase.PhaseNumber != 6 {
+		return errors.New("aethercore VM runtime phase number must be 6")
+	}
+	if phase.PhaseID == RoadmapPhasePerformanceHardening && phase.PhaseNumber != 7 {
+		return errors.New("aethercore performance hardening phase number must be 7")
 	}
 	if err := validateRoadmapText("aethercore implementation roadmap phase name", phase.Name); err != nil {
 		return err
@@ -452,6 +487,65 @@ func (e RoadmapEvidence) Validate(phaseID ImplementationRoadmapPhaseID) error {
 		if !e.PaymentDisputesDeterministicReplay {
 			return errors.New("aethercore phase 5 exit requires deterministic replay payment disputes")
 		}
+	case RoadmapPhaseVMRuntime:
+		if !e.ContractsModuleImplemented {
+			return errors.New("aethercore phase 6 must implement x/contracts")
+		}
+		if !e.AVMBytecodeInterfaceAdded {
+			return errors.New("aethercore phase 6 must add AVM-ready bytecode interface")
+		}
+		if !e.CosmWasmAdapterBoundaryAdded {
+			return errors.New("aethercore phase 6 must add CosmWasm adapter boundary")
+		}
+		if !e.VMStorageAdapterAdded {
+			return errors.New("aethercore phase 6 must add VM storage adapter")
+		}
+		if !e.VMOutboundMessageSupportAdded {
+			return errors.New("aethercore phase 6 must add VM outbound message support")
+		}
+		if !e.ContractReceiptsProofsAdded {
+			return errors.New("aethercore phase 6 must add contract receipts and proofs")
+		}
+		if !e.ContractExecutionMessageDriven {
+			return errors.New("aethercore phase 6 exit requires message-driven contract execution")
+		}
+		if !e.ContractsNoDirectZoneMutation {
+			return errors.New("aethercore phase 6 exit requires contracts to avoid direct mutation of other zones")
+		}
+		if !e.ContractStateRootProofVerifiable {
+			return errors.New("aethercore phase 6 exit requires proof-verifiable contract state root")
+		}
+	case RoadmapPhasePerformanceHardening:
+		if !e.BlockSTMAwareGroupingAdded {
+			return errors.New("aethercore phase 7 must add BlockSTM-aware workload grouping")
+		}
+		if !e.StoreV2RootReadOptimizationAdded {
+			return errors.New("aethercore phase 7 must add Store v2 optimization for root-heavy reads")
+		}
+		if !e.QueueDrainingBenchmarksAdded {
+			return errors.New("aethercore phase 7 must add queue draining benchmarks")
+		}
+		if !e.ServiceLookupBenchmarksAdded {
+			return errors.New("aethercore phase 7 must add service lookup benchmarks")
+		}
+		if !e.StorageProofBenchmarksAdded {
+			return errors.New("aethercore phase 7 must add storage proof benchmarks")
+		}
+		if !e.RoutingSimulationTestsAdded {
+			return errors.New("aethercore phase 7 must add routing simulation tests")
+		}
+		if !e.AdaptiveSyncRecoveryTestsAdded {
+			return errors.New("aethercore phase 7 must add AdaptiveSync recovery tests")
+		}
+		if !e.IndependentZoneWorkloadsParallelize {
+			return errors.New("aethercore phase 7 exit requires independent zone workloads to parallelize")
+		}
+		if !e.RootGenerationBounded {
+			return errors.New("aethercore phase 7 exit requires bounded root generation")
+		}
+		if !e.NodesRecoverServeProofQueriesAfterSync {
+			return errors.New("aethercore phase 7 exit requires nodes to recover and serve proof queries after sync")
+		}
 	default:
 		return fmt.Errorf("unknown aethercore implementation roadmap phase %q", phaseID)
 	}
@@ -465,7 +559,9 @@ func IsImplementationRoadmapPhaseID(phaseID ImplementationRoadmapPhaseID) bool {
 		RoadmapPhaseCrossZoneMessages,
 		RoadmapPhaseCanonicalZones,
 		RoadmapPhaseServiceStorageRouting,
-		RoadmapPhaseIdentityPaymentIntegration:
+		RoadmapPhaseIdentityPaymentIntegration,
+		RoadmapPhaseVMRuntime,
+		RoadmapPhasePerformanceHardening:
 		return true
 	default:
 		return false
@@ -691,6 +787,74 @@ func roadmapPhaseFive(inventory []RoadmapModuleInventoryEntry) ImplementationRoa
 			IdentityResolvesAllOutputTypes:     true,
 			PaymentsSettleThroughFinancialZone: true,
 			PaymentDisputesDeterministicReplay: true,
+		},
+	}
+}
+
+func roadmapPhaseSix(inventory []RoadmapModuleInventoryEntry) ImplementationRoadmapPhase {
+	return ImplementationRoadmapPhase{
+		PhaseID:     RoadmapPhaseVMRuntime,
+		PhaseNumber: 6,
+		Name:        "VM Runtime",
+		Tasks: roadmapChecklist(
+			"implement-x-contracts",
+			"add-avm-ready-bytecode-interface",
+			"add-cosmwasm-adapter-boundary",
+			"add-vm-storage-adapter",
+			"add-vm-outbound-message-support",
+			"add-contract-receipts-and-proofs",
+		),
+		ExitCriteria: roadmapChecklist(
+			"contract-execution-message-driven",
+			"contracts-cannot-directly-mutate-other-zones",
+			"contract-state-root-proof-verifiable",
+		),
+		Evidence: RoadmapEvidence{
+			ModuleInventory:                  inventory,
+			ContractsModuleImplemented:       true,
+			AVMBytecodeInterfaceAdded:        true,
+			CosmWasmAdapterBoundaryAdded:     true,
+			VMStorageAdapterAdded:            true,
+			VMOutboundMessageSupportAdded:    true,
+			ContractReceiptsProofsAdded:      true,
+			ContractExecutionMessageDriven:   true,
+			ContractsNoDirectZoneMutation:    true,
+			ContractStateRootProofVerifiable: true,
+		},
+	}
+}
+
+func roadmapPhaseSeven(inventory []RoadmapModuleInventoryEntry) ImplementationRoadmapPhase {
+	return ImplementationRoadmapPhase{
+		PhaseID:     RoadmapPhasePerformanceHardening,
+		PhaseNumber: 7,
+		Name:        "Performance and Hardening",
+		Tasks: roadmapChecklist(
+			"add-blockstm-aware-workload-grouping",
+			"add-store-v2-optimization-for-root-heavy-reads",
+			"add-queue-draining-benchmarks",
+			"add-service-lookup-benchmarks",
+			"add-storage-proof-benchmarks",
+			"add-routing-simulation-tests",
+			"add-adaptivesync-recovery-tests",
+		),
+		ExitCriteria: roadmapChecklist(
+			"independent-zone-workloads-parallelize",
+			"root-generation-remains-bounded",
+			"nodes-recover-and-serve-proof-queries-after-sync",
+		),
+		Evidence: RoadmapEvidence{
+			ModuleInventory:                        inventory,
+			BlockSTMAwareGroupingAdded:             true,
+			StoreV2RootReadOptimizationAdded:       true,
+			QueueDrainingBenchmarksAdded:           true,
+			ServiceLookupBenchmarksAdded:           true,
+			StorageProofBenchmarksAdded:            true,
+			RoutingSimulationTestsAdded:            true,
+			AdaptiveSyncRecoveryTestsAdded:         true,
+			IndependentZoneWorkloadsParallelize:    true,
+			RootGenerationBounded:                  true,
+			NodesRecoverServeProofQueriesAfterSync: true,
 		},
 	}
 }
@@ -1059,4 +1223,23 @@ func writeRoadmapEvidence(w byteWriter, evidence RoadmapEvidence) {
 	writePart(w, fmt.Sprint(evidence.IdentityResolvesAllOutputTypes))
 	writePart(w, fmt.Sprint(evidence.PaymentsSettleThroughFinancialZone))
 	writePart(w, fmt.Sprint(evidence.PaymentDisputesDeterministicReplay))
+	writePart(w, fmt.Sprint(evidence.ContractsModuleImplemented))
+	writePart(w, fmt.Sprint(evidence.AVMBytecodeInterfaceAdded))
+	writePart(w, fmt.Sprint(evidence.CosmWasmAdapterBoundaryAdded))
+	writePart(w, fmt.Sprint(evidence.VMStorageAdapterAdded))
+	writePart(w, fmt.Sprint(evidence.VMOutboundMessageSupportAdded))
+	writePart(w, fmt.Sprint(evidence.ContractReceiptsProofsAdded))
+	writePart(w, fmt.Sprint(evidence.ContractExecutionMessageDriven))
+	writePart(w, fmt.Sprint(evidence.ContractsNoDirectZoneMutation))
+	writePart(w, fmt.Sprint(evidence.ContractStateRootProofVerifiable))
+	writePart(w, fmt.Sprint(evidence.BlockSTMAwareGroupingAdded))
+	writePart(w, fmt.Sprint(evidence.StoreV2RootReadOptimizationAdded))
+	writePart(w, fmt.Sprint(evidence.QueueDrainingBenchmarksAdded))
+	writePart(w, fmt.Sprint(evidence.ServiceLookupBenchmarksAdded))
+	writePart(w, fmt.Sprint(evidence.StorageProofBenchmarksAdded))
+	writePart(w, fmt.Sprint(evidence.RoutingSimulationTestsAdded))
+	writePart(w, fmt.Sprint(evidence.AdaptiveSyncRecoveryTestsAdded))
+	writePart(w, fmt.Sprint(evidence.IndependentZoneWorkloadsParallelize))
+	writePart(w, fmt.Sprint(evidence.RootGenerationBounded))
+	writePart(w, fmt.Sprint(evidence.NodesRecoverServeProofQueriesAfterSync))
 }
