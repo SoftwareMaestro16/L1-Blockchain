@@ -745,6 +745,39 @@ type WatchDisputeSubmission struct {
 	EvidenceHash          string
 }
 
+type ValidatorPaymentServiceMetadata struct {
+	ValidatorAddress string
+	ServiceAddress   string
+	WatchEndpoint    string
+	RoutingEndpoint  string
+	PublicKey        string
+	MinDelegation    string
+	CommissionBps    uint32
+	Active           bool
+	UpdatedHeight    uint64
+	MetadataHash     string
+}
+
+type ValidatorWatchRegistration struct {
+	ValidatorAddress string
+	ServiceAddress   string
+	Delegator        string
+	MinDelegation    string
+	RegisteredHeight uint64
+	MetadataHash     string
+}
+
+type ValidatorAssistedDisputeSubmission struct {
+	ValidatorAddress      string
+	ServiceAddress        string
+	Delegator             string
+	ChannelID             string
+	ClosingStateReference string
+	NewerState            ChannelState
+	CurrentHeight         uint64
+	EvidenceHash          string
+}
+
 type FinalSettlementRequest struct {
 	ChannelID           string
 	ResolvedConditions  []ConditionResolution
@@ -1671,6 +1704,126 @@ func (w WatchDisputeSubmission) ValidateForChannel(channel ChannelRecord) error 
 		}
 	}
 	return w.NewerState.ValidateForChannel(channel, false)
+}
+
+func (m ValidatorPaymentServiceMetadata) Normalize() ValidatorPaymentServiceMetadata {
+	m.ValidatorAddress = strings.TrimSpace(m.ValidatorAddress)
+	m.ServiceAddress = strings.TrimSpace(m.ServiceAddress)
+	m.WatchEndpoint = strings.TrimSpace(m.WatchEndpoint)
+	m.RoutingEndpoint = strings.TrimSpace(m.RoutingEndpoint)
+	m.PublicKey = strings.TrimSpace(m.PublicKey)
+	m.MinDelegation = strings.TrimSpace(m.MinDelegation)
+	if m.MinDelegation == "" {
+		m.MinDelegation = "0"
+	}
+	m.MetadataHash = normalizeOptionalHash(m.MetadataHash)
+	return m
+}
+
+func (m ValidatorPaymentServiceMetadata) Validate() error {
+	m = m.Normalize()
+	if err := addressing.ValidateUserAddress("payments validator service validator", m.ValidatorAddress); err != nil {
+		return err
+	}
+	if err := addressing.ValidateUserAddress("payments validator service address", m.ServiceAddress); err != nil {
+		return err
+	}
+	if m.WatchEndpoint == "" && m.RoutingEndpoint == "" {
+		return errors.New("payments validator service requires watch or routing endpoint")
+	}
+	if err := validateNonNegativeInt("payments validator service minimum delegation", m.MinDelegation); err != nil {
+		return err
+	}
+	if m.CommissionBps > MaxPenaltyRouteBps {
+		return errors.New("payments validator service commission exceeds 10000 bps")
+	}
+	if m.UpdatedHeight == 0 {
+		return errors.New("payments validator service update height must be positive")
+	}
+	expected := ComputeValidatorPaymentServiceMetadataHash(m)
+	if m.MetadataHash != "" && m.MetadataHash != expected {
+		return errors.New("payments validator service metadata hash mismatch")
+	}
+	return nil
+}
+
+func (r ValidatorWatchRegistration) Normalize() ValidatorWatchRegistration {
+	r.ValidatorAddress = strings.TrimSpace(r.ValidatorAddress)
+	r.ServiceAddress = strings.TrimSpace(r.ServiceAddress)
+	r.Delegator = strings.TrimSpace(r.Delegator)
+	r.MinDelegation = strings.TrimSpace(r.MinDelegation)
+	if r.MinDelegation == "" {
+		r.MinDelegation = "0"
+	}
+	r.MetadataHash = normalizeOptionalHash(r.MetadataHash)
+	return r
+}
+
+func (r ValidatorWatchRegistration) Validate(metadata ValidatorPaymentServiceMetadata) error {
+	r = r.Normalize()
+	metadata = metadata.Normalize()
+	if err := metadata.Validate(); err != nil {
+		return err
+	}
+	if !metadata.Active || metadata.WatchEndpoint == "" {
+		return errors.New("payments validator watch service is not active")
+	}
+	if r.ValidatorAddress != metadata.ValidatorAddress || r.ServiceAddress != metadata.ServiceAddress {
+		return errors.New("payments validator watch registration service mismatch")
+	}
+	if err := addressing.ValidateUserAddress("payments validator watch delegator", r.Delegator); err != nil {
+		return err
+	}
+	if r.RegisteredHeight == 0 {
+		return errors.New("payments validator watch registration height must be positive")
+	}
+	if r.RegisteredHeight < metadata.UpdatedHeight {
+		return errors.New("payments validator watch registration predates metadata")
+	}
+	if r.MetadataHash != "" && r.MetadataHash != metadata.MetadataHash {
+		return errors.New("payments validator watch registration metadata hash mismatch")
+	}
+	return validateNonNegativeInt("payments validator watch minimum delegation", r.MinDelegation)
+}
+
+func (s ValidatorAssistedDisputeSubmission) Normalize() ValidatorAssistedDisputeSubmission {
+	s.ValidatorAddress = strings.TrimSpace(s.ValidatorAddress)
+	s.ServiceAddress = strings.TrimSpace(s.ServiceAddress)
+	s.Delegator = strings.TrimSpace(s.Delegator)
+	s.ChannelID = normalizeHash(s.ChannelID)
+	s.ClosingStateReference = normalizeHash(s.ClosingStateReference)
+	s.NewerState = s.NewerState.Normalize()
+	s.EvidenceHash = normalizeOptionalHash(s.EvidenceHash)
+	return s
+}
+
+func (s ValidatorAssistedDisputeSubmission) ValidateForChannel(channel ChannelRecord, metadata ValidatorPaymentServiceMetadata) error {
+	s = s.Normalize()
+	metadata = metadata.Normalize()
+	if err := metadata.Validate(); err != nil {
+		return err
+	}
+	if !metadata.Active || metadata.WatchEndpoint == "" {
+		return errors.New("payments validator watch service is not active")
+	}
+	if s.ValidatorAddress != metadata.ValidatorAddress {
+		return errors.New("payments validator assisted dispute validator mismatch")
+	}
+	if s.ServiceAddress == "" {
+		s.ServiceAddress = metadata.ServiceAddress
+	}
+	if s.ServiceAddress != metadata.ServiceAddress {
+		return errors.New("payments validator assisted dispute service mismatch")
+	}
+	return (WatchDisputeSubmission{
+		WatchService:          metadata.ServiceAddress,
+		Delegator:             s.Delegator,
+		ChannelID:             s.ChannelID,
+		ClosingStateReference: s.ClosingStateReference,
+		NewerState:            s.NewerState,
+		CurrentHeight:         s.CurrentHeight,
+		EvidenceHash:          s.EvidenceHash,
+	}).ValidateForChannel(channel)
 }
 
 func (r FinalSettlementRequest) Normalize() FinalSettlementRequest {
@@ -4796,6 +4949,24 @@ func ChannelDisputeEvent(channel ChannelRecord, submitter string, height uint64)
 			{Key: "state_hash", Value: channel.PendingClose.State.StateHash},
 			{Key: "nonce", Value: fmt.Sprintf("%d", channel.PendingClose.State.Nonce)},
 			{Key: "settle_after_height", Value: fmt.Sprintf("%d", channel.PendingClose.SettleAfterHeight)},
+		},
+	}
+	return event.Normalize()
+}
+
+func ValidatorAssistedDisputeEvent(metadata ValidatorPaymentServiceMetadata, channel ChannelRecord, delegator string, height uint64) PaymentEvent {
+	metadata = metadata.Normalize()
+	channel = channel.Normalize()
+	event := PaymentEvent{
+		EventID:   HashParts("validator-assisted-dispute", metadata.ValidatorAddress, channel.ChannelID, delegator, fmt.Sprintf("%d", height)),
+		EventType: "validator-assisted-dispute",
+		ChannelID: channel.ChannelID,
+		Height:    height,
+		Attributes: []PaymentEventAttribute{
+			{Key: "validator", Value: metadata.ValidatorAddress},
+			{Key: "watch_service", Value: metadata.ServiceAddress},
+			{Key: "delegator", Value: strings.TrimSpace(delegator)},
+			{Key: "metadata_hash", Value: metadata.MetadataHash},
 		},
 	}
 	return event.Normalize()

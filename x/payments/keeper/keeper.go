@@ -312,6 +312,42 @@ func (k *Keeper) SubmitWatchDispute(submission paymentstypes.WatchDisputeSubmiss
 	return nil
 }
 
+func (k *Keeper) RegisterValidatorPaymentService(metadata paymentstypes.ValidatorPaymentServiceMetadata) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.RegisterValidatorPaymentService(k.genesis.State, metadata)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
+func (k *Keeper) RegisterValidatorWatchService(registration paymentstypes.ValidatorWatchRegistration) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.RegisterValidatorWatchService(k.genesis.State, registration)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
+func (k *Keeper) SubmitValidatorAssistedDispute(submission paymentstypes.ValidatorAssistedDisputeSubmission) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.SubmitValidatorAssistedDispute(k.genesis.State, submission)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
 func (k *Keeper) SubmitFraudProof(channelID string, proof paymentstypes.FraudProof, currentHeight uint64) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err

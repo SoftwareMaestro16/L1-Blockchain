@@ -12,28 +12,32 @@ import (
 )
 
 type PaymentsState struct {
-	Channels        []ChannelRecord
-	Edges           []ChannelEdge
-	VirtualChannels []VirtualChannel
-	Settlements     []SettlementRecord
-	Batches         []SettlementBatch
-	CustodyLocks    []CustodyLock
-	ClosedChannels  []ClosedChannelTombstone
-	ConditionClaims []ConditionClaimRecord
-	Events          []PaymentEvent
+	Channels                 []ChannelRecord
+	Edges                    []ChannelEdge
+	VirtualChannels          []VirtualChannel
+	Settlements              []SettlementRecord
+	Batches                  []SettlementBatch
+	CustodyLocks             []CustodyLock
+	ClosedChannels           []ClosedChannelTombstone
+	ConditionClaims          []ConditionClaimRecord
+	ValidatorPaymentServices []ValidatorPaymentServiceMetadata
+	ValidatorWatchRegistries []ValidatorWatchRegistration
+	Events                   []PaymentEvent
 }
 
 func EmptyState() PaymentsState {
 	return PaymentsState{
-		Channels:        []ChannelRecord{},
-		Edges:           []ChannelEdge{},
-		VirtualChannels: []VirtualChannel{},
-		Settlements:     []SettlementRecord{},
-		Batches:         []SettlementBatch{},
-		CustodyLocks:    []CustodyLock{},
-		ClosedChannels:  []ClosedChannelTombstone{},
-		ConditionClaims: []ConditionClaimRecord{},
-		Events:          []PaymentEvent{},
+		Channels:                 []ChannelRecord{},
+		Edges:                    []ChannelEdge{},
+		VirtualChannels:          []VirtualChannel{},
+		Settlements:              []SettlementRecord{},
+		Batches:                  []SettlementBatch{},
+		CustodyLocks:             []CustodyLock{},
+		ClosedChannels:           []ClosedChannelTombstone{},
+		ConditionClaims:          []ConditionClaimRecord{},
+		ValidatorPaymentServices: []ValidatorPaymentServiceMetadata{},
+		ValidatorWatchRegistries: []ValidatorWatchRegistration{},
+		Events:                   []PaymentEvent{},
 	}
 }
 
@@ -951,6 +955,94 @@ func SubmitWatchDispute(state PaymentsState, submission WatchDisputeSubmission) 
 		Submitter:             submission.Delegator,
 		CurrentHeight:         submission.CurrentHeight,
 	})
+}
+
+func RegisterValidatorPaymentService(state PaymentsState, metadata ValidatorPaymentServiceMetadata) (PaymentsState, error) {
+	state = state.Export()
+	metadata = metadata.Normalize()
+	metadata.MetadataHash = ComputeValidatorPaymentServiceMetadataHash(metadata)
+	if err := metadata.Validate(); err != nil {
+		return PaymentsState{}, err
+	}
+	next := state.Clone()
+	replaced := false
+	for i, existing := range next.ValidatorPaymentServices {
+		if existing.Normalize().ValidatorAddress == metadata.ValidatorAddress {
+			next.ValidatorPaymentServices[i] = metadata
+			replaced = true
+			break
+		}
+	}
+	if !replaced {
+		next.ValidatorPaymentServices = append(next.ValidatorPaymentServices, metadata)
+	}
+	sortValidatorPaymentServices(next.ValidatorPaymentServices)
+	return next, next.Validate()
+}
+
+func RegisterValidatorWatchService(state PaymentsState, registration ValidatorWatchRegistration) (PaymentsState, error) {
+	state = state.Export()
+	registration = registration.Normalize()
+	metadata, found := state.ValidatorPaymentServiceByValidator(registration.ValidatorAddress)
+	if !found {
+		return PaymentsState{}, errors.New("payments validator service not found")
+	}
+	registration.ServiceAddress = metadata.ServiceAddress
+	registration.MetadataHash = metadata.MetadataHash
+	if registration.MinDelegation == "" || registration.MinDelegation == "0" {
+		registration.MinDelegation = metadata.MinDelegation
+	}
+	if err := registration.Validate(metadata); err != nil {
+		return PaymentsState{}, err
+	}
+	next := state.Clone()
+	replaced := false
+	for i, existing := range next.ValidatorWatchRegistries {
+		existing = existing.Normalize()
+		if existing.ValidatorAddress == registration.ValidatorAddress && existing.Delegator == registration.Delegator {
+			next.ValidatorWatchRegistries[i] = registration
+			replaced = true
+			break
+		}
+	}
+	if !replaced {
+		next.ValidatorWatchRegistries = append(next.ValidatorWatchRegistries, registration)
+	}
+	sortValidatorWatchRegistrations(next.ValidatorWatchRegistries)
+	return next, next.Validate()
+}
+
+func SubmitValidatorAssistedDispute(state PaymentsState, submission ValidatorAssistedDisputeSubmission) (PaymentsState, error) {
+	state = state.Export()
+	submission = submission.Normalize()
+	metadata, found := state.ValidatorPaymentServiceByValidator(submission.ValidatorAddress)
+	if !found {
+		return PaymentsState{}, errors.New("payments validator service not found")
+	}
+	channel, found := state.ChannelByID(submission.ChannelID)
+	if !found {
+		return PaymentsState{}, errors.New("payments channel not found")
+	}
+	if err := submission.ValidateForChannel(channel, metadata); err != nil {
+		return PaymentsState{}, err
+	}
+	if _, found := state.ValidatorWatchRegistration(submission.ValidatorAddress, submission.Delegator); !found {
+		return PaymentsState{}, errors.New("payments validator watch registration not found")
+	}
+	next, err := SubmitWatchDispute(state, WatchDisputeSubmission{
+		WatchService:          metadata.ServiceAddress,
+		Delegator:             submission.Delegator,
+		ChannelID:             submission.ChannelID,
+		ClosingStateReference: submission.ClosingStateReference,
+		NewerState:            submission.NewerState,
+		CurrentHeight:         submission.CurrentHeight,
+		EvidenceHash:          submission.EvidenceHash,
+	})
+	if err != nil {
+		return PaymentsState{}, err
+	}
+	next.Events = append(next.Events, ValidatorAssistedDisputeEvent(metadata, channel, submission.Delegator, submission.CurrentHeight))
+	return next, next.Validate()
 }
 
 func SubmitFraudProof(state PaymentsState, channelID string, proof FraudProof, currentHeight uint64) (PaymentsState, error) {
@@ -2186,20 +2278,24 @@ func (s PaymentsState) Export() PaymentsState {
 	sortCustodyLocks(out.CustodyLocks)
 	sortClosedChannelTombstones(out.ClosedChannels)
 	sortConditionClaimRecords(out.ConditionClaims)
+	sortValidatorPaymentServices(out.ValidatorPaymentServices)
+	sortValidatorWatchRegistrations(out.ValidatorWatchRegistries)
 	return out
 }
 
 func (s PaymentsState) Clone() PaymentsState {
 	out := PaymentsState{
-		Channels:        make([]ChannelRecord, len(s.Channels)),
-		Edges:           make([]ChannelEdge, len(s.Edges)),
-		VirtualChannels: make([]VirtualChannel, len(s.VirtualChannels)),
-		Settlements:     make([]SettlementRecord, len(s.Settlements)),
-		Batches:         make([]SettlementBatch, len(s.Batches)),
-		CustodyLocks:    make([]CustodyLock, len(s.CustodyLocks)),
-		ClosedChannels:  make([]ClosedChannelTombstone, len(s.ClosedChannels)),
-		ConditionClaims: make([]ConditionClaimRecord, len(s.ConditionClaims)),
-		Events:          make([]PaymentEvent, len(s.Events)),
+		Channels:                 make([]ChannelRecord, len(s.Channels)),
+		Edges:                    make([]ChannelEdge, len(s.Edges)),
+		VirtualChannels:          make([]VirtualChannel, len(s.VirtualChannels)),
+		Settlements:              make([]SettlementRecord, len(s.Settlements)),
+		Batches:                  make([]SettlementBatch, len(s.Batches)),
+		CustodyLocks:             make([]CustodyLock, len(s.CustodyLocks)),
+		ClosedChannels:           make([]ClosedChannelTombstone, len(s.ClosedChannels)),
+		ConditionClaims:          make([]ConditionClaimRecord, len(s.ConditionClaims)),
+		ValidatorPaymentServices: make([]ValidatorPaymentServiceMetadata, len(s.ValidatorPaymentServices)),
+		ValidatorWatchRegistries: make([]ValidatorWatchRegistration, len(s.ValidatorWatchRegistries)),
+		Events:                   make([]PaymentEvent, len(s.Events)),
 	}
 	for i, channel := range s.Channels {
 		out.Channels[i] = channel.Normalize()
@@ -2224,6 +2320,12 @@ func (s PaymentsState) Clone() PaymentsState {
 	}
 	for i, claim := range s.ConditionClaims {
 		out.ConditionClaims[i] = claim.Normalize()
+	}
+	for i, metadata := range s.ValidatorPaymentServices {
+		out.ValidatorPaymentServices[i] = metadata.Normalize()
+	}
+	for i, registration := range s.ValidatorWatchRegistries {
+		out.ValidatorWatchRegistries[i] = registration.Normalize()
 	}
 	for i, event := range s.Events {
 		out.Events[i] = event.Normalize()
@@ -2259,6 +2361,12 @@ func (s PaymentsState) Validate() error {
 	if err := validateConditionClaimRecords(s.Channels, s.ConditionClaims); err != nil {
 		return err
 	}
+	if err := validateValidatorPaymentServices(s.ValidatorPaymentServices); err != nil {
+		return err
+	}
+	if err := validateValidatorWatchRegistrations(s.ValidatorPaymentServices, s.ValidatorWatchRegistries); err != nil {
+		return err
+	}
 	return validatePaymentEvents(s.Channels, s.Events)
 }
 
@@ -2276,6 +2384,29 @@ func (s PaymentsState) ChannelIndex(channelID string) (int, ChannelRecord, bool)
 		}
 	}
 	return 0, ChannelRecord{}, false
+}
+
+func (s PaymentsState) ValidatorPaymentServiceByValidator(validatorAddress string) (ValidatorPaymentServiceMetadata, bool) {
+	validatorAddress = strings.TrimSpace(validatorAddress)
+	for _, metadata := range s.ValidatorPaymentServices {
+		metadata = metadata.Normalize()
+		if metadata.ValidatorAddress == validatorAddress {
+			return metadata, true
+		}
+	}
+	return ValidatorPaymentServiceMetadata{}, false
+}
+
+func (s PaymentsState) ValidatorWatchRegistration(validatorAddress, delegator string) (ValidatorWatchRegistration, bool) {
+	validatorAddress = strings.TrimSpace(validatorAddress)
+	delegator = strings.TrimSpace(delegator)
+	for _, registration := range s.ValidatorWatchRegistries {
+		registration = registration.Normalize()
+		if registration.ValidatorAddress == validatorAddress && registration.Delegator == delegator {
+			return registration, true
+		}
+	}
+	return ValidatorWatchRegistration{}, false
 }
 
 func (s PaymentsState) EdgeByKey(channelID, from, to string) (ChannelEdge, bool) {
@@ -2636,6 +2767,59 @@ func validateConditionClaimRecords(channels []ChannelRecord, claims []ConditionC
 			return errors.New("payments condition claims must be sorted canonically")
 		}
 		previous = sortKey
+	}
+	return nil
+}
+
+func validateValidatorPaymentServices(services []ValidatorPaymentServiceMetadata) error {
+	seen := make(map[string]struct{}, len(services))
+	var previous string
+	for i, metadata := range services {
+		metadata = metadata.Normalize()
+		if err := metadata.Validate(); err != nil {
+			return err
+		}
+		if metadata.MetadataHash == "" {
+			return errors.New("payments validator service metadata hash is required")
+		}
+		if _, found := seen[metadata.ValidatorAddress]; found {
+			return errors.New("payments duplicate validator payment service")
+		}
+		seen[metadata.ValidatorAddress] = struct{}{}
+		if i > 0 && previous >= metadata.ValidatorAddress {
+			return errors.New("payments validator services must be sorted canonically")
+		}
+		previous = metadata.ValidatorAddress
+	}
+	return nil
+}
+
+func validateValidatorWatchRegistrations(services []ValidatorPaymentServiceMetadata, registrations []ValidatorWatchRegistration) error {
+	serviceByValidator := make(map[string]ValidatorPaymentServiceMetadata, len(services))
+	for _, metadata := range services {
+		metadata = metadata.Normalize()
+		serviceByValidator[metadata.ValidatorAddress] = metadata
+	}
+	seen := make(map[string]struct{}, len(registrations))
+	var previous string
+	for i, registration := range registrations {
+		registration = registration.Normalize()
+		metadata, found := serviceByValidator[registration.ValidatorAddress]
+		if !found {
+			return errors.New("payments validator watch registration references unknown service")
+		}
+		if err := registration.Validate(metadata); err != nil {
+			return err
+		}
+		key := validatorWatchRegistrationKey(registration.ValidatorAddress, registration.Delegator)
+		if _, found := seen[key]; found {
+			return errors.New("payments duplicate validator watch registration")
+		}
+		seen[key] = struct{}{}
+		if i > 0 && previous >= key {
+			return errors.New("payments validator watch registrations must be sorted canonically")
+		}
+		previous = key
 	}
 	return nil
 }
@@ -3818,12 +4002,30 @@ func sortConditionClaimRecords(claims []ConditionClaimRecord) {
 	})
 }
 
+func sortValidatorPaymentServices(services []ValidatorPaymentServiceMetadata) {
+	sort.SliceStable(services, func(i, j int) bool {
+		return services[i].Normalize().ValidatorAddress < services[j].Normalize().ValidatorAddress
+	})
+}
+
+func sortValidatorWatchRegistrations(registrations []ValidatorWatchRegistration) {
+	sort.SliceStable(registrations, func(i, j int) bool {
+		left := registrations[i].Normalize()
+		right := registrations[j].Normalize()
+		return validatorWatchRegistrationKey(left.ValidatorAddress, left.Delegator) < validatorWatchRegistrationKey(right.ValidatorAddress, right.Delegator)
+	})
+}
+
 func conditionClaimKey(channelID, conditionID string) string {
 	return normalizeHash(channelID) + "/" + normalizeHash(conditionID)
 }
 
 func conditionEvidenceKey(channelID, evidenceHash string) string {
 	return normalizeHash(channelID) + "/" + normalizeHash(evidenceHash)
+}
+
+func validatorWatchRegistrationKey(validatorAddress, delegator string) string {
+	return strings.TrimSpace(validatorAddress) + "/" + strings.TrimSpace(delegator)
 }
 
 func edgeKey(edge ChannelEdge) string {

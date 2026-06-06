@@ -124,6 +124,55 @@ func TestKeeperAdaptiveSyncSnapshotRecovery(t *testing.T) {
 	require.Contains(t, recovered.PendingFinalizationIDs, channel.ChannelID)
 }
 
+func TestKeeperValidatorAssistedWatchDispute(t *testing.T) {
+	k := NewKeeper()
+	gs := DefaultGenesis()
+	gs.Params = prototype.TestnetParams()
+	require.NoError(t, k.InitGenesis(gs))
+
+	alice := keeperAddress(0x67)
+	bob := keeperAddress(0x68)
+	validator := keeperAddress(0x69)
+	service := keeperAddress(0x6a)
+	channel := keeperSignedChannel(t, "keeper-validator-watch", "100", alice, bob)
+	require.NoError(t, k.OpenChannel(channel))
+	require.NoError(t, k.RegisterValidatorPaymentService(paymentstypes.ValidatorPaymentServiceMetadata{
+		ValidatorAddress: validator,
+		ServiceAddress:   service,
+		WatchEndpoint:    "https://validator.example/watch",
+		MinDelegation:    "10",
+		Active:           true,
+		UpdatedHeight:    10,
+	}))
+	require.NoError(t, k.RegisterValidatorWatchService(paymentstypes.ValidatorWatchRegistration{
+		ValidatorAddress: validator,
+		Delegator:        bob,
+		RegisteredHeight: 11,
+	}))
+	stale := keeperSignedState(t, channel, 2, channel.OpeningStateHash, []paymentstypes.Balance{
+		{Participant: alice, Amount: "50"},
+		{Participant: bob, Amount: "50"},
+	})
+	newer := keeperSignedState(t, channel, 3, stale.StateHash, []paymentstypes.Balance{
+		{Participant: alice, Amount: "45"},
+		{Participant: bob, Amount: "55"},
+	})
+	require.NoError(t, k.SubmitClose(channel.ChannelID, stale, alice, 20, "0"))
+	require.NoError(t, k.SubmitValidatorAssistedDispute(paymentstypes.ValidatorAssistedDisputeSubmission{
+		ValidatorAddress:      validator,
+		ServiceAddress:        service,
+		Delegator:             bob,
+		ChannelID:             channel.ChannelID,
+		ClosingStateReference: stale.StateHash,
+		NewerState:            newer,
+		CurrentHeight:         21,
+		EvidenceHash:          paymentstypes.HashParts("keeper-validator-watch", channel.ChannelID, newer.StateHash),
+	}))
+	debug, err := k.QueryStateHash(channel.ChannelID)
+	require.NoError(t, err)
+	require.Equal(t, newer.StateHash, debug.PendingStateHash)
+}
+
 func keeperSignedChannel(t *testing.T, salt, collateral, left, right string) paymentstypes.ChannelRecord {
 	t.Helper()
 

@@ -30,6 +30,7 @@ const (
 	domainStateSignaturePreimage  = "aetheris-payment-state-signature-preimage-hash"
 	domainSignatureEnvelope       = "aetheris-payment-signature-envelope"
 	domainSignedNonceWAL          = "aetheris-payment-signed-nonce-wal"
+	domainValidatorPaymentService = "aetheris-payment-validator-service-metadata"
 )
 
 func HashParts(parts ...string) string {
@@ -38,6 +39,22 @@ func HashParts(parts ...string) string {
 	for _, part := range parts {
 		writeString(h, part)
 	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func ComputeValidatorPaymentServiceMetadataHash(metadata ValidatorPaymentServiceMetadata) string {
+	metadata = metadata.Normalize()
+	h := sha256.New()
+	writeString(h, domainValidatorPaymentService)
+	writeString(h, metadata.ValidatorAddress)
+	writeString(h, metadata.ServiceAddress)
+	writeString(h, metadata.WatchEndpoint)
+	writeString(h, metadata.RoutingEndpoint)
+	writeString(h, metadata.PublicKey)
+	writeString(h, metadata.MinDelegation)
+	writeUint64(h, uint64(metadata.CommissionBps))
+	writeString(h, fmt.Sprintf("%t", metadata.Active))
+	writeUint64(h, metadata.UpdatedHeight)
 	return hex.EncodeToString(h.Sum(nil))
 }
 

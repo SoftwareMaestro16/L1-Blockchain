@@ -2870,6 +2870,128 @@ func TestWatchServiceSubmitsStaleCloseDispute(t *testing.T) {
 	require.ErrorContains(t, err, "delegator")
 }
 
+func TestValidatorAssistedWatchServiceSubmitsDispute(t *testing.T) {
+	alice := testAddress(0x92)
+	bob := testAddress(0x93)
+	validator := testAddress(0x94)
+	service := testAddress(0x95)
+	channel := signedChannel(t, "validator-watch-dispute", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+	state, err = RegisterValidatorPaymentService(state, ValidatorPaymentServiceMetadata{
+		ValidatorAddress: validator,
+		ServiceAddress:   service,
+		WatchEndpoint:    "https://validator.example/watch",
+		RoutingEndpoint:  "https://validator.example/route",
+		PublicKey:        "validator-watch-key",
+		MinDelegation:    "100",
+		CommissionBps:    250,
+		Active:           true,
+		UpdatedHeight:    10,
+	})
+	require.NoError(t, err)
+	require.Len(t, state.ValidatorPaymentServices, 1)
+	require.NotEmpty(t, state.ValidatorPaymentServices[0].MetadataHash)
+	state, err = RegisterValidatorWatchService(state, ValidatorWatchRegistration{
+		ValidatorAddress: validator,
+		Delegator:        bob,
+		RegisteredHeight: 11,
+	})
+	require.NoError(t, err)
+
+	stale := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "500"},
+		{Participant: bob, Amount: "500"},
+	})
+	newer := signedState(t, channel, 3, stale.StateHash, []Balance{
+		{Participant: alice, Amount: "425"},
+		{Participant: bob, Amount: "575"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, stale, alice, 20, "0")
+	require.NoError(t, err)
+	state, err = SubmitValidatorAssistedDispute(state, ValidatorAssistedDisputeSubmission{
+		ValidatorAddress:      validator,
+		ServiceAddress:        service,
+		Delegator:             bob,
+		ChannelID:             channel.ChannelID,
+		ClosingStateReference: stale.StateHash,
+		NewerState:            newer,
+		CurrentHeight:         21,
+		EvidenceHash:          HashParts("validator-watch", channel.ChannelID, newer.StateHash),
+	})
+	require.NoError(t, err)
+	require.Equal(t, newer.StateHash, state.Channels[0].PendingClose.State.StateHash)
+	require.Contains(t, paymentEventTypes(state.Events), "validator-assisted-dispute")
+
+	_, err = SubmitValidatorAssistedDispute(state, ValidatorAssistedDisputeSubmission{
+		ValidatorAddress:      testAddress(0x96),
+		ServiceAddress:        service,
+		Delegator:             bob,
+		ChannelID:             channel.ChannelID,
+		ClosingStateReference: newer.StateHash,
+		NewerState:            newer,
+		CurrentHeight:         22,
+	})
+	require.ErrorContains(t, err, "validator service not found")
+}
+
+func TestValidatorServicePenaltiesStaySeparateFromSlashing(t *testing.T) {
+	alice := testAddress(0x97)
+	bob := testAddress(0x98)
+	validator := alice
+	service := testAddress(0x99)
+	channel := signedChannel(t, "validator-penalty-separation", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+	state, err = RegisterValidatorPaymentService(state, ValidatorPaymentServiceMetadata{
+		ValidatorAddress: validator,
+		ServiceAddress:   service,
+		WatchEndpoint:    "https://validator.example/watch",
+		MinDelegation:    "1",
+		Active:           true,
+		UpdatedHeight:    10,
+	})
+	require.NoError(t, err)
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "500"},
+		{Participant: bob, Amount: "500"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+	conflicting := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "450"},
+		{Participant: bob, Amount: "550"},
+	})
+	proof := FraudProof{
+		ProofID:         HashParts("validator-channel-fraud", channel.ChannelID),
+		ProofType:       FraudProofTypeDoubleSign,
+		SubmittedBy:     bob,
+		OffendingSigner: validator,
+		StateA:          closeState,
+		StateB:          conflicting,
+		EvidenceHash:    ComputeDisputeProofHash(FraudProof{ProofID: HashParts("validator-channel-fraud", channel.ChannelID), ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
+		PenaltyDenom:    NativeDenom,
+		PenaltyAmount:   "30",
+	}
+	state, err = SubmitFraudProofWithPolicy(state, channel.ChannelID, proof, 21, FraudPenaltyPolicy{
+		ReporterRewardCap:       "15",
+		SecurityReserveShareBps: 7000,
+		CommunityPoolShareBps:   3000,
+	})
+	require.NoError(t, err)
+	require.Len(t, state.Channels[0].PendingClose.Penalties, 1)
+	require.Equal(t, validator, state.Channels[0].PendingClose.Penalties[0].Offender)
+	require.Equal(t, "15", state.Channels[0].PendingClose.Penalties[0].Amount)
+	require.Equal(t, "10", allocationAmountFor(state.Channels[0].PendingClose.PenaltyAllocations, PenaltyRouteSecurityReserve))
+	require.Equal(t, "5", allocationAmountFor(state.Channels[0].PendingClose.PenaltyAllocations, PenaltyRouteCommunityPool))
+}
+
 func TestFraudCloseSettlesAfterAcceptedProof(t *testing.T) {
 	alice := testAddress(0x53)
 	bob := testAddress(0x54)
@@ -3784,6 +3906,14 @@ func amountFor(balances []Balance, participant string) string {
 		}
 	}
 	return ""
+}
+
+func paymentEventTypes(events []PaymentEvent) []string {
+	types := make([]string, 0, len(events))
+	for _, event := range events {
+		types = append(types, event.EventType)
+	}
+	return types
 }
 
 func allocationAmountFor(allocations []PenaltyAllocation, route PenaltyRoute) string {
