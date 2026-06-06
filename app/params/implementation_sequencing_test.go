@@ -13,8 +13,10 @@ func TestDefaultImplementationSequencingPhase0AndPhase1Ready(t *testing.T) {
 	require.True(t, report.ReadyForPhase1)
 	require.True(t, report.ReadyForPhase2)
 	require.True(t, report.ReadyForPhase3)
+	require.True(t, report.ReadyForPhase4)
 	require.True(t, report.ReadyForIncentiveChanges)
 	require.False(t, report.ReadyForResourcePricing)
+	require.False(t, report.ReadyForLongTermStabilization)
 	require.Len(t, report.Phases, 2)
 	require.Len(t, report.Phases[0].Tasks, 7)
 	require.Len(t, report.Phases[1].Tasks, 7)
@@ -24,21 +26,26 @@ func TestDefaultImplementationSequencingPhase0AndPhase1Ready(t *testing.T) {
 	require.Contains(t, report.GovernanceSummary, "phase1=ready")
 }
 
-func TestFullImplementationSequencingPhase2AndPhase3Ready(t *testing.T) {
+func TestFullImplementationSequencingPhase2ThroughPhase4Ready(t *testing.T) {
 	report := BuildFullImplementationSequencingReport(nil, nil, nil, nil)
 	require.True(t, report.Passed, report.Failed)
 	require.True(t, report.ReadyForPhase1)
 	require.True(t, report.ReadyForPhase2)
 	require.True(t, report.ReadyForPhase3)
+	require.True(t, report.ReadyForPhase4)
 	require.True(t, report.ReadyForIncentiveChanges)
 	require.True(t, report.ReadyForResourcePricing)
-	require.Len(t, report.Phases, 4)
+	require.True(t, report.ReadyForLongTermStabilization)
+	require.Len(t, report.Phases, 5)
 	require.Len(t, report.Phases[2].Tasks, 7)
 	require.Len(t, report.Phases[3].Tasks, 7)
+	require.Len(t, report.Phases[4].Tasks, 6)
 	require.Equal(t, EconomicSequencePhase2, report.Phases[2].PhaseID)
 	require.Equal(t, EconomicSequencePhase3, report.Phases[3].PhaseID)
+	require.Equal(t, EconomicSequencePhase4, report.Phases[4].PhaseID)
 	require.Contains(t, report.GovernanceSummary, "phase2=ready")
 	require.Contains(t, report.GovernanceSummary, "phase3=ready")
+	require.Contains(t, report.GovernanceSummary, "phase4=ready")
 }
 
 func TestImplementationSequencingBlocksPhase1WhenMeasurementMissing(t *testing.T) {
@@ -122,11 +129,46 @@ func TestImplementationSequencingBlocksPhase3WhenSpamOrStoragePricingDisconnecte
 	require.True(t, report.ReadyForPhase3)
 	require.True(t, report.ReadyForIncentiveChanges)
 	require.False(t, report.ReadyForResourcePricing)
+	require.False(t, report.ReadyForLongTermStabilization)
 	require.Equal(t, SequencingStatusBlocked, report.Phases[3].Status)
 	require.Contains(t, report.Failed, EconomicSequencePhase3+":"+SequencingTaskSenderLocalSpamSurcharge+"_not_ready")
 	require.Contains(t, report.Failed, EconomicSequencePhase3+":"+SequencingTaskStorageFootprintQueries+"_not_ready")
 	require.Contains(t, report.Failed, EconomicSequencePhase3+":persistent_state_and_spam_directly_priced:resource_abuse_not_directly_priced")
 	require.Contains(t, report.Failed, EconomicSequencePhase3+":state_growth_bounded_by_pricing_telemetry:state_growth_bound_not_queryable")
+}
+
+func TestImplementationSequencingBlocksPhase4WhenControllerPolicyDisconnected(t *testing.T) {
+	phase4 := DefaultPhase4SequencingTasks()
+	for i := range phase4 {
+		if phase4[i].Name == SequencingTaskAdaptiveInflationController {
+			phase4[i].Reconciled = false
+		}
+	}
+
+	report := BuildFullImplementationSequencingReport(nil, nil, nil, nil, phase4)
+	require.False(t, report.Passed)
+	require.True(t, report.ReadyForPhase4)
+	require.True(t, report.ReadyForResourcePricing)
+	require.False(t, report.ReadyForLongTermStabilization)
+	require.Equal(t, SequencingStatusBlocked, report.Phases[4].Status)
+	require.Contains(t, report.Failed, EconomicSequencePhase4+":"+SequencingTaskAdaptiveInflationController+"_not_ready")
+	require.Contains(t, report.Failed, EconomicSequencePhase4+":issuance_burn_net_issuance_explicit_policy:supply_policy_loop_not_explicit")
+	require.Contains(t, report.Failed, EconomicSequencePhase4+":controllers_simulation_tested_before_activation:controller_simulation_gate_missing")
+}
+
+func TestImplementationSequencingBlocksPhase4WhenGovernanceImpactReportsNotQueryable(t *testing.T) {
+	phase4 := DefaultPhase4SequencingTasks()
+	for i := range phase4 {
+		if phase4[i].Name == SequencingTaskPreUpgradeEconomicSimulationRequirement {
+			phase4[i].Queryable = false
+		}
+	}
+
+	report := BuildFullImplementationSequencingReport(nil, nil, nil, nil, phase4)
+	require.False(t, report.Passed)
+	require.True(t, report.ReadyForPhase4)
+	require.False(t, report.ReadyForLongTermStabilization)
+	require.Contains(t, report.Failed, EconomicSequencePhase4+":governance_parameter_impact_reports_available:governance_impact_report_not_queryable")
 }
 
 func TestImplementationSequencingRejectsDuplicateAndMissingTasks(t *testing.T) {
