@@ -304,6 +304,10 @@ func TransferDomainNFT(state IdentityState, name string, actor sdk.AccAddress, n
 	next.DomainNFTs = transferNFT(next.DomainNFTs, domain.NFTID, newOwner, height)
 	next.Resolvers = transferResolverOwnership(next.Resolvers, state.Domains, domain.Name, newOwner, height)
 	next.PendingResolverUpdates = removePendingResolverUpdates(next.PendingResolverUpdates, state.Domains, domain.Name)
+	next, _, err = InvalidateReverseRecordsForDomainV2(next, domain.Name, height, nil)
+	if err != nil {
+		return IdentityState{}, Domain{}, err
+	}
 	sortIdentityState(&next)
 	return next, domain, next.Validate()
 }

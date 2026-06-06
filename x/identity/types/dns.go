@@ -79,6 +79,10 @@ func PatchIdentityResolver(state IdentityState, domainName string, actor sdk.Acc
 	}
 	next := state.Clone()
 	next.Resolvers = upsertResolver(next.Resolvers, record)
+	next, _, err = InvalidateReverseRecordsForDomainV2(next, normalized, height, nil)
+	if err != nil {
+		return IdentityState{}, ResolverRecord{}, err
+	}
 	sortIdentityState(&next)
 	return next, record, next.Validate()
 }

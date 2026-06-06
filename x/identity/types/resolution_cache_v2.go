@@ -127,7 +127,7 @@ func ComputeResolvedRecordHashV2(record UnifiedResolutionRecordV2) (string, erro
 		record.RoutingMetadata.Entrypoint,
 	}
 	for _, target := range record.ContractTargets {
-		parts = append(parts, "contract", target.Key, hex.EncodeToString(target.Address))
+		parts = append(parts, "contract", target.Key, hex.EncodeToString(target.Address), target.CodeID)
 	}
 	for _, endpoint := range record.ServiceEndpoints {
 		parts = append(parts, "service", endpoint.Key, endpoint.Endpoint)
