@@ -51,6 +51,7 @@ import (
 	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
 	treasurytypes "github.com/sovereign-l1/l1/x/treasury/types"
 	validatorelectiontypes "github.com/sovereign-l1/l1/x/validator-election/types"
+	validatorinsurancetypes "github.com/sovereign-l1/l1/x/validator-insurance/types"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
@@ -90,6 +91,7 @@ var aetherCoreSystemModules = []string{
 	nominatorpooltypes.ModuleName,
 	singlenominatorpooltypes.ModuleName,
 	validatorelectiontypes.ModuleName,
+	validatorinsurancetypes.ModuleName,
 	validatorregistrytypes.ModuleName,
 	configtypes.ModuleName,
 }
@@ -136,6 +138,7 @@ func AetherCoreSystemStoreKeys() []string {
 		nominatorpooltypes.StoreKey,
 		singlenominatorpooltypes.StoreKey,
 		validatorelectiontypes.StoreKey,
+		validatorinsurancetypes.StoreKey,
 		validatorregistrytypes.StoreKey,
 		configtypes.StoreKey,
 	}
@@ -163,6 +166,7 @@ func aetherCoreBeginBlockerOrder() []string {
 		nominatorpooltypes.ModuleName,
 		singlenominatorpooltypes.ModuleName,
 		validatorelectiontypes.ModuleName,
+		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
 		aethercoretypes.ModuleName,
@@ -199,6 +203,7 @@ func aetherCoreEndBlockerOrder() []string {
 		nominatorpooltypes.ModuleName,
 		singlenominatorpooltypes.ModuleName,
 		validatorelectiontypes.ModuleName,
+		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
 		aethercoretypes.ModuleName,
@@ -245,6 +250,7 @@ func aetherCoreInitGenesisOrder() []string {
 		nominatorpooltypes.ModuleName,
 		singlenominatorpooltypes.ModuleName,
 		validatorelectiontypes.ModuleName,
+		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
 		aethercoretypes.ModuleName,
@@ -298,6 +304,7 @@ func aetherCoreExportGenesisOrder() []string {
 		nominatorpooltypes.ModuleName,
 		singlenominatorpooltypes.ModuleName,
 		validatorelectiontypes.ModuleName,
+		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
 		aethercoretypes.ModuleName,

@@ -62,6 +62,7 @@ import (
 	tokenfactorymodule "github.com/sovereign-l1/l1/x/tokenfactory"
 	treasurymodule "github.com/sovereign-l1/l1/x/treasury"
 	validatorelectionmodule "github.com/sovereign-l1/l1/x/validator-election"
+	validatorinsurancemodule "github.com/sovereign-l1/l1/x/validator-insurance"
 	validatorregistrymodule "github.com/sovereign-l1/l1/x/validator-registry"
 	zonesmodule "github.com/sovereign-l1/l1/x/zones"
 )
@@ -96,6 +97,7 @@ func (app *L1App) initModules(
 		nominatorpoolmodule.NewAppModule(&app.NominatorPoolKeeper),
 		singlenominatorpoolmodule.NewAppModule(&app.SingleNominatorPoolKeeper),
 		validatorelectionmodule.NewAppModule(&app.ValidatorElectionKeeper),
+		validatorinsurancemodule.NewAppModule(&app.ValidatorInsuranceKeeper),
 		validatorregistrymodule.NewAppModule(&app.ValidatorRegistryKeeper),
 		configmodule.NewAppModule(&app.ConfigKeeper),
 		configvotingmodule.NewAppModule(&app.ConfigVotingKeeper),

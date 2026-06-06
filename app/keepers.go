@@ -106,6 +106,8 @@ import (
 	treasurytypes "github.com/sovereign-l1/l1/x/treasury/types"
 	validatorelectionkeeper "github.com/sovereign-l1/l1/x/validator-election/keeper"
 	validatorelectiontypes "github.com/sovereign-l1/l1/x/validator-election/types"
+	validatorinsurancekeeper "github.com/sovereign-l1/l1/x/validator-insurance/keeper"
+	validatorinsurancetypes "github.com/sovereign-l1/l1/x/validator-insurance/types"
 	validatorregistrykeeper "github.com/sovereign-l1/l1/x/validator-registry/keeper"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
 	zoneskeeper "github.com/sovereign-l1/l1/x/zones/keeper"
@@ -271,6 +273,7 @@ func (app *L1App) initKeepers(
 	app.NominatorPoolKeeper = nominatorpoolkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[nominatorpooltypes.StoreKey]))
 	app.SingleNominatorPoolKeeper = singlenominatorpoolkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[singlenominatorpooltypes.StoreKey]))
 	app.ValidatorElectionKeeper = validatorelectionkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorelectiontypes.StoreKey]))
+	app.ValidatorInsuranceKeeper = validatorinsurancekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorinsurancetypes.StoreKey]))
 	app.ValidatorRegistryKeeper = validatorregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorregistrytypes.StoreKey]))
 	app.ConfigKeeper = configkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configtypes.StoreKey]))
 	app.ConfigVotingKeeper = configvotingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configvotingtypes.StoreKey]))

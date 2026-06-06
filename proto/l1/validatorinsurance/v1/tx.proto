@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package l1.validatorinsurance.v1;
+
+import "l1/validatorinsurance/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/validatorinsurance/v1;validatorinsurancev1";
+
+service Msg {
+  rpc FundValidatorInsurance(MsgFundValidatorInsurance) returns (MsgFundValidatorInsuranceResponse);
+  rpc WithdrawValidatorInsurance(MsgWithdrawValidatorInsurance) returns (MsgWithdrawValidatorInsuranceResponse);
+  rpc SubmitInsuranceClaim(MsgSubmitInsuranceClaim) returns (MsgSubmitInsuranceClaimResponse);
+  rpc ResolveInsuranceClaim(MsgResolveInsuranceClaim) returns (MsgResolveInsuranceClaimResponse);
+}
+
+message MsgFundValidatorInsurance {
+  string authority = 1;
+  string validator_address = 2;
+  string funder = 3;
+  uint64 amount = 4;
+  uint64 height = 5;
+}
+
+message MsgFundValidatorInsuranceResponse {
+  ValidatorInsurance insurance = 1;
+}
+
+message MsgWithdrawValidatorInsurance {
+  string authority = 1;
+  string validator_address = 2;
+  string recipient = 3;
+  uint64 amount = 4;
+  uint64 height = 5;
+  string validator_status = 6;
+}
+
+message MsgWithdrawValidatorInsuranceResponse {
+  PendingInsuranceWithdrawal withdrawal = 1;
+}
+
+message MsgSubmitInsuranceClaim {
+  string authority = 1;
+  string claim_id = 2;
+  string validator_address = 3;
+  string claimant = 4;
+  uint64 amount = 5;
+  string reason = 6;
+  uint64 height = 7;
+}
+
+message MsgSubmitInsuranceClaimResponse {
+  InsuranceClaim claim = 1;
+}
+
+message MsgResolveInsuranceClaim {
+  string authority = 1;
+  string claim_id = 2;
+  bool approved = 3;
+  uint64 height = 4;
+}
+
+message MsgResolveInsuranceClaimResponse {
+  InsuranceClaim claim = 1;
+}

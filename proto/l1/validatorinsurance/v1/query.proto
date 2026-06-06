@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package l1.validatorinsurance.v1;
+
+import "l1/validatorinsurance/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/validatorinsurance/v1;validatorinsurancev1";
+
+service Query {
+  rpc ValidatorInsurance(QueryValidatorInsuranceRequest) returns (QueryValidatorInsuranceResponse);
+  rpc InsuranceClaims(QueryInsuranceClaimsRequest) returns (QueryInsuranceClaimsResponse);
+  rpc InsuranceParams(QueryInsuranceParamsRequest) returns (QueryInsuranceParamsResponse);
+}
+
+message QueryValidatorInsuranceRequest {
+  string validator_address = 1;
+}
+
+message QueryValidatorInsuranceResponse {
+  ValidatorInsurance insurance = 1;
+}
+
+message QueryInsuranceClaimsRequest {
+  string validator_address = 1;
+}
+
+message QueryInsuranceClaimsResponse {
+  repeated InsuranceClaim claims = 1;
+}
+
+message QueryInsuranceParamsRequest {}
+
+message QueryInsuranceParamsResponse {
+  Params params = 1;
+}

@@ -112,6 +112,8 @@ import (
 	treasurytypes "github.com/sovereign-l1/l1/x/treasury/types"
 	validatorelectionkeeper "github.com/sovereign-l1/l1/x/validator-election/keeper"
 	validatorelectiontypes "github.com/sovereign-l1/l1/x/validator-election/types"
+	validatorinsurancekeeper "github.com/sovereign-l1/l1/x/validator-insurance/keeper"
+	validatorinsurancetypes "github.com/sovereign-l1/l1/x/validator-insurance/types"
 	validatorregistrykeeper "github.com/sovereign-l1/l1/x/validator-registry/keeper"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
 	zoneskeeper "github.com/sovereign-l1/l1/x/zones/keeper"
@@ -222,6 +224,7 @@ type L1App struct {
 	NominatorPoolKeeper       nominatorpoolkeeper.Keeper
 	SingleNominatorPoolKeeper singlenominatorpoolkeeper.Keeper
 	ValidatorElectionKeeper   validatorelectionkeeper.Keeper
+	ValidatorInsuranceKeeper  validatorinsurancekeeper.Keeper
 	ValidatorRegistryKeeper   validatorregistrykeeper.Keeper
 
 	// the module manager
@@ -329,6 +332,7 @@ func NewL1App(
 		nominatorpooltypes.StoreKey,
 		singlenominatorpooltypes.StoreKey,
 		validatorelectiontypes.StoreKey,
+		validatorinsurancetypes.StoreKey,
 		validatorregistrytypes.StoreKey,
 		configtypes.StoreKey,
 		configvotingtypes.StoreKey,

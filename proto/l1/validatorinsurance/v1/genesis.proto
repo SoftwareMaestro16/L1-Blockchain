@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package l1.validatorinsurance.v1;
+
+option go_package = "github.com/sovereign-l1/l1/api/l1/validatorinsurance/v1;validatorinsurancev1";
+
+message Params {
+  string authority = 1;
+  bool enabled = 2;
+  uint64 minimum_insurance = 3;
+  uint64 withdrawal_lock_blocks = 4;
+  uint32 default_slash_coverage_bps = 5;
+  uint32 max_validators = 6;
+  uint32 max_claims = 7;
+  uint32 max_claim_id_bytes = 8;
+  uint32 max_reason_bytes = 9;
+  uint32 max_coverage_rules = 10;
+  uint32 max_fault_type_bytes = 11;
+}
+
+message PendingInsuranceWithdrawal {
+  uint64 amount = 1;
+  string recipient = 2;
+  uint64 request_height = 3;
+  uint64 complete_height = 4;
+  string status = 5;
+}
+
+message ValidatorInsurance {
+  string validator_address = 1;
+  uint64 balance = 2;
+  PendingInsuranceWithdrawal pending_withdrawal = 3;
+  string validator_status = 4;
+}
+
+message InsuranceClaim {
+  string claim_id = 1;
+  string validator_address = 2;
+  string claimant = 3;
+  uint64 amount = 4;
+  uint64 payout_amount = 5;
+  string status = 6;
+  string reason = 7;
+  uint64 submitted_height = 8;
+  uint64 resolved_height = 9;
+  bool paid = 10;
+}
+
+message SlashCoverageRule {
+  string fault_type = 1;
+  uint32 coverage_bps = 2;
+}
+
+message State {
+  repeated ValidatorInsurance insurances = 1;
+  repeated InsuranceClaim claims = 2;
+  repeated SlashCoverageRule coverage_rules = 3;
+}
+
+message GenesisState {
+  uint64 version = 1;
+  Params params = 2;
+  State state = 3;
+}
