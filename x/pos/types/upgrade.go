@@ -207,18 +207,23 @@ func DefaultLayeredPosArchitecture() LayeredPosArchitecture {
 			Layer: PosLayerEconomicConsensus,
 			Responsibilities: []string{
 				"validator scoring",
-				"incentives",
-				"performance rewards",
+				"performance incentives",
+				"stake saturation",
+				"role-specific reward weights",
 				"slashing severity",
+				"reporter incentives",
+				"treasury, burn, and stabilization routing",
 			},
 			DependsOn: []PosLayer{PosLayerTaskAssignment, PosLayerValidatorExecution, PosLayerStakingCapital, PosLayerBaseCometBFT},
 		},
 		{
 			Layer: PosLayerTaskAssignment,
 			Responsibilities: []string{
+				"workload grouping",
 				"shard validator groups",
-				"workload validator groups",
-				"evidence reviewer subsets",
+				"zone validator groups",
+				"evidence verification subsets",
+				"collator and verifier assignments",
 			},
 			DependsOn: []PosLayer{PosLayerValidatorExecution, PosLayerStakingCapital, PosLayerBaseCometBFT},
 		},
@@ -227,6 +232,8 @@ func DefaultLayeredPosArchitecture() LayeredPosArchitecture {
 			Responsibilities: []string{
 				"block production",
 				"state transition verification",
+				"cross-domain proof verification",
+				"signature production",
 				"fault rejection",
 			},
 			DependsOn: []PosLayer{PosLayerStakingCapital, PosLayerBaseCometBFT},
@@ -236,8 +243,11 @@ func DefaultLayeredPosArchitecture() LayeredPosArchitecture {
 			Responsibilities: []string{
 				"validators",
 				"delegators",
-				"delegation markets",
+				"bonded stake",
+				"unbonding",
+				"redelegation",
 				"capital risk preferences",
+				"commission and delegation market metadata",
 			},
 			DependsOn: []PosLayer{PosLayerBaseCometBFT},
 		},
@@ -247,6 +257,7 @@ func DefaultLayeredPosArchitecture() LayeredPosArchitecture {
 				"finality",
 				"proposal and vote protocol",
 				"validator public key set",
+				"consensus safety and liveness",
 			},
 		},
 	}
@@ -1334,7 +1345,7 @@ func validatePosResponsibility(fieldName string, value string) error {
 		return fmt.Errorf("%s must be <= %d bytes", fieldName, maxPosTokenLength)
 	}
 	for _, r := range value {
-		if r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '_' || r == '-' || r == '.' || r == ':' || r == '/' || r == ' ' || r == '+' {
+		if r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '_' || r == '-' || r == '.' || r == ':' || r == '/' || r == ' ' || r == '+' || r == ',' {
 			continue
 		}
 		return fmt.Errorf("%s contains invalid character", fieldName)

@@ -20,11 +20,46 @@ func TestLayeredPoSArchitectureMatchesTargetStack(t *testing.T) {
 		PosLayerBaseCometBFT,
 	}, DefaultPosLayerOrder())
 	require.Equal(t, ComputeLayeredPosArchitectureRoot(architecture.Layers), architecture.Root)
-	require.Contains(t, architecture.Layers[0].Responsibilities, "validator scoring")
-	require.Contains(t, architecture.Layers[1].Responsibilities, "workload validator groups")
-	require.Contains(t, architecture.Layers[2].Responsibilities, "block production")
-	require.Contains(t, architecture.Layers[3].Responsibilities, "delegation markets")
-	require.Contains(t, architecture.Layers[4].Responsibilities, "finality")
+
+	specs := posLayerSpecsByLayer(architecture)
+	require.Equal(t, []string{
+		"finality",
+		"proposal and vote protocol",
+		"validator public key set",
+		"consensus safety and liveness",
+	}, specs[PosLayerBaseCometBFT].Responsibilities)
+	require.Equal(t, []string{
+		"validators",
+		"delegators",
+		"bonded stake",
+		"unbonding",
+		"redelegation",
+		"capital risk preferences",
+		"commission and delegation market metadata",
+	}, specs[PosLayerStakingCapital].Responsibilities)
+	require.Equal(t, []string{
+		"block production",
+		"state transition verification",
+		"cross-domain proof verification",
+		"signature production",
+		"fault rejection",
+	}, specs[PosLayerValidatorExecution].Responsibilities)
+	require.Equal(t, []string{
+		"workload grouping",
+		"shard validator groups",
+		"zone validator groups",
+		"evidence verification subsets",
+		"collator and verifier assignments",
+	}, specs[PosLayerTaskAssignment].Responsibilities)
+	require.Equal(t, []string{
+		"validator scoring",
+		"performance incentives",
+		"stake saturation",
+		"role-specific reward weights",
+		"slashing severity",
+		"reporter incentives",
+		"treasury, burn, and stabilization routing",
+	}, specs[PosLayerEconomicConsensus].Responsibilities)
 }
 
 func TestLayeredPoSArchitectureRejectsReorderedOrUpwardDependencies(t *testing.T) {
@@ -236,4 +271,12 @@ func scoredCandidates(t *testing.T, params Params, candidates []Candidate) []Sco
 		validators[i] = scored
 	}
 	return validators
+}
+
+func posLayerSpecsByLayer(architecture LayeredPosArchitecture) map[PosLayer]PosLayerSpec {
+	specs := make(map[PosLayer]PosLayerSpec, len(architecture.Layers))
+	for _, layer := range architecture.Layers {
+		specs[layer.Layer] = layer
+	}
+	return specs
 }
