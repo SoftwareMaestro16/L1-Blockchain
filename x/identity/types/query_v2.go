@@ -46,11 +46,13 @@ type IdentityQueryServiceV2 struct {
 
 type IdentityQueryResponseV2 struct {
 	Code          IdentityQueryCodeV2
+	FailureCode   IdentityLightClientFailureCodeV2
 	Error         string
 	Height        uint64
 	RecordVersion uint64
 	Page          IdentityQueryPageResponseV2
 	Proof         *IdentityResolutionProof
+	AbsenceProof  *IdentityAbsenceProof
 	Domain        *DomainRecordV2
 	Domains       []DomainRecordV2
 	Binding       *DomainNFTBinding
@@ -92,9 +94,21 @@ func (q IdentityQueryServiceV2) QueryDomain(nameHash string, includeProof bool) 
 }
 
 func (q IdentityQueryServiceV2) QueryDomainByName(name string, includeProof bool) IdentityQueryResponseV2 {
-	domain, found := findDomain(q.ctx.State, name)
+	normalized, err := NormalizeAETDomain(name)
+	if err != nil {
+		return q.failureTyped(IdentityQueryInvalidRequest, IdentityLightClientErrInvalidName, err, nil, 0)
+	}
+	domain, found := findDomain(q.ctx.State, normalized)
 	if !found {
-		return q.failure(IdentityQueryNotFound, errors.New("identity v2 query domain not found"))
+		var absence *IdentityAbsenceProof
+		if includeProof {
+			proof, err := BuildIdentityAbsenceProof(q.ctx.State, mustIdentityDomainStoreKeyV2(normalized))
+			if err != nil {
+				return q.failureTyped(IdentityQueryVerificationFailed, IdentityLightClientErrProofInvalid, err, nil, 0)
+			}
+			absence = &proof
+		}
+		return q.failureTyped(IdentityQueryNotFound, IdentityLightClientErrDomainNotFound, errors.New("identity v2 query domain not found"), absence, 0)
 	}
 	return q.domainResponse(domain, includeProof)
 }
@@ -151,6 +165,7 @@ func (q IdentityQueryServiceV2) QueryResolver(name string, includeProof bool) Id
 	if err != nil {
 		return q.failure(queryCodeForResolutionErrorV2(err), err)
 	}
+	record.RecordVersion = q.resolverRecordVersionForName(name, record.RecordVersion)
 	resp := q.ok()
 	resp.Resolver = &record
 	resp.RecordVersion = record.RecordVersion
@@ -170,7 +185,7 @@ func (q IdentityQueryServiceV2) QueryResolvePrimary(name string) IdentityQueryRe
 		return q.failure(queryCodeForResolutionErrorV2(err), err)
 	}
 	if len(resolution.Record.Primary) == 0 {
-		return q.failure(IdentityQueryNotFound, errors.New("identity v2 query primary target not found"))
+		return q.failureTyped(IdentityQueryNotFound, IdentityLightClientErrTargetNotFound, errors.New("identity v2 query primary target not found"), nil, ResolverRecordVersionV2(resolution.Record))
 	}
 	resp := q.ok()
 	resp.Address = cloneSpecAddress(resolution.Record.Primary)
@@ -194,6 +209,7 @@ func (q IdentityQueryServiceV2) QueryResolveService(name string, service string)
 	if err != nil {
 		return q.failure(queryCodeForResolutionErrorV2(err), err)
 	}
+	record.RecordVersion = q.resolverRecordVersionForName(name, record.RecordVersion)
 	for _, endpoint := range record.ServiceEndpoints {
 		if endpoint.Key == service {
 			resp := q.ok()
@@ -202,7 +218,7 @@ func (q IdentityQueryServiceV2) QueryResolveService(name string, service string)
 			return resp
 		}
 	}
-	return q.failure(IdentityQueryNotFound, errors.New("identity v2 query service endpoint not found"))
+	return q.failureTyped(IdentityQueryNotFound, IdentityLightClientErrTargetNotFound, errors.New("identity v2 query service endpoint not found"), nil, record.RecordVersion)
 }
 
 func (q IdentityQueryServiceV2) QueryResolveInterface(name string, interfaceID string) IdentityQueryResponseV2 {
@@ -210,6 +226,7 @@ func (q IdentityQueryServiceV2) QueryResolveInterface(name string, interfaceID s
 	if err != nil {
 		return q.failure(queryCodeForResolutionErrorV2(err), err)
 	}
+	record.RecordVersion = q.resolverRecordVersionForName(name, record.RecordVersion)
 	for _, descriptor := range record.InterfaceDescriptors {
 		if descriptor.InterfaceID == interfaceID {
 			resp := q.ok()
@@ -218,7 +235,7 @@ func (q IdentityQueryServiceV2) QueryResolveInterface(name string, interfaceID s
 			return resp
 		}
 	}
-	return q.failure(IdentityQueryNotFound, errors.New("identity v2 query interface descriptor not found"))
+	return q.failureTyped(IdentityQueryNotFound, IdentityLightClientErrTargetNotFound, errors.New("identity v2 query interface descriptor not found"), nil, record.RecordVersion)
 }
 
 func (q IdentityQueryServiceV2) QueryResolveRoute(name string) IdentityQueryResponseV2 {
@@ -226,6 +243,7 @@ func (q IdentityQueryServiceV2) QueryResolveRoute(name string) IdentityQueryResp
 	if err != nil {
 		return q.failure(queryCodeForResolutionErrorV2(err), err)
 	}
+	record.RecordVersion = q.resolverRecordVersionForName(name, record.RecordVersion)
 	resp := q.ok()
 	resp.Route = &record.RoutingMetadata
 	resp.RecordVersion = record.RecordVersion
@@ -355,11 +373,15 @@ func (q IdentityQueryServiceV2) ok() IdentityQueryResponseV2 {
 }
 
 func (q IdentityQueryServiceV2) failure(code IdentityQueryCodeV2, err error) IdentityQueryResponseV2 {
+	return q.failureTyped(code, queryFailureCodeV2(code), err, nil, 0)
+}
+
+func (q IdentityQueryServiceV2) failureTyped(code IdentityQueryCodeV2, failureCode IdentityLightClientFailureCodeV2, err error, absence *IdentityAbsenceProof, recordVersion uint64) IdentityQueryResponseV2 {
 	message := ""
 	if err != nil {
 		message = err.Error()
 	}
-	return IdentityQueryResponseV2{Code: code, Error: message, Height: q.ctx.Height}
+	return IdentityQueryResponseV2{Code: code, FailureCode: failureCode, Error: message, Height: q.ctx.Height, AbsenceProof: absence, RecordVersion: recordVersion}
 }
 
 func (q IdentityQueryServiceV2) domainResponse(domain Domain, includeProof bool) IdentityQueryResponseV2 {
@@ -386,6 +408,18 @@ func (q IdentityQueryServiceV2) domainRecordV2(domain Domain) (DomainRecordV2, e
 		return DomainRecordV2{}, err
 	}
 	return NewDomainRecordV2FromDomain(domain, status, 0, q.ctx.Height)
+}
+
+func (q IdentityQueryServiceV2) resolverRecordVersionForName(name string, fallback uint64) uint64 {
+	resolution, err := ResolveIdentityRecordRecursive(q.ctx.State, name, q.ctx.Height)
+	if err != nil {
+		return fallback
+	}
+	version := ResolverRecordVersionV2(resolution.Record)
+	if version == 0 {
+		return fallback
+	}
+	return version
 }
 
 func (q IdentityQueryServiceV2) findDomainByHash(nameHash string) (Domain, bool, error) {
