@@ -4,6 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
@@ -105,6 +106,13 @@ func validateNoZeroMsgAddresses(msg sdk.Msg) error {
 			if err := aetherisaddress.ValidateUserAddress("bank multisend output", output.Address); err != nil {
 				return types.ErrInvalidFee.Wrapf("output %d: %s", i, err.Error())
 			}
+		}
+	case *distrtypes.MsgSetWithdrawAddress:
+		if err := aetherisaddress.ValidateUserAddress("distribution withdraw delegator", msg.DelegatorAddress); err != nil {
+			return types.ErrInvalidFee.Wrap(err.Error())
+		}
+		if err := aetherisaddress.ValidateUserAddress("distribution withdraw address", msg.WithdrawAddress); err != nil {
+			return types.ErrInvalidFee.Wrap(err.Error())
 		}
 	}
 	return nil

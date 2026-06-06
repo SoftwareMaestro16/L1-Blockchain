@@ -57,8 +57,8 @@ import (
 	routingmodule "github.com/sovereign-l1/l1/x/routing"
 	schedulermodule "github.com/sovereign-l1/l1/x/scheduler"
 	shardingcoordinatormodule "github.com/sovereign-l1/l1/x/sharding-coordinator"
-	stakeconcentrationmodule "github.com/sovereign-l1/l1/x/stake-concentration"
 	singlenominatorpoolmodule "github.com/sovereign-l1/l1/x/single-nominator-pool"
+	stakeconcentrationmodule "github.com/sovereign-l1/l1/x/stake-concentration"
 	storagerentmodule "github.com/sovereign-l1/l1/x/storage-rent"
 	systemregistrymodule "github.com/sovereign-l1/l1/x/system-registry"
 	tokenfactorymodule "github.com/sovereign-l1/l1/x/tokenfactory"
@@ -103,13 +103,13 @@ func (app *L1App) initModules(
 		validatorregistrymodule.NewAppModule(&app.ValidatorRegistryKeeper),
 		configmodule.NewAppModule(&app.ConfigKeeper),
 		configvotingmodule.NewAppModule(&app.ConfigVotingKeeper),
-		aethercoremodule.NewAppModule(app.AetherCoreKeeper),
-		loadmodule.NewAppModule(app.LoadKeeper),
-		routingmodule.NewAppModule(app.RoutingKeeper),
-		zonesmodule.NewAppModule(app.ZonesKeeper),
-		meshmodule.NewAppModule(app.MeshKeeper),
-		networkingmodule.NewAppModule(app.NetworkingKeeper),
-		paymentsmodule.NewAppModule(app.PaymentsKeeper),
+		aethercoremodule.NewAppModule(&app.AetherCoreKeeper),
+		loadmodule.NewAppModule(&app.LoadKeeper),
+		routingmodule.NewAppModule(&app.RoutingKeeper),
+		zonesmodule.NewAppModule(&app.ZonesKeeper),
+		meshmodule.NewAppModule(&app.MeshKeeper),
+		networkingmodule.NewAppModule(&app.NetworkingKeeper),
+		paymentsmodule.NewAppModule(&app.PaymentsKeeper),
 		schedulermodule.NewAppModule(&app.SchedulerKeeper),
 		avmschedulermodule.NewAppModule(&app.AVMSchedulerKeeper),
 		actorregistrymodule.NewAppModule(&app.ActorRegistryKeeper),

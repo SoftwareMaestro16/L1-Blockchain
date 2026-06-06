@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"reflect"
 
 	corestore "cosmossdk.io/core/store"
 
@@ -61,12 +62,13 @@ func (k *Keeper) InitGenesis(gs GenesisState) error {
 	return nil
 }
 
-func (k Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
+func (k *Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
 	if err := gs.Validate(); err != nil {
 		return err
 	}
+	k.genesis = cloneGenesis(gs)
 	if k.storeService == nil {
-		return errors.New("aethercore prototype persistent store is not configured")
+		return nil
 	}
 	bz, err := json.Marshal(cloneGenesis(gs))
 	if err != nil {
@@ -81,6 +83,9 @@ func (k Keeper) ExportGenesis() GenesisState {
 
 func (k Keeper) ExportGenesisState(ctx context.Context) (GenesisState, error) {
 	if k.storeService == nil {
+		return k.ExportGenesis(), nil
+	}
+	if !reflect.DeepEqual(k.genesis, DefaultGenesis()) {
 		return k.ExportGenesis(), nil
 	}
 	bz, err := k.storeService.OpenKVStore(ctx).Get(genesisKey)

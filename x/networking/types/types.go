@@ -105,13 +105,20 @@ const (
 type NodeRecord struct {
 	NodeID               string
 	NodePubKey           []byte
+	PublicKey            []byte
 	ValidatorPubKey      []byte
 	OperatorAddress      string
 	Roles                []NodeRole
 	NetworkAddressesHash string
 	ZonesSupported       []string
+	Services             []string
 	ServicesSupported    []string
+	ServiceIDs           []string
 	ProtocolVersions     []string
+	SupportedProtocols   []string
+	Reputation           ReputationCommitment
+	LatencyVector        []NodeLatencyVectorEntry
+	RecordVersion        uint64
 	ExpiresHeight        uint64
 	Signature            []byte
 }
@@ -276,13 +283,30 @@ func PriorityForChannel(channel ChannelClass) uint32 {
 func NormalizeNodeRecord(record NodeRecord) NodeRecord {
 	record.NodeID = strings.ToLower(strings.TrimSpace(record.NodeID))
 	record.NodePubKey = cloneBytes(record.NodePubKey)
+	record.PublicKey = cloneBytes(record.PublicKey)
+	if len(record.NodePubKey) == 0 && len(record.PublicKey) > 0 {
+		record.NodePubKey = cloneBytes(record.PublicKey)
+	}
+	if len(record.PublicKey) == 0 && len(record.NodePubKey) > 0 {
+		record.PublicKey = cloneBytes(record.NodePubKey)
+	}
 	record.ValidatorPubKey = cloneBytes(record.ValidatorPubKey)
 	record.OperatorAddress = strings.TrimSpace(record.OperatorAddress)
 	record.NetworkAddressesHash = strings.ToLower(strings.TrimSpace(record.NetworkAddressesHash))
 	record.Roles = normalizeRoles(record.Roles)
 	record.ZonesSupported, _ = normalizeStringSet("zone", record.ZonesSupported, MaxZoneIDBytes)
-	record.ServicesSupported, _ = normalizeStringSet("service", record.ServicesSupported, MaxServiceIDBytes)
-	record.ProtocolVersions, _ = normalizeStringSet("protocol", record.ProtocolVersions, MaxProtocolIDBytes)
+	services := normalizePreferredStringSet(MaxServiceIDBytes, record.ServicesSupported, record.Services, record.ServiceIDs)
+	record.Services = append([]string(nil), services...)
+	record.ServicesSupported = append([]string(nil), services...)
+	record.ServiceIDs = append([]string(nil), services...)
+	protocols := normalizePreferredStringSet(MaxProtocolIDBytes, record.ProtocolVersions, record.SupportedProtocols)
+	record.ProtocolVersions = append([]string(nil), protocols...)
+	record.SupportedProtocols = append([]string(nil), protocols...)
+	record.Reputation = NormalizeReputationCommitment(record.Reputation)
+	record.LatencyVector = normalizeNodeLatencyVector(record.LatencyVector)
+	if record.RecordVersion == 0 {
+		record.RecordVersion = DefaultNodeRecordVersion
+	}
 	record.Signature = cloneBytes(record.Signature)
 	return record
 }
@@ -334,6 +358,12 @@ func (r NodeRecord) ValidateBasic() error {
 	if len(record.NodePubKey) != ed25519.PublicKeySize {
 		return fmt.Errorf("networking node pub key must be %d bytes", ed25519.PublicKeySize)
 	}
+	if len(record.PublicKey) != ed25519.PublicKeySize {
+		return fmt.Errorf("networking public key must be %d bytes", ed25519.PublicKeySize)
+	}
+	if string(record.PublicKey) != string(record.NodePubKey) {
+		return errors.New("networking public key must match node pub key")
+	}
 	if len(record.ValidatorPubKey) > 0 && len(record.ValidatorPubKey) != ed25519.PublicKeySize {
 		return fmt.Errorf("networking validator pub key must be %d bytes", ed25519.PublicKeySize)
 	}
@@ -358,11 +388,20 @@ func (r NodeRecord) ValidateBasic() error {
 	if len(record.ServicesSupported) > MaxServicesPerNode {
 		return fmt.Errorf("networking services supported must be <= %d", MaxServicesPerNode)
 	}
+	if len(record.Services) > MaxServicesPerNode || len(record.ServiceIDs) > MaxServicesPerNode {
+		return fmt.Errorf("networking service ids must be <= %d", MaxServicesPerNode)
+	}
 	if len(record.ProtocolVersions) == 0 {
 		return errors.New("networking node record requires at least one protocol")
 	}
 	if len(record.ProtocolVersions) > MaxProtocolsPerNode {
 		return fmt.Errorf("networking protocol versions must be <= %d", MaxProtocolsPerNode)
+	}
+	if len(record.SupportedProtocols) > MaxProtocolsPerNode {
+		return fmt.Errorf("networking supported protocols must be <= %d", MaxProtocolsPerNode)
+	}
+	if record.RecordVersion == 0 {
+		return errors.New("networking node record version must be positive")
 	}
 	if record.ExpiresHeight == 0 {
 		return errors.New("networking node record expires height must be positive")
@@ -381,7 +420,27 @@ func (r NodeRecord) ValidateBasic() error {
 	if err := validateIdentifierSet("service", record.ServicesSupported, MaxServiceIDBytes); err != nil {
 		return err
 	}
-	return validateIdentifierSet("protocol", record.ProtocolVersions, MaxProtocolIDBytes)
+	if err := validateIdentifierSet("service", record.Services, MaxServiceIDBytes); err != nil {
+		return err
+	}
+	if err := validateIdentifierSet("service", record.ServiceIDs, MaxServiceIDBytes); err != nil {
+		return err
+	}
+	if err := validateIdentifierSet("protocol", record.ProtocolVersions, MaxProtocolIDBytes); err != nil {
+		return err
+	}
+	if err := validateIdentifierSet("protocol", record.SupportedProtocols, MaxProtocolIDBytes); err != nil {
+		return err
+	}
+	if IsReputationCommitmentSet(record.Reputation) {
+		if err := record.Reputation.Validate(); err != nil {
+			return err
+		}
+		if record.Reputation.NodeID != record.NodeID {
+			return errors.New("networking node reputation must reference node")
+		}
+	}
+	return validateNodeLatencyVector(record.LatencyVector, record.NodeID)
 }
 
 func (r NodeRecord) Validate(networkSalt []byte, currentHeight uint64) error {

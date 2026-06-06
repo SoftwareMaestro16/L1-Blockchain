@@ -3,6 +3,11 @@
 Phase 12 keeps the current `x/dex` native module in the blockchain repository
 while Aetheris async contract execution and VM selection mature.
 
+The production target for the native DEX is documented in
+[x/dex Production Specification](dex-production-spec.md).
+The current native DEX audit is documented in
+[x/dex Security Audit Report](../security/dex-audit-report.md).
+
 ## Current Native Module
 
 `x/dex` remains a native module. It is the current reference implementation for
@@ -36,6 +41,8 @@ liquidity, swap, genesis import, and export:
   policy
 - slippage bounds are enforced before state mutation
 - malformed or corrupted pool state returns errors, not panics
+- active pools cannot be reduced to zero reserves or zero LP supply through
+  ordinary liquidity removal
 
 The DEX module account remains the reserve custodian. LP supply is minted and
 burned only by the DEX module.

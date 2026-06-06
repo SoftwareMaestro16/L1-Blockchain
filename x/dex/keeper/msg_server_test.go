@@ -414,6 +414,31 @@ func TestRemoveLiquidityReserveMismatchDoesNotBurnSharesOrUpdatePool(t *testing.
 	require.Equal(t, supplyBefore, app.BankKeeper.GetSupply(ctx, poolBefore.LpDenom))
 }
 
+func TestRemoveLiquidityRejectsFullPoolWithdrawal(t *testing.T) {
+	app, ctx, msgServer, withdrawer, poolID := setupDexPool(t)
+
+	poolBefore, found, err := app.DexKeeper.GetPool(ctx, poolID)
+	require.NoError(t, err)
+	require.True(t, found)
+	lpBefore := app.BankKeeper.GetBalance(ctx, withdrawer, poolBefore.LpDenom)
+	supplyBefore := app.BankKeeper.GetSupply(ctx, poolBefore.LpDenom)
+
+	_, err = msgServer.RemoveLiquidity(ctx, &types.MsgRemoveLiquidity{
+		Withdrawer: withdrawer.String(),
+		PoolId:     poolID,
+		Shares:     sdk.NewCoin(poolBefore.LpDenom, mustIntFromString(t, poolBefore.TotalShares)),
+	})
+	require.ErrorIs(t, err, types.ErrInvalidLiquidity)
+	require.Contains(t, err.Error(), "cannot remove all LP shares")
+
+	poolAfter, found, err := app.DexKeeper.GetPool(ctx, poolID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, poolBefore, poolAfter)
+	require.Equal(t, lpBefore, app.BankKeeper.GetBalance(ctx, withdrawer, poolBefore.LpDenom))
+	require.Equal(t, supplyBefore, app.BankKeeper.GetSupply(ctx, poolBefore.LpDenom))
+}
+
 func TestDexLifecycleRejectsSlippageAndWrongDenoms(t *testing.T) {
 	app, ctx, msgServer, trader, poolID := setupDexPool(t)
 	fundAccount(t, app, ctx, trader, sdk.NewCoins(sdk.NewInt64Coin("uatom", 1_000)))

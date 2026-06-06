@@ -30,10 +30,10 @@ var (
 )
 
 type AppModule struct {
-	keeper keeper.Keeper
+	keeper *keeper.Keeper
 }
 
-func NewAppModule(k keeper.Keeper) AppModule {
+func NewAppModule(k *keeper.Keeper) AppModule {
 	return AppModule{keeper: k}
 }
 

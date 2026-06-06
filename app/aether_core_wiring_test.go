@@ -27,6 +27,8 @@ import (
 	paymentstypes "github.com/sovereign-l1/l1/x/payments/types"
 	routingkeeper "github.com/sovereign-l1/l1/x/routing/keeper"
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
+	schedulerkeeper "github.com/sovereign-l1/l1/x/scheduler/keeper"
+	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
 	zoneskeeper "github.com/sovereign-l1/l1/x/zones/keeper"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
@@ -88,6 +90,11 @@ func TestAetherCoreWiringGateRegistersPrototypeModulesDisabled(t *testing.T) {
 	require.False(t, paymentsGenesis.Params.Enabled)
 	require.Empty(t, paymentsGenesis.State.Channels)
 	require.Empty(t, paymentsGenesis.State.Settlements)
+
+	schedulerGenesis := decodeJSONGenesis[schedulerkeeper.GenesisState](t, genesis[schedulertypes.ModuleName])
+	require.False(t, schedulerGenesis.Params.Enabled)
+	require.Empty(t, schedulerGenesis.State.Jobs)
+	require.Empty(t, schedulerGenesis.State.History)
 }
 
 func TestFeatureDisabledMainnetProfileHasNoActiveProductionShardingBehavior(t *testing.T) {
@@ -107,6 +114,40 @@ func TestFeatureDisabledMainnetProfileHasNoActiveProductionShardingBehavior(t *t
 	require.ErrorContains(t, err, "disabled")
 	err = app.AetherCoreKeeper.RegisterZoneDescriptor(aethercoretypes.ZoneDescriptor{})
 	require.ErrorContains(t, err, "disabled")
+	err = app.SchedulerKeeper.RegisterScheduledJob(schedulertypes.MsgRegisterScheduledJob{
+		Authority: "4:0000000000000000000000000000000000000000000000000000000000000001",
+		Job: schedulertypes.ScheduledJob{
+			ID:                  "disabled",
+			OwnerModule:         "aethercore",
+			Type:                schedulertypes.JobTypeDelayed,
+			NextExecutionHeight: 1,
+			MaxGas:              1,
+		},
+	})
+	require.ErrorContains(t, err, "disabled")
+}
+
+func TestPrototypeGenesisInitializesRuntimeKeeperState(t *testing.T) {
+	app, genesis := setup(true, 5)
+	genesis = GenesisStateWithSingleValidator(t, app)
+	routingGenesis := routingkeeper.DefaultGenesis()
+	routingGenesis.Shards = []routingkeeper.ShardConfig{{ZoneID: routingtypes.ZoneFinancial, ActiveShards: 2}}
+	rawRoutingGenesis, err := json.Marshal(routingGenesis)
+	require.NoError(t, err)
+	genesis[routingtypes.ModuleName] = rawRoutingGenesis
+	stateBytes, err := json.MarshalIndent(genesis, "", " ")
+	require.NoError(t, err)
+
+	_, err = app.InitChain(&abci.RequestInitChain{
+		Validators:      []abci.ValidatorUpdate{},
+		ConsensusParams: sims.DefaultConsensusParams,
+		AppStateBytes:   stateBytes,
+	})
+	require.NoError(t, err)
+
+	shards, _, err := app.RoutingKeeper.Shards(nil)
+	require.NoError(t, err)
+	require.Equal(t, []routingkeeper.ShardConfig{{ZoneID: routingtypes.ZoneFinancial, ActiveShards: 2}}, shards)
 }
 
 func TestAetherCorePrototypeStateSurvivesRestartWhenDisabled(t *testing.T) {
@@ -146,6 +187,8 @@ func TestAetherCorePrototypeStateSurvivesRestartWhenDisabled(t *testing.T) {
 	require.NoError(t, err)
 	sourceAetherCore, err := source.AetherCoreKeeper.ExportGenesisState(sourceCtx)
 	require.NoError(t, err)
+	sourceScheduler, err := source.SchedulerKeeper.ExportGenesisState(sourceCtx)
+	require.NoError(t, err)
 
 	restarted := NewL1App(log.NewNopLogger(), db, true, appOptions)
 	restartedCtx := restarted.NewUncachedContext(false, cmtproto.Header{Height: restarted.LastBlockHeight()})
@@ -163,6 +206,8 @@ func TestAetherCorePrototypeStateSurvivesRestartWhenDisabled(t *testing.T) {
 	require.NoError(t, err)
 	restartedAetherCore, err := restarted.AetherCoreKeeper.ExportGenesisState(restartedCtx)
 	require.NoError(t, err)
+	restartedScheduler, err := restarted.SchedulerKeeper.ExportGenesisState(restartedCtx)
+	require.NoError(t, err)
 
 	require.Equal(t, sourceAetherCore, restartedAetherCore)
 	require.Equal(t, sourceLoad, restartedLoad)
@@ -171,6 +216,7 @@ func TestAetherCorePrototypeStateSurvivesRestartWhenDisabled(t *testing.T) {
 	require.Equal(t, sourceMesh, restartedMesh)
 	require.Equal(t, sourceNetworking, restartedNetworking)
 	require.Equal(t, sourcePayments, restartedPayments)
+	require.Equal(t, sourceScheduler, restartedScheduler)
 }
 
 func decodeJSONGenesis[T any](t *testing.T, raw json.RawMessage) T {

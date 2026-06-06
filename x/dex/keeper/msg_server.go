@@ -228,6 +228,9 @@ func (m msgServer) RemoveLiquidity(ctx context.Context, msg *types.MsgRemoveLiqu
 	if msg.Shares.Amount.GT(totalShares) {
 		return nil, types.ErrInvalidLiquidity.Wrap("shares exceed pool supply")
 	}
+	if msg.Shares.Amount.Equal(totalShares) {
+		return nil, types.ErrInvalidLiquidity.Wrap("cannot remove all LP shares from an active pool")
+	}
 	amount0 := reserve0.Mul(msg.Shares.Amount).Quo(totalShares)
 	amount1 := reserve1.Mul(msg.Shares.Amount).Quo(totalShares)
 	if !amount0.IsPositive() || !amount1.IsPositive() {

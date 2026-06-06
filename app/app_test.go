@@ -453,6 +453,58 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 			},
 			errMatch: "v1 only accepts fee denom naet",
 		},
+		"dex reserve module balance mismatch": {
+			mutate: func(app *L1App, genesis GenesisState) {
+				dexGenesis := dextypes.GenesisState{
+					NextPoolId: 2,
+					Params:     dextypes.DefaultParams(),
+					Pools: []dextypes.Pool{{
+						Id:          1,
+						Denom0:      appparams.BaseDenom,
+						Denom1:      "uatom",
+						Reserve0:    "100",
+						Reserve1:    "200",
+						TotalShares: "100",
+						LpDenom:     "lp/1",
+					}},
+				}
+				genesis[dextypes.ModuleName] = app.AppCodec().MustMarshalJSON(&dexGenesis)
+			},
+			errMatch: "dex genesis reserve mismatch",
+		},
+		"dex LP supply mismatch": {
+			mutate: func(app *L1App, genesis GenesisState) {
+				dexGenesis := dextypes.GenesisState{
+					NextPoolId: 2,
+					Params:     dextypes.DefaultParams(),
+					Pools: []dextypes.Pool{{
+						Id:          1,
+						Denom0:      appparams.BaseDenom,
+						Denom1:      "uatom",
+						Reserve0:    "100",
+						Reserve1:    "200",
+						TotalShares: "100",
+						LpDenom:     "lp/1",
+					}},
+				}
+				genesis[dextypes.ModuleName] = app.AppCodec().MustMarshalJSON(&dexGenesis)
+
+				bankGenesis := banktypes.GetGenesisStateFromAppState(app.AppCodec(), genesis)
+				bankGenesis.Balances = append(bankGenesis.Balances, banktypes.Balance{
+					Address: authtypes.NewModuleAddress(dextypes.ModuleName).String(),
+					Coins: sdk.NewCoins(
+						sdk.NewInt64Coin(appparams.BaseDenom, 100),
+						sdk.NewInt64Coin("uatom", 200),
+					),
+				})
+				bankGenesis.Supply = bankGenesis.Supply.Add(
+					sdk.NewInt64Coin(appparams.BaseDenom, 100),
+					sdk.NewInt64Coin("uatom", 200),
+				)
+				genesis[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
+			},
+			errMatch: "dex genesis LP supply mismatch",
+		},
 	}
 
 	for name, tc := range tests {

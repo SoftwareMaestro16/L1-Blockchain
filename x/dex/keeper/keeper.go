@@ -228,7 +228,7 @@ func (k Keeper) InitGenesis(ctx context.Context, gs types.GenesisState) error {
 			return err
 		}
 		if err := k.SetPoolPairIndex(ctx, pool.Denom0, pool.Denom1, pool.Id); err != nil {
-			panic(err)
+			return err
 		}
 	}
 	return nil

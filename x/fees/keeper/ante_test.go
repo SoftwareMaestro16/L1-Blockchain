@@ -12,6 +12,7 @@ import (
 	sigtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
@@ -134,6 +135,17 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				}},
 			},
 			wantErr: "output 0: bank multisend output must not be zero address",
+		},
+		{
+			name: "rejects zero distribution withdraw address",
+			tx: feeTx{
+				fees: fee,
+				msgs: []sdk.Msg{&distrtypes.MsgSetWithdrawAddress{
+					DelegatorAddress: validSender,
+					WithdrawAddress:  aetherisaddress.ZeroRawAddress,
+				}},
+			},
+			wantErr: "distribution withdraw address must not be zero address",
 		},
 		{
 			name:    "rejects empty fee list",

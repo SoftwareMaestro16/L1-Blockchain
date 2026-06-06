@@ -12,6 +12,7 @@ import (
 	"cosmossdk.io/client/v2/autocli"
 	"cosmossdk.io/collections"
 	"cosmossdk.io/core/appmodule"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -38,6 +39,7 @@ import (
 	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
 	appparams "github.com/sovereign-l1/l1/app/params"
 	"github.com/sovereign-l1/l1/observability"
+	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
 )
 
@@ -102,6 +104,9 @@ func (app *L1App) validateAetherisGenesis(genesisState GenesisState) error {
 		return err
 	}
 	if err := app.validateAetherisMintGenesis(genesisState); err != nil {
+		return err
+	}
+	if err := app.validateAetherisDexGenesis(genesisState); err != nil {
 		return err
 	}
 	return app.validateAetherisFeeGenesis(genesisState)
@@ -222,6 +227,93 @@ func (app *L1App) validateAetherisFeeGenesis(genesisState GenesisState) error {
 		return err
 	}
 	return nil
+}
+
+func (app *L1App) validateAetherisDexGenesis(genesisState GenesisState) error {
+	var dexGenesis dextypes.GenesisState
+	if genesisState[dextypes.ModuleName] == nil {
+		return fmt.Errorf("missing %s genesis state", dextypes.ModuleName)
+	}
+	if err := app.appCodec.UnmarshalJSON(genesisState[dextypes.ModuleName], &dexGenesis); err != nil {
+		return fmt.Errorf("invalid %s genesis state: %w", dextypes.ModuleName, err)
+	}
+	if err := dexGenesis.Validate(); err != nil {
+		return err
+	}
+	if len(dexGenesis.Pools) == 0 {
+		return nil
+	}
+
+	var bankGenesis banktypes.GenesisState
+	if genesisState[banktypes.ModuleName] == nil {
+		return fmt.Errorf("missing %s genesis state", banktypes.ModuleName)
+	}
+	if err := app.appCodec.UnmarshalJSON(genesisState[banktypes.ModuleName], &bankGenesis); err != nil {
+		return fmt.Errorf("invalid %s genesis state: %w", banktypes.ModuleName, err)
+	}
+
+	expectedReserves := map[string]sdkmath.Int{}
+	expectedLPSupply := map[string]sdkmath.Int{}
+	for _, pool := range dexGenesis.Pools {
+		reserve0, err := parseDexGenesisInt("reserve0", pool.Id, pool.Reserve0)
+		if err != nil {
+			return err
+		}
+		reserve1, err := parseDexGenesisInt("reserve1", pool.Id, pool.Reserve1)
+		if err != nil {
+			return err
+		}
+		totalShares, err := parseDexGenesisInt("total_shares", pool.Id, pool.TotalShares)
+		if err != nil {
+			return err
+		}
+		expectedReserves[pool.Denom0] = addGenesisInt(expectedReserves[pool.Denom0], reserve0)
+		expectedReserves[pool.Denom1] = addGenesisInt(expectedReserves[pool.Denom1], reserve1)
+		expectedLPSupply[pool.LpDenom] = totalShares
+	}
+
+	dexModuleAddr := authtypes.NewModuleAddress(dextypes.ModuleName)
+	moduleBalances := sdk.NewCoins()
+	for _, balance := range bankGenesis.Balances {
+		addr, err := aetherisaddress.ParseAccAddress(balance.Address)
+		if err != nil {
+			return fmt.Errorf("invalid bank balance address %s: %w", balance.Address, err)
+		}
+		if !addr.Equals(dexModuleAddr) {
+			continue
+		}
+		moduleBalances = balance.Coins
+		break
+	}
+
+	for denom, expected := range expectedReserves {
+		actual := moduleBalances.AmountOf(denom)
+		if !actual.Equal(expected) {
+			return fmt.Errorf("dex genesis reserve mismatch for %s: expected module balance %s, got %s", denom, expected, actual)
+		}
+	}
+	for denom, expected := range expectedLPSupply {
+		actual := bankGenesis.Supply.AmountOf(denom)
+		if !actual.Equal(expected) {
+			return fmt.Errorf("dex genesis LP supply mismatch for %s: expected %s, got %s", denom, expected, actual)
+		}
+	}
+	return nil
+}
+
+func parseDexGenesisInt(field string, poolID uint64, value string) (sdkmath.Int, error) {
+	out, ok := sdkmath.NewIntFromString(value)
+	if !ok || !out.IsPositive() {
+		return sdkmath.Int{}, fmt.Errorf("invalid %s for dex pool %d: must be a positive integer", field, poolID)
+	}
+	return out, nil
+}
+
+func addGenesisInt(left, right sdkmath.Int) sdkmath.Int {
+	if left.IsNil() {
+		left = sdkmath.ZeroInt()
+	}
+	return left.Add(right)
 }
 
 func (app *L1App) ensureCoreGenesisCollections(ctx sdk.Context) error {

@@ -599,7 +599,7 @@ func (response DNLDiscoveryResponse) Validate(requireProof bool) error {
 	if err := validateDNLServiceEntries(response.Entries); err != nil {
 		return err
 	}
-	if err := validateDNLRoutes(response.Routes, response.Entries); err != nil {
+	if err := validateDNLRoutes(normalizeDNLRoutes(response.Routes), response.Entries); err != nil {
 		return err
 	}
 	if err := ValidateHash("networking DNL response hash", response.ResponseHash); err != nil {

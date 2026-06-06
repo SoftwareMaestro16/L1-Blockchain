@@ -96,10 +96,10 @@ import (
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
 	shardingcoordinatorkeeper "github.com/sovereign-l1/l1/x/sharding-coordinator/keeper"
 	shardingcoordinatortypes "github.com/sovereign-l1/l1/x/sharding-coordinator/types"
-	stakeconcentrationkeeper "github.com/sovereign-l1/l1/x/stake-concentration/keeper"
-	stakeconcentrationtypes "github.com/sovereign-l1/l1/x/stake-concentration/types"
 	singlenominatorpoolkeeper "github.com/sovereign-l1/l1/x/single-nominator-pool/keeper"
 	singlenominatorpooltypes "github.com/sovereign-l1/l1/x/single-nominator-pool/types"
+	stakeconcentrationkeeper "github.com/sovereign-l1/l1/x/stake-concentration/keeper"
+	stakeconcentrationtypes "github.com/sovereign-l1/l1/x/stake-concentration/types"
 	storagerentkeeper "github.com/sovereign-l1/l1/x/storage-rent/keeper"
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
 	systemregistrykeeper "github.com/sovereign-l1/l1/x/system-registry/keeper"
@@ -271,6 +271,8 @@ func (app *L1App) initKeepers(
 	app.EpochsKeeper = &epochsKeeper
 	app.EpochsKeeper.SetHooks(epochstypes.NewMultiEpochHooks())
 	app.ConstitutionKeeper = constitutionkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[constitutiontypes.StoreKey]))
+	app.ConfigKeeper = configkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configtypes.StoreKey]))
+	app.ConfigVotingKeeper = configvotingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configvotingtypes.StoreKey]))
 	app.SystemRegistryKeeper = systemregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[systemregistrytypes.StoreKey]))
 	app.NativeEvidenceKeeper = nativeevidencekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[nativeevidencetypes.StoreKey]))
 	app.ReporterKeeper = reporterkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[reportertypes.StoreKey]))
@@ -279,8 +281,6 @@ func (app *L1App) initKeepers(
 	app.ValidatorElectionKeeper = validatorelectionkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorelectiontypes.StoreKey]))
 	app.ValidatorInsuranceKeeper = validatorinsurancekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorinsurancetypes.StoreKey]))
 	app.ValidatorRegistryKeeper = validatorregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorregistrytypes.StoreKey]))
-	app.ConfigKeeper = configkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configtypes.StoreKey]))
-	app.ConfigVotingKeeper = configvotingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configvotingtypes.StoreKey]))
 
 	app.TokenFactoryKeeper = tokenfactorykeeper.NewKeeper(
 		appCodec,

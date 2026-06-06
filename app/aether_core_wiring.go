@@ -46,8 +46,8 @@ import (
 	routingtypes "github.com/sovereign-l1/l1/x/routing/types"
 	schedulertypes "github.com/sovereign-l1/l1/x/scheduler/types"
 	shardingcoordinatortypes "github.com/sovereign-l1/l1/x/sharding-coordinator/types"
-	stakeconcentrationtypes "github.com/sovereign-l1/l1/x/stake-concentration/types"
 	singlenominatorpooltypes "github.com/sovereign-l1/l1/x/single-nominator-pool/types"
+	stakeconcentrationtypes "github.com/sovereign-l1/l1/x/stake-concentration/types"
 	storagerenttypes "github.com/sovereign-l1/l1/x/storage-rent/types"
 	systemregistrytypes "github.com/sovereign-l1/l1/x/system-registry/types"
 	tokenfactorytypes "github.com/sovereign-l1/l1/x/tokenfactory/types"
@@ -171,6 +171,7 @@ func aetherCoreBeginBlockerOrder() []string {
 		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
+		configvotingtypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,
 		routingtypes.ModuleName,
@@ -178,7 +179,6 @@ func aetherCoreBeginBlockerOrder() []string {
 		meshtypes.ModuleName,
 		networkingtypes.ModuleName,
 		paymentstypes.ModuleName,
-		configvotingtypes.ModuleName,
 		schedulertypes.ModuleName,
 		avmschedulertypes.ModuleName,
 		actorregistrytypes.ModuleName,
@@ -208,6 +208,7 @@ func aetherCoreEndBlockerOrder() []string {
 		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
+		configvotingtypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,
 		routingtypes.ModuleName,
@@ -215,7 +216,6 @@ func aetherCoreEndBlockerOrder() []string {
 		meshtypes.ModuleName,
 		networkingtypes.ModuleName,
 		paymentstypes.ModuleName,
-		configvotingtypes.ModuleName,
 		schedulertypes.ModuleName,
 		avmschedulertypes.ModuleName,
 		actorregistrytypes.ModuleName,
@@ -255,6 +255,7 @@ func aetherCoreInitGenesisOrder() []string {
 		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
+		configvotingtypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,
 		routingtypes.ModuleName,
@@ -262,7 +263,6 @@ func aetherCoreInitGenesisOrder() []string {
 		meshtypes.ModuleName,
 		networkingtypes.ModuleName,
 		paymentstypes.ModuleName,
-		configvotingtypes.ModuleName,
 		schedulertypes.ModuleName,
 		avmschedulertypes.ModuleName,
 		actorregistrytypes.ModuleName,
@@ -311,6 +311,7 @@ func aetherCoreExportGenesisOrder() []string {
 		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
 		configtypes.ModuleName,
+		configvotingtypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,
 		routingtypes.ModuleName,
@@ -318,7 +319,6 @@ func aetherCoreExportGenesisOrder() []string {
 		meshtypes.ModuleName,
 		networkingtypes.ModuleName,
 		paymentstypes.ModuleName,
-		configvotingtypes.ModuleName,
 		schedulertypes.ModuleName,
 		avmschedulertypes.ModuleName,
 		actorregistrytypes.ModuleName,
