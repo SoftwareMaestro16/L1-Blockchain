@@ -14,6 +14,7 @@ func (app *L1App) ValidateAetherCoreWiringGate() error {
 	if len(prototypeModuleNames) != len(prototypeStoreKeys) {
 		return fmt.Errorf("prototype module/store key count mismatch")
 	}
+	moduleAccountPermissions := GetMaccPerms()
 	for i, moduleName := range prototypeModuleNames {
 		if _, found := app.ModuleManager.Modules[moduleName]; !found {
 			return fmt.Errorf("prototype module %s is not registered", moduleName)
@@ -22,7 +23,7 @@ func (app *L1App) ValidateAetherCoreWiringGate() error {
 		if _, found := app.keys[storeKey]; !found {
 			return fmt.Errorf("prototype module %s store key %s is not mounted", moduleName, storeKey)
 		}
-		if _, found := maccPerms[moduleName]; found && !IsReservedSystemModuleAccountName(moduleName) {
+		if _, found := moduleAccountPermissions[moduleName]; found && !IsReservedSystemModuleAccountName(moduleName) {
 			return fmt.Errorf("prototype module %s must not have module account permissions", moduleName)
 		}
 	}
@@ -39,7 +40,7 @@ func (app *L1App) ValidateAetherCoreWiringGate() error {
 		if _, found := app.keys[storeKey]; !found {
 			return fmt.Errorf("system module %s store key %s is not mounted", moduleName, storeKey)
 		}
-		if _, found := maccPerms[moduleName]; found && !IsReservedSystemModuleAccountName(moduleName) {
+		if _, found := moduleAccountPermissions[moduleName]; found && !IsReservedSystemModuleAccountName(moduleName) {
 			return fmt.Errorf("system module %s must not have module account permissions", moduleName)
 		}
 	}

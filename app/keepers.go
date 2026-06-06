@@ -40,6 +40,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	"github.com/sovereign-l1/l1/app/keeperconfig"
 	actorregistrykeeper "github.com/sovereign-l1/l1/x/actor-registry/keeper"
 	actorregistrytypes "github.com/sovereign-l1/l1/x/actor-registry/types"
 	aethercorekeeper "github.com/sovereign-l1/l1/x/aethercore/keeper"
@@ -140,7 +141,7 @@ func (app *L1App) initKeepers(
 		appCodec,
 		runtime.NewKVStoreService(keys[authtypes.StoreKey]),
 		authtypes.ProtoBaseAccount,
-		maccPerms,
+		GetMaccPerms(),
 		aetherisaddress.Codec{},
 		AccountAddressPrefix,
 		govAuthority,
@@ -156,7 +157,7 @@ func (app *L1App) initKeepers(
 		logger,
 	)
 
-	txConfig := newAetraTxConfig(appCodec, app.BankKeeper)
+	txConfig := keeperconfig.NewTxConfig(appCodec, app.BankKeeper)
 	app.txConfig = txConfig
 
 	app.StakingKeeper = stakingkeeper.NewKeeper(
@@ -220,7 +221,7 @@ func (app *L1App) initKeepers(
 	)
 
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(
-		unsafeSkipUpgradeHeights(appOpts),
+		keeperconfig.UnsafeSkipUpgradeHeights(appOpts),
 		runtime.NewKVStoreService(keys[upgradetypes.StoreKey]),
 		appCodec,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
@@ -268,7 +269,6 @@ func (app *L1App) initKeepers(
 	app.ValidatorElectionKeeper = validatorelectionkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorelectiontypes.StoreKey]))
 	app.ValidatorInsuranceKeeper = validatorinsurancekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorinsurancetypes.StoreKey]))
 	app.ValidatorRegistryKeeper = validatorregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorregistrytypes.StoreKey]))
-
 	app.TokenFactoryKeeper = tokenfactorykeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[tokenfactorytypes.StoreKey]),
