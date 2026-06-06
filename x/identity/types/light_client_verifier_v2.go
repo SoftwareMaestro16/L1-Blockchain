@@ -392,7 +392,7 @@ func lightClientTargetFromRecordV2(record UnifiedResolutionRecordV2, request Ide
 		}
 		return IdentityLightClientVerifiedTargetV2{}, lightClientFailV2(IdentityLightClientErrTargetNotFound, "interface target is missing", nil)
 	case IdentityResolutionTargetRoute:
-		if record.RoutingMetadata.ZoneID == "" && record.RoutingMetadata.ShardID == "" && record.RoutingMetadata.VM == "" && record.RoutingMetadata.Entrypoint == "" {
+		if !routingMetadataHasTargetV2(record.RoutingMetadata) {
 			return IdentityLightClientVerifiedTargetV2{}, lightClientFailV2(IdentityLightClientErrTargetNotFound, "route target is missing", nil)
 		}
 		target.Route = record.RoutingMetadata

@@ -128,7 +128,20 @@ func ComputeResolvedRecordHashV2(record UnifiedResolutionRecordV2) (string, erro
 		record.RoutingMetadata.ShardID,
 		record.RoutingMetadata.VM,
 		record.RoutingMetadata.Entrypoint,
+		record.RoutingMetadata.RouteID,
+		record.RoutingMetadata.TargetType,
+		record.RoutingMetadata.PreferredTarget,
+		fmt.Sprintf("%020d", len(record.RoutingMetadata.FallbackTargets)),
 	}
+	parts = append(parts, record.RoutingMetadata.FallbackTargets...)
+	parts = append(parts,
+		record.RoutingMetadata.ChainContext,
+		record.RoutingMetadata.FeeHint,
+		fmt.Sprintf("%020d", record.RoutingMetadata.TimeoutHint),
+		record.RoutingMetadata.MemoPolicy,
+		fmt.Sprintf("%020d", len(record.RoutingMetadata.CapabilityRequirements)),
+	)
+	parts = append(parts, record.RoutingMetadata.CapabilityRequirements...)
 	for _, target := range record.ContractTargets {
 		parts = append(parts,
 			"contract",
@@ -177,7 +190,18 @@ func ComputeResolvedRecordHashV2(record UnifiedResolutionRecordV2) (string, erro
 		parts = append(parts, descriptor.ContractTargetIDOptional, descriptor.ServiceIDOptional)
 	}
 	for _, hint := range record.ExecutionHints {
-		parts = append(parts, "hint", hint.Key, hint.Value)
+		parts = append(parts,
+			"hint",
+			hint.Key,
+			hint.Value,
+			fmt.Sprintf("%020d", hint.DefaultGasLimitHint),
+			hint.PreferredFeeMode,
+			hint.MessageType,
+			fmt.Sprintf("%t", hint.AsyncAllowed),
+			fmt.Sprintf("%t", hint.RequiresMemo),
+			fmt.Sprintf("%t", hint.RequiresInterfaceConfirmation),
+			fmt.Sprintf("%t", hint.SimulationRequired),
+		)
 	}
 	return identityHash(parts...), nil
 }

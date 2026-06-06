@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,11 +22,20 @@ const (
 	MaxUnifiedEndpointBytes         = 128
 	MaxUnifiedRoutingMetadataBytes  = 256
 	MaxUnifiedOwnerSignatureBytes   = 128
+	MaxUnifiedRouteListEntries      = 16
 	MaxContractCodeIDBytesV2        = 64
 	MaxContractEntrypointBytesV2    = 64
 	MaxRequiredFundsPolicyBytesV2   = 64
 	MaxUnifiedPayloadBytesV2        = 64 * 1024
 	MaxContractGasHintV2            = 100_000_000
+	MaxRouteIDBytesV2               = 48
+	MaxRouteTargetTypeBytesV2       = 24
+	MaxRouteTargetBytesV2           = 64
+	MaxRouteChainContextBytesV2     = 64
+	MaxRouteFeeHintBytesV2          = 64
+	MaxRouteMemoPolicyBytesV2       = 48
+	MaxRouteCapabilityBytesV2       = 48
+	MaxRouteTimeoutHintV2           = 86_400
 	MaxServiceTypeBytesV2           = 48
 	MaxServiceTransportBytesV2      = 24
 	MaxServiceAuthPolicyBytesV2     = 48
@@ -38,6 +48,9 @@ const (
 	MaxInterfaceRenderPolicyBytesV2 = 48
 	MaxInterfacePermissionBytesV2   = 48
 	MaxInterfacePermissionsV2       = 16
+	MaxExecutionFeeModeBytesV2      = 32
+	MaxExecutionMessageTypeBytesV2  = 64
+	MaxExecutionGasLimitHintV2      = 100_000_000
 
 	UnifiedResolutionSchemaVersionV2 uint64 = 1
 
@@ -86,15 +99,31 @@ type InterfaceDescriptorV2 struct {
 }
 
 type RoutingMetadataV2 struct {
-	ZoneID     string
-	ShardID    string
-	VM         string
-	Entrypoint string
+	ZoneID                 string
+	ShardID                string
+	VM                     string
+	Entrypoint             string
+	RouteID                string
+	TargetType             string
+	PreferredTarget        string
+	FallbackTargets        []string
+	ChainContext           string
+	FeeHint                string
+	TimeoutHint            uint64
+	MemoPolicy             string
+	CapabilityRequirements []string
 }
 
 type ExecutionHintV2 struct {
-	Key   string
-	Value string
+	Key                           string
+	Value                         string
+	DefaultGasLimitHint           uint64
+	PreferredFeeMode              string
+	MessageType                   string
+	AsyncAllowed                  bool
+	RequiresMemo                  bool
+	RequiresInterfaceConfirmation bool
+	SimulationRequired            bool
 }
 
 type UnifiedResolutionRecordV2 struct {
@@ -182,9 +211,15 @@ func BuildUnifiedResolutionRecordV2(state IdentityState, name string, height uin
 				RenderPolicy: "wallet_confirm",
 			})
 		case isResolverRouteMetadataKey(entry.Key):
-			continue
+			if err := applyRoutingMetadataEntryV2(&record.RoutingMetadata, entry); err != nil {
+				return UnifiedResolutionRecordV2{}, err
+			}
 		default:
-			record.ExecutionHints = append(record.ExecutionHints, ExecutionHintV2{Key: entry.Key, Value: entry.Value})
+			hint, err := executionHintFromResolverMetadataV2(entry)
+			if err != nil {
+				return UnifiedResolutionRecordV2{}, err
+			}
+			record.ExecutionHints = append(record.ExecutionHints, hint)
 		}
 	}
 	sortUnifiedResolutionRecordV2(&record)
@@ -451,11 +486,49 @@ func routeV2FromExecutionRoute(route IdentityExecutionRoute) RoutingMetadataV2 {
 
 func isResolverRouteMetadataKey(key string) bool {
 	switch key {
-	case ResolverMetadataRouteZone, ResolverMetadataRouteShard, ResolverMetadataRouteVM, ResolverMetadataRouteEntrypoint:
+	case ResolverMetadataRouteZone, ResolverMetadataRouteShard, ResolverMetadataRouteVM, ResolverMetadataRouteEntrypoint,
+		"route.id", "route.target_type", "route.preferred_target", "route.fallback_targets", "route.chain_context",
+		"route.fee_hint", "route.timeout_hint", "route.memo_policy", "route.capability_requirements":
 		return true
 	default:
 		return false
 	}
+}
+
+func applyRoutingMetadataEntryV2(route *RoutingMetadataV2, entry ResolverMetadataEntry) error {
+	switch entry.Key {
+	case ResolverMetadataRouteZone:
+		route.ZoneID = entry.Value
+	case ResolverMetadataRouteShard:
+		route.ShardID = entry.Value
+	case ResolverMetadataRouteVM:
+		route.VM = entry.Value
+	case ResolverMetadataRouteEntrypoint:
+		route.Entrypoint = entry.Value
+	case "route.id":
+		route.RouteID = entry.Value
+	case "route.target_type":
+		route.TargetType = entry.Value
+	case "route.preferred_target":
+		route.PreferredTarget = entry.Value
+	case "route.fallback_targets":
+		route.FallbackTargets = splitCanonicalCSVV2(entry.Value)
+	case "route.chain_context":
+		route.ChainContext = entry.Value
+	case "route.fee_hint":
+		route.FeeHint = entry.Value
+	case "route.timeout_hint":
+		timeout, err := strconv.ParseUint(entry.Value, 10, 64)
+		if err != nil {
+			return fmt.Errorf("identity v2 routing timeout_hint must be numeric: %w", err)
+		}
+		route.TimeoutHint = timeout
+	case "route.memo_policy":
+		route.MemoPolicy = entry.Value
+	case "route.capability_requirements":
+		route.CapabilityRequirements = splitCanonicalCSVV2(entry.Value)
+	}
+	return nil
 }
 
 func validateContractTargetsV2(targets []ContractTargetV2, descriptors []InterfaceDescriptorV2) error {
@@ -802,7 +875,15 @@ func validateASCIIValueV2(field string, value string) error {
 }
 
 func validateRoutingMetadataV2(route RoutingMetadataV2) error {
-	totalBytes := len(route.ZoneID) + len(route.ShardID) + len(route.VM) + len(route.Entrypoint)
+	totalBytes := len(route.ZoneID) + len(route.ShardID) + len(route.VM) + len(route.Entrypoint) +
+		len(route.RouteID) + len(route.TargetType) + len(route.PreferredTarget) + len(route.ChainContext) +
+		len(route.FeeHint) + len(route.MemoPolicy)
+	for _, target := range route.FallbackTargets {
+		totalBytes += len(target)
+	}
+	for _, capability := range route.CapabilityRequirements {
+		totalBytes += len(capability)
+	}
 	if totalBytes > MaxUnifiedRoutingMetadataBytes {
 		return fmt.Errorf("identity v2 routing metadata must not exceed %d bytes", MaxUnifiedRoutingMetadataBytes)
 	}
@@ -819,30 +900,213 @@ func validateRoutingMetadataV2(route RoutingMetadataV2) error {
 			return err
 		}
 	}
+	newRouteFieldsSet := route.RouteID != "" || route.TargetType != "" || route.PreferredTarget != "" ||
+		len(route.FallbackTargets) > 0 || route.ChainContext != "" || route.FeeHint != "" ||
+		route.TimeoutHint != 0 || route.MemoPolicy != "" || len(route.CapabilityRequirements) > 0
+	if !newRouteFieldsSet {
+		return nil
+	}
+	if err := validateUnifiedRecordKey("identity v2 routing route_id", route.RouteID); err != nil {
+		return err
+	}
+	if err := validateRoutingTargetTypeV2(route.TargetType); err != nil {
+		return err
+	}
+	if err := validateUnifiedRecordValue("identity v2 routing preferred_target", route.PreferredTarget, MaxRouteTargetBytesV2); err != nil {
+		return err
+	}
+	if err := validateSortedRoutingListV2("identity v2 routing fallback target", route.FallbackTargets, MaxRouteTargetBytesV2); err != nil {
+		return err
+	}
+	if route.ChainContext != "" {
+		if err := validateUnifiedRecordValue("identity v2 routing chain_context", route.ChainContext, MaxRouteChainContextBytesV2); err != nil {
+			return err
+		}
+	}
+	if route.FeeHint != "" {
+		if err := validateUnifiedRecordValue("identity v2 routing fee_hint", route.FeeHint, MaxRouteFeeHintBytesV2); err != nil {
+			return err
+		}
+		if containsBypassSemanticsV2(route.FeeHint) {
+			return errors.New("identity v2 routing fee hints cannot override fee module requirements")
+		}
+	}
+	if route.TimeoutHint > MaxRouteTimeoutHintV2 {
+		return fmt.Errorf("identity v2 routing timeout_hint must not exceed %d seconds", MaxRouteTimeoutHintV2)
+	}
+	if route.MemoPolicy != "" {
+		if err := validateMemoPolicyV2(route.MemoPolicy); err != nil {
+			return err
+		}
+	}
+	if err := validateSortedRoutingListV2("identity v2 routing capability requirement", route.CapabilityRequirements, MaxRouteCapabilityBytesV2); err != nil {
+		return err
+	}
 	return nil
 }
 
 func validateExecutionHintsV2(hints []ExecutionHintV2) error {
 	seen := map[string]struct{}{}
 	for i, hint := range hints {
-		if err := validateUnifiedRecordKey("identity v2 execution hint key", hint.Key); err != nil {
+		hintID := executionHintIDV2(hint)
+		if err := validateUnifiedRecordKey("identity v2 execution hint key", hintID); err != nil {
 			return err
 		}
-		if !strings.HasPrefix(hint.Key, "hint.") {
+		if !strings.HasPrefix(hintID, "hint.") {
 			return errors.New("identity v2 execution hints are advisory and must use hint.* keys")
 		}
-		if err := validateUnifiedRecordValue("identity v2 execution hint", hint.Value, MaxUnifiedRecordValueBytes); err != nil {
-			return err
+		if hint.Key != "" && hint.Value != "" {
+			if err := validateUnifiedRecordValue("identity v2 execution hint", hint.Value, MaxUnifiedRecordValueBytes); err != nil {
+				return err
+			}
+			if containsBypassSemanticsV2(hint.Value) {
+				return errors.New("identity v2 execution hints must not bypass ante-handler checks")
+			}
 		}
-		if _, found := seen[hint.Key]; found {
-			return fmt.Errorf("duplicate identity v2 execution hint %q", hint.Key)
+		if hint.DefaultGasLimitHint > MaxExecutionGasLimitHintV2 {
+			return fmt.Errorf("identity v2 execution default_gas_limit_hint must not exceed %d", MaxExecutionGasLimitHintV2)
 		}
-		seen[hint.Key] = struct{}{}
-		if i > 0 && hints[i-1].Key >= hint.Key {
+		if hint.PreferredFeeMode != "" {
+			if err := validateUnifiedRecordValue("identity v2 execution preferred_fee_mode", hint.PreferredFeeMode, MaxExecutionFeeModeBytesV2); err != nil {
+				return err
+			}
+			if containsBypassSemanticsV2(hint.PreferredFeeMode) {
+				return errors.New("identity v2 execution hints must not bypass ante-handler checks")
+			}
+		}
+		if hint.MessageType != "" {
+			if err := validateUnifiedRecordValue("identity v2 execution message_type", hint.MessageType, MaxExecutionMessageTypeBytesV2); err != nil {
+				return err
+			}
+		}
+		if _, found := seen[hintID]; found {
+			return fmt.Errorf("duplicate identity v2 execution hint %q", hintID)
+		}
+		seen[hintID] = struct{}{}
+		if i > 0 && executionHintIDV2(hints[i-1]) >= hintID {
 			return errors.New("identity v2 execution hints must be sorted canonically")
 		}
 	}
 	return nil
+}
+
+func routingMetadataHasTargetV2(route RoutingMetadataV2) bool {
+	return route.ZoneID != "" || route.ShardID != "" || route.VM != "" || route.Entrypoint != "" ||
+		route.RouteID != "" || route.TargetType != "" || route.PreferredTarget != "" || len(route.FallbackTargets) > 0
+}
+
+func validateRoutingTargetTypeV2(targetType string) error {
+	if err := validateUnifiedRecordValue("identity v2 routing target_type", targetType, MaxRouteTargetTypeBytesV2); err != nil {
+		return err
+	}
+	switch IdentityResolutionTargetTypeV2(targetType) {
+	case IdentityResolutionTargetPrimary, IdentityResolutionTargetContract, IdentityResolutionTargetService,
+		IdentityResolutionTargetInterface, IdentityResolutionTargetRoute, IdentityResolutionTargetRecord:
+		return nil
+	default:
+		return fmt.Errorf("unsupported identity v2 routing target_type %q", targetType)
+	}
+}
+
+func validateSortedRoutingListV2(field string, values []string, maxBytes int) error {
+	if len(values) > MaxUnifiedRouteListEntries {
+		return fmt.Errorf("%s list must not exceed %d entries", field, MaxUnifiedRouteListEntries)
+	}
+	seen := map[string]struct{}{}
+	for i, value := range values {
+		if err := validateUnifiedRecordValue(field, value, maxBytes); err != nil {
+			return err
+		}
+		if _, found := seen[value]; found {
+			return fmt.Errorf("duplicate %s %q", field, value)
+		}
+		seen[value] = struct{}{}
+		if i > 0 && values[i-1] >= value {
+			return fmt.Errorf("%s list must be sorted canonically", field)
+		}
+	}
+	return nil
+}
+
+func validateMemoPolicyV2(policy string) error {
+	if err := validateUnifiedRecordValue("identity v2 routing memo_policy", policy, MaxRouteMemoPolicyBytesV2); err != nil {
+		return err
+	}
+	switch policy {
+	case "none", "optional", "required", "forbidden":
+		return nil
+	default:
+		return fmt.Errorf("unsupported identity v2 routing memo_policy %q", policy)
+	}
+}
+
+func executionHintIDV2(hint ExecutionHintV2) string {
+	if hint.Key != "" {
+		return hint.Key
+	}
+	if hint.MessageType != "" {
+		return "hint.message." + hint.MessageType
+	}
+	return "hint.default"
+}
+
+func executionHintFromResolverMetadataV2(entry ResolverMetadataEntry) (ExecutionHintV2, error) {
+	hint := ExecutionHintV2{Key: entry.Key, Value: entry.Value}
+	switch entry.Key {
+	case "hint.default_gas_limit":
+		value, err := strconv.ParseUint(entry.Value, 10, 64)
+		if err != nil {
+			return ExecutionHintV2{}, fmt.Errorf("identity v2 execution default_gas_limit_hint must be numeric: %w", err)
+		}
+		hint.DefaultGasLimitHint = value
+	case "hint.preferred_fee_mode":
+		hint.PreferredFeeMode = entry.Value
+	case "hint.message_type":
+		hint.MessageType = entry.Value
+	case "hint.async_allowed":
+		value, err := strconv.ParseBool(entry.Value)
+		if err != nil {
+			return ExecutionHintV2{}, fmt.Errorf("identity v2 execution async_allowed must be boolean: %w", err)
+		}
+		hint.AsyncAllowed = value
+	case "hint.requires_memo":
+		value, err := strconv.ParseBool(entry.Value)
+		if err != nil {
+			return ExecutionHintV2{}, fmt.Errorf("identity v2 execution requires_memo must be boolean: %w", err)
+		}
+		hint.RequiresMemo = value
+	case "hint.requires_interface_confirmation":
+		value, err := strconv.ParseBool(entry.Value)
+		if err != nil {
+			return ExecutionHintV2{}, fmt.Errorf("identity v2 execution requires_interface_confirmation must be boolean: %w", err)
+		}
+		hint.RequiresInterfaceConfirmation = value
+	case "hint.simulation_required":
+		value, err := strconv.ParseBool(entry.Value)
+		if err != nil {
+			return ExecutionHintV2{}, fmt.Errorf("identity v2 execution simulation_required must be boolean: %w", err)
+		}
+		hint.SimulationRequired = value
+	}
+	return hint, nil
+}
+
+func splitCanonicalCSVV2(value string) []string {
+	if value == "" {
+		return nil
+	}
+	parts := strings.Split(value, ",")
+	out := make([]string, 0, len(parts))
+	for _, part := range parts {
+		out = append(out, part)
+	}
+	return out
+}
+
+func containsBypassSemanticsV2(value string) bool {
+	lower := strings.ToLower(value)
+	return strings.Contains(lower, "override") || strings.Contains(lower, "bypass") ||
+		strings.Contains(lower, "no-fee") || strings.Contains(lower, "zero-fee") || lower == "free"
 }
 
 func InterfaceDescriptorHashV2(descriptor string) (string, error) {

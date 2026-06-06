@@ -278,7 +278,7 @@ func verifyUnifiedTargetExistsV2(record UnifiedResolutionRecordV2, opts Determin
 		}
 		return fmt.Errorf("identity v2 deterministic interface target %q is not resolved", opts.TargetKey)
 	case IdentityResolutionTargetRoute:
-		if record.RoutingMetadata.ZoneID == "" && record.RoutingMetadata.ShardID == "" && record.RoutingMetadata.VM == "" && record.RoutingMetadata.Entrypoint == "" {
+		if !routingMetadataHasTargetV2(record.RoutingMetadata) {
 			return errors.New("identity v2 deterministic route target is not resolved")
 		}
 	default:

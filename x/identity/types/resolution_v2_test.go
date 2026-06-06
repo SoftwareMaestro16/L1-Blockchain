@@ -76,6 +76,40 @@ func TestUnifiedResolutionRecordV2BuildsFromResolverView(t *testing.T) {
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 }
 
+func TestUnifiedResolutionRecordV2BuildsRoutingAndExecutionHintsFromMetadata(t *testing.T) {
+	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
+	metadata, err := EncodeResolverMetadata([]ResolverMetadataEntry{
+		{Key: "route.id", Value: "swap-route"},
+		{Key: "route.target_type", Value: string(IdentityResolutionTargetContract)},
+		{Key: "route.preferred_target", Value: "swap"},
+		{Key: "route.fallback_targets", Value: "swap-backup"},
+		{Key: "route.fee_hint", Value: "standard"},
+		{Key: "hint.default_gas_limit", Value: "250000"},
+		{Key: "hint.requires_interface_confirmation", Value: "true"},
+	})
+	require.NoError(t, err)
+
+	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
+		Primary:  addr(2),
+		Metadata: metadata,
+	}, 12)
+	require.NoError(t, err)
+
+	record, err := BuildUnifiedResolutionRecordV2(state, "alice.aet", 13, 30)
+	require.NoError(t, err)
+	require.Equal(t, RoutingMetadataV2{
+		RouteID:         "swap-route",
+		TargetType:      string(IdentityResolutionTargetContract),
+		PreferredTarget: "swap",
+		FallbackTargets: []string{"swap-backup"},
+		FeeHint:         "standard",
+	}, record.RoutingMetadata)
+	require.Equal(t, []ExecutionHintV2{
+		{Key: "hint.default_gas_limit", Value: "250000", DefaultGasLimitHint: 250_000},
+		{Key: "hint.requires_interface_confirmation", Value: "true", RequiresInterfaceConfirmation: true},
+	}, record.ExecutionHints)
+}
+
 func TestUnifiedResolutionRecordV2RejectsNonCanonicalAndTTL(t *testing.T) {
 	nameHash, err := DomainRecordV2NameHash("alice.aet")
 	require.NoError(t, err)
@@ -200,6 +234,91 @@ func TestUnifiedResolutionRecordV2ContractTargetSchemaValidation(t *testing.T) {
 	badGas.ContractTargets = append([]ContractTargetV2(nil), record.ContractTargets...)
 	badGas.ContractTargets[0].GasHint = MaxContractGasHintV2 + 1
 	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badGas), "gas_hint")
+}
+
+func TestUnifiedResolutionRecordV2RoutingMetadataValidation(t *testing.T) {
+	nameHash, err := DomainRecordV2NameHash("alice.aet")
+	require.NoError(t, err)
+	record := UnifiedResolutionRecordV2{
+		NameHash:       nameHash,
+		Owner:          addr(1),
+		PrimaryAddress: addr(2),
+		RoutingMetadata: RoutingMetadataV2{
+			RouteID:                "swap-route",
+			TargetType:             string(IdentityResolutionTargetContract),
+			PreferredTarget:        "swap",
+			FallbackTargets:        []string{"swap-backup", "swap-cold"},
+			ChainContext:           "aetheris-main",
+			FeeHint:                "standard",
+			TimeoutHint:            30,
+			MemoPolicy:             "optional",
+			CapabilityRequirements: []string{"cap.contract.invoke", "cap.fee.pay"},
+		},
+		RecordVersion:   7,
+		RecordTTL:       10,
+		UpdatedAtHeight: 12,
+		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
+		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+	}
+	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
+	require.True(t, routingMetadataHasTargetV2(record.RoutingMetadata))
+
+	badFallback := record
+	badFallback.RoutingMetadata.FallbackTargets = []string{"swap-cold", "swap-backup"}
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badFallback), "sorted")
+
+	badFee := record
+	badFee.RoutingMetadata.FeeHint = "override-fee-module"
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badFee), "fee hints")
+
+	badTarget := record
+	badTarget.RoutingMetadata.TargetType = "validator"
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badTarget), "target_type")
+
+	badTimeout := record
+	badTimeout.RoutingMetadata.TimeoutHint = MaxRouteTimeoutHintV2 + 1
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badTimeout), "timeout_hint")
+}
+
+func TestUnifiedResolutionRecordV2ExecutionHintValidation(t *testing.T) {
+	nameHash, err := DomainRecordV2NameHash("alice.aet")
+	require.NoError(t, err)
+	record := UnifiedResolutionRecordV2{
+		NameHash:       nameHash,
+		Owner:          addr(1),
+		PrimaryAddress: addr(2),
+		ExecutionHints: []ExecutionHintV2{{
+			Key:                           "hint.invoke",
+			DefaultGasLimitHint:           250_000,
+			PreferredFeeMode:              "standard",
+			MessageType:                   "cosmos.msg.v1",
+			AsyncAllowed:                  true,
+			RequiresMemo:                  true,
+			RequiresInterfaceConfirmation: true,
+			SimulationRequired:            true,
+		}},
+		RecordVersion:   7,
+		RecordTTL:       10,
+		UpdatedAtHeight: 12,
+		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
+		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+	}
+	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
+
+	badGas := record
+	badGas.ExecutionHints = append([]ExecutionHintV2(nil), record.ExecutionHints...)
+	badGas.ExecutionHints[0].DefaultGasLimitHint = MaxExecutionGasLimitHintV2 + 1
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badGas), "default_gas_limit_hint")
+
+	badFee := record
+	badFee.ExecutionHints = append([]ExecutionHintV2(nil), record.ExecutionHints...)
+	badFee.ExecutionHints[0].PreferredFeeMode = "bypass-ante"
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badFee), "ante-handler")
+
+	badKey := record
+	badKey.ExecutionHints = append([]ExecutionHintV2(nil), record.ExecutionHints...)
+	badKey.ExecutionHints[0].Key = "exec.invoke"
+	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badKey), "hint.*")
 }
 
 func TestUnifiedResolutionRecordV2ServiceEndpointSchemaValidation(t *testing.T) {
