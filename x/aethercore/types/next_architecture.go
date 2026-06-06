@@ -44,6 +44,9 @@ func BuildAetherisNextCommitment(height uint64, state CoreState, contributions R
 	if err := ensureNativeAETResolver(state); err != nil {
 		return AetherisNextCommitment{}, err
 	}
+	if err := ValidateAetherisNextTopologyState(state, height); err != nil {
+		return AetherisNextCommitment{}, err
+	}
 
 	zoneDescriptorRoot, err := ComputeZoneDescriptorRoot(zones, state.Params)
 	if err != nil {

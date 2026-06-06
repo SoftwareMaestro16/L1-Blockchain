@@ -308,8 +308,14 @@ func TestRoutingTableRejectsLayoutMismatch(t *testing.T) {
 }
 
 func TestAetherisNextCommitmentDeterministicAcrossNodes(t *testing.T) {
-	nodeA := nextReadyState(t, []ZoneID{ZoneIDFinancial, ZoneIDIdentity}, []ZoneID{ZoneIDFinancial, ZoneIDIdentity})
-	nodeB := nextReadyState(t, []ZoneID{ZoneIDIdentity, ZoneIDFinancial}, []ZoneID{ZoneIDIdentity, ZoneIDFinancial})
+	nodeA := nextReadyState(t,
+		[]ZoneID{ZoneIDFinancial, ZoneIDIdentity, ZoneIDApplication, ZoneIDContract},
+		[]ZoneID{ZoneIDFinancial, ZoneIDIdentity, ZoneIDApplication, ZoneIDContract},
+	)
+	nodeB := nextReadyState(t,
+		[]ZoneID{ZoneIDContract, ZoneIDApplication, ZoneIDIdentity, ZoneIDFinancial},
+		[]ZoneID{ZoneIDContract, ZoneIDApplication, ZoneIDIdentity, ZoneIDFinancial},
+	)
 
 	commitmentA, err := BuildAetherisNextCommitment(10, nodeA, testContributions(10), testHash("10/resolver"))
 	require.NoError(t, err)
@@ -321,22 +327,73 @@ func TestAetherisNextCommitmentDeterministicAcrossNodes(t *testing.T) {
 	require.NoError(t, ValidateHash("next architecture hash", commitmentA.ArchitectureHash))
 }
 
+func TestAetherisNextTopologyBootstrapMatchesArchitectureDiagram(t *testing.T) {
+	plan, err := DefaultAetherisNextTopology()
+	require.NoError(t, err)
+	require.NoError(t, plan.ValidateHash())
+	require.Len(t, plan.Nodes, 9)
+	require.Len(t, plan.Edges, 10)
+	require.True(t, hasTopologyEdge(plan, topologyNodeCore, topologyNodeFinancial, topologyRelationSchedules))
+	require.True(t, hasTopologyEdge(plan, topologyNodeCore, topologyNodeIdentity, topologyRelationSchedules))
+	require.True(t, hasTopologyEdge(plan, topologyNodeCore, topologyNodeApplication, topologyRelationSchedules))
+	require.True(t, hasTopologyEdge(plan, topologyNodeFinancialShards, topologyNodeContract, topologyRelationAsyncCall))
+	require.True(t, hasTopologyEdge(plan, topologyNodeIdentityShards, topologyNodeContract, topologyRelationAsyncCall))
+	require.True(t, hasTopologyEdge(plan, topologyNodeApplicationShards, topologyNodeContract, topologyRelationAsyncCall))
+	require.True(t, hasTopologyEdge(plan, topologyNodeContract, topologyNodeContractShards, topologyRelationOwns))
+
+	stateA, planA, err := BuildAetherisNextTopologyState(TestnetParams(), 1, 1, 10)
+	require.NoError(t, err)
+	stateB, planB, err := BuildAetherisNextTopologyState(TestnetParams(), 1, 1, 10)
+	require.NoError(t, err)
+	require.Equal(t, planA, planB)
+	require.Equal(t, stateA, stateB)
+	require.Equal(t, plan.TopologyHash, planA.TopologyHash)
+	require.NoError(t, ValidateAetherisNextTopologyState(stateA, 10))
+	require.Len(t, stateA.Export().Zones, 4)
+	require.Len(t, stateA.Export().ShardLayouts, 4)
+	require.Len(t, stateA.Export().RoutingTables, 1)
+}
+
 func TestAetherisNextCommitmentRejectsMissingShardLayout(t *testing.T) {
 	state := EmptyState(TestnetParams())
 	var err error
-	state, err = RegisterZoneDescriptor(state, testDescriptor(ZoneIDIdentity, ZoneTypeIdentity, "identity"))
+	for _, zone := range DefaultAetherisNextZoneDescriptors() {
+		state, err = RegisterZoneDescriptor(state, zone)
+		require.NoError(t, err)
+	}
+	service, err := DefaultAetherisNextIdentityResolverService(1)
 	require.NoError(t, err)
-	state, err = RegisterServiceDescriptor(state, testService("identity-resolver", ZoneIDIdentity))
+	state, err = RegisterServiceDescriptor(state, service)
 	require.NoError(t, err)
-	state, err = AppendZoneCommitment(state, testCommitment(t, 10, ZoneIDIdentity))
+	layouts, err := DefaultAetherisNextShardLayouts(1)
 	require.NoError(t, err)
+	registeredLayouts := make([]ShardLayout, 0, len(layouts)-1)
+	for _, layout := range layouts {
+		if layout.ZoneID == ZoneIDContract {
+			continue
+		}
+		state, err = RegisterShardLayout(state, layout)
+		require.NoError(t, err)
+		registeredLayouts = append(registeredLayouts, layout)
+	}
+	table, err := BuildRoutingTableCommitment(1, 10, registeredLayouts)
+	require.NoError(t, err)
+	state, err = CommitRoutingTable(state, table)
+	require.NoError(t, err)
+	for _, zone := range DefaultAetherisNextZoneDescriptors() {
+		state, err = AppendZoneCommitment(state, testCommitment(t, 10, zone.ZoneID))
+		require.NoError(t, err)
+	}
 
 	_, err = BuildAetherisNextCommitment(10, state, testContributions(10), testHash("10/resolver"))
-	require.ErrorContains(t, err, "missing shard layout")
+	require.ErrorContains(t, err, "missing shard layout for zone CONTRACT_ZONE")
 }
 
 func TestAetherisNextCommitmentRejectsStaleRoutingTable(t *testing.T) {
-	state := nextReadyState(t, []ZoneID{ZoneIDIdentity, ZoneIDFinancial}, []ZoneID{ZoneIDIdentity, ZoneIDFinancial})
+	state := nextReadyState(t,
+		[]ZoneID{ZoneIDIdentity, ZoneIDFinancial, ZoneIDApplication, ZoneIDContract},
+		[]ZoneID{ZoneIDIdentity, ZoneIDFinancial, ZoneIDApplication, ZoneIDContract},
+	)
 	financialV2 := testShardLayout(t, ZoneIDFinancial, 2, []ShardID{"0", "1", "2"})
 	var err error
 	state, err = RegisterShardLayout(state, financialV2)
@@ -456,6 +513,10 @@ func nextReadyState(t *testing.T, zoneOrder []ZoneID, layoutOrder []ZoneID) Aeth
 			state, err = RegisterZoneDescriptor(state, testDescriptor(ZoneIDFinancial, ZoneTypeFinancial, "financial"))
 		case ZoneIDIdentity:
 			state, err = RegisterZoneDescriptor(state, testDescriptor(ZoneIDIdentity, ZoneTypeIdentity, "identity"))
+		case ZoneIDApplication:
+			state, err = RegisterZoneDescriptor(state, testDescriptor(ZoneIDApplication, ZoneTypeApplication, "application"))
+		case ZoneIDContract:
+			state, err = RegisterZoneDescriptor(state, testDescriptor(ZoneIDContract, ZoneTypeContract, "contract"))
 		default:
 			t.Fatalf("unsupported next zone %s", zoneID)
 		}
@@ -465,8 +526,10 @@ func nextReadyState(t *testing.T, zoneOrder []ZoneID, layoutOrder []ZoneID) Aeth
 	require.NoError(t, err)
 
 	layoutsByZone := map[ZoneID]ShardLayout{
-		ZoneIDFinancial: testShardLayout(t, ZoneIDFinancial, 1, []ShardID{"1", "0"}),
-		ZoneIDIdentity:  testShardLayout(t, ZoneIDIdentity, 1, []ShardID{"0"}),
+		ZoneIDFinancial:   testShardLayout(t, ZoneIDFinancial, 1, []ShardID{"1", "0"}),
+		ZoneIDIdentity:    testShardLayout(t, ZoneIDIdentity, 1, []ShardID{"0"}),
+		ZoneIDApplication: testShardLayout(t, ZoneIDApplication, 1, []ShardID{"0"}),
+		ZoneIDContract:    testShardLayout(t, ZoneIDContract, 1, []ShardID{"1", "0"}),
 	}
 	layouts := make([]ShardLayout, 0, len(layoutOrder))
 	for _, zoneID := range layoutOrder {
@@ -811,6 +874,15 @@ func testProposalItem(zoneID ZoneID, shardID ShardID, seed string, priority uint
 func hasProofRoot(snapshot RootSnapshot, rootType RootType, hash string) bool {
 	for _, root := range snapshot.ProofRoots {
 		if root.RootType == rootType && root.RootHash == hash {
+			return true
+		}
+	}
+	return false
+}
+
+func hasTopologyEdge(plan AetherisNextTopologyPlan, from string, to string, relation string) bool {
+	for _, edge := range plan.Edges {
+		if edge.FromNodeID == from && edge.ToNodeID == to && edge.Relation == relation {
 			return true
 		}
 	}
