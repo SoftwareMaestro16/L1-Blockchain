@@ -425,6 +425,94 @@ func TestPerformanceBasedRewardRejectsUnsafeInputs(t *testing.T) {
 	require.ErrorContains(t, err, "uptime score")
 }
 
+func TestPerformanceRecordComputesRewardMultiplierAndDampening(t *testing.T) {
+	record, err := BuildPerformanceRecord(PerformanceRecordInput{
+		EpochID:             14,
+		OperatorAddress:     "val-performance",
+		Role:                ValidatorRoleCollator,
+		AssignedTasks:       10,
+		CompletedTasks:      7,
+		MissedTasks:         2,
+		InvalidTasks:        1,
+		UptimeScoreBps:      9_000,
+		LatencyScoreBps:     8_000,
+		CorrectnessScoreBps: 7_500,
+	})
+	require.NoError(t, err)
+	require.Equal(t, []string{
+		"epoch_id",
+		"operator_address",
+		"role",
+		"assigned_tasks",
+		"completed_tasks",
+		"missed_tasks",
+		"invalid_tasks",
+		"uptime_score",
+		"latency_score",
+		"correctness_score",
+		"task_completion_rate",
+		"reward_multiplier",
+	}, PerformanceRecordFieldNames())
+	require.Equal(t, uint32(7_000), record.TaskCompletionRateBps)
+	require.Equal(t, uint32(3_780), record.RewardMultiplierBps)
+	require.NoError(t, record.Validate())
+
+	dampened, err := ApplyPerformanceDampening(PerformanceDampeningInput{
+		Record:                           record,
+		CurrentRewardNaet:                sdkmath.NewInt(1_000_000),
+		FutureElectionScoreBps:           9_000,
+		DelegationAttractivenessBps:      8_000,
+		RoleEligibilityBps:               8_500,
+		CollatorAssignmentProbabilityBps: 7_000,
+	})
+	require.NoError(t, err)
+	require.Equal(t, sdkmath.NewInt(378_000), dampened.CurrentRewardNaet)
+	require.Equal(t, uint32(3_402), dampened.FutureElectionScoreBps)
+	require.Equal(t, uint32(3_024), dampened.DelegationAttractivenessBps)
+	require.Equal(t, uint32(3_213), dampened.RoleEligibilityBps)
+	require.Equal(t, uint32(2_646), dampened.CollatorAssignmentProbabilityBps)
+}
+
+func TestPerformanceRecordRejectsInvalidTaskAccountingAndPreservesNonCollatorAssignmentProbability(t *testing.T) {
+	_, err := BuildPerformanceRecord(PerformanceRecordInput{
+		EpochID:             14,
+		OperatorAddress:     "val-performance",
+		Role:                ValidatorRoleVerifier,
+		AssignedTasks:       2,
+		CompletedTasks:      2,
+		MissedTasks:         1,
+		UptimeScoreBps:      BasisPoints,
+		LatencyScoreBps:     BasisPoints,
+		CorrectnessScoreBps: BasisPoints,
+	})
+	require.ErrorContains(t, err, "task counts")
+
+	record, err := BuildPerformanceRecord(PerformanceRecordInput{
+		EpochID:             14,
+		OperatorAddress:     "val-verifier",
+		Role:                ValidatorRoleVerifier,
+		AssignedTasks:       4,
+		CompletedTasks:      4,
+		UptimeScoreBps:      5_000,
+		LatencyScoreBps:     5_000,
+		CorrectnessScoreBps: 5_000,
+	})
+	require.NoError(t, err)
+	dampened, err := ApplyPerformanceDampening(PerformanceDampeningInput{
+		Record:                           record,
+		CurrentRewardNaet:                sdkmath.NewInt(1_000),
+		FutureElectionScoreBps:           BasisPoints,
+		DelegationAttractivenessBps:      BasisPoints,
+		RoleEligibilityBps:               BasisPoints,
+		CollatorAssignmentProbabilityBps: 7_000,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint32(7_000), dampened.CollatorAssignmentProbabilityBps)
+
+	record.RewardMultiplierBps++
+	require.ErrorContains(t, record.Validate(), "reward multiplier")
+}
+
 func TestEpochLifecycleValidationRejectsReorderedOrDuplicatePhases(t *testing.T) {
 	lifecycle := DefaultEpochLifecycle()
 	slices.Reverse(lifecycle)

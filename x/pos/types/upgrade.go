@@ -607,6 +607,55 @@ type PerformanceRewardRecord struct {
 	RewardHash            string
 }
 
+type PerformanceRecord struct {
+	EpochID               uint64
+	OperatorAddress       string
+	Role                  ValidatorRole
+	AssignedTasks         uint64
+	CompletedTasks        uint64
+	MissedTasks           uint64
+	InvalidTasks          uint64
+	UptimeScoreBps        uint32
+	LatencyScoreBps       uint32
+	CorrectnessScoreBps   uint32
+	TaskCompletionRateBps uint32
+	RewardMultiplierBps   uint32
+}
+
+type PerformanceRecordInput struct {
+	EpochID             uint64
+	OperatorAddress     string
+	Role                ValidatorRole
+	AssignedTasks       uint64
+	CompletedTasks      uint64
+	MissedTasks         uint64
+	InvalidTasks        uint64
+	UptimeScoreBps      uint32
+	LatencyScoreBps     uint32
+	CorrectnessScoreBps uint32
+}
+
+type PerformanceDampeningInput struct {
+	Record                           PerformanceRecord
+	CurrentRewardNaet                sdkmath.Int
+	FutureElectionScoreBps           uint32
+	DelegationAttractivenessBps      uint32
+	RoleEligibilityBps               uint32
+	CollatorAssignmentProbabilityBps uint32
+}
+
+type PerformanceDampeningResult struct {
+	EpochID                          uint64
+	OperatorAddress                  string
+	Role                             ValidatorRole
+	RewardMultiplierBps              uint32
+	CurrentRewardNaet                sdkmath.Int
+	FutureElectionScoreBps           uint32
+	DelegationAttractivenessBps      uint32
+	RoleEligibilityBps               uint32
+	CollatorAssignmentProbabilityBps uint32
+}
+
 type PosLayer string
 
 const (
@@ -1101,6 +1150,155 @@ func ComputePerformanceRewardHash(record PerformanceRewardRecord) string {
 		posWriteUint64(w, uint64(record.TaskCompletionRateBps))
 		posWritePart(w, record.RewardNaet.String())
 	})
+}
+
+func PerformanceRecordFieldNames() []string {
+	return []string{
+		"epoch_id",
+		"operator_address",
+		"role",
+		"assigned_tasks",
+		"completed_tasks",
+		"missed_tasks",
+		"invalid_tasks",
+		"uptime_score",
+		"latency_score",
+		"correctness_score",
+		"task_completion_rate",
+		"reward_multiplier",
+	}
+}
+
+func BuildPerformanceRecord(input PerformanceRecordInput) (PerformanceRecord, error) {
+	input.OperatorAddress = strings.TrimSpace(input.OperatorAddress)
+	if input.AssignedTasks < input.CompletedTasks {
+		return PerformanceRecord{}, errors.New("completed tasks cannot exceed assigned tasks")
+	}
+	if input.AssignedTasks < input.MissedTasks {
+		return PerformanceRecord{}, errors.New("missed tasks cannot exceed assigned tasks")
+	}
+	if input.AssignedTasks < input.InvalidTasks {
+		return PerformanceRecord{}, errors.New("invalid tasks cannot exceed assigned tasks")
+	}
+	observed, err := checkedAddUint64(input.CompletedTasks, input.MissedTasks, "performance observed task overflow")
+	if err != nil {
+		return PerformanceRecord{}, err
+	}
+	observed, err = checkedAddUint64(observed, input.InvalidTasks, "performance observed task overflow")
+	if err != nil {
+		return PerformanceRecord{}, err
+	}
+	if observed > input.AssignedTasks {
+		return PerformanceRecord{}, errors.New("performance task counts exceed assigned tasks")
+	}
+	taskCompletion, err := ComputeTaskCompletionRate(TaskCompletionRateInput{
+		CompletedAssignedTasks: input.CompletedTasks,
+		ExpectedAssignedTasks:  input.AssignedTasks,
+	})
+	if err != nil {
+		return PerformanceRecord{}, err
+	}
+	multiplier, err := computeRewardMultiplierBps(input.UptimeScoreBps, input.LatencyScoreBps, input.CorrectnessScoreBps, taskCompletion)
+	if err != nil {
+		return PerformanceRecord{}, err
+	}
+	record := PerformanceRecord{
+		EpochID:               input.EpochID,
+		OperatorAddress:       input.OperatorAddress,
+		Role:                  input.Role,
+		AssignedTasks:         input.AssignedTasks,
+		CompletedTasks:        input.CompletedTasks,
+		MissedTasks:           input.MissedTasks,
+		InvalidTasks:          input.InvalidTasks,
+		UptimeScoreBps:        input.UptimeScoreBps,
+		LatencyScoreBps:       input.LatencyScoreBps,
+		CorrectnessScoreBps:   input.CorrectnessScoreBps,
+		TaskCompletionRateBps: taskCompletion,
+		RewardMultiplierBps:   multiplier,
+	}
+	return record, record.Validate()
+}
+
+func (r PerformanceRecord) Validate() error {
+	if r.EpochID == 0 {
+		return errors.New("performance record epoch id is required")
+	}
+	if err := validatePosToken("performance record operator address", r.OperatorAddress); err != nil {
+		return err
+	}
+	if err := validateValidatorRole(r.Role); err != nil {
+		return err
+	}
+	if r.AssignedTasks < r.CompletedTasks {
+		return errors.New("completed tasks cannot exceed assigned tasks")
+	}
+	if r.AssignedTasks < r.MissedTasks {
+		return errors.New("missed tasks cannot exceed assigned tasks")
+	}
+	if r.AssignedTasks < r.InvalidTasks {
+		return errors.New("invalid tasks cannot exceed assigned tasks")
+	}
+	observed, err := checkedAddUint64(r.CompletedTasks, r.MissedTasks, "performance observed task overflow")
+	if err != nil {
+		return err
+	}
+	observed, err = checkedAddUint64(observed, r.InvalidTasks, "performance observed task overflow")
+	if err != nil {
+		return err
+	}
+	if observed > r.AssignedTasks {
+		return errors.New("performance task counts exceed assigned tasks")
+	}
+	if err := validatePerformanceRewardBps(r.UptimeScoreBps, r.LatencyScoreBps, r.CorrectnessScoreBps, r.TaskCompletionRateBps); err != nil {
+		return err
+	}
+	if r.RewardMultiplierBps > BasisPoints {
+		return fmt.Errorf("reward multiplier must be <= %d bps", BasisPoints)
+	}
+	expectedMultiplier, err := computeRewardMultiplierBps(r.UptimeScoreBps, r.LatencyScoreBps, r.CorrectnessScoreBps, r.TaskCompletionRateBps)
+	if err != nil {
+		return err
+	}
+	if r.RewardMultiplierBps != expectedMultiplier {
+		return errors.New("performance record reward multiplier mismatch")
+	}
+	return nil
+}
+
+func ApplyPerformanceDampening(input PerformanceDampeningInput) (PerformanceDampeningResult, error) {
+	if err := input.Record.Validate(); err != nil {
+		return PerformanceDampeningResult{}, err
+	}
+	if input.CurrentRewardNaet.IsNil() {
+		input.CurrentRewardNaet = sdkmath.ZeroInt()
+	}
+	if input.CurrentRewardNaet.IsNegative() {
+		return PerformanceDampeningResult{}, errors.New("performance dampening current reward cannot be negative")
+	}
+	if err := validatePerformanceRewardBps(
+		input.FutureElectionScoreBps,
+		input.DelegationAttractivenessBps,
+		input.RoleEligibilityBps,
+		input.CollatorAssignmentProbabilityBps,
+	); err != nil {
+		return PerformanceDampeningResult{}, err
+	}
+	multiplier := input.Record.RewardMultiplierBps
+	result := PerformanceDampeningResult{
+		EpochID:                          input.Record.EpochID,
+		OperatorAddress:                  input.Record.OperatorAddress,
+		Role:                             input.Record.Role,
+		RewardMultiplierBps:              multiplier,
+		CurrentRewardNaet:                mulIntBps(input.CurrentRewardNaet, multiplier),
+		FutureElectionScoreBps:           mulBps(input.FutureElectionScoreBps, multiplier),
+		DelegationAttractivenessBps:      mulBps(input.DelegationAttractivenessBps, multiplier),
+		RoleEligibilityBps:               mulBps(input.RoleEligibilityBps, multiplier),
+		CollatorAssignmentProbabilityBps: mulBps(input.CollatorAssignmentProbabilityBps, multiplier),
+	}
+	if input.Record.Role != ValidatorRoleCollator {
+		result.CollatorAssignmentProbabilityBps = input.CollatorAssignmentProbabilityBps
+	}
+	return result, nil
 }
 
 func reliabilityPenalty(input ReliabilityIndexInput) (uint64, error) {
@@ -4309,6 +4507,20 @@ func validatePerformanceRewardBps(values ...uint32) error {
 		}
 	}
 	return nil
+}
+
+func computeRewardMultiplierBps(uptimeScoreBps uint32, latencyScoreBps uint32, correctnessScoreBps uint32, taskCompletionRateBps uint32) (uint32, error) {
+	if err := validatePerformanceRewardBps(uptimeScoreBps, latencyScoreBps, correctnessScoreBps, taskCompletionRateBps); err != nil {
+		return 0, err
+	}
+	multiplier := mulBps(uptimeScoreBps, latencyScoreBps)
+	multiplier = mulBps(multiplier, correctnessScoreBps)
+	multiplier = mulBps(multiplier, taskCompletionRateBps)
+	return multiplier, nil
+}
+
+func mulBps(value uint32, multiplier uint32) uint32 {
+	return uint32((uint64(value) * uint64(multiplier)) / uint64(BasisPoints))
 }
 
 func checkedAddUint64(left uint64, right uint64, message string) (uint64, error) {
