@@ -202,6 +202,32 @@ func (k Keeper) BuildProposalSchedule(height uint64, items []types.ProposalItem)
 	return schedule, nil
 }
 
+func (k Keeper) PrepareKernelProposal(ctx types.KernelConsensusContext, items []types.ProposalItem) (types.KernelBlockPlan, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return types.KernelBlockPlan{}, err
+	}
+	return types.PrepareKernelProposal(ctx, k.genesis.State, items)
+}
+
+func (k Keeper) ProcessKernelProposal(ctx types.KernelConsensusContext, plan types.KernelBlockPlan) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	return types.ProcessKernelProposal(ctx, k.genesis.State, plan)
+}
+
+func (k *Keeper) FinalizeKernelBlock(ctx types.KernelConsensusContext, plan types.KernelBlockPlan, input types.KernelFinalizationInput) (types.KernelFinalization, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return types.KernelFinalization{}, err
+	}
+	next, finalization, err := types.FinalizeKernelBlock(ctx, k.genesis.State, plan, input)
+	if err != nil {
+		return types.KernelFinalization{}, err
+	}
+	k.genesis.State = next
+	return finalization, nil
+}
+
 func (k *Keeper) CommitGlobalRoot(height uint64, contributions types.RootContributions) (types.GlobalStateRoot, error) {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return types.GlobalStateRoot{}, err
@@ -232,6 +258,13 @@ func (k *Keeper) AddExportManifest(appHash string, root types.GlobalStateRoot) (
 	}
 	k.genesis.State = next
 	return manifest, nil
+}
+
+func (k Keeper) BuildKernelExportManifest(height uint64, appHash string) (types.ExportManifest, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return types.ExportManifest{}, err
+	}
+	return types.BuildKernelExportManifest(k.genesis.State, height, appHash)
 }
 
 func (k Keeper) LatestRootSnapshot() (types.RootSnapshot, bool) {

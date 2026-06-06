@@ -208,19 +208,48 @@ func CommitBlockRoots(state CoreState, height uint64) (CoreState, RootSnapshot, 
 	if err := state.Validate(); err != nil {
 		return CoreState{}, RootSnapshot{}, err
 	}
+	zonesRoot, err := ComputeZoneCommitmentsRoot(height, state.CommitmentsAtHeight(height))
+	if err != nil {
+		return CoreState{}, RootSnapshot{}, err
+	}
+	messageRoot := hashParts("aetheris-aek-global-message-root-v1", fmt.Sprint(height), zonesRoot)
+	receiptRoot := hashParts("aetheris-aek-execution-receipt-root-v1", fmt.Sprint(height), zonesRoot)
+	contributions := RootContributions{
+		IdentityRoot: EmptyRootHash,
+		StorageRoot:  EmptyRootHash,
+		MessageRoot:  messageRoot,
+		ReceiptsRoot: receiptRoot,
+		PaymentsRoot: EmptyRootHash,
+		VMRoot:       EmptyRootHash,
+		ParamsHash:   ComputeAetherCoreParamsHash(state.Params),
+	}
+	return CommitBlockRootsWithContributions(state, height, contributions)
+}
+
+func CommitBlockRootsWithContributions(state CoreState, height uint64, contributions RootContributions) (CoreState, RootSnapshot, error) {
+	if height == 0 {
+		return CoreState{}, RootSnapshot{}, errors.New("aethercore root snapshot height must be positive")
+	}
+	if err := state.Validate(); err != nil {
+		return CoreState{}, RootSnapshot{}, err
+	}
+	if err := contributions.Validate(); err != nil {
+		return CoreState{}, RootSnapshot{}, err
+	}
 	for _, snapshot := range state.RootSnapshots {
 		if snapshot.Height == height {
 			return CoreState{}, RootSnapshot{}, errors.New("duplicate aethercore root snapshot height")
 		}
 	}
 	commitments := state.CommitmentsAtHeight(height)
-	zonesRoot, err := ComputeZoneCommitmentsRoot(height, commitments)
+	if _, err := ComputeZoneCommitmentsRoot(height, commitments); err != nil {
+		return CoreState{}, RootSnapshot{}, err
+	}
+	globalRoot, err := BuildGlobalStateRoot(height, state, contributions)
 	if err != nil {
 		return CoreState{}, RootSnapshot{}, err
 	}
-	messageRoot := hashParts("aetheris-aek-global-message-root-v1", fmt.Sprint(height), zonesRoot)
-	receiptRoot := hashParts("aetheris-aek-execution-receipt-root-v1", fmt.Sprint(height), zonesRoot)
-	globalRootHash := hashParts("aetheris-aek-root-snapshot-v1", fmt.Sprint(height), zonesRoot, messageRoot, receiptRoot)
+	globalRootHash := globalRoot.GlobalRoot
 	proofRoots := make([]ProofRoot, len(commitments))
 	for i, commitment := range commitments {
 		proofRoots[i] = ProofRoot{
@@ -252,34 +281,21 @@ func CommitBlockRoots(state CoreState, height uint64) (CoreState, RootSnapshot, 
 		GlobalMessageRoot: ProofRoot{
 			Height:   height,
 			RootType: MessageProofRootType,
-			RootHash: messageRoot,
+			RootHash: contributions.MessageRoot,
 		},
 		ExecutionReceiptRoot: ProofRoot{
 			Height:   height,
 			RootType: ReceiptProofRootType,
-			RootHash: receiptRoot,
+			RootHash: contributions.ReceiptsRoot,
 		},
 		ProofRoots: proofRoots,
 		Finality: FinalityRoots{
 			GlobalStateRoot:      globalRootHash,
-			GlobalMessageRoot:    messageRoot,
-			ExecutionReceiptRoot: receiptRoot,
+			GlobalMessageRoot:    contributions.MessageRoot,
+			ExecutionReceiptRoot: contributions.ReceiptsRoot,
 		},
 	}
 	if err := snapshot.Validate(); err != nil {
-		return CoreState{}, RootSnapshot{}, err
-	}
-	contributions := RootContributions{
-		IdentityRoot: EmptyRootHash,
-		StorageRoot:  EmptyRootHash,
-		MessageRoot:  messageRoot,
-		ReceiptsRoot: receiptRoot,
-		PaymentsRoot: EmptyRootHash,
-		VMRoot:       EmptyRootHash,
-		ParamsHash:   hashParts("aetheris-aek-params-v1", fmt.Sprint(state.Params.Enabled), state.Params.Authority),
-	}
-	globalRoot, err := BuildGlobalStateRoot(height, state, contributions)
-	if err != nil {
 		return CoreState{}, RootSnapshot{}, err
 	}
 	next := state.Clone()
