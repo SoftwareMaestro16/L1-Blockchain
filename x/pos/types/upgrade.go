@@ -921,6 +921,20 @@ type CosmosSDKCompatibilityManifest struct {
 	Root       string
 }
 
+type PosModuleBoundary struct {
+	ModuleName     string
+	ModulePath     string
+	Owns           []string
+	ReadsModules   []string
+	WritesModules  []string
+	QueryEndpoints []string
+}
+
+type PosModuleBoundaryManifest struct {
+	Boundaries []PosModuleBoundary
+	Root       string
+}
+
 func (p CentralizationControlParams) Validate() error {
 	checks := []struct {
 		name  string
@@ -1272,6 +1286,160 @@ func ComputeCosmosSDKCompatibilityRoot(manifest CosmosSDKCompatibilityManifest) 
 			posWriteStringSlice(w, middleware.Extends)
 			posWriteStringSlice(w, middleware.ReadsModules)
 			posWriteStringSlice(w, middleware.WritesModules)
+		}
+	})
+}
+
+func DefaultPoSModuleBoundaryManifest() PosModuleBoundaryManifest {
+	manifest := PosModuleBoundaryManifest{
+		Boundaries: []PosModuleBoundary{
+			{
+				ModuleName:     "epoch",
+				ModulePath:     "x/epoch",
+				Owns:           []string{"epoch lifecycle", "phase transitions", "epoch seed", "epoch queries"},
+				ReadsModules:   []string{"staking"},
+				WritesModules:  []string{"epoch"},
+				QueryEndpoints: []string{"QueryCurrentEpoch", "QueryEpochHistory"},
+			},
+			{
+				ModuleName:     "validator_economy",
+				ModulePath:     "x/validator-economy",
+				Owns:           []string{"validator score", "effective stake", "stake saturation", "election ranking", "role eligibility"},
+				ReadsModules:   []string{"staking", "slashing", "performance"},
+				WritesModules:  []string{"validator_economy"},
+				QueryEndpoints: []string{"QueryValidatorScore", "QueryElectionRanking", "QueryValidatorSaturation", "QueryRoleEligibility"},
+			},
+			{
+				ModuleName:     "taskgroups",
+				ModulePath:     "x/taskgroups",
+				Owns:           []string{"workload registry", "task group assignment", "proposer rotation", "verification groups"},
+				ReadsModules:   []string{"epoch", "validator_economy", "staking"},
+				WritesModules:  []string{"taskgroups"},
+				QueryEndpoints: []string{"QueryWorkloadRegistry", "QueryTaskGroup", "QueryProposerRotation", "QueryVerificationGroup"},
+			},
+			{
+				ModuleName:     "evidence",
+				ModulePath:     "x/evidence",
+				Owns:           []string{"structured evidence records", "evidence deposits", "verification group decisions", "reporter rewards"},
+				ReadsModules:   []string{"taskgroups", "staking", "slashing"},
+				WritesModules:  []string{"evidence", "slashing", "distribution"},
+				QueryEndpoints: []string{"QueryEvidenceRecord", "QueryEvidenceDeposit", "QueryEvidenceDecision", "QueryReporterRewards"},
+			},
+			{
+				ModuleName:     "performance",
+				ModulePath:     "x/performance",
+				Owns:           []string{"uptime", "latency", "correctness", "task completion", "reward multipliers"},
+				ReadsModules:   []string{"taskgroups", "staking", "distribution"},
+				WritesModules:  []string{"performance", "distribution"},
+				QueryEndpoints: []string{"QueryPerformanceRecord", "QueryOperatorPerformanceHistory", "QueryRolePerformance", "QueryRewardMultiplier"},
+			},
+		},
+	}
+	manifest.Root = ComputePoSModuleBoundaryRoot(manifest)
+	return manifest
+}
+
+func (m PosModuleBoundaryManifest) Validate(compatibility CosmosSDKCompatibilityManifest) error {
+	if err := compatibility.Validate(); err != nil {
+		return err
+	}
+	if len(m.Boundaries) == 0 {
+		return errors.New("pos module boundaries are required")
+	}
+	knownModules := make(map[string]struct{})
+	for _, extension := range compatibility.Extensions {
+		knownModules[extension.ModuleName] = struct{}{}
+	}
+	for _, module := range compatibility.Modules {
+		knownModules[module.ModuleName] = struct{}{}
+	}
+	required := RequiredPoSModuleNames(compatibility)
+	boundaryByName := make(map[string]PosModuleBoundary, len(m.Boundaries))
+	owned := make(map[string]string)
+	for _, boundary := range m.Boundaries {
+		if err := boundary.Validate(knownModules); err != nil {
+			return err
+		}
+		if _, found := boundaryByName[boundary.ModuleName]; found {
+			return fmt.Errorf("duplicate pos module boundary %s", boundary.ModuleName)
+		}
+		boundaryByName[boundary.ModuleName] = boundary
+		for _, item := range boundary.Owns {
+			if owner, found := owned[item]; found {
+				return fmt.Errorf("pos boundary ownership %q overlaps between %s and %s", item, owner, boundary.ModuleName)
+			}
+			owned[item] = boundary.ModuleName
+		}
+	}
+	for _, moduleName := range required {
+		if _, found := boundaryByName[moduleName]; !found {
+			return fmt.Errorf("required pos module boundary %s is missing", moduleName)
+		}
+	}
+	if err := validatePosHash("pos module boundary root", m.Root); err != nil {
+		return err
+	}
+	if expected := ComputePoSModuleBoundaryRoot(m); expected != m.Root {
+		return errors.New("pos module boundary root mismatch")
+	}
+	return nil
+}
+
+func (b PosModuleBoundary) Validate(knownModules map[string]struct{}) error {
+	if err := validatePosToken("pos module boundary name", b.ModuleName); err != nil {
+		return err
+	}
+	if err := validatePosToken("pos module boundary path", b.ModulePath); err != nil {
+		return err
+	}
+	if len(b.Owns) == 0 {
+		return fmt.Errorf("pos module boundary %s must own at least one responsibility", b.ModuleName)
+	}
+	for _, item := range b.Owns {
+		if err := validatePosResponsibility("pos module boundary ownership", item); err != nil {
+			return err
+		}
+	}
+	if len(b.QueryEndpoints) == 0 {
+		return fmt.Errorf("pos module boundary %s must expose query endpoints", b.ModuleName)
+	}
+	for _, endpoint := range b.QueryEndpoints {
+		if err := validatePosToken("pos module boundary query endpoint", endpoint); err != nil {
+			return err
+		}
+	}
+	referenced := append([]string{}, b.ReadsModules...)
+	referenced = append(referenced, b.WritesModules...)
+	for _, moduleName := range referenced {
+		if err := validatePosToken("pos module boundary referenced module", moduleName); err != nil {
+			return err
+		}
+		if _, found := knownModules[moduleName]; !found {
+			return fmt.Errorf("pos module boundary %s references unknown module %s", b.ModuleName, moduleName)
+		}
+	}
+	return nil
+}
+
+func PoSModuleBoundaryByName(manifest PosModuleBoundaryManifest, moduleName string) (PosModuleBoundary, bool) {
+	for _, boundary := range manifest.Boundaries {
+		if boundary.ModuleName == moduleName {
+			return boundary, true
+		}
+	}
+	return PosModuleBoundary{}, false
+}
+
+func ComputePoSModuleBoundaryRoot(manifest PosModuleBoundaryManifest) string {
+	return posHashRoot("aetheris-pos-module-boundaries-v1", func(w posByteWriter) {
+		posWriteUint64(w, uint64(len(manifest.Boundaries)))
+		for _, boundary := range manifest.Boundaries {
+			posWritePart(w, boundary.ModuleName)
+			posWritePart(w, boundary.ModulePath)
+			posWriteStringSlice(w, boundary.Owns)
+			posWriteStringSlice(w, boundary.ReadsModules)
+			posWriteStringSlice(w, boundary.WritesModules)
+			posWriteStringSlice(w, boundary.QueryEndpoints)
 		}
 	})
 }

@@ -124,6 +124,58 @@ func TestCosmosSDKCompatibilityManifestRejectsReplacementOrMissingModules(t *tes
 	require.ErrorContains(t, unknown.Validate(), "unknown module")
 }
 
+func TestPoSModuleBoundariesMatchRequiredCompatibilityModules(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	boundaries := DefaultPoSModuleBoundaryManifest()
+	require.NoError(t, boundaries.Validate(compatibility))
+	require.Equal(t, ComputePoSModuleBoundaryRoot(boundaries), boundaries.Root)
+
+	require.Equal(t, RequiredPoSModuleNames(compatibility), posBoundaryModuleNames(boundaries))
+	epoch, found := PoSModuleBoundaryByName(boundaries, "epoch")
+	require.True(t, found)
+	require.Equal(t, []string{"epoch lifecycle", "phase transitions", "epoch seed", "epoch queries"}, epoch.Owns)
+	validatorEconomy, found := PoSModuleBoundaryByName(boundaries, "validator_economy")
+	require.True(t, found)
+	require.Equal(t, []string{"validator score", "effective stake", "stake saturation", "election ranking", "role eligibility"}, validatorEconomy.Owns)
+	taskgroups, found := PoSModuleBoundaryByName(boundaries, "taskgroups")
+	require.True(t, found)
+	require.Equal(t, []string{"workload registry", "task group assignment", "proposer rotation", "verification groups"}, taskgroups.Owns)
+	evidence, found := PoSModuleBoundaryByName(boundaries, "evidence")
+	require.True(t, found)
+	require.Equal(t, []string{"structured evidence records", "evidence deposits", "verification group decisions", "reporter rewards"}, evidence.Owns)
+	require.Contains(t, evidence.WritesModules, "slashing")
+	require.Contains(t, evidence.WritesModules, "distribution")
+	performance, found := PoSModuleBoundaryByName(boundaries, "performance")
+	require.True(t, found)
+	require.Equal(t, []string{"uptime", "latency", "correctness", "task completion", "reward multipliers"}, performance.Owns)
+	require.Contains(t, performance.QueryEndpoints, "QueryRewardMultiplier")
+}
+
+func TestPoSModuleBoundariesRejectOverlapMissingAndUnknownReferences(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	boundaries := DefaultPoSModuleBoundaryManifest()
+
+	overlap := boundaries
+	overlap.Boundaries = append([]PosModuleBoundary{}, boundaries.Boundaries...)
+	overlap.Boundaries[1].Owns = append([]string{}, overlap.Boundaries[1].Owns...)
+	overlap.Boundaries[1].Owns = append(overlap.Boundaries[1].Owns, "epoch seed")
+	overlap.Root = ComputePoSModuleBoundaryRoot(overlap)
+	require.ErrorContains(t, overlap.Validate(compatibility), "overlaps")
+
+	missing := boundaries
+	missing.Boundaries = append([]PosModuleBoundary{}, boundaries.Boundaries...)
+	missing.Boundaries = missing.Boundaries[:len(missing.Boundaries)-1]
+	missing.Root = ComputePoSModuleBoundaryRoot(missing)
+	require.ErrorContains(t, missing.Validate(compatibility), "performance")
+
+	unknown := boundaries
+	unknown.Boundaries = append([]PosModuleBoundary{}, boundaries.Boundaries...)
+	unknown.Boundaries[0].ReadsModules = append([]string{}, unknown.Boundaries[0].ReadsModules...)
+	unknown.Boundaries[0].ReadsModules = append(unknown.Boundaries[0].ReadsModules, "unknown_module")
+	unknown.Root = ComputePoSModuleBoundaryRoot(unknown)
+	require.ErrorContains(t, unknown.Validate(compatibility), "unknown module")
+}
+
 func TestEpochDefinitionDefaultsMatchLifecycleParameters(t *testing.T) {
 	params := DefaultParams()
 
@@ -2065,6 +2117,14 @@ func compatibilityMiddlewareNames(manifest CosmosSDKCompatibilityManifest) []str
 	out := make([]string, len(manifest.Middleware))
 	for i, middleware := range manifest.Middleware {
 		out[i] = middleware.Name
+	}
+	return out
+}
+
+func posBoundaryModuleNames(manifest PosModuleBoundaryManifest) []string {
+	out := make([]string, len(manifest.Boundaries))
+	for i, boundary := range manifest.Boundaries {
+		out[i] = boundary.ModuleName
 	}
 	return out
 }
