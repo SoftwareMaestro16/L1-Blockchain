@@ -692,6 +692,84 @@ func TestPosObservabilityManifestRejectsMissingDuplicateAndInvalidSpecs(t *testi
 	require.ErrorContains(t, rootMismatch.Validate(compatibility), "root mismatch")
 }
 
+func TestPosGovernanceParameterManifestCoversRequiredCategories(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	manifest := DefaultPosGovernanceParameterManifest()
+	require.NoError(t, manifest.Validate(compatibility))
+	require.Equal(t, ComputePosGovernanceParameterRoot(manifest), manifest.Root)
+
+	required := RequiredPosGovernanceParametersByCategory()
+	require.Len(t, manifest.Parameters, countRequiredGovernanceParameters(required))
+	for category, names := range required {
+		for _, name := range names {
+			parameter, found := PosGovernanceParameterByName(manifest, category, name)
+			require.True(t, found, "%s/%s", category, name)
+			require.Equal(t, "governance", parameter.UpdateAuthority)
+			require.NotEmpty(t, parameter.ValueKind)
+			require.NotEmpty(t, parameter.SafetyLevel)
+		}
+	}
+
+	epochDuration, found := PosGovernanceParameterByName(manifest, "epoch", "epoch_duration")
+	require.True(t, found)
+	require.Equal(t, "epoch", epochDuration.ModuleName)
+	require.Equal(t, "duration_seconds", epochDuration.ValueKind)
+	require.Equal(t, "high", epochDuration.SafetyLevel)
+
+	seedSource, found := PosGovernanceParameterByName(manifest, "epoch", "epoch_seed_source")
+	require.True(t, found)
+	require.Equal(t, "critical", seedSource.SafetyLevel)
+
+	saturation, found := PosGovernanceParameterByName(manifest, "validator_economy", "stake_saturation_cap_factor")
+	require.True(t, found)
+	require.Equal(t, "validator_economy", saturation.ModuleName)
+	require.Equal(t, "bps", saturation.ValueKind)
+
+	unbonding, found := PosGovernanceParameterByName(manifest, "unbonding", "redelegation_risk_retention")
+	require.True(t, found)
+	require.Equal(t, "staking", unbonding.ModuleName)
+	require.Equal(t, "retention_policy", unbonding.ValueKind)
+}
+
+func TestPosGovernanceParameterManifestRejectsMissingDuplicateAndUnsafeSpecs(t *testing.T) {
+	compatibility := DefaultCosmosSDKCompatibilityManifest()
+	manifest := DefaultPosGovernanceParameterManifest()
+
+	missing := manifest
+	missing.Parameters = append([]PosGovernanceParameterSpec{}, manifest.Parameters...)
+	missing.Parameters = missing.Parameters[1:]
+	missing.Root = ComputePosGovernanceParameterRoot(missing)
+	require.ErrorContains(t, missing.Validate(compatibility), "epoch/epoch_duration")
+
+	duplicate := manifest
+	duplicate.Parameters = append([]PosGovernanceParameterSpec{}, manifest.Parameters...)
+	duplicate.Parameters = append(duplicate.Parameters, manifest.Parameters[0])
+	duplicate.Root = ComputePosGovernanceParameterRoot(duplicate)
+	require.ErrorContains(t, duplicate.Validate(compatibility), "duplicate pos governance parameter")
+
+	unknownCategory := manifest
+	unknownCategory.Parameters = append([]PosGovernanceParameterSpec{}, manifest.Parameters...)
+	unknownCategory.Parameters[0].Category = "unknown_category"
+	unknownCategory.Root = ComputePosGovernanceParameterRoot(unknownCategory)
+	require.ErrorContains(t, unknownCategory.Validate(compatibility), "unknown")
+
+	unknownModule := manifest
+	unknownModule.Parameters = append([]PosGovernanceParameterSpec{}, manifest.Parameters...)
+	unknownModule.Parameters[0].ModuleName = "unknown_module"
+	unknownModule.Root = ComputePosGovernanceParameterRoot(unknownModule)
+	require.ErrorContains(t, unknownModule.Validate(compatibility), "unknown module")
+
+	badSafety := manifest
+	badSafety.Parameters = append([]PosGovernanceParameterSpec{}, manifest.Parameters...)
+	badSafety.Parameters[0].SafetyLevel = "unsafe"
+	badSafety.Root = ComputePosGovernanceParameterRoot(badSafety)
+	require.ErrorContains(t, badSafety.Validate(compatibility), "invalid")
+
+	rootMismatch := manifest
+	rootMismatch.Root = PosEmptyRootHash
+	require.ErrorContains(t, rootMismatch.Validate(compatibility), "root mismatch")
+}
+
 func TestKeeperIntegrationManifestCoversSDKKeepersHooksAndExportImport(t *testing.T) {
 	compatibility := DefaultCosmosSDKCompatibilityManifest()
 	boundaries := DefaultPoSModuleBoundaryManifest()
@@ -2905,6 +2983,14 @@ func posMigrationPhaseNames(manifest PosMigrationStrategyManifest) []string {
 		out[i] = phase.Name
 	}
 	return out
+}
+
+func countRequiredGovernanceParameters(required map[string][]string) int {
+	total := 0
+	for _, names := range required {
+		total += len(names)
+	}
+	return total
 }
 
 func keeperInterfacesByName(manifest KeeperIntegrationManifest) map[string]KeeperInterfaceSpec {
