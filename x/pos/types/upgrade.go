@@ -98,6 +98,8 @@ type EpochSettlementRoots struct {
 
 type WorkloadTask struct {
 	TaskID             string
+	WorkloadID         string
+	WorkloadType       WorkloadType
 	ZoneID             string
 	ShardID            string
 	WorkloadClass      string
@@ -105,8 +107,22 @@ type WorkloadTask struct {
 	Roles              []ValidatorRole
 }
 
+type WorkloadType string
+
+const (
+	WorkloadTypeGlobalConsensus      WorkloadType = "global_consensus"
+	WorkloadTypeZoneExecution        WorkloadType = "zone_execution"
+	WorkloadTypeShardExecution       WorkloadType = "shard_execution"
+	WorkloadTypeProofVerification    WorkloadType = "proof_verification"
+	WorkloadTypeEvidenceVerification WorkloadType = "evidence_verification"
+	WorkloadTypeDataAvailability     WorkloadType = "data_availability"
+	WorkloadTypeServiceValidation    WorkloadType = "service_validation"
+)
+
 type TaskAssignment struct {
 	TaskID         string
+	WorkloadID     string
+	WorkloadType   WorkloadType
 	ZoneID         string
 	ShardID        string
 	WorkloadClass  string
@@ -120,6 +136,28 @@ type TaskAssignmentSet struct {
 	Seed        string
 	Assignments []TaskAssignment
 	Root        string
+}
+
+type TaskGroup struct {
+	EpochID          uint64
+	TaskGroupID      string
+	WorkloadID       string
+	WorkloadType     WorkloadType
+	ValidatorMembers []string
+	ProposerOrder    []string
+	VerifierSet      []string
+	MinimumGroupSize uint32
+	StakeWeightRoot  string
+	AssignmentSeed   string
+	ActivationHeight uint64
+	ExpiryHeight     uint64
+}
+
+type TaskGroupSet struct {
+	EpochID uint64
+	Seed    string
+	Groups  []TaskGroup
+	Root    string
 }
 
 type DelegationIntent struct {
@@ -1010,6 +1048,8 @@ func BuildTaskAssignments(params Params, epoch EpochRecord, validators []ScoredV
 			selected := selectTaskValidatorIDs(epoch.Seed, task, role, eligible, task.RequiredValidators)
 			assignment := TaskAssignment{
 				TaskID:        task.TaskID,
+				WorkloadID:    task.WorkloadID,
+				WorkloadType:  task.WorkloadType,
 				ZoneID:        task.ZoneID,
 				ShardID:       task.ShardID,
 				WorkloadClass: task.WorkloadClass,
@@ -1028,8 +1068,84 @@ func BuildTaskAssignments(params Params, epoch EpochRecord, validators []ScoredV
 	return out, out.Validate()
 }
 
+func BuildTaskGroups(params Params, epoch EpochRecord, validators []ScoredValidator, tasks []WorkloadTask, activationHeight uint64, expiryHeight uint64) (TaskGroupSet, error) {
+	if activationHeight == 0 {
+		return TaskGroupSet{}, errors.New("task group activation height is required")
+	}
+	if expiryHeight <= activationHeight {
+		return TaskGroupSet{}, errors.New("task group expiry height must be after activation height")
+	}
+	assignments, err := BuildTaskAssignments(params, epoch, validators, tasks)
+	if err != nil {
+		return TaskGroupSet{}, err
+	}
+	if len(tasks) == 0 {
+		return TaskGroupSet{EpochID: epoch.EpochID, Seed: epoch.Seed, Root: PosEmptyRootHash}, nil
+	}
+	validatorByID := make(map[string]ScoredValidator, len(validators))
+	for _, validator := range validators {
+		validatorByID[validator.ValidatorID] = validator
+	}
+	taskByID := make(map[string]WorkloadTask, len(tasks))
+	for _, task := range tasks {
+		normalized := normalizeWorkloadTask(params, task)
+		taskByID[taskKey(normalized)] = normalized
+	}
+	assignmentsByTask := make(map[string][]TaskAssignment)
+	for _, assignment := range assignments.Assignments {
+		key := taskKey(WorkloadTask{
+			TaskID:        assignment.TaskID,
+			WorkloadID:    assignment.WorkloadID,
+			WorkloadType:  assignment.WorkloadType,
+			ZoneID:        assignment.ZoneID,
+			ShardID:       assignment.ShardID,
+			WorkloadClass: assignment.WorkloadClass,
+		})
+		assignmentsByTask[key] = append(assignmentsByTask[key], assignment)
+	}
+	groups := make([]TaskGroup, 0, len(taskByID))
+	taskKeys := sortedStringKeys(taskByID)
+	for _, key := range taskKeys {
+		task := taskByID[key]
+		taskAssignments := assignmentsByTask[key]
+		members := taskGroupMembers(taskAssignments)
+		verifiers := taskGroupVerifiers(taskAssignments, members)
+		group := TaskGroup{
+			EpochID:          epoch.EpochID,
+			WorkloadID:       task.WorkloadID,
+			WorkloadType:     task.WorkloadType,
+			ValidatorMembers: members,
+			ProposerOrder:    taskGroupProposerOrder(epoch.Seed, task, members),
+			VerifierSet:      verifiers,
+			MinimumGroupSize: task.RequiredValidators,
+			StakeWeightRoot:  ComputeTaskGroupStakeWeightRoot(epoch.EpochID, task, members, validatorByID),
+			AssignmentSeed:   epoch.Seed,
+			ActivationHeight: activationHeight,
+			ExpiryHeight:     expiryHeight,
+		}
+		group.TaskGroupID = ComputeTaskGroupID(group)
+		groups = append(groups, group)
+	}
+	sort.SliceStable(groups, func(i, j int) bool {
+		return compareTaskGroups(groups[i], groups[j]) < 0
+	})
+	out := TaskGroupSet{
+		EpochID: epoch.EpochID,
+		Seed:    epoch.Seed,
+		Groups:  groups,
+		Root:    ComputeTaskGroupRoot(epoch.EpochID, epoch.Seed, groups),
+	}
+	return out, out.Validate()
+}
+
 func (t WorkloadTask) Validate(params Params) error {
 	if err := validatePosToken("task id", t.TaskID); err != nil {
+		return err
+	}
+	if err := validatePosToken("task workload id", t.WorkloadID); err != nil {
+		return err
+	}
+	if err := validateWorkloadType(t.WorkloadType); err != nil {
 		return err
 	}
 	if err := validatePosToken("task zone id", t.ZoneID); err != nil {
@@ -1052,6 +1168,12 @@ func (t WorkloadTask) Validate(params Params) error {
 
 func (a TaskAssignment) Validate() error {
 	if err := validatePosToken("assignment task id", a.TaskID); err != nil {
+		return err
+	}
+	if err := validatePosToken("assignment workload id", a.WorkloadID); err != nil {
+		return err
+	}
+	if err := validateWorkloadType(a.WorkloadType); err != nil {
 		return err
 	}
 	if err := validatePosToken("assignment zone id", a.ZoneID); err != nil {
@@ -1116,11 +1238,90 @@ func (s TaskAssignmentSet) Validate() error {
 	return nil
 }
 
+func (g TaskGroup) Validate() error {
+	if g.EpochID == 0 {
+		return errors.New("task group epoch id is required")
+	}
+	if err := validatePosToken("task group id", g.TaskGroupID); err != nil {
+		return err
+	}
+	if err := validatePosToken("task group workload id", g.WorkloadID); err != nil {
+		return err
+	}
+	if err := validateWorkloadType(g.WorkloadType); err != nil {
+		return err
+	}
+	if len(g.ValidatorMembers) < int(g.MinimumGroupSize) {
+		return errors.New("task group members below minimum group size")
+	}
+	if err := validateCanonicalValidatorIDs("task group member", g.ValidatorMembers); err != nil {
+		return err
+	}
+	if len(g.ProposerOrder) != len(g.ValidatorMembers) {
+		return errors.New("task group proposer order must include every member")
+	}
+	if err := validateValidatorIDSet("task group proposer", g.ProposerOrder, g.ValidatorMembers); err != nil {
+		return err
+	}
+	if len(g.VerifierSet) == 0 {
+		return errors.New("task group verifier set is required")
+	}
+	if err := validateCanonicalValidatorIDs("task group verifier", g.VerifierSet); err != nil {
+		return err
+	}
+	if err := validateValidatorIDSubset("task group verifier", g.VerifierSet, g.ValidatorMembers); err != nil {
+		return err
+	}
+	if err := validatePosHash("task group stake weight root", g.StakeWeightRoot); err != nil {
+		return err
+	}
+	if err := validatePosHash("task group assignment seed", g.AssignmentSeed); err != nil {
+		return err
+	}
+	if g.ActivationHeight == 0 {
+		return errors.New("task group activation height is required")
+	}
+	if g.ExpiryHeight <= g.ActivationHeight {
+		return errors.New("task group expiry height must be after activation height")
+	}
+	if expected := ComputeTaskGroupID(g); g.TaskGroupID != expected {
+		return errors.New("task group id mismatch")
+	}
+	return nil
+}
+
+func (s TaskGroupSet) Validate() error {
+	if err := validatePosHash("task group set seed", s.Seed); err != nil {
+		return err
+	}
+	if err := validatePosHash("task group set root", s.Root); err != nil {
+		return err
+	}
+	for i, group := range s.Groups {
+		if err := group.Validate(); err != nil {
+			return err
+		}
+		if i > 0 && compareTaskGroups(s.Groups[i-1], group) >= 0 {
+			return errors.New("task groups must be sorted canonically")
+		}
+	}
+	expectedRoot := PosEmptyRootHash
+	if len(s.Groups) > 0 {
+		expectedRoot = ComputeTaskGroupRoot(s.EpochID, s.Seed, s.Groups)
+	}
+	if s.Root != expectedRoot {
+		return errors.New("task group root mismatch")
+	}
+	return nil
+}
+
 func ComputeTaskAssignmentHash(epochID uint64, seed string, assignment TaskAssignment) string {
 	return posHashRoot("aetheris-pos-task-assignment-v1", func(w posByteWriter) {
 		posWriteUint64(w, epochID)
 		posWritePart(w, seed)
 		posWritePart(w, assignment.TaskID)
+		posWritePart(w, assignment.WorkloadID)
+		posWritePart(w, string(assignment.WorkloadType))
 		posWritePart(w, assignment.ZoneID)
 		posWritePart(w, assignment.ShardID)
 		posWritePart(w, assignment.WorkloadClass)
@@ -1139,6 +1340,45 @@ func ComputeTaskAssignmentRoot(epochID uint64, seed string, assignments []TaskAs
 		posWriteUint64(w, uint64(len(assignments)))
 		for _, assignment := range assignments {
 			posWritePart(w, assignment.AssignmentHash)
+		}
+	})
+}
+
+func ComputeTaskGroupID(group TaskGroup) string {
+	return posHashRoot("aetheris-pos-task-group-id-v1", func(w posByteWriter) {
+		posWriteUint64(w, group.EpochID)
+		posWritePart(w, group.WorkloadID)
+		posWritePart(w, string(group.WorkloadType))
+		posWritePart(w, group.AssignmentSeed)
+		posWriteUint64(w, group.ActivationHeight)
+		posWriteUint64(w, group.ExpiryHeight)
+	})
+}
+
+func ComputeTaskGroupStakeWeightRoot(epochID uint64, task WorkloadTask, members []string, validators map[string]ScoredValidator) string {
+	return posHashRoot("aetheris-pos-task-group-stake-root-v1", func(w posByteWriter) {
+		posWriteUint64(w, epochID)
+		posWritePart(w, task.TaskID)
+		posWritePart(w, task.WorkloadID)
+		posWritePart(w, string(task.WorkloadType))
+		posWriteUint64(w, uint64(len(members)))
+		for _, validatorID := range members {
+			validator := validators[validatorID]
+			posWritePart(w, validatorID)
+			posWritePart(w, validator.ScoreComponents.StakeWeightNaet.String())
+			posWritePart(w, validator.VotingPowerNaet.String())
+		}
+	})
+}
+
+func ComputeTaskGroupRoot(epochID uint64, seed string, groups []TaskGroup) string {
+	return posHashRoot("aetheris-pos-task-group-root-v1", func(w posByteWriter) {
+		posWriteUint64(w, epochID)
+		posWritePart(w, seed)
+		posWriteUint64(w, uint64(len(groups)))
+		for _, group := range groups {
+			posWritePart(w, group.TaskGroupID)
+			posWritePart(w, group.StakeWeightRoot)
 		}
 	})
 }
@@ -1495,6 +1735,12 @@ func normalizedRoles(roles []ValidatorRole, defaults []ValidatorRole) []Validato
 
 func normalizeWorkloadTask(params Params, task WorkloadTask) WorkloadTask {
 	out := task
+	if out.WorkloadID == "" {
+		out.WorkloadID = out.TaskID
+	}
+	if out.WorkloadType == "" {
+		out.WorkloadType = WorkloadTypeServiceValidation
+	}
 	if out.WorkloadClass == "" {
 		out.WorkloadClass = DefaultWorkloadClass
 	}
@@ -1506,6 +1752,21 @@ func normalizeWorkloadTask(params Params, task WorkloadTask) WorkloadTask {
 	}
 	out.Roles = normalizedRoles(out.Roles, DefaultTaskRoles())
 	return out
+}
+
+func validateWorkloadType(workloadType WorkloadType) error {
+	switch workloadType {
+	case WorkloadTypeGlobalConsensus,
+		WorkloadTypeZoneExecution,
+		WorkloadTypeShardExecution,
+		WorkloadTypeProofVerification,
+		WorkloadTypeEvidenceVerification,
+		WorkloadTypeDataAvailability,
+		WorkloadTypeServiceValidation:
+		return nil
+	default:
+		return fmt.Errorf("unsupported workload type %q", workloadType)
+	}
 }
 
 func validatorsForRole(validators []ScoredValidator, role ValidatorRole) []ScoredValidator {
@@ -1532,6 +1793,8 @@ func selectTaskValidatorIDs(seed string, task WorkloadTask, role ValidatorRole, 
 			rankHash: posHashRoot("aetheris-pos-task-rank-v1", func(w posByteWriter) {
 				posWritePart(w, seed)
 				posWritePart(w, task.TaskID)
+				posWritePart(w, task.WorkloadID)
+				posWritePart(w, string(task.WorkloadType))
 				posWritePart(w, task.ZoneID)
 				posWritePart(w, task.ShardID)
 				posWritePart(w, string(role))
@@ -1558,11 +1821,137 @@ func selectTaskValidatorIDs(seed string, task WorkloadTask, role ValidatorRole, 
 	return selected
 }
 
+func taskKey(task WorkloadTask) string {
+	return strings.Join([]string{task.TaskID, task.WorkloadID, string(task.WorkloadType), task.ZoneID, task.ShardID, task.WorkloadClass}, "|")
+}
+
+func taskGroupMembers(assignments []TaskAssignment) []string {
+	seen := make(map[string]struct{})
+	for _, assignment := range assignments {
+		for _, validatorID := range assignment.Validators {
+			seen[validatorID] = struct{}{}
+		}
+	}
+	members := make([]string, 0, len(seen))
+	for validatorID := range seen {
+		members = append(members, validatorID)
+	}
+	sort.Strings(members)
+	return members
+}
+
+func taskGroupVerifiers(assignments []TaskAssignment, members []string) []string {
+	seen := make(map[string]struct{})
+	for _, assignment := range assignments {
+		if assignment.Role == ValidatorRoleVerifier || assignment.Role == ValidatorRoleEvidenceReviewer {
+			for _, validatorID := range assignment.Validators {
+				seen[validatorID] = struct{}{}
+			}
+		}
+	}
+	if len(seen) == 0 {
+		for _, validatorID := range members {
+			seen[validatorID] = struct{}{}
+		}
+	}
+	verifiers := make([]string, 0, len(seen))
+	for validatorID := range seen {
+		verifiers = append(verifiers, validatorID)
+	}
+	sort.Strings(verifiers)
+	return verifiers
+}
+
+func taskGroupProposerOrder(seed string, task WorkloadTask, members []string) []string {
+	type proposerRank struct {
+		validatorID string
+		hash        string
+	}
+	ranks := make([]proposerRank, len(members))
+	for i, validatorID := range members {
+		ranks[i] = proposerRank{
+			validatorID: validatorID,
+			hash: posHashRoot("aetheris-pos-task-group-proposer-v1", func(w posByteWriter) {
+				posWritePart(w, seed)
+				posWritePart(w, task.TaskID)
+				posWritePart(w, task.WorkloadID)
+				posWritePart(w, string(task.WorkloadType))
+				posWritePart(w, validatorID)
+			}),
+		}
+	}
+	sort.SliceStable(ranks, func(i, j int) bool {
+		if ranks[i].hash != ranks[j].hash {
+			return ranks[i].hash < ranks[j].hash
+		}
+		return ranks[i].validatorID < ranks[j].validatorID
+	})
+	out := make([]string, len(ranks))
+	for i, rank := range ranks {
+		out[i] = rank.validatorID
+	}
+	return out
+}
+
+func validateCanonicalValidatorIDs(fieldName string, validatorIDs []string) error {
+	if len(validatorIDs) == 0 {
+		return fmt.Errorf("%s ids are required", fieldName)
+	}
+	seen := make(map[string]struct{}, len(validatorIDs))
+	var previous string
+	for i, validatorID := range validatorIDs {
+		if err := validatePosToken(fieldName+" id", validatorID); err != nil {
+			return err
+		}
+		if _, found := seen[validatorID]; found {
+			return fmt.Errorf("duplicate %s id %q", fieldName, validatorID)
+		}
+		seen[validatorID] = struct{}{}
+		if i > 0 && previous >= validatorID {
+			return fmt.Errorf("%s ids must be sorted canonically", fieldName)
+		}
+		previous = validatorID
+	}
+	return nil
+}
+
+func validateValidatorIDSet(fieldName string, values []string, expectedMembers []string) error {
+	if len(values) != len(expectedMembers) {
+		return fmt.Errorf("%s ids must include every task group member", fieldName)
+	}
+	return validateValidatorIDSubset(fieldName, values, expectedMembers)
+}
+
+func validateValidatorIDSubset(fieldName string, values []string, members []string) error {
+	memberSet := make(map[string]struct{}, len(members))
+	for _, member := range members {
+		memberSet[member] = struct{}{}
+	}
+	for _, value := range values {
+		if _, found := memberSet[value]; !found {
+			return fmt.Errorf("%s id %q is not a task group member", fieldName, value)
+		}
+	}
+	return nil
+}
+
 func compareWorkloadTasks(left, right WorkloadTask) int {
 	if left.TaskID < right.TaskID {
 		return -1
 	}
 	if left.TaskID > right.TaskID {
+		return 1
+	}
+	if left.WorkloadID < right.WorkloadID {
+		return -1
+	}
+	if left.WorkloadID > right.WorkloadID {
+		return 1
+	}
+	if left.WorkloadType < right.WorkloadType {
+		return -1
+	}
+	if left.WorkloadType > right.WorkloadType {
 		return 1
 	}
 	if left.ZoneID < right.ZoneID {
@@ -1577,13 +1966,19 @@ func compareWorkloadTasks(left, right WorkloadTask) int {
 	if left.ShardID > right.ShardID {
 		return 1
 	}
+	if left.WorkloadClass < right.WorkloadClass {
+		return -1
+	}
+	if left.WorkloadClass > right.WorkloadClass {
+		return 1
+	}
 	return 0
 }
 
 func compareTaskAssignments(left, right TaskAssignment) int {
 	if cmp := compareWorkloadTasks(
-		WorkloadTask{TaskID: left.TaskID, ZoneID: left.ZoneID, ShardID: left.ShardID},
-		WorkloadTask{TaskID: right.TaskID, ZoneID: right.ZoneID, ShardID: right.ShardID},
+		WorkloadTask{TaskID: left.TaskID, WorkloadID: left.WorkloadID, WorkloadType: left.WorkloadType, ZoneID: left.ZoneID, ShardID: left.ShardID, WorkloadClass: left.WorkloadClass},
+		WorkloadTask{TaskID: right.TaskID, WorkloadID: right.WorkloadID, WorkloadType: right.WorkloadType, ZoneID: right.ZoneID, ShardID: right.ShardID, WorkloadClass: right.WorkloadClass},
 	); cmp != 0 {
 		return cmp
 	}
@@ -1591,6 +1986,34 @@ func compareTaskAssignments(left, right TaskAssignment) int {
 		return -1
 	}
 	if left.Role > right.Role {
+		return 1
+	}
+	return 0
+}
+
+func compareTaskGroups(left, right TaskGroup) int {
+	if left.EpochID < right.EpochID {
+		return -1
+	}
+	if left.EpochID > right.EpochID {
+		return 1
+	}
+	if left.WorkloadID < right.WorkloadID {
+		return -1
+	}
+	if left.WorkloadID > right.WorkloadID {
+		return 1
+	}
+	if left.WorkloadType < right.WorkloadType {
+		return -1
+	}
+	if left.WorkloadType > right.WorkloadType {
+		return 1
+	}
+	if left.TaskGroupID < right.TaskGroupID {
+		return -1
+	}
+	if left.TaskGroupID > right.TaskGroupID {
 		return 1
 	}
 	return 0

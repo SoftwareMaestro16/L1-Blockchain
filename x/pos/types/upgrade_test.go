@@ -423,6 +423,102 @@ func TestTaskAssignmentsAreSeededRoleAwareAndStable(t *testing.T) {
 	require.ErrorContains(t, err, "committed validator set hash")
 }
 
+func TestTaskGroupsCaptureWorkloadDomainsAndStakeRoots(t *testing.T) {
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	params.MinTaskGroupValidators = 2
+	params.MaxTaskGroupValidators = 4
+
+	candidates := makeCandidates(4, 1_000)
+	candidates[0].Roles = []ValidatorRole{ValidatorRoleBlockProducer, ValidatorRoleVerifier, ValidatorRoleCollator}
+	candidates[1].Roles = []ValidatorRole{ValidatorRoleVerifier, ValidatorRoleEvidenceReviewer}
+	candidates[2].Roles = []ValidatorRole{ValidatorRoleCollator, ValidatorRoleVerifier}
+	candidates[3].Roles = []ValidatorRole{ValidatorRoleEvidenceReviewer, ValidatorRoleVerifier}
+	validators := scoredCandidates(t, params, candidates)
+	epoch, err := NewEpochRecord(params, 4, 40, 59, EpochPhaseAssignment, "", validators)
+	require.NoError(t, err)
+
+	tasks := []WorkloadTask{
+		{
+			TaskID:             "zone-exec-a",
+			WorkloadID:         "zone-alpha",
+			WorkloadType:       WorkloadTypeZoneExecution,
+			ZoneID:             "ZONE-A",
+			ShardID:            "shard-0",
+			WorkloadClass:      "execution",
+			RequiredValidators: 2,
+			Roles:              []ValidatorRole{ValidatorRoleVerifier, ValidatorRoleCollator},
+		},
+		{
+			TaskID:             "evidence-a",
+			WorkloadID:         "evidence-market",
+			WorkloadType:       WorkloadTypeEvidenceVerification,
+			ZoneID:             "GLOBAL",
+			ShardID:            "evidence",
+			WorkloadClass:      "evidence",
+			RequiredValidators: 2,
+			Roles:              []ValidatorRole{ValidatorRoleEvidenceReviewer, ValidatorRoleVerifier},
+		},
+	}
+	left, err := BuildTaskGroups(params, epoch, validators, tasks, 41, 60)
+	require.NoError(t, err)
+	right, err := BuildTaskGroups(params, epoch, validators, tasks, 41, 60)
+	require.NoError(t, err)
+	require.Equal(t, left.Root, right.Root)
+	require.Len(t, left.Groups, 2)
+	require.NoError(t, left.Validate())
+
+	group := left.Groups[0]
+	require.Equal(t, uint64(4), group.EpochID)
+	require.NotEmpty(t, group.TaskGroupID)
+	require.Contains(t, []WorkloadType{WorkloadTypeEvidenceVerification, WorkloadTypeZoneExecution}, group.WorkloadType)
+	require.GreaterOrEqual(t, len(group.ValidatorMembers), int(group.MinimumGroupSize))
+	require.Len(t, group.ProposerOrder, len(group.ValidatorMembers))
+	require.NotEmpty(t, group.VerifierSet)
+	require.Len(t, group.StakeWeightRoot, PosHashHexLength)
+	require.Equal(t, epoch.Seed, group.AssignmentSeed)
+	require.Equal(t, uint64(41), group.ActivationHeight)
+	require.Equal(t, uint64(60), group.ExpiryHeight)
+}
+
+func TestTaskGroupsValidateWorkloadTypesAndHeightWindow(t *testing.T) {
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	params.MinTaskGroupValidators = 2
+	params.MaxTaskGroupValidators = 3
+	candidates := makeCandidates(3, 1_000)
+	for i := range candidates {
+		candidates[i].Roles = []ValidatorRole{ValidatorRoleVerifier}
+	}
+	validators := scoredCandidates(t, params, candidates)
+	epoch, err := NewEpochRecord(params, 5, 50, 70, EpochPhaseAssignment, "", validators)
+	require.NoError(t, err)
+
+	_, err = BuildTaskGroups(params, epoch, validators, []WorkloadTask{{
+		TaskID:             "bad-workload",
+		WorkloadID:         "bad-workload",
+		WorkloadType:       WorkloadType("invalid"),
+		ZoneID:             "GLOBAL",
+		ShardID:            "shard",
+		WorkloadClass:      "class",
+		RequiredValidators: 2,
+		Roles:              []ValidatorRole{ValidatorRoleVerifier},
+	}}, 51, 70)
+	require.ErrorContains(t, err, "unsupported workload type")
+
+	_, err = BuildTaskGroups(params, epoch, validators, []WorkloadTask{{
+		TaskID:             "proof-a",
+		WorkloadID:         "proof-a",
+		WorkloadType:       WorkloadTypeProofVerification,
+		ZoneID:             "GLOBAL",
+		ShardID:            "proof",
+		WorkloadClass:      "proof",
+		RequiredValidators: 2,
+		Roles:              []ValidatorRole{ValidatorRoleVerifier},
+	}}, 70, 70)
+	require.ErrorContains(t, err, "expiry height")
+}
+
 func TestDelegationIntentsRespectActivationDelayAndRiskProfile(t *testing.T) {
 	params := DefaultParams()
 	params.DelegationActivationEpochs = 2
