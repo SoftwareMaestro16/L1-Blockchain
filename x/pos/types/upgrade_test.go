@@ -989,6 +989,99 @@ func TestWorkloadRewardsSplitByRoleAndCompletedUnits(t *testing.T) {
 	require.Len(t, settlement.RewardRoot, PosHashHexLength)
 }
 
+func TestValidatorRoleExpansionAndRoleRecordFields(t *testing.T) {
+	require.Equal(t, []ValidatorRole{
+		ValidatorRoleValidator,
+		ValidatorRoleProposer,
+		ValidatorRoleVerifier,
+		ValidatorRoleEvidenceReporter,
+		ValidatorRoleDelegationOperator,
+		ValidatorRoleCollator,
+		ValidatorRoleFisherman,
+	}, ValidatorRoleValues())
+	require.Equal(t, []string{
+		"validator_address",
+		"role",
+		"epoch_id",
+		"status",
+		"eligibility_score",
+		"capacity",
+		"assigned_task_count",
+		"performance_score",
+	}, RoleRecordFieldNames())
+	require.Equal(t, []string{
+		RoleStatusEligible,
+		RoleStatusAssigned,
+		RoleStatusSuspended,
+		RoleStatusInactive,
+	}, RoleStatusValues())
+	for _, role := range ValidatorRoleValues() {
+		require.NoError(t, validateValidatorRole(role))
+	}
+}
+
+func TestRoleRecordsAllowOverlapButRejectDuplicateRoleForEpoch(t *testing.T) {
+	capacity := ValidatorCapacity{MaxTaskGroups: 3, SupportedWorkloads: []WorkloadType{WorkloadTypeProofVerification}, AvailabilityCommitment: 9_000}
+	verifier, err := NewRoleRecord(RoleRecord{
+		ValidatorAddress:  "val-a",
+		Role:              ValidatorRoleVerifier,
+		EpochID:           12,
+		Status:            RoleStatusAssigned,
+		EligibilityScore:  9_500,
+		Capacity:          capacity,
+		AssignedTaskCount: 2,
+		PerformanceScore:  9_700,
+	})
+	require.NoError(t, err)
+	reporter, err := NewRoleRecord(RoleRecord{
+		ValidatorAddress:  "val-a",
+		Role:              ValidatorRoleEvidenceReporter,
+		EpochID:           12,
+		Status:            RoleStatusEligible,
+		EligibilityScore:  9_300,
+		Capacity:          capacity,
+		AssignedTaskCount: 0,
+		PerformanceScore:  9_400,
+	})
+	require.NoError(t, err)
+	require.NoError(t, ValidateRoleRecords([]RoleRecord{verifier, reporter}))
+
+	duplicate := reporter
+	duplicate.PerformanceScore = 9_200
+	require.ErrorContains(t, ValidateRoleRecords([]RoleRecord{reporter, duplicate}), "duplicate role record")
+}
+
+func TestRoleRecordRejectsCapacityOverflowAndInvalidScores(t *testing.T) {
+	_, err := NewRoleRecord(RoleRecord{
+		ValidatorAddress:  "val-a",
+		Role:              ValidatorRoleCollator,
+		EpochID:           12,
+		Status:            RoleStatusAssigned,
+		EligibilityScore:  9_500,
+		Capacity:          ValidatorCapacity{MaxTaskGroups: 1, SupportedWorkloads: []WorkloadType{WorkloadTypeShardExecution}},
+		AssignedTaskCount: 2,
+		PerformanceScore:  9_000,
+	})
+	require.ErrorContains(t, err, "exceeds capacity")
+
+	_, err = NewRoleRecord(RoleRecord{
+		ValidatorAddress: "val-a",
+		Role:             ValidatorRoleFisherman,
+		EpochID:          12,
+		Status:           RoleStatusEligible,
+		EligibilityScore: BasisPoints + 1,
+	})
+	require.ErrorContains(t, err, "eligibility score")
+
+	_, err = NewRoleRecord(RoleRecord{
+		ValidatorAddress: "val-a",
+		Role:             ValidatorRoleProposer,
+		EpochID:          12,
+		Status:           RoleStatusAssigned,
+	})
+	require.ErrorContains(t, err, "assigned task count")
+}
+
 func scoredCandidates(t *testing.T, params Params, candidates []Candidate) []ScoredValidator {
 	t.Helper()
 	validators := make([]ScoredValidator, len(candidates))

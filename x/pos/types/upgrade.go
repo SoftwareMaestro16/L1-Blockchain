@@ -48,11 +48,34 @@ const (
 type ValidatorRole string
 
 const (
-	ValidatorRoleBlockProducer    ValidatorRole = "block_producer"
-	ValidatorRoleVerifier         ValidatorRole = "verifier"
-	ValidatorRoleCollator         ValidatorRole = "collator"
-	ValidatorRoleEvidenceReviewer ValidatorRole = "evidence_reviewer"
+	ValidatorRoleValidator          ValidatorRole = "validator"
+	ValidatorRoleProposer           ValidatorRole = "proposer"
+	ValidatorRoleBlockProducer      ValidatorRole = "block_producer"
+	ValidatorRoleVerifier           ValidatorRole = "verifier"
+	ValidatorRoleEvidenceReporter   ValidatorRole = "evidence_reporter"
+	ValidatorRoleCollator           ValidatorRole = "collator"
+	ValidatorRoleDelegationOperator ValidatorRole = "delegation_operator"
+	ValidatorRoleFisherman          ValidatorRole = "fisherman"
+	ValidatorRoleEvidenceReviewer   ValidatorRole = "evidence_reviewer"
 )
+
+const (
+	RoleStatusEligible  = "eligible"
+	RoleStatusAssigned  = "assigned"
+	RoleStatusSuspended = "suspended"
+	RoleStatusInactive  = "inactive"
+)
+
+type RoleRecord struct {
+	ValidatorAddress  string
+	Role              ValidatorRole
+	EpochID           uint64
+	Status            string
+	EligibilityScore  uint32
+	Capacity          ValidatorCapacity
+	AssignedTaskCount uint32
+	PerformanceScore  uint32
+}
 
 type ValidatorCapacity struct {
 	MaxTaskGroups          uint32
@@ -2459,11 +2482,105 @@ func ValidatorSupportsRole(candidate Candidate, role ValidatorRole) bool {
 	return false
 }
 
+func ValidatorRoleValues() []ValidatorRole {
+	return []ValidatorRole{
+		ValidatorRoleValidator,
+		ValidatorRoleProposer,
+		ValidatorRoleVerifier,
+		ValidatorRoleEvidenceReporter,
+		ValidatorRoleDelegationOperator,
+		ValidatorRoleCollator,
+		ValidatorRoleFisherman,
+	}
+}
+
+func RoleRecordFieldNames() []string {
+	return []string{
+		"validator_address",
+		"role",
+		"epoch_id",
+		"status",
+		"eligibility_score",
+		"capacity",
+		"assigned_task_count",
+		"performance_score",
+	}
+}
+
+func RoleStatusValues() []string {
+	return []string{
+		RoleStatusEligible,
+		RoleStatusAssigned,
+		RoleStatusSuspended,
+		RoleStatusInactive,
+	}
+}
+
+func NewRoleRecord(record RoleRecord) (RoleRecord, error) {
+	record.ValidatorAddress = strings.TrimSpace(record.ValidatorAddress)
+	record.Status = strings.TrimSpace(record.Status)
+	if record.Status == "" {
+		record.Status = RoleStatusEligible
+	}
+	return record, record.Validate()
+}
+
+func (r RoleRecord) Validate() error {
+	if err := validatePosToken("role record validator address", r.ValidatorAddress); err != nil {
+		return err
+	}
+	if err := validateValidatorRole(r.Role); err != nil {
+		return err
+	}
+	if r.EpochID == 0 {
+		return errors.New("role record epoch id is required")
+	}
+	if err := validateRoleStatus(r.Status); err != nil {
+		return err
+	}
+	if r.EligibilityScore > BasisPoints {
+		return fmt.Errorf("role record eligibility score must be <= %d bps", BasisPoints)
+	}
+	if r.PerformanceScore > BasisPoints {
+		return fmt.Errorf("role record performance score must be <= %d bps", BasisPoints)
+	}
+	if err := r.Capacity.Validate(); err != nil {
+		return err
+	}
+	if r.Capacity.MaxTaskGroups > 0 && r.AssignedTaskCount > r.Capacity.MaxTaskGroups {
+		return errors.New("role record assigned task count exceeds capacity")
+	}
+	if r.Status == RoleStatusAssigned && r.AssignedTaskCount == 0 {
+		return errors.New("assigned role record requires assigned task count")
+	}
+	return nil
+}
+
+func ValidateRoleRecords(records []RoleRecord) error {
+	seen := make(map[string]struct{}, len(records))
+	for _, record := range records {
+		if err := record.Validate(); err != nil {
+			return err
+		}
+		key := fmt.Sprintf("%s|%s|%d", record.ValidatorAddress, record.Role, record.EpochID)
+		if _, found := seen[key]; found {
+			return fmt.Errorf("duplicate role record %s", key)
+		}
+		seen[key] = struct{}{}
+	}
+	return nil
+}
+
 func AllValidatorRoles() []ValidatorRole {
 	return []ValidatorRole{
+		ValidatorRoleValidator,
+		ValidatorRoleProposer,
 		ValidatorRoleBlockProducer,
 		ValidatorRoleVerifier,
+		ValidatorRoleEvidenceReporter,
+		ValidatorRoleDelegationOperator,
 		ValidatorRoleCollator,
+		ValidatorRoleFisherman,
 		ValidatorRoleEvidenceReviewer,
 	}
 }
@@ -2483,10 +2600,27 @@ func validateEpochPhase(phase EpochPhase) error {
 
 func validateValidatorRole(role ValidatorRole) error {
 	switch role {
-	case ValidatorRoleBlockProducer, ValidatorRoleVerifier, ValidatorRoleCollator, ValidatorRoleEvidenceReviewer:
+	case ValidatorRoleValidator,
+		ValidatorRoleProposer,
+		ValidatorRoleBlockProducer,
+		ValidatorRoleVerifier,
+		ValidatorRoleEvidenceReporter,
+		ValidatorRoleDelegationOperator,
+		ValidatorRoleCollator,
+		ValidatorRoleFisherman,
+		ValidatorRoleEvidenceReviewer:
 		return nil
 	default:
 		return fmt.Errorf("unsupported validator role %q", role)
+	}
+}
+
+func validateRoleStatus(status string) error {
+	switch status {
+	case RoleStatusEligible, RoleStatusAssigned, RoleStatusSuspended, RoleStatusInactive:
+		return nil
+	default:
+		return fmt.Errorf("unsupported role status %q", status)
 	}
 }
 
