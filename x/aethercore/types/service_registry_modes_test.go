@@ -119,3 +119,126 @@ func TestOnChainRegistryRejectsMissingOwnerAuthorization(t *testing.T) {
 	_, err = BuildServiceRegistryModeState(ServiceRegistryOnChain, []ServiceDescriptor{service}, nil, 10)
 	require.ErrorContains(t, err, "requires owner authorization")
 }
+
+func TestDistributedRegistryMeshStoresSignedAdvisoryCache(t *testing.T) {
+	service := testOffChainService("indexer-feed", ZoneIDApplication)
+	service.Discovery.ProviderRoot = testHash(service.ServiceID + "/providers")
+	providerID := "provider-alpha"
+	signatureHash := ComputeMeshServiceRegistryAdvertisementSignatureHash(
+		service.ServiceID,
+		service.Owner,
+		providerID,
+		ComputeServiceDescriptorHash(service),
+		30,
+	)
+
+	advertisement, err := NewMeshServiceRegistryAdvertisement(
+		service,
+		providerID,
+		service.Execution.Endpoint,
+		"aetheris.services.v1",
+		signatureHash,
+		30,
+	)
+	require.NoError(t, err)
+	require.Equal(t, service.ServiceID, advertisement.ServiceID)
+	require.Equal(t, service.Owner, advertisement.Owner)
+	require.Equal(t, providerID, advertisement.ProviderID)
+	require.Equal(t, service.Execution.Endpoint, advertisement.Endpoint)
+	require.Equal(t, ComputeServiceDescriptorHash(service), advertisement.DescriptorHash)
+	require.Equal(t, service.Interface.InterfaceHash, advertisement.InterfaceHash)
+	require.Equal(t, service.Discovery.ProviderRoot, advertisement.ProviderRoot)
+	require.Equal(t, signatureHash, advertisement.SignatureHash)
+	require.False(t, advertisement.HasAnchorProof())
+	require.NoError(t, VerifyMeshServiceRegistryAdvertisementDescriptor(advertisement, service))
+
+	cacheRecord, err := NewMeshServiceRegistryCacheRecord(advertisement, 88, 31)
+	require.NoError(t, err)
+	require.True(t, cacheRecord.AdvisoryOnly)
+	require.Equal(t, uint64(88), cacheRecord.LocalReputation)
+	require.Equal(t, service.ExpiryHeight, cacheRecord.ExpiryHeight)
+
+	meshState, err := BuildDistributedRegistryMeshState([]MeshServiceRegistryCacheRecord{cacheRecord}, 31)
+	require.NoError(t, err)
+	require.Equal(t, ServiceRegistryMesh, meshState.Mode)
+	require.Len(t, meshState.MeshRecords, 1)
+	require.Empty(t, meshState.OnChainStates)
+	require.Empty(t, meshState.HybridAnchors)
+	require.NoError(t, meshState.Validate())
+
+	lookup, proof, found := meshState.MeshLookup(service.ServiceID)
+	require.True(t, found)
+	require.True(t, lookup.AdvisoryOnly)
+	require.Equal(t, cacheRecord.CacheHash, proof.RecordHash)
+	require.Equal(t, ServiceRegistryMesh, proof.RegistryMode)
+	require.Equal(t, meshState.StateRoot, proof.RegistryRoot)
+	require.NoError(t, proof.Validate())
+}
+
+func TestDistributedRegistryMeshLookupCarriesAnchorProofWhenPresent(t *testing.T) {
+	service := testOffChainService("indexer-feed", ZoneIDApplication)
+	service.Discovery.ProviderRoot = testHash(service.ServiceID + "/providers")
+	hybridState, err := BuildServiceRegistryModeState(ServiceRegistryHybrid, []ServiceDescriptor{service}, nil, 20)
+	require.NoError(t, err)
+	_, anchorProof, found := hybridState.HybridAnchorByID(service.ServiceID)
+	require.True(t, found)
+
+	providerID := "provider-alpha"
+	signatureHash := ComputeMeshServiceRegistryAdvertisementSignatureHash(
+		service.ServiceID,
+		service.Owner,
+		providerID,
+		ComputeServiceDescriptorHash(service),
+		30,
+	)
+	advertisement, err := NewMeshServiceRegistryAdvertisement(service, providerID, service.Execution.Endpoint, "aetheris.services.v1", signatureHash, 30)
+	require.NoError(t, err)
+	advertisement, err = AttachMeshServiceRegistryAnchorProof(advertisement, anchorProof)
+	require.NoError(t, err)
+	require.True(t, advertisement.HasAnchorProof())
+
+	cacheRecord, err := NewMeshServiceRegistryCacheRecord(advertisement, 91, 31)
+	require.NoError(t, err)
+	meshState, err := BuildDistributedRegistryMeshState([]MeshServiceRegistryCacheRecord{cacheRecord}, 31)
+	require.NoError(t, err)
+
+	lookup, _, found := meshState.MeshLookup(service.ServiceID)
+	require.True(t, found)
+	require.True(t, lookup.Advertisement.HasAnchorProof())
+	require.Equal(t, anchorProof.ProofHash, lookup.Advertisement.AnchorProof.ProofHash)
+	require.NoError(t, lookup.Validate())
+}
+
+func TestDistributedRegistryMeshRejectsUnsignedExpiredOrConsensusCache(t *testing.T) {
+	service := testOffChainService("indexer-feed", ZoneIDApplication)
+	service.Discovery.ProviderRoot = testHash(service.ServiceID + "/providers")
+	providerID := "provider-alpha"
+
+	_, err := NewMeshServiceRegistryAdvertisement(service, providerID, service.Execution.Endpoint, "aetheris.services.v1", "", 30)
+	require.ErrorContains(t, err, "signature")
+
+	signatureHash := ComputeMeshServiceRegistryAdvertisementSignatureHash(
+		service.ServiceID,
+		service.Owner,
+		providerID,
+		ComputeServiceDescriptorHash(service),
+		30,
+	)
+	advertisement, err := NewMeshServiceRegistryAdvertisement(service, providerID, service.Execution.Endpoint, "aetheris.services.v1", signatureHash, 30)
+	require.NoError(t, err)
+
+	_, err = NewMeshServiceRegistryCacheRecord(advertisement, 10, service.ExpiryHeight)
+	require.ErrorContains(t, err, "expired")
+
+	cacheRecord, err := NewMeshServiceRegistryCacheRecord(advertisement, 10, 31)
+	require.NoError(t, err)
+	cacheRecord.AdvisoryOnly = false
+	cacheRecord.CacheHash = ComputeMeshServiceRegistryCacheRecordHash(cacheRecord)
+	require.ErrorContains(t, cacheRecord.Validate(), "advisory")
+
+	tampered := service
+	tampered.Version = 2
+	tampered.Interface.Version = 2
+	tampered.Interface.InterfaceHash = ComputeServiceInterfaceHash(tampered.Interface)
+	require.ErrorContains(t, VerifyMeshServiceRegistryAdvertisementDescriptor(advertisement, tampered), "descriptor hash")
+}

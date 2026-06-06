@@ -31,10 +31,37 @@ type HybridServiceRegistryAnchor struct {
 	AnchorHash        string
 }
 
+type MeshServiceRegistryAdvertisement struct {
+	ServiceID         string
+	Owner             string
+	ProviderID        string
+	Endpoint          string
+	DescriptorHash    string
+	InterfaceHash     string
+	ProviderRoot      string
+	GossipTopic       string
+	IndexerNodeID     string
+	SignatureHash     string
+	AnchorProof       ServiceRegistryProof
+	AdvertisedHeight  uint64
+	ExpiryHeight      uint64
+	AdvertisementHash string
+}
+
+type MeshServiceRegistryCacheRecord struct {
+	Advertisement   MeshServiceRegistryAdvertisement
+	AdvisoryOnly    bool
+	LocalReputation uint64
+	CachedHeight    uint64
+	ExpiryHeight    uint64
+	CacheHash       string
+}
+
 type ServiceRegistryModeState struct {
 	Mode          ServiceRegistryMode
 	OnChainStates []OnChainServiceRegistryState
 	HybridAnchors []HybridServiceRegistryAnchor
+	MeshRecords   []MeshServiceRegistryCacheRecord
 	StateRoot     string
 	UpdatedHeight uint64
 }
@@ -116,9 +143,86 @@ func BuildServiceRegistryModeState(mode ServiceRegistryMode, descriptors []Servi
 			state.HybridAnchors = append(state.HybridAnchors, anchor)
 		}
 		sortHybridServiceRegistryAnchors(state.HybridAnchors)
+	case ServiceRegistryMesh:
+		return ServiceRegistryModeState{}, errors.New("aethercore distributed registry mesh requires signed advertisements")
 	default:
 		return ServiceRegistryModeState{}, fmt.Errorf("aethercore service registry mode state does not implement %q", mode)
 	}
+	state.StateRoot = ComputeServiceRegistryModeStateRoot(state)
+	return state, state.Validate()
+}
+
+func NewMeshServiceRegistryAdvertisement(descriptor ServiceDescriptor, providerID, endpoint, gossipTopic, signatureHash string, advertisedHeight uint64) (MeshServiceRegistryAdvertisement, error) {
+	descriptor = CanonicalServiceDescriptor(descriptor)
+	if err := descriptor.Validate(); err != nil {
+		return MeshServiceRegistryAdvertisement{}, err
+	}
+	if advertisedHeight == 0 {
+		return MeshServiceRegistryAdvertisement{}, errors.New("aethercore mesh registry advertisement height must be positive")
+	}
+	if err := ValidateHash("aethercore mesh registry advertisement signature", signatureHash); err != nil {
+		return MeshServiceRegistryAdvertisement{}, err
+	}
+	providerRoot := registryProviderSet(descriptor)
+	advertisement := MeshServiceRegistryAdvertisement{
+		ServiceID:        descriptor.ServiceID,
+		Owner:            descriptor.Owner,
+		ProviderID:       strings.TrimSpace(providerID),
+		Endpoint:         strings.TrimSpace(endpoint),
+		DescriptorHash:   ComputeServiceDescriptorHash(descriptor),
+		InterfaceHash:    descriptor.Interface.InterfaceHash,
+		ProviderRoot:     providerRoot,
+		GossipTopic:      strings.TrimSpace(gossipTopic),
+		SignatureHash:    strings.ToLower(strings.TrimSpace(signatureHash)),
+		AdvertisedHeight: advertisedHeight,
+		ExpiryHeight:     descriptor.ExpiryHeight,
+	}
+	advertisement.AdvertisementHash = ComputeMeshServiceRegistryAdvertisementHash(advertisement)
+	return advertisement, advertisement.Validate()
+}
+
+func AttachMeshServiceRegistryAnchorProof(advertisement MeshServiceRegistryAdvertisement, proof ServiceRegistryProof) (MeshServiceRegistryAdvertisement, error) {
+	advertisement = CanonicalMeshServiceRegistryAdvertisement(advertisement)
+	if err := advertisement.Validate(); err != nil {
+		return MeshServiceRegistryAdvertisement{}, err
+	}
+	advertisement.AnchorProof = proof
+	advertisement.AdvertisementHash = ComputeMeshServiceRegistryAdvertisementHash(advertisement)
+	return advertisement, advertisement.Validate()
+}
+
+func NewMeshServiceRegistryCacheRecord(advertisement MeshServiceRegistryAdvertisement, localReputation, cachedHeight uint64) (MeshServiceRegistryCacheRecord, error) {
+	advertisement = CanonicalMeshServiceRegistryAdvertisement(advertisement)
+	if err := advertisement.Validate(); err != nil {
+		return MeshServiceRegistryCacheRecord{}, err
+	}
+	if cachedHeight == 0 {
+		return MeshServiceRegistryCacheRecord{}, errors.New("aethercore mesh registry cache height must be positive")
+	}
+	if advertisement.ExpiryHeight <= cachedHeight {
+		return MeshServiceRegistryCacheRecord{}, errors.New("aethercore mesh registry cached record is expired")
+	}
+	record := MeshServiceRegistryCacheRecord{
+		Advertisement:   advertisement,
+		AdvisoryOnly:    true,
+		LocalReputation: localReputation,
+		CachedHeight:    cachedHeight,
+		ExpiryHeight:    advertisement.ExpiryHeight,
+	}
+	record.CacheHash = ComputeMeshServiceRegistryCacheRecordHash(record)
+	return record, record.Validate()
+}
+
+func BuildDistributedRegistryMeshState(records []MeshServiceRegistryCacheRecord, height uint64) (ServiceRegistryModeState, error) {
+	if height == 0 {
+		return ServiceRegistryModeState{}, errors.New("aethercore distributed registry mesh height must be positive")
+	}
+	state := ServiceRegistryModeState{
+		Mode:          ServiceRegistryMesh,
+		MeshRecords:   append([]MeshServiceRegistryCacheRecord(nil), records...),
+		UpdatedHeight: height,
+	}
+	sortMeshServiceRegistryCacheRecords(state.MeshRecords)
 	state.StateRoot = ComputeServiceRegistryModeStateRoot(state)
 	return state, state.Validate()
 }
@@ -205,6 +309,9 @@ func (state ServiceRegistryModeState) Validate() error {
 		if len(state.HybridAnchors) != 0 {
 			return errors.New("aethercore on-chain registry mode state cannot contain hybrid anchors")
 		}
+		if len(state.MeshRecords) != 0 {
+			return errors.New("aethercore on-chain registry mode state cannot contain mesh records")
+		}
 		if err := validateOnChainServiceRegistryStates(state.OnChainStates); err != nil {
 			return err
 		}
@@ -212,7 +319,17 @@ func (state ServiceRegistryModeState) Validate() error {
 		if len(state.OnChainStates) != 0 {
 			return errors.New("aethercore hybrid registry mode state cannot contain full on-chain descriptors")
 		}
+		if len(state.MeshRecords) != 0 {
+			return errors.New("aethercore hybrid registry mode state cannot contain mesh records")
+		}
 		if err := validateHybridServiceRegistryAnchors(state.HybridAnchors); err != nil {
+			return err
+		}
+	case ServiceRegistryMesh:
+		if len(state.OnChainStates) != 0 || len(state.HybridAnchors) != 0 {
+			return errors.New("aethercore distributed registry mesh state cannot contain consensus registry records")
+		}
+		if err := validateMeshServiceRegistryCacheRecords(state.MeshRecords); err != nil {
 			return err
 		}
 	default:
@@ -271,6 +388,28 @@ func (state ServiceRegistryModeState) HybridAnchorByID(serviceID string) (Hybrid
 	return HybridServiceRegistryAnchor{}, ServiceRegistryProof{}, false
 }
 
+func (state ServiceRegistryModeState) MeshLookup(serviceID string) (MeshServiceRegistryCacheRecord, ServiceRegistryProof, bool) {
+	if state.Mode != ServiceRegistryMesh {
+		return MeshServiceRegistryCacheRecord{}, ServiceRegistryProof{}, false
+	}
+	for _, record := range state.MeshRecords {
+		if record.Advertisement.ServiceID == serviceID {
+			proof := ServiceRegistryProof{
+				ServiceID:      serviceID,
+				RegistryMode:   state.Mode,
+				RegistryRoot:   state.StateRoot,
+				RecordHash:     record.CacheHash,
+				DescriptorHash: record.Advertisement.DescriptorHash,
+				InterfaceHash:  record.Advertisement.InterfaceHash,
+				ProofHeight:    state.UpdatedHeight,
+			}
+			proof.ProofHash = ComputeServiceRegistryProofHash(proof)
+			return record, proof, true
+		}
+	}
+	return MeshServiceRegistryCacheRecord{}, ServiceRegistryProof{}, false
+}
+
 func CanonicalHybridServiceRegistryAnchor(anchor HybridServiceRegistryAnchor) HybridServiceRegistryAnchor {
 	anchor.ServiceID = strings.TrimSpace(anchor.ServiceID)
 	anchor.Owner = strings.TrimSpace(anchor.Owner)
@@ -284,12 +423,168 @@ func CanonicalHybridServiceRegistryAnchor(anchor HybridServiceRegistryAnchor) Hy
 	return anchor
 }
 
+func CanonicalMeshServiceRegistryAdvertisement(advertisement MeshServiceRegistryAdvertisement) MeshServiceRegistryAdvertisement {
+	advertisement.ServiceID = strings.TrimSpace(advertisement.ServiceID)
+	advertisement.Owner = strings.TrimSpace(advertisement.Owner)
+	advertisement.ProviderID = strings.TrimSpace(advertisement.ProviderID)
+	advertisement.Endpoint = strings.TrimSpace(advertisement.Endpoint)
+	advertisement.DescriptorHash = strings.ToLower(strings.TrimSpace(advertisement.DescriptorHash))
+	advertisement.InterfaceHash = strings.ToLower(strings.TrimSpace(advertisement.InterfaceHash))
+	advertisement.ProviderRoot = strings.ToLower(strings.TrimSpace(advertisement.ProviderRoot))
+	advertisement.GossipTopic = strings.TrimSpace(advertisement.GossipTopic)
+	advertisement.IndexerNodeID = strings.TrimSpace(advertisement.IndexerNodeID)
+	advertisement.SignatureHash = strings.ToLower(strings.TrimSpace(advertisement.SignatureHash))
+	advertisement.AdvertisementHash = strings.ToLower(strings.TrimSpace(advertisement.AdvertisementHash))
+	if advertisement.AdvertisementHash == "" {
+		advertisement.AdvertisementHash = ComputeMeshServiceRegistryAdvertisementHash(advertisement)
+	}
+	return advertisement
+}
+
+func CanonicalMeshServiceRegistryCacheRecord(record MeshServiceRegistryCacheRecord) MeshServiceRegistryCacheRecord {
+	record.Advertisement = CanonicalMeshServiceRegistryAdvertisement(record.Advertisement)
+	record.CacheHash = strings.ToLower(strings.TrimSpace(record.CacheHash))
+	if record.CacheHash == "" {
+		record.CacheHash = ComputeMeshServiceRegistryCacheRecordHash(record)
+	}
+	return record
+}
+
+func (advertisement MeshServiceRegistryAdvertisement) HasAnchorProof() bool {
+	return strings.TrimSpace(advertisement.AnchorProof.ProofHash) != ""
+}
+
+func (advertisement MeshServiceRegistryAdvertisement) Validate() error {
+	advertisement = CanonicalMeshServiceRegistryAdvertisement(advertisement)
+	if err := validatePolicyID("aethercore mesh registry service id", advertisement.ServiceID); err != nil {
+		return err
+	}
+	if err := addressing.ValidateAuthorityAddress("aethercore mesh registry owner", advertisement.Owner); err != nil {
+		return err
+	}
+	if err := validatePolicyID("aethercore mesh registry provider id", advertisement.ProviderID); err != nil {
+		return err
+	}
+	if err := validatePolicyID("aethercore mesh registry endpoint", advertisement.Endpoint); err != nil {
+		return err
+	}
+	if err := ValidateHash("aethercore mesh registry descriptor hash", advertisement.DescriptorHash); err != nil {
+		return err
+	}
+	if err := ValidateHash("aethercore mesh registry interface hash", advertisement.InterfaceHash); err != nil {
+		return err
+	}
+	if advertisement.ProviderRoot != "" {
+		if err := ValidateHash("aethercore mesh registry provider root", advertisement.ProviderRoot); err != nil {
+			return err
+		}
+	}
+	if err := validatePolicyID("aethercore mesh registry gossip topic", advertisement.GossipTopic); err != nil {
+		return err
+	}
+	if advertisement.IndexerNodeID != "" {
+		if err := validatePolicyID("aethercore mesh registry indexer node id", advertisement.IndexerNodeID); err != nil {
+			return err
+		}
+	}
+	if err := ValidateHash("aethercore mesh registry advertisement signature", advertisement.SignatureHash); err != nil {
+		return err
+	}
+	if advertisement.AdvertisedHeight == 0 {
+		return errors.New("aethercore mesh registry advertisement height must be positive")
+	}
+	if advertisement.ExpiryHeight == 0 || advertisement.ExpiryHeight <= advertisement.AdvertisedHeight {
+		return errors.New("aethercore mesh registry advertisement expiry must be after advertised height")
+	}
+	if advertisement.HasAnchorProof() {
+		if err := advertisement.AnchorProof.Validate(); err != nil {
+			return err
+		}
+		if advertisement.AnchorProof.RegistryMode == ServiceRegistryMesh {
+			return errors.New("aethercore mesh registry anchor proof must reference on-chain or hybrid registry state")
+		}
+		if advertisement.AnchorProof.ServiceID != advertisement.ServiceID ||
+			advertisement.AnchorProof.DescriptorHash != advertisement.DescriptorHash ||
+			advertisement.AnchorProof.InterfaceHash != advertisement.InterfaceHash {
+			return errors.New("aethercore mesh registry anchor proof does not match advertisement")
+		}
+	}
+	if err := ValidateHash("aethercore mesh registry advertisement hash", advertisement.AdvertisementHash); err != nil {
+		return err
+	}
+	if expected := ComputeMeshServiceRegistryAdvertisementHash(advertisement); advertisement.AdvertisementHash != expected {
+		return fmt.Errorf("aethercore mesh registry advertisement hash mismatch: expected %s", expected)
+	}
+	return nil
+}
+
+func (record MeshServiceRegistryCacheRecord) Validate() error {
+	record = CanonicalMeshServiceRegistryCacheRecord(record)
+	if err := record.Advertisement.Validate(); err != nil {
+		return err
+	}
+	if !record.AdvisoryOnly {
+		return errors.New("aethercore mesh registry cache records must remain advisory")
+	}
+	if record.CachedHeight == 0 {
+		return errors.New("aethercore mesh registry cache height must be positive")
+	}
+	if record.ExpiryHeight == 0 {
+		return errors.New("aethercore mesh registry cached records require expiry height")
+	}
+	if record.ExpiryHeight != record.Advertisement.ExpiryHeight {
+		return errors.New("aethercore mesh registry cache expiry must match advertisement")
+	}
+	if record.ExpiryHeight <= record.CachedHeight {
+		return errors.New("aethercore mesh registry cached record is expired")
+	}
+	if err := ValidateHash("aethercore mesh registry cache hash", record.CacheHash); err != nil {
+		return err
+	}
+	if expected := ComputeMeshServiceRegistryCacheRecordHash(record); record.CacheHash != expected {
+		return fmt.Errorf("aethercore mesh registry cache hash mismatch: expected %s", expected)
+	}
+	return nil
+}
+
+func VerifyMeshServiceRegistryAdvertisementDescriptor(advertisement MeshServiceRegistryAdvertisement, descriptor ServiceDescriptor) error {
+	advertisement = CanonicalMeshServiceRegistryAdvertisement(advertisement)
+	if err := advertisement.Validate(); err != nil {
+		return err
+	}
+	descriptor = CanonicalServiceDescriptor(descriptor)
+	if err := descriptor.Validate(); err != nil {
+		return err
+	}
+	if advertisement.ServiceID != descriptor.ServiceID || advertisement.Owner != descriptor.Owner {
+		return errors.New("aethercore mesh registry advertisement identity mismatch")
+	}
+	if advertisement.DescriptorHash != ComputeServiceDescriptorHash(descriptor) {
+		return errors.New("aethercore mesh registry advertisement descriptor hash mismatch")
+	}
+	if advertisement.InterfaceHash != descriptor.Interface.InterfaceHash {
+		return errors.New("aethercore mesh registry advertisement interface hash mismatch")
+	}
+	return nil
+}
+
 func ComputeServiceOwnerAuthorizationHash(serviceID, owner string, height uint64) string {
 	return hashParts(
 		"aetheris-aek-service-owner-authorization-v1",
 		strings.TrimSpace(serviceID),
 		strings.TrimSpace(owner),
 		fmt.Sprint(height),
+	)
+}
+
+func ComputeMeshServiceRegistryAdvertisementSignatureHash(serviceID, owner, providerID, descriptorHash string, advertisedHeight uint64) string {
+	return hashParts(
+		"aetheris-aek-mesh-service-registry-advertisement-signature-v1",
+		strings.TrimSpace(serviceID),
+		strings.TrimSpace(owner),
+		strings.TrimSpace(providerID),
+		strings.ToLower(strings.TrimSpace(descriptorHash)),
+		fmt.Sprint(advertisedHeight),
 	)
 }
 
@@ -320,11 +615,45 @@ func ComputeHybridServiceRegistryAnchorHash(anchor HybridServiceRegistryAnchor) 
 	)
 }
 
+func ComputeMeshServiceRegistryAdvertisementHash(advertisement MeshServiceRegistryAdvertisement) string {
+	advertisement.AdvertisementHash = ""
+	return hashParts(
+		"aetheris-aek-mesh-service-registry-advertisement-v1",
+		advertisement.ServiceID,
+		advertisement.Owner,
+		advertisement.ProviderID,
+		advertisement.Endpoint,
+		advertisement.DescriptorHash,
+		advertisement.InterfaceHash,
+		advertisement.ProviderRoot,
+		advertisement.GossipTopic,
+		advertisement.IndexerNodeID,
+		advertisement.SignatureHash,
+		advertisement.AnchorProof.ProofHash,
+		fmt.Sprint(advertisement.AdvertisedHeight),
+		fmt.Sprint(advertisement.ExpiryHeight),
+	)
+}
+
+func ComputeMeshServiceRegistryCacheRecordHash(record MeshServiceRegistryCacheRecord) string {
+	record.CacheHash = ""
+	return hashParts(
+		"aetheris-aek-mesh-service-registry-cache-record-v1",
+		record.Advertisement.AdvertisementHash,
+		fmt.Sprint(record.AdvisoryOnly),
+		fmt.Sprint(record.LocalReputation),
+		fmt.Sprint(record.CachedHeight),
+		fmt.Sprint(record.ExpiryHeight),
+	)
+}
+
 func ComputeServiceRegistryModeStateRoot(state ServiceRegistryModeState) string {
 	onChainStates := append([]OnChainServiceRegistryState(nil), state.OnChainStates...)
 	hybridAnchors := append([]HybridServiceRegistryAnchor(nil), state.HybridAnchors...)
+	meshRecords := append([]MeshServiceRegistryCacheRecord(nil), state.MeshRecords...)
 	sortOnChainServiceRegistryStates(onChainStates)
 	sortHybridServiceRegistryAnchors(hybridAnchors)
+	sortMeshServiceRegistryCacheRecords(meshRecords)
 	parts := []string{
 		"aetheris-aek-service-registry-mode-state-root-v1",
 		string(state.Mode),
@@ -337,6 +666,12 @@ func ComputeServiceRegistryModeStateRoot(state ServiceRegistryModeState) string 
 	}
 	for _, anchor := range hybridAnchors {
 		parts = append(parts, anchor.AnchorHash)
+	}
+	if state.Mode == ServiceRegistryMesh || len(meshRecords) != 0 {
+		parts = append(parts, fmt.Sprint(len(meshRecords)))
+		for _, record := range meshRecords {
+			parts = append(parts, record.CacheHash)
+		}
 	}
 	return hashParts(parts...)
 }
@@ -381,6 +716,27 @@ func validateHybridServiceRegistryAnchors(anchors []HybridServiceRegistryAnchor)
 	return nil
 }
 
+func validateMeshServiceRegistryCacheRecords(records []MeshServiceRegistryCacheRecord) error {
+	var previous string
+	seen := make(map[string]struct{}, len(records))
+	for _, record := range records {
+		record = CanonicalMeshServiceRegistryCacheRecord(record)
+		if err := record.Validate(); err != nil {
+			return err
+		}
+		key := record.Advertisement.ServiceID + "/" + record.Advertisement.ProviderID
+		if _, found := seen[key]; found {
+			return fmt.Errorf("duplicate aethercore mesh registry cache record %s", key)
+		}
+		seen[key] = struct{}{}
+		if previous != "" && previous >= key {
+			return errors.New("aethercore mesh registry cache records must be sorted canonically")
+		}
+		previous = key
+	}
+	return nil
+}
+
 func sortOnChainServiceRegistryStates(states []OnChainServiceRegistryState) {
 	sort.SliceStable(states, func(i, j int) bool {
 		return states[i].Descriptor.ServiceID < states[j].Descriptor.ServiceID
@@ -389,4 +745,12 @@ func sortOnChainServiceRegistryStates(states []OnChainServiceRegistryState) {
 
 func sortHybridServiceRegistryAnchors(anchors []HybridServiceRegistryAnchor) {
 	sort.SliceStable(anchors, func(i, j int) bool { return anchors[i].ServiceID < anchors[j].ServiceID })
+}
+
+func sortMeshServiceRegistryCacheRecords(records []MeshServiceRegistryCacheRecord) {
+	sort.SliceStable(records, func(i, j int) bool {
+		left := records[i].Advertisement.ServiceID + "/" + records[i].Advertisement.ProviderID
+		right := records[j].Advertisement.ServiceID + "/" + records[j].Advertisement.ProviderID
+		return left < right
+	})
 }
