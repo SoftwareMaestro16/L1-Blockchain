@@ -332,6 +332,60 @@ func TestKeeperRoutingEngineModuleSelectsRetriesAndProbes(t *testing.T) {
 	require.NotEmpty(t, engine.LocalPeerScores)
 }
 
+func TestKeeperConditionalPaymentsModuleMessagesAndInvariants(t *testing.T) {
+	k := NewKeeper()
+	gs := DefaultGenesis()
+	gs.Params = prototype.TestnetParams()
+	require.NoError(t, k.InitGenesis(gs))
+
+	alice := keeperAddress(0x77)
+	bob := keeperAddress(0x78)
+	channel := keeperSignedChannel(t, "keeper-conditional", "500", alice, bob)
+	require.NoError(t, k.OpenChannel(channel))
+	base := keeperSignedReserveState(t, channel, 2, channel.OpeningStateHash, "40", "0", []paymentstypes.Balance{
+		{Participant: alice, Amount: "450"},
+		{Participant: bob, Amount: "10"},
+	})
+	require.NoError(t, k.AcceptSignedState(channel.ChannelID, base, 19))
+	promiseChannel := channel
+	promiseChannel.LatestState = base
+	preimage := "keeper-conditional-preimage"
+	promise := keeperSignedPromiseWithHashLock(t, promiseChannel, "keeper-conditional-promise", alice, bob, "20", "1", 7, 40, paymentstypes.HashParts(preimage))
+
+	snapshot, err := k.HandleConditionalPaymentMessage(paymentstypes.MsgRegisterPromise{
+		Signer:        alice,
+		ChannelID:     channel.ChannelID,
+		BaseState:     base,
+		Promises:      []paymentstypes.ConditionalPromise{promise},
+		CurrentHeight: 20,
+	})
+	require.NoError(t, err)
+	require.Len(t, snapshot.Promises, 1)
+	require.Len(t, snapshot.ConditionRoots, 1)
+	require.NoError(t, k.AssertConditionalReserveInvariant())
+
+	snapshot, err = k.HandleConditionalPaymentMessage(paymentstypes.MsgResolveWithPreimage{Request: paymentstypes.PreimageRevealRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []paymentstypes.ConditionalPromise{promise},
+		Preimage:      preimage,
+		Revealer:      bob,
+		CurrentHeight: 30,
+	}})
+	require.NoError(t, err)
+	require.Len(t, snapshot.PreimageClaims, 1)
+	require.Empty(t, snapshot.Promises)
+	require.NoError(t, k.AssertConditionalReserveInvariant())
+
+	_, err = k.HandleConditionalPaymentMessage(paymentstypes.MsgResolveWithPreimage{Request: paymentstypes.PreimageRevealRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []paymentstypes.ConditionalPromise{promise},
+		Preimage:      preimage,
+		Revealer:      bob,
+		CurrentHeight: 31,
+	}})
+	require.ErrorContains(t, err, "already been settled")
+}
+
 func TestKeeperValidatorAssistedWatchDispute(t *testing.T) {
 	k := NewKeeper()
 	gs := DefaultGenesis()
@@ -436,6 +490,58 @@ func keeperSignedState(t *testing.T, channel paymentstypes.ChannelRecord, nonce 
 	state = state.Normalize()
 	require.NoError(t, state.ValidateForChannel(channel, true))
 	return state
+}
+
+func keeperSignedReserveState(t *testing.T, channel paymentstypes.ChannelRecord, nonce uint64, previous, reserveA, reserveB string, balances []paymentstypes.Balance) paymentstypes.ChannelState {
+	t.Helper()
+
+	state, err := paymentstypes.BuildState(paymentstypes.ChannelState{
+		ChainID:           channel.ChainID,
+		ChannelID:         channel.ChannelID,
+		ChannelType:       channel.ChannelType,
+		Denom:             channel.Denom,
+		Version:           paymentstypes.CurrentStateVersion,
+		Epoch:             1,
+		Nonce:             nonce,
+		Balances:          balances,
+		ReserveA:          reserveA,
+		ReserveB:          reserveB,
+		PreviousStateHash: previous,
+		TimeoutHeight:     channel.OpenHeight + channel.DisputePeriod + 70,
+		CloseDelay:        channel.DisputePeriod,
+		FeePolicyID:       paymentstypes.NativeDenom,
+	})
+	require.NoError(t, err)
+	for _, signer := range channel.Normalize().Participants {
+		sig, err := paymentstypes.SignatureForState(state, signer)
+		require.NoError(t, err)
+		state.Signatures = append(state.Signatures, sig)
+	}
+	state = state.Normalize()
+	require.NoError(t, state.ValidateForChannel(channel, true))
+	return state
+}
+
+func keeperSignedPromiseWithHashLock(t *testing.T, channel paymentstypes.ChannelRecord, salt, source, destination, amount, fee string, nonce, timeoutHeight uint64, hashLock string) paymentstypes.ConditionalPromise {
+	t.Helper()
+
+	promise, err := paymentstypes.BuildConditionalPromise(paymentstypes.ConditionalPromise{
+		PromiseID:        paymentstypes.HashParts("keeper-promise", channel.ChannelID, salt),
+		ChannelID:        channel.ChannelID,
+		Source:           source,
+		Destination:      destination,
+		Amount:           amount,
+		Fee:              fee,
+		HashLock:         hashLock,
+		TimeoutHeight:    timeoutHeight,
+		TimeoutTimestamp: int64(timeoutHeight * 10),
+		ConditionType:    paymentstypes.ConditionTypeHashLock,
+		Nonce:            nonce,
+	})
+	require.NoError(t, err)
+	promise.Signature, err = paymentstypes.SignatureForPromise(channel, promise, source)
+	require.NoError(t, err)
+	return promise.Normalize()
 }
 
 func keeperAddress(fill byte) string {

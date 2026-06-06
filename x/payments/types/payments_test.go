@@ -602,6 +602,160 @@ func TestBatchConditionSettlementAtomicallyResolvesChainedPromises(t *testing.T)
 	require.ErrorContains(t, err, "already been settled")
 }
 
+func TestConditionalPaymentsModuleMessagesRootsClaimsAndDisputes(t *testing.T) {
+	alice := testAddress(0xd1)
+	bob := testAddress(0xd2)
+	channel := signedChannel(t, "conditional-module", "1000", alice, bob)
+	base := signedReserveState(t, channel, 2, channel.OpeningStateHash, "80", "0", []Balance{
+		{Participant: alice, Amount: "900"},
+		{Participant: bob, Amount: "20"},
+	})
+	promiseChannel := channel
+	promiseChannel.LatestState = base
+	preimage := "conditional-module-preimage"
+	promise := signedPromiseWithHashLock(t, promiseChannel, "conditional-module-promise", alice, bob, "20", "1", 9, 40, HashParts(preimage))
+	state := EmptyStateWithChannel(t, channel)
+	state, err := AcceptSignedState(state, channel.ChannelID, base, 19)
+	require.NoError(t, err)
+
+	state, snapshot, err := ApplyConditionalPaymentMessage(state, MsgRegisterPromise{
+		Signer:        alice,
+		ChannelID:     channel.ChannelID,
+		BaseState:     base,
+		Promises:      []ConditionalPromise{promise},
+		CurrentHeight: 20,
+	})
+	require.NoError(t, err)
+	require.Len(t, snapshot.Promises, 1)
+	require.Len(t, snapshot.ConditionRoots, 1)
+	require.Len(t, snapshot.PromiseTimeouts, 1)
+	require.NoError(t, ValidateReservedBalancesForConditions(state.Channels[0], state.Channels[0].LatestState))
+
+	_, _, err = ApplyConditionalPaymentMessage(state, MsgRegisterPromise{
+		Signer:        alice,
+		ChannelID:     channel.ChannelID,
+		BaseState:     base,
+		Promises:      []ConditionalPromise{promise, promise},
+		CurrentHeight: 21,
+	})
+	require.ErrorContains(t, err, "duplicate promise")
+
+	state, snapshot, err = ApplyConditionalPaymentMessage(state, MsgResolveWithPreimage{Request: PreimageRevealRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []ConditionalPromise{promise},
+		Preimage:      preimage,
+		Revealer:      bob,
+		CurrentHeight: 30,
+	}})
+	require.NoError(t, err)
+	require.Len(t, snapshot.PreimageClaims, 1)
+	require.Equal(t, HashParts(preimage), state.ConditionClaims[0].PreimageHash)
+
+	_, _, err = ApplyConditionalPaymentMessage(state, MsgResolveWithPreimage{Request: PreimageRevealRequest{
+		ChannelID:     channel.ChannelID,
+		Promises:      []ConditionalPromise{promise},
+		Preimage:      preimage,
+		Revealer:      bob,
+		CurrentHeight: 31,
+	}})
+	require.ErrorContains(t, err, "already been settled")
+
+	invalidResolution := ConditionResolution{
+		ConditionID:  promise.PromiseID,
+		Resolver:     bob,
+		Recipient:    alice,
+		Amount:       promise.Amount,
+		EvidenceHash: HashParts("invalid-condition-resolution", promise.PromiseID),
+	}
+	disputed, _, err := ApplyConditionalPaymentMessage(state, MsgDisputeCondition{
+		Signer:        alice,
+		ChannelID:     channel.ChannelID,
+		Promise:       promise,
+		Resolution:    invalidResolution,
+		Reason:        "wrong-recipient",
+		CurrentHeight: 32,
+	})
+	require.NoError(t, err)
+	require.Equal(t, "condition_dispute", disputed.Events[len(disputed.Events)-1].EventType)
+}
+
+func TestConditionalPaymentsModuleExpiryAndBatchFinalizeRecords(t *testing.T) {
+	alice := testAddress(0xd3)
+	router := testAddress(0xd4)
+	bob := testAddress(0xd5)
+	routeID := HashParts("conditional-module-route", alice, router, bob)
+	hashLock := HashParts("conditional-module-batch-preimage")
+	firstChannel := signedChannel(t, "conditional-module-first", "1000", alice, router)
+	secondChannel := signedChannel(t, "conditional-module-second", "1000", router, bob)
+	firstBase := signedReserveState(t, firstChannel, 2, firstChannel.OpeningStateHash, "80", "0", []Balance{
+		{Participant: alice, Amount: "900"},
+		{Participant: router, Amount: "20"},
+	})
+	secondBase := signedReserveState(t, secondChannel, 2, secondChannel.OpeningStateHash, "80", "0", []Balance{
+		{Participant: router, Amount: "900"},
+		{Participant: bob, Amount: "20"},
+	})
+	firstPromiseChannel := firstChannel
+	firstPromiseChannel.LatestState = firstBase
+	secondPromiseChannel := secondChannel
+	secondPromiseChannel.LatestState = secondBase
+	firstID := HashParts("conditional-module-promise", "first")
+	secondID := HashParts("conditional-module-promise", "second")
+	first := signedRoutePromise(t, firstPromiseChannel, firstID, routeID, alice, router, "31", "0", 9, 70, hashLock, "", secondID)
+	second := signedRoutePromise(t, secondPromiseChannel, secondID, routeID, router, bob, "30", "1", 10, 40, hashLock, firstID, "")
+	state := EmptyState()
+	var err error
+	state, err = OpenChannel(state, firstChannel)
+	require.NoError(t, err)
+	state, err = OpenChannel(state, secondChannel)
+	require.NoError(t, err)
+	state, err = AcceptSignedState(state, firstChannel.ChannelID, firstBase, 19)
+	require.NoError(t, err)
+	state, err = AcceptSignedState(state, secondChannel.ChannelID, secondBase, 19)
+	require.NoError(t, err)
+	state, _, err = ApplyConditionalPaymentMessage(state, MsgRegisterPromise{Signer: alice, ChannelID: firstChannel.ChannelID, BaseState: firstBase, Promises: []ConditionalPromise{first}, CurrentHeight: 20})
+	require.NoError(t, err)
+	state, _, err = ApplyConditionalPaymentMessage(state, MsgRegisterPromise{Signer: router, ChannelID: secondChannel.ChannelID, BaseState: secondBase, Promises: []ConditionalPromise{second}, CurrentHeight: 20})
+	require.NoError(t, err)
+
+	proof := ConditionLinkageProof{
+		RouteID:       routeID,
+		Promises:      []ConditionalPromise{first, second},
+		Sender:        alice,
+		Receiver:      bob,
+		Amount:        "30",
+		TotalFees:     "1",
+		HashLock:      hashLock,
+		TimeoutMargin: DefaultTimeoutMargin,
+	}
+	state, snapshot, err := ApplyConditionalPaymentMessage(state, MsgBatchResolvePromises{Request: BatchConditionSettlementRequest{
+		LinkageProof:  proof,
+		Mode:          ConditionSettlementModePreimage,
+		Preimage:      "conditional-module-batch-preimage",
+		Resolver:      bob,
+		CurrentHeight: 30,
+	}})
+	require.NoError(t, err)
+	require.Len(t, state.ConditionClaims, 2)
+	require.NotEmpty(t, snapshot.ExpiredClaims)
+	require.Equal(t, "condition_settlement", state.Events[len(state.Events)-1].EventType)
+
+	record := ConditionSettlementRecordFromBatch(BatchConditionSettlementRequest{
+		LinkageProof:  proof,
+		Mode:          ConditionSettlementModePreimage,
+		Resolver:      bob,
+		CurrentHeight: 30,
+	}, BatchConditionSettlementResult{
+		RouteID:              routeID,
+		Resolutions:          []ConditionResolution{{ConditionID: first.PromiseID, Resolver: bob, Recipient: router, Amount: first.Amount, EvidenceHash: HashParts("finalize-condition", first.PromiseID)}},
+		ConditionRootUpdates: []ConditionRootUpdate{{ChannelID: first.ChannelID, Nonce: 2, ConditionRoot: state.Channels[0].LatestState.ConditionRoot, ConditionCount: 1, Conditions: state.Channels[0].LatestState.Conditions}},
+		EvidenceHash:         HashParts("finalize-condition", routeID),
+	})
+	state, _, err = ApplyConditionalPaymentMessage(state, MsgFinalizeConditionSettlement{Signer: bob, Settlement: record, CurrentHeight: 31})
+	require.NoError(t, err)
+	require.Equal(t, "condition_settlement", state.Events[len(state.Events)-1].EventType)
+}
+
 func TestBatchConditionSettlementRejectsBrokenRouteInvariants(t *testing.T) {
 	alice := testAddress(0x2b)
 	router := testAddress(0x2c)
