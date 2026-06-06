@@ -26,6 +26,14 @@ const (
 	DefaultReporterRewardCap                  = "5"
 	DefaultPenaltyBurnAllocationBps           = uint32(2_500)
 	DefaultSecurityReserveAllocationBps       = uint32(2_500)
+	DefaultMaxTopologyUpdatesPerPeerWindow    = uint32(16)
+	DefaultRouteFailureScoreDecay             = uint64(DefaultGossipTTL)
+	DefaultCongestionPenaltyDecay             = uint64(DefaultGossipTTL)
+	DefaultCapacityProbeRateLimit             = uint32(16)
+	DefaultFinalizationQueueWorkLimit         = uint64(256)
+	DefaultChannelOpenCongestionMultiplierBps = uint32(20_000)
+	DefaultDisputeCongestionMultiplierBps     = uint32(25_000)
+	DefaultStorePruningHorizon                = uint64(DefaultReplayHorizon)
 )
 
 type PaymentGovernanceParams struct {
@@ -33,6 +41,8 @@ type PaymentGovernanceParams struct {
 	Conditional  PaymentConditionalGovernanceParams
 	Virtual      PaymentVirtualChannelGovernanceParams
 	FraudPenalty PaymentFraudPenaltyGovernanceParams
+	Routing      PaymentRoutingGovernanceParams
+	Execution    PaymentExecutionGovernanceParams
 	ParamsHash   string
 }
 
@@ -81,6 +91,26 @@ type PaymentFraudPenaltyGovernanceParams struct {
 	CounterpartyCompensationPriority bool
 }
 
+type PaymentRoutingGovernanceParams struct {
+	RoutingAdvertisementDeposit         string
+	GossipMessageExpiry                 uint64
+	LiquidityHintExpiry                 uint64
+	MaximumTopologyUpdatesPerPeerWindow uint32
+	RouteFailureScoreDecay              uint64
+	CongestionPenaltyDecay              uint64
+	CapacityProbeRateLimit              uint32
+	CapacityProbeWindow                 uint64
+}
+
+type PaymentExecutionGovernanceParams struct {
+	SettlementBatchMaximumSize             uint64
+	FinalizationQueueWorkLimitPerBlock     uint64
+	ExpiredPromiseCleanupWorkLimitPerBlock uint64
+	ChannelOpenCongestionFeeMultiplierBps  uint32
+	DisputeCongestionFeeMultiplierBps      uint32
+	StorePruningHorizon                    uint64
+}
+
 func DefaultPaymentGovernanceParams() PaymentGovernanceParams {
 	feeSchedule := DefaultPaymentFeeSchedule().Normalize()
 	params := PaymentGovernanceParams{
@@ -125,6 +155,24 @@ func DefaultPaymentGovernanceParams() PaymentGovernanceParams {
 			SecurityReserveAllocationBps:     DefaultSecurityReserveAllocationBps,
 			CounterpartyCompensationPriority: true,
 		},
+		Routing: PaymentRoutingGovernanceParams{
+			RoutingAdvertisementDeposit:         feeSchedule.RoutingAdvertisementDeposit,
+			GossipMessageExpiry:                 DefaultGossipTTL,
+			LiquidityHintExpiry:                 DefaultGossipTTL,
+			MaximumTopologyUpdatesPerPeerWindow: DefaultMaxTopologyUpdatesPerPeerWindow,
+			RouteFailureScoreDecay:              DefaultRouteFailureScoreDecay,
+			CongestionPenaltyDecay:              DefaultCongestionPenaltyDecay,
+			CapacityProbeRateLimit:              DefaultCapacityProbeRateLimit,
+			CapacityProbeWindow:                 DefaultGossipTTL,
+		},
+		Execution: PaymentExecutionGovernanceParams{
+			SettlementBatchMaximumSize:             MaxSettlementBatchOps,
+			FinalizationQueueWorkLimitPerBlock:     DefaultFinalizationQueueWorkLimit,
+			ExpiredPromiseCleanupWorkLimitPerBlock: DefaultExpiredPromiseCleanupLimitPerBlock,
+			ChannelOpenCongestionFeeMultiplierBps:  DefaultChannelOpenCongestionMultiplierBps,
+			DisputeCongestionFeeMultiplierBps:      DefaultDisputeCongestionMultiplierBps,
+			StorePruningHorizon:                    DefaultStorePruningHorizon,
+		},
 	}
 	params = params.Normalize()
 	params.ParamsHash = ComputePaymentGovernanceParamsHash(params)
@@ -168,6 +216,20 @@ func ComputePaymentGovernanceParamsHash(params PaymentGovernanceParams) string {
 		fmt.Sprintf("%010d", params.FraudPenalty.PenaltyBurnAllocationBps),
 		fmt.Sprintf("%010d", params.FraudPenalty.SecurityReserveAllocationBps),
 		fmt.Sprintf("%t", params.FraudPenalty.CounterpartyCompensationPriority),
+		params.Routing.RoutingAdvertisementDeposit,
+		fmt.Sprintf("%020d", params.Routing.GossipMessageExpiry),
+		fmt.Sprintf("%020d", params.Routing.LiquidityHintExpiry),
+		fmt.Sprintf("%010d", params.Routing.MaximumTopologyUpdatesPerPeerWindow),
+		fmt.Sprintf("%020d", params.Routing.RouteFailureScoreDecay),
+		fmt.Sprintf("%020d", params.Routing.CongestionPenaltyDecay),
+		fmt.Sprintf("%010d", params.Routing.CapacityProbeRateLimit),
+		fmt.Sprintf("%020d", params.Routing.CapacityProbeWindow),
+		fmt.Sprintf("%020d", params.Execution.SettlementBatchMaximumSize),
+		fmt.Sprintf("%020d", params.Execution.FinalizationQueueWorkLimitPerBlock),
+		fmt.Sprintf("%020d", params.Execution.ExpiredPromiseCleanupWorkLimitPerBlock),
+		fmt.Sprintf("%010d", params.Execution.ChannelOpenCongestionFeeMultiplierBps),
+		fmt.Sprintf("%010d", params.Execution.DisputeCongestionFeeMultiplierBps),
+		fmt.Sprintf("%020d", params.Execution.StorePruningHorizon),
 	)
 }
 
@@ -182,6 +244,7 @@ func BuildGovernedPaymentFeeSchedule(params PaymentGovernanceParams) (PaymentFee
 	schedule.StorageByteFee = params.Channel.ChannelStorageFeePerByte
 	schedule.ConditionalPromiseSettlementFee = params.Conditional.PromiseStorageFee
 	schedule.VirtualChannelAnchorFee = params.Virtual.VirtualChannelAnchorFee
+	schedule.RoutingAdvertisementDeposit = params.Routing.RoutingAdvertisementDeposit
 	return schedule.Normalize(), schedule.Validate()
 }
 
@@ -296,6 +359,8 @@ func (p PaymentGovernanceParams) Normalize() PaymentGovernanceParams {
 	p.Conditional = p.Conditional.Normalize(defaults.Conditional)
 	p.Virtual = p.Virtual.Normalize(defaults.Virtual)
 	p.FraudPenalty = p.FraudPenalty.Normalize(defaults.FraudPenalty)
+	p.Routing = p.Routing.Normalize(defaults.Routing)
+	p.Execution = p.Execution.Normalize(defaults.Execution)
 	p.ParamsHash = normalizeOptionalHash(p.ParamsHash)
 	return p
 }
@@ -318,6 +383,12 @@ func (p PaymentGovernanceParams) Validate() error {
 		return err
 	}
 	if err := params.FraudPenalty.Validate(); err != nil {
+		return err
+	}
+	if err := params.Routing.Validate(); err != nil {
+		return err
+	}
+	if err := params.Execution.Validate(); err != nil {
 		return err
 	}
 	if err := ValidateHash("payments governance params hash", params.ParamsHash); err != nil {
@@ -372,6 +443,24 @@ func DefaultPaymentGovernanceParamsNoHash() PaymentGovernanceParams {
 			PenaltyBurnAllocationBps:         DefaultPenaltyBurnAllocationBps,
 			SecurityReserveAllocationBps:     DefaultSecurityReserveAllocationBps,
 			CounterpartyCompensationPriority: true,
+		},
+		Routing: PaymentRoutingGovernanceParams{
+			RoutingAdvertisementDeposit:         feeSchedule.RoutingAdvertisementDeposit,
+			GossipMessageExpiry:                 DefaultGossipTTL,
+			LiquidityHintExpiry:                 DefaultGossipTTL,
+			MaximumTopologyUpdatesPerPeerWindow: DefaultMaxTopologyUpdatesPerPeerWindow,
+			RouteFailureScoreDecay:              DefaultRouteFailureScoreDecay,
+			CongestionPenaltyDecay:              DefaultCongestionPenaltyDecay,
+			CapacityProbeRateLimit:              DefaultCapacityProbeRateLimit,
+			CapacityProbeWindow:                 DefaultGossipTTL,
+		},
+		Execution: PaymentExecutionGovernanceParams{
+			SettlementBatchMaximumSize:             MaxSettlementBatchOps,
+			FinalizationQueueWorkLimitPerBlock:     DefaultFinalizationQueueWorkLimit,
+			ExpiredPromiseCleanupWorkLimitPerBlock: DefaultExpiredPromiseCleanupLimitPerBlock,
+			ChannelOpenCongestionFeeMultiplierBps:  DefaultChannelOpenCongestionMultiplierBps,
+			DisputeCongestionFeeMultiplierBps:      DefaultDisputeCongestionMultiplierBps,
+			StorePruningHorizon:                    DefaultStorePruningHorizon,
 		},
 	}
 }
@@ -839,6 +928,282 @@ func governedReporterRewardCapFromPenalty(penaltyAmount string, params PaymentFr
 		reward = capAmount
 	}
 	return reward.String(), nil
+}
+
+func BuildGovernedRoutePolicy(params PaymentGovernanceParams) (RoutePolicy, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return RoutePolicy{}, err
+	}
+	policy := DefaultRoutePolicy().Normalize()
+	policy.StaleLiquidityAfter = params.Routing.LiquidityHintExpiry
+	policy.DecayHalfLife = params.Routing.CongestionPenaltyDecay
+	return policy.Normalize(), policy.Validate()
+}
+
+func BuildGovernedGossipRateLimitPolicy(params PaymentGovernanceParams) (GossipRateLimitPolicy, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return GossipRateLimitPolicy{}, err
+	}
+	policy := DefaultGossipRateLimitPolicy().Normalize()
+	policy.WindowBlocks = params.Routing.GossipMessageExpiry
+	policy.MaxTopologyUpdates = params.Routing.MaximumTopologyUpdatesPerPeerWindow
+	return policy.Normalize(), policy.Validate()
+}
+
+func BuildGovernedRouteFailureScoringPolicy(params PaymentGovernanceParams) (RouteFailureScoringPolicy, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return RouteFailureScoringPolicy{}, err
+	}
+	policy := DefaultRouteFailureScoringPolicy().Normalize()
+	return policy, policy.Validate()
+}
+
+func ValidateGossipMessageExpiryWithGovernance(message GossipMessage, params PaymentGovernanceParams) error {
+	message = message.Normalize()
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return err
+	}
+	if err := message.ValidateBasic(); err != nil {
+		return err
+	}
+	expiry := params.Routing.GossipMessageExpiry
+	if message.MessageType == GossipLiquidityHint {
+		expiry = params.Routing.LiquidityHintExpiry
+	}
+	if message.ValidUntilHeight < message.ValidAfterHeight {
+		return errors.New("payments gossip validity window is inverted")
+	}
+	if message.ValidUntilHeight-message.ValidAfterHeight > expiry {
+		return errors.New("payments gossip message expiry exceeds governance maximum")
+	}
+	return nil
+}
+
+func ValidateCapacityProbeRateLimitWithGovernance(existing []CapacityProbeRequest, req CapacityProbeRequest, params PaymentGovernanceParams) error {
+	req = req.Normalize()
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return err
+	}
+	if err := req.Validate(); err != nil {
+		return err
+	}
+	window := params.Routing.CapacityProbeWindow
+	windowStart := uint64(1)
+	if req.CurrentHeight > window {
+		windowStart = req.CurrentHeight - window + 1
+	}
+	count := uint32(0)
+	for _, probe := range existing {
+		probe = probe.Normalize()
+		if probe.From != req.From || probe.CurrentHeight < windowStart || probe.CurrentHeight > req.CurrentHeight {
+			continue
+		}
+		count++
+	}
+	if count >= params.Routing.CapacityProbeRateLimit {
+		return errors.New("payments capacity probe rate limit exceeded")
+	}
+	return nil
+}
+
+func DecayRouteFailureScoreWithGovernance(score RouteFailureScore, currentHeight uint64, params PaymentGovernanceParams) (RouteFailureScore, error) {
+	score.NodeID = strings.TrimSpace(score.NodeID)
+	score.ChannelID = normalizeHash(score.ChannelID)
+	score.ScoreHash = normalizeOptionalHash(score.ScoreHash)
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return RouteFailureScore{}, err
+	}
+	if score.NodeID == "" {
+		return RouteFailureScore{}, errors.New("payments route failure score node id is required")
+	}
+	if err := ValidateHash("payments route failure score channel", score.ChannelID); err != nil {
+		return RouteFailureScore{}, err
+	}
+	if !IsRouteFailureClass(score.FailureClass) {
+		return RouteFailureScore{}, fmt.Errorf("unknown payments route failure class %q", score.FailureClass)
+	}
+	if score.FailureCount == 0 || score.ObservedHeight == 0 {
+		return RouteFailureScore{}, errors.New("payments route failure score count and height must be positive")
+	}
+	if currentHeight < score.ObservedHeight {
+		return RouteFailureScore{}, errors.New("payments route failure decay height before observation")
+	}
+	halfLife := params.Routing.RouteFailureScoreDecay
+	periods := (currentHeight - score.ObservedHeight) / halfLife
+	decayed := score.ScoreDelta
+	for i := uint64(0); i < periods && decayed != 0; i++ {
+		decayed /= 2
+	}
+	score.ScoreDelta = decayed
+	score.ObservedHeight = currentHeight
+	score.ScoreHash = score.Hash()
+	return score, nil
+}
+
+func NewSettlementBatchWithGovernance(batchID string, operations []SettlementOperation, params PaymentGovernanceParams) (SettlementBatch, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return SettlementBatch{}, err
+	}
+	if uint64(len(operations)) > params.Execution.SettlementBatchMaximumSize {
+		return SettlementBatch{}, fmt.Errorf("payments settlement batch exceeds governance maximum %d", params.Execution.SettlementBatchMaximumSize)
+	}
+	return NewSettlementBatch(batchID, operations)
+}
+
+func ProcessAsyncExecutionQueuesWithGovernance(state PaymentsState, currentHeight uint64, params PaymentGovernanceParams) (PaymentsState, AsyncExecutionResult, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return PaymentsState{}, AsyncExecutionResult{}, err
+	}
+	return ProcessAsyncExecutionQueues(state, currentHeight, params.Execution.FinalizationQueueWorkLimitPerBlock, params.Execution.ExpiredPromiseCleanupWorkLimitPerBlock)
+}
+
+func ApplyGovernedExecutionFeeMultipliers(state PaymentsState, currentHeight, channelOpenCongestionBps, disputeCongestionBps uint64, params PaymentGovernanceParams) (PaymentsState, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return PaymentsState{}, err
+	}
+	if currentHeight == 0 {
+		return PaymentsState{}, errors.New("payments governed fee multiplier height must be positive")
+	}
+	if channelOpenCongestionBps > 10_000 || disputeCongestionBps > 10_000 {
+		return PaymentsState{}, errors.New("payments governed fee multiplier congestion bps exceeds 10000")
+	}
+	next := state.Export()
+	var err error
+	if channelOpenCongestionBps > 0 {
+		next, err = SetPaymentFeeMultiplier(next, PaymentFeeMultiplier{
+			FeeClass:      PaymentFeeClassChannelOpen,
+			MultiplierBps: params.Execution.ChannelOpenCongestionFeeMultiplierBps,
+			CongestionBps: uint32(channelOpenCongestionBps),
+			UpdatedHeight: currentHeight,
+		})
+		if err != nil {
+			return PaymentsState{}, err
+		}
+	}
+	if disputeCongestionBps > 0 {
+		next, err = SetPaymentFeeMultiplier(next, PaymentFeeMultiplier{
+			FeeClass:      PaymentFeeClassDispute,
+			MultiplierBps: params.Execution.DisputeCongestionFeeMultiplierBps,
+			CongestionBps: uint32(disputeCongestionBps),
+			UpdatedHeight: currentHeight,
+		})
+		if err != nil {
+			return PaymentsState{}, err
+		}
+	}
+	return next, next.Validate()
+}
+
+func StorePruneAfterHeightWithGovernance(recordHeight uint64, params PaymentGovernanceParams) (uint64, error) {
+	params = params.Normalize()
+	if err := params.Validate(); err != nil {
+		return 0, err
+	}
+	if recordHeight == 0 {
+		return 0, errors.New("payments store prune record height must be positive")
+	}
+	if recordHeight+params.Execution.StorePruningHorizon < recordHeight {
+		return 0, errors.New("payments store pruning horizon overflows height")
+	}
+	return recordHeight + params.Execution.StorePruningHorizon, nil
+}
+
+func (p PaymentRoutingGovernanceParams) Normalize(defaults PaymentRoutingGovernanceParams) PaymentRoutingGovernanceParams {
+	p.RoutingAdvertisementDeposit = normalizeAmountOrDefault(p.RoutingAdvertisementDeposit, defaults.RoutingAdvertisementDeposit)
+	if p.GossipMessageExpiry == 0 {
+		p.GossipMessageExpiry = defaults.GossipMessageExpiry
+	}
+	if p.LiquidityHintExpiry == 0 {
+		p.LiquidityHintExpiry = defaults.LiquidityHintExpiry
+	}
+	if p.MaximumTopologyUpdatesPerPeerWindow == 0 {
+		p.MaximumTopologyUpdatesPerPeerWindow = defaults.MaximumTopologyUpdatesPerPeerWindow
+	}
+	if p.RouteFailureScoreDecay == 0 {
+		p.RouteFailureScoreDecay = defaults.RouteFailureScoreDecay
+	}
+	if p.CongestionPenaltyDecay == 0 {
+		p.CongestionPenaltyDecay = defaults.CongestionPenaltyDecay
+	}
+	if p.CapacityProbeRateLimit == 0 {
+		p.CapacityProbeRateLimit = defaults.CapacityProbeRateLimit
+	}
+	if p.CapacityProbeWindow == 0 {
+		p.CapacityProbeWindow = defaults.CapacityProbeWindow
+	}
+	return p
+}
+
+func (p PaymentRoutingGovernanceParams) Validate() error {
+	params := p.Normalize(DefaultPaymentGovernanceParamsNoHash().Routing)
+	if err := validateNonNegativeInt("payments governance routing advertisement deposit", params.RoutingAdvertisementDeposit); err != nil {
+		return err
+	}
+	if params.GossipMessageExpiry == 0 || params.LiquidityHintExpiry == 0 {
+		return errors.New("payments governance gossip expiries must be positive")
+	}
+	if params.MaximumTopologyUpdatesPerPeerWindow == 0 {
+		return errors.New("payments governance topology update limit must be positive")
+	}
+	if params.RouteFailureScoreDecay == 0 || params.CongestionPenaltyDecay == 0 {
+		return errors.New("payments governance routing decay windows must be positive")
+	}
+	if params.CapacityProbeRateLimit == 0 || params.CapacityProbeWindow == 0 {
+		return errors.New("payments governance capacity probe rate limits must be positive")
+	}
+	return nil
+}
+
+func (p PaymentExecutionGovernanceParams) Normalize(defaults PaymentExecutionGovernanceParams) PaymentExecutionGovernanceParams {
+	if p.SettlementBatchMaximumSize == 0 {
+		p.SettlementBatchMaximumSize = defaults.SettlementBatchMaximumSize
+	}
+	if p.FinalizationQueueWorkLimitPerBlock == 0 {
+		p.FinalizationQueueWorkLimitPerBlock = defaults.FinalizationQueueWorkLimitPerBlock
+	}
+	if p.ExpiredPromiseCleanupWorkLimitPerBlock == 0 {
+		p.ExpiredPromiseCleanupWorkLimitPerBlock = defaults.ExpiredPromiseCleanupWorkLimitPerBlock
+	}
+	if p.ChannelOpenCongestionFeeMultiplierBps == 0 {
+		p.ChannelOpenCongestionFeeMultiplierBps = defaults.ChannelOpenCongestionFeeMultiplierBps
+	}
+	if p.DisputeCongestionFeeMultiplierBps == 0 {
+		p.DisputeCongestionFeeMultiplierBps = defaults.DisputeCongestionFeeMultiplierBps
+	}
+	if p.StorePruningHorizon == 0 {
+		p.StorePruningHorizon = defaults.StorePruningHorizon
+	}
+	return p
+}
+
+func (p PaymentExecutionGovernanceParams) Validate() error {
+	params := p.Normalize(DefaultPaymentGovernanceParamsNoHash().Execution)
+	if params.SettlementBatchMaximumSize == 0 || params.SettlementBatchMaximumSize > MaxSettlementBatchOps {
+		return fmt.Errorf("payments governance settlement batch max must be between 1 and %d", MaxSettlementBatchOps)
+	}
+	if params.FinalizationQueueWorkLimitPerBlock == 0 || params.ExpiredPromiseCleanupWorkLimitPerBlock == 0 {
+		return errors.New("payments governance queue work limits must be positive")
+	}
+	defaultSchedule := DefaultPaymentFeeSchedule().Normalize()
+	if params.ChannelOpenCongestionFeeMultiplierBps < defaultSchedule.BaseMultiplierBps || params.ChannelOpenCongestionFeeMultiplierBps > defaultSchedule.MaxMultiplierBps {
+		return errors.New("payments governance channel-open fee multiplier outside schedule bounds")
+	}
+	if params.DisputeCongestionFeeMultiplierBps < defaultSchedule.BaseMultiplierBps || params.DisputeCongestionFeeMultiplierBps > defaultSchedule.MaxMultiplierBps {
+		return errors.New("payments governance dispute fee multiplier outside schedule bounds")
+	}
+	if params.StorePruningHorizon == 0 {
+		return errors.New("payments governance store pruning horizon must be positive")
+	}
+	return nil
 }
 
 func normalizeAmountOrDefault(value, fallback string) string {

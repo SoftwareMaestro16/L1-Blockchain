@@ -1123,6 +1123,142 @@ func TestPaymentGovernanceParametersValidateVirtualAndFraudPenaltyBounds(t *test
 	require.ErrorContains(t, badAlloc.Validate(), "exceed 10000")
 }
 
+func TestPaymentGovernanceParametersValidateRoutingAndExecutionBounds(t *testing.T) {
+	alice := testAddress(0xe5)
+	router := testAddress(0xe6)
+	bob := testAddress(0xe7)
+	channel := signedChannel(t, "governance-routing-execution", "1000", alice, bob)
+
+	params := DefaultPaymentGovernanceParams()
+	params.Routing.RoutingAdvertisementDeposit = "12"
+	params.Routing.GossipMessageExpiry = 20
+	params.Routing.LiquidityHintExpiry = 10
+	params.Routing.MaximumTopologyUpdatesPerPeerWindow = 3
+	params.Routing.RouteFailureScoreDecay = 5
+	params.Routing.CongestionPenaltyDecay = 7
+	params.Routing.CapacityProbeRateLimit = 2
+	params.Routing.CapacityProbeWindow = 6
+	params.Execution.SettlementBatchMaximumSize = 1
+	params.Execution.FinalizationQueueWorkLimitPerBlock = 4
+	params.Execution.ExpiredPromiseCleanupWorkLimitPerBlock = 5
+	params.Execution.ChannelOpenCongestionFeeMultiplierBps = 30_000
+	params.Execution.DisputeCongestionFeeMultiplierBps = 40_000
+	params.Execution.StorePruningHorizon = 33
+	params = params.WithHash()
+	require.NoError(t, params.Validate())
+
+	schedule, err := BuildGovernedPaymentFeeSchedule(params)
+	require.NoError(t, err)
+	require.Equal(t, "12", schedule.RoutingAdvertisementDeposit)
+
+	routePolicy, err := BuildGovernedRoutePolicy(params)
+	require.NoError(t, err)
+	require.Equal(t, uint64(10), routePolicy.StaleLiquidityAfter)
+	require.Equal(t, uint64(7), routePolicy.DecayHalfLife)
+
+	gossipPolicy, err := BuildGovernedGossipRateLimitPolicy(params)
+	require.NoError(t, err)
+	require.Equal(t, uint64(20), gossipPolicy.WindowBlocks)
+	require.Equal(t, uint32(3), gossipPolicy.MaxTopologyUpdates)
+
+	failurePolicy, err := BuildGovernedRouteFailureScoringPolicy(params)
+	require.NoError(t, err)
+	score, err := BuildRouteFailureScore(RouteFailureReport{
+		ChannelID:      channel.ChannelID,
+		From:           alice,
+		To:             bob,
+		FailureClass:   RouteFailureCongestion,
+		Retryable:      true,
+		ObservedHeight: 10,
+	}, 1, failurePolicy)
+	require.NoError(t, err)
+	decayed, err := DecayRouteFailureScoreWithGovernance(score, 15, params)
+	require.NoError(t, err)
+	require.Equal(t, score.ScoreDelta/2, decayed.ScoreDelta)
+
+	gossip, err := BuildGossipMessage(GossipMessage{
+		MessageType:      GossipChannelUpdate,
+		ChainID:          channel.ChainID,
+		ChannelID:        channel.ChannelID,
+		NodeID:           alice,
+		From:             alice,
+		To:               bob,
+		Capacity:         "100",
+		FeeDenom:         NativeDenom,
+		FeeAmount:        "1",
+		ValidAfterHeight: 20,
+		ValidUntilHeight: 40,
+		Sequence:         1,
+	})
+	require.NoError(t, err)
+	require.NoError(t, ValidateGossipMessageExpiryWithGovernance(gossip, params))
+	tooLong := gossip
+	tooLong.ValidUntilHeight = 41
+	require.ErrorContains(t, ValidateGossipMessageExpiryWithGovernance(tooLong, params), "expiry exceeds")
+
+	liquidity, err := BuildGossipMessage(GossipMessage{
+		MessageType:      GossipLiquidityHint,
+		ChainID:          channel.ChainID,
+		ChannelID:        channel.ChannelID,
+		NodeID:           alice,
+		From:             alice,
+		To:               bob,
+		Capacity:         "100",
+		Liquidity:        "90",
+		FeeDenom:         NativeDenom,
+		FeeAmount:        "1",
+		ValidAfterHeight: 20,
+		ValidUntilHeight: 30,
+		Sequence:         2,
+	})
+	require.NoError(t, err)
+	require.NoError(t, ValidateGossipMessageExpiryWithGovernance(liquidity, params))
+	liquidity.ValidUntilHeight = 31
+	require.ErrorContains(t, ValidateGossipMessageExpiryWithGovernance(liquidity, params), "expiry exceeds")
+
+	probe := CapacityProbeRequest{From: alice, To: router, Amount: "10", CurrentHeight: 20, MaxHops: 3, BlindedRouteHint: HashParts("governance-probe")}
+	existing := []CapacityProbeRequest{
+		{From: alice, To: router, Amount: "10", CurrentHeight: 16, MaxHops: 3, BlindedRouteHint: HashParts("governance-probe-1")},
+		{From: alice, To: bob, Amount: "10", CurrentHeight: 19, MaxHops: 3, BlindedRouteHint: HashParts("governance-probe-2")},
+	}
+	require.ErrorContains(t, ValidateCapacityProbeRateLimitWithGovernance(existing, probe, params), "rate limit")
+	require.NoError(t, ValidateCapacityProbeRateLimitWithGovernance(existing[:1], probe, params))
+
+	opA := SettlementOperation{OperationID: HashParts("governance-batch-a"), OperationType: BatchOperationClose, ChannelID: channel.ChannelID, Nonce: 1, StateHash: channel.LatestState.StateHash}
+	opB := SettlementOperation{OperationID: HashParts("governance-batch-b"), OperationType: BatchOperationDispute, ChannelID: channel.ChannelID, Nonce: 2, StateHash: channel.LatestState.StateHash}
+	_, err = NewSettlementBatchWithGovernance(HashParts("governance-batch"), []SettlementOperation{opA, opB}, params)
+	require.ErrorContains(t, err, "settlement batch exceeds")
+	batch, err := NewSettlementBatchWithGovernance(HashParts("governance-batch-ok"), []SettlementOperation{opA}, params)
+	require.NoError(t, err)
+	require.Len(t, batch.Operations, 1)
+
+	next, result, err := ProcessAsyncExecutionQueuesWithGovernance(EmptyStateWithChannel(t, channel), 20, params)
+	require.NoError(t, err)
+	require.NoError(t, next.Validate())
+	require.LessOrEqual(t, result.ProcessedFinalizations, params.Execution.FinalizationQueueWorkLimitPerBlock)
+	require.LessOrEqual(t, result.ProcessedPromiseExpiries, params.Execution.ExpiredPromiseCleanupWorkLimitPerBlock)
+
+	feeState, err := ApplyGovernedExecutionFeeMultipliers(EmptyState(), 21, 8_000, 9_000, params)
+	require.NoError(t, err)
+	require.Len(t, feeState.FeeMultipliers, 2)
+	require.Equal(t, uint32(30_000), feeMultiplierForClass(feeState, PaymentFeeClassChannelOpen, feeState.FeeSchedule))
+	require.Equal(t, uint32(40_000), feeMultiplierForClass(feeState, PaymentFeeClassDispute, feeState.FeeSchedule))
+
+	pruneAfter, err := StorePruneAfterHeightWithGovernance(100, params)
+	require.NoError(t, err)
+	require.Equal(t, uint64(133), pruneAfter)
+
+	badExecution := params
+	badExecution.Execution.SettlementBatchMaximumSize = MaxSettlementBatchOps + 1
+	badExecution = badExecution.WithHash()
+	require.ErrorContains(t, badExecution.Validate(), "settlement batch max")
+
+	badMultiplier := params
+	badMultiplier.Execution.ChannelOpenCongestionFeeMultiplierBps = 1
+	badMultiplier = badMultiplier.WithHash()
+	require.ErrorContains(t, badMultiplier.Validate(), "channel-open fee multiplier")
+}
+
 func TestSettlementArbitrationBoundaryRejectsNonDeterministicInputs(t *testing.T) {
 	alice := testAddress(0x12)
 	bob := testAddress(0x13)
