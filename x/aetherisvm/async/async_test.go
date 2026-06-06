@@ -5,8 +5,11 @@ import (
 	"reflect"
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
+
+	appparams "github.com/sovereign-l1/l1/app/params"
 )
 
 func TestContractEmitsInternalMessageAndRecipientExecutesInOrder(t *testing.T) {
@@ -71,6 +74,49 @@ func TestContractEmitsInternalMessageAndRecipientExecutesInOrder(t *testing.T) {
 	queue := executor.Receipts()
 	require.Equal(t, uint64(0), queue[0].Sequence)
 	require.Equal(t, uint64(1), queue[1].Sequence)
+}
+
+func TestExecutionEconomyFeedsProtocolLoop(t *testing.T) {
+	executor := newTestExecutor(t)
+	deployer := testAddr(1)
+	contract := deployTestContract(t, executor, deployer, []byte("economy"))
+	params := DefaultParams()
+
+	require.NoError(t, executor.RegisterHandler(contract, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
+		return ExecutionResult{
+			NewState:   []byte("abcde"),
+			ResultCode: ResultOK,
+		}
+	}))
+	msg := testMessage(testAddr(9), contract, 1)
+	msg.Value = naetCoin(0)
+	require.NoError(t, executor.EnqueueTxMessages([]MessageEnvelope{msg}))
+
+	receipts, err := executor.ProcessBlock(1)
+	require.NoError(t, err)
+	require.Len(t, receipts, 1)
+	require.Equal(t, ResultOK, receipts[0].ResultCode)
+
+	activity := executor.EconomicActivity()
+	require.Equal(t, params.ContractDeploymentCost, activity.AVMDeploymentCostNaet)
+	require.Equal(t, params.StorageFeePerByte.MulRaw(5), activity.AVMStorageFeeNaet)
+	require.Equal(t, params.ForwardingFee, activity.AVMForwardingFeeNaet)
+
+	control, err := appparams.BalanceController(appparams.BalanceControllerInput{
+		CurrentInflationBps: appparams.DefaultTargetInflationBps,
+		StakeRatioBps:       appparams.DefaultTargetStakeBps,
+		BlockLoadBps:        appparams.DefaultTargetLoadBps,
+		AnnualMint:          sdkmath.NewInt(100),
+		AnnualBurn:          sdkmath.NewInt(100),
+		Activity:            activity,
+	})
+	require.NoError(t, err)
+	require.True(t, control.DeflationGuardActive)
+
+	flow, err := executor.EconomicFlow(control)
+	require.NoError(t, err)
+	require.Equal(t, activity.TotalCharges(), flow.TotalChargesNaet)
+	require.Equal(t, flow.TotalChargesNaet, flow.BurnNaet.Add(flow.TreasuryNaet).Add(flow.ValidatorRewardsNaet))
 }
 
 func TestFailedSendProducesDeterministicBounceWithoutDestinationMutation(t *testing.T) {

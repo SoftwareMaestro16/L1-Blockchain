@@ -70,6 +70,7 @@ func (e *Executor) DeployContracts(deployer sdk.AccAddress, specs []DeploySpec) 
 			return nil, err
 		}
 		e.contracts[string(address)] = contract
+		e.metrics.DeploymentCostsNaet = addNaetMetric(e.metrics.DeploymentCostsNaet, e.params.ContractDeploymentCost)
 		if first == nil {
 			first = address
 		}

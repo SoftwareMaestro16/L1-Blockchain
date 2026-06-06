@@ -167,6 +167,26 @@ func TestDynamicFeeFormulaIsBoundedAndNonAuction(t *testing.T) {
 	}
 }
 
+func TestQuoteFeeIncludesEconomicControlSurface(t *testing.T) {
+	params := DefaultParams()
+	quote, err := QuoteFee(params, params.MaxTxGas, params.MaxBlockGas-params.MaxTxGas)
+	if err != nil {
+		t.Fatalf("quote should compute: %v", err)
+	}
+	if !quote.Congested || !quote.AtHardCap {
+		t.Fatalf("expected congested hard-cap quote, got %+v", quote)
+	}
+	if quote.EconomicControl.BurnRatioBps != appparams.CongestedBurnRatioBps {
+		t.Fatalf("expected congested burn ratio, got %+v", quote.EconomicControl)
+	}
+	if !quote.EconomicControl.RateLimited {
+		t.Fatalf("expected rate-limit economic signal")
+	}
+	if quote.EconomicControl.ActivityInflationDeltaBps >= 0 {
+		t.Fatalf("expected network activity to reduce inflation pressure, got %+v", quote.EconomicControl)
+	}
+}
+
 func TestValidateAdmissionRejectsSpamWithoutUnboundedFeeEscalation(t *testing.T) {
 	params := DefaultParams()
 	quote, err := ValidateAdmission(params, AdmissionInput{

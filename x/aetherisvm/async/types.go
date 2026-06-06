@@ -112,15 +112,16 @@ type ExecutionReceipt struct {
 }
 
 type Observability struct {
-	QueuedMessages     uint64
-	ProcessedMessages  uint64
-	BouncedMessages    uint64
-	RefundMessages     uint64
-	RetriedMessages    uint64
-	DeadLetterMessages uint64
-	FailedExecutions   uint64
-	GasUsed            uint64
-	QueueLag           uint64
+	QueuedMessages      uint64
+	ProcessedMessages   uint64
+	BouncedMessages     uint64
+	RefundMessages      uint64
+	RetriedMessages     uint64
+	DeadLetterMessages  uint64
+	FailedExecutions    uint64
+	GasUsed             uint64
+	QueueLag            uint64
+	DeploymentCostsNaet uint64
 }
 
 type ExportedState struct {

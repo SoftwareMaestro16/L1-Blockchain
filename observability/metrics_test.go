@@ -28,6 +28,18 @@ func TestMetricNamesSnapshot(t *testing.T) {
 		MetricDexSwaps,
 		MetricFeesAccepted,
 		MetricFeesRejected,
+		MetricEconomyInflationBps,
+		MetricEconomyBurnRatioBps,
+		MetricEconomyValidatorFeeRatioBps,
+		MetricEconomyDeflationGuard,
+		MetricEconomyQueueLimited,
+		MetricEconomyRateLimited,
+		MetricEconomyTotalChargesNaet,
+		MetricEconomyBurnNaet,
+		MetricEconomyTreasuryNaet,
+		MetricEconomyValidatorRewardsNaet,
+		MetricEconomyOptimalState,
+		MetricEconomyFailedConditions,
 		MetricLocalnetHealth,
 		MetricProcessUptimeSeconds,
 		MetricProcessMemoryBytes,
@@ -106,6 +118,18 @@ func (r *Registry) RecordTestSamples() {
 	r.IncCounter(MetricDexSwaps, Labels{"result": "success"}, 1)
 	r.IncCounter(MetricFeesAccepted, Labels{"result": "accepted"}, 1)
 	r.IncCounter(MetricFeesRejected, Labels{"reason": "invalid_fee"}, 1)
+	r.SetGauge(MetricEconomyInflationBps, nil, 300)
+	r.SetGauge(MetricEconomyBurnRatioBps, nil, 3_000)
+	r.SetGauge(MetricEconomyValidatorFeeRatioBps, nil, 6_000)
+	r.SetGauge(MetricEconomyDeflationGuard, nil, 0)
+	r.SetGauge(MetricEconomyQueueLimited, nil, 0)
+	r.SetGauge(MetricEconomyRateLimited, nil, 0)
+	r.SetGauge(MetricEconomyTotalChargesNaet, Labels{"denom": "naet"}, 100)
+	r.SetGauge(MetricEconomyBurnNaet, Labels{"denom": "naet"}, 30)
+	r.SetGauge(MetricEconomyTreasuryNaet, Labels{"denom": "naet"}, 10)
+	r.SetGauge(MetricEconomyValidatorRewardsNaet, Labels{"denom": "naet"}, 60)
+	r.SetGauge(MetricEconomyOptimalState, nil, 1)
+	r.SetGauge(MetricEconomyFailedConditions, nil, 0)
 }
 
 func renderRegistry(t *testing.T, reg *Registry) string {

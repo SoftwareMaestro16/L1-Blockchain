@@ -5,6 +5,8 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	appparams "github.com/sovereign-l1/l1/app/params"
 )
 
 const (
@@ -31,6 +33,7 @@ type FeeQuote struct {
 	Congested         bool
 	AtHardCap         bool
 	AcceptedFeeAmount sdkmath.Int
+	EconomicControl   appparams.BalanceControllerOutput
 }
 
 type AdmissionInput struct {
@@ -61,6 +64,14 @@ func QuoteFee(params Params, gasLimit, blockGasConsumed uint64) (FeeQuote, error
 	if accepted.GT(maxFee) {
 		accepted = maxFee
 	}
+	economicControl, err := appparams.BalanceController(appparams.BalanceControllerInput{
+		CurrentInflationBps: appparams.DefaultTargetInflationBps,
+		StakeRatioBps:       appparams.DefaultTargetStakeBps,
+		BlockLoadBps:        int64(utilization),
+	})
+	if err != nil {
+		return FeeQuote{}, err
+	}
 	return FeeQuote{
 		RequiredFee:       sdk.NewCoin(BondDenom, accepted),
 		BaseFee:           sdk.NewCoin(BondDenom, baseFee),
@@ -69,6 +80,7 @@ func QuoteFee(params Params, gasLimit, blockGasConsumed uint64) (FeeQuote, error
 		Congested:         utilization >= params.CongestionThresholdBps,
 		AtHardCap:         accepted.Equal(maxFee),
 		AcceptedFeeAmount: accepted,
+		EconomicControl:   economicControl,
 	}, nil
 }
 

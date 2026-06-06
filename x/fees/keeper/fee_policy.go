@@ -7,6 +7,8 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	appparams "github.com/sovereign-l1/l1/app/params"
+	"github.com/sovereign-l1/l1/observability"
 	"github.com/sovereign-l1/l1/x/fees/types"
 )
 
@@ -47,6 +49,28 @@ func (k Keeper) AdmitTx(ctx sdk.Context, tx sdk.FeeTx, sender sdk.AccAddress, si
 		return types.FeeQuote{}, err
 	}
 	if !simulate {
+		observability.RecordEconomicControl(
+			quote.EconomicControl.InflationBps,
+			quote.EconomicControl.BurnRatioBps,
+			quote.EconomicControl.ValidatorFeeRatioBps,
+			quote.EconomicControl.DeflationGuardActive,
+			quote.EconomicControl.QueueLimited,
+			quote.EconomicControl.RateLimited,
+		)
+		if flow, err := appparams.ComputeProtocolEconomicFlow(appparams.ProtocolEconomicFlowInput{
+			Activity: appparams.ProtocolEconomicActivity{
+				TxFeeNaet: quote.AcceptedFeeAmount,
+			},
+			BurnRatioBps:     quote.EconomicControl.BurnRatioBps,
+			TreasuryRatioBps: appparams.TreasuryFeeRatioBps,
+		}); err == nil {
+			observability.RecordEconomicFlow(
+				flow.TotalChargesNaet.Int64(),
+				flow.BurnNaet.Int64(),
+				flow.TreasuryNaet.Int64(),
+				flow.ValidatorRewardsNaet.Int64(),
+			)
+		}
 		if err := k.setBlockTxCount(ctx, blockCount+1); err != nil {
 			return types.FeeQuote{}, err
 		}
