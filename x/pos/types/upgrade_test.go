@@ -236,6 +236,85 @@ func TestKeeperIntegrationManifestRejectsUnsafeHooksMigrationsAndRewards(t *test
 	require.ErrorContains(t, badExport.Validate(compatibility, boundaries), "deterministic")
 }
 
+func TestStateModelManifestDefinesAllRequiredKeyPrefixes(t *testing.T) {
+	manifest := DefaultStateModelManifest()
+	require.NoError(t, manifest.Validate())
+	require.Equal(t, ComputeStateModelRoot(manifest), manifest.Root)
+	require.Equal(t, []string{
+		"epoch/current",
+		"epoch/records/{epoch_id}",
+		"epoch/phase/{epoch_id}",
+		"epoch/seed/{epoch_id}",
+		"valecon/scores/{epoch_id}/{validator}",
+		"valecon/effective_stake/{epoch_id}/{validator}",
+		"valecon/saturation/{epoch_id}/{validator}",
+		"valecon/roles/{epoch_id}/{validator}/{role}",
+		"taskgroups/groups/{epoch_id}/{task_group_id}",
+		"taskgroups/workloads/{workload_id}",
+		"taskgroups/assignments/{epoch_id}/{validator}/{task_group_id}",
+		"taskgroups/proposer/{epoch_id}/{slot}/{task_group_id}",
+		"evidence/records/{evidence_id}",
+		"evidence/by_accused/{validator}/{evidence_id}",
+		"evidence/by_reporter/{reporter}/{evidence_id}",
+		"evidence/verification_groups/{evidence_id}",
+		"evidence/deposits/{evidence_id}",
+		"performance/records/{epoch_id}/{operator}/{role}",
+		"performance/uptime/{epoch_id}/{validator}",
+		"performance/correctness/{epoch_id}/{validator}",
+		"performance/tasks/{epoch_id}/{validator}",
+		"risk/unbonding/{delegator}/{validator}/{creation_height}",
+		"risk/redelegation/{delegator}/{src_validator}/{dst_validator}/{epoch_id}",
+		"risk/exposure/{epoch_id}/{validator}/{delegator}",
+	}, stateKeyTemplates(manifest))
+}
+
+func TestStateKeyBuildersProduceDeterministicPaths(t *testing.T) {
+	require.Equal(t, "epoch/current", EpochCurrentKey())
+	require.Equal(t, "epoch/records/42", EpochRecordKey(42))
+	require.Equal(t, "epoch/phase/42", EpochPhaseKey(42))
+	require.Equal(t, "epoch/seed/42", EpochSeedKey(42))
+	require.Equal(t, "valecon/scores/42/val-a", mustStateKey(t, func() (string, error) { return ValidatorScoreKey(42, "val-a") }))
+	require.Equal(t, "valecon/effective_stake/42/val-a", mustStateKey(t, func() (string, error) { return ValidatorEffectiveStakeKey(42, "val-a") }))
+	require.Equal(t, "valecon/saturation/42/val-a", mustStateKey(t, func() (string, error) { return ValidatorSaturationKey(42, "val-a") }))
+	require.Equal(t, "valecon/roles/42/val-a/verifier", mustStateKey(t, func() (string, error) { return ValidatorRoleKey(42, "val-a", ValidatorRoleVerifier) }))
+	require.Equal(t, "taskgroups/groups/42/tg-a", mustStateKey(t, func() (string, error) { return TaskGroupKey(42, "tg-a") }))
+	require.Equal(t, "taskgroups/workloads/workload-a", mustStateKey(t, func() (string, error) { return WorkloadKey("workload-a") }))
+	require.Equal(t, "taskgroups/assignments/42/val-a/tg-a", mustStateKey(t, func() (string, error) { return TaskAssignmentKey(42, "val-a", "tg-a") }))
+	require.Equal(t, "taskgroups/proposer/42/7/tg-a", mustStateKey(t, func() (string, error) { return ProposerKey(42, 7, "tg-a") }))
+	require.Equal(t, "evidence/records/evidence-a", mustStateKey(t, func() (string, error) { return EvidenceRecordKey("evidence-a") }))
+	require.Equal(t, "evidence/by_accused/val-a/evidence-a", mustStateKey(t, func() (string, error) { return EvidenceByAccusedKey("val-a", "evidence-a") }))
+	require.Equal(t, "evidence/by_reporter/reporter-a/evidence-a", mustStateKey(t, func() (string, error) { return EvidenceByReporterKey("reporter-a", "evidence-a") }))
+	require.Equal(t, "evidence/verification_groups/evidence-a", mustStateKey(t, func() (string, error) { return EvidenceVerificationGroupKey("evidence-a") }))
+	require.Equal(t, "evidence/deposits/evidence-a", mustStateKey(t, func() (string, error) { return EvidenceDepositKey("evidence-a") }))
+	require.Equal(t, "performance/records/42/operator-a/verifier", mustStateKey(t, func() (string, error) { return PerformanceRecordKey(42, "operator-a", ValidatorRoleVerifier) }))
+	require.Equal(t, "performance/uptime/42/val-a", mustStateKey(t, func() (string, error) { return PerformanceUptimeKey(42, "val-a") }))
+	require.Equal(t, "performance/correctness/42/val-a", mustStateKey(t, func() (string, error) { return PerformanceCorrectnessKey(42, "val-a") }))
+	require.Equal(t, "performance/tasks/42/val-a", mustStateKey(t, func() (string, error) { return PerformanceTasksKey(42, "val-a") }))
+	require.Equal(t, "risk/unbonding/delegator-a/val-a/100", mustStateKey(t, func() (string, error) { return RiskUnbondingKey("delegator-a", "val-a", 100) }))
+	require.Equal(t, "risk/redelegation/delegator-a/val-a/val-b/42", mustStateKey(t, func() (string, error) { return RiskRedelegationKey("delegator-a", "val-a", "val-b", 42) }))
+	require.Equal(t, "risk/exposure/42/val-a/delegator-a", mustStateKey(t, func() (string, error) { return RiskExposureKey(42, "val-a", "delegator-a") }))
+}
+
+func TestStateModelRejectsAmbiguousPrefixesAndPathInjection(t *testing.T) {
+	manifest := DefaultStateModelManifest()
+	duplicate := manifest
+	duplicate.Keys = append([]StateKeySpec{}, manifest.Keys...)
+	duplicate.Keys[1].Template = duplicate.Keys[0].Template
+	duplicate.Keys[1].Components = nil
+	duplicate.Root = ComputeStateModelRoot(duplicate)
+	require.ErrorContains(t, duplicate.Validate(), "duplicate state key template")
+
+	tampered := manifest
+	tampered.Keys = append([]StateKeySpec{}, manifest.Keys...)
+	tampered.Keys[0].Name = "current2"
+	require.ErrorContains(t, tampered.Validate(), "root mismatch")
+
+	_, err := ValidatorScoreKey(42, "val/a")
+	require.ErrorContains(t, err, "path separator")
+	_, err = EvidenceRecordKey(" evidence-a")
+	require.ErrorContains(t, err, "surrounding whitespace")
+}
+
 func TestEpochDefinitionDefaultsMatchLifecycleParameters(t *testing.T) {
 	params := DefaultParams()
 
@@ -2219,4 +2298,19 @@ func exportImportModuleNames(specs []ModuleExportImportSpec) []string {
 		out[i] = spec.ModuleName
 	}
 	return out
+}
+
+func stateKeyTemplates(manifest StateModelManifest) []string {
+	out := make([]string, len(manifest.Keys))
+	for i, key := range manifest.Keys {
+		out[i] = key.Template
+	}
+	return out
+}
+
+func mustStateKey(t *testing.T, build func() (string, error)) string {
+	t.Helper()
+	key, err := build()
+	require.NoError(t, err)
+	return key
 }
