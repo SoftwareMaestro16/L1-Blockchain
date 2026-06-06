@@ -184,6 +184,32 @@ func AcceptAsyncCheckpoint(state PaymentsState, channelID string, checkpoint Cha
 	return next, next.Validate()
 }
 
+func RegisterUpdateCheckpoint(state PaymentsState, req ChannelUpdateRequest) (PaymentsState, ChannelUpdateResult, error) {
+	state = state.Export()
+	channel, found := state.ChannelByID(req.ChannelID)
+	if !found {
+		return PaymentsState{}, ChannelUpdateResult{}, errors.New("payments channel not found")
+	}
+	result, err := ValidateOffchainUpdate(channel, req)
+	if err != nil {
+		return PaymentsState{}, ChannelUpdateResult{}, err
+	}
+	if !req.Normalize().RegisterCheckpoint {
+		return state, result, nil
+	}
+	var next PaymentsState
+	if channel.ChannelType == ChannelTypeAsync || len(req.Normalize().AsyncDeltas) > 0 {
+		next, err = AcceptAsyncCheckpoint(state, channel.ChannelID, req.Normalize().State, req.Normalize().AsyncDeltas, req.Normalize().Submitter, req.Normalize().CurrentHeight)
+	} else {
+		next, err = AcceptSignedState(state, channel.ChannelID, req.Normalize().State, req.Normalize().CurrentHeight)
+	}
+	if err != nil {
+		return PaymentsState{}, ChannelUpdateResult{}, err
+	}
+	result.CheckpointRegistered = true
+	return next, result, nil
+}
+
 func SubmitClose(state PaymentsState, channelID string, closingState ChannelState, submitter string, currentHeight uint64, settlementFee string) (PaymentsState, error) {
 	state = state.Export()
 	if currentHeight == 0 {
@@ -217,6 +243,52 @@ func SubmitClose(state PaymentsState, channelID string, closingState ChannelStat
 	nextChannel.Status = ChannelStatusPendingClose
 	nextChannel.PendingClose = pending
 	nextChannel.LatestState = pending.State
+	next := state.Clone()
+	next.Channels[index] = nextChannel.Normalize()
+	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
+	sortChannels(next.Channels)
+	return next, next.Validate()
+}
+
+func ForcedClose(state PaymentsState, channelID string, submitter string, currentHeight uint64, settlementFee string) (PaymentsState, error) {
+	state = state.Export()
+	if currentHeight == 0 {
+		return PaymentsState{}, errors.New("payments forced close height must be positive")
+	}
+	index, channel, found := state.ChannelIndex(channelID)
+	if !found {
+		return PaymentsState{}, errors.New("payments channel not found")
+	}
+	if channel.Status != ChannelStatusOpen {
+		return PaymentsState{}, errors.New("payments channel is not open")
+	}
+	if !containsString(channel.Participants, submitter) {
+		return PaymentsState{}, errors.New("payments forced close submitter must be participant")
+	}
+	timeoutHeight := channel.LatestState.TimeoutHeight
+	if channel.ChannelType == ChannelTypeAsync && channel.LatestState.ExpiryHeight != 0 {
+		timeoutHeight = channel.LatestState.ExpiryHeight
+	}
+	if channel.ChannelType == ChannelTypeUnidirectional && channel.ExpirationHeight != 0 {
+		timeoutHeight = channel.ExpirationHeight
+	}
+	if timeoutHeight == 0 || currentHeight <= timeoutHeight {
+		return PaymentsState{}, errors.New("payments forced close timeout has not expired")
+	}
+	pending := PendingClose{
+		Submitter:          submitter,
+		SubmittedHeight:    currentHeight,
+		SettleAfterHeight:  currentHeight + channel.DisputePeriod,
+		SettlementFeeDenom: NativeDenom,
+		SettlementFee:      settlementFee,
+		State:              channel.LatestState.Normalize(),
+	}
+	if err := pending.ValidateForChannel(channel); err != nil {
+		return PaymentsState{}, err
+	}
+	nextChannel := channel
+	nextChannel.Status = ChannelStatusPendingClose
+	nextChannel.PendingClose = pending
 	next := state.Clone()
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
@@ -478,6 +550,52 @@ func SubmitFraudProof(state PaymentsState, channelID string, proof FraudProof, c
 	next.Channels[index] = nextChannel.Normalize()
 	sortChannels(next.Channels)
 	return next, next.Validate()
+}
+
+func FraudClose(state PaymentsState, channelID string, currentHeight uint64) (PaymentsState, SettlementRecord, error) {
+	state = state.Export()
+	if currentHeight == 0 {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments fraud close height must be positive")
+	}
+	index, channel, found := state.ChannelIndex(channelID)
+	if !found {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments channel not found")
+	}
+	if channel.Status != ChannelStatusPendingClose {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments fraud close requires pending close")
+	}
+	if len(channel.PendingClose.FraudProofs) == 0 || len(channel.PendingClose.Penalties) == 0 {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments fraud close requires accepted proof")
+	}
+	finalBalances, err := applySettlementAdjustments(channel.PendingClose.State.Balances, channel.PendingClose.Penalties, channel.PendingClose.SettlementFee, channel.PendingClose.Submitter)
+	if err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	settlement := SettlementRecord{
+		ChannelID:          channel.ChannelID,
+		StateHash:          channel.PendingClose.State.StateHash,
+		Nonce:              channel.PendingClose.State.Nonce,
+		FinalBalances:      finalBalances,
+		SettlementFeeDenom: channel.PendingClose.SettlementFeeDenom,
+		SettlementFee:      channel.PendingClose.SettlementFee,
+		Penalties:          channel.PendingClose.Penalties,
+		SettledHeight:      currentHeight,
+	}
+	settlement.SettlementHash = ComputeSettlementHash(settlement)
+	if err := settlement.ValidateForChannel(channel); err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	nextChannel := channel
+	nextChannel.Status = ChannelStatusSettled
+	nextChannel.FinalizedNonce = settlement.Nonce
+	nextChannel.PendingClose = PendingClose{}
+	next := state.Clone()
+	next.Channels[index] = nextChannel.Normalize()
+	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
+	next.Settlements = append(next.Settlements, settlement)
+	sortChannels(next.Channels)
+	sortSettlements(next.Settlements)
+	return next, settlement, next.Validate()
 }
 
 func FinalizeSettlement(state PaymentsState, channelID string, currentHeight uint64) (PaymentsState, SettlementRecord, error) {

@@ -129,6 +129,25 @@ type ChannelOpenRequest struct {
 	ExpirationTimestamp          int64
 }
 
+type ChannelUpdateRequest struct {
+	ChannelID            string
+	State                ChannelState
+	ConditionCommitments []ConditionalPayment
+	AsyncDeltas          []AsyncPaymentDelta
+	RegisterCheckpoint   bool
+	Submitter            string
+	CurrentHeight        uint64
+}
+
+type ChannelUpdateResult struct {
+	ChannelID            string
+	StateHash            string
+	Nonce                uint64
+	ValidatedOffChain    bool
+	CheckpointRegistered bool
+	Liquidity            []Balance
+}
+
 type ChannelState struct {
 	ChainID               string
 	ChannelID             string
@@ -485,6 +504,74 @@ func (r ChannelOpenRequest) Validate() error {
 		return errors.New("payments async open expiry height must be positive")
 	}
 	return nil
+}
+
+func (r ChannelUpdateRequest) Normalize() ChannelUpdateRequest {
+	r.ChannelID = normalizeHash(r.ChannelID)
+	r.State = r.State.Normalize()
+	r.ConditionCommitments = normalizeConditions(r.ConditionCommitments)
+	r.AsyncDeltas = normalizeAsyncDeltas(r.AsyncDeltas)
+	r.Submitter = strings.TrimSpace(r.Submitter)
+	return r
+}
+
+func ValidateOffchainUpdate(channel ChannelRecord, req ChannelUpdateRequest) (ChannelUpdateResult, error) {
+	channel = channel.Normalize()
+	if err := channel.ValidateCore(); err != nil {
+		return ChannelUpdateResult{}, err
+	}
+	if channel.Status != ChannelStatusOpen {
+		return ChannelUpdateResult{}, errors.New("payments update requires open channel")
+	}
+	req = req.Normalize()
+	if req.ChannelID != channel.ChannelID {
+		return ChannelUpdateResult{}, errors.New("payments update channel mismatch")
+	}
+	if req.CurrentHeight == 0 {
+		return ChannelUpdateResult{}, errors.New("payments update height must be positive")
+	}
+	if req.Submitter != "" && !containsString(channel.Participants, req.Submitter) {
+		return ChannelUpdateResult{}, errors.New("payments update submitter must be participant")
+	}
+	if req.State.Nonce <= channel.LatestState.Nonce {
+		return ChannelUpdateResult{}, errors.New("payments update nonce must increase")
+	}
+	if channel.ChannelType != ChannelTypeAsync && req.State.PreviousStateHash != channel.LatestState.StateHash {
+		return ChannelUpdateResult{}, errors.New("payments update previous hash must match latest state")
+	}
+	if len(req.ConditionCommitments) > 0 {
+		if !channel.ConditionalPayments {
+			return ChannelUpdateResult{}, errors.New("payments channel does not support conditional payments")
+		}
+		if err := validateConditions(req.ConditionCommitments); err != nil {
+			return ChannelUpdateResult{}, err
+		}
+		if req.State.PendingConditionsRoot != ComputeConditionsRoot(req.ConditionCommitments) {
+			return ChannelUpdateResult{}, errors.New("payments update condition commitment root mismatch")
+		}
+	}
+	if err := req.State.ValidateForChannel(channel, false); err != nil {
+		return ChannelUpdateResult{}, err
+	}
+	if err := validateUpdateExposure(req.State); err != nil {
+		return ChannelUpdateResult{}, err
+	}
+	if len(req.AsyncDeltas) > 0 {
+		reconstructed, err := BuildAsyncCheckpointState(channel, req.AsyncDeltas, req.State.CheckpointNonce, req.CurrentHeight)
+		if err != nil {
+			return ChannelUpdateResult{}, err
+		}
+		if reconstructed.StateHash != req.State.StateHash {
+			return ChannelUpdateResult{}, errors.New("payments async update checkpoint mismatch")
+		}
+	}
+	return ChannelUpdateResult{
+		ChannelID:         channel.ChannelID,
+		StateHash:         req.State.StateHash,
+		Nonce:             req.State.Nonce,
+		ValidatedOffChain: true,
+		Liquidity:         req.State.Balances,
+	}, nil
 }
 
 func BuildUnidirectionalClaim(claim UnidirectionalClaim) (UnidirectionalClaim, error) {
@@ -1819,6 +1906,29 @@ func validateCloseDelay(closeDelay uint64) error {
 func validateChallengePeriod(period uint64) error {
 	if period < MinChallengePeriod || period > MaxChallengePeriod {
 		return fmt.Errorf("payments challenge period must be between %d and %d", MinChallengePeriod, MaxChallengePeriod)
+	}
+	return nil
+}
+
+func validateUpdateExposure(state ChannelState) error {
+	state = state.Normalize()
+	if state.ChannelType != ChannelTypeBidirectional || len(state.Conditions) == 0 {
+		return nil
+	}
+	conditionTotal, err := sumConditions(state.Conditions)
+	if err != nil {
+		return err
+	}
+	reserveA, err := parseNonNegativeInt("payments update reserve a", state.ReserveA)
+	if err != nil {
+		return err
+	}
+	reserveB, err := parseNonNegativeInt("payments update reserve b", state.ReserveB)
+	if err != nil {
+		return err
+	}
+	if conditionTotal.GT(reserveA.Add(reserveB)) {
+		return errors.New("payments update conditions exceed reserve limits")
 	}
 	return nil
 }

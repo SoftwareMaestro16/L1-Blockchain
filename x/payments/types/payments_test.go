@@ -272,6 +272,87 @@ func TestBidirectionalCloseAndUpdateRules(t *testing.T) {
 	require.Equal(t, "545", amountFor(settlement.FinalBalances, bob))
 }
 
+func TestChannelUpdateLifecycleValidatesOffchainAndRegistersCheckpoint(t *testing.T) {
+	alice := testAddress(0x46)
+	bob := testAddress(0x47)
+	channel := signedChannel(t, "update-lifecycle", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	update := signedConditionalState(t, channel, 2, channel.OpeningStateHash, "25", []Balance{
+		{Participant: channel.Participants[0], Amount: "475"},
+		{Participant: channel.Participants[1], Amount: "500"},
+	})
+	req := ChannelUpdateRequest{
+		ChannelID:            channel.ChannelID,
+		State:                update,
+		ConditionCommitments: update.Conditions,
+		Submitter:            alice,
+		CurrentHeight:        18,
+	}
+	result, err := ValidateOffchainUpdate(channel, req)
+	require.NoError(t, err)
+	require.True(t, result.ValidatedOffChain)
+	require.False(t, result.CheckpointRegistered)
+
+	unchanged, result, err := RegisterUpdateCheckpoint(state, req)
+	require.NoError(t, err)
+	require.False(t, result.CheckpointRegistered)
+	require.Equal(t, channel.LatestState.StateHash, unchanged.Channels[0].LatestState.StateHash)
+
+	req.RegisterCheckpoint = true
+	state, result, err = RegisterUpdateCheckpoint(state, req)
+	require.NoError(t, err)
+	require.True(t, result.CheckpointRegistered)
+	require.Equal(t, update.StateHash, state.Channels[0].LatestState.StateHash)
+
+	overReserve := signedConditionalState(t, channel, 2, channel.OpeningStateHash, "30", []Balance{
+		{Participant: channel.Participants[0], Amount: "475"},
+		{Participant: channel.Participants[1], Amount: "500"},
+	})
+	_, err = ValidateOffchainUpdate(channel, ChannelUpdateRequest{
+		ChannelID:            channel.ChannelID,
+		State:                overReserve,
+		ConditionCommitments: overReserve.Conditions,
+		Submitter:            alice,
+		CurrentHeight:        18,
+	})
+	require.ErrorContains(t, err, "reserve")
+}
+
+func TestAsyncUpdateBatchCanRegisterCheckpoint(t *testing.T) {
+	alice := testAddress(0x48)
+	bob := testAddress(0x49)
+	channel := signedAsyncChannel(t, "async-update-lifecycle", "1000", []Balance{
+		{Participant: alice, Amount: "700"},
+		{Participant: bob, Amount: "300"},
+	}, 4, 8, "100", 90, alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	delta := signedAsyncDelta(t, channel, "update-delta", alice, bob, "40", 2, 2, 80)
+	checkpoint, err := BuildAsyncCheckpointState(channel, []AsyncPaymentDelta{delta}, 3, 30)
+	require.NoError(t, err)
+	checkpoint = signAsyncCheckpoint(t, channel, checkpoint)
+	state, result, err := RegisterUpdateCheckpoint(state, ChannelUpdateRequest{
+		ChannelID:          channel.ChannelID,
+		State:              checkpoint,
+		AsyncDeltas:        []AsyncPaymentDelta{delta},
+		RegisterCheckpoint: true,
+		Submitter:          bob,
+		CurrentHeight:      30,
+	})
+	require.NoError(t, err)
+	require.True(t, result.CheckpointRegistered)
+	require.Equal(t, checkpoint.StateHash, state.Channels[0].LatestState.StateHash)
+}
+
 func TestUnidirectionalReceiverCloseUsesSinglePayerSignature(t *testing.T) {
 	payer := testAddress(0x3b)
 	receiver := testAddress(0x3c)
@@ -581,6 +662,73 @@ func TestSettlementPrunesRoutingEdgesForAuthoritativeClosedChannel(t *testing.T)
 	require.ErrorContains(t, err, "route not found")
 }
 
+func TestForcedClosePreservesDisputeWindowAfterTimeout(t *testing.T) {
+	alice := testAddress(0x4e)
+	bob := testAddress(0x4f)
+	channel := signedChannel(t, "forced-close", "500", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	_, err = ForcedClose(state, channel.ChannelID, alice, channel.LatestState.TimeoutHeight, "0")
+	require.ErrorContains(t, err, "timeout")
+
+	state, err = ForcedClose(state, channel.ChannelID, alice, channel.LatestState.TimeoutHeight+1, "0")
+	require.NoError(t, err)
+	require.Equal(t, ChannelStatusPendingClose, state.Channels[0].Status)
+	require.Equal(t, channel.LatestState.TimeoutHeight+1+channel.DisputePeriod, state.Channels[0].PendingClose.SettleAfterHeight)
+
+	newer := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "225"},
+		{Participant: bob, Amount: "275"},
+	})
+	state, err = DisputeClose(state, channel.ChannelID, newer, bob, channel.LatestState.TimeoutHeight+2)
+	require.NoError(t, err)
+	require.Equal(t, newer.StateHash, state.Channels[0].PendingClose.State.StateHash)
+}
+
+func TestFraudCloseSettlesAfterAcceptedProof(t *testing.T) {
+	alice := testAddress(0x53)
+	bob := testAddress(0x54)
+	channel := signedChannel(t, "fraud-close", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "400"},
+		{Participant: bob, Amount: "600"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+
+	conflicting := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "500"},
+		{Participant: bob, Amount: "500"},
+	})
+	proof := FraudProof{
+		ProofID:         HashParts("fraud-close-proof", channel.ChannelID),
+		ProofType:       FraudProofTypeDoubleSign,
+		SubmittedBy:     bob,
+		OffendingSigner: alice,
+		StateA:          closeState,
+		StateB:          conflicting,
+		PenaltyAmount:   "25",
+		EvidenceHash:    HashParts("evidence", closeState.StateHash, conflicting.StateHash),
+	}
+	state, err = SubmitFraudProof(state, channel.ChannelID, proof, 21)
+	require.NoError(t, err)
+	state, settlement, err := FraudClose(state, channel.ChannelID, 22)
+	require.NoError(t, err)
+	require.Equal(t, ChannelStatusSettled, state.Channels[0].Status)
+	require.Equal(t, "375", amountFor(settlement.FinalBalances, alice))
+	require.Equal(t, "625", amountFor(settlement.FinalBalances, bob))
+}
+
 func TestSettlementBatchRequiresIndependentChannels(t *testing.T) {
 	alice := testAddress(0x51)
 	bob := testAddress(0x52)
@@ -655,6 +803,49 @@ func signedState(t *testing.T, channel ChannelRecord, nonce uint64, previous str
 	})
 	require.NoError(t, err)
 	for _, signer := range channel.Normalize().Participants {
+		sig, err := SignatureForState(state, signer)
+		require.NoError(t, err)
+		state.Signatures = append(state.Signatures, sig)
+	}
+	state = state.Normalize()
+	require.NoError(t, state.ValidateForChannel(channel, true))
+	return state
+}
+
+func signedConditionalState(t *testing.T, channel ChannelRecord, nonce uint64, previous, conditionAmount string, balances []Balance) ChannelState {
+	t.Helper()
+
+	channel = channel.Normalize()
+	condition := ConditionalPayment{
+		ConditionID:   HashParts("condition", channel.ChannelID, conditionAmount),
+		ConditionType: ConditionTypeHashLock,
+		Payer:         channel.Participants[0],
+		Payee:         channel.Participants[1],
+		Amount:        conditionAmount,
+		HashLock:      HashParts("condition-preimage", conditionAmount),
+		TimeoutHeight: channel.OpenHeight + channel.DisputePeriod + nonce + 2,
+		NonceStart:    nonce,
+		NonceEnd:      nonce + 2,
+	}
+	state, err := BuildState(ChannelState{
+		ChainID:           channel.ChainID,
+		ChannelID:         channel.ChannelID,
+		ChannelType:       channel.ChannelType,
+		Denom:             channel.Denom,
+		Version:           CurrentStateVersion,
+		Epoch:             1,
+		Nonce:             nonce,
+		Balances:          balances,
+		ReserveA:          "25",
+		ReserveB:          "0",
+		Conditions:        []ConditionalPayment{condition},
+		PreviousStateHash: previous,
+		TimeoutHeight:     channel.OpenHeight + channel.DisputePeriod + nonce,
+		CloseDelay:        channel.DisputePeriod,
+		FeePolicyID:       NativeDenom,
+	})
+	require.NoError(t, err)
+	for _, signer := range channel.Participants {
 		sig, err := SignatureForState(state, signer)
 		require.NoError(t, err)
 		state.Signatures = append(state.Signatures, sig)

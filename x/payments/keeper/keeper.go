@@ -156,11 +156,35 @@ func (k *Keeper) AcceptAsyncCheckpoint(channelID string, checkpoint paymentstype
 	return nil
 }
 
+func (k *Keeper) RegisterUpdateCheckpoint(req paymentstypes.ChannelUpdateRequest) (paymentstypes.ChannelUpdateResult, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return paymentstypes.ChannelUpdateResult{}, err
+	}
+	next, result, err := paymentstypes.RegisterUpdateCheckpoint(k.genesis.State, req)
+	if err != nil {
+		return paymentstypes.ChannelUpdateResult{}, err
+	}
+	k.genesis.State = next
+	return result, nil
+}
+
 func (k *Keeper) SubmitClose(channelID string, closingState paymentstypes.ChannelState, submitter string, currentHeight uint64, settlementFee string) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err
 	}
 	next, err := paymentstypes.SubmitClose(k.genesis.State, channelID, closingState, submitter, currentHeight, settlementFee)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
+func (k *Keeper) ForcedClose(channelID string, submitter string, currentHeight uint64, settlementFee string) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.ForcedClose(k.genesis.State, channelID, submitter, currentHeight, settlementFee)
 	if err != nil {
 		return err
 	}
@@ -226,6 +250,18 @@ func (k *Keeper) SubmitFraudProof(channelID string, proof paymentstypes.FraudPro
 	}
 	k.genesis.State = next
 	return nil
+}
+
+func (k *Keeper) FraudClose(channelID string, currentHeight uint64) (paymentstypes.SettlementRecord, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	next, settlement, err := paymentstypes.FraudClose(k.genesis.State, channelID, currentHeight)
+	if err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	k.genesis.State = next
+	return settlement, nil
 }
 
 func (k *Keeper) FinalizeSettlement(channelID string, currentHeight uint64) (paymentstypes.SettlementRecord, error) {
