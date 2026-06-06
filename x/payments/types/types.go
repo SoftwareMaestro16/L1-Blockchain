@@ -15,6 +15,11 @@ const (
 	NativeDenom              = "naet"
 	CurrentStateVersion      = uint32(1)
 	DefaultDisputePeriod     = uint64(16)
+	DefaultOpeningFee        = "1"
+	MinCloseDelay            = uint64(1)
+	MaxCloseDelay            = uint64(10_000)
+	MinChallengePeriod       = uint64(1)
+	MaxChallengePeriod       = uint64(20_000)
 	MaxParticipants          = 8
 	MaxConditionsPerState    = 128
 	MaxParentChannels        = 16
@@ -103,6 +108,25 @@ type DeltaSignature struct {
 	Signer        string
 	DeltaHash     string
 	SignatureHash string
+}
+
+type ChannelOpenRequest struct {
+	ChainID                      string
+	ChannelID                    string
+	Participants                 []string
+	InitialBalances              []Balance
+	ChannelType                  ChannelType
+	Collateral                   string
+	CloseDelay                   uint64
+	ChallengePeriod              uint64
+	FeePolicyID                  string
+	OpeningFeeDenom              string
+	OpeningFeePaid               string
+	RoutingAdvertised            bool
+	ConditionalPaymentsSupported bool
+	OpenHeight                   uint64
+	ExpirationHeight             uint64
+	ExpirationTimestamp          int64
 }
 
 type ChannelState struct {
@@ -231,9 +255,16 @@ type ChannelRecord struct {
 	Denom               string
 	Collateral          string
 	OpenHeight          uint64
+	CloseDelay          uint64
 	DisputePeriod       uint64
 	ExpirationHeight    uint64
 	ExpirationTimestamp int64
+	OpeningFeeDenom     string
+	OpeningFeePaid      string
+	RoutingAdvertised   bool
+	ConditionalPayments bool
+	CustodyDenom        string
+	CustodyAmount       string
 	Status              ChannelStatus
 	OpeningStateHash    string
 	FinalizedNonce      uint64
@@ -252,6 +283,25 @@ type SettlementRecord struct {
 	Penalties          []Penalty
 	SettledHeight      uint64
 	SettlementHash     string
+}
+
+type CustodyLock struct {
+	ChannelID string
+	Denom     string
+	Amount    string
+}
+
+type PaymentEventAttribute struct {
+	Key   string
+	Value string
+}
+
+type PaymentEvent struct {
+	EventID    string
+	EventType  string
+	ChannelID  string
+	Height     uint64
+	Attributes []PaymentEventAttribute
 }
 
 type ChannelEdge struct {
@@ -315,6 +365,126 @@ func SignatureForState(state ChannelState, signer string) (StateSignature, error
 		StateHash:     state.StateHash,
 		SignatureHash: ComputeSignatureHash(signer, state.StateHash),
 	}, nil
+}
+
+func BuildChannelFromOpenRequest(req ChannelOpenRequest) (ChannelRecord, error) {
+	req = req.Normalize()
+	if err := req.Validate(); err != nil {
+		return ChannelRecord{}, err
+	}
+	channel := ChannelRecord{
+		ChainID:             req.ChainID,
+		ChannelID:           req.ChannelID,
+		ChannelType:         req.ChannelType,
+		Participants:        req.Participants,
+		Denom:               NativeDenom,
+		Collateral:          req.Collateral,
+		OpenHeight:          req.OpenHeight,
+		CloseDelay:          req.CloseDelay,
+		DisputePeriod:       req.ChallengePeriod,
+		ExpirationHeight:    req.ExpirationHeight,
+		ExpirationTimestamp: req.ExpirationTimestamp,
+		OpeningFeeDenom:     req.OpeningFeeDenom,
+		OpeningFeePaid:      req.OpeningFeePaid,
+		RoutingAdvertised:   req.RoutingAdvertised,
+		ConditionalPayments: req.ConditionalPaymentsSupported,
+		CustodyDenom:        NativeDenom,
+		CustodyAmount:       req.Collateral,
+		Status:              ChannelStatusOpen,
+	}
+	if req.ChannelType == ChannelTypeUnidirectional && len(req.Participants) == 2 {
+		channel.Payer = req.Participants[0]
+		channel.Receiver = req.Participants[1]
+	}
+	state, err := BuildState(openingStateForRequest(req, channel))
+	if err != nil {
+		return ChannelRecord{}, err
+	}
+	for _, signer := range channel.Normalize().Participants {
+		sig, err := SignatureForState(state, signer)
+		if err != nil {
+			return ChannelRecord{}, err
+		}
+		state.Signatures = append(state.Signatures, sig)
+	}
+	channel.LatestState = state.Normalize()
+	channel.OpeningStateHash = channel.LatestState.StateHash
+	if err := channel.Validate(); err != nil {
+		return ChannelRecord{}, err
+	}
+	return channel.Normalize(), nil
+}
+
+func (r ChannelOpenRequest) Normalize() ChannelOpenRequest {
+	r.ChainID = strings.TrimSpace(r.ChainID)
+	r.ChannelID = normalizeOptionalHash(r.ChannelID)
+	r.Participants = normalizeAddressSet(r.Participants)
+	r.InitialBalances = normalizeBalances(r.InitialBalances)
+	r.Collateral = strings.TrimSpace(r.Collateral)
+	r.FeePolicyID = strings.TrimSpace(r.FeePolicyID)
+	if r.FeePolicyID == "" {
+		r.FeePolicyID = NativeDenom
+	}
+	r.OpeningFeeDenom = normalizeAssetDenom(r.OpeningFeeDenom)
+	r.OpeningFeePaid = strings.TrimSpace(r.OpeningFeePaid)
+	if r.ChannelID == "" {
+		parts := append([]string{"open", r.ChainID, string(r.ChannelType), r.Collateral}, r.Participants...)
+		r.ChannelID = HashParts(parts...)
+	}
+	return r
+}
+
+func (r ChannelOpenRequest) Validate() error {
+	req := r.Normalize()
+	if strings.TrimSpace(req.ChainID) == "" {
+		return errors.New("payments open chain id is required")
+	}
+	if err := ValidateHash("payments open channel id", req.ChannelID); err != nil {
+		return err
+	}
+	if !IsChannelType(req.ChannelType) {
+		return fmt.Errorf("unknown payments open channel type %q", req.ChannelType)
+	}
+	if err := validateAddressSet("payments open participant", req.Participants, 2, MaxParticipants); err != nil {
+		return err
+	}
+	if err := validateBalances(req.InitialBalances); err != nil {
+		return err
+	}
+	if err := validateInitialBalances(req.InitialBalances, req.Participants, req.Collateral); err != nil {
+		return err
+	}
+	if err := validatePositiveInt("payments open collateral", req.Collateral); err != nil {
+		return err
+	}
+	if err := validateCloseDelay(req.CloseDelay); err != nil {
+		return err
+	}
+	if err := validateChallengePeriod(req.ChallengePeriod); err != nil {
+		return err
+	}
+	if req.FeePolicyID != NativeDenom {
+		return fmt.Errorf("payments open fee policy must be %s", NativeDenom)
+	}
+	if req.OpeningFeeDenom != NativeDenom {
+		return fmt.Errorf("payments opening fee denom must be %s", NativeDenom)
+	}
+	if err := validateOpeningFeePaid(req.OpeningFeePaid); err != nil {
+		return err
+	}
+	if req.OpenHeight == 0 {
+		return errors.New("payments open height must be positive")
+	}
+	if req.ExpirationTimestamp < 0 {
+		return errors.New("payments open expiration timestamp must be non-negative")
+	}
+	if req.ChannelType == ChannelTypeUnidirectional && req.ExpirationHeight == 0 {
+		return errors.New("payments unidirectional open expiration height must be positive")
+	}
+	if req.ChannelType == ChannelTypeAsync && req.ExpirationHeight == 0 {
+		return errors.New("payments async open expiry height must be positive")
+	}
+	return nil
 }
 
 func BuildUnidirectionalClaim(claim UnidirectionalClaim) (UnidirectionalClaim, error) {
@@ -854,6 +1024,10 @@ func (c ChannelRecord) Normalize() ChannelRecord {
 	c.Denom = strings.TrimSpace(c.Denom)
 	c.Collateral = strings.TrimSpace(c.Collateral)
 	c.OpeningStateHash = normalizeOptionalHash(c.OpeningStateHash)
+	c.OpeningFeeDenom = normalizeAssetDenom(c.OpeningFeeDenom)
+	c.OpeningFeePaid = strings.TrimSpace(c.OpeningFeePaid)
+	c.CustodyDenom = normalizeAssetDenom(c.CustodyDenom)
+	c.CustodyAmount = strings.TrimSpace(c.CustodyAmount)
 	c.Participants = normalizeAddressSet(c.Participants)
 	c.RequiredSigners = normalizeAddressSet(c.RequiredSigners)
 	c.Payer = strings.TrimSpace(c.Payer)
@@ -871,6 +1045,12 @@ func (c ChannelRecord) Normalize() ChannelRecord {
 	}
 	if c.DisputePeriod == 0 {
 		c.DisputePeriod = DefaultDisputePeriod
+	}
+	if c.CloseDelay == 0 && c.LatestState.CloseDelay != 0 {
+		c.CloseDelay = c.LatestState.CloseDelay
+	}
+	if c.CustodyAmount == "" {
+		c.CustodyAmount = c.Collateral
 	}
 	if c.Status == "" {
 		c.Status = ChannelStatusOpen
@@ -903,8 +1083,26 @@ func (c ChannelRecord) ValidateCore() error {
 	if c.OpenHeight == 0 {
 		return errors.New("payments channel open height must be positive")
 	}
+	if err := validateCloseDelay(c.CloseDelay); err != nil {
+		return err
+	}
 	if c.DisputePeriod == 0 {
 		return errors.New("payments channel dispute period must be positive")
+	}
+	if err := validateChallengePeriod(c.DisputePeriod); err != nil {
+		return err
+	}
+	if c.OpeningFeeDenom != NativeDenom {
+		return fmt.Errorf("payments opening fee denom must be %s", NativeDenom)
+	}
+	if err := validateOpeningFeePaid(c.OpeningFeePaid); err != nil {
+		return err
+	}
+	if c.CustodyDenom != NativeDenom {
+		return fmt.Errorf("payments custody denom must be %s", NativeDenom)
+	}
+	if c.CustodyAmount != c.Collateral {
+		return errors.New("payments custody amount must match channel collateral")
 	}
 	if !IsChannelStatus(c.Status) {
 		return fmt.Errorf("unknown payments channel status %q", c.Status)
@@ -943,6 +1141,12 @@ func (c ChannelRecord) Validate() error {
 	}
 	if err := channel.LatestState.ValidateForChannel(channel, false); err != nil {
 		return err
+	}
+	if channel.LatestState.CloseDelay != channel.CloseDelay {
+		return errors.New("payments opening state close delay mismatch")
+	}
+	if channel.LatestState.FeePolicyID != NativeDenom {
+		return fmt.Errorf("payments opening state fee policy must be %s", NativeDenom)
 	}
 	if channel.OpeningStateHash == "" {
 		return errors.New("payments opening state hash is required")
@@ -1187,6 +1391,95 @@ func (s SettlementRecord) ValidateForChannel(channel ChannelRecord) error {
 		return errors.New("payments settlement hash mismatch")
 	}
 	return nil
+}
+
+func (c CustodyLock) Normalize() CustodyLock {
+	c.ChannelID = normalizeHash(c.ChannelID)
+	c.Denom = normalizeAssetDenom(c.Denom)
+	c.Amount = strings.TrimSpace(c.Amount)
+	return c
+}
+
+func (c CustodyLock) ValidateForChannel(channel ChannelRecord) error {
+	lock := c.Normalize()
+	if lock.ChannelID != channel.Normalize().ChannelID {
+		return errors.New("payments custody channel mismatch")
+	}
+	if lock.Denom != NativeDenom {
+		return fmt.Errorf("payments custody denom must be %s", NativeDenom)
+	}
+	locked, err := parsePositiveInt("payments custody amount", lock.Amount)
+	if err != nil {
+		return err
+	}
+	collateral, err := parsePositiveInt("payments channel collateral", channel.Collateral)
+	if err != nil {
+		return err
+	}
+	if !locked.Equal(collateral) {
+		return errors.New("payments custody amount must match channel collateral")
+	}
+	return nil
+}
+
+func (e PaymentEventAttribute) Normalize() PaymentEventAttribute {
+	e.Key = strings.TrimSpace(e.Key)
+	e.Value = strings.TrimSpace(e.Value)
+	return e
+}
+
+func (e PaymentEvent) Normalize() PaymentEvent {
+	e.EventID = normalizeHash(e.EventID)
+	e.EventType = strings.TrimSpace(e.EventType)
+	e.ChannelID = normalizeHash(e.ChannelID)
+	e.Attributes = normalizePaymentEventAttributes(e.Attributes)
+	return e
+}
+
+func (e PaymentEvent) Validate() error {
+	event := e.Normalize()
+	if err := ValidateHash("payments event id", event.EventID); err != nil {
+		return err
+	}
+	if event.EventType == "" {
+		return errors.New("payments event type is required")
+	}
+	if err := ValidateHash("payments event channel id", event.ChannelID); err != nil {
+		return err
+	}
+	if event.Height == 0 {
+		return errors.New("payments event height must be positive")
+	}
+	seen := make(map[string]struct{}, len(event.Attributes))
+	for _, attr := range event.Attributes {
+		if attr.Key == "" {
+			return errors.New("payments event attribute key is required")
+		}
+		if _, found := seen[attr.Key]; found {
+			return errors.New("payments duplicate event attribute")
+		}
+		seen[attr.Key] = struct{}{}
+	}
+	return nil
+}
+
+func ChannelOpenEvent(channel ChannelRecord) PaymentEvent {
+	channel = channel.Normalize()
+	event := PaymentEvent{
+		EventID:   HashParts("channel-open", channel.ChannelID, channel.OpeningStateHash),
+		EventType: "channel-open",
+		ChannelID: channel.ChannelID,
+		Height:    channel.OpenHeight,
+		Attributes: []PaymentEventAttribute{
+			{Key: "channel_type", Value: string(channel.ChannelType)},
+			{Key: "collateral", Value: channel.Collateral},
+			{Key: "denom", Value: channel.Denom},
+			{Key: "opening_fee", Value: channel.OpeningFeePaid},
+			{Key: "routing_advertised", Value: fmt.Sprintf("%t", channel.RoutingAdvertised)},
+			{Key: "conditional_payments", Value: fmt.Sprintf("%t", channel.ConditionalPayments)},
+		},
+	}
+	return event.Normalize()
 }
 
 func (e ChannelEdge) Normalize() ChannelEdge {
@@ -1455,6 +1748,94 @@ func validateUnsignedStateShape(state ChannelState) error {
 		return err
 	}
 	return validateConditions(state.Conditions)
+}
+
+func openingStateForRequest(req ChannelOpenRequest, channel ChannelRecord) ChannelState {
+	state := ChannelState{
+		ChainID:       req.ChainID,
+		ChannelID:     req.ChannelID,
+		ChannelType:   req.ChannelType,
+		Denom:         NativeDenom,
+		Version:       CurrentStateVersion,
+		Epoch:         1,
+		Nonce:         1,
+		Balances:      req.InitialBalances,
+		TimeoutHeight: req.OpenHeight + req.ChallengePeriod,
+		CloseDelay:    req.CloseDelay,
+		FeePolicyID:   req.FeePolicyID,
+	}
+	if req.ChannelType == ChannelTypeUnidirectional {
+		state.TimeoutHeight = req.ExpirationHeight
+		state.TimeoutTimestamp = req.ExpirationTimestamp
+	}
+	if req.ChannelType == ChannelTypeAsync {
+		state.CheckpointNonce = 1
+		state.CheckpointBalances = req.InitialBalances
+		state.AsyncUpdateRoot = ComputeAsyncDeltaRoot(nil)
+		state.AcceptedUpdateRoot = ComputeAsyncDeltaRoot(nil)
+		state.SendWindow = req.CloseDelay
+		state.ReceiveWindow = req.ChallengePeriod
+		state.MaxUnackedAmount = req.Collateral
+		state.ExpiryHeight = req.ExpirationHeight
+		state.TimeoutHeight = req.ExpirationHeight
+	}
+	if channel.ChannelType == ChannelTypeBidirectional && len(req.InitialBalances) == 2 {
+		state.ParticipantA = channel.Normalize().Participants[0]
+		state.ParticipantB = channel.Normalize().Participants[1]
+	}
+	return state
+}
+
+func validateInitialBalances(balances []Balance, participants []string, collateralText string) error {
+	if len(balances) != len(participants) {
+		return errors.New("payments initial balances must include every participant")
+	}
+	for _, balance := range normalizeBalances(balances) {
+		if !containsString(participants, balance.Participant) {
+			return errors.New("payments initial balance participant must be in channel")
+		}
+	}
+	total, err := sumBalances(balances)
+	if err != nil {
+		return err
+	}
+	collateral, err := parsePositiveInt("payments open collateral", collateralText)
+	if err != nil {
+		return err
+	}
+	if !total.Equal(collateral) {
+		return errors.New("payments initial balances must sum to collateral")
+	}
+	return nil
+}
+
+func validateCloseDelay(closeDelay uint64) error {
+	if closeDelay < MinCloseDelay || closeDelay > MaxCloseDelay {
+		return fmt.Errorf("payments close delay must be between %d and %d", MinCloseDelay, MaxCloseDelay)
+	}
+	return nil
+}
+
+func validateChallengePeriod(period uint64) error {
+	if period < MinChallengePeriod || period > MaxChallengePeriod {
+		return fmt.Errorf("payments challenge period must be between %d and %d", MinChallengePeriod, MaxChallengePeriod)
+	}
+	return nil
+}
+
+func validateOpeningFeePaid(feePaid string) error {
+	paid, err := parseNonNegativeInt("payments opening fee paid", feePaid)
+	if err != nil {
+		return err
+	}
+	required, err := parsePositiveInt("payments opening fee required", DefaultOpeningFee)
+	if err != nil {
+		return err
+	}
+	if paid.LT(required) {
+		return errors.New("payments opening fee is not paid")
+	}
+	return nil
 }
 
 func validateUnsignedUnidirectionalClaim(claim UnidirectionalClaim) error {
@@ -1954,6 +2335,17 @@ func normalizeSignatures(signatures []StateSignature) []StateSignature {
 	}
 	sort.SliceStable(out, func(i, j int) bool {
 		return out[i].Signer < out[j].Signer
+	})
+	return out
+}
+
+func normalizePaymentEventAttributes(attrs []PaymentEventAttribute) []PaymentEventAttribute {
+	out := make([]PaymentEventAttribute, len(attrs))
+	for i, attr := range attrs {
+		out[i] = attr.Normalize()
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		return out[i].Key < out[j].Key
 	})
 	return out
 }

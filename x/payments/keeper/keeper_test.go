@@ -59,15 +59,20 @@ func keeperSignedChannel(t *testing.T, salt, collateral, left, right string) pay
 	t.Helper()
 
 	channel := paymentstypes.ChannelRecord{
-		ChainID:       "aetheris-test-1",
-		ChannelID:     paymentstypes.HashParts(salt, left, right),
-		ChannelType:   paymentstypes.ChannelTypeBidirectional,
-		Participants:  []string{left, right},
-		Denom:         paymentstypes.NativeDenom,
-		Collateral:    collateral,
-		OpenHeight:    10,
-		DisputePeriod: 8,
-		Status:        paymentstypes.ChannelStatusOpen,
+		ChainID:             "aetheris-test-1",
+		ChannelID:           paymentstypes.HashParts(salt, left, right),
+		ChannelType:         paymentstypes.ChannelTypeBidirectional,
+		Participants:        []string{left, right},
+		Denom:               paymentstypes.NativeDenom,
+		Collateral:          collateral,
+		OpenHeight:          10,
+		CloseDelay:          8,
+		DisputePeriod:       8,
+		OpeningFeePaid:      paymentstypes.DefaultOpeningFee,
+		ConditionalPayments: true,
+		CustodyDenom:        paymentstypes.NativeDenom,
+		CustodyAmount:       collateral,
+		Status:              paymentstypes.ChannelStatusOpen,
 	}
 	openState := keeperSignedState(t, channel, 1, "", []paymentstypes.Balance{
 		{Participant: left, Amount: collateral},

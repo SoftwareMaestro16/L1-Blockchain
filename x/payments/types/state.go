@@ -14,6 +14,8 @@ type PaymentsState struct {
 	VirtualChannels []VirtualChannel
 	Settlements     []SettlementRecord
 	Batches         []SettlementBatch
+	CustodyLocks    []CustodyLock
+	Events          []PaymentEvent
 }
 
 func EmptyState() PaymentsState {
@@ -23,38 +25,65 @@ func EmptyState() PaymentsState {
 		VirtualChannels: []VirtualChannel{},
 		Settlements:     []SettlementRecord{},
 		Batches:         []SettlementBatch{},
+		CustodyLocks:    []CustodyLock{},
+		Events:          []PaymentEvent{},
 	}
 }
 
+func OpenChannelFromRequest(state PaymentsState, req ChannelOpenRequest) (PaymentsState, PaymentEvent, error) {
+	channel, err := BuildChannelFromOpenRequest(req)
+	if err != nil {
+		return PaymentsState{}, PaymentEvent{}, err
+	}
+	next, event, err := openChannelRecord(state, channel)
+	return next, event, err
+}
+
 func OpenChannel(state PaymentsState, channel ChannelRecord) (PaymentsState, error) {
+	next, _, err := openChannelRecord(state, channel)
+	return next, err
+}
+
+func openChannelRecord(state PaymentsState, channel ChannelRecord) (PaymentsState, PaymentEvent, error) {
 	state = state.Export()
 	if err := state.Validate(); err != nil {
-		return PaymentsState{}, err
+		return PaymentsState{}, PaymentEvent{}, err
 	}
 	channel = channel.Normalize()
 	if channel.Status != ChannelStatusOpen {
-		return PaymentsState{}, errors.New("payments new channel must start open")
+		return PaymentsState{}, PaymentEvent{}, errors.New("payments new channel must start open")
 	}
 	if _, found := state.ChannelByID(channel.ChannelID); found {
-		return PaymentsState{}, errors.New("payments channel already exists")
+		return PaymentsState{}, PaymentEvent{}, errors.New("payments channel already exists")
 	}
 	if err := channel.LatestState.ValidateForChannel(channel, true); err != nil {
-		return PaymentsState{}, err
+		return PaymentsState{}, PaymentEvent{}, err
 	}
 	if channel.OpeningStateHash == "" {
 		channel.OpeningStateHash = channel.LatestState.StateHash
 	}
 	if channel.OpeningStateHash != channel.LatestState.StateHash {
-		return PaymentsState{}, errors.New("payments opening state hash mismatch")
+		return PaymentsState{}, PaymentEvent{}, errors.New("payments opening state hash mismatch")
 	}
 	channel.FinalizedNonce = 0
 	if err := channel.Validate(); err != nil {
-		return PaymentsState{}, err
+		return PaymentsState{}, PaymentEvent{}, err
 	}
+	lock := CustodyLock{ChannelID: channel.ChannelID, Denom: NativeDenom, Amount: channel.Collateral}.Normalize()
+	if err := lock.ValidateForChannel(channel); err != nil {
+		return PaymentsState{}, PaymentEvent{}, err
+	}
+	if _, found := state.CustodyLockByChannel(channel.ChannelID); found {
+		return PaymentsState{}, PaymentEvent{}, errors.New("payments custody lock already exists")
+	}
+	event := ChannelOpenEvent(channel)
 	next := state.Clone()
 	next.Channels = append(next.Channels, channel)
+	next.CustodyLocks = append(next.CustodyLocks, lock)
+	next.Events = append(next.Events, event)
 	sortChannels(next.Channels)
-	return next, next.Validate()
+	sortCustodyLocks(next.CustodyLocks)
+	return next, event, next.Validate()
 }
 
 func RegisterRoutingEdge(state PaymentsState, edge ChannelEdge) (PaymentsState, error) {
@@ -625,6 +654,7 @@ func (s PaymentsState) Export() PaymentsState {
 	sortVirtualChannels(out.VirtualChannels)
 	sortSettlements(out.Settlements)
 	sortBatches(out.Batches)
+	sortCustodyLocks(out.CustodyLocks)
 	return out
 }
 
@@ -635,6 +665,8 @@ func (s PaymentsState) Clone() PaymentsState {
 		VirtualChannels: make([]VirtualChannel, len(s.VirtualChannels)),
 		Settlements:     make([]SettlementRecord, len(s.Settlements)),
 		Batches:         make([]SettlementBatch, len(s.Batches)),
+		CustodyLocks:    make([]CustodyLock, len(s.CustodyLocks)),
+		Events:          make([]PaymentEvent, len(s.Events)),
 	}
 	for i, channel := range s.Channels {
 		out.Channels[i] = channel.Normalize()
@@ -650,6 +682,12 @@ func (s PaymentsState) Clone() PaymentsState {
 	}
 	for i, batch := range s.Batches {
 		out.Batches[i] = batch.Normalize()
+	}
+	for i, lock := range s.CustodyLocks {
+		out.CustodyLocks[i] = lock.Normalize()
+	}
+	for i, event := range s.Events {
+		out.Events[i] = event.Normalize()
 	}
 	return out
 }
@@ -667,7 +705,13 @@ func (s PaymentsState) Validate() error {
 	if err := validateSettlements(s.Channels, s.Settlements); err != nil {
 		return err
 	}
-	return validateBatches(s.Channels, s.Batches)
+	if err := validateBatches(s.Channels, s.Batches); err != nil {
+		return err
+	}
+	if err := validateCustodyLocks(s.Channels, s.CustodyLocks); err != nil {
+		return err
+	}
+	return validatePaymentEvents(s.Channels, s.Events)
 }
 
 func (s PaymentsState) ChannelByID(channelID string) (ChannelRecord, bool) {
@@ -706,6 +750,17 @@ func (s PaymentsState) VirtualChannelByID(id string) (VirtualChannel, bool) {
 		}
 	}
 	return VirtualChannel{}, false
+}
+
+func (s PaymentsState) CustodyLockByChannel(channelID string) (CustodyLock, bool) {
+	needle := normalizeHash(channelID)
+	for _, lock := range s.CustodyLocks {
+		lock = lock.Normalize()
+		if lock.ChannelID == needle {
+			return lock, true
+		}
+	}
+	return CustodyLock{}, false
 }
 
 func validateChannels(channels []ChannelRecord) error {
@@ -837,6 +892,64 @@ func validateBatches(channels []ChannelRecord, batches []SettlementBatch) error 
 	return nil
 }
 
+func validateCustodyLocks(channels []ChannelRecord, locks []CustodyLock) error {
+	channelByID := channelMap(channels)
+	seen := make(map[string]struct{}, len(locks))
+	var previous string
+	for i, lock := range locks {
+		lock = lock.Normalize()
+		channel, found := channelByID[lock.ChannelID]
+		if !found {
+			return errors.New("payments custody lock references unknown channel")
+		}
+		if err := lock.ValidateForChannel(channel); err != nil {
+			return err
+		}
+		if _, found := seen[lock.ChannelID]; found {
+			return errors.New("payments duplicate custody lock")
+		}
+		seen[lock.ChannelID] = struct{}{}
+		if i > 0 && previous >= lock.ChannelID {
+			return errors.New("payments custody locks must be sorted canonically")
+		}
+		previous = lock.ChannelID
+	}
+	for _, channel := range channelByID {
+		if _, found := seen[channel.ChannelID]; !found {
+			return errors.New("payments channel custody lock is required")
+		}
+	}
+	return nil
+}
+
+func validatePaymentEvents(channels []ChannelRecord, events []PaymentEvent) error {
+	channelByID := channelMap(channels)
+	seen := make(map[string]struct{}, len(events))
+	openEventByChannel := make(map[string]struct{}, len(channels))
+	for _, event := range events {
+		event = event.Normalize()
+		if err := event.Validate(); err != nil {
+			return err
+		}
+		if _, found := channelByID[event.ChannelID]; !found {
+			return errors.New("payments event references unknown channel")
+		}
+		if _, found := seen[event.EventID]; found {
+			return errors.New("payments duplicate event")
+		}
+		seen[event.EventID] = struct{}{}
+		if event.EventType == "channel-open" {
+			openEventByChannel[event.ChannelID] = struct{}{}
+		}
+	}
+	for _, channel := range channelByID {
+		if _, found := openEventByChannel[channel.ChannelID]; !found {
+			return errors.New("payments channel-open event is required")
+		}
+	}
+	return nil
+}
+
 func applySettlementAdjustments(balances []Balance, penalties []Penalty, feeText, feePayer string) ([]Balance, error) {
 	amounts := make(map[string]sdkmath.Int, len(balances))
 	for _, balance := range normalizeBalances(balances) {
@@ -961,6 +1074,12 @@ func sortSettlements(settlements []SettlementRecord) {
 func sortBatches(batches []SettlementBatch) {
 	sort.SliceStable(batches, func(i, j int) bool {
 		return batches[i].Normalize().BatchID < batches[j].Normalize().BatchID
+	})
+}
+
+func sortCustodyLocks(locks []CustodyLock) {
+	sort.SliceStable(locks, func(i, j int) bool {
+		return locks[i].Normalize().ChannelID < locks[j].Normalize().ChannelID
 	})
 }
 

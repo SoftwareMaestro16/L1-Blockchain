@@ -96,6 +96,69 @@ func TestPaymentStateRejectsNonNaetAndCollateralMismatch(t *testing.T) {
 	require.ErrorContains(t, err, "conserve")
 }
 
+func TestChannelOpenLifecycleLocksFeeAndEmitsEvent(t *testing.T) {
+	alice := testAddress(0x33)
+	bob := testAddress(0x34)
+	req := ChannelOpenRequest{
+		ChainID:                      "aetheris-test-1",
+		ChannelID:                    HashParts("open-lifecycle", alice, bob),
+		Participants:                 []string{alice, bob},
+		InitialBalances:              []Balance{{Participant: alice, Amount: "700"}, {Participant: bob, Amount: "300"}},
+		ChannelType:                  ChannelTypeBidirectional,
+		Collateral:                   "1000",
+		CloseDelay:                   8,
+		ChallengePeriod:              12,
+		FeePolicyID:                  NativeDenom,
+		OpeningFeeDenom:              NativeDenom,
+		OpeningFeePaid:               DefaultOpeningFee,
+		RoutingAdvertised:            true,
+		ConditionalPaymentsSupported: true,
+		OpenHeight:                   11,
+	}
+
+	state, event, err := OpenChannelFromRequest(EmptyState(), req)
+	require.NoError(t, err)
+	require.Len(t, state.Channels, 1)
+	require.Len(t, state.CustodyLocks, 1)
+	require.Len(t, state.Events, 1)
+	require.Equal(t, event, state.Events[0])
+	require.Equal(t, "channel-open", event.EventType)
+	require.Equal(t, req.ChannelID, state.CustodyLocks[0].ChannelID)
+	require.Equal(t, "1000", state.CustodyLocks[0].Amount)
+	require.Equal(t, DefaultOpeningFee, state.Channels[0].OpeningFeePaid)
+	require.True(t, state.Channels[0].RoutingAdvertised)
+	require.True(t, state.Channels[0].ConditionalPayments)
+	require.Equal(t, uint64(8), state.Channels[0].CloseDelay)
+	require.Equal(t, uint64(12), state.Channels[0].DisputePeriod)
+
+	_, _, err = OpenChannelFromRequest(state, req)
+	require.ErrorContains(t, err, "already exists")
+
+	badFee := req
+	badFee.ChannelID = HashParts("open-bad-fee", alice, bob)
+	badFee.OpeningFeePaid = "0"
+	_, _, err = OpenChannelFromRequest(EmptyState(), badFee)
+	require.ErrorContains(t, err, "opening fee")
+
+	badDelay := req
+	badDelay.ChannelID = HashParts("open-bad-delay", alice, bob)
+	badDelay.CloseDelay = 0
+	_, _, err = OpenChannelFromRequest(EmptyState(), badDelay)
+	require.ErrorContains(t, err, "close delay")
+
+	badChallenge := req
+	badChallenge.ChannelID = HashParts("open-bad-challenge", alice, bob)
+	badChallenge.ChallengePeriod = MaxChallengePeriod + 1
+	_, _, err = OpenChannelFromRequest(EmptyState(), badChallenge)
+	require.ErrorContains(t, err, "challenge period")
+
+	badBalances := req
+	badBalances.ChannelID = HashParts("open-bad-balances", alice, bob)
+	badBalances.InitialBalances = []Balance{{Participant: alice, Amount: "999"}, {Participant: bob, Amount: "0"}}
+	_, _, err = OpenChannelFromRequest(EmptyState(), badBalances)
+	require.ErrorContains(t, err, "sum to collateral")
+}
+
 func TestBidirectionalStateCommitmentIncludesDomainFields(t *testing.T) {
 	alice := testAddress(0x37)
 	bob := testAddress(0x38)
@@ -548,15 +611,20 @@ func signedChannel(t *testing.T, salt, collateral, left, right string) ChannelRe
 
 	channelID := HashParts(salt, left, right)
 	channel := ChannelRecord{
-		ChainID:       "aetheris-test-1",
-		ChannelID:     channelID,
-		ChannelType:   ChannelTypeBidirectional,
-		Participants:  []string{left, right},
-		Denom:         NativeDenom,
-		Collateral:    collateral,
-		OpenHeight:    10,
-		DisputePeriod: 8,
-		Status:        ChannelStatusOpen,
+		ChainID:             "aetheris-test-1",
+		ChannelID:           channelID,
+		ChannelType:         ChannelTypeBidirectional,
+		Participants:        []string{left, right},
+		Denom:               NativeDenom,
+		Collateral:          collateral,
+		OpenHeight:          10,
+		CloseDelay:          8,
+		DisputePeriod:       8,
+		OpeningFeePaid:      DefaultOpeningFee,
+		ConditionalPayments: true,
+		CustodyDenom:        NativeDenom,
+		CustodyAmount:       collateral,
+		Status:              ChannelStatusOpen,
 	}
 	openState := signedState(t, channel, 1, "", []Balance{
 		{Participant: left, Amount: collateral},
@@ -610,9 +678,13 @@ func signedUnidirectionalChannel(t *testing.T, salt, collateral, payer, receiver
 		Denom:               NativeDenom,
 		Collateral:          collateral,
 		OpenHeight:          10,
+		CloseDelay:          8,
 		DisputePeriod:       8,
 		ExpirationHeight:    72,
 		ExpirationTimestamp: 0,
+		OpeningFeePaid:      DefaultOpeningFee,
+		CustodyDenom:        NativeDenom,
+		CustodyAmount:       collateral,
 		Status:              ChannelStatusOpen,
 	}
 	openState, err := BuildState(ChannelState{
@@ -672,15 +744,19 @@ func signedAsyncChannel(t *testing.T, salt, collateral string, balances []Balanc
 	t.Helper()
 
 	channel := ChannelRecord{
-		ChainID:       "aetheris-test-1",
-		ChannelID:     HashParts(append([]string{salt}, participants...)...),
-		ChannelType:   ChannelTypeAsync,
-		Participants:  participants,
-		Denom:         NativeDenom,
-		Collateral:    collateral,
-		OpenHeight:    10,
-		DisputePeriod: 8,
-		Status:        ChannelStatusOpen,
+		ChainID:        "aetheris-test-1",
+		ChannelID:      HashParts(append([]string{salt}, participants...)...),
+		ChannelType:    ChannelTypeAsync,
+		Participants:   participants,
+		Denom:          NativeDenom,
+		Collateral:     collateral,
+		OpenHeight:     10,
+		CloseDelay:     8,
+		DisputePeriod:  8,
+		OpeningFeePaid: DefaultOpeningFee,
+		CustodyDenom:   NativeDenom,
+		CustodyAmount:  collateral,
+		Status:         ChannelStatusOpen,
 	}
 	openState, err := BuildState(ChannelState{
 		ChainID:            channel.ChainID,
