@@ -78,6 +78,11 @@ func TestVotingPowerCapBoundsWhaleInfluence(t *testing.T) {
 	}
 	cap := totalEffective.MulRaw(int64(params.MaxVotingPowerBps)).QuoRaw(int64(BasisPoints))
 	require.True(t, selection.Active[0].VotingPowerNaet.LTE(cap))
+	require.True(t, selection.Active[0].VotingPowerCap.SoftCapped)
+	require.Equal(t, sdkmath.NewInt(1_000_000), selection.Active[0].VotingPowerCap.PreCapVotingPowerNaet)
+	require.Equal(t, cap, selection.Active[0].VotingPowerCap.FinalVotingPowerNaet)
+	require.Equal(t, cap, selection.Active[0].VotingPowerCap.CapNaet)
+	require.Contains(t, selection.Active[0].VotingPowerCap.Warning, "voting power target")
 }
 
 func TestStakeDecayReducesInactiveWeightOnly(t *testing.T) {
@@ -106,13 +111,49 @@ func TestScoreCandidateUsesSaturatedCompositeIntegerModel(t *testing.T) {
 	require.Equal(t, sdkmath.NewInt(1_000), scored.EffectiveStakeNaet)
 	require.Equal(t, sdkmath.NewInt(478), scored.Score)
 	require.Equal(t, ValidatorScoreComponents{
-		StakeWeightNaet:      sdkmath.NewInt(1_000),
-		PerformanceFactorBps: 9_000,
-		UptimeFactorBps:      9_500,
-		LatencyFactorBps:     8_000,
-		ReliabilityIndexBps:  7_000,
-		Score:                sdkmath.NewInt(478),
+		StakeWeightNaet:        sdkmath.NewInt(1_000),
+		StakeSaturationCapNaet: sdkmath.NewInt(1_000),
+		SaturatedStakeNaet:     sdkmath.NewInt(9_000),
+		RewardWeightNaet:       sdkmath.NewInt(3_250),
+		PerformanceFactorBps:   9_000,
+		UptimeFactorBps:        9_500,
+		LatencyFactorBps:       8_000,
+		ReliabilityIndexBps:    7_000,
+		Score:                  sdkmath.NewInt(478),
 	}, scored.ScoreComponents)
+}
+
+func TestStakeSaturationPreviewUsesCapFactorAndPreservesBondedBalance(t *testing.T) {
+	params := DefaultParams()
+	params.MinStakeNaet = sdkmath.NewInt(100)
+	params.StakeSaturationThresholdNaet = sdkmath.NewInt(2_000)
+	params.StakeSaturationCapFactorBps = 15_000
+	params.StakeSaturationNaet = sdkmath.NewInt(9_999)
+	params.SaturatedStakeRewardBps = 2_000
+	saturatedCandidate := candidate("val-saturated", 2_000, 8_000)
+
+	preview, err := PreviewStakeSaturation(params, saturatedCandidate)
+	require.NoError(t, err)
+	require.Equal(t, sdkmath.NewInt(10_000), preview.BondedStakeNaet)
+	require.Equal(t, sdkmath.NewInt(3_000), preview.SaturationCapNaet)
+	require.Equal(t, sdkmath.NewInt(3_000), preview.EffectiveStakeNaet)
+	require.Equal(t, sdkmath.NewInt(7_000), preview.SaturatedStakeNaet)
+	require.Equal(t, sdkmath.NewInt(4_400), preview.RewardWeightNaet)
+	require.True(t, preview.Saturated)
+	require.Contains(t, preview.Warning, "excess stake")
+
+	scored, err := ScoreCandidate(params, saturatedCandidate)
+	require.NoError(t, err)
+	require.Equal(t, preview.BondedStakeNaet, scored.TotalStakeNaet)
+	require.Equal(t, preview.EffectiveStakeNaet, scored.EffectiveStakeNaet)
+	require.Equal(t, preview.RewardWeightNaet, scored.ScoreComponents.RewardWeightNaet)
+
+	pending, err := PreviewDelegationSaturation(params, candidate("val-saturated", 2_000, 0), sdkmath.NewInt(8_000))
+	require.NoError(t, err)
+	require.Equal(t, preview, pending)
+
+	_, err = PreviewDelegationSaturation(params, saturatedCandidate, sdkmath.NewInt(-1))
+	require.ErrorContains(t, err, "additional delegation")
 }
 
 func TestPerformanceScoreUsesUptimeLatencyAndCorrectness(t *testing.T) {
@@ -229,6 +270,14 @@ func TestParamsEnforceProductionBounds(t *testing.T) {
 	params = DefaultParams()
 	params.TargetCommitMillis = MaxTargetCommitMillis + 1
 	require.ErrorContains(t, params.Validate(), "target commit latency")
+
+	params = DefaultParams()
+	params.StakeSaturationCapFactorBps = 0
+	require.ErrorContains(t, params.Validate(), "cap factor")
+
+	params = DefaultParams()
+	params.SaturatedStakeRewardBps = BasisPoints + 1
+	require.ErrorContains(t, params.Validate(), "saturated stake reward")
 }
 
 func makeCandidates(count int, stake int64) []Candidate {

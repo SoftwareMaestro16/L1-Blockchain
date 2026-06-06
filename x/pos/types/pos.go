@@ -19,17 +19,21 @@ const (
 	MinEpochDurationSeconds     = uint64(43_200)
 	MaxEpochDurationSeconds     = uint64(86_400)
 
-	DefaultMaxCommissionBps    = uint32(2_000)
-	DefaultMaxVotingPowerBps   = uint32(1_500)
-	DefaultMinUptimeBps        = uint32(9_500)
-	DefaultInactiveAfterEpochs = uint64(2)
-	DefaultStakeDecayBps       = uint32(100)
-	DefaultStakeSaturationNaet = int64(100_000_000_000)
-	DefaultUnbondingSeconds    = uint64(1_209_600)
-	MinUnbondingSeconds        = uint64(604_800)
-	MaxUnbondingSeconds        = uint64(1_814_400)
-	DefaultTargetCommitMillis  = uint32(1_500)
-	MaxTargetCommitMillis      = uint32(2_000)
+	DefaultMaxCommissionBps             = uint32(2_000)
+	DefaultMaxVotingPowerBps            = uint32(1_500)
+	DefaultMinUptimeBps                 = uint32(9_500)
+	DefaultInactiveAfterEpochs          = uint64(2)
+	DefaultStakeDecayBps                = uint32(100)
+	DefaultStakeSaturationThresholdNaet = int64(10_000_000_000)
+	DefaultStakeSaturationCapFactorBps  = uint32(100_000)
+	MaxStakeSaturationCapFactorBps      = uint32(1_000_000)
+	DefaultStakeSaturationNaet          = int64(100_000_000_000)
+	DefaultSaturatedStakeRewardBps      = uint32(2_500)
+	DefaultUnbondingSeconds             = uint64(1_209_600)
+	MinUnbondingSeconds                 = uint64(604_800)
+	MaxUnbondingSeconds                 = uint64(1_814_400)
+	DefaultTargetCommitMillis           = uint32(1_500)
+	MaxTargetCommitMillis               = uint32(2_000)
 
 	DefaultMaxValidatorSetChangeRateBps = uint32(1_000)
 
@@ -57,7 +61,10 @@ type Params struct {
 	MinUptimeBps                 uint32
 	InactiveAfterEpochs          uint64
 	StakeDecayBps                uint32
+	StakeSaturationThresholdNaet sdkmath.Int
+	StakeSaturationCapFactorBps  uint32
 	StakeSaturationNaet          sdkmath.Int
+	SaturatedStakeRewardBps      uint32
 	UnbondingSeconds             uint64
 	TargetCommitMillis           uint32
 	MinTaskGroupValidators       uint32
@@ -100,12 +107,15 @@ type Nomination struct {
 }
 
 type ValidatorScoreComponents struct {
-	StakeWeightNaet      sdkmath.Int
-	PerformanceFactorBps uint32
-	UptimeFactorBps      uint32
-	LatencyFactorBps     uint32
-	ReliabilityIndexBps  uint32
-	Score                sdkmath.Int
+	StakeWeightNaet        sdkmath.Int
+	StakeSaturationCapNaet sdkmath.Int
+	SaturatedStakeNaet     sdkmath.Int
+	RewardWeightNaet       sdkmath.Int
+	PerformanceFactorBps   uint32
+	UptimeFactorBps        uint32
+	LatencyFactorBps       uint32
+	ReliabilityIndexBps    uint32
+	Score                  sdkmath.Int
 }
 
 type ScoredValidator struct {
@@ -114,7 +124,32 @@ type ScoredValidator struct {
 	EffectiveStakeNaet sdkmath.Int
 	Score              sdkmath.Int
 	VotingPowerNaet    sdkmath.Int
+	VotingPowerCap     VotingPowerCapStatus
 	ScoreComponents    ValidatorScoreComponents
+}
+
+type StakeSaturationPreview struct {
+	ValidatorID             string
+	BondedStakeNaet         sdkmath.Int
+	SaturationThresholdNaet sdkmath.Int
+	CapFactorBps            uint32
+	SaturationCapNaet       sdkmath.Int
+	EffectiveStakeNaet      sdkmath.Int
+	SaturatedStakeNaet      sdkmath.Int
+	RewardWeightNaet        sdkmath.Int
+	SaturatedStakeRewardBps uint32
+	Saturated               bool
+	Warning                 string
+}
+
+type VotingPowerCapStatus struct {
+	CapNaet               sdkmath.Int
+	PreCapVotingPowerNaet sdkmath.Int
+	FinalVotingPowerNaet  sdkmath.Int
+	ExcessVotingPowerNaet sdkmath.Int
+	MaxVotingPowerBps     uint32
+	SoftCapped            bool
+	Warning               string
 }
 
 type Selection struct {
@@ -192,7 +227,10 @@ func DefaultParams() Params {
 		MinUptimeBps:                 DefaultMinUptimeBps,
 		InactiveAfterEpochs:          DefaultInactiveAfterEpochs,
 		StakeDecayBps:                DefaultStakeDecayBps,
+		StakeSaturationThresholdNaet: sdkmath.NewInt(DefaultStakeSaturationThresholdNaet),
+		StakeSaturationCapFactorBps:  DefaultStakeSaturationCapFactorBps,
 		StakeSaturationNaet:          sdkmath.NewInt(DefaultStakeSaturationNaet),
+		SaturatedStakeRewardBps:      DefaultSaturatedStakeRewardBps,
 		UnbondingSeconds:             DefaultUnbondingSeconds,
 		TargetCommitMillis:           DefaultTargetCommitMillis,
 		MinTaskGroupValidators:       DefaultMinTaskGroupValidators,
@@ -252,8 +290,17 @@ func (p Params) Validate() error {
 	if p.StakeDecayBps > BasisPoints {
 		return fmt.Errorf("stake decay must be <= %d bps", BasisPoints)
 	}
+	if !p.StakeSaturationThresholdNaet.IsPositive() {
+		return errors.New("stake saturation threshold must be positive")
+	}
+	if p.StakeSaturationCapFactorBps == 0 || p.StakeSaturationCapFactorBps > MaxStakeSaturationCapFactorBps {
+		return fmt.Errorf("stake saturation cap factor must be within 1..%d bps", MaxStakeSaturationCapFactorBps)
+	}
 	if !p.StakeSaturationNaet.IsPositive() {
 		return errors.New("stake saturation must be positive")
+	}
+	if p.SaturatedStakeRewardBps > BasisPoints {
+		return fmt.Errorf("saturated stake reward weight must be <= %d bps", BasisPoints)
 	}
 	if p.UnbondingSeconds < MinUnbondingSeconds || p.UnbondingSeconds > MaxUnbondingSeconds {
 		return fmt.Errorf("unbonding period must be within %d..%d seconds", MinUnbondingSeconds, MaxUnbondingSeconds)
@@ -430,7 +477,10 @@ func ScoreCandidate(params Params, candidate Candidate) (ScoredValidator, error)
 }
 
 func ComputeValidatorScoreComponents(params Params, totalStake sdkmath.Int, candidate Candidate) ValidatorScoreComponents {
-	stakeWeight := ApplyStakeSaturation(ApplyStakeDecay(totalStake, candidate.InactiveEpochs, params), params)
+	decayedStake := ApplyStakeDecay(totalStake, candidate.InactiveEpochs, params)
+	stakeWeight := ApplyStakeSaturation(decayedStake, params)
+	saturationCap := StakeSaturationCap(params)
+	saturatedStake := SaturatedStake(decayedStake, params)
 	score := mulIntBps(stakeWeight, candidate.PerformanceScoreBps)
 	score = mulIntBps(score, candidate.UptimeFactorBps)
 	latencyFactor := normalizeOptionalFactorBps(candidate.LatencyFactorBps)
@@ -438,12 +488,15 @@ func ComputeValidatorScoreComponents(params Params, totalStake sdkmath.Int, cand
 	score = mulIntBps(score, latencyFactor)
 	score = mulIntBps(score, reliabilityIndex)
 	return ValidatorScoreComponents{
-		StakeWeightNaet:      stakeWeight,
-		PerformanceFactorBps: candidate.PerformanceScoreBps,
-		UptimeFactorBps:      candidate.UptimeFactorBps,
-		LatencyFactorBps:     latencyFactor,
-		ReliabilityIndexBps:  reliabilityIndex,
-		Score:                score,
+		StakeWeightNaet:        stakeWeight,
+		StakeSaturationCapNaet: saturationCap,
+		SaturatedStakeNaet:     saturatedStake,
+		RewardWeightNaet:       RewardCurveStakeWeight(decayedStake, params),
+		PerformanceFactorBps:   candidate.PerformanceScoreBps,
+		UptimeFactorBps:        candidate.UptimeFactorBps,
+		LatencyFactorBps:       latencyFactor,
+		ReliabilityIndexBps:    reliabilityIndex,
+		Score:                  score,
 	}
 }
 
@@ -463,10 +516,84 @@ func ApplyStakeSaturation(stake sdkmath.Int, params Params) sdkmath.Int {
 	if !stake.IsPositive() {
 		return sdkmath.ZeroInt()
 	}
-	if params.StakeSaturationNaet.IsPositive() && stake.GT(params.StakeSaturationNaet) {
-		return params.StakeSaturationNaet
+	cap := StakeSaturationCap(params)
+	if cap.IsPositive() && stake.GT(cap) {
+		return cap
 	}
 	return stake
+}
+
+func StakeSaturationCap(params Params) sdkmath.Int {
+	derivedCap := mulIntBps(params.StakeSaturationThresholdNaet, params.StakeSaturationCapFactorBps)
+	if !derivedCap.IsPositive() {
+		return params.StakeSaturationNaet
+	}
+	if params.StakeSaturationNaet.IsPositive() && params.StakeSaturationNaet.LT(derivedCap) {
+		return params.StakeSaturationNaet
+	}
+	return derivedCap
+}
+
+func SaturatedStake(stake sdkmath.Int, params Params) sdkmath.Int {
+	if !stake.IsPositive() {
+		return sdkmath.ZeroInt()
+	}
+	cap := StakeSaturationCap(params)
+	if !cap.IsPositive() || stake.LTE(cap) {
+		return sdkmath.ZeroInt()
+	}
+	return stake.Sub(cap)
+}
+
+func RewardCurveStakeWeight(stake sdkmath.Int, params Params) sdkmath.Int {
+	if !stake.IsPositive() {
+		return sdkmath.ZeroInt()
+	}
+	cap := StakeSaturationCap(params)
+	if !cap.IsPositive() || stake.LTE(cap) {
+		return stake
+	}
+	excessWeight := mulIntBps(stake.Sub(cap), params.SaturatedStakeRewardBps)
+	return cap.Add(excessWeight)
+}
+
+func PreviewStakeSaturation(params Params, candidate Candidate) (StakeSaturationPreview, error) {
+	if err := candidate.Validate(params); err != nil {
+		return StakeSaturationPreview{}, err
+	}
+	bondedStake := candidate.SelfStakeNaet.Add(candidate.DelegatedStakeNaet)
+	return buildStakeSaturationPreview(params, strings.TrimSpace(candidate.ValidatorID), bondedStake), nil
+}
+
+func PreviewDelegationSaturation(params Params, candidate Candidate, additionalStake sdkmath.Int) (StakeSaturationPreview, error) {
+	if additionalStake.IsNegative() {
+		return StakeSaturationPreview{}, errors.New("additional delegation stake cannot be negative")
+	}
+	if err := candidate.Validate(params); err != nil {
+		return StakeSaturationPreview{}, err
+	}
+	bondedStake := candidate.SelfStakeNaet.Add(candidate.DelegatedStakeNaet).Add(additionalStake)
+	return buildStakeSaturationPreview(params, strings.TrimSpace(candidate.ValidatorID), bondedStake), nil
+}
+
+func buildStakeSaturationPreview(params Params, validatorID string, bondedStake sdkmath.Int) StakeSaturationPreview {
+	cap := StakeSaturationCap(params)
+	preview := StakeSaturationPreview{
+		ValidatorID:             validatorID,
+		BondedStakeNaet:         bondedStake,
+		SaturationThresholdNaet: params.StakeSaturationThresholdNaet,
+		CapFactorBps:            params.StakeSaturationCapFactorBps,
+		SaturationCapNaet:       cap,
+		EffectiveStakeNaet:      ApplyStakeSaturation(bondedStake, params),
+		SaturatedStakeNaet:      SaturatedStake(bondedStake, params),
+		RewardWeightNaet:        RewardCurveStakeWeight(bondedStake, params),
+		SaturatedStakeRewardBps: params.SaturatedStakeRewardBps,
+	}
+	preview.Saturated = preview.SaturatedStakeNaet.IsPositive()
+	if preview.Saturated {
+		preview.Warning = "validator stake exceeds saturation cap; excess stake keeps bonded balance but receives reduced election weight"
+	}
+	return preview
 }
 
 func DistributeRewards(input RewardInput) (RewardDistribution, error) {
@@ -617,9 +744,20 @@ func applyVotingPowerCap(params Params, validators []ScoredValidator) {
 	}
 	cap := mulIntBps(total, params.MaxVotingPowerBps)
 	for i := range validators {
+		status := VotingPowerCapStatus{
+			CapNaet:               cap,
+			PreCapVotingPowerNaet: validators[i].VotingPowerNaet,
+			FinalVotingPowerNaet:  validators[i].VotingPowerNaet,
+			MaxVotingPowerBps:     params.MaxVotingPowerBps,
+		}
 		if validators[i].VotingPowerNaet.GT(cap) {
+			status.ExcessVotingPowerNaet = validators[i].VotingPowerNaet.Sub(cap)
+			status.FinalVotingPowerNaet = cap
+			status.SoftCapped = true
+			status.Warning = "validator exceeds voting power target; marginal stake has reduced consensus weight"
 			validators[i].VotingPowerNaet = cap
 		}
+		validators[i].VotingPowerCap = status
 	}
 }
 
