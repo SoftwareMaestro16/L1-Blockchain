@@ -58,6 +58,8 @@ import (
 	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	configkeeper "github.com/sovereign-l1/l1/x/config/keeper"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
+	constitutionkeeper "github.com/sovereign-l1/l1/x/constitution/keeper"
+	constitutiontypes "github.com/sovereign-l1/l1/x/constitution/types"
 	dexkeeper "github.com/sovereign-l1/l1/x/dex/keeper"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feeskeeper "github.com/sovereign-l1/l1/x/fees/keeper"
@@ -145,6 +147,7 @@ type L1App struct {
 	EpochsKeeper       *epochskeeper.Keeper
 	ProtocolPoolKeeper protocolpoolkeeper.Keeper
 	ConfigKeeper       configkeeper.Keeper
+	ConstitutionKeeper constitutionkeeper.Keeper
 	TokenFactoryKeeper tokenfactorykeeper.Keeper
 	DexKeeper          dexkeeper.Keeper
 	FeesKeeper         feeskeeper.Keeper
@@ -257,6 +260,7 @@ func NewL1App(
 		epochstypes.StoreKey,
 		protocolpooltypes.StoreKey,
 		configtypes.StoreKey,
+		constitutiontypes.StoreKey,
 		tokenfactorytypes.StoreKey,
 		dextypes.StoreKey,
 		feestypes.StoreKey,

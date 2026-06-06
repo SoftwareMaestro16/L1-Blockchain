@@ -24,6 +24,7 @@ import (
 	aethercoretypes "github.com/sovereign-l1/l1/x/aethercore/types"
 	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
+	constitutiontypes "github.com/sovereign-l1/l1/x/constitution/types"
 	dextypes "github.com/sovereign-l1/l1/x/dex/types"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
 	loadtypes "github.com/sovereign-l1/l1/x/load/types"
@@ -58,6 +59,7 @@ var aetherCorePrototypeModules = []string{
 
 var aetherCoreSystemModules = []string{
 	configtypes.ModuleName,
+	constitutiontypes.ModuleName,
 }
 
 func AetherCoreRoutingExecutionPoint() RoutingExecutionPoint {
@@ -89,6 +91,7 @@ func AetherCoreSystemModuleNames() []string {
 func AetherCoreSystemStoreKeys() []string {
 	return []string{
 		configtypes.StoreKey,
+		constitutiontypes.StoreKey,
 	}
 }
 
@@ -108,6 +111,7 @@ func aetherCoreBeginBlockerOrder() []string {
 		authz.ModuleName,
 		epochstypes.ModuleName,
 		configtypes.ModuleName,
+		constitutiontypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,
 		routingtypes.ModuleName,
@@ -129,6 +133,7 @@ func aetherCoreEndBlockerOrder() []string {
 		feegrant.ModuleName,
 		protocolpooltypes.ModuleName,
 		configtypes.ModuleName,
+		constitutiontypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,
 		routingtypes.ModuleName,
@@ -159,6 +164,7 @@ func aetherCoreInitGenesisOrder() []string {
 		consensusparamtypes.ModuleName,
 		epochstypes.ModuleName,
 		protocolpooltypes.ModuleName,
+		constitutiontypes.ModuleName,
 		configtypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,
@@ -193,6 +199,7 @@ func aetherCoreExportGenesisOrder() []string {
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		epochstypes.ModuleName,
+		constitutiontypes.ModuleName,
 		configtypes.ModuleName,
 		aethercoretypes.ModuleName,
 		loadtypes.ModuleName,

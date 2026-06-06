@@ -1,0 +1,68 @@
+syntax = "proto3";
+package l1.constitution.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/constitution/types";
+
+message GenesisState {
+  uint64 version = 1;
+  Params params = 2 [(gogoproto.nullable) = false];
+  State state = 3 [(gogoproto.nullable) = false];
+}
+
+message Params {
+  string authority = 1;
+  uint32 max_pending_amendments = 2;
+  uint32 max_amendment_id_bytes = 3;
+  uint64 min_amendment_delay = 4;
+  uint32 min_quorum_bps = 5;
+  uint64 emergency_pause_max_blocks = 6;
+}
+
+message Constitution {
+  uint32 max_inflation_bps = 1;
+  uint32 min_slash_fraction_bps = 2;
+  uint32 max_slash_fraction_bps = 3;
+  uint32 max_validator_voting_power_bps = 4;
+  uint64 max_block_gas = 5;
+  uint64 max_avm_code_size_bytes = 6;
+  uint64 max_contract_state_size_bytes = 7;
+  uint64 min_storage_rent_rate = 8;
+  uint64 treasury_spend_limit_per_epoch = 9;
+  uint64 upgrade_delay_blocks = 10;
+  uint64 emergency_pause_max_blocks = 11;
+  uint32 governance_quorum_floor_bps = 12;
+  repeated string protected_modules = 13;
+  repeated string constitutional_exception_keys = 14;
+  uint64 emergency_pause_until_height = 15;
+}
+
+message Amendment {
+  string id = 1;
+  string status = 2;
+  string proposer = 3;
+  string approver = 4;
+  string executor = 5;
+  string canceller = 6;
+  string reason = 7;
+  Constitution proposed = 8 [(gogoproto.nullable) = false];
+  uint64 created_height = 9;
+  uint64 updated_height = 10;
+  uint64 executable_height = 11;
+  uint32 yes_voting_power_bps = 12;
+  uint32 no_voting_power_bps = 13;
+}
+
+message State {
+  Constitution constitution = 1 [(gogoproto.nullable) = false];
+  repeated Amendment pending_amendments = 2 [(gogoproto.nullable) = false];
+}
+
+message ProtectedLimits {
+  uint64 max_block_gas = 1;
+  uint64 max_avm_code_size_bytes = 2;
+  uint64 max_contract_state_size_bytes = 3;
+  uint64 min_storage_rent_rate = 4;
+  repeated string protected_modules = 5;
+}

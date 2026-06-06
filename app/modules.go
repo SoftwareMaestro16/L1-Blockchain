@@ -35,6 +35,7 @@ import (
 	aethercoremodule "github.com/sovereign-l1/l1/x/aethercore"
 	avmschedulermodule "github.com/sovereign-l1/l1/x/avm-scheduler"
 	configmodule "github.com/sovereign-l1/l1/x/config"
+	constitutionmodule "github.com/sovereign-l1/l1/x/constitution"
 	dexmodule "github.com/sovereign-l1/l1/x/dex"
 	feesmodule "github.com/sovereign-l1/l1/x/fees"
 	loadmodule "github.com/sovereign-l1/l1/x/load"
@@ -70,6 +71,7 @@ func (app *L1App) initModules(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		epochs.NewAppModule(app.EpochsKeeper),
 		protocolpool.NewAppModule(app.ProtocolPoolKeeper, app.AccountKeeper, app.BankKeeper),
+		constitutionmodule.NewAppModule(&app.ConstitutionKeeper),
 		configmodule.NewAppModule(&app.ConfigKeeper),
 		aethercoremodule.NewAppModule(app.AetherCoreKeeper),
 		loadmodule.NewAppModule(app.LoadKeeper),

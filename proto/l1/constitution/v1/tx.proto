@@ -1,0 +1,53 @@
+syntax = "proto3";
+package l1.constitution.v1;
+
+import "l1/constitution/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/constitution/types";
+
+message MsgProposeConstitutionAmendment {
+  string authority = 1;
+  Amendment amendment = 2;
+}
+
+message MsgProposeConstitutionAmendmentResponse {
+  Amendment amendment = 1;
+}
+
+message MsgVoteConstitutionAmendment {
+  string authority = 1;
+  string amendment_id = 2;
+  string support = 3;
+  uint32 voting_power_bps = 4;
+}
+
+message MsgVoteConstitutionAmendmentResponse {
+  Amendment amendment = 1;
+}
+
+message MsgExecuteConstitutionAmendment {
+  string authority = 1;
+  string amendment_id = 2;
+}
+
+message MsgExecuteConstitutionAmendmentResponse {
+  Constitution constitution = 1;
+  Amendment amendment = 2;
+}
+
+message MsgCancelConstitutionAmendment {
+  string authority = 1;
+  string amendment_id = 2;
+  string reason = 3;
+}
+
+message MsgCancelConstitutionAmendmentResponse {
+  Amendment amendment = 1;
+}
+
+service Msg {
+  rpc ProposeConstitutionAmendment(MsgProposeConstitutionAmendment) returns (MsgProposeConstitutionAmendmentResponse);
+  rpc VoteConstitutionAmendment(MsgVoteConstitutionAmendment) returns (MsgVoteConstitutionAmendmentResponse);
+  rpc ExecuteConstitutionAmendment(MsgExecuteConstitutionAmendment) returns (MsgExecuteConstitutionAmendmentResponse);
+  rpc CancelConstitutionAmendment(MsgCancelConstitutionAmendment) returns (MsgCancelConstitutionAmendmentResponse);
+}

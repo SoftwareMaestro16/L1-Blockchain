@@ -1,0 +1,39 @@
+syntax = "proto3";
+package l1.constitution.v1;
+
+import "l1/constitution/v1/genesis.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/constitution/types";
+
+message QueryConstitutionRequest {}
+
+message QueryConstitutionResponse {
+  Constitution constitution = 1;
+}
+
+message QueryPendingAmendmentsRequest {}
+
+message QueryPendingAmendmentsResponse {
+  repeated Amendment amendments = 1;
+}
+
+message QueryAmendmentRequest {
+  string amendment_id = 1;
+}
+
+message QueryAmendmentResponse {
+  Amendment amendment = 1;
+}
+
+message QueryProtectedLimitsRequest {}
+
+message QueryProtectedLimitsResponse {
+  ProtectedLimits limits = 1;
+}
+
+service Query {
+  rpc Constitution(QueryConstitutionRequest) returns (QueryConstitutionResponse);
+  rpc PendingAmendments(QueryPendingAmendmentsRequest) returns (QueryPendingAmendmentsResponse);
+  rpc Amendment(QueryAmendmentRequest) returns (QueryAmendmentResponse);
+  rpc ProtectedLimits(QueryProtectedLimitsRequest) returns (QueryProtectedLimitsResponse);
+}
