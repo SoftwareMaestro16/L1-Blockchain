@@ -117,6 +117,99 @@ func TestSettlementArbitrationBoundaryRequiresSignedState(t *testing.T) {
 	require.ErrorContains(t, err, "quorum")
 }
 
+func TestUnilateralCloseRequestStoresReasonAndDetachedSignatures(t *testing.T) {
+	alice := testAddress(0x18)
+	bob := testAddress(0x19)
+	channel := signedChannel(t, "unilateral-close-request", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "425"},
+		{Participant: bob, Amount: "575"},
+	})
+	detached := closeState.Signatures
+	closeState.Signatures = nil
+	state, err = SubmitCloseWithRequest(state, ChannelCloseRequest{
+		ChannelID:     channel.ChannelID,
+		ClosingState:  closeState,
+		Signatures:    detached,
+		CloseReason:   CloseReasonUnilateral,
+		Submitter:     bob,
+		CurrentHeight: 20,
+		SettlementFee: "3",
+	})
+	require.NoError(t, err)
+	require.Equal(t, ChannelStatusPendingClose, state.Channels[0].Status)
+	require.Equal(t, CloseReasonUnilateral, state.Channels[0].PendingClose.CloseReason)
+	require.Equal(t, uint64(20), state.Channels[0].PendingClose.SubmittedHeight)
+	require.Equal(t, uint64(28), state.Channels[0].PendingClose.SettleAfterHeight)
+	require.Equal(t, "3", state.Channels[0].PendingClose.SettlementFee)
+}
+
+func TestFraudProofInvalidBalanceRoutesPenaltyRemainder(t *testing.T) {
+	alice := testAddress(0x1a)
+	bob := testAddress(0x1b)
+	channel := signedChannel(t, "fraud-penalty-routing", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "400"},
+		{Participant: bob, Amount: "600"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+
+	invalid := mutateCanonicalState(closeState, func(next *ChannelState) {
+		next.Nonce = 3
+		next.PreviousStateHash = closeState.StateHash
+		next.Balances = []Balance{
+			{Participant: alice, Amount: "900"},
+			{Participant: bob, Amount: "900"},
+		}
+		next.BalanceA = "900"
+		next.BalanceB = "900"
+	})
+	invalid = resignState(t, channel, invalid)
+	require.ErrorContains(t, invalid.ValidateForChannel(channel, false), "conserve")
+
+	proof := FraudProof{
+		ProofID:         HashParts("invalid-balance", channel.ChannelID),
+		ProofType:       FraudProofTypeInvalidBalance,
+		SubmittedBy:     bob,
+		OffendingSigner: alice,
+		StateA:          invalid,
+		PenaltyAmount:   "25",
+		EvidenceHash:    HashParts("evidence", invalid.StateHash),
+	}
+	state, err = SubmitFraudProofWithPolicy(state, channel.ChannelID, proof, 21, FraudPenaltyPolicy{
+		ReporterRewardCap:       "10",
+		BurnShareBps:            5000,
+		SecurityReserveShareBps: 2500,
+		CommunityPoolShareBps:   2500,
+	})
+	require.NoError(t, err)
+	require.Len(t, state.Channels[0].PendingClose.Penalties, 1)
+	require.Equal(t, "10", state.Channels[0].PendingClose.Penalties[0].Amount)
+	require.Equal(t, "7", allocationAmountFor(state.Channels[0].PendingClose.PenaltyAllocations, PenaltyRouteBurn))
+	require.Equal(t, "3", allocationAmountFor(state.Channels[0].PendingClose.PenaltyAllocations, PenaltyRouteSecurityReserve))
+	require.Equal(t, "5", allocationAmountFor(state.Channels[0].PendingClose.PenaltyAllocations, PenaltyRouteCommunityPool))
+
+	state, settlement, err := FinalizeSettlement(state, channel.ChannelID, 50)
+	require.NoError(t, err)
+	require.Equal(t, "375", amountFor(settlement.FinalBalances, alice))
+	require.Equal(t, "610", amountFor(settlement.FinalBalances, bob))
+	require.Len(t, settlement.PenaltyAllocations, 3)
+	require.NoError(t, settlement.ValidateForChannel(state.Channels[0]))
+}
+
 func TestDisputeRequestEmitsEventAndAppliesOptionalFraudProof(t *testing.T) {
 	alice := testAddress(0x14)
 	bob := testAddress(0x15)
@@ -1747,6 +1840,15 @@ func amountFor(balances []Balance, participant string) string {
 	for _, balance := range balances {
 		if balance.Participant == participant {
 			return balance.Amount
+		}
+	}
+	return ""
+}
+
+func allocationAmountFor(allocations []PenaltyAllocation, route PenaltyRoute) string {
+	for _, allocation := range allocations {
+		if allocation.Route == route {
+			return allocation.Amount
 		}
 	}
 	return ""

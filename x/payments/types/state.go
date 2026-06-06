@@ -221,30 +221,47 @@ func RegisterUpdateCheckpoint(state PaymentsState, req ChannelUpdateRequest) (Pa
 }
 
 func SubmitClose(state PaymentsState, channelID string, closingState ChannelState, submitter string, currentHeight uint64, settlementFee string) (PaymentsState, error) {
+	return SubmitCloseWithRequest(state, ChannelCloseRequest{
+		ChannelID:     channelID,
+		ClosingState:  closingState,
+		CloseReason:   CloseReasonUnilateral,
+		Submitter:     submitter,
+		CurrentHeight: currentHeight,
+		SettlementFee: settlementFee,
+	})
+}
+
+func SubmitCloseWithRequest(state PaymentsState, req ChannelCloseRequest) (PaymentsState, error) {
 	state = state.Export()
-	if currentHeight == 0 {
+	req = req.Normalize()
+	if req.CurrentHeight == 0 {
 		return PaymentsState{}, errors.New("payments close height must be positive")
 	}
-	index, channel, found := state.ChannelIndex(channelID)
+	index, channel, found := state.ChannelIndex(req.ChannelID)
 	if !found {
 		return PaymentsState{}, errors.New("payments channel not found")
 	}
 	if channel.Status != ChannelStatusOpen {
 		return PaymentsState{}, errors.New("payments channel is not open")
 	}
+	closingState := req.ClosingStateWithSignatures()
+	if err := req.ValidateForChannel(channel); err != nil {
+		return PaymentsState{}, err
+	}
 	pending := PendingClose{
-		Submitter:          submitter,
-		SubmittedHeight:    currentHeight,
-		SettleAfterHeight:  currentHeight + channel.DisputePeriod,
+		Submitter:          req.Submitter,
+		SubmittedHeight:    req.CurrentHeight,
+		SettleAfterHeight:  req.CurrentHeight + channel.DisputePeriod,
+		CloseReason:        req.CloseReason,
 		SettlementFeeDenom: NativeDenom,
-		SettlementFee:      settlementFee,
-		State:              closingState.Normalize(),
+		SettlementFee:      req.SettlementFee,
+		State:              closingState,
 	}
 	if err := (SettlementArbitrationInput{
 		Operation:     SettlementArbitrationUnilateralClose,
 		ChannelID:     channel.ChannelID,
 		SignedState:   pending.State,
-		CurrentHeight: currentHeight,
+		CurrentHeight: req.CurrentHeight,
 	}).ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, err
 	}
@@ -300,6 +317,7 @@ func ForcedClose(state PaymentsState, channelID string, submitter string, curren
 		Submitter:          submitter,
 		SubmittedHeight:    currentHeight,
 		SettleAfterHeight:  currentHeight + channel.DisputePeriod,
+		CloseReason:        CloseReasonTimeout,
 		SettlementFeeDenom: NativeDenom,
 		SettlementFee:      settlementFee,
 		State:              channel.LatestState.Normalize(),
@@ -350,7 +368,7 @@ func CooperativeClose(state PaymentsState, channelID string, closingState Channe
 	if closingState.Nonce < channel.LatestState.Nonce {
 		return PaymentsState{}, SettlementRecord{}, errors.New("payments cooperative close state nonce is below latest accepted nonce")
 	}
-	finalBalances, err := applySettlementAdjustments(closingState.Balances, nil, settlementFee, submitter)
+	finalBalances, err := applySettlementAdjustments(closingState.Balances, nil, nil, settlementFee, submitter)
 	if err != nil {
 		return PaymentsState{}, SettlementRecord{}, err
 	}
@@ -492,7 +510,7 @@ func PayerReclaim(state PaymentsState, channelID string, payer string, currentHe
 		finalBalances, err = applySettlementAdjustments([]Balance{
 			{Participant: channel.Payer, Amount: channel.Collateral},
 			{Participant: channel.Receiver, Amount: "0"},
-		}, nil, settlementFee, payer)
+		}, nil, nil, settlementFee, payer)
 	} else {
 		stateHash = claim.StateHash
 		nonce = claim.Nonce
@@ -603,12 +621,13 @@ func DisputeChannel(state PaymentsState, req ChannelDisputeRequest) (PaymentsSta
 		if err := req.FraudProof.ValidateForChannel(channel); err != nil {
 			return PaymentsState{}, err
 		}
-		penalty := Penalty{Offender: req.FraudProof.OffendingSigner, Recipient: req.FraudProof.SubmittedBy, Denom: NativeDenom, Amount: req.FraudProof.PenaltyAmount}.Normalize()
-		if err := penalty.ValidateForChannel(channel); err != nil {
+		penalties, allocations, err := BuildFraudPenaltyRouting(channel, req.FraudProof, FraudPenaltyPolicy{})
+		if err != nil {
 			return PaymentsState{}, err
 		}
 		nextChannel.PendingClose.FraudProofs = append(nextChannel.PendingClose.FraudProofs, req.FraudProof)
-		nextChannel.PendingClose.Penalties = append(nextChannel.PendingClose.Penalties, penalty)
+		nextChannel.PendingClose.Penalties = append(nextChannel.PendingClose.Penalties, penalties...)
+		nextChannel.PendingClose.PenaltyAllocations = append(nextChannel.PendingClose.PenaltyAllocations, allocations...)
 	}
 	nextChannel.LatestState = req.NewerState
 	next := state.Clone()
@@ -638,6 +657,10 @@ func SubmitWatchDispute(state PaymentsState, submission WatchDisputeSubmission) 
 }
 
 func SubmitFraudProof(state PaymentsState, channelID string, proof FraudProof, currentHeight uint64) (PaymentsState, error) {
+	return SubmitFraudProofWithPolicy(state, channelID, proof, currentHeight, FraudPenaltyPolicy{})
+}
+
+func SubmitFraudProofWithPolicy(state PaymentsState, channelID string, proof FraudProof, currentHeight uint64, policy FraudPenaltyPolicy) (PaymentsState, error) {
 	state = state.Export()
 	if currentHeight == 0 {
 		return PaymentsState{}, errors.New("payments fraud proof height must be positive")
@@ -669,13 +692,14 @@ func SubmitFraudProof(state PaymentsState, channelID string, proof FraudProof, c
 			return PaymentsState{}, errors.New("payments duplicate fraud proof")
 		}
 	}
-	penalty := Penalty{Offender: proof.OffendingSigner, Recipient: proof.SubmittedBy, Denom: NativeDenom, Amount: proof.PenaltyAmount}.Normalize()
-	if err := penalty.ValidateForChannel(channel); err != nil {
+	penalties, allocations, err := BuildFraudPenaltyRouting(channel, proof, policy)
+	if err != nil {
 		return PaymentsState{}, err
 	}
 	nextChannel := channel
 	nextChannel.PendingClose.FraudProofs = append(nextChannel.PendingClose.FraudProofs, proof)
-	nextChannel.PendingClose.Penalties = append(nextChannel.PendingClose.Penalties, penalty)
+	nextChannel.PendingClose.Penalties = append(nextChannel.PendingClose.Penalties, penalties...)
+	nextChannel.PendingClose.PenaltyAllocations = append(nextChannel.PendingClose.PenaltyAllocations, allocations...)
 	next := state.Clone()
 	next.Channels[index] = nextChannel.Normalize()
 	sortChannels(next.Channels)
@@ -709,7 +733,7 @@ func FraudClose(state PaymentsState, channelID string, currentHeight uint64) (Pa
 	if err := rejectReusedConditionClaims(state, channel, channel.PendingClose.ConditionProofs); err != nil {
 		return PaymentsState{}, SettlementRecord{}, err
 	}
-	finalBalances, err := applySettlementAdjustments(channel.PendingClose.State.Balances, channel.PendingClose.Penalties, channel.PendingClose.SettlementFee, channel.PendingClose.Submitter)
+	finalBalances, err := applySettlementAdjustments(channel.PendingClose.State.Balances, channel.PendingClose.Penalties, channel.PendingClose.PenaltyAllocations, channel.PendingClose.SettlementFee, channel.PendingClose.Submitter)
 	if err != nil {
 		return PaymentsState{}, SettlementRecord{}, err
 	}
@@ -722,6 +746,7 @@ func FraudClose(state PaymentsState, channelID string, currentHeight uint64) (Pa
 		SettlementFeeDenom: channel.PendingClose.SettlementFeeDenom,
 		SettlementFee:      channel.PendingClose.SettlementFee,
 		Penalties:          channel.PendingClose.Penalties,
+		PenaltyAllocations: channel.PendingClose.PenaltyAllocations,
 		SettledHeight:      currentHeight,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
@@ -785,7 +810,7 @@ func FinalizeSettlementWithRequest(state PaymentsState, req FinalSettlementReque
 	if err != nil {
 		return PaymentsState{}, SettlementRecord{}, err
 	}
-	finalBalances, err := applySettlementAdjustments(baseBalances, channel.PendingClose.Penalties, channel.PendingClose.SettlementFee, channel.PendingClose.Submitter)
+	finalBalances, err := applySettlementAdjustments(baseBalances, channel.PendingClose.Penalties, channel.PendingClose.PenaltyAllocations, channel.PendingClose.SettlementFee, channel.PendingClose.Submitter)
 	if err != nil {
 		return PaymentsState{}, SettlementRecord{}, err
 	}
@@ -798,6 +823,7 @@ func FinalizeSettlementWithRequest(state PaymentsState, req FinalSettlementReque
 		SettlementFeeDenom: channel.PendingClose.SettlementFeeDenom,
 		SettlementFee:      channel.PendingClose.SettlementFee,
 		Penalties:          channel.PendingClose.Penalties,
+		PenaltyAllocations: channel.PendingClose.PenaltyAllocations,
 		SettledHeight:      req.CurrentHeight,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
@@ -1381,7 +1407,7 @@ func validatePaymentEvents(channels []ChannelRecord, events []PaymentEvent) erro
 	return nil
 }
 
-func applySettlementAdjustments(balances []Balance, penalties []Penalty, feeText, feePayer string) ([]Balance, error) {
+func applySettlementAdjustments(balances []Balance, penalties []Penalty, allocations []PenaltyAllocation, feeText, feePayer string) ([]Balance, error) {
 	amounts := make(map[string]sdkmath.Int, len(balances))
 	for _, balance := range normalizeBalances(balances) {
 		amount, err := parseNonNegativeInt("payments final balance", balance.Amount)
@@ -1401,6 +1427,17 @@ func applySettlementAdjustments(balances []Balance, penalties []Penalty, feeText
 		}
 		amounts[penalty.Offender] = offenderBalance.Sub(amount)
 		amounts[penalty.Recipient] = amounts[penalty.Recipient].Add(amount)
+	}
+	for _, allocation := range normalizePenaltyAllocations(allocations) {
+		amount, err := parsePositiveInt("payments penalty allocation amount", allocation.Amount)
+		if err != nil {
+			return nil, err
+		}
+		offenderBalance, found := amounts[allocation.Offender]
+		if !found || offenderBalance.LT(amount) {
+			return nil, errors.New("payments penalty allocation exceeds offender balance")
+		}
+		amounts[allocation.Offender] = offenderBalance.Sub(amount)
 	}
 	fee, err := parseNonNegativeInt("payments settlement fee", feeText)
 	if err != nil {
@@ -1560,7 +1597,7 @@ func finalBalancesForUnidirectionalClaim(channel ChannelRecord, claim Unidirecti
 	return applySettlementAdjustments([]Balance{
 		{Participant: channel.Payer, Amount: collateral.Sub(claimed).String()},
 		{Participant: channel.Receiver, Amount: claimed.String()},
-	}, nil, settlementFee, feePayer)
+	}, nil, nil, settlementFee, feePayer)
 }
 
 func activeEdgesForAmount(edges []ChannelEdge, amount sdkmath.Int, currentHeight uint64) []ChannelEdge {

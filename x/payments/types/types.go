@@ -34,6 +34,7 @@ const (
 	MaxRoutingHops           = 16
 	MaxTokenLength           = 128
 	MaxSettlementFeeFraction = int64(10_000)
+	MaxPenaltyRouteBps       = uint32(10_000)
 	DefaultReplayHorizon     = uint64(100_000)
 	SignerIsolationProcess   = "process"
 	SignerIsolationHardware  = "hardware"
@@ -91,11 +92,13 @@ const (
 type FraudProofType string
 
 const (
-	FraudProofTypeDoubleSign       FraudProofType = "DOUBLE_SIGN"
-	FraudProofTypeStaleClose       FraudProofType = "STALE_CLOSE"
-	FraudProofTypeInvalidClose     FraudProofType = "INVALID_CLOSE"
-	FraudProofTypeInvalidCondition FraudProofType = "INVALID_CONDITION"
-	FraudProofTypeReplayAttempt    FraudProofType = "REPLAY_ATTEMPT"
+	FraudProofTypeDoubleSign        FraudProofType = "DOUBLE_SIGN"
+	FraudProofTypeStaleClose        FraudProofType = "STALE_CLOSE"
+	FraudProofTypeInvalidClose      FraudProofType = "INVALID_CLOSE"
+	FraudProofTypeInvalidBalance    FraudProofType = "INVALID_BALANCE"
+	FraudProofTypeInvalidCondition  FraudProofType = "INVALID_CONDITION"
+	FraudProofTypeReplayAttempt     FraudProofType = "REPLAY_ATTEMPT"
+	FraudProofTypeAsyncOverexposure FraudProofType = "ASYNC_OVEREXPOSURE"
 )
 
 type BatchOperationType string
@@ -105,6 +108,15 @@ const (
 	BatchOperationClose   BatchOperationType = "CLOSE"
 	BatchOperationDispute BatchOperationType = "DISPUTE"
 	BatchOperationSettle  BatchOperationType = "SETTLE"
+)
+
+type CloseReason string
+
+const (
+	CloseReasonUnilateral  CloseReason = "UNILATERAL"
+	CloseReasonCooperative CloseReason = "COOPERATIVE"
+	CloseReasonTimeout     CloseReason = "TIMEOUT"
+	CloseReasonFraud       CloseReason = "FRAUD"
 )
 
 type SettlementArbitrationOperation string
@@ -127,6 +139,15 @@ type VirtualChannelStatus string
 const (
 	VirtualChannelStatusOpen    VirtualChannelStatus = "OPEN"
 	VirtualChannelStatusSettled VirtualChannelStatus = "SETTLED"
+)
+
+type PenaltyRoute string
+
+const (
+	PenaltyRouteReporter        PenaltyRoute = "REPORTER"
+	PenaltyRouteBurn            PenaltyRoute = "BURN"
+	PenaltyRouteSecurityReserve PenaltyRoute = "SECURITY_RESERVE"
+	PenaltyRouteCommunityPool   PenaltyRoute = "COMMUNITY_POOL"
 )
 
 type Balance struct {
@@ -287,6 +308,16 @@ type ChannelUpdateResult struct {
 	ValidatedOffChain    bool
 	CheckpointRegistered bool
 	Liquidity            []Balance
+}
+
+type ChannelCloseRequest struct {
+	ChannelID     string
+	ClosingState  ChannelState
+	Signatures    []StateSignature
+	CloseReason   CloseReason
+	Submitter     string
+	CurrentHeight uint64
+	SettlementFee string
 }
 
 type ConditionResolution struct {
@@ -474,12 +505,14 @@ type PendingClose struct {
 	SubmittedHeight    uint64
 	SettleAfterHeight  uint64
 	DisputeCount       uint32
+	CloseReason        CloseReason
 	SettlementFeeDenom string
 	SettlementFee      string
 	State              ChannelState
 	FraudProofs        []FraudProof
 	ConditionProofs    []ConditionResolution
 	Penalties          []Penalty
+	PenaltyAllocations []PenaltyAllocation
 }
 
 type FraudProof struct {
@@ -489,6 +522,7 @@ type FraudProof struct {
 	OffendingSigner string
 	StateA          ChannelState
 	StateB          ChannelState
+	AsyncProof      AsyncDeltaDisputeProof
 	PenaltyDenom    string
 	PenaltyAmount   string
 	EvidenceHash    string
@@ -499,6 +533,20 @@ type Penalty struct {
 	Recipient string
 	Denom     string
 	Amount    string
+}
+
+type PenaltyAllocation struct {
+	Offender string
+	Route    PenaltyRoute
+	Denom    string
+	Amount   string
+}
+
+type FraudPenaltyPolicy struct {
+	ReporterRewardCap       string
+	BurnShareBps            uint32
+	SecurityReserveShareBps uint32
+	CommunityPoolShareBps   uint32
 }
 
 type ChannelRecord struct {
@@ -541,6 +589,7 @@ type SettlementRecord struct {
 	SettlementFeeDenom string
 	SettlementFee      string
 	Penalties          []Penalty
+	PenaltyAllocations []PenaltyAllocation
 	SettledHeight      uint64
 	SettlementHash     string
 }
@@ -846,6 +895,51 @@ func (r ChannelUpdateRequest) Normalize() ChannelUpdateRequest {
 	r.AsyncDeltas = normalizeAsyncDeltas(r.AsyncDeltas)
 	r.Submitter = strings.TrimSpace(r.Submitter)
 	return r
+}
+
+func (r ChannelCloseRequest) Normalize() ChannelCloseRequest {
+	r.ChannelID = normalizeHash(r.ChannelID)
+	r.ClosingState = r.ClosingState.Normalize()
+	r.Signatures = normalizeStateSignatures(r.Signatures)
+	r.Submitter = strings.TrimSpace(r.Submitter)
+	r.SettlementFee = strings.TrimSpace(r.SettlementFee)
+	if r.CloseReason == "" {
+		r.CloseReason = CloseReasonUnilateral
+	}
+	return r
+}
+
+func (r ChannelCloseRequest) ClosingStateWithSignatures() ChannelState {
+	req := r.Normalize()
+	state := req.ClosingState
+	if len(req.Signatures) > 0 {
+		state.Signatures = req.Signatures
+	}
+	return state.Normalize()
+}
+
+func (r ChannelCloseRequest) ValidateForChannel(channel ChannelRecord) error {
+	req := r.Normalize()
+	channel = channel.Normalize()
+	if req.ChannelID != channel.ChannelID {
+		return errors.New("payments close request channel mismatch")
+	}
+	if err := validateCloseReason(req.CloseReason); err != nil {
+		return err
+	}
+	if err := addressing.ValidateUserAddress("payments close submitter", req.Submitter); err != nil {
+		return err
+	}
+	if !containsString(channel.Participants, req.Submitter) {
+		return errors.New("payments close submitter must be participant")
+	}
+	if req.CurrentHeight == 0 {
+		return errors.New("payments close height must be positive")
+	}
+	if err := validateNonNegativeInt("payments settlement fee", req.SettlementFee); err != nil {
+		return err
+	}
+	return req.ClosingStateWithSignatures().ValidateForChannel(channel, false)
 }
 
 func (r ChannelDisputeRequest) Normalize() ChannelDisputeRequest {
@@ -2119,12 +2213,16 @@ func (c ChannelRecord) Validate() error {
 
 func (p PendingClose) Normalize() PendingClose {
 	p.Submitter = strings.TrimSpace(p.Submitter)
+	if p.CloseReason == "" {
+		p.CloseReason = CloseReasonUnilateral
+	}
 	p.SettlementFeeDenom = normalizeAssetDenom(p.SettlementFeeDenom)
 	p.SettlementFee = strings.TrimSpace(p.SettlementFee)
 	p.State = p.State.Normalize()
 	p.FraudProofs = normalizeFraudProofs(p.FraudProofs)
 	p.ConditionProofs = normalizeConditionResolutions(p.ConditionProofs)
 	p.Penalties = normalizePenalties(p.Penalties)
+	p.PenaltyAllocations = normalizePenaltyAllocations(p.PenaltyAllocations)
 	return p
 }
 
@@ -2141,6 +2239,9 @@ func (p PendingClose) ValidateForChannel(channel ChannelRecord) error {
 	}
 	if p.SettleAfterHeight <= p.SubmittedHeight {
 		return errors.New("payments pending close settlement height must exceed submitted height")
+	}
+	if err := validateCloseReason(p.CloseReason); err != nil {
+		return err
 	}
 	if p.SettlementFeeDenom != NativeDenom {
 		return fmt.Errorf("payments settlement fee denom must be %s", NativeDenom)
@@ -2164,6 +2265,11 @@ func (p PendingClose) ValidateForChannel(channel ChannelRecord) error {
 			return err
 		}
 	}
+	for _, allocation := range p.PenaltyAllocations {
+		if err := allocation.ValidateForChannel(channel); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -2176,6 +2282,7 @@ func (f FraudProof) Normalize() FraudProof {
 	f.EvidenceHash = normalizeHash(f.EvidenceHash)
 	f.StateA = f.StateA.Normalize()
 	f.StateB = f.StateB.Normalize()
+	f.AsyncProof = f.AsyncProof.Normalize()
 	return f
 }
 
@@ -2247,6 +2354,13 @@ func (f FraudProof) ValidateForChannel(channel ChannelRecord) error {
 		if proof.StateA.StateHash == channel.LatestState.StateHash {
 			return errors.New("payments invalid-close proof requires non-latest close state")
 		}
+	case FraudProofTypeInvalidBalance:
+		if err := validateSignedStateDomainForFraud(channel, proof.StateA); err != nil {
+			return err
+		}
+		if err := validateCollateralConservation(proof.StateA, channel); err == nil {
+			return errors.New("payments invalid-balance proof requires collateral conservation failure")
+		}
 	case FraudProofTypeInvalidCondition:
 		if err := proof.StateA.ValidateForChannel(channel, false); err != nil {
 			return err
@@ -2255,11 +2369,21 @@ func (f FraudProof) ValidateForChannel(channel ChannelRecord) error {
 			return errors.New("payments invalid-condition proof requires conditions")
 		}
 	case FraudProofTypeReplayAttempt:
+		if proof.StateA.ChainID != channel.ChainID || proof.StateA.ChannelID != channel.ChannelID {
+			if err := validateSignedStateShapeForFraud(channel, proof.StateA); err != nil {
+				return err
+			}
+			return nil
+		}
 		if err := proof.StateA.ValidateForChannel(channel, false); err != nil {
 			return err
 		}
 		if proof.StateA.Nonce > channel.FinalizedNonce {
 			return errors.New("payments replay proof requires finalized or older nonce")
+		}
+	case FraudProofTypeAsyncOverexposure:
+		if err := validateAsyncOverexposureProof(channel, proof.AsyncProof); err != nil {
+			return err
 		}
 	default:
 		return fmt.Errorf("unknown payments fraud proof type %q", proof.ProofType)
@@ -2295,6 +2419,94 @@ func (p Penalty) ValidateForChannel(channel ChannelRecord) error {
 	return validatePositiveInt("payments penalty amount", p.Amount)
 }
 
+func (p PenaltyAllocation) Normalize() PenaltyAllocation {
+	p.Offender = strings.TrimSpace(p.Offender)
+	p.Denom = normalizeAssetDenom(p.Denom)
+	p.Amount = strings.TrimSpace(p.Amount)
+	return p
+}
+
+func (p PenaltyAllocation) ValidateForChannel(channel ChannelRecord) error {
+	allocation := p.Normalize()
+	if err := addressing.ValidateUserAddress("payments penalty allocation offender", allocation.Offender); err != nil {
+		return err
+	}
+	if !containsString(channel.Participants, allocation.Offender) {
+		return errors.New("payments penalty allocation offender must be channel participant")
+	}
+	if !IsPenaltyRoute(allocation.Route) || allocation.Route == PenaltyRouteReporter {
+		return errors.New("payments penalty allocation route must be burn, security reserve, or community pool")
+	}
+	if allocation.Denom != NativeDenom {
+		return fmt.Errorf("payments penalty allocation denom must be %s", NativeDenom)
+	}
+	return validatePositiveInt("payments penalty allocation amount", allocation.Amount)
+}
+
+func (p FraudPenaltyPolicy) Normalize() FraudPenaltyPolicy {
+	p.ReporterRewardCap = strings.TrimSpace(p.ReporterRewardCap)
+	return p
+}
+
+func (p FraudPenaltyPolicy) Validate() error {
+	p = p.Normalize()
+	if p.ReporterRewardCap != "" {
+		if err := validateNonNegativeInt("payments reporter reward cap", p.ReporterRewardCap); err != nil {
+			return err
+		}
+	}
+	total := p.BurnShareBps + p.SecurityReserveShareBps + p.CommunityPoolShareBps
+	if total > MaxPenaltyRouteBps {
+		return errors.New("payments penalty route shares exceed 10000 bps")
+	}
+	return nil
+}
+
+func BuildFraudPenaltyRouting(channel ChannelRecord, proof FraudProof, policy FraudPenaltyPolicy) ([]Penalty, []PenaltyAllocation, error) {
+	channel = channel.Normalize()
+	proof = proof.Normalize()
+	policy = policy.Normalize()
+	if err := proof.ValidateForChannel(channel); err != nil {
+		return nil, nil, err
+	}
+	if err := policy.Validate(); err != nil {
+		return nil, nil, err
+	}
+	penaltyAmount, err := parsePositiveInt("payments fraud penalty", proof.PenaltyAmount)
+	if err != nil {
+		return nil, nil, err
+	}
+	reporterReward := penaltyAmount
+	if policy.ReporterRewardCap != "" {
+		capAmount, err := parseNonNegativeInt("payments reporter reward cap", policy.ReporterRewardCap)
+		if err != nil {
+			return nil, nil, err
+		}
+		if reporterReward.GT(capAmount) {
+			reporterReward = capAmount
+		}
+	}
+	penalties := []Penalty{}
+	if reporterReward.IsPositive() {
+		penalty := Penalty{Offender: proof.OffendingSigner, Recipient: proof.SubmittedBy, Denom: NativeDenom, Amount: reporterReward.String()}.Normalize()
+		if err := penalty.ValidateForChannel(channel); err != nil {
+			return nil, nil, err
+		}
+		penalties = append(penalties, penalty)
+	}
+	remaining := penaltyAmount.Sub(reporterReward)
+	allocations, err := splitPenaltyRemainder(proof.OffendingSigner, remaining, policy)
+	if err != nil {
+		return nil, nil, err
+	}
+	for _, allocation := range allocations {
+		if err := allocation.ValidateForChannel(channel); err != nil {
+			return nil, nil, err
+		}
+	}
+	return normalizePenalties(penalties), normalizePenaltyAllocations(allocations), nil
+}
+
 func (s SettlementRecord) Normalize() SettlementRecord {
 	s.ChainID = strings.TrimSpace(s.ChainID)
 	s.ChannelID = normalizeHash(s.ChannelID)
@@ -2304,6 +2516,7 @@ func (s SettlementRecord) Normalize() SettlementRecord {
 	s.SettlementHash = normalizeOptionalHash(s.SettlementHash)
 	s.FinalBalances = normalizeBalances(s.FinalBalances)
 	s.Penalties = normalizePenalties(s.Penalties)
+	s.PenaltyAllocations = normalizePenaltyAllocations(s.PenaltyAllocations)
 	return s
 }
 
@@ -2341,6 +2554,11 @@ func (s SettlementRecord) ValidateForChannel(channel ChannelRecord) error {
 			return err
 		}
 	}
+	for _, allocation := range settlement.PenaltyAllocations {
+		if err := allocation.ValidateForChannel(channel); err != nil {
+			return err
+		}
+	}
 	finalTotal, err := sumBalances(settlement.FinalBalances)
 	if err != nil {
 		return err
@@ -2353,8 +2571,12 @@ func (s SettlementRecord) ValidateForChannel(channel ChannelRecord) error {
 	if err != nil {
 		return err
 	}
-	if !finalTotal.Add(fee).Equal(collateral) {
-		return errors.New("payments settlement must conserve collateral minus fee")
+	allocationTotal, err := sumPenaltyAllocations(settlement.PenaltyAllocations)
+	if err != nil {
+		return err
+	}
+	if !finalTotal.Add(fee).Add(allocationTotal).Equal(collateral) {
+		return errors.New("payments settlement must conserve collateral minus fee and routed penalties")
 	}
 	if settlement.SettlementHash == "" {
 		return errors.New("payments settlement hash is required")
@@ -2683,7 +2905,13 @@ func IsChannelStatus(value ChannelStatus) bool {
 
 func IsFraudProofType(value FraudProofType) bool {
 	switch value {
-	case FraudProofTypeDoubleSign, FraudProofTypeStaleClose, FraudProofTypeInvalidClose, FraudProofTypeInvalidCondition, FraudProofTypeReplayAttempt:
+	case FraudProofTypeDoubleSign,
+		FraudProofTypeStaleClose,
+		FraudProofTypeInvalidClose,
+		FraudProofTypeInvalidBalance,
+		FraudProofTypeInvalidCondition,
+		FraudProofTypeReplayAttempt,
+		FraudProofTypeAsyncOverexposure:
 		return true
 	default:
 		return false
@@ -2699,9 +2927,27 @@ func IsBatchOperationType(value BatchOperationType) bool {
 	}
 }
 
+func IsCloseReason(value CloseReason) bool {
+	switch value {
+	case CloseReasonUnilateral, CloseReasonCooperative, CloseReasonTimeout, CloseReasonFraud:
+		return true
+	default:
+		return false
+	}
+}
+
 func IsVirtualChannelStatus(value VirtualChannelStatus) bool {
 	switch value {
 	case VirtualChannelStatusOpen, VirtualChannelStatusSettled:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsPenaltyRoute(value PenaltyRoute) bool {
+	switch value {
+	case PenaltyRouteReporter, PenaltyRouteBurn, PenaltyRouteSecurityReserve, PenaltyRouteCommunityPool:
 		return true
 	default:
 		return false
@@ -3042,6 +3288,13 @@ func validateUnidirectionalChannelCore(channel ChannelRecord) error {
 	return nil
 }
 
+func validateCloseReason(reason CloseReason) error {
+	if !IsCloseReason(reason) {
+		return fmt.Errorf("unknown payments close reason %q", reason)
+	}
+	return nil
+}
+
 func validateUnidirectionalOpeningState(channel ChannelRecord) error {
 	if channel.LatestState.TimeoutHeight != channel.ExpirationHeight {
 		return errors.New("payments unidirectional opening state expiration height mismatch")
@@ -3291,6 +3544,104 @@ func validateSignatureQuorum(signatures []StateSignature, required []string, sta
 	return nil
 }
 
+func validateSignedStateShapeForFraud(channel ChannelRecord, state ChannelState) error {
+	channel = channel.Normalize()
+	state = state.Normalize()
+	if err := validateUnsignedStateShape(state); err != nil {
+		return err
+	}
+	if state.StateHash == "" {
+		return errors.New("payments fraud state hash is required")
+	}
+	if expected := ComputeStateHash(state); state.StateHash != expected {
+		return errors.New("payments fraud state hash mismatch")
+	}
+	return validateSignatureQuorum(state.Signatures, channel.RequiredSigners, state)
+}
+
+func validateSignedStateDomainForFraud(channel ChannelRecord, state ChannelState) error {
+	channel = channel.Normalize()
+	state = state.Normalize()
+	if err := validateSignedStateShapeForFraud(channel, state); err != nil {
+		return err
+	}
+	if state.ChainID != channel.ChainID {
+		return errors.New("payments fraud state chain id mismatch")
+	}
+	if state.ChannelID != channel.ChannelID {
+		return errors.New("payments fraud state channel mismatch")
+	}
+	if state.ChannelType != channel.ChannelType {
+		return errors.New("payments fraud state type mismatch")
+	}
+	if expected := ComputeParticipantSetHash(channel.Participants); state.ParticipantSetHash != expected {
+		return errors.New("payments fraud state participant set hash mismatch")
+	}
+	if state.Denom != channel.Denom {
+		return errors.New("payments fraud state denom mismatch")
+	}
+	if state.ChallengePeriod != channel.DisputePeriod {
+		return errors.New("payments fraud state challenge period mismatch")
+	}
+	if expected := ComputeRequiredSignerBitmap(channel.Participants, channel.RequiredSigners); state.RequiredSignerBitmap != expected {
+		return errors.New("payments fraud state required signer bitmap mismatch")
+	}
+	return validateStateParticipants(state, channel)
+}
+
+func validateAsyncOverexposureProof(channel ChannelRecord, asyncProof AsyncDeltaDisputeProof) error {
+	channel = channel.Normalize()
+	proof := asyncProof.Normalize()
+	if channel.ChannelType != ChannelTypeAsync {
+		return errors.New("payments async overexposure proof requires async channel")
+	}
+	if err := ValidateHash("payments async overexposure proof id", proof.ProofID); err != nil {
+		return err
+	}
+	if proof.ChannelID != channel.ChannelID {
+		return errors.New("payments async overexposure proof channel mismatch")
+	}
+	if err := ValidateHash("payments async overexposure evidence hash", proof.EvidenceHash); err != nil {
+		return err
+	}
+	if err := proof.CheckpointState.ValidateForChannel(channel, false); err != nil {
+		return err
+	}
+	if len(proof.Deltas) == 0 {
+		return errors.New("payments async overexposure proof requires deltas")
+	}
+	maxExposure, err := parsePositiveInt("payments async max unacked amount", proof.CheckpointState.MaxUnackedAmount)
+	if err != nil {
+		return err
+	}
+	currentHeight := channel.OpenHeight
+	if channel.PendingClose.SubmittedHeight != 0 {
+		currentHeight = channel.PendingClose.SubmittedHeight
+	}
+	exposureBySender := make(map[string]sdkmath.Int, len(channel.Participants))
+	overexposed := false
+	for _, delta := range normalizeAsyncDeltas(proof.Deltas) {
+		if err := delta.ValidateForChannel(channel, currentHeight); err != nil {
+			return err
+		}
+		amount, err := parsePositiveInt("payments async delta amount", delta.Amount)
+		if err != nil {
+			return err
+		}
+		exposureBySender[delta.From] = exposureBySender[delta.From].Add(amount)
+		if exposureBySender[delta.From].GT(maxExposure) {
+			overexposed = true
+		}
+	}
+	if !overexposed {
+		return errors.New("payments async overexposure proof requires exposure above max")
+	}
+	if proof.EvidenceHash != HashParts("async-overexposure", proof.CheckpointState.StateHash, ComputeAsyncDeltaRootForChannel(channel, proof.Deltas)) {
+		return errors.New("payments async overexposure evidence hash mismatch")
+	}
+	return nil
+}
+
 func validateClaimSignatureEnvelope(sig ClaimSignature, claim UnidirectionalClaim) error {
 	sig = sig.Normalize()
 	claim = claim.Normalize()
@@ -3509,6 +3860,68 @@ func sumConditions(conditions []ConditionalPayment) (sdkmath.Int, error) {
 		total = total.Add(amount)
 	}
 	return total, nil
+}
+
+func sumPenaltyAllocations(allocations []PenaltyAllocation) (sdkmath.Int, error) {
+	total := sdkmath.ZeroInt()
+	for _, allocation := range normalizePenaltyAllocations(allocations) {
+		amount, err := parsePositiveInt("payments penalty allocation amount", allocation.Amount)
+		if err != nil {
+			return sdkmath.Int{}, err
+		}
+		total = total.Add(amount)
+	}
+	return total, nil
+}
+
+func splitPenaltyRemainder(offender string, remaining sdkmath.Int, policy FraudPenaltyPolicy) ([]PenaltyAllocation, error) {
+	if !remaining.IsPositive() {
+		return nil, nil
+	}
+	shares := []struct {
+		route PenaltyRoute
+		bps   uint32
+	}{
+		{route: PenaltyRouteBurn, bps: policy.BurnShareBps},
+		{route: PenaltyRouteSecurityReserve, bps: policy.SecurityReserveShareBps},
+		{route: PenaltyRouteCommunityPool, bps: policy.CommunityPoolShareBps},
+	}
+	allocated := sdkmath.ZeroInt()
+	amountByRoute := map[PenaltyRoute]sdkmath.Int{}
+	for _, share := range shares {
+		if share.bps == 0 {
+			continue
+		}
+		amount := remaining.MulRaw(int64(share.bps)).QuoRaw(int64(MaxPenaltyRouteBps))
+		if !amount.IsPositive() {
+			continue
+		}
+		allocated = allocated.Add(amount)
+		current, found := amountByRoute[share.route]
+		if !found {
+			current = sdkmath.ZeroInt()
+		}
+		amountByRoute[share.route] = current.Add(amount)
+	}
+	remainder := remaining.Sub(allocated)
+	if remainder.IsPositive() {
+		route := PenaltyRouteCommunityPool
+		if policy.BurnShareBps == 0 && policy.SecurityReserveShareBps == 0 && policy.CommunityPoolShareBps == 0 {
+			route = PenaltyRouteCommunityPool
+		}
+		current, found := amountByRoute[route]
+		if !found {
+			current = sdkmath.ZeroInt()
+		}
+		amountByRoute[route] = current.Add(remainder)
+	}
+	allocations := make([]PenaltyAllocation, 0, len(amountByRoute))
+	for route, amount := range amountByRoute {
+		if amount.IsPositive() {
+			allocations = append(allocations, PenaltyAllocation{Offender: offender, Route: route, Denom: NativeDenom, Amount: amount.String()})
+		}
+	}
+	return normalizePenaltyAllocations(allocations), nil
 }
 
 func normalizeBalances(balances []Balance) []Balance {
@@ -3742,6 +4155,34 @@ func normalizePenalties(penalties []Penalty) []Penalty {
 			return out[i].Recipient < out[j].Recipient
 		}
 		return out[i].Amount < out[j].Amount
+	})
+	return out
+}
+
+func normalizePenaltyAllocations(allocations []PenaltyAllocation) []PenaltyAllocation {
+	out := make([]PenaltyAllocation, len(allocations))
+	for i, allocation := range allocations {
+		out[i] = allocation.Normalize()
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].Offender != out[j].Offender {
+			return out[i].Offender < out[j].Offender
+		}
+		if out[i].Route != out[j].Route {
+			return out[i].Route < out[j].Route
+		}
+		return out[i].Amount < out[j].Amount
+	})
+	return out
+}
+
+func normalizeStateSignatures(signatures []StateSignature) []StateSignature {
+	out := make([]StateSignature, len(signatures))
+	for i, signature := range signatures {
+		out[i] = signature.Normalize()
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		return out[i].Signer < out[j].Signer
 	})
 	return out
 }

@@ -180,6 +180,18 @@ func (k *Keeper) SubmitClose(channelID string, closingState paymentstypes.Channe
 	return nil
 }
 
+func (k *Keeper) SubmitCloseWithRequest(req paymentstypes.ChannelCloseRequest) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.SubmitCloseWithRequest(k.genesis.State, req)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
 func (k *Keeper) ForcedClose(channelID string, submitter string, currentHeight uint64, settlementFee string) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err
@@ -269,6 +281,18 @@ func (k *Keeper) SubmitFraudProof(channelID string, proof paymentstypes.FraudPro
 		return err
 	}
 	next, err := paymentstypes.SubmitFraudProof(k.genesis.State, channelID, proof, currentHeight)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
+func (k *Keeper) SubmitFraudProofWithPolicy(channelID string, proof paymentstypes.FraudProof, currentHeight uint64, policy paymentstypes.FraudPenaltyPolicy) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.SubmitFraudProofWithPolicy(k.genesis.State, channelID, proof, currentHeight, policy)
 	if err != nil {
 		return err
 	}

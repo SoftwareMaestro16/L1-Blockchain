@@ -598,6 +598,12 @@ func ComputeSettlementHash(settlement SettlementRecord) string {
 		writeString(h, penalty.Denom)
 		writeString(h, penalty.Amount)
 	}
+	for _, allocation := range settlement.PenaltyAllocations {
+		writeString(h, allocation.Offender)
+		writeString(h, string(allocation.Route))
+		writeString(h, allocation.Denom)
+		writeString(h, allocation.Amount)
+	}
 	return hex.EncodeToString(h.Sum(nil))
 }
 
