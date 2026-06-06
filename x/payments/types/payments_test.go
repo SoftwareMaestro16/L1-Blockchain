@@ -73,9 +73,13 @@ func TestPaymentStateRejectsNonNaetAndCollateralMismatch(t *testing.T) {
 		ChannelID:         channel.ChannelID,
 		ChannelType:       channel.ChannelType,
 		Denom:             channel.Denom,
+		Version:           CurrentStateVersion,
 		Epoch:             1,
 		Nonce:             2,
 		PreviousStateHash: channel.OpeningStateHash,
+		TimeoutHeight:     64,
+		CloseDelay:        channel.DisputePeriod,
+		FeePolicyID:       NativeDenom,
 		Balances: []Balance{
 			{Participant: alice, Amount: "999"},
 			{Participant: bob, Amount: "0"},
@@ -90,6 +94,119 @@ func TestPaymentStateRejectsNonNaetAndCollateralMismatch(t *testing.T) {
 	channel.LatestState = badState
 	err = channel.LatestState.ValidateForChannel(channel, true)
 	require.ErrorContains(t, err, "conserve")
+}
+
+func TestBidirectionalStateCommitmentIncludesDomainFields(t *testing.T) {
+	alice := testAddress(0x37)
+	bob := testAddress(0x38)
+	channel := signedChannel(t, "bidirectional-domain", "1000", alice, bob)
+	channel = channel.Normalize()
+
+	condition := ConditionalPayment{
+		ConditionID:   HashParts("condition", channel.ChannelID),
+		ConditionType: ConditionTypeHashLock,
+		Payer:         channel.Participants[0],
+		Payee:         channel.Participants[1],
+		Amount:        "40",
+		HashLock:      HashParts("preimage"),
+		TimeoutHeight: 88,
+		NonceStart:    2,
+		NonceEnd:      5,
+	}
+	state, err := BuildState(ChannelState{
+		ChainID:           channel.ChainID,
+		ChannelID:         channel.ChannelID,
+		ChannelType:       channel.ChannelType,
+		Denom:             channel.Denom,
+		Version:           CurrentStateVersion,
+		Epoch:             1,
+		Nonce:             2,
+		PreviousStateHash: channel.OpeningStateHash,
+		Balances:          []Balance{{Participant: channel.Participants[0], Amount: "460"}, {Participant: channel.Participants[1], Amount: "500"}},
+		ReserveA:          "25",
+		ReserveB:          "15",
+		Conditions:        []ConditionalPayment{condition},
+		TimeoutHeight:     96,
+		CloseDelay:        channel.DisputePeriod,
+		FeePolicyID:       NativeDenom,
+	})
+	require.NoError(t, err)
+	for _, signer := range channel.Participants {
+		sig, err := SignatureForState(state, signer)
+		require.NoError(t, err)
+		state.Signatures = append(state.Signatures, sig)
+	}
+	state = state.Normalize()
+	require.NoError(t, state.ValidateForChannel(channel, true))
+	require.Equal(t, ComputeConditionsRoot(state.Conditions), state.PendingConditionsRoot)
+
+	changedTimeout := state
+	changedTimeout.TimeoutHeight++
+	changedTimeout.StateHash = ""
+	changedTimeout.Signatures = nil
+	changedTimeout, err = BuildState(changedTimeout)
+	require.NoError(t, err)
+	require.NotEqual(t, state.StateHash, changedTimeout.StateHash)
+
+	changedReserve := state
+	changedReserve.ReserveB = "16"
+	changedReserve.StateHash = ""
+	changedReserve.Signatures = nil
+	changedReserve, err = BuildState(changedReserve)
+	require.NoError(t, err)
+	require.NotEqual(t, state.StateHash, changedReserve.StateHash)
+
+	badRoot := state
+	badRoot.PendingConditionsRoot = HashParts("wrong-root")
+	badRoot.StateHash = ComputeStateHash(badRoot)
+	for i := range badRoot.Signatures {
+		sig, err := SignatureForState(badRoot, badRoot.Signatures[i].Signer)
+		require.NoError(t, err)
+		badRoot.Signatures[i] = sig
+	}
+	require.ErrorContains(t, badRoot.ValidateForChannel(channel, true), "conditions root")
+}
+
+func TestBidirectionalCloseAndUpdateRules(t *testing.T) {
+	alice := testAddress(0x39)
+	bob := testAddress(0x3a)
+	channel := signedChannel(t, "bidirectional-lifecycle", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	update := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "475"},
+		{Participant: bob, Amount: "525"},
+	})
+	oneSignature := update
+	oneSignature.Signatures = oneSignature.Signatures[:1]
+	require.ErrorContains(t, oneSignature.ValidateForChannel(channel, true), "quorum")
+
+	state, err = AcceptSignedState(state, channel.ChannelID, update, 18)
+	require.NoError(t, err)
+	_, err = AcceptSignedState(state, channel.ChannelID, update, 19)
+	require.ErrorContains(t, err, "strictly increase")
+
+	staleClose := signedState(t, channel, 1, "", []Balance{
+		{Participant: alice, Amount: "1000"},
+		{Participant: bob, Amount: "0"},
+	})
+	_, err = SubmitClose(state, channel.ChannelID, staleClose, alice, 20, "0")
+	require.ErrorContains(t, err, "latest accepted nonce")
+
+	cooperative := signedState(t, channel, 3, update.StateHash, []Balance{
+		{Participant: alice, Amount: "450"},
+		{Participant: bob, Amount: "550"},
+	})
+	state, settlement, err := CooperativeClose(state, channel.ChannelID, cooperative, bob, 21, "5")
+	require.NoError(t, err)
+	require.Equal(t, ChannelStatusSettled, state.Channels[0].Status)
+	require.Empty(t, state.Channels[0].PendingClose.State.StateHash)
+	require.Equal(t, cooperative.Nonce, settlement.Nonce)
+	require.Equal(t, "545", amountFor(settlement.FinalBalances, bob))
 }
 
 func TestPaymentAssetScopeRejectsNonNaetFeesAndPenalties(t *testing.T) {
@@ -317,10 +434,14 @@ func signedState(t *testing.T, channel ChannelRecord, nonce uint64, previous str
 		ChannelID:         channel.ChannelID,
 		ChannelType:       channel.ChannelType,
 		Denom:             channel.Denom,
+		Version:           CurrentStateVersion,
 		Epoch:             1,
 		Nonce:             nonce,
 		Balances:          balances,
 		PreviousStateHash: previous,
+		TimeoutHeight:     channel.OpenHeight + channel.DisputePeriod + nonce,
+		CloseDelay:        channel.DisputePeriod,
+		FeePolicyID:       NativeDenom,
 	})
 	require.NoError(t, err)
 	for _, signer := range channel.Normalize().Participants {

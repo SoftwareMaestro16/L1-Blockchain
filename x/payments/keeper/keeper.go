@@ -132,6 +132,18 @@ func (k *Keeper) RegisterRoutingEdge(edge paymentstypes.ChannelEdge) error {
 	return nil
 }
 
+func (k *Keeper) AcceptSignedState(channelID string, nextState paymentstypes.ChannelState, currentHeight uint64) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.AcceptSignedState(k.genesis.State, channelID, nextState, currentHeight)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
 func (k *Keeper) SubmitClose(channelID string, closingState paymentstypes.ChannelState, submitter string, currentHeight uint64, settlementFee string) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err
@@ -142,6 +154,18 @@ func (k *Keeper) SubmitClose(channelID string, closingState paymentstypes.Channe
 	}
 	k.genesis.State = next
 	return nil
+}
+
+func (k *Keeper) CooperativeClose(channelID string, closingState paymentstypes.ChannelState, submitter string, currentHeight uint64, settlementFee string) (paymentstypes.SettlementRecord, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	next, settlement, err := paymentstypes.CooperativeClose(k.genesis.State, channelID, closingState, submitter, currentHeight, settlementFee)
+	if err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	k.genesis.State = next
+	return settlement, nil
 }
 
 func (k *Keeper) DisputeClose(channelID string, newerState paymentstypes.ChannelState, submitter string, currentHeight uint64) error {

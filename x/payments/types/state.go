@@ -82,6 +82,36 @@ func RegisterRoutingEdge(state PaymentsState, edge ChannelEdge) (PaymentsState, 
 	return next, next.Validate()
 }
 
+func AcceptSignedState(state PaymentsState, channelID string, nextState ChannelState, currentHeight uint64) (PaymentsState, error) {
+	state = state.Export()
+	if currentHeight == 0 {
+		return PaymentsState{}, errors.New("payments state update height must be positive")
+	}
+	index, channel, found := state.ChannelIndex(channelID)
+	if !found {
+		return PaymentsState{}, errors.New("payments channel not found")
+	}
+	if channel.Status != ChannelStatusOpen {
+		return PaymentsState{}, errors.New("payments channel is not open")
+	}
+	nextState = nextState.Normalize()
+	if err := nextState.ValidateForChannel(channel, true); err != nil {
+		return PaymentsState{}, err
+	}
+	if nextState.Nonce <= channel.LatestState.Nonce {
+		return PaymentsState{}, errors.New("payments channel state nonce must strictly increase")
+	}
+	if channel.ChannelType != ChannelTypeAsync && nextState.PreviousStateHash != channel.LatestState.StateHash {
+		return PaymentsState{}, errors.New("payments channel state previous hash must match latest state")
+	}
+	nextChannel := channel
+	nextChannel.LatestState = nextState
+	next := state.Clone()
+	next.Channels[index] = nextChannel.Normalize()
+	sortChannels(next.Channels)
+	return next, next.Validate()
+}
+
 func SubmitClose(state PaymentsState, channelID string, closingState ChannelState, submitter string, currentHeight uint64, settlementFee string) (PaymentsState, error) {
 	state = state.Export()
 	if currentHeight == 0 {
@@ -108,6 +138,9 @@ func SubmitClose(state PaymentsState, channelID string, closingState ChannelStat
 	if pending.State.Nonce < channel.FinalizedNonce {
 		return PaymentsState{}, errors.New("payments close state nonce is below finalized nonce")
 	}
+	if pending.State.Nonce < channel.LatestState.Nonce {
+		return PaymentsState{}, errors.New("payments close state nonce is below latest accepted nonce")
+	}
 	nextChannel := channel
 	nextChannel.Status = ChannelStatusPendingClose
 	nextChannel.PendingClose = pending
@@ -117,6 +150,59 @@ func SubmitClose(state PaymentsState, channelID string, closingState ChannelStat
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
 	sortChannels(next.Channels)
 	return next, next.Validate()
+}
+
+func CooperativeClose(state PaymentsState, channelID string, closingState ChannelState, submitter string, currentHeight uint64, settlementFee string) (PaymentsState, SettlementRecord, error) {
+	state = state.Export()
+	if currentHeight == 0 {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments cooperative close height must be positive")
+	}
+	index, channel, found := state.ChannelIndex(channelID)
+	if !found {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments channel not found")
+	}
+	if channel.Status != ChannelStatusOpen {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments channel is not open")
+	}
+	if !containsString(channel.Participants, submitter) {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments cooperative close submitter must be participant")
+	}
+	closingState = closingState.Normalize()
+	if err := closingState.ValidateForChannel(channel, true); err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	if closingState.Nonce < channel.LatestState.Nonce {
+		return PaymentsState{}, SettlementRecord{}, errors.New("payments cooperative close state nonce is below latest accepted nonce")
+	}
+	finalBalances, err := applySettlementAdjustments(closingState.Balances, nil, settlementFee, submitter)
+	if err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	settlement := SettlementRecord{
+		ChannelID:          channel.ChannelID,
+		StateHash:          closingState.StateHash,
+		Nonce:              closingState.Nonce,
+		FinalBalances:      finalBalances,
+		SettlementFeeDenom: NativeDenom,
+		SettlementFee:      settlementFee,
+		SettledHeight:      currentHeight,
+	}
+	settlement.SettlementHash = ComputeSettlementHash(settlement)
+	if err := settlement.ValidateForChannel(channel); err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	nextChannel := channel
+	nextChannel.Status = ChannelStatusSettled
+	nextChannel.FinalizedNonce = settlement.Nonce
+	nextChannel.LatestState = closingState
+	nextChannel.PendingClose = PendingClose{}
+	next := state.Clone()
+	next.Channels[index] = nextChannel.Normalize()
+	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
+	next.Settlements = append(next.Settlements, settlement)
+	sortChannels(next.Channels)
+	sortSettlements(next.Settlements)
+	return next, settlement, next.Validate()
 }
 
 func DisputeClose(state PaymentsState, channelID string, newerState ChannelState, submitter string, currentHeight uint64) (PaymentsState, error) {

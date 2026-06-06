@@ -87,10 +87,14 @@ func keeperSignedState(t *testing.T, channel paymentstypes.ChannelRecord, nonce 
 		ChannelID:         channel.ChannelID,
 		ChannelType:       channel.ChannelType,
 		Denom:             channel.Denom,
+		Version:           paymentstypes.CurrentStateVersion,
 		Epoch:             1,
 		Nonce:             nonce,
 		Balances:          balances,
 		PreviousStateHash: previous,
+		TimeoutHeight:     channel.OpenHeight + channel.DisputePeriod + nonce,
+		CloseDelay:        channel.DisputePeriod,
+		FeePolicyID:       paymentstypes.NativeDenom,
 	})
 	require.NoError(t, err)
 	for _, signer := range channel.Normalize().Participants {
@@ -98,7 +102,9 @@ func keeperSignedState(t *testing.T, channel paymentstypes.ChannelRecord, nonce 
 		require.NoError(t, err)
 		state.Signatures = append(state.Signatures, sig)
 	}
-	return state.Normalize()
+	state = state.Normalize()
+	require.NoError(t, state.ValidateForChannel(channel, true))
+	return state
 }
 
 func keeperAddress(fill byte) string {

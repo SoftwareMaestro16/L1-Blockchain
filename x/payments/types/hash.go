@@ -28,9 +28,21 @@ func ComputeStateHash(state ChannelState) string {
 	writeString(h, state.ChannelID)
 	writeString(h, string(state.ChannelType))
 	writeString(h, state.Denom)
+	writeUint64(h, uint64(state.Version))
+	writeString(h, state.ParticipantA)
+	writeString(h, state.ParticipantB)
+	writeString(h, state.BalanceA)
+	writeString(h, state.BalanceB)
+	writeString(h, state.ReserveA)
+	writeString(h, state.ReserveB)
 	writeUint64(h, state.Epoch)
 	writeUint64(h, state.Nonce)
+	writeString(h, state.PendingConditionsRoot)
 	writeString(h, state.PreviousStateHash)
+	writeUint64(h, state.TimeoutHeight)
+	writeInt64(h, state.TimeoutTimestamp)
+	writeUint64(h, state.CloseDelay)
+	writeString(h, state.FeePolicyID)
 	for _, balance := range state.Balances {
 		writeString(h, balance.Participant)
 		writeString(h, balance.Amount)
@@ -49,11 +61,35 @@ func ComputeStateHash(state ChannelState) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+func ComputeConditionsRoot(conditions []ConditionalPayment) string {
+	h := sha256.New()
+	writeString(h, "aetheris-payment-conditions-root-v1")
+	for _, condition := range normalizeConditions(conditions) {
+		writeString(h, condition.ConditionID)
+		writeString(h, string(condition.ConditionType))
+		writeString(h, condition.Payer)
+		writeString(h, condition.Payee)
+		writeString(h, condition.Amount)
+		writeString(h, condition.HashLock)
+		writeUint64(h, condition.TimeoutHeight)
+		writeUint64(h, condition.NonceStart)
+		writeUint64(h, condition.NonceEnd)
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func SignaturePreimage(signer, stateHash string) []byte {
+	var buf bytes.Buffer
+	writeString(&buf, "aetheris-payment-state-signature-preimage-v1")
+	writeString(&buf, signer)
+	writeString(&buf, stateHash)
+	return buf.Bytes()
+}
+
 func ComputeSignatureHash(signer, stateHash string) string {
 	h := sha256.New()
 	writeString(h, "aetheris-payment-state-signature-v1")
-	writeString(h, signer)
-	writeString(h, stateHash)
+	_, _ = h.Write(SignaturePreimage(signer, stateHash))
 	return hex.EncodeToString(h.Sum(nil))
 }
 
@@ -132,6 +168,10 @@ func writeUint64(w interface{ Write([]byte) (int, error) }, value uint64) {
 	var bz [8]byte
 	binary.BigEndian.PutUint64(bz[:], value)
 	_, _ = w.Write(bz[:])
+}
+
+func writeInt64(w interface{ Write([]byte) (int, error) }, value int64) {
+	writeUint64(w, uint64(value))
 }
 
 func compareString(left, right string) int {

@@ -13,6 +13,7 @@ import (
 
 const (
 	NativeDenom              = "naet"
+	CurrentStateVersion      = uint32(1)
 	DefaultDisputePeriod     = uint64(16)
 	MaxParticipants          = 8
 	MaxConditionsPerState    = 128
@@ -93,17 +94,29 @@ type StateSignature struct {
 }
 
 type ChannelState struct {
-	ChainID           string
-	ChannelID         string
-	ChannelType       ChannelType
-	Denom             string
-	Epoch             uint64
-	Nonce             uint64
-	Balances          []Balance
-	Conditions        []ConditionalPayment
-	PreviousStateHash string
-	StateHash         string
-	Signatures        []StateSignature
+	ChainID               string
+	ChannelID             string
+	ChannelType           ChannelType
+	Denom                 string
+	Version               uint32
+	ParticipantA          string
+	ParticipantB          string
+	BalanceA              string
+	BalanceB              string
+	ReserveA              string
+	ReserveB              string
+	Epoch                 uint64
+	Nonce                 uint64
+	PendingConditionsRoot string
+	Balances              []Balance
+	Conditions            []ConditionalPayment
+	PreviousStateHash     string
+	StateHash             string
+	TimeoutHeight         uint64
+	TimeoutTimestamp      int64
+	CloseDelay            uint64
+	FeePolicyID           string
+	Signatures            []StateSignature
 }
 
 type PendingClose struct {
@@ -232,10 +245,46 @@ func (s ChannelState) Normalize() ChannelState {
 	s.ChainID = strings.TrimSpace(s.ChainID)
 	s.ChannelID = normalizeHash(s.ChannelID)
 	s.Denom = strings.TrimSpace(s.Denom)
+	if s.Version == 0 {
+		s.Version = CurrentStateVersion
+	}
+	s.ParticipantA = strings.TrimSpace(s.ParticipantA)
+	s.ParticipantB = strings.TrimSpace(s.ParticipantB)
+	s.BalanceA = strings.TrimSpace(s.BalanceA)
+	s.BalanceB = strings.TrimSpace(s.BalanceB)
+	s.ReserveA = strings.TrimSpace(s.ReserveA)
+	s.ReserveB = strings.TrimSpace(s.ReserveB)
 	s.PreviousStateHash = normalizeOptionalHash(s.PreviousStateHash)
 	s.StateHash = normalizeOptionalHash(s.StateHash)
 	s.Balances = normalizeBalances(s.Balances)
 	s.Conditions = normalizeConditions(s.Conditions)
+	s.PendingConditionsRoot = normalizeOptionalHash(s.PendingConditionsRoot)
+	if s.PendingConditionsRoot == "" {
+		s.PendingConditionsRoot = ComputeConditionsRoot(s.Conditions)
+	}
+	if s.FeePolicyID == "" {
+		s.FeePolicyID = NativeDenom
+	}
+	if s.ChannelType == ChannelTypeBidirectional && len(s.Balances) == 2 {
+		if s.ParticipantA == "" {
+			s.ParticipantA = s.Balances[0].Participant
+		}
+		if s.ParticipantB == "" {
+			s.ParticipantB = s.Balances[1].Participant
+		}
+		if s.BalanceA == "" {
+			s.BalanceA = s.Balances[0].Amount
+		}
+		if s.BalanceB == "" {
+			s.BalanceB = s.Balances[1].Amount
+		}
+	}
+	if s.ReserveA == "" {
+		s.ReserveA = "0"
+	}
+	if s.ReserveB == "" {
+		s.ReserveB = "0"
+	}
 	s.Signatures = normalizeSignatures(s.Signatures)
 	return s
 }
@@ -273,7 +322,7 @@ func (s ChannelState) ValidateForChannel(channel ChannelRecord, requireAllPartic
 	if err := validateStateParticipants(state, channel); err != nil {
 		return err
 	}
-	if err := validateCollateralConservation(state, channel.Collateral); err != nil {
+	if err := validateCollateralConservation(state, channel); err != nil {
 		return err
 	}
 	required := channel.RequiredSigners
@@ -855,6 +904,9 @@ func validateUnsignedStateShape(state ChannelState) error {
 	if state.Denom != NativeDenom {
 		return fmt.Errorf("payments channel state denom must be %s", NativeDenom)
 	}
+	if state.Version != CurrentStateVersion {
+		return fmt.Errorf("payments channel state version must be %d", CurrentStateVersion)
+	}
 	if state.Epoch == 0 {
 		return errors.New("payments channel state epoch must be positive")
 	}
@@ -866,6 +918,18 @@ func validateUnsignedStateShape(state ChannelState) error {
 			return err
 		}
 	}
+	if err := ValidateHash("payments pending conditions root", state.PendingConditionsRoot); err != nil {
+		return err
+	}
+	if expected := ComputeConditionsRoot(state.Conditions); state.PendingConditionsRoot != expected {
+		return errors.New("payments pending conditions root mismatch")
+	}
+	if state.TimeoutTimestamp < 0 {
+		return errors.New("payments channel state timeout timestamp must be non-negative")
+	}
+	if state.FeePolicyID != NativeDenom {
+		return fmt.Errorf("payments channel state fee policy must be %s", NativeDenom)
+	}
 	if err := validateBalances(state.Balances); err != nil {
 		return err
 	}
@@ -873,6 +937,11 @@ func validateUnsignedStateShape(state ChannelState) error {
 }
 
 func validateStateParticipants(state ChannelState, channel ChannelRecord) error {
+	if channel.ChannelType == ChannelTypeBidirectional {
+		if err := validateBidirectionalProjection(state, channel); err != nil {
+			return err
+		}
+	}
 	for _, balance := range state.Balances {
 		if !containsString(channel.Participants, balance.Participant) {
 			return errors.New("payments balance participant must be in channel")
@@ -886,10 +955,68 @@ func validateStateParticipants(state ChannelState, channel ChannelRecord) error 
 	return nil
 }
 
-func validateCollateralConservation(state ChannelState, collateralText string) error {
-	collateral, err := parsePositiveInt("payments channel collateral", collateralText)
+func validateBidirectionalProjection(state ChannelState, channel ChannelRecord) error {
+	if len(channel.Participants) != 2 {
+		return errors.New("payments bidirectional channel requires exactly two participants")
+	}
+	if len(state.Balances) != 2 {
+		return errors.New("payments bidirectional state requires exactly two balances")
+	}
+	if state.ParticipantA == "" || state.ParticipantB == "" {
+		return errors.New("payments bidirectional state participants are required")
+	}
+	if state.ParticipantA == state.ParticipantB {
+		return errors.New("payments bidirectional state participants must differ")
+	}
+	if state.ParticipantA != channel.Participants[0] || state.ParticipantB != channel.Participants[1] {
+		return errors.New("payments bidirectional state participants must match canonical channel order")
+	}
+	if state.TimeoutHeight == 0 {
+		return errors.New("payments bidirectional state timeout height must be positive")
+	}
+	if state.CloseDelay == 0 {
+		return errors.New("payments bidirectional state close delay must be positive")
+	}
+	balanceByParticipant := map[string]string{}
+	for _, balance := range state.Balances {
+		balanceByParticipant[balance.Participant] = balance.Amount
+	}
+	if balanceByParticipant[state.ParticipantA] != state.BalanceA || balanceByParticipant[state.ParticipantB] != state.BalanceB {
+		return errors.New("payments bidirectional state balance projection mismatch")
+	}
+	if err := validateNonNegativeInt("payments bidirectional reserve a", state.ReserveA); err != nil {
+		return err
+	}
+	return validateNonNegativeInt("payments bidirectional reserve b", state.ReserveB)
+}
+
+func validateCollateralConservation(state ChannelState, channel ChannelRecord) error {
+	collateral, err := parsePositiveInt("payments channel collateral", channel.Collateral)
 	if err != nil {
 		return err
+	}
+	if channel.ChannelType == ChannelTypeBidirectional {
+		balanceA, err := parseNonNegativeInt("payments bidirectional balance a", state.BalanceA)
+		if err != nil {
+			return err
+		}
+		balanceB, err := parseNonNegativeInt("payments bidirectional balance b", state.BalanceB)
+		if err != nil {
+			return err
+		}
+		reserveA, err := parseNonNegativeInt("payments bidirectional reserve a", state.ReserveA)
+		if err != nil {
+			return err
+		}
+		reserveB, err := parseNonNegativeInt("payments bidirectional reserve b", state.ReserveB)
+		if err != nil {
+			return err
+		}
+		total := balanceA.Add(balanceB).Add(reserveA).Add(reserveB)
+		if !total.Equal(collateral) {
+			return errors.New("payments channel state must conserve collateral")
+		}
+		return nil
 	}
 	total, err := sumBalances(state.Balances)
 	if err != nil {
