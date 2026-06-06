@@ -240,6 +240,18 @@ func (k *Keeper) DisputeClose(channelID string, newerState paymentstypes.Channel
 	return nil
 }
 
+func (k *Keeper) DisputeChannel(req paymentstypes.ChannelDisputeRequest) error {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return err
+	}
+	next, err := paymentstypes.DisputeChannel(k.genesis.State, req)
+	if err != nil {
+		return err
+	}
+	k.genesis.State = next
+	return nil
+}
+
 func (k *Keeper) SubmitFraudProof(channelID string, proof paymentstypes.FraudProof, currentHeight uint64) error {
 	if err := k.genesis.Params.RequireEnabled(); err != nil {
 		return err
@@ -269,6 +281,18 @@ func (k *Keeper) FinalizeSettlement(channelID string, currentHeight uint64) (pay
 		return paymentstypes.SettlementRecord{}, err
 	}
 	next, settlement, err := paymentstypes.FinalizeSettlement(k.genesis.State, channelID, currentHeight)
+	if err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	k.genesis.State = next
+	return settlement, nil
+}
+
+func (k *Keeper) FinalizeSettlementWithRequest(req paymentstypes.FinalSettlementRequest) (paymentstypes.SettlementRecord, error) {
+	if err := k.genesis.Params.RequireEnabled(); err != nil {
+		return paymentstypes.SettlementRecord{}, err
+	}
+	next, settlement, err := paymentstypes.FinalizeSettlementWithRequest(k.genesis.State, req)
 	if err != nil {
 		return paymentstypes.SettlementRecord{}, err
 	}

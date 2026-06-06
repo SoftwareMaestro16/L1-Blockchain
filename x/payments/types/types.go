@@ -16,6 +16,7 @@ const (
 	CurrentStateVersion      = uint32(1)
 	DefaultDisputePeriod     = uint64(16)
 	DefaultOpeningFee        = "1"
+	MaxDisputeExtensions     = uint32(2)
 	MinCloseDelay            = uint64(1)
 	MaxCloseDelay            = uint64(10_000)
 	MinChallengePeriod       = uint64(1)
@@ -55,8 +56,11 @@ const (
 type FraudProofType string
 
 const (
-	FraudProofTypeDoubleSign FraudProofType = "DOUBLE_SIGN"
-	FraudProofTypeStaleClose FraudProofType = "STALE_CLOSE"
+	FraudProofTypeDoubleSign       FraudProofType = "DOUBLE_SIGN"
+	FraudProofTypeStaleClose       FraudProofType = "STALE_CLOSE"
+	FraudProofTypeInvalidClose     FraudProofType = "INVALID_CLOSE"
+	FraudProofTypeInvalidCondition FraudProofType = "INVALID_CONDITION"
+	FraudProofTypeReplayAttempt    FraudProofType = "REPLAY_ATTEMPT"
 )
 
 type BatchOperationType string
@@ -148,6 +152,33 @@ type ChannelUpdateResult struct {
 	Liquidity            []Balance
 }
 
+type ConditionResolution struct {
+	ConditionID  string
+	Resolver     string
+	Recipient    string
+	Amount       string
+	Expired      bool
+	EvidenceHash string
+}
+
+type ChannelDisputeRequest struct {
+	ChannelID             string
+	ClosingStateReference string
+	NewerState            ChannelState
+	FraudProof            FraudProof
+	ConditionProofs       []ConditionResolution
+	Submitter             string
+	CurrentHeight         uint64
+}
+
+type FinalSettlementRequest struct {
+	ChannelID           string
+	ResolvedConditions  []ConditionResolution
+	CurrentHeight       uint64
+	FeeAccountingState  string
+	RoutingFeeClaimHash string
+}
+
 type ChannelState struct {
 	ChainID               string
 	ChannelID             string
@@ -236,10 +267,12 @@ type PendingClose struct {
 	Submitter          string
 	SubmittedHeight    uint64
 	SettleAfterHeight  uint64
+	DisputeCount       uint32
 	SettlementFeeDenom string
 	SettlementFee      string
 	State              ChannelState
 	FraudProofs        []FraudProof
+	ConditionProofs    []ConditionResolution
 	Penalties          []Penalty
 }
 
@@ -513,6 +546,71 @@ func (r ChannelUpdateRequest) Normalize() ChannelUpdateRequest {
 	r.AsyncDeltas = normalizeAsyncDeltas(r.AsyncDeltas)
 	r.Submitter = strings.TrimSpace(r.Submitter)
 	return r
+}
+
+func (r ChannelDisputeRequest) Normalize() ChannelDisputeRequest {
+	r.ChannelID = normalizeHash(r.ChannelID)
+	r.ClosingStateReference = normalizeHash(r.ClosingStateReference)
+	r.NewerState = r.NewerState.Normalize()
+	r.FraudProof = r.FraudProof.Normalize()
+	r.ConditionProofs = normalizeConditionResolutions(r.ConditionProofs)
+	r.Submitter = strings.TrimSpace(r.Submitter)
+	return r
+}
+
+func (r FinalSettlementRequest) Normalize() FinalSettlementRequest {
+	r.ChannelID = normalizeHash(r.ChannelID)
+	r.ResolvedConditions = normalizeConditionResolutions(r.ResolvedConditions)
+	r.FeeAccountingState = strings.TrimSpace(r.FeeAccountingState)
+	r.RoutingFeeClaimHash = normalizeOptionalHash(r.RoutingFeeClaimHash)
+	return r
+}
+
+func (r ConditionResolution) Normalize() ConditionResolution {
+	r.ConditionID = normalizeHash(r.ConditionID)
+	r.Resolver = strings.TrimSpace(r.Resolver)
+	r.Recipient = strings.TrimSpace(r.Recipient)
+	r.Amount = strings.TrimSpace(r.Amount)
+	r.EvidenceHash = normalizeHash(r.EvidenceHash)
+	return r
+}
+
+func (r ConditionResolution) ValidateForCondition(condition ConditionalPayment, channel ChannelRecord) error {
+	resolution := r.Normalize()
+	condition = condition.Normalize()
+	if resolution.ConditionID != condition.ConditionID {
+		return errors.New("payments condition resolution id mismatch")
+	}
+	if err := addressing.ValidateUserAddress("payments condition resolver", resolution.Resolver); err != nil {
+		return err
+	}
+	if !containsString(channel.Participants, resolution.Resolver) {
+		return errors.New("payments condition resolver must be participant")
+	}
+	if err := addressing.ValidateUserAddress("payments condition resolution recipient", resolution.Recipient); err != nil {
+		return err
+	}
+	if resolution.Recipient != condition.Payer && resolution.Recipient != condition.Payee {
+		return errors.New("payments condition resolution recipient must be condition party")
+	}
+	if resolution.Expired && resolution.Recipient != condition.Payer {
+		return errors.New("payments expired condition must return to payer")
+	}
+	if !resolution.Expired && resolution.Recipient != condition.Payee {
+		return errors.New("payments resolved condition must pay payee")
+	}
+	amount, err := parsePositiveInt("payments condition resolution amount", resolution.Amount)
+	if err != nil {
+		return err
+	}
+	conditionAmount, err := parsePositiveInt("payments condition amount", condition.Amount)
+	if err != nil {
+		return err
+	}
+	if !amount.Equal(conditionAmount) {
+		return errors.New("payments condition resolution amount mismatch")
+	}
+	return ValidateHash("payments condition resolution evidence hash", resolution.EvidenceHash)
 }
 
 func ValidateOffchainUpdate(channel ChannelRecord, req ChannelUpdateRequest) (ChannelUpdateResult, error) {
@@ -1276,6 +1374,7 @@ func (p PendingClose) Normalize() PendingClose {
 	p.SettlementFee = strings.TrimSpace(p.SettlementFee)
 	p.State = p.State.Normalize()
 	p.FraudProofs = normalizeFraudProofs(p.FraudProofs)
+	p.ConditionProofs = normalizeConditionResolutions(p.ConditionProofs)
 	p.Penalties = normalizePenalties(p.Penalties)
 	return p
 }
@@ -1307,6 +1406,9 @@ func (p PendingClose) ValidateForChannel(channel ChannelRecord) error {
 		if err := proof.ValidateForChannel(channel); err != nil {
 			return err
 		}
+	}
+	if err := validateConditionResolutionsForState(p.State, channel, p.ConditionProofs, false); err != nil {
+		return err
 	}
 	for _, penalty := range p.Penalties {
 		if err := penalty.ValidateForChannel(channel); err != nil {
@@ -1380,6 +1482,27 @@ func (f FraudProof) ValidateForChannel(channel ChannelRecord) error {
 		}
 		if proof.StateB.Nonce <= proof.StateA.Nonce {
 			return errors.New("payments stale-close proof requires newer state")
+		}
+	case FraudProofTypeInvalidClose:
+		if err := proof.StateA.ValidateForChannel(channel, false); err != nil {
+			return err
+		}
+		if proof.StateA.StateHash == channel.LatestState.StateHash {
+			return errors.New("payments invalid-close proof requires non-latest close state")
+		}
+	case FraudProofTypeInvalidCondition:
+		if err := proof.StateA.ValidateForChannel(channel, false); err != nil {
+			return err
+		}
+		if len(proof.StateA.Conditions) == 0 {
+			return errors.New("payments invalid-condition proof requires conditions")
+		}
+	case FraudProofTypeReplayAttempt:
+		if err := proof.StateA.ValidateForChannel(channel, false); err != nil {
+			return err
+		}
+		if proof.StateA.Nonce > channel.FinalizedNonce {
+			return errors.New("payments replay proof requires finalized or older nonce")
 		}
 	default:
 		return fmt.Errorf("unknown payments fraud proof type %q", proof.ProofType)
@@ -1564,6 +1687,23 @@ func ChannelOpenEvent(channel ChannelRecord) PaymentEvent {
 			{Key: "opening_fee", Value: channel.OpeningFeePaid},
 			{Key: "routing_advertised", Value: fmt.Sprintf("%t", channel.RoutingAdvertised)},
 			{Key: "conditional_payments", Value: fmt.Sprintf("%t", channel.ConditionalPayments)},
+		},
+	}
+	return event.Normalize()
+}
+
+func ChannelDisputeEvent(channel ChannelRecord, submitter string, height uint64) PaymentEvent {
+	channel = channel.Normalize()
+	event := PaymentEvent{
+		EventID:   HashParts("channel-dispute", channel.ChannelID, channel.PendingClose.State.StateHash, fmt.Sprintf("%d", height)),
+		EventType: "channel-dispute",
+		ChannelID: channel.ChannelID,
+		Height:    height,
+		Attributes: []PaymentEventAttribute{
+			{Key: "submitter", Value: strings.TrimSpace(submitter)},
+			{Key: "state_hash", Value: channel.PendingClose.State.StateHash},
+			{Key: "nonce", Value: fmt.Sprintf("%d", channel.PendingClose.State.Nonce)},
+			{Key: "settle_after_height", Value: fmt.Sprintf("%d", channel.PendingClose.SettleAfterHeight)},
 		},
 	}
 	return event.Normalize()
@@ -1764,7 +1904,7 @@ func IsChannelStatus(value ChannelStatus) bool {
 
 func IsFraudProofType(value FraudProofType) bool {
 	switch value {
-	case FraudProofTypeDoubleSign, FraudProofTypeStaleClose:
+	case FraudProofTypeDoubleSign, FraudProofTypeStaleClose, FraudProofTypeInvalidClose, FraudProofTypeInvalidCondition, FraudProofTypeReplayAttempt:
 		return true
 	default:
 		return false
@@ -1929,6 +2069,39 @@ func validateUpdateExposure(state ChannelState) error {
 	}
 	if conditionTotal.GT(reserveA.Add(reserveB)) {
 		return errors.New("payments update conditions exceed reserve limits")
+	}
+	return nil
+}
+
+func validateConditionResolutionsForState(state ChannelState, channel ChannelRecord, resolutions []ConditionResolution, requireAll bool) error {
+	state = state.Normalize()
+	if len(state.Conditions) == 0 {
+		if len(resolutions) > 0 {
+			return errors.New("payments condition proofs supplied for state without conditions")
+		}
+		return nil
+	}
+	conditionByID := make(map[string]ConditionalPayment, len(state.Conditions))
+	for _, condition := range state.Conditions {
+		condition = condition.Normalize()
+		conditionByID[condition.ConditionID] = condition
+	}
+	seen := make(map[string]struct{}, len(resolutions))
+	for _, resolution := range normalizeConditionResolutions(resolutions) {
+		condition, found := conditionByID[resolution.ConditionID]
+		if !found {
+			return errors.New("payments condition proof references unknown condition")
+		}
+		if _, found := seen[resolution.ConditionID]; found {
+			return errors.New("payments duplicate condition proof")
+		}
+		if err := resolution.ValidateForCondition(condition, channel); err != nil {
+			return err
+		}
+		seen[resolution.ConditionID] = struct{}{}
+	}
+	if requireAll && len(seen) != len(conditionByID) {
+		return errors.New("payments all conditions must be resolved or expired")
 	}
 	return nil
 }
@@ -2431,6 +2604,17 @@ func normalizeConditions(conditions []ConditionalPayment) []ConditionalPayment {
 	out := make([]ConditionalPayment, len(conditions))
 	for i, condition := range conditions {
 		out[i] = condition.Normalize()
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		return out[i].ConditionID < out[j].ConditionID
+	})
+	return out
+}
+
+func normalizeConditionResolutions(resolutions []ConditionResolution) []ConditionResolution {
+	out := make([]ConditionResolution, len(resolutions))
+	for i, resolution := range resolutions {
+		out[i] = resolution.Normalize()
 	}
 	sort.SliceStable(out, func(i, j int) bool {
 		return out[i].ConditionID < out[j].ConditionID

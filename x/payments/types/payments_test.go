@@ -57,6 +57,65 @@ func TestPaymentChannelCloseDisputeFraudAndSettlement(t *testing.T) {
 	require.Equal(t, "675", amountFor(settlement.FinalBalances, bob))
 	require.Equal(t, ChannelStatusSettled, state.Channels[0].Status)
 	require.Equal(t, newerState.Nonce, state.Channels[0].FinalizedNonce)
+	require.Empty(t, state.CustodyLocks)
+}
+
+func TestDisputeRequestEmitsEventAndAppliesOptionalFraudProof(t *testing.T) {
+	alice := testAddress(0x14)
+	bob := testAddress(0x15)
+	channel := signedChannel(t, "dispute-request", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "400"},
+		{Participant: bob, Amount: "600"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+
+	newerState := signedState(t, channel, 3, closeState.StateHash, []Balance{
+		{Participant: alice, Amount: "350"},
+		{Participant: bob, Amount: "650"},
+	})
+	conflicting := signedState(t, channel, 3, closeState.StateHash, []Balance{
+		{Participant: alice, Amount: "500"},
+		{Participant: bob, Amount: "500"},
+	})
+	state, err = DisputeChannel(state, ChannelDisputeRequest{
+		ChannelID:             channel.ChannelID,
+		ClosingStateReference: closeState.StateHash,
+		NewerState:            newerState,
+		FraudProof: FraudProof{
+			ProofID:         HashParts("dispute-proof", channel.ChannelID),
+			ProofType:       FraudProofTypeDoubleSign,
+			SubmittedBy:     bob,
+			OffendingSigner: alice,
+			StateA:          newerState,
+			StateB:          conflicting,
+			PenaltyAmount:   "25",
+			EvidenceHash:    HashParts("evidence", newerState.StateHash, conflicting.StateHash),
+		},
+		Submitter:     bob,
+		CurrentHeight: 25,
+	})
+	require.NoError(t, err)
+	require.Equal(t, newerState.StateHash, state.Channels[0].PendingClose.State.StateHash)
+	require.Len(t, state.Channels[0].PendingClose.FraudProofs, 1)
+	require.Len(t, state.Channels[0].PendingClose.Penalties, 1)
+	require.Equal(t, "channel-dispute", state.Events[len(state.Events)-1].EventType)
+
+	_, err = DisputeChannel(state, ChannelDisputeRequest{
+		ChannelID:             channel.ChannelID,
+		ClosingStateReference: closeState.StateHash,
+		NewerState:            newerState,
+		Submitter:             bob,
+		CurrentHeight:         26,
+	})
+	require.ErrorContains(t, err, "reference")
 }
 
 func TestPaymentStateRejectsNonNaetAndCollateralMismatch(t *testing.T) {
@@ -660,6 +719,45 @@ func TestSettlementPrunesRoutingEdgesForAuthoritativeClosedChannel(t *testing.T)
 
 	_, err = RoutePayment(state, alice, bob, "50", 41, 4)
 	require.ErrorContains(t, err, "route not found")
+}
+
+func TestFinalSettlementRequiresResolvedConditionsAndUnlocksCustody(t *testing.T) {
+	alice := testAddress(0x55)
+	bob := testAddress(0x56)
+	channel := signedChannel(t, "condition-settlement", "1000", alice, bob)
+	state := EmptyState()
+
+	var err error
+	state, err = OpenChannel(state, channel)
+	require.NoError(t, err)
+
+	closeState := signedConditionalState(t, channel, 2, channel.OpeningStateHash, "25", []Balance{
+		{Participant: channel.Participants[0], Amount: "475"},
+		{Participant: channel.Participants[1], Amount: "500"},
+	})
+	state, err = SubmitClose(state, channel.ChannelID, closeState, alice, 20, "0")
+	require.NoError(t, err)
+
+	_, _, err = FinalizeSettlement(state, channel.ChannelID, 40)
+	require.ErrorContains(t, err, "conditions")
+
+	resolution := ConditionResolution{
+		ConditionID:  closeState.Conditions[0].ConditionID,
+		Resolver:     bob,
+		Recipient:    closeState.Conditions[0].Payee,
+		Amount:       closeState.Conditions[0].Amount,
+		EvidenceHash: HashParts("condition-resolution", closeState.Conditions[0].ConditionID),
+	}
+	state, settlement, err := FinalizeSettlementWithRequest(state, FinalSettlementRequest{
+		ChannelID:          channel.ChannelID,
+		ResolvedConditions: []ConditionResolution{resolution},
+		CurrentHeight:      40,
+	})
+	require.NoError(t, err)
+	require.Equal(t, ChannelStatusSettled, state.Channels[0].Status)
+	require.Empty(t, state.CustodyLocks)
+	require.Equal(t, "475", amountFor(settlement.FinalBalances, channel.Participants[0]))
+	require.Equal(t, "525", amountFor(settlement.FinalBalances, channel.Participants[1]))
 }
 
 func TestForcedClosePreservesDisputeWindowAfterTimeout(t *testing.T) {

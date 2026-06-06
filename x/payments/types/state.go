@@ -343,6 +343,7 @@ func CooperativeClose(state PaymentsState, channelID string, closingState Channe
 	next := state.Clone()
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
+	next.CustodyLocks = filterCustodyLocksForSettledChannel(next.CustodyLocks, channel.ChannelID)
 	next.Settlements = append(next.Settlements, settlement)
 	sortChannels(next.Channels)
 	sortSettlements(next.Settlements)
@@ -403,6 +404,7 @@ func ReceiverClose(state PaymentsState, channelID string, claim UnidirectionalCl
 	next := state.Clone()
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
+	next.CustodyLocks = filterCustodyLocksForSettledChannel(next.CustodyLocks, channel.ChannelID)
 	next.Settlements = append(next.Settlements, settlement)
 	sortChannels(next.Channels)
 	sortSettlements(next.Settlements)
@@ -473,6 +475,7 @@ func PayerReclaim(state PaymentsState, channelID string, payer string, currentHe
 	next := state.Clone()
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
+	next.CustodyLocks = filterCustodyLocksForSettledChannel(next.CustodyLocks, channel.ChannelID)
 	next.Settlements = append(next.Settlements, settlement)
 	sortChannels(next.Channels)
 	sortSettlements(next.Settlements)
@@ -480,37 +483,73 @@ func PayerReclaim(state PaymentsState, channelID string, payer string, currentHe
 }
 
 func DisputeClose(state PaymentsState, channelID string, newerState ChannelState, submitter string, currentHeight uint64) (PaymentsState, error) {
+	channel, found := state.Export().ChannelByID(channelID)
+	if !found {
+		return PaymentsState{}, errors.New("payments channel not found")
+	}
+	return DisputeChannel(state, ChannelDisputeRequest{
+		ChannelID:             channelID,
+		ClosingStateReference: channel.PendingClose.State.StateHash,
+		NewerState:            newerState,
+		Submitter:             submitter,
+		CurrentHeight:         currentHeight,
+	})
+}
+
+func DisputeChannel(state PaymentsState, req ChannelDisputeRequest) (PaymentsState, error) {
 	state = state.Export()
-	if currentHeight == 0 {
+	req = req.Normalize()
+	if req.CurrentHeight == 0 {
 		return PaymentsState{}, errors.New("payments dispute height must be positive")
 	}
-	index, channel, found := state.ChannelIndex(channelID)
+	index, channel, found := state.ChannelIndex(req.ChannelID)
 	if !found {
 		return PaymentsState{}, errors.New("payments channel not found")
 	}
 	if channel.Status != ChannelStatusPendingClose {
 		return PaymentsState{}, errors.New("payments channel is not pending close")
 	}
-	if currentHeight > channel.PendingClose.SettleAfterHeight {
+	if req.ClosingStateReference != channel.PendingClose.State.StateHash {
+		return PaymentsState{}, errors.New("payments dispute closing state reference mismatch")
+	}
+	if req.CurrentHeight > channel.PendingClose.SettleAfterHeight {
 		return PaymentsState{}, errors.New("payments dispute window has closed")
 	}
-	newerState = newerState.Normalize()
-	if err := newerState.ValidateForChannel(channel, false); err != nil {
+	if err := req.NewerState.ValidateForChannel(channel, false); err != nil {
 		return PaymentsState{}, err
 	}
-	if newerState.Nonce <= channel.PendingClose.State.Nonce {
-		return PaymentsState{}, errors.New("payments dispute state nonce must be newer")
+	if !stateStrongerThan(req.NewerState, channel.PendingClose.State) {
+		return PaymentsState{}, errors.New("payments dispute state must be newer or stronger")
 	}
-	if !containsString(channel.Participants, submitter) {
+	if !containsString(channel.Participants, req.Submitter) {
 		return PaymentsState{}, errors.New("payments dispute submitter must be participant")
 	}
+	if err := validateConditionResolutionsForState(req.NewerState, channel, req.ConditionProofs, false); err != nil {
+		return PaymentsState{}, err
+	}
 	nextChannel := channel
-	nextChannel.PendingClose.State = newerState
-	nextChannel.PendingClose.SubmittedHeight = currentHeight
-	nextChannel.PendingClose.SettleAfterHeight = currentHeight + channel.DisputePeriod
-	nextChannel.LatestState = newerState
+	nextChannel.PendingClose.State = req.NewerState
+	nextChannel.PendingClose.SubmittedHeight = req.CurrentHeight
+	if nextChannel.PendingClose.DisputeCount < MaxDisputeExtensions {
+		nextChannel.PendingClose.SettleAfterHeight = req.CurrentHeight + channel.DisputePeriod
+		nextChannel.PendingClose.DisputeCount++
+	}
+	nextChannel.PendingClose.ConditionProofs = mergeConditionResolutions(nextChannel.PendingClose.ConditionProofs, req.ConditionProofs)
+	if req.FraudProof.ProofID != "" {
+		if err := req.FraudProof.ValidateForChannel(channel); err != nil {
+			return PaymentsState{}, err
+		}
+		penalty := Penalty{Offender: req.FraudProof.OffendingSigner, Recipient: req.FraudProof.SubmittedBy, Denom: NativeDenom, Amount: req.FraudProof.PenaltyAmount}.Normalize()
+		if err := penalty.ValidateForChannel(channel); err != nil {
+			return PaymentsState{}, err
+		}
+		nextChannel.PendingClose.FraudProofs = append(nextChannel.PendingClose.FraudProofs, req.FraudProof)
+		nextChannel.PendingClose.Penalties = append(nextChannel.PendingClose.Penalties, penalty)
+	}
+	nextChannel.LatestState = req.NewerState
 	next := state.Clone()
 	next.Channels[index] = nextChannel.Normalize()
+	next.Events = append(next.Events, ChannelDisputeEvent(nextChannel, req.Submitter, req.CurrentHeight))
 	sortChannels(next.Channels)
 	return next, next.Validate()
 }
@@ -592,6 +631,7 @@ func FraudClose(state PaymentsState, channelID string, currentHeight uint64) (Pa
 	next := state.Clone()
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
+	next.CustodyLocks = filterCustodyLocksForSettledChannel(next.CustodyLocks, channel.ChannelID)
 	next.Settlements = append(next.Settlements, settlement)
 	sortChannels(next.Channels)
 	sortSettlements(next.Settlements)
@@ -599,21 +639,34 @@ func FraudClose(state PaymentsState, channelID string, currentHeight uint64) (Pa
 }
 
 func FinalizeSettlement(state PaymentsState, channelID string, currentHeight uint64) (PaymentsState, SettlementRecord, error) {
+	return FinalizeSettlementWithRequest(state, FinalSettlementRequest{ChannelID: channelID, CurrentHeight: currentHeight})
+}
+
+func FinalizeSettlementWithRequest(state PaymentsState, req FinalSettlementRequest) (PaymentsState, SettlementRecord, error) {
 	state = state.Export()
-	if currentHeight == 0 {
+	req = req.Normalize()
+	if req.CurrentHeight == 0 {
 		return PaymentsState{}, SettlementRecord{}, errors.New("payments settlement height must be positive")
 	}
-	index, channel, found := state.ChannelIndex(channelID)
+	index, channel, found := state.ChannelIndex(req.ChannelID)
 	if !found {
 		return PaymentsState{}, SettlementRecord{}, errors.New("payments channel not found")
 	}
 	if channel.Status != ChannelStatusPendingClose {
 		return PaymentsState{}, SettlementRecord{}, errors.New("payments channel is not pending close")
 	}
-	if currentHeight < channel.PendingClose.SettleAfterHeight {
+	if req.CurrentHeight < channel.PendingClose.SettleAfterHeight {
 		return PaymentsState{}, SettlementRecord{}, errors.New("payments settlement is still in dispute window")
 	}
-	finalBalances, err := applySettlementAdjustments(channel.PendingClose.State.Balances, channel.PendingClose.Penalties, channel.PendingClose.SettlementFee, channel.PendingClose.Submitter)
+	resolutions := mergeConditionResolutions(channel.PendingClose.ConditionProofs, req.ResolvedConditions)
+	if err := validateConditionResolutionsForState(channel.PendingClose.State, channel, resolutions, true); err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	baseBalances, err := settlementBalancesWithConditions(channel.PendingClose.State, channel, resolutions)
+	if err != nil {
+		return PaymentsState{}, SettlementRecord{}, err
+	}
+	finalBalances, err := applySettlementAdjustments(baseBalances, channel.PendingClose.Penalties, channel.PendingClose.SettlementFee, channel.PendingClose.Submitter)
 	if err != nil {
 		return PaymentsState{}, SettlementRecord{}, err
 	}
@@ -625,7 +678,7 @@ func FinalizeSettlement(state PaymentsState, channelID string, currentHeight uin
 		SettlementFeeDenom: channel.PendingClose.SettlementFeeDenom,
 		SettlementFee:      channel.PendingClose.SettlementFee,
 		Penalties:          channel.PendingClose.Penalties,
-		SettledHeight:      currentHeight,
+		SettledHeight:      req.CurrentHeight,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
 	if err := settlement.ValidateForChannel(channel); err != nil {
@@ -638,6 +691,7 @@ func FinalizeSettlement(state PaymentsState, channelID string, currentHeight uin
 	next := state.Clone()
 	next.Channels[index] = nextChannel.Normalize()
 	next.Edges = filterEdgesForSettledChannel(next.Edges, channel.ChannelID)
+	next.CustodyLocks = filterCustodyLocksForSettledChannel(next.CustodyLocks, channel.ChannelID)
 	next.Settlements = append(next.Settlements, settlement)
 	sortChannels(next.Channels)
 	sortSettlements(next.Settlements)
@@ -1020,6 +1074,9 @@ func validateCustodyLocks(channels []ChannelRecord, locks []CustodyLock) error {
 		if !found {
 			return errors.New("payments custody lock references unknown channel")
 		}
+		if channel.Status == ChannelStatusSettled {
+			return errors.New("payments settled channel must not retain custody lock")
+		}
 		if err := lock.ValidateForChannel(channel); err != nil {
 			return err
 		}
@@ -1033,6 +1090,9 @@ func validateCustodyLocks(channels []ChannelRecord, locks []CustodyLock) error {
 		previous = lock.ChannelID
 	}
 	for _, channel := range channelByID {
+		if channel.Status == ChannelStatusSettled {
+			continue
+		}
 		if _, found := seen[channel.ChannelID]; !found {
 			return errors.New("payments channel custody lock is required")
 		}
@@ -1107,6 +1167,67 @@ func applySettlementAdjustments(balances []Balance, penalties []Penalty, feeText
 	return normalizeBalances(out), nil
 }
 
+func settlementBalancesWithConditions(state ChannelState, channel ChannelRecord, resolutions []ConditionResolution) ([]Balance, error) {
+	state = state.Normalize()
+	if len(state.Conditions) == 0 {
+		return state.Balances, nil
+	}
+	amounts := make(map[string]sdkmath.Int, len(state.Balances))
+	for _, balance := range normalizeBalances(state.Balances) {
+		amount, err := parseNonNegativeInt("payments settlement base balance", balance.Amount)
+		if err != nil {
+			return nil, err
+		}
+		amounts[balance.Participant] = amount
+	}
+	reserveByParticipant := map[string]sdkmath.Int{}
+	if state.ChannelType == ChannelTypeBidirectional {
+		reserveA, err := parseNonNegativeInt("payments settlement reserve a", state.ReserveA)
+		if err != nil {
+			return nil, err
+		}
+		reserveB, err := parseNonNegativeInt("payments settlement reserve b", state.ReserveB)
+		if err != nil {
+			return nil, err
+		}
+		reserveByParticipant[state.ParticipantA] = reserveA
+		reserveByParticipant[state.ParticipantB] = reserveB
+	}
+	resolutionByID := make(map[string]ConditionResolution, len(resolutions))
+	for _, resolution := range normalizeConditionResolutions(resolutions) {
+		resolutionByID[resolution.ConditionID] = resolution
+	}
+	for _, condition := range state.Conditions {
+		condition = condition.Normalize()
+		resolution, found := resolutionByID[condition.ConditionID]
+		if !found {
+			return nil, errors.New("payments condition is unresolved")
+		}
+		amount, err := parsePositiveInt("payments condition amount", condition.Amount)
+		if err != nil {
+			return nil, err
+		}
+		reserve := reserveByParticipant[condition.Payer]
+		if reserve.LT(amount) {
+			return nil, errors.New("payments condition exceeds reserved balance")
+		}
+		reserveByParticipant[condition.Payer] = reserve.Sub(amount)
+		recipient := resolution.Recipient
+		amounts[recipient] = amounts[recipient].Add(amount)
+	}
+	for participant, reserve := range reserveByParticipant {
+		amounts[participant] = amounts[participant].Add(reserve)
+	}
+	out := make([]Balance, 0, len(amounts))
+	for participant, amount := range amounts {
+		if !containsString(channel.Participants, participant) {
+			return nil, errors.New("payments settlement condition participant must be in channel")
+		}
+		out = append(out, Balance{Participant: participant, Amount: amount.String()})
+	}
+	return normalizeBalances(out), nil
+}
+
 func finalBalancesForUnidirectionalClaim(channel ChannelRecord, claim UnidirectionalClaim, settlementFee, feePayer string) ([]Balance, error) {
 	collateral, err := parsePositiveInt("payments channel collateral", channel.Collateral)
 	if err != nil {
@@ -1154,6 +1275,42 @@ func filterEdgesForSettledChannel(edges []ChannelEdge, channelID string) []Chann
 		out = append(out, edge)
 	}
 	return out
+}
+
+func filterCustodyLocksForSettledChannel(locks []CustodyLock, channelID string) []CustodyLock {
+	channelID = normalizeHash(channelID)
+	out := make([]CustodyLock, 0, len(locks))
+	for _, lock := range locks {
+		if lock.Normalize().ChannelID == channelID {
+			continue
+		}
+		out = append(out, lock)
+	}
+	return out
+}
+
+func stateStrongerThan(candidate, current ChannelState) bool {
+	candidate = candidate.Normalize()
+	current = current.Normalize()
+	if candidate.Nonce > current.Nonce {
+		return true
+	}
+	return candidate.ChannelType == ChannelTypeAsync && candidate.CheckpointNonce > current.CheckpointNonce
+}
+
+func mergeConditionResolutions(left, right []ConditionResolution) []ConditionResolution {
+	byID := make(map[string]ConditionResolution, len(left)+len(right))
+	for _, resolution := range normalizeConditionResolutions(left) {
+		byID[resolution.ConditionID] = resolution
+	}
+	for _, resolution := range normalizeConditionResolutions(right) {
+		byID[resolution.ConditionID] = resolution
+	}
+	out := make([]ConditionResolution, 0, len(byID))
+	for _, resolution := range byID {
+		out = append(out, resolution)
+	}
+	return normalizeConditionResolutions(out)
 }
 
 func channelMap(channels []ChannelRecord) map[string]ChannelRecord {
