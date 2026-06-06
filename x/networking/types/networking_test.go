@@ -573,7 +573,9 @@ func TestRL2TransferBuildsFromChunksResumeTokenAndPropagationPlan(t *testing.T) 
 		RL2FECXORParity,
 	)
 	require.NoError(t, err)
-	require.Equal(t, chunks[0].PayloadHash, transfer.PayloadRoot)
+	chunkRoot, err := ComputeRL2ChunkRoot(chunks)
+	require.NoError(t, err)
+	require.Equal(t, chunkRoot, transfer.PayloadRoot)
 	require.Equal(t, chunks[0].Total, transfer.ChunkCount)
 	require.Equal(t, RL2FECXORParity, transfer.FECPolicy)
 
@@ -595,6 +597,112 @@ func TestRL2TransferBuildsFromChunksResumeTokenAndPropagationPlan(t *testing.T) 
 	require.False(t, plan.HandledByCometBFT)
 	require.True(t, plan.UsesAdvisoryPeerMetric)
 	require.Greater(t, plan.AdapterFanout, uint32(0))
+}
+
+func TestRL2ChunkDescriptorsVerifyOrderedMerkleRootAndChunkBytes(t *testing.T) {
+	source := HashParts("rl2-node", "source")
+	target := HashParts("rl2-node", "target")
+	payload := bytes.Repeat([]byte("rl2-proof-set"), 96)
+	chunks, err := ChunkPayload(payload, 64)
+	require.NoError(t, err)
+	require.Greater(t, len(chunks), 2)
+
+	transfer, err := NewRL2TransferFromChunks(
+		source,
+		target,
+		RL2PayloadProofSet,
+		chunks,
+		DefaultRL2Priority(RL2PayloadProofSet),
+		0,
+		RL2FECNone,
+	)
+	require.NoError(t, err)
+
+	descriptors, err := NewRL2ChunkDescriptors(transfer, chunks)
+	require.NoError(t, err)
+	require.Len(t, descriptors, len(chunks))
+	require.NoError(t, ValidateRL2ChunkDescriptors(transfer, descriptors))
+
+	for i, descriptor := range descriptors {
+		require.Equal(t, uint32(i), descriptor.ChunkIndex)
+		require.NotEmpty(t, descriptor.ProofPath)
+		require.NoError(t, VerifyRL2Chunk(transfer, descriptor, chunks[i]))
+	}
+
+	tampered := descriptors[1]
+	tampered.ChunkHash = HashParts("rl2", "wrong-chunk")
+	require.ErrorContains(t, VerifyRL2ChunkProof(tampered, transfer.PayloadRoot, transfer.ChunkCount), "root mismatch")
+
+	badRange := descriptors
+	badRange[1].RangeStart++
+	require.ErrorContains(t, ValidateRL2ChunkDescriptors(transfer, badRange), "contiguous")
+}
+
+func TestRL2MissingChunksRequestUsesVerifiedBitmapResumeToken(t *testing.T) {
+	source := HashParts("rl2-node", "source")
+	target := HashParts("rl2-node", "target")
+	payload := bytes.Repeat([]byte{0xa7}, 256)
+	chunks, err := ChunkPayload(payload, 64)
+	require.NoError(t, err)
+
+	transfer, err := NewRL2TransferFromChunks(
+		source,
+		target,
+		RL2PayloadZoneSnapshot,
+		chunks,
+		DefaultRL2Priority(RL2PayloadZoneSnapshot),
+		120,
+		RL2FECReedSolomon,
+	)
+	require.NoError(t, err)
+
+	progress, err := NewRL2TransferProgress(transfer, []uint32{0, 2})
+	require.NoError(t, err)
+	require.Len(t, progress.VerifiedBitmap, int(transfer.ChunkCount))
+	require.True(t, progress.VerifiedBitmap[0])
+	require.True(t, progress.VerifiedBitmap[2])
+	require.False(t, progress.VerifiedBitmap[1])
+
+	request, err := NewRL2ChunkRequest(transfer, []uint32{0, 2})
+	require.NoError(t, err)
+	require.Equal(t, transfer.TransferID, request.TransferID)
+	require.Equal(t, progress.ResumeToken, request.ResumeToken)
+	require.Equal(t, []uint32{1, 3}, request.MissingIndexes)
+}
+
+func TestRL2StreamingPlanAdaptsBandwidthBackpressureParallelismAndFEC(t *testing.T) {
+	source := HashParts("rl2-node", "source")
+	target := HashParts("rl2-node", "target")
+	payload := bytes.Repeat([]byte("rl2-streaming"), 256)
+	chunks, err := ChunkPayload(payload, 128)
+	require.NoError(t, err)
+
+	transfer, err := NewRL2TransferFromChunks(
+		source,
+		target,
+		RL2PayloadStateSyncStream,
+		chunks,
+		DefaultRL2Priority(RL2PayloadStateSyncStream),
+		0,
+		RL2FECXORParity,
+	)
+	require.NoError(t, err)
+
+	plan, err := PlanRL2Streaming(transfer, PeerScore{ScoreBps: 5_000}, 1024, 0, 4)
+	require.NoError(t, err)
+	require.Equal(t, ChannelStateSync, plan.Channel)
+	require.Equal(t, transfer.Priority, plan.PriorityLane)
+	require.Equal(t, uint32(4), plan.ParallelStreams)
+	require.Equal(t, uint64(512), plan.ChunkBudgetBytes)
+	require.True(t, plan.FECEnabled)
+	require.False(t, plan.BackpressureActive)
+	require.Greater(t, plan.MaxInFlightChunks, uint32(1))
+
+	congested, err := PlanRL2Streaming(transfer, PeerScore{ScoreBps: 9_000}, 1024, 1024, 4)
+	require.NoError(t, err)
+	require.True(t, congested.BackpressureActive)
+	require.Equal(t, uint32(1), congested.ParallelStreams)
+	require.Equal(t, uint32(1), congested.MaxInFlightChunks)
 }
 
 func TestNetworkingStateRegistersNodesAndSessionsCanonically(t *testing.T) {
