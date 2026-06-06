@@ -496,6 +496,100 @@ func TestCommitmentModelBindsChannelDomainAndPayloads(t *testing.T) {
 	require.NotEqual(t, ComputeSettlementHash(settlement), ComputeSettlementHash(otherDomain))
 }
 
+func TestSignatureEnvelopeRejectsReplayAndWrongCommitment(t *testing.T) {
+	alice := testAddress(0x5b)
+	bob := testAddress(0x5c)
+	channel := signedChannel(t, "signature-envelope", "1000", alice, bob)
+	state := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
+		{Participant: alice, Amount: "490"},
+		{Participant: bob, Amount: "510"},
+	})
+
+	wrongChain := state
+	wrongChain.Signatures = append([]StateSignature(nil), state.Signatures...)
+	wrongChain.Signatures[0].ChainID = "other-chain"
+	wrongChain.Signatures[0].SignatureHash = ComputeSignatureEnvelopeHash(
+		wrongChain.Signatures[0].Signer,
+		wrongChain.Signatures[0].ChainID,
+		wrongChain.Signatures[0].ChannelID,
+		wrongChain.Signatures[0].ObjectType,
+		wrongChain.Signatures[0].Version,
+		wrongChain.Signatures[0].Nonce,
+		wrongChain.Signatures[0].ObjectID,
+		wrongChain.Signatures[0].ExpirationHeight,
+		wrongChain.Signatures[0].CommitmentHash,
+	)
+	require.ErrorContains(t, wrongChain.ValidateForChannel(channel, true), "chain id")
+
+	wrongCommitment := state
+	wrongCommitment.Signatures = append([]StateSignature(nil), state.Signatures...)
+	wrongCommitment.Signatures[0].CommitmentHash = HashParts("wrong-commitment")
+	wrongCommitment.Signatures[0].SignatureHash = ComputeSignatureEnvelopeHash(
+		wrongCommitment.Signatures[0].Signer,
+		wrongCommitment.Signatures[0].ChainID,
+		wrongCommitment.Signatures[0].ChannelID,
+		wrongCommitment.Signatures[0].ObjectType,
+		wrongCommitment.Signatures[0].Version,
+		wrongCommitment.Signatures[0].Nonce,
+		wrongCommitment.Signatures[0].ObjectID,
+		wrongCommitment.Signatures[0].ExpirationHeight,
+		wrongCommitment.Signatures[0].CommitmentHash,
+	)
+	require.ErrorContains(t, wrongCommitment.ValidateForChannel(channel, true), "commitment")
+
+	duplicate := state
+	duplicate.Signatures = append([]StateSignature(nil), state.Signatures...)
+	duplicate.Signatures = append(duplicate.Signatures, duplicate.Signatures[0])
+	duplicate.Signatures = normalizeSignatures(duplicate.Signatures)
+	require.ErrorContains(t, duplicate.ValidateForChannel(channel, true), "duplicate")
+}
+
+func TestClaimAndDeltaSignatureEnvelopeValidation(t *testing.T) {
+	payer := testAddress(0x5d)
+	receiver := testAddress(0x5e)
+	channel := signedUnidirectionalChannel(t, "claim-envelope", "1000", payer, receiver, false)
+	claim := signedUnidirectionalClaim(t, channel, "100", 2, 80, false)
+
+	wrongChannel := claim
+	wrongChannel.PayerSignature.ChannelID = HashParts("wrong-channel")
+	wrongChannel.PayerSignature.SignatureHash = ComputeSignatureEnvelopeHash(
+		wrongChannel.PayerSignature.Signer,
+		wrongChannel.PayerSignature.ChainID,
+		wrongChannel.PayerSignature.ChannelID,
+		wrongChannel.PayerSignature.ObjectType,
+		wrongChannel.PayerSignature.Version,
+		wrongChannel.PayerSignature.Nonce,
+		wrongChannel.PayerSignature.ObjectID,
+		wrongChannel.PayerSignature.ExpirationHeight,
+		wrongChannel.PayerSignature.CommitmentHash,
+	)
+	require.ErrorContains(t, wrongChannel.ValidateForChannel(channel), "channel id")
+
+	alice := testAddress(0x5f)
+	bob := testAddress(0x60)
+	async := signedAsyncChannel(t, "delta-envelope", "1000", []Balance{
+		{Participant: alice, Amount: "1000"},
+		{Participant: bob, Amount: "0"},
+	}, 4, 4, "100", 80, alice, bob)
+	delta := signedAsyncDelta(t, async, "delta-envelope", alice, bob, "10", 2, 2, 70)
+
+	wrongType := delta
+	wrongType.Signature.ObjectType = SignatureObjectClaim
+	wrongType.Signature.SignatureHash = ComputeSignatureEnvelopeHash(
+		wrongType.Signature.Signer,
+		wrongType.Signature.ChainID,
+		wrongType.Signature.ChannelID,
+		wrongType.Signature.ObjectType,
+		wrongType.Signature.Version,
+		wrongType.Signature.Nonce,
+		wrongType.Signature.ObjectID,
+		wrongType.Signature.ExpirationHeight,
+		wrongType.Signature.CommitmentHash,
+	)
+	require.ErrorContains(t, wrongType.ValidateForChannel(async, 30), "object type")
+	require.ErrorContains(t, delta.ValidateForChannel(async, 71), "expired")
+}
+
 func TestBidirectionalCloseAndUpdateRules(t *testing.T) {
 	alice := testAddress(0x39)
 	bob := testAddress(0x3a)

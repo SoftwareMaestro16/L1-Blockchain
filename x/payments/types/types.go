@@ -17,6 +17,9 @@ const (
 	CurrentAppVersion        = uint32(1)
 	CurrentStateVersion      = uint32(1)
 	SignatureSchemeEd25519   = "ed25519-aetheris-v1"
+	SignatureObjectState     = "channel_state"
+	SignatureObjectClaim     = "unidirectional_claim"
+	SignatureObjectDelta     = "async_delta"
 	DefaultDisputePeriod     = uint64(16)
 	DefaultOpeningFee        = "1"
 	MaxDisputeExtensions     = uint32(2)
@@ -126,21 +129,45 @@ type ConditionalPayment struct {
 }
 
 type StateSignature struct {
-	Signer        string
-	StateHash     string
-	SignatureHash string
+	Signer           string
+	ChainID          string
+	ChannelID        string
+	ObjectType       string
+	Version          uint32
+	Nonce            uint64
+	ObjectID         string
+	ExpirationHeight uint64
+	CommitmentHash   string
+	StateHash        string
+	SignatureHash    string
 }
 
 type ClaimSignature struct {
-	Signer        string
-	ClaimHash     string
-	SignatureHash string
+	Signer           string
+	ChainID          string
+	ChannelID        string
+	ObjectType       string
+	Version          uint32
+	Nonce            uint64
+	ObjectID         string
+	ExpirationHeight uint64
+	CommitmentHash   string
+	ClaimHash        string
+	SignatureHash    string
 }
 
 type DeltaSignature struct {
-	Signer        string
-	DeltaHash     string
-	SignatureHash string
+	Signer           string
+	ChainID          string
+	ChannelID        string
+	ObjectType       string
+	Version          uint32
+	Nonce            uint64
+	ObjectID         string
+	ExpirationHeight uint64
+	CommitmentHash   string
+	DeltaHash        string
+	SignatureHash    string
 }
 
 type ChannelOpenRequest struct {
@@ -474,9 +501,27 @@ func SignatureForState(state ChannelState, signer string) (StateSignature, error
 		return StateSignature{}, err
 	}
 	return StateSignature{
-		Signer:        signer,
-		StateHash:     state.StateHash,
-		SignatureHash: ComputeSignatureHash(signer, state.StateHash),
+		Signer:           signer,
+		ChainID:          state.ChainID,
+		ChannelID:        state.ChannelID,
+		ObjectType:       SignatureObjectState,
+		Version:          state.Version,
+		Nonce:            state.Nonce,
+		ObjectID:         state.StateHash,
+		ExpirationHeight: state.TimeoutHeight,
+		CommitmentHash:   state.StateHash,
+		StateHash:        state.StateHash,
+		SignatureHash: ComputeSignatureEnvelopeHash(
+			signer,
+			state.ChainID,
+			state.ChannelID,
+			SignatureObjectState,
+			state.Version,
+			state.Nonce,
+			state.StateHash,
+			state.TimeoutHeight,
+			state.StateHash,
+		),
 	}, nil
 }
 
@@ -755,9 +800,27 @@ func SignatureForClaim(claim UnidirectionalClaim, signer string) (ClaimSignature
 		return ClaimSignature{}, err
 	}
 	return ClaimSignature{
-		Signer:        signer,
-		ClaimHash:     claim.StateHash,
-		SignatureHash: ComputeClaimSignatureHash(signer, claim.StateHash),
+		Signer:           signer,
+		ChainID:          claim.ChainID,
+		ChannelID:        claim.ChannelID,
+		ObjectType:       SignatureObjectClaim,
+		Version:          CurrentStateVersion,
+		Nonce:            claim.Nonce,
+		ObjectID:         claim.StateHash,
+		ExpirationHeight: claim.ExpirationHeight,
+		CommitmentHash:   claim.StateHash,
+		ClaimHash:        claim.StateHash,
+		SignatureHash: ComputeSignatureEnvelopeHash(
+			signer,
+			claim.ChainID,
+			claim.ChannelID,
+			SignatureObjectClaim,
+			CurrentStateVersion,
+			claim.Nonce,
+			claim.StateHash,
+			claim.ExpirationHeight,
+			claim.StateHash,
+		),
 	}, nil
 }
 
@@ -783,9 +846,27 @@ func SignatureForAsyncDelta(delta AsyncPaymentDelta, signer string) (DeltaSignat
 		return DeltaSignature{}, err
 	}
 	return DeltaSignature{
-		Signer:        signer,
-		DeltaHash:     delta.DeltaHash,
-		SignatureHash: ComputeDeltaSignatureHash(signer, delta.DeltaHash),
+		Signer:           signer,
+		ChainID:          delta.ChainID,
+		ChannelID:        delta.ChannelID,
+		ObjectType:       SignatureObjectDelta,
+		Version:          CurrentStateVersion,
+		Nonce:            delta.NonceStart,
+		ObjectID:         delta.UpdateID,
+		ExpirationHeight: delta.ExpiryHeight,
+		CommitmentHash:   delta.DeltaHash,
+		DeltaHash:        delta.DeltaHash,
+		SignatureHash: ComputeSignatureEnvelopeHash(
+			signer,
+			delta.ChainID,
+			delta.ChannelID,
+			SignatureObjectDelta,
+			CurrentStateVersion,
+			delta.NonceStart,
+			delta.UpdateID,
+			delta.ExpiryHeight,
+			delta.DeltaHash,
+		),
 	}, nil
 }
 
@@ -1020,6 +1101,11 @@ func (s ChannelState) Normalize() ChannelState {
 
 func (s ClaimSignature) Normalize() ClaimSignature {
 	s.Signer = strings.TrimSpace(s.Signer)
+	s.ChainID = strings.TrimSpace(s.ChainID)
+	s.ChannelID = normalizeHash(s.ChannelID)
+	s.ObjectType = strings.TrimSpace(s.ObjectType)
+	s.ObjectID = strings.TrimSpace(s.ObjectID)
+	s.CommitmentHash = normalizeHash(s.CommitmentHash)
 	s.ClaimHash = normalizeHash(s.ClaimHash)
 	s.SignatureHash = normalizeHash(s.SignatureHash)
 	return s
@@ -1033,10 +1119,22 @@ func (s ClaimSignature) Validate(expectedClaimHash string) error {
 	if s.ClaimHash != expectedClaimHash {
 		return errors.New("payments claim signature hash mismatch")
 	}
+	if s.ObjectType != SignatureObjectClaim {
+		return errors.New("payments claim signature object type mismatch")
+	}
+	if s.Version != CurrentStateVersion {
+		return errors.New("payments claim signature version mismatch")
+	}
+	if s.ObjectID != s.ClaimHash {
+		return errors.New("payments claim signature object id mismatch")
+	}
+	if s.CommitmentHash != s.ClaimHash {
+		return errors.New("payments claim signature commitment mismatch")
+	}
 	if err := ValidateHash("payments claim signature hash", s.SignatureHash); err != nil {
 		return err
 	}
-	if expected := ComputeClaimSignatureHash(s.Signer, s.ClaimHash); s.SignatureHash != expected {
+	if expected := ComputeSignatureEnvelopeHash(s.Signer, s.ChainID, s.ChannelID, s.ObjectType, s.Version, s.Nonce, s.ObjectID, s.ExpirationHeight, s.CommitmentHash); s.SignatureHash != expected {
 		return errors.New("payments claim signature value mismatch")
 	}
 	return nil
@@ -1044,6 +1142,11 @@ func (s ClaimSignature) Validate(expectedClaimHash string) error {
 
 func (s DeltaSignature) Normalize() DeltaSignature {
 	s.Signer = strings.TrimSpace(s.Signer)
+	s.ChainID = strings.TrimSpace(s.ChainID)
+	s.ChannelID = normalizeHash(s.ChannelID)
+	s.ObjectType = strings.TrimSpace(s.ObjectType)
+	s.ObjectID = strings.TrimSpace(s.ObjectID)
+	s.CommitmentHash = normalizeHash(s.CommitmentHash)
 	s.DeltaHash = normalizeHash(s.DeltaHash)
 	s.SignatureHash = normalizeHash(s.SignatureHash)
 	return s
@@ -1057,10 +1160,22 @@ func (s DeltaSignature) Validate(expectedDeltaHash string) error {
 	if s.DeltaHash != expectedDeltaHash {
 		return errors.New("payments async delta signature hash mismatch")
 	}
+	if s.ObjectType != SignatureObjectDelta {
+		return errors.New("payments async delta signature object type mismatch")
+	}
+	if s.Version != CurrentStateVersion {
+		return errors.New("payments async delta signature version mismatch")
+	}
+	if s.ObjectID == "" {
+		return errors.New("payments async delta signature object id is required")
+	}
+	if s.CommitmentHash != s.DeltaHash {
+		return errors.New("payments async delta signature commitment mismatch")
+	}
 	if err := ValidateHash("payments async delta signature hash", s.SignatureHash); err != nil {
 		return err
 	}
-	if expected := ComputeDeltaSignatureHash(s.Signer, s.DeltaHash); s.SignatureHash != expected {
+	if expected := ComputeSignatureEnvelopeHash(s.Signer, s.ChainID, s.ChannelID, s.ObjectType, s.Version, s.Nonce, s.ObjectID, s.ExpirationHeight, s.CommitmentHash); s.SignatureHash != expected {
 		return errors.New("payments async delta signature value mismatch")
 	}
 	return nil
@@ -1120,6 +1235,12 @@ func (d AsyncPaymentDelta) ValidateForChannel(channel ChannelRecord, currentHeig
 	}
 	if err := delta.Signature.Validate(delta.DeltaHash); err != nil {
 		return err
+	}
+	if err := validateDeltaSignatureEnvelope(delta.Signature, delta); err != nil {
+		return err
+	}
+	if currentHeight > delta.Signature.ExpirationHeight {
+		return errors.New("payments async delta signature is expired")
 	}
 	if delta.Signature.Signer != delta.From {
 		return errors.New("payments async delta signer must be sender")
@@ -1229,6 +1350,9 @@ func (c UnidirectionalClaim) ValidateForChannel(channel ChannelRecord) error {
 	if err := claim.PayerSignature.Validate(claim.StateHash); err != nil {
 		return err
 	}
+	if err := validateClaimSignatureEnvelope(claim.PayerSignature, claim); err != nil {
+		return err
+	}
 	if claim.PayerSignature.Signer != channel.Payer {
 		return errors.New("payments claim payer signature is required")
 	}
@@ -1239,6 +1363,9 @@ func (c UnidirectionalClaim) ValidateForChannel(channel ChannelRecord) error {
 		return nil
 	}
 	if err := claim.ReceiverAckOptional.Validate(claim.StateHash); err != nil {
+		return err
+	}
+	if err := validateClaimSignatureEnvelope(claim.ReceiverAckOptional, claim); err != nil {
 		return err
 	}
 	if claim.ReceiverAckOptional.Signer != channel.Receiver {
@@ -1306,11 +1433,16 @@ func (s ChannelState) ValidateForChannel(channel ChannelRecord, requireAllPartic
 	if requireAllParticipants {
 		required = channel.Participants
 	}
-	return validateSignatureQuorum(state.Signatures, required, state.StateHash)
+	return validateSignatureQuorum(state.Signatures, required, state)
 }
 
 func (s StateSignature) Normalize() StateSignature {
 	s.Signer = strings.TrimSpace(s.Signer)
+	s.ChainID = strings.TrimSpace(s.ChainID)
+	s.ChannelID = normalizeHash(s.ChannelID)
+	s.ObjectType = strings.TrimSpace(s.ObjectType)
+	s.ObjectID = strings.TrimSpace(s.ObjectID)
+	s.CommitmentHash = normalizeHash(s.CommitmentHash)
 	s.StateHash = normalizeHash(s.StateHash)
 	s.SignatureHash = normalizeHash(s.SignatureHash)
 	return s
@@ -1324,10 +1456,19 @@ func (s StateSignature) Validate(expectedStateHash string) error {
 	if s.StateHash != expectedStateHash {
 		return errors.New("payments signature state hash mismatch")
 	}
+	if s.ObjectType != SignatureObjectState {
+		return errors.New("payments signature object type mismatch")
+	}
+	if s.ObjectID != s.StateHash {
+		return errors.New("payments signature object id mismatch")
+	}
+	if s.CommitmentHash != s.StateHash {
+		return errors.New("payments signature commitment mismatch")
+	}
 	if err := ValidateHash("payments signature hash", s.SignatureHash); err != nil {
 		return err
 	}
-	if expected := ComputeSignatureHash(s.Signer, s.StateHash); s.SignatureHash != expected {
+	if expected := ComputeSignatureEnvelopeHash(s.Signer, s.ChainID, s.ChannelID, s.ObjectType, s.Version, s.Nonce, s.ObjectID, s.ExpirationHeight, s.CommitmentHash); s.SignatureHash != expected {
 		return errors.New("payments signature hash mismatch")
 	}
 	return nil
@@ -2628,14 +2769,35 @@ func validateCollateralConservation(state ChannelState, channel ChannelRecord) e
 	return nil
 }
 
-func validateSignatureQuorum(signatures []StateSignature, required []string, stateHash string) error {
+func validateSignatureQuorum(signatures []StateSignature, required []string, state ChannelState) error {
 	if err := validateAddressSet("payments required signer", required, 1, MaxParticipants); err != nil {
 		return err
 	}
 	seen := make(map[string]struct{}, len(signatures))
 	for i, sig := range signatures {
 		sig = sig.Normalize()
-		if err := sig.Validate(stateHash); err != nil {
+		if sig.ChainID != state.ChainID {
+			return errors.New("payments signature chain id mismatch")
+		}
+		if sig.ChannelID != state.ChannelID {
+			return errors.New("payments signature channel id mismatch")
+		}
+		if sig.Version != state.Version {
+			return errors.New("payments signature version mismatch")
+		}
+		if sig.Nonce != state.Nonce {
+			return errors.New("payments signature nonce mismatch")
+		}
+		if sig.ExpirationHeight != state.TimeoutHeight {
+			return errors.New("payments signature expiration height mismatch")
+		}
+		if sig.CommitmentHash != state.StateHash {
+			return errors.New("payments signature commitment mismatch")
+		}
+		if sig.ObjectID != state.StateHash {
+			return errors.New("payments signature object id mismatch")
+		}
+		if err := sig.Validate(state.StateHash); err != nil {
 			return err
 		}
 		if _, found := seen[sig.Signer]; found {
@@ -2650,6 +2812,54 @@ func validateSignatureQuorum(signatures []StateSignature, required []string, sta
 		if _, found := seen[signer]; !found {
 			return errors.New("payments state signatures do not satisfy channel quorum")
 		}
+	}
+	return nil
+}
+
+func validateClaimSignatureEnvelope(sig ClaimSignature, claim UnidirectionalClaim) error {
+	sig = sig.Normalize()
+	claim = claim.Normalize()
+	if sig.ChainID != claim.ChainID {
+		return errors.New("payments claim signature chain id mismatch")
+	}
+	if sig.ChannelID != claim.ChannelID {
+		return errors.New("payments claim signature channel id mismatch")
+	}
+	if sig.Nonce != claim.Nonce {
+		return errors.New("payments claim signature nonce mismatch")
+	}
+	if sig.ExpirationHeight != claim.ExpirationHeight {
+		return errors.New("payments claim signature expiration height mismatch")
+	}
+	if sig.ObjectID != claim.StateHash {
+		return errors.New("payments claim signature object id mismatch")
+	}
+	if sig.CommitmentHash != claim.StateHash {
+		return errors.New("payments claim signature commitment mismatch")
+	}
+	return nil
+}
+
+func validateDeltaSignatureEnvelope(sig DeltaSignature, delta AsyncPaymentDelta) error {
+	sig = sig.Normalize()
+	delta = delta.Normalize()
+	if sig.ChainID != delta.ChainID {
+		return errors.New("payments async delta signature chain id mismatch")
+	}
+	if sig.ChannelID != delta.ChannelID {
+		return errors.New("payments async delta signature channel id mismatch")
+	}
+	if sig.Nonce != delta.NonceStart {
+		return errors.New("payments async delta signature nonce mismatch")
+	}
+	if sig.ExpirationHeight != delta.ExpiryHeight {
+		return errors.New("payments async delta signature expiration height mismatch")
+	}
+	if sig.ObjectID != delta.UpdateID {
+		return errors.New("payments async delta signature object id mismatch")
+	}
+	if sig.CommitmentHash != delta.DeltaHash {
+		return errors.New("payments async delta signature commitment mismatch")
 	}
 	return nil
 }
