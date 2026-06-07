@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	appparams "github.com/sovereign-l1/l1/app/params"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/nominator-pool/types"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
@@ -13,6 +14,16 @@ import (
 
 func TestDefaultGenesisValidates(t *testing.T) {
 	require.NoError(t, DefaultGenesis().Validate())
+}
+
+func TestNominatorPoolUnbondingUsesStakingPolicyWindow(t *testing.T) {
+	gs := DefaultGenesis()
+
+	require.Equal(t, appparams.StakingUnbondingDefaultBlocks, gs.Params.UnbondingBlocks)
+	require.NoError(t, gs.Validate())
+
+	gs.Params.UnbondingBlocks = appparams.StakingUnbondingMinBlocks - 1
+	require.ErrorContains(t, gs.Validate(), "14-21 days")
 }
 
 func TestDepositMintsShares(t *testing.T) {

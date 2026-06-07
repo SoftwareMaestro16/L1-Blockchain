@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
+	appparams "github.com/sovereign-l1/l1/app/params"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
 )
@@ -29,7 +30,7 @@ const (
 	MaxBasisPoints              = uint32(10_000)
 	IndexScale                  = uint64(1_000_000_000)
 	DefaultMaxCommissionBps     = uint32(2_000)
-	DefaultUnbondingBlocks      = uint64(1_000)
+	DefaultUnbondingBlocks      = appparams.StakingUnbondingDefaultBlocks
 	DefaultValidatorChangeDelay = uint64(100)
 )
 
@@ -199,8 +200,8 @@ func (p Params) Validate() error {
 	if p.MaxCommissionBps > MaxBasisPoints {
 		return fmt.Errorf("nominator pool max commission must be <= %d", MaxBasisPoints)
 	}
-	if p.UnbondingBlocks == 0 {
-		return errors.New("nominator pool unbonding blocks must be positive")
+	if err := appparams.ValidateStakingUnbondingBlocks(p.UnbondingBlocks); err != nil {
+		return fmt.Errorf("nominator pool %w", err)
 	}
 	if p.ValidatorChangeDelay == 0 {
 		return errors.New("nominator pool validator change delay must be positive")

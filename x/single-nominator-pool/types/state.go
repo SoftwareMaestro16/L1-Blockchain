@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
+	appparams "github.com/sovereign-l1/l1/app/params"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
 )
@@ -21,7 +22,7 @@ const (
 
 	MaxPoolsV1             = uint32(100_000)
 	MaxPoolIDBytesV1       = uint32(96)
-	DefaultUnbondingBlocks = uint64(1_000)
+	DefaultUnbondingBlocks = appparams.StakingUnbondingDefaultBlocks
 )
 
 type Params struct {
@@ -121,8 +122,8 @@ func (p Params) Validate() error {
 	if p.MaxPoolIDBytes == 0 || p.MaxPoolIDBytes > MaxPoolIDBytesV1 {
 		return fmt.Errorf("single nominator pool max pool id bytes must be between 1 and %d", MaxPoolIDBytesV1)
 	}
-	if p.UnbondingBlocks == 0 {
-		return errors.New("single nominator pool unbonding blocks must be positive")
+	if err := appparams.ValidateStakingUnbondingBlocks(p.UnbondingBlocks); err != nil {
+		return fmt.Errorf("single nominator pool %w", err)
 	}
 	return nil
 }
