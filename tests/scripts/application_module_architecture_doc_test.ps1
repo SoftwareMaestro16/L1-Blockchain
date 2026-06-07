@@ -19,12 +19,14 @@ $boundariesText = Get-Content -Raw -LiteralPath $BoundariesPath
 
 foreach ($term in @(
     'Application Module Architecture',
-    '`avm-dex-contract` remains the native DEX module',
+    'Historical DEX Prototype Boundary',
+    'production target is contract-only DEX behavior',
+    'token, NFT, market, and DEX application logic must not be reintroduced as active native asset modules',
     'pool creator, liquidity provider, withdrawer, swap trader, and swap recipient',
     'native denom spoofing',
     'reserves match the DEX module account balances',
     'LP supply matches pool shares',
-    'contract pool migration',
+    'Contract pool migration',
     '`x/identity` is the planned `.aet` domain registry',
     'source of truth',
     'DomainRecord',
@@ -78,6 +80,15 @@ foreach ($term in @(
     '`x/workflow/types`: bounded workflow and step validation'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "application architecture doc missing: $term"
+}
+
+foreach ($pattern in @(
+    'x/dex` remains the native DEX module',
+    'The native DEX is the current source of truth'
+  )) {
+  if ($docText -match [regex]::Escape($pattern)) {
+    throw "application architecture doc contains active native DEX wording: $pattern"
+  }
 }
 
 foreach ($term in @(

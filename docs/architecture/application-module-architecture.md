@@ -7,14 +7,16 @@ Application modules must not bypass signer validation, zero-address rejection,
 native `naet` fee policy, denom validation, genesis validation, or deterministic
 event contracts.
 
-## x/dex
+## Historical DEX Prototype Boundary
 
-`x/dex` remains the native DEX module until contract DEX pools and routers are
-implemented, tested, audited, and migrated explicitly. The native DEX is the
-current source of truth for AMM pool state, liquidity pool custody, swap
-execution, LP accounting, and fee integration.
+Historical `x/dex` prototype language is retained only as a migration and test
+reference. The production target is contract-only DEX behavior through AVM
+contracts and standards; token, NFT, market, and DEX application logic must not
+be reintroduced as active native asset modules.
 
-Required native DEX behavior:
+token, NFT, market, and DEX application logic must not be reintroduced as active native asset modules.
+
+Historical native DEX behavior that any contract migration must preserve:
 
 - pool creator, liquidity provider, withdrawer, swap trader, and swap recipient
   are valid non-zero user addresses;
@@ -26,8 +28,8 @@ Required native DEX behavior:
   policy;
 - slippage bounds are checked before state mutation.
 
-Future contract pool migration must be explicit. A migration plan must define
-pool snapshot format, reserve custody transfer, LP token migration, router path
+Contract pool migration must be explicit. A migration plan must define pool
+snapshot format, reserve custody transfer, LP token migration, router path
 compatibility, invariant checks, rollback/pause procedure, and audit evidence.
 
 ## x/identity
@@ -201,8 +203,8 @@ Track 2.4 production code starts with pure validation packages:
 
 - `x/identity/types`: domain name and record validation;
 - `x/workflow/types`: bounded workflow and step validation;
-- `x/dex`: native DEX keeper and invariant tests remain authoritative until a
-  contract DEX exists.
+- historical DEX prototype tests remain migration compatibility references
+  until contract DEX pools and routers replace them.
 
 Future keeper/proto additions must preserve these validation rules and extend
 the test matrix before enabling new state transitions.

@@ -22,7 +22,10 @@ $checklistText = Get-Content -Raw -LiteralPath $ChecklistPath
 
 foreach ($term in @(
     'DEX Direction',
-    '`avm-dex-contract` remains a native module',
+    'prototype language is now a migration reference',
+    'Production DEX pools and routers target AVM contracts',
+    'Historical Native Module',
+    'historical reference implementation',
     'native `naet`',
     'Pool creator must be a valid non-zero user address',
     'Liquidity provider must be a valid non-zero user address',
@@ -40,13 +43,13 @@ foreach ($term in @(
     'async_swap_settlement',
     'deterministic bounce',
     'refund/excess',
-    'go test ./avm-dex-contract/types ./avm-dex-contract/keeper'
+    'go test ./x/dex/types ./x/dex/keeper'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "DEX direction doc missing: $term"
 }
 
 foreach ($term in @(
-    '`avm-dex-contract` remains a native module',
+    'historical `x/dex` prototype language',
     'Future contract-based pools/routers',
     'Native AET metadata cannot be spoofed',
     'Recorded reserves must match module account balances',

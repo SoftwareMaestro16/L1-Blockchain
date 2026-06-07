@@ -116,6 +116,10 @@ Application features are meant to be built as AVM contracts:
 
 The old `x/identity` package remains as a legacy/spec migration target. Root-only `.aet` logic belongs in native `x/identity-root`; domain NFT collections, resolvers, subdomain managers, auctions, and domain governance should migrate to AVM contracts.
 
+The native account, official liquid staking, pool-share accounting, allocation,
+stake reputation, proof, storage-rent, auth policy, and migration model is
+documented in [Native Account, Staking, Reputation, And Rent Model](docs/native-account-staking-reputation.md).
+
 ## Economy
 
 The native economy is split into clear accounting surfaces:

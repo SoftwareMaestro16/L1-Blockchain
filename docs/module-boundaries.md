@@ -11,9 +11,14 @@ Application module architecture is documented in
 Additional support modules are documented in
 [Additional Modules](architecture/additional-modules.md).
 
-## `x/tokenfactory`
+## Historical `x/tokenfactory` Prototype Boundary
 
-Purpose: create and manage custom denoms without EVM dependency.
+Historical purpose: create and manage custom denoms without EVM dependency
+during prototype testing. This is not the production token design. Production
+fungible token behavior belongs in AVM contracts such as AFT-44, and historical
+`x/tokenfactory` behavior is retained only as migration compatibility evidence.
+
+Production fungible token behavior belongs in AVM contracts such as AFT-44.
 
 State:
 - Denom registry keyed by full denom.
@@ -38,15 +43,22 @@ Security invariants:
 - Subdenom length bounds and mint/burn/create emergency flags are governance-controlled.
 - Governance cannot seize an existing factory denom admin role.
 
-## `x/dex`
+## Historical `x/dex` Prototype Boundary
 
-Purpose: deterministic constant-product AMM.
+Historical purpose: deterministic constant-product AMM during prototype
+testing. This is not the production DEX design. Production DEX pools and routers
+belong in AVM contracts, and historical `x/dex` prototype language is retained
+only as a migration compatibility reference.
+
+Production DEX pools and routers belong in AVM contracts.
 
 Current direction:
-- `x/dex` remains a native module while async contract execution and VM
-  selection mature.
-- Future contract-based pools/routers must treat this module as the reference
-  implementation or migration bridge until audited.
+- token, NFT, market, and DEX application logic must not be reintroduced as
+  active native asset modules.
+- Future contract-based pools/routers must treat the historical prototype as the
+  reference implementation or migration bridge until audited.
+
+token, NFT, market, and DEX application logic must not be reintroduced as active native asset modules.
 
 State:
 - Pool registry keyed by pool ID.

@@ -1,21 +1,30 @@
 > Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # DEX Direction
 
-Phase 12 keeps the current `x/dex` native module in the blockchain repository
-while Aetra async contract execution and VM selection mature.
+Phase 12 historical notes kept `x/dex` in the blockchain repository while Aetra
+async contract execution and VM selection matured. That prototype language is
+now a migration reference. Production DEX pools and routers target AVM
+contracts, not active native DEX asset modules.
 
-The production target for the native DEX is documented in
-[x/dex Production Specification](dex-production-spec.md).
-The current native DEX audit is documented in
+prototype language is now a migration reference.
+Production DEX pools and routers target AVM contracts.
+
+The historical production target for the native DEX is documented in
+[x/dex Production Specification](dex-production-spec.md), and is now treated as
+compatibility evidence for the contract migration path. The native DEX audit is
+documented in
 [x/dex Security Audit Report](../security/dex-audit-report.md).
 
-## Current Native Module
+## Historical Native Module
 
-`x/dex` remains a native module. It is the current reference implementation for
-constant-product pool accounting, reserve custody, LP share mint/burn, slippage
-checks, and DEX observability.
+`x/dex` was the native prototype module and remains only a historical reference
+implementation for constant-product pool accounting, reserve custody, LP share
+mint/burn, slippage checks, and DEX observability. New token/NFT/DEX
+application logic belongs in AVM contracts and standards.
 
-Current safety requirements:
+historical reference implementation.
+
+Historical safety requirements that contract DEX migration must preserve:
 
 - DEX tests use native `naet` for native-side liquidity and swap paths.
 - Pool creator must be a valid non-zero user address.
@@ -31,10 +40,11 @@ Current safety requirements:
 - LP denoms are native module-controlled `lp/{pool_id}` denoms and must not be
   accepted from user input as arbitrary native-token aliases.
 
-## Native Invariants
+## Historical Native Invariants
 
-The native DEX must keep these invariants after create, add liquidity, remove
-liquidity, swap, genesis import, and export:
+The historical native DEX compatibility suite must keep these invariants after
+create, add liquidity, remove liquidity, swap, genesis import, and export until
+contract migration removes the prototype path:
 
 - recorded reserves match the `dex` module account balances
 - LP supply matches `pool.total_shares`
@@ -45,14 +55,15 @@ liquidity, swap, genesis import, and export:
 - active pools cannot be reduced to zero reserves or zero LP supply through
   ordinary liquidity removal
 
-The DEX module account remains the reserve custodian. LP supply is minted and
-burned only by the DEX module.
+The historical DEX module account remains the reserve custodian for legacy
+prototype state. LP supply is minted and burned only by that historical module
+until an explicit migration transfers custody to contracts.
 
 ## Future Contract DEX
 
-Aetra should move toward contract-based pools and routers only after async
-contract execution is safe and audited. Until then, the native DEX remains the
-reference implementation or migration bridge.
+Aetra moves toward contract-based pools and routers only after async contract
+execution is safe and audited. Historical native DEX behavior is a migration
+bridge, not a reason to add new native DEX application features.
 
 Future contract model:
 
@@ -93,7 +104,7 @@ go test ./x/dex/types ./x/dex/keeper
 go test ./...
 ```
 
-The current regression suite covers:
+The historical regression suite covers:
 
 - native `naet` pool paths
 - zero-address actor rejection
