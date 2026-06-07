@@ -15,6 +15,7 @@ message StorageRentParams {
   uint32 fee_collector_share = 9;
   uint32 treasury_share = 10;
   uint32 burn_share = 11;
+  uint64 rent_rate_per_byte_second = 12;
 }
 
 message ContractRentRecord {

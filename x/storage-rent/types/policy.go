@@ -30,6 +30,13 @@ const (
 	SystemRentAlertWarning   = "warning"
 	SystemRentAlertCritical  = "critical"
 	SystemRentAlertInvariant = "invariant"
+
+	SystemRentPayerFeeCollector = "fee_collector"
+	SystemRentPayerTreasury     = "treasury"
+	SystemRentPayerGovernance   = "governance_configured_payer"
+
+	RentProcessingStepSystemTopUp = "system_top_up"
+	RentProcessingStepUserFreeze  = "user_freeze"
 )
 
 type PersistentStateRecord struct {
@@ -76,9 +83,29 @@ type SystemRentResult struct {
 	RunwayBlocks    uint64
 	Alert           string
 	TopUpAmount     uint64
+	TopUpSources    []SystemRentTopUpSource
 	RemainingDebt   uint64
 	FreezeForbidden bool
 	Executable      bool
+}
+
+type SystemRentTopUpSource struct {
+	Source string
+	Amount uint64
+}
+
+type RentProcessingInput struct {
+	Params              StorageRentParams
+	System              SystemRentAccounting
+	Subjects            []PersistentStateRecord
+	CurrentUnixSeconds  uint64
+	FreezeDebtThreshold uint64
+}
+
+type RentProcessingResult struct {
+	System   SystemRentResult
+	Subjects []PersistentStateRecord
+	Order    []string
 }
 
 func PersistentStorageSize(record PersistentStateRecord) (uint64, error) {
@@ -86,11 +113,7 @@ func PersistentStorageSize(record PersistentStateRecord) (uint64, error) {
 	if total > math.MaxUint64-record.DataBytes {
 		return 0, errors.New("storage rent persistent state size overflow")
 	}
-	total += record.DataBytes
-	if total > math.MaxUint64-record.IndexBytes {
-		return 0, errors.New("storage rent persistent state size overflow")
-	}
-	return total + record.IndexBytes, nil
+	return total + record.DataBytes, nil
 }
 
 func AccruePersistentStateRent(record PersistentStateRecord, params StorageRentParams, height uint64) (SubjectRentResult, error) {
@@ -108,7 +131,7 @@ func AccruePersistentStateRent(record PersistentStateRecord, params StorageRentP
 	if err != nil {
 		return SubjectRentResult{}, err
 	}
-	delta, err := RentForBlocks(size, params, height-record.LastChargedHeight)
+	delta, err := RentForSeconds(size, params, height-record.LastChargedHeight)
 	if err != nil {
 		return SubjectRentResult{}, err
 	}
@@ -175,6 +198,19 @@ func OfficialPoolStatusForDebt(pool PersistentStateRecord, debt uint64) string {
 	return pool.Status
 }
 
+func StatusAfterRentDebt(record PersistentStateRecord, debt uint64) string {
+	if record.ProtocolCritical || record.Class == StateClassSystemModule || record.Class == StateClassValidatorRecord {
+		return normalizedActiveStatus(record.Status)
+	}
+	if record.OfficialPool || record.Class == StateClassPoolContract {
+		return OfficialPoolStatusForDebt(record, debt)
+	}
+	if debt > 0 {
+		return ContractStatusFrozen
+	}
+	return normalizedActiveStatus(record.Status)
+}
+
 func FrozenLimitedPoolAllows(action string) bool {
 	switch action {
 	case PoolActionClaim, PoolActionUnbond, PoolActionMaturedWithdrawal, PoolActionGovernanceRecovery:
@@ -224,16 +260,24 @@ func ComputeSystemRentAccounting(input SystemRentAccounting) SystemRentResult {
 		result.Alert = SystemRentAlertCritical
 		remaining := input.RequiredTopUp
 		topUp := uint64(0)
-		for _, balance := range []uint64{input.FeeCollectorBalance, input.TreasuryBalance, input.GovernanceConfiguredPayerBalance} {
+		sources := []string{SystemRentPayerFeeCollector, SystemRentPayerTreasury, SystemRentPayerGovernance}
+		for i, balance := range []uint64{input.FeeCollectorBalance, input.TreasuryBalance, input.GovernanceConfiguredPayerBalance} {
+			source := sources[i]
 			if remaining == 0 {
 				break
 			}
 			if balance >= remaining {
 				topUp += remaining
+				if remaining > 0 {
+					result.TopUpSources = append(result.TopUpSources, SystemRentTopUpSource{Source: source, Amount: remaining})
+				}
 				remaining = 0
 				break
 			}
 			topUp += balance
+			if balance > 0 {
+				result.TopUpSources = append(result.TopUpSources, SystemRentTopUpSource{Source: source, Amount: balance})
+			}
 			remaining -= balance
 		}
 		result.TopUpAmount = topUp
@@ -245,6 +289,38 @@ func ComputeSystemRentAccounting(input SystemRentAccounting) SystemRentResult {
 	return result
 }
 
+func ProcessStorageRent(input RentProcessingInput) (RentProcessingResult, error) {
+	if err := input.Params.Validate(); err != nil {
+		return RentProcessingResult{}, err
+	}
+	if input.CurrentUnixSeconds == 0 {
+		return RentProcessingResult{}, errors.New("storage rent current unix seconds must be positive")
+	}
+	system := ComputeSystemRentAccounting(input.System)
+	result := RentProcessingResult{
+		System: system,
+		Order:  []string{RentProcessingStepSystemTopUp},
+	}
+	for _, subject := range input.Subjects {
+		accrued, err := AccruePersistentStateRent(subject, input.Params, input.CurrentUnixSeconds)
+		if err != nil {
+			return RentProcessingResult{}, err
+		}
+		next := accrued.Subject
+		if accrued.ProtocolPaid {
+			next.Status = normalizedActiveStatus(next.Status)
+		} else if next.RentDebt > input.FreezeDebtThreshold {
+			next.Status = StatusAfterRentDebt(next, next.RentDebt)
+		}
+		if isForbiddenProtocolCriticalStatus(next) {
+			return RentProcessingResult{}, errors.New("protocol-critical state cannot be frozen archived or deleted by storage rent")
+		}
+		result.Subjects = append(result.Subjects, next)
+	}
+	result.Order = append(result.Order, RentProcessingStepUserFreeze)
+	return result, nil
+}
+
 func ValidatePersistentStateClass(class string) error {
 	switch class {
 	case StateClassWallet, StateClassContract, StateClassPoolContract, StateClassPoolShare,
@@ -254,5 +330,28 @@ func ValidatePersistentStateClass(class string) error {
 		return nil
 	default:
 		return fmt.Errorf("unsupported storage rent state class %q", class)
+	}
+}
+
+func normalizedActiveStatus(status string) string {
+	switch status {
+	case "":
+		return ContractStatusActive
+	case ContractStatusFrozen, ContractStatusFrozenLimited, ContractStatusArchived, ContractStatusDeleted:
+		return ContractStatusActive
+	default:
+		return status
+	}
+}
+
+func isForbiddenProtocolCriticalStatus(record PersistentStateRecord) bool {
+	if !record.ProtocolCritical && record.Class != StateClassSystemModule && record.Class != StateClassValidatorRecord {
+		return false
+	}
+	switch record.Status {
+	case ContractStatusFrozen, ContractStatusFrozenLimited, ContractStatusArchived, ContractStatusDeleted:
+		return true
+	default:
+		return false
 	}
 }

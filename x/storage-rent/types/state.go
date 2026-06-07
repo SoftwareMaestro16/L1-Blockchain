@@ -20,17 +20,18 @@ const (
 )
 
 type StorageRentParams struct {
-	RentRatePerByteBlock uint64
-	FreeStorageAllowance uint64
-	RetentionBlocks      uint64
-	UnfreezeBufferBlocks uint64
-	MaxContracts         uint32
-	MaxExemptions        uint32
-	FeeCollectorAccount  string
-	TreasuryAccount      string
-	FeeCollectorShare    uint32
-	TreasuryShare        uint32
-	BurnShare            uint32
+	RentRatePerByteBlock  uint64
+	RentRatePerByteSecond uint64
+	FreeStorageAllowance  uint64
+	RetentionBlocks       uint64
+	UnfreezeBufferBlocks  uint64
+	MaxContracts          uint32
+	MaxExemptions         uint32
+	FeeCollectorAccount   string
+	TreasuryAccount       string
+	FeeCollectorShare     uint32
+	TreasuryShare         uint32
+	BurnShare             uint32
 }
 
 type StorageRentState struct {
@@ -108,16 +109,17 @@ type MsgUpdateStorageRentParams struct {
 
 func DefaultStorageRentParams() StorageRentParams {
 	return StorageRentParams{
-		RentRatePerByteBlock: 1,
-		RetentionBlocks:      10_000,
-		UnfreezeBufferBlocks: 100,
-		MaxContracts:         100_000,
-		MaxExemptions:        1_024,
-		FeeCollectorAccount:  "fee_collector",
-		TreasuryAccount:      "treasury",
-		FeeCollectorShare:    5_000,
-		TreasuryShare:        4_000,
-		BurnShare:            1_000,
+		RentRatePerByteBlock:  1,
+		RentRatePerByteSecond: 1,
+		RetentionBlocks:       10_000,
+		UnfreezeBufferBlocks:  100,
+		MaxContracts:          100_000,
+		MaxExemptions:         1_024,
+		FeeCollectorAccount:   "fee_collector",
+		TreasuryAccount:       "treasury",
+		FeeCollectorShare:     5_000,
+		TreasuryShare:         4_000,
+		BurnShare:             1_000,
 	}
 }
 
@@ -132,6 +134,9 @@ func EmptyStorageRentState() StorageRentState {
 func (p StorageRentParams) Validate() error {
 	if p.RentRatePerByteBlock == 0 {
 		return errors.New("storage rent rate must be positive")
+	}
+	if p.RentRatePerByteSecond == 0 {
+		return errors.New("storage rent per-second rate must be positive")
 	}
 	if p.RetentionBlocks == 0 {
 		return errors.New("storage rent retention blocks must be positive")
@@ -315,6 +320,21 @@ func RentForBlocks(storageBytes uint64, params StorageRentParams, blocks uint64)
 		return 0, errors.New("storage rent block overflow")
 	}
 	return perBlock * blocks, nil
+}
+
+func RentForSeconds(storageBytes uint64, params StorageRentParams, elapsedSeconds uint64) (uint64, error) {
+	if storageBytes <= params.FreeStorageAllowance || elapsedSeconds == 0 {
+		return 0, nil
+	}
+	billable := storageBytes - params.FreeStorageAllowance
+	if billable > math.MaxUint64/params.RentRatePerByteSecond {
+		return 0, errors.New("storage rent byte-second rate overflow")
+	}
+	perSecond := billable * params.RentRatePerByteSecond
+	if elapsedSeconds > math.MaxUint64/perSecond {
+		return 0, errors.New("storage rent elapsed seconds overflow")
+	}
+	return perSecond * elapsedSeconds, nil
 }
 
 func RequiredUnfreezePayment(contract ContractRentRecord, params StorageRentParams) (uint64, error) {

@@ -9,28 +9,48 @@ import (
 func TestPersistentStateRentAccruesForActiveContractAndLongLivedRecords(t *testing.T) {
 	params := DefaultStorageRentParams()
 	params.FreeStorageAllowance = 0
-	params.RentRatePerByteBlock = 2
+	params.RentRatePerByteSecond = 2
 
 	fixtures := []PersistentStateRecord{
 		{SubjectID: "contract-1", Class: StateClassContract, CodeBytes: 10, DataBytes: 20, IndexBytes: 5, Persistent: true, Status: ContractStatusActive, LastChargedHeight: 7},
-		{SubjectID: "domain-1", Class: StateClassDomainRecord, DataBytes: 35, Persistent: true, Status: ContractStatusActive, LastChargedHeight: 7},
+		{SubjectID: "domain-1", Class: StateClassDomainRecord, DataBytes: 30, IndexBytes: 5, Persistent: true, Status: ContractStatusActive, LastChargedHeight: 7},
 		{SubjectID: "rep-1", Class: StateClassStakingReputation, DataBytes: 30, IndexBytes: 5, Persistent: true, Status: ContractStatusActive, LastChargedHeight: 7},
 	}
 
 	for _, fixture := range fixtures {
 		result, err := AccruePersistentStateRent(fixture, params, 9)
 		require.NoError(t, err, fixture.SubjectID)
-		require.Equal(t, uint64(35), result.StorageBytes, fixture.SubjectID)
-		require.Equal(t, uint64(140), result.RentDelta, fixture.SubjectID)
-		require.Equal(t, uint64(140), result.Subject.RentDebt, fixture.SubjectID)
+		require.Equal(t, uint64(30), result.StorageBytes, fixture.SubjectID)
+		require.Equal(t, uint64(120), result.RentDelta, fixture.SubjectID)
+		require.Equal(t, uint64(120), result.Subject.RentDebt, fixture.SubjectID)
 		require.Equal(t, uint64(9), result.Subject.LastChargedHeight, fixture.SubjectID)
 	}
+}
+
+func TestPersistentStorageSizeIsCodeBytesPlusDataBytesOnly(t *testing.T) {
+	size, err := PersistentStorageSize(PersistentStateRecord{
+		CodeBytes:  11,
+		DataBytes:  17,
+		IndexBytes: 99,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(28), size)
+}
+
+func TestRentDeltaUsesRatePerByteSecondAndElapsedSeconds(t *testing.T) {
+	params := DefaultStorageRentParams()
+	params.FreeStorageAllowance = 0
+	params.RentRatePerByteSecond = 3
+
+	delta, err := RentForSeconds(7, params, 11)
+	require.NoError(t, err)
+	require.Equal(t, uint64(231), delta)
 }
 
 func TestPersistentStateRentSkipsUnactivatedEmptyAndDeletedState(t *testing.T) {
 	params := DefaultStorageRentParams()
 	params.FreeStorageAllowance = 0
-	params.RentRatePerByteBlock = 10
+	params.RentRatePerByteSecond = 10
 
 	unactivated := PersistentStateRecord{SubjectID: "virtual-ae", Class: StateClassWallet, Persistent: false, LastChargedHeight: 1}
 	result, err := AccruePersistentStateRent(unactivated, params, 50)
@@ -49,6 +69,26 @@ func TestPersistentStateRentSkipsUnactivatedEmptyAndDeletedState(t *testing.T) {
 	require.NoError(t, err)
 	require.Zero(t, result.RentDelta)
 	require.Zero(t, result.Subject.RentDebt)
+}
+
+func TestZeroBalanceNoStateHasZeroRentDebtAndPersistentStateAccruesDebt(t *testing.T) {
+	params := DefaultStorageRentParams()
+	params.FreeStorageAllowance = 0
+	params.RentRatePerByteSecond = 4
+
+	noState := PersistentStateRecord{SubjectID: "empty", Class: StateClassWallet, Persistent: true, Status: ContractStatusActive, LastChargedHeight: 10}
+	result, err := AccruePersistentStateRent(noState, params, 20)
+	require.NoError(t, err)
+	require.Zero(t, result.RentDelta)
+	require.Zero(t, result.Subject.RentDebt)
+
+	withState := noState
+	withState.SubjectID = "wallet-with-state"
+	withState.DataBytes = 5
+	result, err = AccruePersistentStateRent(withState, params, 20)
+	require.NoError(t, err)
+	require.Equal(t, uint64(200), result.RentDelta)
+	require.Equal(t, uint64(200), result.Subject.RentDebt)
 }
 
 func TestWalletEffectiveFeeIncludesGasRentAndUnpaidDebt(t *testing.T) {
@@ -80,10 +120,19 @@ func TestPoolRentUsesProtocolReservesAndFrozenLimitedAllowsOnlyRecoveryActions(t
 	require.True(t, FrozenLimitedPoolAllows(PoolActionGovernanceRecovery))
 }
 
+func TestNormalAccountAndContractFreezeOnUnpaidDebt(t *testing.T) {
+	wallet := PersistentStateRecord{Class: StateClassWallet, Status: ContractStatusActive}
+	contract := PersistentStateRecord{Class: StateClassContract, Status: ContractStatusActive}
+
+	require.Equal(t, ContractStatusFrozen, StatusAfterRentDebt(wallet, 1))
+	require.Equal(t, ContractStatusFrozen, StatusAfterRentDebt(contract, 1))
+	require.Equal(t, ContractStatusActive, StatusAfterRentDebt(contract, 0))
+}
+
 func TestProtocolCriticalSystemStateIsProtocolPaidAndCannotFreezeFromRent(t *testing.T) {
 	params := DefaultStorageRentParams()
 	params.FreeStorageAllowance = 0
-	params.RentRatePerByteBlock = 1
+	params.RentRatePerByteSecond = 1
 	system := PersistentStateRecord{
 		SubjectID:         "system/module",
 		Class:             StateClassSystemModule,
@@ -103,6 +152,31 @@ func TestProtocolCriticalSystemStateIsProtocolPaidAndCannotFreezeFromRent(t *tes
 }
 
 func TestSystemRentAccountingWarnsTopsUpDeterministicallyAndKeepsCriticalExecutable(t *testing.T) {
+	warning := ComputeSystemRentAccounting(SystemRentAccounting{
+		AvailableFunds:             60,
+		ProjectedRentPerBlock:      10,
+		WarningRunwayBlocks:        10,
+		CriticalRunwayBlocks:       5,
+		RequiredTopUp:              20,
+		ProtocolCriticalExecutable: true,
+	})
+	require.Equal(t, uint64(6), warning.RunwayBlocks)
+	require.Equal(t, SystemRentAlertWarning, warning.Alert)
+	require.Zero(t, warning.TopUpAmount)
+
+	critical := ComputeSystemRentAccounting(SystemRentAccounting{
+		AvailableFunds:             40,
+		ProjectedRentPerBlock:      10,
+		WarningRunwayBlocks:        10,
+		CriticalRunwayBlocks:       5,
+		FeeCollectorBalance:        20,
+		RequiredTopUp:              20,
+		ProtocolCriticalExecutable: true,
+	})
+	require.Equal(t, uint64(4), critical.RunwayBlocks)
+	require.Equal(t, SystemRentAlertCritical, critical.Alert)
+	require.Equal(t, uint64(20), critical.TopUpAmount)
+
 	result := ComputeSystemRentAccounting(SystemRentAccounting{
 		AvailableFunds:                   10,
 		ProjectedRentPerBlock:            5,
@@ -118,9 +192,49 @@ func TestSystemRentAccountingWarnsTopsUpDeterministicallyAndKeepsCriticalExecuta
 	require.Equal(t, uint64(2), result.RunwayBlocks)
 	require.Equal(t, SystemRentAlertInvariant, result.Alert)
 	require.Equal(t, uint64(9), result.TopUpAmount)
+	require.Equal(t, []SystemRentTopUpSource{
+		{Source: SystemRentPayerFeeCollector, Amount: 4},
+		{Source: SystemRentPayerTreasury, Amount: 3},
+		{Source: SystemRentPayerGovernance, Amount: 2},
+	}, result.TopUpSources)
 	require.Equal(t, uint64(1), result.RemainingDebt)
 	require.True(t, result.FreezeForbidden)
 	require.True(t, result.Executable)
+}
+
+func TestSystemTopUpRunsBeforeUserFreezeProcessingAndProtocolCriticalKeepsExecuting(t *testing.T) {
+	params := DefaultStorageRentParams()
+	params.FreeStorageAllowance = 0
+	params.RentRatePerByteSecond = 1
+
+	result, err := ProcessStorageRent(RentProcessingInput{
+		Params: params,
+		System: SystemRentAccounting{
+			AvailableFunds:             0,
+			ProjectedRentPerBlock:      10,
+			WarningRunwayBlocks:        10,
+			CriticalRunwayBlocks:       5,
+			FeeCollectorBalance:        3,
+			TreasuryBalance:            2,
+			RequiredTopUp:              10,
+			ProtocolCriticalExecutable: true,
+		},
+		CurrentUnixSeconds:  20,
+		FreezeDebtThreshold: 0,
+		Subjects: []PersistentStateRecord{
+			{SubjectID: "wallet", Class: StateClassWallet, DataBytes: 4, Persistent: true, Status: ContractStatusActive, LastChargedHeight: 10},
+			{SubjectID: "system", Class: StateClassSystemModule, DataBytes: 4, Persistent: true, Status: ContractStatusActive, ProtocolCritical: true, LastChargedHeight: 10},
+		},
+	})
+	require.NoError(t, err)
+	require.Equal(t, []string{RentProcessingStepSystemTopUp, RentProcessingStepUserFreeze}, result.Order)
+	require.Equal(t, SystemRentAlertInvariant, result.System.Alert)
+	require.Equal(t, uint64(5), result.System.TopUpAmount)
+	require.Equal(t, uint64(5), result.System.RemainingDebt)
+	require.True(t, result.System.Executable)
+	require.Equal(t, ContractStatusFrozen, result.Subjects[0].Status)
+	require.Equal(t, ContractStatusActive, result.Subjects[1].Status)
+	require.True(t, CanExecutePersistentStateAction(result.Subjects[1], "begin_block"))
 }
 
 func TestFrozenContractPreservesReadAndProofButBlocksNormalExecute(t *testing.T) {
