@@ -47,7 +47,35 @@ foreach ($term in @(
     'Governance capture threshold analysis must model proposal quorum',
     'Split-identity simulation must assume one operator can run multiple validators',
     'Delegation overflow simulation must prove over-cap stake cannot increase effective voting power',
-    'BuildAetraValidatorCartelThreatReport'
+    'BuildAetraValidatorCartelThreatReport',
+    '29.2 Stake Centralization Through Rewards',
+    'large validators grow faster because delegators chase apparent safety/APR',
+    'overflow rewards reduced',
+    'over-cap warnings',
+    'concentration metrics',
+    'reward multiplier based on cap',
+    'rewards for over-cap validator lower than normal',
+    'delegator APR estimate reflects overflow penalty',
+    'cap changes do not create accounting corruption',
+    'Reward accounting must not let overflow stake receive the same effective reward weight as in-cap stake',
+    'APR estimates shown to delegators must include overflow penalty and commission impact',
+    'Cap changes must be epoch-boundary or otherwise deterministic',
+    'BuildAetraStakeCentralizationRewardsThreatReport',
+    '29.3 Downtime And Weak Operators',
+    'too many low-quality validators reduce liveness',
+    'minimum self-bond',
+    'validator score',
+    'downtime slashing',
+    'jail',
+    'public metrics',
+    'gradual validator set growth',
+    'liveness with < 1/3 voting power offline',
+    'halt behavior with > 1/3 offline documented',
+    'recovery after validators return',
+    'downtime penalties applied',
+    'Validator score must use objective chain data',
+    'Halt behavior with more than one third voting power offline must be documented clearly as a BFT liveness boundary',
+    'BuildAetraDowntimeWeakOperatorsThreatReport'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "threat model doc missing: $term"
 }
@@ -55,6 +83,8 @@ foreach ($term in @(
 foreach ($term in @(
     'AetraThreatModelModuleName',
     'AetraThreatValidatorCartel',
+    'AetraThreatStakeCentralizationThroughRewards',
+    'AetraThreatDowntimeWeakOperators',
     'AetraThreatControlValidatorSetTarget',
     'AetraThreatControlValidatorPowerCap',
     'AetraThreatControlTopNMonitoring',
@@ -62,10 +92,27 @@ foreach ($term in @(
     'AetraThreatControlIdentityTransparency',
     'AetraThreatControlGovernanceParticipationMetrics',
     'AetraThreatControlDelegationWarnings',
+    'AetraThreatControlOverflowRewardsReduced',
+    'AetraThreatControlOverCapWarnings',
+    'AetraThreatControlConcentrationMetrics',
+    'AetraThreatControlRewardMultiplierBasedOnCap',
+    'AetraThreatControlMinimumSelfBond',
+    'AetraThreatControlValidatorScore',
+    'AetraThreatControlDowntimeSlashing',
+    'AetraThreatControlJail',
+    'AetraThreatControlPublicMetrics',
+    'AetraThreatControlGradualValidatorSetGrowth',
     'AetraThreatSimulationTop10Concentration',
     'AetraThreatSimulationSplitIdentityValidator',
     'AetraThreatSimulationDelegationOverflow',
     'AetraThreatSimulationGovernanceCaptureThreshold',
+    'AetraThreatTestOverCapRewardsLower',
+    'AetraThreatTestDelegatorAPROverflowPenalty',
+    'AetraThreatTestCapChangeAccountingSafe',
+    'AetraThreatTestLivenessUnderOneThirdOffline',
+    'AetraThreatTestHaltOverOneThirdOfflineDoc',
+    'AetraThreatTestRecoveryAfterValidatorsReturn',
+    'AetraThreatTestDowntimePenaltiesApplied',
     'AetraValidatorCartelThreatEvidence',
     'DefaultAetraValidatorCartelThreatEvidence',
     'ValidateAetraValidatorCartelThreat',
@@ -73,14 +120,26 @@ foreach ($term in @(
     'UsesObjectiveChainData',
     'UsesEconomicSignals',
     'AvoidsMandatoryValidatorKYC',
-    'DoesNotHaltStakingOnWarning'
+    'DoesNotHaltStakingOnWarning',
+    'AetraStakeCentralizationRewardsThreatEvidence',
+    'DefaultAetraStakeCentralizationRewardsThreatEvidence',
+    'ValidateAetraStakeCentralizationRewardsThreat',
+    'BuildAetraStakeCentralizationRewardsThreatReport',
+    'AetraDowntimeWeakOperatorsThreatEvidence',
+    'DefaultAetraDowntimeWeakOperatorsThreatEvidence',
+    'ValidateAetraDowntimeWeakOperatorsThreat',
+    'BuildAetraDowntimeWeakOperatorsThreatReport'
   )) {
   Assert-Contains -Text $policyText -Pattern ([regex]::Escape($term)) -Message "threat model gate missing: $term"
 }
 
 foreach ($term in @(
     'TestDefaultAetraValidatorCartelThreatCoversSection291',
-    'TestAetraValidatorCartelThreatRejectsMissingControlsSimulationsAndSafety'
+    'TestAetraValidatorCartelThreatRejectsMissingControlsSimulationsAndSafety',
+    'TestDefaultAetraStakeCentralizationRewardsThreatCoversSection292',
+    'TestAetraStakeCentralizationRewardsThreatRejectsMissingControlsAndTests',
+    'TestDefaultAetraDowntimeWeakOperatorsThreatCoversSection293',
+    'TestAetraDowntimeWeakOperatorsThreatRejectsMissingControlsAndTests'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "threat model tests missing: $term"
 }
