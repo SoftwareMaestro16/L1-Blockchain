@@ -75,7 +75,23 @@ foreach ($term in @(
     'downtime penalties applied',
     'Validator score must use objective chain data',
     'Halt behavior with more than one third voting power offline must be documented clearly as a BFT liveness boundary',
-    'BuildAetraDowntimeWeakOperatorsThreatReport'
+    'BuildAetraDowntimeWeakOperatorsThreatReport',
+    '29.4 Governance Attack',
+    'malicious proposal changes economics, slashing, cap, or VM params dangerously',
+    'param bounds',
+    'delayed activation',
+    'emergency review window for critical params',
+    'explicit authority checks',
+    'event monitoring',
+    'malicious param proposal rejected',
+    'out-of-range values rejected',
+    'authority spoofing rejected',
+    'delayed activation works',
+    'Economics, slashing, validator power cap, validator set growth, block gas/bytes, and VM/CosmWasm/AVM params must define explicit min/max bounds',
+    'Critical params must activate after a deterministic delay or epoch boundary',
+    'Governance and params messages must verify explicit authority and reject spoofed signers',
+    'Param update execution must emit stable events with old value, new value, activation height or epoch, authority, and criticality',
+    'BuildAetraGovernanceAttackThreatReport'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "threat model doc missing: $term"
 }
@@ -85,6 +101,7 @@ foreach ($term in @(
     'AetraThreatValidatorCartel',
     'AetraThreatStakeCentralizationThroughRewards',
     'AetraThreatDowntimeWeakOperators',
+    'AetraThreatGovernanceAttack',
     'AetraThreatControlValidatorSetTarget',
     'AetraThreatControlValidatorPowerCap',
     'AetraThreatControlTopNMonitoring',
@@ -102,6 +119,11 @@ foreach ($term in @(
     'AetraThreatControlJail',
     'AetraThreatControlPublicMetrics',
     'AetraThreatControlGradualValidatorSetGrowth',
+    'AetraThreatControlParamBounds',
+    'AetraThreatControlDelayedActivation',
+    'AetraThreatControlEmergencyReviewWindow',
+    'AetraThreatControlExplicitAuthorityChecks',
+    'AetraThreatControlEventMonitoring',
     'AetraThreatSimulationTop10Concentration',
     'AetraThreatSimulationSplitIdentityValidator',
     'AetraThreatSimulationDelegationOverflow',
@@ -113,6 +135,10 @@ foreach ($term in @(
     'AetraThreatTestHaltOverOneThirdOfflineDoc',
     'AetraThreatTestRecoveryAfterValidatorsReturn',
     'AetraThreatTestDowntimePenaltiesApplied',
+    'AetraThreatTestMaliciousParamProposalRejected',
+    'AetraThreatTestOutOfRangeValuesRejected',
+    'AetraThreatTestAuthoritySpoofingRejected',
+    'AetraThreatTestDelayedActivationWorks',
     'AetraValidatorCartelThreatEvidence',
     'DefaultAetraValidatorCartelThreatEvidence',
     'ValidateAetraValidatorCartelThreat',
@@ -128,7 +154,11 @@ foreach ($term in @(
     'AetraDowntimeWeakOperatorsThreatEvidence',
     'DefaultAetraDowntimeWeakOperatorsThreatEvidence',
     'ValidateAetraDowntimeWeakOperatorsThreat',
-    'BuildAetraDowntimeWeakOperatorsThreatReport'
+    'BuildAetraDowntimeWeakOperatorsThreatReport',
+    'AetraGovernanceAttackThreatEvidence',
+    'DefaultAetraGovernanceAttackThreatEvidence',
+    'ValidateAetraGovernanceAttackThreat',
+    'BuildAetraGovernanceAttackThreatReport'
   )) {
   Assert-Contains -Text $policyText -Pattern ([regex]::Escape($term)) -Message "threat model gate missing: $term"
 }
@@ -139,7 +169,9 @@ foreach ($term in @(
     'TestDefaultAetraStakeCentralizationRewardsThreatCoversSection292',
     'TestAetraStakeCentralizationRewardsThreatRejectsMissingControlsAndTests',
     'TestDefaultAetraDowntimeWeakOperatorsThreatCoversSection293',
-    'TestAetraDowntimeWeakOperatorsThreatRejectsMissingControlsAndTests'
+    'TestAetraDowntimeWeakOperatorsThreatRejectsMissingControlsAndTests',
+    'TestDefaultAetraGovernanceAttackThreatCoversSection294',
+    'TestAetraGovernanceAttackThreatRejectsMissingControlsAndTests'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "threat model tests missing: $term"
 }

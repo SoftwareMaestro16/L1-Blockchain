@@ -188,3 +188,65 @@ func TestAetraDowntimeWeakOperatorsThreatRejectsMissingControlsAndTests(t *testi
 	require.Contains(t, report.Failed, "tests.ignore_downtime_penalties:unexpected")
 	require.Error(t, ValidateAetraDowntimeWeakOperatorsThreat(evidence))
 }
+
+func TestDefaultAetraGovernanceAttackThreatCoversSection294(t *testing.T) {
+	evidence := DefaultAetraGovernanceAttackThreatEvidence()
+
+	report := BuildAetraGovernanceAttackThreatReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Empty(t, report.Failed)
+	require.Equal(t, AetraThreatModelModuleName, report.ModuleName)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 10, report.Required)
+	require.Contains(t, evidence.Threats, AetraThreatGovernanceAttack)
+	for _, control := range []string{
+		AetraThreatControlParamBounds,
+		AetraThreatControlDelayedActivation,
+		AetraThreatControlEmergencyReviewWindow,
+		AetraThreatControlExplicitAuthorityChecks,
+		AetraThreatControlEventMonitoring,
+	} {
+		require.Contains(t, evidence.Controls, control)
+	}
+	for _, testName := range []string{
+		AetraThreatTestMaliciousParamProposalRejected,
+		AetraThreatTestOutOfRangeValuesRejected,
+		AetraThreatTestAuthoritySpoofingRejected,
+		AetraThreatTestDelayedActivationWorks,
+	} {
+		require.Contains(t, evidence.Tests, testName)
+	}
+	require.NoError(t, ValidateAetraGovernanceAttackThreat(evidence))
+}
+
+func TestAetraGovernanceAttackThreatRejectsMissingControlsAndTests(t *testing.T) {
+	evidence := DefaultAetraGovernanceAttackThreatEvidence()
+	evidence.ModuleName = ""
+	evidence.Threats = nil
+	evidence.Controls = removeString(evidence.Controls,
+		AetraThreatControlParamBounds,
+		AetraThreatControlEmergencyReviewWindow,
+		AetraThreatControlExplicitAuthorityChecks,
+	)
+	evidence.Tests = removeString(evidence.Tests,
+		AetraThreatTestOutOfRangeValuesRejected,
+		AetraThreatTestAuthoritySpoofingRejected,
+	)
+	evidence.Controls = append(evidence.Controls, AetraThreatControlDelayedActivation, "unbounded_param_update")
+	evidence.Tests = append(evidence.Tests, AetraThreatTestDelayedActivationWorks, "manual_multisig_review_only")
+
+	report := BuildAetraGovernanceAttackThreatReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_required")
+	require.Contains(t, report.Failed, "threats."+AetraThreatGovernanceAttack+":missing")
+	require.Contains(t, report.Failed, "controls."+AetraThreatControlParamBounds+":missing")
+	require.Contains(t, report.Failed, "controls."+AetraThreatControlEmergencyReviewWindow+":missing")
+	require.Contains(t, report.Failed, "controls."+AetraThreatControlExplicitAuthorityChecks+":missing")
+	require.Contains(t, report.Failed, "controls."+AetraThreatControlDelayedActivation+":duplicate")
+	require.Contains(t, report.Failed, "controls.unbounded_param_update:unexpected")
+	require.Contains(t, report.Failed, "tests."+AetraThreatTestOutOfRangeValuesRejected+":missing")
+	require.Contains(t, report.Failed, "tests."+AetraThreatTestAuthoritySpoofingRejected+":missing")
+	require.Contains(t, report.Failed, "tests."+AetraThreatTestDelayedActivationWorks+":duplicate")
+	require.Contains(t, report.Failed, "tests.manual_multisig_review_only:unexpected")
+	require.Error(t, ValidateAetraGovernanceAttackThreat(evidence))
+}

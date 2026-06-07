@@ -117,3 +117,40 @@ Acceptance gate:
 - Missing downtime and weak operators threat definition must fail validation.
 - Missing self-bond, validator score, downtime slashing, jail, public metrics, or gradual validator set growth control must fail validation.
 - Missing liveness, halt-boundary, recovery, or downtime penalty test must fail validation.
+
+## 29.4 Governance Attack
+
+Threat:
+
+- malicious proposal changes economics, slashing, cap, or VM params dangerously.
+
+Controls:
+
+- param bounds;
+- delayed activation;
+- emergency review window for critical params;
+- explicit authority checks;
+- event monitoring.
+
+Tests:
+
+- malicious param proposal rejected;
+- out-of-range values rejected;
+- authority spoofing rejected;
+- delayed activation works.
+
+Security requirements:
+
+- Economics, slashing, validator power cap, validator set growth, block gas/bytes, and VM/CosmWasm/AVM params must define explicit min/max bounds.
+- Critical params must activate after a deterministic delay or epoch boundary so validators, dashboards, and delegators can observe the change before it becomes active.
+- Emergency review window for critical params must be documented and observable; it must not depend on subjective off-chain consensus in the state transition.
+- Governance and params messages must verify explicit authority and reject spoofed signers.
+- Param update execution must emit stable events with old value, new value, activation height or epoch, authority, and criticality.
+- Event monitoring must alert on critical economics, slashing, cap, or VM parameter changes before activation.
+
+Acceptance gate:
+
+- `BuildAetraGovernanceAttackThreatReport` must pass.
+- Missing governance attack threat definition must fail validation.
+- Missing param bounds, delayed activation, emergency review window, explicit authority checks, or event monitoring control must fail validation.
+- Missing malicious proposal rejection, out-of-range rejection, authority spoofing rejection, or delayed activation test must fail validation.

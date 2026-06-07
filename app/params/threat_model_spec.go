@@ -11,6 +11,7 @@ const (
 	AetraThreatValidatorCartel                   = "several_validators_coordinate_censorship_or_governance_capture"
 	AetraThreatStakeCentralizationThroughRewards = "large_validators_grow_faster_because_delegators_chase_apparent_safety_apr"
 	AetraThreatDowntimeWeakOperators             = "too_many_low_quality_validators_reduce_liveness"
+	AetraThreatGovernanceAttack                  = "malicious_proposal_changes_economics_slashing_cap_or_vm_params_dangerously"
 
 	AetraThreatControlValidatorSetTarget             = "100_300_validator_target"
 	AetraThreatControlValidatorPowerCap              = "validator_power_cap"
@@ -29,19 +30,28 @@ const (
 	AetraThreatControlJail                           = "jail"
 	AetraThreatControlPublicMetrics                  = "public_metrics"
 	AetraThreatControlGradualValidatorSetGrowth      = "gradual_validator_set_growth"
+	AetraThreatControlParamBounds                    = "param_bounds"
+	AetraThreatControlDelayedActivation              = "delayed_activation"
+	AetraThreatControlEmergencyReviewWindow          = "emergency_review_window_for_critical_params"
+	AetraThreatControlExplicitAuthorityChecks        = "explicit_authority_checks"
+	AetraThreatControlEventMonitoring                = "event_monitoring"
 
 	AetraThreatSimulationTop10Concentration         = "top_10_concentration_simulation"
 	AetraThreatSimulationSplitIdentityValidator     = "split_identity_validator_simulation"
 	AetraThreatSimulationDelegationOverflow         = "delegation_overflow_simulation"
 	AetraThreatSimulationGovernanceCaptureThreshold = "governance_capture_threshold_analysis"
 
-	AetraThreatTestOverCapRewardsLower           = "rewards_for_over_cap_validator_lower_than_normal"
-	AetraThreatTestDelegatorAPROverflowPenalty   = "delegator_apr_estimate_reflects_overflow_penalty"
-	AetraThreatTestCapChangeAccountingSafe       = "cap_changes_do_not_create_accounting_corruption"
-	AetraThreatTestLivenessUnderOneThirdOffline  = "liveness_with_less_than_one_third_voting_power_offline"
-	AetraThreatTestHaltOverOneThirdOfflineDoc    = "halt_behavior_with_more_than_one_third_offline_documented"
-	AetraThreatTestRecoveryAfterValidatorsReturn = "recovery_after_validators_return"
-	AetraThreatTestDowntimePenaltiesApplied      = "downtime_penalties_applied"
+	AetraThreatTestOverCapRewardsLower            = "rewards_for_over_cap_validator_lower_than_normal"
+	AetraThreatTestDelegatorAPROverflowPenalty    = "delegator_apr_estimate_reflects_overflow_penalty"
+	AetraThreatTestCapChangeAccountingSafe        = "cap_changes_do_not_create_accounting_corruption"
+	AetraThreatTestLivenessUnderOneThirdOffline   = "liveness_with_less_than_one_third_voting_power_offline"
+	AetraThreatTestHaltOverOneThirdOfflineDoc     = "halt_behavior_with_more_than_one_third_offline_documented"
+	AetraThreatTestRecoveryAfterValidatorsReturn  = "recovery_after_validators_return"
+	AetraThreatTestDowntimePenaltiesApplied       = "downtime_penalties_applied"
+	AetraThreatTestMaliciousParamProposalRejected = "malicious_param_proposal_rejected"
+	AetraThreatTestOutOfRangeValuesRejected       = "out_of_range_values_rejected"
+	AetraThreatTestAuthoritySpoofingRejected      = "authority_spoofing_rejected"
+	AetraThreatTestDelayedActivationWorks         = "delayed_activation_works"
 )
 
 type AetraValidatorCartelThreatEvidence struct {
@@ -90,6 +100,22 @@ type AetraDowntimeWeakOperatorsThreatEvidence struct {
 }
 
 type AetraDowntimeWeakOperatorsThreatReport struct {
+	ModuleName string
+	Required   int
+	Passed     int
+	Failed     []string
+	Ready      bool
+}
+
+type AetraGovernanceAttackThreatEvidence struct {
+	ModuleName string
+
+	Threats  []string
+	Controls []string
+	Tests    []string
+}
+
+type AetraGovernanceAttackThreatReport struct {
 	ModuleName string
 	Required   int
 	Passed     int
@@ -230,6 +256,44 @@ func BuildAetraDowntimeWeakOperatorsThreatReport(evidence AetraDowntimeWeakOpera
 	}
 }
 
+func DefaultAetraGovernanceAttackThreatEvidence() AetraGovernanceAttackThreatEvidence {
+	return AetraGovernanceAttackThreatEvidence{
+		ModuleName: AetraThreatModelModuleName,
+		Threats: []string{
+			AetraThreatGovernanceAttack,
+		},
+		Controls: requiredAetraGovernanceAttackControls(),
+		Tests:    requiredAetraGovernanceAttackTests(),
+	}
+}
+
+func ValidateAetraGovernanceAttackThreat(evidence AetraGovernanceAttackThreatEvidence) error {
+	report := BuildAetraGovernanceAttackThreatReport(evidence)
+	if !report.Ready {
+		return fmt.Errorf("aetra governance attack threat model failed: %v", report.Failed)
+	}
+	return nil
+}
+
+func BuildAetraGovernanceAttackThreatReport(evidence AetraGovernanceAttackThreatEvidence) AetraGovernanceAttackThreatReport {
+	failed := validateAetraThreatModelModuleName(evidence.ModuleName)
+	passedThreats, failedThreats := validateAetraThreatModelCatalog("threats", evidence.Threats, []string{AetraThreatGovernanceAttack})
+	passedControls, failedControls := validateAetraThreatModelCatalog("controls", evidence.Controls, requiredAetraGovernanceAttackControls())
+	passedTests, failedTests := validateAetraThreatModelCatalog("tests", evidence.Tests, requiredAetraGovernanceAttackTests())
+	failed = append(failed, failedThreats...)
+	failed = append(failed, failedControls...)
+	failed = append(failed, failedTests...)
+
+	sort.Strings(failed)
+	return AetraGovernanceAttackThreatReport{
+		ModuleName: evidence.ModuleName,
+		Required:   10,
+		Passed:     passedThreats + passedControls + passedTests,
+		Failed:     failed,
+		Ready:      len(failed) == 0,
+	}
+}
+
 func requiredAetraValidatorCartelControls() []string {
 	return []string{
 		AetraThreatControlValidatorSetTarget,
@@ -286,6 +350,25 @@ func requiredAetraDowntimeWeakOperatorsTests() []string {
 		AetraThreatTestHaltOverOneThirdOfflineDoc,
 		AetraThreatTestRecoveryAfterValidatorsReturn,
 		AetraThreatTestDowntimePenaltiesApplied,
+	}
+}
+
+func requiredAetraGovernanceAttackControls() []string {
+	return []string{
+		AetraThreatControlParamBounds,
+		AetraThreatControlDelayedActivation,
+		AetraThreatControlEmergencyReviewWindow,
+		AetraThreatControlExplicitAuthorityChecks,
+		AetraThreatControlEventMonitoring,
+	}
+}
+
+func requiredAetraGovernanceAttackTests() []string {
+	return []string{
+		AetraThreatTestMaliciousParamProposalRejected,
+		AetraThreatTestOutOfRangeValuesRejected,
+		AetraThreatTestAuthoritySpoofingRejected,
+		AetraThreatTestDelayedActivationWorks,
 	}
 }
 
