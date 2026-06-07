@@ -2,25 +2,53 @@
 
 Aetra governance controls network parameters, but governance must not be able to execute unsafe values. Governance is a control plane with safety bounds, not a bypass around protocol invariants.
 
-## Governance-Controlled Params
+## 27. Governance Specification
+
+Governance must be powerful enough to tune the network, but not powerful enough
+to accidentally destroy it through invalid params.
+
+## 27.1 Governance-Controlled Modules
 
 Governance may control:
 
-- validator set size;
-- validator power cap;
-- commission floor/max;
-- max commission change;
-- inflation min/max;
-- target bonded ratio;
-- fee split;
-- slashing fractions;
-- downtime windows;
+- staking policy params;
+- economics params;
+- validator score params;
+- slashing params within bounds;
 - CosmWasm upload policy;
-- treasury spend policy.
+- treasury spend;
+- validator set growth schedule;
+- block gas/size within safe bounds.
+
+The implementation catalog maps those modules to parameter categories:
+
+- `staking_policy`: validator set size, validator power cap, commission
+  floor/max, max commission change;
+- `economics`: inflation min/max, target bonded ratio, fee split;
+- `validator_score`: validator score policy;
+- `slashing`: double-sign slash, downtime slash, downtime window;
+- `vm`: CosmWasm upload policy;
+- `treasury`: treasury spend policy;
+- `validator_set_growth`: validator set growth schedule;
+- `consensus`: block gas limit and block max bytes.
 
 Each parameter must have an explicit key, value type, category, min/max or enum validation, genesis validation, proposal execution validation, and event emission.
 
-## Safety Bounds
+## 27.2 Param Safety Bounds
+
+Every param must define:
+
+- type;
+- default value;
+- min value;
+- max value;
+- authority;
+- whether change is immediate or epoch-delayed;
+- event emitted on change;
+- tests for invalid update.
+
+Critical params should apply only at epoch boundary to avoid surprising
+mid-block behavior.
 
 Safety requirements:
 
@@ -89,5 +117,10 @@ Required catalog properties:
 - every governed parameter is bounded;
 - every governed parameter is checked during genesis validation;
 - every governed parameter change emits events;
+- every governed parameter has authority metadata;
+- every governed parameter has default value metadata;
+- every governed parameter declares immediate or epoch-delayed application;
+- every governed parameter has invalid update tests;
 - critical parameters require longer voting period or higher quorum;
+- critical parameters apply at epoch boundary;
 - enum policies are closed lists, not free-form strings.

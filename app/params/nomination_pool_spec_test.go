@@ -56,6 +56,94 @@ func TestAetraNominationPoolModelRejectsDuplicateUnexpectedAndWrongModule(t *tes
 	require.Error(t, ValidateAetraNominationPoolModel(evidence))
 }
 
+func TestDefaultAetraNominationPoolRequirementsCoverSection262(t *testing.T) {
+	evidence := DefaultAetraNominationPoolRequirementsEvidence()
+
+	report := BuildAetraNominationPoolRequirementsReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Empty(t, report.Failed)
+	require.Equal(t, AetraNominationPoolModuleName, report.ModuleName)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 10, report.Required)
+	require.NoError(t, ValidateAetraNominationPoolRequirements(evidence))
+}
+
+func TestAetraNominationPoolRequirementsRejectMissingRequiredItems(t *testing.T) {
+	evidence := DefaultAetraNominationPoolRequirementsEvidence()
+	evidence.ModuleName = ""
+	evidence.UsersDepositNativeStakingDenom = false
+	evidence.MintsSharesDeterministically = false
+	evidence.DelegatesToValidator = false
+	evidence.DistributesRewardsProRata = false
+	evidence.CommissionBounded = false
+	evidence.WithdrawalFollowsUnbondingPeriod = false
+	evidence.SlashingReducesShareValue = false
+	evidence.OperatorCannotWithdrawPrincipal = false
+	evidence.CannotBypassValidatorPowerCap = false
+	evidence.ExposesRiskWarnings = false
+
+	report := BuildAetraNominationPoolRequirementsReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_required")
+	require.Contains(t, report.Failed, AetraNominationPoolRequirementNativeStakingDenom)
+	require.Contains(t, report.Failed, AetraNominationPoolRequirementDeterministicShareMint)
+	require.Contains(t, report.Failed, AetraNominationPoolRequirementDelegatesToValidator)
+	require.Contains(t, report.Failed, AetraNominationPoolRequirementProRataRewards)
+	require.Contains(t, report.Failed, AetraNominationPoolRequirementCommissionBounded)
+	require.Contains(t, report.Failed, AetraNominationPoolRequirementWithdrawalUnbonding)
+	require.Contains(t, report.Failed, AetraNominationPoolRequirementSlashingReducesShare)
+	require.Contains(t, report.Failed, AetraNominationPoolRequirementOperatorNoPrincipalTheft)
+	require.Contains(t, report.Failed, AetraNominationPoolRequirementCannotBypassPowerCap)
+	require.Contains(t, report.Failed, AetraNominationPoolRequirementRiskWarnings)
+	require.Error(t, ValidateAetraNominationPoolRequirements(evidence))
+}
+
+func TestDefaultAetraNominationPoolTestingCoversSection263(t *testing.T) {
+	evidence := DefaultAetraNominationPoolTestingEvidence()
+
+	report := BuildAetraNominationPoolTestingReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Empty(t, report.Failed)
+	require.Equal(t, AetraNominationPoolModuleName, report.ModuleName)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 12, report.Required)
+	require.NoError(t, ValidateAetraNominationPoolTesting(evidence))
+}
+
+func TestAetraNominationPoolTestingRejectsMissingRequiredItems(t *testing.T) {
+	evidence := DefaultAetraNominationPoolTestingEvidence()
+	evidence.ModuleName = "x/pool"
+	evidence.FirstDepositSharePrice = false
+	evidence.SubsequentDepositSharePrice = false
+	evidence.RewardDistribution = false
+	evidence.CommissionDeduction = false
+	evidence.PartialWithdrawal = false
+	evidence.FullWithdrawal = false
+	evidence.SlashingPoolValidator = false
+	evidence.JailedValidator = false
+	evidence.RedelegationIfAllowed = false
+	evidence.PoolOperatorAbuseAttempt = false
+	evidence.ExportImportActiveUnbonding = false
+	evidence.RoundingDustHandling = false
+
+	report := BuildAetraNominationPoolTestingReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_must_be_"+AetraNominationPoolModuleName)
+	require.Contains(t, report.Failed, AetraNominationPoolTestFirstDepositSharePrice)
+	require.Contains(t, report.Failed, AetraNominationPoolTestSubsequentDepositSharePrice)
+	require.Contains(t, report.Failed, AetraNominationPoolTestRewardDistribution)
+	require.Contains(t, report.Failed, AetraNominationPoolTestCommissionDeduction)
+	require.Contains(t, report.Failed, AetraNominationPoolTestPartialWithdrawal)
+	require.Contains(t, report.Failed, AetraNominationPoolTestFullWithdrawal)
+	require.Contains(t, report.Failed, AetraNominationPoolTestSlashingPoolValidator)
+	require.Contains(t, report.Failed, AetraNominationPoolTestJailedValidator)
+	require.Contains(t, report.Failed, AetraNominationPoolTestRedelegationIfAllowed)
+	require.Contains(t, report.Failed, AetraNominationPoolTestOperatorAbuseAttempt)
+	require.Contains(t, report.Failed, AetraNominationPoolTestExportImportActiveUnbonding)
+	require.Contains(t, report.Failed, AetraNominationPoolTestRoundingDustHandling)
+	require.Error(t, ValidateAetraNominationPoolTesting(evidence))
+}
+
 func removeNominationPoolString(values []string, targets ...string) []string {
 	targetSet := map[string]bool{}
 	for _, target := range targets {

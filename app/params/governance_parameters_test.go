@@ -26,6 +26,52 @@ func TestDefaultGovernanceParameterSpecsCoverSection13(t *testing.T) {
 	}
 }
 
+func TestGovernanceControlledModulesCoverSection271(t *testing.T) {
+	specs := DefaultGovernanceParameterSpecs()
+	byCategory := map[string]int{}
+	byKey := map[string]bool{}
+	for _, spec := range specs {
+		byCategory[spec.Category]++
+		byKey[spec.Key] = true
+	}
+
+	require.NotZero(t, byCategory["staking_policy"])
+	require.NotZero(t, byCategory["economics"])
+	require.NotZero(t, byCategory["validator_score"])
+	require.NotZero(t, byCategory["slashing"])
+	require.NotZero(t, byCategory["vm"])
+	require.NotZero(t, byCategory["treasury"])
+	require.NotZero(t, byCategory["validator_set_growth"])
+	require.NotZero(t, byCategory["consensus"])
+	require.True(t, byKey[GovernanceParamValidatorScorePolicy])
+	require.True(t, byKey[GovernanceParamValidatorSetGrowth])
+	require.True(t, byKey[GovernanceParamBlockGasLimit])
+	require.True(t, byKey[GovernanceParamBlockMaxBytes])
+}
+
+func TestGovernanceParamSpecsCarrySection272Metadata(t *testing.T) {
+	specs := DefaultGovernanceParameterSpecs()
+	for _, spec := range specs {
+		require.NotEmpty(t, spec.ValueType, spec.Key)
+		require.NotEmpty(t, spec.Authority, spec.Key)
+		require.NotEmpty(t, spec.EventType, spec.Key)
+		require.True(t, spec.InvalidUpdateTest, spec.Key)
+		if spec.Critical {
+			require.True(t, spec.ApplyEpochDelay, spec.Key)
+		}
+		switch spec.ValueType {
+		case GovernanceValueTypeInteger:
+			require.LessOrEqual(t, spec.MinInt, spec.DefaultInt, spec.Key)
+			require.LessOrEqual(t, spec.DefaultInt, spec.MaxInt, spec.Key)
+		case GovernanceValueTypeEnum:
+			require.Contains(t, spec.AllowedValues, spec.DefaultString, spec.Key)
+		default:
+			require.Fail(t, "unexpected governance value type", spec.Key)
+		}
+	}
+	require.NoError(t, ValidateGovernanceParameterSpecs(specs))
+}
+
 func TestGovernanceParamChangeRejectsUnsafeExecution(t *testing.T) {
 	change := GovernanceParamChange{
 		Value: GovernanceParamValue{
@@ -127,5 +173,23 @@ func TestGovernanceSafetyReportDetectsMissingBoundsGenesisAndEvents(t *testing.T
 	require.False(t, report.AllBounded)
 	require.False(t, report.AllGenesisChecked)
 	require.False(t, report.AllEmitEvents)
+	require.Error(t, ValidateGovernanceParameterSpecs(specs))
+}
+
+func TestGovernanceSafetyReportDetectsMissingSection272Metadata(t *testing.T) {
+	specs := DefaultGovernanceParameterSpecs()
+	specs[0].Authority = ""
+	specs[1].ApplyEpochDelay = false
+	specs[2].EventType = ""
+	specs[3].InvalidUpdateTest = false
+	specs[4].DefaultInt = specs[4].MaxInt + 1
+
+	report := BuildGovernanceParameterSafetyReport(specs)
+	require.NotEmpty(t, report.Failed)
+	require.Contains(t, report.Failed, specs[0].Key+":authority_missing")
+	require.Contains(t, report.Failed, specs[1].Key+":critical_param_must_apply_at_epoch_boundary")
+	require.Contains(t, report.Failed, specs[2].Key+":event_type_missing")
+	require.Contains(t, report.Failed, specs[3].Key+":invalid_update_test_missing")
+	require.Contains(t, report.Failed, specs[4].Key+":default integer value is outside bounds")
 	require.Error(t, ValidateGovernanceParameterSpecs(specs))
 }

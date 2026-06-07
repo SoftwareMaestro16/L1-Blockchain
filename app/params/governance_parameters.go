@@ -22,6 +22,10 @@ const (
 	GovernanceParamDowntimeWindow       = "downtime_window_blocks"
 	GovernanceParamCosmWasmUploadPolicy = "cosmwasm_upload_policy"
 	GovernanceParamTreasurySpendPolicy  = "treasury_spend_policy"
+	GovernanceParamValidatorScorePolicy = "validator_score_policy"
+	GovernanceParamValidatorSetGrowth   = "validator_set_growth_schedule"
+	GovernanceParamBlockGasLimit        = "block_gas_limit"
+	GovernanceParamBlockMaxBytes        = "block_max_bytes"
 
 	GovernanceValueTypeInteger = "integer"
 	GovernanceValueTypeEnum    = "enum"
@@ -34,25 +38,43 @@ const (
 	TreasurySpendGovernanceOnly = "governance_only"
 	TreasurySpendBudgetCapped   = "budget_capped"
 
+	ValidatorScorePolicyInformationalOnly = "informational_only"
+	ValidatorScorePolicyObjectiveRewards  = "objective_reward_modifier"
+
+	ValidatorSetGrowthPaused  = "paused"
+	ValidatorSetGrowthGradual = "gradual"
+	ValidatorSetGrowthMature  = "mature_cap"
+
 	GovernanceDefaultVotingPeriodBlocks  = uint64(10_000)
 	GovernanceCriticalVotingPeriodBlocks = uint64(20_000)
 	GovernanceDefaultQuorumBps           = int64(4_000)
 	GovernanceCriticalQuorumBps          = int64(5_000)
 	GovernanceValidatorPowerCapMinBps    = int64(200)
 	GovernanceValidatorPowerCapMaxBps    = int64(300)
+	GovernanceAuthorityGovModule         = "gov"
+	GovernanceDefaultBlockGasLimit       = int64(20_000_000)
+	GovernanceMaxBlockGasLimit           = int64(80_000_000)
+	GovernanceDefaultBlockMaxBytes       = int64(1_048_576)
+	GovernanceMaxBlockMaxBytes           = int64(4_194_304)
 )
 
 type GovernanceParameterSpec struct {
-	Key              string
-	Category         string
-	ValueType        string
-	MinInt           int64
-	MaxInt           int64
-	AllowedValues    []string
-	Critical         bool
-	GenesisRequired  bool
-	ExecutionBounded bool
-	EmitsEvents      bool
+	Key               string
+	Category          string
+	ValueType         string
+	DefaultInt        int64
+	DefaultString     string
+	MinInt            int64
+	MaxInt            int64
+	AllowedValues     []string
+	Authority         string
+	ApplyEpochDelay   bool
+	EventType         string
+	InvalidUpdateTest bool
+	Critical          bool
+	GenesisRequired   bool
+	ExecutionBounded  bool
+	EmitsEvents       bool
 }
 
 type GovernanceParamValue struct {
@@ -80,22 +102,26 @@ type GovernanceParameterSafetyReport struct {
 
 func DefaultGovernanceParameterSpecs() []GovernanceParameterSpec {
 	return []GovernanceParameterSpec{
-		governanceIntegerSpec(GovernanceParamValidatorSetSize, "validator", AetraValidatorSetMin, AetraValidatorSetMax, true),
-		governanceIntegerSpec(GovernanceParamValidatorPowerCap, "validator", GovernanceValidatorPowerCapMinBps, GovernanceValidatorPowerCapMaxBps, true),
-		governanceIntegerSpec(GovernanceParamCommissionFloor, "validator", StakingCommissionFloorBps, 500, false),
-		governanceIntegerSpec(GovernanceParamCommissionMax, "validator", 1_500, 2_000, false),
-		governanceIntegerSpec(GovernanceParamCommissionMaxChange, "validator", 50, StakingMaxDailyCommissionBps, false),
-		governanceIntegerSpec(GovernanceParamInflationMin, "economics", 150, 200, true),
-		governanceIntegerSpec(GovernanceParamInflationMax, "economics", 500, 600, true),
-		governanceIntegerSpec(GovernanceParamTargetBondedRatio, "economics", AetraTargetBondedRatioMinBps, AetraTargetBondedRatioMaxBps, true),
-		governanceIntegerSpec(GovernanceParamFeeBurnShare, "economics", AetraFeeBurnShareMinBps, AetraFeeBurnShareMaxBps, true),
-		governanceIntegerSpec(GovernanceParamFeeRewardShare, "economics", AetraFeeRewardShareMinBps, AetraFeeRewardShareMaxBps, true),
-		governanceIntegerSpec(GovernanceParamFeeTreasuryShare, "economics", AetraFeeTreasuryShareMinBps, AetraFeeTreasuryShareMaxBps, true),
-		governanceIntegerSpec(GovernanceParamDoubleSignSlash, "slashing", DoubleSignSlashMinBps, DoubleSignSlashMaxBps, true),
-		governanceIntegerSpec(GovernanceParamDowntimeSlash, "slashing", DowntimeFirstSlashMinBps, DowntimeChronicSlashMaxBps, true),
-		governanceIntegerSpec(GovernanceParamDowntimeWindow, "slashing", 1_000, 100_000, true),
-		governanceEnumSpec(GovernanceParamCosmWasmUploadPolicy, "vm", true, CosmWasmUploadDisabled, CosmWasmUploadGovernanceOnly, CosmWasmUploadPermissioned),
-		governanceEnumSpec(GovernanceParamTreasurySpendPolicy, "treasury", true, TreasurySpendDisabled, TreasurySpendGovernanceOnly, TreasurySpendBudgetCapped),
+		governanceIntegerSpec(GovernanceParamValidatorSetSize, "staking_policy", AetraValidatorSetGenesisMin, AetraValidatorSetMin, AetraValidatorSetMax, true),
+		governanceIntegerSpec(GovernanceParamValidatorPowerCap, "staking_policy", GovernanceValidatorPowerCapMaxBps, GovernanceValidatorPowerCapMinBps, GovernanceValidatorPowerCapMaxBps, true),
+		governanceIntegerSpec(GovernanceParamCommissionFloor, "staking_policy", StakingCommissionFloorBps, StakingCommissionFloorBps, 500, false),
+		governanceIntegerSpec(GovernanceParamCommissionMax, "staking_policy", StakingCommissionCeilingBps, 1_500, 2_000, false),
+		governanceIntegerSpec(GovernanceParamCommissionMaxChange, "staking_policy", StakingMaxDailyCommissionBps, 50, StakingMaxDailyCommissionBps, false),
+		governanceIntegerSpec(GovernanceParamInflationMin, "economics", MinInflationBps, 150, 200, true),
+		governanceIntegerSpec(GovernanceParamInflationMax, "economics", MaxInflationBps, 500, 600, true),
+		governanceIntegerSpec(GovernanceParamTargetBondedRatio, "economics", AetraTargetBondedRatioDefaultBps, AetraTargetBondedRatioMinBps, AetraTargetBondedRatioMaxBps, true),
+		governanceIntegerSpec(GovernanceParamFeeBurnShare, "economics", AetraFeeBurnShareMinBps, AetraFeeBurnShareMinBps, AetraFeeBurnShareMaxBps, true),
+		governanceIntegerSpec(GovernanceParamFeeRewardShare, "economics", AetraFeeRewardShareMinBps, AetraFeeRewardShareMinBps, AetraFeeRewardShareMaxBps, true),
+		governanceIntegerSpec(GovernanceParamFeeTreasuryShare, "economics", AetraFeeTreasuryShareMinBps, AetraFeeTreasuryShareMinBps, AetraFeeTreasuryShareMaxBps, true),
+		governanceEnumSpec(GovernanceParamValidatorScorePolicy, "validator_score", ValidatorScorePolicyInformationalOnly, true, ValidatorScorePolicyInformationalOnly, ValidatorScorePolicyObjectiveRewards),
+		governanceIntegerSpec(GovernanceParamDoubleSignSlash, "slashing", DoubleSignSlashDefaultBps, DoubleSignSlashMinBps, DoubleSignSlashMaxBps, true),
+		governanceIntegerSpec(GovernanceParamDowntimeSlash, "slashing", DowntimeFirstSlashDefaultBps, DowntimeFirstSlashMinBps, DowntimeChronicSlashMaxBps, true),
+		governanceIntegerSpec(GovernanceParamDowntimeWindow, "slashing", int64(HeightUnbondingEvidenceWindowBlocks), 1_000, 100_000, true),
+		governanceEnumSpec(GovernanceParamCosmWasmUploadPolicy, "vm", CosmWasmUploadGovernanceOnly, true, CosmWasmUploadDisabled, CosmWasmUploadGovernanceOnly, CosmWasmUploadPermissioned),
+		governanceEnumSpec(GovernanceParamTreasurySpendPolicy, "treasury", TreasurySpendGovernanceOnly, true, TreasurySpendDisabled, TreasurySpendGovernanceOnly, TreasurySpendBudgetCapped),
+		governanceEnumSpec(GovernanceParamValidatorSetGrowth, "validator_set_growth", ValidatorSetGrowthGradual, true, ValidatorSetGrowthPaused, ValidatorSetGrowthGradual, ValidatorSetGrowthMature),
+		governanceIntegerSpec(GovernanceParamBlockGasLimit, "consensus", GovernanceDefaultBlockGasLimit, 1_000_000, GovernanceMaxBlockGasLimit, true),
+		governanceIntegerSpec(GovernanceParamBlockMaxBytes, "consensus", GovernanceDefaultBlockMaxBytes, 220_200, GovernanceMaxBlockMaxBytes, true),
 	}
 }
 
@@ -112,11 +138,15 @@ func DefaultGovernanceGenesisParams() []GovernanceParamValue {
 		{Key: GovernanceParamFeeBurnShare, IntValue: AetraFeeBurnShareMinBps},
 		{Key: GovernanceParamFeeRewardShare, IntValue: AetraFeeRewardShareMinBps},
 		{Key: GovernanceParamFeeTreasuryShare, IntValue: AetraFeeTreasuryShareMinBps},
+		{Key: GovernanceParamValidatorScorePolicy, StringValue: ValidatorScorePolicyInformationalOnly},
 		{Key: GovernanceParamDoubleSignSlash, IntValue: DoubleSignSlashDefaultBps},
 		{Key: GovernanceParamDowntimeSlash, IntValue: DowntimeFirstSlashDefaultBps},
 		{Key: GovernanceParamDowntimeWindow, IntValue: int64(HeightUnbondingEvidenceWindowBlocks)},
 		{Key: GovernanceParamCosmWasmUploadPolicy, StringValue: CosmWasmUploadGovernanceOnly},
 		{Key: GovernanceParamTreasurySpendPolicy, StringValue: TreasurySpendGovernanceOnly},
+		{Key: GovernanceParamValidatorSetGrowth, StringValue: ValidatorSetGrowthGradual},
+		{Key: GovernanceParamBlockGasLimit, IntValue: GovernanceDefaultBlockGasLimit},
+		{Key: GovernanceParamBlockMaxBytes, IntValue: GovernanceDefaultBlockMaxBytes},
 	}
 }
 
@@ -164,6 +194,20 @@ func BuildGovernanceParameterSafetyReport(specs []GovernanceParameterSpec) Gover
 		if !spec.EmitsEvents {
 			allEmitEvents = false
 			failed = append(failed, spec.Key+":event_missing")
+		}
+		if spec.Authority == "" {
+			failed = append(failed, spec.Key+":authority_missing")
+		}
+		if spec.EventType == "" {
+			allEmitEvents = false
+			failed = append(failed, spec.Key+":event_type_missing")
+		}
+		if !spec.InvalidUpdateTest {
+			failed = append(failed, spec.Key+":invalid_update_test_missing")
+		}
+		if spec.Critical && !spec.ApplyEpochDelay {
+			criticalProtected = false
+			failed = append(failed, spec.Key+":critical_param_must_apply_at_epoch_boundary")
 		}
 		if err := spec.ValidateValueSpec(); err != nil {
 			allBounded = false
@@ -252,9 +296,25 @@ func (s GovernanceParameterSpec) ValidateValueSpec() error {
 		if s.MinInt > s.MaxInt {
 			return fmt.Errorf("integer bounds are invalid")
 		}
+		if s.DefaultInt < s.MinInt || s.DefaultInt > s.MaxInt {
+			return fmt.Errorf("default integer value is outside bounds")
+		}
 	case GovernanceValueTypeEnum:
 		if len(s.AllowedValues) == 0 {
 			return fmt.Errorf("enum allowed values are required")
+		}
+		if s.DefaultString == "" {
+			return fmt.Errorf("default enum value is required")
+		}
+		found := false
+		for _, allowed := range s.AllowedValues {
+			if s.DefaultString == allowed {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return fmt.Errorf("default enum value must be allowed")
 		}
 	default:
 		return fmt.Errorf("value type is invalid")
@@ -284,32 +344,42 @@ func (s GovernanceParameterSpec) ValidateValue(value GovernanceParamValue) error
 	return nil
 }
 
-func governanceIntegerSpec(key, category string, minValue, maxValue int64, critical bool) GovernanceParameterSpec {
+func governanceIntegerSpec(key, category string, defaultValue, minValue, maxValue int64, critical bool) GovernanceParameterSpec {
 	return GovernanceParameterSpec{
-		Key:              key,
-		Category:         category,
-		ValueType:        GovernanceValueTypeInteger,
-		MinInt:           minValue,
-		MaxInt:           maxValue,
-		Critical:         critical,
-		GenesisRequired:  true,
-		ExecutionBounded: true,
-		EmitsEvents:      true,
+		Key:               key,
+		Category:          category,
+		ValueType:         GovernanceValueTypeInteger,
+		DefaultInt:        defaultValue,
+		MinInt:            minValue,
+		MaxInt:            maxValue,
+		Authority:         GovernanceAuthorityGovModule,
+		ApplyEpochDelay:   critical,
+		EventType:         "governance.param_changed",
+		InvalidUpdateTest: true,
+		Critical:          critical,
+		GenesisRequired:   true,
+		ExecutionBounded:  true,
+		EmitsEvents:       true,
 	}
 }
 
-func governanceEnumSpec(key, category string, critical bool, allowedValues ...string) GovernanceParameterSpec {
+func governanceEnumSpec(key, category string, defaultValue string, critical bool, allowedValues ...string) GovernanceParameterSpec {
 	values := append([]string{}, allowedValues...)
 	sort.Strings(values)
 	return GovernanceParameterSpec{
-		Key:              key,
-		Category:         category,
-		ValueType:        GovernanceValueTypeEnum,
-		AllowedValues:    values,
-		Critical:         critical,
-		GenesisRequired:  true,
-		ExecutionBounded: true,
-		EmitsEvents:      true,
+		Key:               key,
+		Category:          category,
+		ValueType:         GovernanceValueTypeEnum,
+		DefaultString:     defaultValue,
+		AllowedValues:     values,
+		Authority:         GovernanceAuthorityGovModule,
+		ApplyEpochDelay:   critical,
+		EventType:         "governance.param_changed",
+		InvalidUpdateTest: true,
+		Critical:          critical,
+		GenesisRequired:   true,
+		ExecutionBounded:  true,
+		EmitsEvents:       true,
 	}
 }
 
@@ -348,10 +418,14 @@ func requiredGovernanceParameterKeys() map[string]bool {
 		GovernanceParamFeeBurnShare:         true,
 		GovernanceParamFeeRewardShare:       true,
 		GovernanceParamFeeTreasuryShare:     true,
+		GovernanceParamValidatorScorePolicy: true,
 		GovernanceParamDoubleSignSlash:      true,
 		GovernanceParamDowntimeSlash:        true,
 		GovernanceParamDowntimeWindow:       true,
 		GovernanceParamCosmWasmUploadPolicy: true,
 		GovernanceParamTreasurySpendPolicy:  true,
+		GovernanceParamValidatorSetGrowth:   true,
+		GovernanceParamBlockGasLimit:        true,
+		GovernanceParamBlockMaxBytes:        true,
 	}
 }

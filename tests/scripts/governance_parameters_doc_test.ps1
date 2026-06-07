@@ -25,22 +25,45 @@ $testText = Get-Content -Raw -LiteralPath (Resolve-RepoPath $Tests)
 
 foreach ($term in @(
     'Governance and Parameters',
-    'validator set size',
-    'validator power cap',
-    'commission floor/max',
-    'max commission change',
+    '27. Governance Specification',
+    'Governance must be powerful enough to tune the network',
+    '27.1 Governance-Controlled Modules',
+    'staking policy params',
+    'economics params',
+    'validator score params',
+    'slashing params within bounds',
+    'CosmWasm upload policy',
+    'treasury spend',
+    'validator set growth schedule',
+    'block gas/size within safe bounds',
+    '`staking_policy`: validator set size, validator power cap',
     'inflation min/max',
     'target bonded ratio',
     'fee split',
-    'slashing fractions',
-    'downtime windows',
-    'CosmWasm upload policy',
+    '`validator_score`: validator score policy',
+    '`slashing`: double-sign slash, downtime slash, downtime window',
+    '`validator_set_growth`: validator set growth schedule',
+    '`consensus`: block gas limit and block max bytes',
+    '27.2 Param Safety Bounds',
+    'type',
+    'default value',
+    'min value',
+    'max value',
+    'authority',
+    'whether change is immediate or epoch-delayed',
+    'event emitted on change',
+    'tests for invalid update',
+    'Critical params should apply only at epoch boundary',
     'treasury spend policy',
     'params must have min/max validation',
     'unsafe params must be rejected at proposal execution',
     'genesis validation must reject invalid params',
     'parameter changes must emit events',
-    'critical changes should use longer voting period or higher quorum'
+    'critical changes should use longer voting period or higher quorum',
+    'every governed parameter has authority metadata',
+    'every governed parameter has default value metadata',
+    'every governed parameter declares immediate or epoch-delayed application',
+    'critical parameters apply at epoch boundary'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "governance parameters doc missing: $term"
 }
@@ -70,6 +93,17 @@ foreach ($term in @(
     'GovernanceParamDowntimeWindow',
     'GovernanceParamCosmWasmUploadPolicy',
     'GovernanceParamTreasurySpendPolicy',
+    'GovernanceParamValidatorScorePolicy',
+    'GovernanceParamValidatorSetGrowth',
+    'GovernanceParamBlockGasLimit',
+    'GovernanceParamBlockMaxBytes',
+    'GovernanceAuthorityGovModule',
+    'DefaultInt',
+    'DefaultString',
+    'Authority',
+    'ApplyEpochDelay',
+    'EventType',
+    'InvalidUpdateTest',
     'GovernanceCriticalVotingPeriodBlocks',
     'GovernanceCriticalQuorumBps'
   )) {
@@ -78,12 +112,15 @@ foreach ($term in @(
 
 foreach ($term in @(
     'TestDefaultGovernanceParameterSpecsCoverSection13',
+    'TestGovernanceControlledModulesCoverSection271',
+    'TestGovernanceParamSpecsCarrySection272Metadata',
     'TestGovernanceParamChangeRejectsUnsafeExecution',
     'TestCriticalGovernanceParamChangesRequireLongerVotingAndHigherQuorum',
     'TestNonCriticalGovernanceParamChangeUsesNormalVotingBounds',
     'TestGovernanceGenesisValidationRejectsInvalidParams',
     'TestGovernanceEnumParamsAreBounded',
-    'TestGovernanceSafetyReportDetectsMissingBoundsGenesisAndEvents'
+    'TestGovernanceSafetyReportDetectsMissingBoundsGenesisAndEvents',
+    'TestGovernanceSafetyReportDetectsMissingSection272Metadata'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "governance parameters tests missing: $term"
 }
