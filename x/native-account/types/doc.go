@@ -12,4 +12,8 @@
 // account_number}, account/reputation/{reputation_id}, and
 // account/storage/{AE...}. User-facing query inputs accept AE addresses only;
 // raw 4: addresses are accepted only on raw/internal query boundaries.
+//
+// Account activation initializes sequence at 0. This is a compatibility
+// contract: future upgrades must preserve sequence semantics or ship an
+// explicit migration with compatibility tests.
 package types

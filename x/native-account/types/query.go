@@ -210,6 +210,19 @@ func (s *IndexedAccountStore) AccountsAfter(cursor string, limit uint64) ([]Acco
 	return accounts, end < len(s.sortedUsers), nil
 }
 
+func (s *IndexedAccountStore) NextAccountNumber() uint64 {
+	if s == nil || len(s.byNumber) == 0 {
+		return 1
+	}
+	var max uint64
+	for accountNumber := range s.byNumber {
+		if accountNumber > max {
+			max = accountNumber
+		}
+	}
+	return max + 1
+}
+
 func (s *IndexedAccountStore) rebuildSortedUsers() {
 	s.sortedUsers = s.sortedUsers[:0]
 	for user := range s.byUser {
