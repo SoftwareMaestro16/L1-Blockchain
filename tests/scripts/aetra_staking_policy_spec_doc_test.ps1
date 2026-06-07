@@ -181,7 +181,27 @@ foreach ($term in @(
     'state export/import preserves policy state',
     'The invariant gate is `BuildAetraStakingPolicyInvariantSpecReport` in `app/params/aetra_staking_policy_spec.go`',
     'top-N calculations never exceed `10000` bps',
-    'invariants must be covered by tests'
+    'invariants must be covered by tests',
+    '22.9 Tests',
+    'Required tests:',
+    'cap math for 100 validators',
+    'cap math for 150 validators',
+    'cap math for 250 validators',
+    'cap math for 300 validators',
+    'validator crossing cap upward',
+    'validator crossing cap downward',
+    'delegation to over-cap validator',
+    'redelegation from over-cap validator',
+    'unbonding from over-cap validator',
+    'slashing over-cap validator',
+    'commission below floor rejected',
+    'commission above max rejected',
+    'commission daily jump rejected',
+    'governance param update accepted within bounds',
+    'governance param update rejected outside bounds',
+    'export/import with over-cap validators',
+    'deterministic concentration snapshot',
+    'The test gate is `BuildAetraStakingPolicyTestSpecReport` in `app/params/aetra_staking_policy_spec.go`'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "aetra staking policy spec doc missing: $term"
 }
@@ -343,7 +363,29 @@ foreach ($term in @(
     'AetraStakingPolicyInvariantCommissionDailyChange',
     'AetraStakingPolicyInvariantTopNMaxHundredPercent',
     'AetraStakingPolicyInvariantExportImportPreserves',
-    'AetraStakingPolicyInvariantCoveredByTests'
+    'AetraStakingPolicyInvariantCoveredByTests',
+    'AetraStakingPolicyTestSpecEvidence',
+    'AetraStakingPolicyTestSpecReport',
+    'DefaultAetraStakingPolicyTestSpecEvidence',
+    'ValidateAetraStakingPolicyTestSpec',
+    'BuildAetraStakingPolicyTestSpecReport',
+    'AetraStakingPolicyTestCapMath100Validators',
+    'AetraStakingPolicyTestCapMath150Validators',
+    'AetraStakingPolicyTestCapMath250Validators',
+    'AetraStakingPolicyTestCapMath300Validators',
+    'AetraStakingPolicyTestValidatorCrossingCapUpward',
+    'AetraStakingPolicyTestValidatorCrossingCapDownward',
+    'AetraStakingPolicyTestDelegationToOverCapValidator',
+    'AetraStakingPolicyTestRedelegationFromOverCapValidator',
+    'AetraStakingPolicyTestUnbondingFromOverCapValidator',
+    'AetraStakingPolicyTestSlashingOverCapValidator',
+    'AetraStakingPolicyTestCommissionBelowFloorRejected',
+    'AetraStakingPolicyTestCommissionAboveMaxRejected',
+    'AetraStakingPolicyTestCommissionDailyJumpRejected',
+    'AetraStakingPolicyTestGovernanceParamUpdateAccepted',
+    'AetraStakingPolicyTestGovernanceParamUpdateRejected',
+    'AetraStakingPolicyTestExportImportOverCapValidators',
+    'AetraStakingPolicyTestDeterministicConcentrationSnapshot'
   )) {
   Assert-Contains -Text $policyText -Pattern ([regex]::Escape($term)) -Message "aetra staking policy spec policy missing: $term"
 }
@@ -379,7 +421,9 @@ foreach ($term in @(
     'TestAetraStakingPolicyEventSpecRejectsMissingDuplicateUnexpectedAndUnstableEvents',
     'TestDefaultAetraStakingPolicyInvariantSpecCoversRequiredInvariants',
     'TestAetraStakingPolicyInvariantSpecRejectsMissingSafetyInvariants',
-    'TestAetraStakingPolicyInvariantSpecRejectsWrongModuleIdentity'
+    'TestAetraStakingPolicyInvariantSpecRejectsWrongModuleIdentity',
+    'TestDefaultAetraStakingPolicyTestSpecCoversRequiredTests',
+    'TestAetraStakingPolicyTestSpecRejectsMissingDuplicateUnexpectedAndWrongModule'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "aetra staking policy spec tests missing: $term"
 }

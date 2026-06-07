@@ -516,6 +516,52 @@ func TestAetraStakingPolicyInvariantSpecRejectsWrongModuleIdentity(t *testing.T)
 	require.Contains(t, report.Failed, "module_name_must_be_"+AetraStakingPolicyModuleName)
 }
 
+func TestDefaultAetraStakingPolicyTestSpecCoversRequiredTests(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyTestSpecEvidence()
+
+	report := BuildAetraStakingPolicyTestSpecReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 17, report.Required)
+	for _, requiredTest := range []string{
+		AetraStakingPolicyTestCapMath100Validators,
+		AetraStakingPolicyTestCapMath150Validators,
+		AetraStakingPolicyTestCapMath250Validators,
+		AetraStakingPolicyTestCapMath300Validators,
+		AetraStakingPolicyTestValidatorCrossingCapUpward,
+		AetraStakingPolicyTestValidatorCrossingCapDownward,
+		AetraStakingPolicyTestDelegationToOverCapValidator,
+		AetraStakingPolicyTestRedelegationFromOverCapValidator,
+		AetraStakingPolicyTestUnbondingFromOverCapValidator,
+		AetraStakingPolicyTestSlashingOverCapValidator,
+		AetraStakingPolicyTestCommissionBelowFloorRejected,
+		AetraStakingPolicyTestCommissionAboveMaxRejected,
+		AetraStakingPolicyTestCommissionDailyJumpRejected,
+		AetraStakingPolicyTestGovernanceParamUpdateAccepted,
+		AetraStakingPolicyTestGovernanceParamUpdateRejected,
+		AetraStakingPolicyTestExportImportOverCapValidators,
+		AetraStakingPolicyTestDeterministicConcentrationSnapshot,
+	} {
+		require.Contains(t, evidence.RequiredTests, requiredTest)
+	}
+	require.NoError(t, ValidateAetraStakingPolicyTestSpec(evidence))
+}
+
+func TestAetraStakingPolicyTestSpecRejectsMissingDuplicateUnexpectedAndWrongModule(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyTestSpecEvidence()
+	evidence.ModuleName = "x/other"
+	evidence.RequiredTests = removeString(evidence.RequiredTests, AetraStakingPolicyTestSlashingOverCapValidator)
+	evidence.RequiredTests = append(evidence.RequiredTests, AetraStakingPolicyTestCapMath100Validators, "untracked_manual_test")
+
+	report := BuildAetraStakingPolicyTestSpecReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_must_be_"+AetraStakingPolicyModuleName)
+	require.Contains(t, report.Failed, "tests."+AetraStakingPolicyTestSlashingOverCapValidator+":missing")
+	require.Contains(t, report.Failed, "tests."+AetraStakingPolicyTestCapMath100Validators+":duplicate")
+	require.Contains(t, report.Failed, "tests.untracked_manual_test:unexpected")
+	require.Error(t, ValidateAetraStakingPolicyTestSpec(evidence))
+}
+
 func removeString(values []string, targets ...string) []string {
 	targetSet := map[string]bool{}
 	for _, target := range targets {

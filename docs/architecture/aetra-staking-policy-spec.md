@@ -419,3 +419,42 @@ Required catalog properties:
 - export/import preserves policy state;
 - invariants must be covered by tests;
 - wrong module identity must fail validation.
+
+## 22.9 Tests
+
+Required tests:
+
+- cap math for 100 validators;
+- cap math for 150 validators;
+- cap math for 250 validators;
+- cap math for 300 validators;
+- validator crossing cap upward;
+- validator crossing cap downward;
+- delegation to over-cap validator;
+- redelegation from over-cap validator;
+- unbonding from over-cap validator;
+- slashing over-cap validator;
+- commission below floor rejected;
+- commission above max rejected;
+- commission daily jump rejected;
+- governance param update accepted within bounds;
+- governance param update rejected outside bounds;
+- export/import with over-cap validators;
+- deterministic concentration snapshot.
+
+### Test Requirements
+
+The test matrix must cover cap math at validator-set sizes that match Aetra's target rollout: 100, 150, 250, and 300 active validators. Cap transition tests must cover validators moving above and back below cap so events, warnings, reward multipliers, and query responses stay correct.
+
+Delegation, redelegation, unbonding, and slashing tests must cover over-cap validators because cap policy must not corrupt staking shares or prevent raw stake from being slashed. Commission policy tests must cover below-floor, above-max, and daily-jump rejection. Governance tests must cover valid parameter updates and rejected unsafe updates. Export/import and deterministic concentration snapshot tests are mandatory launch gates.
+
+### Test Implementation Contract
+
+The test gate is `BuildAetraStakingPolicyTestSpecReport` in `app/params/aetra_staking_policy_spec.go`.
+
+Required catalog properties:
+
+- `DefaultAetraStakingPolicyTestSpecEvidence` must include every required test scenario;
+- missing required test scenarios must fail validation;
+- duplicate or unexpected test scenario names must fail validation;
+- wrong module identity must fail validation.

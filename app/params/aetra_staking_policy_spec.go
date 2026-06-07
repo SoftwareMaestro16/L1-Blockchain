@@ -134,6 +134,24 @@ const (
 	AetraStakingPolicyInvariantTopNMaxHundredPercent = "top_n_calculations_do_not_exceed_100_percent"
 	AetraStakingPolicyInvariantExportImportPreserves = "state_export_import_preserves_policy_state"
 	AetraStakingPolicyInvariantCoveredByTests        = "invariants_are_covered_by_tests"
+
+	AetraStakingPolicyTestCapMath100Validators               = "cap_math_for_100_validators"
+	AetraStakingPolicyTestCapMath150Validators               = "cap_math_for_150_validators"
+	AetraStakingPolicyTestCapMath250Validators               = "cap_math_for_250_validators"
+	AetraStakingPolicyTestCapMath300Validators               = "cap_math_for_300_validators"
+	AetraStakingPolicyTestValidatorCrossingCapUpward         = "validator_crossing_cap_upward"
+	AetraStakingPolicyTestValidatorCrossingCapDownward       = "validator_crossing_cap_downward"
+	AetraStakingPolicyTestDelegationToOverCapValidator       = "delegation_to_over_cap_validator"
+	AetraStakingPolicyTestRedelegationFromOverCapValidator   = "redelegation_from_over_cap_validator"
+	AetraStakingPolicyTestUnbondingFromOverCapValidator      = "unbonding_from_over_cap_validator"
+	AetraStakingPolicyTestSlashingOverCapValidator           = "slashing_over_cap_validator"
+	AetraStakingPolicyTestCommissionBelowFloorRejected       = "commission_below_floor_rejected"
+	AetraStakingPolicyTestCommissionAboveMaxRejected         = "commission_above_max_rejected"
+	AetraStakingPolicyTestCommissionDailyJumpRejected        = "commission_daily_jump_rejected"
+	AetraStakingPolicyTestGovernanceParamUpdateAccepted      = "governance_param_update_accepted_within_bounds"
+	AetraStakingPolicyTestGovernanceParamUpdateRejected      = "governance_param_update_rejected_outside_bounds"
+	AetraStakingPolicyTestExportImportOverCapValidators      = "export_import_with_over_cap_validators"
+	AetraStakingPolicyTestDeterministicConcentrationSnapshot = "deterministic_concentration_snapshot"
 )
 
 type AetraStakingPolicySpecEvidence struct {
@@ -317,6 +335,20 @@ type AetraStakingPolicyInvariantSpecEvidence struct {
 }
 
 type AetraStakingPolicyInvariantSpecReport struct {
+	ModuleName string
+	Required   int
+	Passed     int
+	Failed     []string
+	Ready      bool
+}
+
+type AetraStakingPolicyTestSpecEvidence struct {
+	ModuleName string
+
+	RequiredTests []string
+}
+
+type AetraStakingPolicyTestSpecReport struct {
 	ModuleName string
 	Required   int
 	Passed     int
@@ -1100,5 +1132,64 @@ func requiredAetraStakingPolicyEvents() []string {
 		AetraStakingPolicyEventCommissionRejected,
 		AetraStakingPolicyEventConcentrationSnapshot,
 		AetraStakingPolicyEventRewardMultiplierChanged,
+	}
+}
+
+func DefaultAetraStakingPolicyTestSpecEvidence() AetraStakingPolicyTestSpecEvidence {
+	return AetraStakingPolicyTestSpecEvidence{
+		ModuleName:    AetraStakingPolicyModuleName,
+		RequiredTests: requiredAetraStakingPolicyTests(),
+	}
+}
+
+func ValidateAetraStakingPolicyTestSpec(evidence AetraStakingPolicyTestSpecEvidence) error {
+	report := BuildAetraStakingPolicyTestSpecReport(evidence)
+	if !report.Ready {
+		return fmt.Errorf("aetra staking policy test spec failed: %v", report.Failed)
+	}
+	return nil
+}
+
+func BuildAetraStakingPolicyTestSpecReport(evidence AetraStakingPolicyTestSpecEvidence) AetraStakingPolicyTestSpecReport {
+	failed := make([]string, 0)
+	if evidence.ModuleName == "" {
+		failed = append(failed, "module_name_required")
+	} else if evidence.ModuleName != AetraStakingPolicyModuleName {
+		failed = append(failed, "module_name_must_be_"+AetraStakingPolicyModuleName)
+	}
+
+	requiredTests := requiredAetraStakingPolicyTests()
+	passed, testFailures := validateAetraStakingPolicyCatalog("tests", evidence.RequiredTests, requiredTests)
+	failed = append(failed, testFailures...)
+
+	sort.Strings(failed)
+	return AetraStakingPolicyTestSpecReport{
+		ModuleName: evidence.ModuleName,
+		Required:   len(requiredTests),
+		Passed:     passed,
+		Failed:     failed,
+		Ready:      len(failed) == 0,
+	}
+}
+
+func requiredAetraStakingPolicyTests() []string {
+	return []string{
+		AetraStakingPolicyTestCapMath100Validators,
+		AetraStakingPolicyTestCapMath150Validators,
+		AetraStakingPolicyTestCapMath250Validators,
+		AetraStakingPolicyTestCapMath300Validators,
+		AetraStakingPolicyTestValidatorCrossingCapUpward,
+		AetraStakingPolicyTestValidatorCrossingCapDownward,
+		AetraStakingPolicyTestDelegationToOverCapValidator,
+		AetraStakingPolicyTestRedelegationFromOverCapValidator,
+		AetraStakingPolicyTestUnbondingFromOverCapValidator,
+		AetraStakingPolicyTestSlashingOverCapValidator,
+		AetraStakingPolicyTestCommissionBelowFloorRejected,
+		AetraStakingPolicyTestCommissionAboveMaxRejected,
+		AetraStakingPolicyTestCommissionDailyJumpRejected,
+		AetraStakingPolicyTestGovernanceParamUpdateAccepted,
+		AetraStakingPolicyTestGovernanceParamUpdateRejected,
+		AetraStakingPolicyTestExportImportOverCapValidators,
+		AetraStakingPolicyTestDeterministicConcentrationSnapshot,
 	}
 }
