@@ -116,6 +116,24 @@ const (
 
 	AetraStakingPolicyQueryStableResponses          = "query_responses_stable"
 	AetraStakingPolicyQueryIndexerFriendlyResponses = "query_responses_indexer_friendly"
+
+	AetraStakingPolicyEventParamsUpdated           = "aetra.staking_policy.params_updated"
+	AetraStakingPolicyEventValidatorOverCap        = "aetra.staking_policy.validator_over_cap"
+	AetraStakingPolicyEventValidatorBackUnderCap   = "aetra.staking_policy.validator_back_under_cap"
+	AetraStakingPolicyEventCommissionRejected      = "aetra.staking_policy.commission_rejected"
+	AetraStakingPolicyEventConcentrationSnapshot   = "aetra.staking_policy.concentration_snapshot"
+	AetraStakingPolicyEventRewardMultiplierChanged = "aetra.staking_policy.reward_multiplier_changed"
+	AetraStakingPolicyEventStableNames             = "event_names_are_stable"
+	AetraStakingPolicyEventIndexerFriendlyAttrs    = "event_attributes_are_indexer_friendly"
+
+	AetraStakingPolicyInvariantEffectivePowerCap     = "effective_power_never_exceeds_configured_cap"
+	AetraStakingPolicyInvariantOverflowNonNegative   = "overflow_stake_is_never_negative"
+	AetraStakingPolicyInvariantRawStakeConservation  = "raw_stake_equals_effective_stake_plus_overflow_stake"
+	AetraStakingPolicyInvariantCommissionBounds      = "commission_floor_lte_commission_lte_commission_max"
+	AetraStakingPolicyInvariantCommissionDailyChange = "commission_change_lte_max_daily_change"
+	AetraStakingPolicyInvariantTopNMaxHundredPercent = "top_n_calculations_do_not_exceed_100_percent"
+	AetraStakingPolicyInvariantExportImportPreserves = "state_export_import_preserves_policy_state"
+	AetraStakingPolicyInvariantCoveredByTests        = "invariants_are_covered_by_tests"
 )
 
 type AetraStakingPolicySpecEvidence struct {
@@ -261,6 +279,44 @@ type AetraStakingPolicyQuerySpecEvidence struct {
 }
 
 type AetraStakingPolicyQuerySpecReport struct {
+	ModuleName string
+	Required   int
+	Passed     int
+	Failed     []string
+	Ready      bool
+}
+
+type AetraStakingPolicyEventSpecEvidence struct {
+	ModuleName string
+
+	RequiredEvents []string
+
+	StableEventNames          bool
+	IndexerFriendlyAttributes bool
+}
+
+type AetraStakingPolicyEventSpecReport struct {
+	ModuleName string
+	Required   int
+	Passed     int
+	Failed     []string
+	Ready      bool
+}
+
+type AetraStakingPolicyInvariantSpecEvidence struct {
+	ModuleName string
+
+	EffectivePowerNeverExceedsCap    bool
+	OverflowStakeNeverNegative       bool
+	RawStakeConservation             bool
+	CommissionWithinFloorAndMax      bool
+	CommissionChangeWithinDailyLimit bool
+	TopNDoesNotExceedHundredPercent  bool
+	ExportImportPreservesPolicyState bool
+	CoveredByTests                   bool
+}
+
+type AetraStakingPolicyInvariantSpecReport struct {
 	ModuleName string
 	Required   int
 	Passed     int
@@ -924,4 +980,125 @@ func validateAetraStakingPolicyCatalog(group string, actual []string, required [
 		}
 	}
 	return passed, failed
+}
+
+func DefaultAetraStakingPolicyEventSpecEvidence() AetraStakingPolicyEventSpecEvidence {
+	return AetraStakingPolicyEventSpecEvidence{
+		ModuleName:     AetraStakingPolicyModuleName,
+		RequiredEvents: requiredAetraStakingPolicyEvents(),
+
+		StableEventNames:          true,
+		IndexerFriendlyAttributes: true,
+	}
+}
+
+func ValidateAetraStakingPolicyEventSpec(evidence AetraStakingPolicyEventSpecEvidence) error {
+	report := BuildAetraStakingPolicyEventSpecReport(evidence)
+	if !report.Ready {
+		return fmt.Errorf("aetra staking policy event spec failed: %v", report.Failed)
+	}
+	return nil
+}
+
+func BuildAetraStakingPolicyEventSpecReport(evidence AetraStakingPolicyEventSpecEvidence) AetraStakingPolicyEventSpecReport {
+	failed := make([]string, 0)
+	if evidence.ModuleName == "" {
+		failed = append(failed, "module_name_required")
+	} else if evidence.ModuleName != AetraStakingPolicyModuleName {
+		failed = append(failed, "module_name_must_be_"+AetraStakingPolicyModuleName)
+	}
+
+	requiredEvents := requiredAetraStakingPolicyEvents()
+	passed, eventFailures := validateAetraStakingPolicyCatalog("events", evidence.RequiredEvents, requiredEvents)
+	failed = append(failed, eventFailures...)
+	for _, check := range []requirementCheck{
+		{AetraStakingPolicyEventStableNames, evidence.StableEventNames},
+		{AetraStakingPolicyEventIndexerFriendlyAttrs, evidence.IndexerFriendlyAttributes},
+	} {
+		if check.Passed {
+			passed++
+		} else {
+			failed = append(failed, check.ID)
+		}
+	}
+
+	sort.Strings(failed)
+	return AetraStakingPolicyEventSpecReport{
+		ModuleName: evidence.ModuleName,
+		Required:   len(requiredEvents) + 2,
+		Passed:     passed,
+		Failed:     failed,
+		Ready:      len(failed) == 0,
+	}
+}
+
+func DefaultAetraStakingPolicyInvariantSpecEvidence() AetraStakingPolicyInvariantSpecEvidence {
+	return AetraStakingPolicyInvariantSpecEvidence{
+		ModuleName: AetraStakingPolicyModuleName,
+
+		EffectivePowerNeverExceedsCap:    true,
+		OverflowStakeNeverNegative:       true,
+		RawStakeConservation:             true,
+		CommissionWithinFloorAndMax:      true,
+		CommissionChangeWithinDailyLimit: true,
+		TopNDoesNotExceedHundredPercent:  true,
+		ExportImportPreservesPolicyState: true,
+		CoveredByTests:                   true,
+	}
+}
+
+func ValidateAetraStakingPolicyInvariantSpec(evidence AetraStakingPolicyInvariantSpecEvidence) error {
+	report := BuildAetraStakingPolicyInvariantSpecReport(evidence)
+	if !report.Ready {
+		return fmt.Errorf("aetra staking policy invariant spec failed: %v", report.Failed)
+	}
+	return nil
+}
+
+func BuildAetraStakingPolicyInvariantSpecReport(evidence AetraStakingPolicyInvariantSpecEvidence) AetraStakingPolicyInvariantSpecReport {
+	failed := make([]string, 0)
+	if evidence.ModuleName == "" {
+		failed = append(failed, "module_name_required")
+	} else if evidence.ModuleName != AetraStakingPolicyModuleName {
+		failed = append(failed, "module_name_must_be_"+AetraStakingPolicyModuleName)
+	}
+
+	checks := []requirementCheck{
+		{AetraStakingPolicyInvariantEffectivePowerCap, evidence.EffectivePowerNeverExceedsCap},
+		{AetraStakingPolicyInvariantOverflowNonNegative, evidence.OverflowStakeNeverNegative},
+		{AetraStakingPolicyInvariantRawStakeConservation, evidence.RawStakeConservation},
+		{AetraStakingPolicyInvariantCommissionBounds, evidence.CommissionWithinFloorAndMax},
+		{AetraStakingPolicyInvariantCommissionDailyChange, evidence.CommissionChangeWithinDailyLimit},
+		{AetraStakingPolicyInvariantTopNMaxHundredPercent, evidence.TopNDoesNotExceedHundredPercent},
+		{AetraStakingPolicyInvariantExportImportPreserves, evidence.ExportImportPreservesPolicyState},
+		{AetraStakingPolicyInvariantCoveredByTests, evidence.CoveredByTests},
+	}
+	passed := 0
+	for _, check := range checks {
+		if check.Passed {
+			passed++
+		} else {
+			failed = append(failed, check.ID)
+		}
+	}
+
+	sort.Strings(failed)
+	return AetraStakingPolicyInvariantSpecReport{
+		ModuleName: evidence.ModuleName,
+		Required:   len(checks),
+		Passed:     passed,
+		Failed:     failed,
+		Ready:      len(failed) == 0,
+	}
+}
+
+func requiredAetraStakingPolicyEvents() []string {
+	return []string{
+		AetraStakingPolicyEventParamsUpdated,
+		AetraStakingPolicyEventValidatorOverCap,
+		AetraStakingPolicyEventValidatorBackUnderCap,
+		AetraStakingPolicyEventCommissionRejected,
+		AetraStakingPolicyEventConcentrationSnapshot,
+		AetraStakingPolicyEventRewardMultiplierChanged,
+	}
 }

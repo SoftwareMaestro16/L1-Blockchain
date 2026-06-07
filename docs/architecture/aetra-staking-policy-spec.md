@@ -347,3 +347,75 @@ Required catalog properties:
 - query responses must be stable;
 - query responses must be indexer-friendly;
 - wrong module identity must fail validation.
+
+## 22.7 Events
+
+Required events:
+
+```text
+aetra.staking_policy.params_updated
+aetra.staking_policy.validator_over_cap
+aetra.staking_policy.validator_back_under_cap
+aetra.staking_policy.commission_rejected
+aetra.staking_policy.concentration_snapshot
+aetra.staking_policy.reward_multiplier_changed
+```
+
+### Event Requirements
+
+Events must use stable names and indexer-friendly attributes. Event attributes should include enough context for explorers and monitoring systems to reconstruct policy changes and validator status transitions without replaying custom application logic.
+
+`aetra.staking_policy.params_updated` must be emitted when governance/authority changes staking policy params. `aetra.staking_policy.validator_over_cap` and `aetra.staking_policy.validator_back_under_cap` must mark validator cap status transitions. `aetra.staking_policy.commission_rejected` must be emitted when a commission update is rejected by policy. `aetra.staking_policy.concentration_snapshot` must be emitted when the module records or publishes network concentration metrics. `aetra.staking_policy.reward_multiplier_changed` must be emitted when a validator reward multiplier changes because of cap or concentration policy.
+
+### Event Implementation Contract
+
+The event gate is `BuildAetraStakingPolicyEventSpecReport` in `app/params/aetra_staking_policy_spec.go`.
+
+Required catalog properties:
+
+- `DefaultAetraStakingPolicyEventSpecEvidence` must include all required event names;
+- missing required events must fail validation;
+- duplicate or unexpected event names must fail validation;
+- event names must be stable;
+- event attributes must be indexer-friendly;
+- wrong module identity must fail validation.
+
+## 22.8 Invariants
+
+Required invariants:
+
+- effective power never exceeds configured cap;
+- overflow stake is never negative;
+- raw stake = effective stake + overflow stake for capped calculation;
+- commission floor <= commission <= commission max;
+- commission change <= max daily change;
+- top-N calculations do not exceed 100%;
+- state export/import preserves policy state.
+
+### Invariant Requirements
+
+The module must treat these invariants as production safety conditions, not observability-only metrics. Violations must be detectable in unit tests, integration tests, simulation/property tests where appropriate, and export/import test coverage.
+
+The capped-power calculation must conserve stake accounting:
+
+```text
+raw stake = effective stake + overflow stake
+```
+
+`effective power` must never exceed the configured `ValidatorPowerCapBps`. `overflow stake` must never become negative. Commission validation must enforce both absolute bounds and daily-change bounds. Top-N concentration math must clamp or reject impossible results above `10000` bps. Export/import must preserve all policy params, validator policy state, warning acknowledgements, concentration snapshots, and any state needed to enforce commission-change windows.
+
+### Invariant Implementation Contract
+
+The invariant gate is `BuildAetraStakingPolicyInvariantSpecReport` in `app/params/aetra_staking_policy_spec.go`.
+
+Required catalog properties:
+
+- effective power never exceeds configured cap;
+- overflow stake is never negative;
+- raw stake equals effective stake plus overflow stake;
+- commission remains between floor and max;
+- commission change remains within max daily change;
+- top-N calculations never exceed `10000` bps;
+- export/import preserves policy state;
+- invariants must be covered by tests;
+- wrong module identity must fail validation.

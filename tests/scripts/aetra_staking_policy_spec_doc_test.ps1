@@ -160,7 +160,28 @@ foreach ($term in @(
     'Query/ConcentrationSnapshot',
     'Query/NakamotoCoefficient',
     'Query responses must be stable and indexer-friendly',
-    'The query gate is `BuildAetraStakingPolicyQuerySpecReport` in `app/params/aetra_staking_policy_spec.go`'
+    'The query gate is `BuildAetraStakingPolicyQuerySpecReport` in `app/params/aetra_staking_policy_spec.go`',
+    '22.7 Events',
+    'Required events:',
+    'aetra.staking_policy.params_updated',
+    'aetra.staking_policy.validator_over_cap',
+    'aetra.staking_policy.validator_back_under_cap',
+    'aetra.staking_policy.commission_rejected',
+    'aetra.staking_policy.concentration_snapshot',
+    'aetra.staking_policy.reward_multiplier_changed',
+    'The event gate is `BuildAetraStakingPolicyEventSpecReport` in `app/params/aetra_staking_policy_spec.go`',
+    '22.8 Invariants',
+    'Required invariants:',
+    'effective power never exceeds configured cap',
+    'overflow stake is never negative',
+    'raw stake = effective stake + overflow stake for capped calculation',
+    'commission floor <= commission <= commission max',
+    'commission change <= max daily change',
+    'top-N calculations do not exceed 100%',
+    'state export/import preserves policy state',
+    'The invariant gate is `BuildAetraStakingPolicyInvariantSpecReport` in `app/params/aetra_staking_policy_spec.go`',
+    'top-N calculations never exceed `10000` bps',
+    'invariants must be covered by tests'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "aetra staking policy spec doc missing: $term"
 }
@@ -296,7 +317,33 @@ foreach ($term in @(
     'AetraStakingPolicyQueryConcentrationSnapshot',
     'AetraStakingPolicyQueryNakamotoCoefficient',
     'AetraStakingPolicyQueryStableResponses',
-    'AetraStakingPolicyQueryIndexerFriendlyResponses'
+    'AetraStakingPolicyQueryIndexerFriendlyResponses',
+    'AetraStakingPolicyEventSpecEvidence',
+    'AetraStakingPolicyEventSpecReport',
+    'DefaultAetraStakingPolicyEventSpecEvidence',
+    'ValidateAetraStakingPolicyEventSpec',
+    'BuildAetraStakingPolicyEventSpecReport',
+    'AetraStakingPolicyEventParamsUpdated',
+    'AetraStakingPolicyEventValidatorOverCap',
+    'AetraStakingPolicyEventValidatorBackUnderCap',
+    'AetraStakingPolicyEventCommissionRejected',
+    'AetraStakingPolicyEventConcentrationSnapshot',
+    'AetraStakingPolicyEventRewardMultiplierChanged',
+    'AetraStakingPolicyEventStableNames',
+    'AetraStakingPolicyEventIndexerFriendlyAttrs',
+    'AetraStakingPolicyInvariantSpecEvidence',
+    'AetraStakingPolicyInvariantSpecReport',
+    'DefaultAetraStakingPolicyInvariantSpecEvidence',
+    'ValidateAetraStakingPolicyInvariantSpec',
+    'BuildAetraStakingPolicyInvariantSpecReport',
+    'AetraStakingPolicyInvariantEffectivePowerCap',
+    'AetraStakingPolicyInvariantOverflowNonNegative',
+    'AetraStakingPolicyInvariantRawStakeConservation',
+    'AetraStakingPolicyInvariantCommissionBounds',
+    'AetraStakingPolicyInvariantCommissionDailyChange',
+    'AetraStakingPolicyInvariantTopNMaxHundredPercent',
+    'AetraStakingPolicyInvariantExportImportPreserves',
+    'AetraStakingPolicyInvariantCoveredByTests'
   )) {
   Assert-Contains -Text $policyText -Pattern ([regex]::Escape($term)) -Message "aetra staking policy spec policy missing: $term"
 }
@@ -327,7 +374,12 @@ foreach ($term in @(
     'TestAetraStakingPolicyMessageSpecRejectsDuplicateUnexpectedAndWrongModule',
     'TestDefaultAetraStakingPolicyQuerySpecCoversRequiredQueries',
     'TestAetraStakingPolicyQuerySpecRejectsMissingUnstableAndNonIndexerFriendlyQueries',
-    'TestAetraStakingPolicyQuerySpecRejectsDuplicateUnexpectedAndWrongModule'
+    'TestAetraStakingPolicyQuerySpecRejectsDuplicateUnexpectedAndWrongModule',
+    'TestDefaultAetraStakingPolicyEventSpecCoversRequiredEvents',
+    'TestAetraStakingPolicyEventSpecRejectsMissingDuplicateUnexpectedAndUnstableEvents',
+    'TestDefaultAetraStakingPolicyInvariantSpecCoversRequiredInvariants',
+    'TestAetraStakingPolicyInvariantSpecRejectsMissingSafetyInvariants',
+    'TestAetraStakingPolicyInvariantSpecRejectsWrongModuleIdentity'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "aetra staking policy spec tests missing: $term"
 }

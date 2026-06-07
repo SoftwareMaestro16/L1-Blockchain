@@ -427,6 +427,95 @@ func TestAetraStakingPolicyQuerySpecRejectsDuplicateUnexpectedAndWrongModule(t *
 	require.Contains(t, report.Failed, "queries.Query/UnstableDebug:unexpected")
 }
 
+func TestDefaultAetraStakingPolicyEventSpecCoversRequiredEvents(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyEventSpecEvidence()
+
+	report := BuildAetraStakingPolicyEventSpecReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 8, report.Required)
+	for _, event := range []string{
+		AetraStakingPolicyEventParamsUpdated,
+		AetraStakingPolicyEventValidatorOverCap,
+		AetraStakingPolicyEventValidatorBackUnderCap,
+		AetraStakingPolicyEventCommissionRejected,
+		AetraStakingPolicyEventConcentrationSnapshot,
+		AetraStakingPolicyEventRewardMultiplierChanged,
+	} {
+		require.Contains(t, evidence.RequiredEvents, event)
+	}
+	require.True(t, evidence.StableEventNames)
+	require.True(t, evidence.IndexerFriendlyAttributes)
+	require.NoError(t, ValidateAetraStakingPolicyEventSpec(evidence))
+}
+
+func TestAetraStakingPolicyEventSpecRejectsMissingDuplicateUnexpectedAndUnstableEvents(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyEventSpecEvidence()
+	evidence.ModuleName = "x/other"
+	evidence.RequiredEvents = removeString(evidence.RequiredEvents, AetraStakingPolicyEventCommissionRejected)
+	evidence.RequiredEvents = append(evidence.RequiredEvents, AetraStakingPolicyEventParamsUpdated, "aetra.staking_policy.debug_only")
+	evidence.StableEventNames = false
+	evidence.IndexerFriendlyAttributes = false
+
+	report := BuildAetraStakingPolicyEventSpecReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_must_be_"+AetraStakingPolicyModuleName)
+	require.Contains(t, report.Failed, "events."+AetraStakingPolicyEventCommissionRejected+":missing")
+	require.Contains(t, report.Failed, "events."+AetraStakingPolicyEventParamsUpdated+":duplicate")
+	require.Contains(t, report.Failed, "events.aetra.staking_policy.debug_only:unexpected")
+	require.Contains(t, report.Failed, AetraStakingPolicyEventStableNames)
+	require.Contains(t, report.Failed, AetraStakingPolicyEventIndexerFriendlyAttrs)
+	require.Error(t, ValidateAetraStakingPolicyEventSpec(evidence))
+}
+
+func TestDefaultAetraStakingPolicyInvariantSpecCoversRequiredInvariants(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyInvariantSpecEvidence()
+
+	report := BuildAetraStakingPolicyInvariantSpecReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 8, report.Required)
+	require.NoError(t, ValidateAetraStakingPolicyInvariantSpec(evidence))
+}
+
+func TestAetraStakingPolicyInvariantSpecRejectsMissingSafetyInvariants(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyInvariantSpecEvidence()
+	evidence.EffectivePowerNeverExceedsCap = false
+	evidence.OverflowStakeNeverNegative = false
+	evidence.RawStakeConservation = false
+	evidence.CommissionWithinFloorAndMax = false
+	evidence.CommissionChangeWithinDailyLimit = false
+	evidence.TopNDoesNotExceedHundredPercent = false
+	evidence.ExportImportPreservesPolicyState = false
+	evidence.CoveredByTests = false
+
+	report := BuildAetraStakingPolicyInvariantSpecReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, AetraStakingPolicyInvariantEffectivePowerCap)
+	require.Contains(t, report.Failed, AetraStakingPolicyInvariantOverflowNonNegative)
+	require.Contains(t, report.Failed, AetraStakingPolicyInvariantRawStakeConservation)
+	require.Contains(t, report.Failed, AetraStakingPolicyInvariantCommissionBounds)
+	require.Contains(t, report.Failed, AetraStakingPolicyInvariantCommissionDailyChange)
+	require.Contains(t, report.Failed, AetraStakingPolicyInvariantTopNMaxHundredPercent)
+	require.Contains(t, report.Failed, AetraStakingPolicyInvariantExportImportPreserves)
+	require.Contains(t, report.Failed, AetraStakingPolicyInvariantCoveredByTests)
+	require.Error(t, ValidateAetraStakingPolicyInvariantSpec(evidence))
+}
+
+func TestAetraStakingPolicyInvariantSpecRejectsWrongModuleIdentity(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyInvariantSpecEvidence()
+	evidence.ModuleName = ""
+
+	report := BuildAetraStakingPolicyInvariantSpecReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_required")
+
+	evidence.ModuleName = "x/other"
+	report = BuildAetraStakingPolicyInvariantSpecReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_must_be_"+AetraStakingPolicyModuleName)
+}
+
 func removeString(values []string, targets ...string) []string {
 	targetSet := map[string]bool{}
 	for _, target := range targets {
