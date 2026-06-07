@@ -32,33 +32,153 @@ const (
 	MaxPoolIDBytesV1                      = uint32(96)
 	MaxBasisPoints                        = uint32(10_000)
 	IndexScale                            = uint64(1_000_000_000)
+	SecondsPerDay                         = uint64(24 * 60 * 60)
+	DefaultBaseDenom                      = appparams.BaseDenom
+	DefaultDisplayDenom                   = appparams.DisplayDenom
+	DefaultDisplayExponent                = appparams.DisplayDenomExponent
+	DefaultAETBaseUnits                   = uint64(appparams.BaseUnitsPerDisplay)
 	DefaultMaxCommissionBps               = uint32(2_000)
 	DefaultMaxValidatorCommissionBps      = uint32(2_000)
 	DefaultMaxOperatorPerformanceBonusBps = uint32(1_000)
-	DefaultUnbondingBlocks                = appparams.StakingUnbondingDefaultBlocks
+	DefaultUnbondingDays                  = uint64(18)
+	DefaultUnbondingBlocks                = DefaultUnbondingDays * SecondsPerDay / appparams.StakingUnbondingBlockTimeSeconds
 	DefaultValidatorChangeDelay           = uint64(100)
-	DefaultMinPoolDeposit                 = uint64(10)
+	DefaultMinValidatorStake              = uint64(1_000_000) * DefaultAETBaseUnits
+	DefaultSoloValidatorMinSelfStake      = uint64(1_000_000) * DefaultAETBaseUnits
+	DefaultPoolBackedMinSelfStake         = uint64(400_000) * DefaultAETBaseUnits
+	DefaultPoolBackedMaxNominatorStake    = uint64(600_000) * DefaultAETBaseUnits
+	DefaultMinPoolDeposit                 = uint64(10) * DefaultAETBaseUnits
+	DefaultMinTxFeeBaseUnits              = uint64(3_000_000)
+	DefaultRewardEpochDurationBlocks      = SecondsPerDay / appparams.StakingUnbondingBlockTimeSeconds
+	DefaultValidatorPowerCapBps           = uint32(300)
+	DefaultMinPoolValidatorAllocationBps  = uint32(25)
+	DefaultMaxPoolValidatorAllocationBps  = uint32(300)
 )
 
 type Params struct {
-	Authority                      string
-	MaxPools                       uint32
-	MaxDelegators                  uint32
-	MaxPendingDeposits             uint32
-	MaxPendingWithdrawals          uint32
-	MaxUnbondingEntries            uint32
-	MaxPoolIDBytes                 uint32
-	MaxCommissionBps               uint32
-	MaxValidatorCommissionBps      uint32
-	MaxOperatorPerformanceBonusBps uint32
-	UnbondingBlocks                uint64
-	ValidatorChangeDelay           uint64
-	MinPoolDeposit                 uint64
-	DirectUserDelegationEnabled    bool
+	Authority                              string
+	BaseDenom                              string
+	DisplayDenom                           string
+	DisplayExponent                        uint32
+	MaxPools                               uint32
+	MaxDelegators                          uint32
+	MaxPendingDeposits                     uint32
+	MaxPendingWithdrawals                  uint32
+	MaxUnbondingEntries                    uint32
+	MaxPoolIDBytes                         uint32
+	MinValidatorStake                      uint64
+	SoloValidatorMinSelfStake              uint64
+	PoolBackedValidatorMinSelfStake        uint64
+	PoolBackedValidatorMaxNominatorStake   uint64
+	ValidatorSelfStakeMinRatioBps          uint32
+	ValidatorNominatorStakeMaxRatioBps     uint32
+	GovernanceMinValidatorCount            uint32
+	TargetValidatorCount                   uint32
+	MaxValidatorCount                      uint32
+	GovernanceMaxValidatorCount            uint32
+	MaxCommissionBps                       uint32
+	MaxValidatorCommissionBps              uint32
+	MaxOperatorPerformanceBonusBps         uint32
+	ValidatorCommissionFloorBps            uint32
+	DefaultValidatorCommissionBps          uint32
+	ValidatorCommissionCeilingBps          uint32
+	ValidatorCommissionMaxDailyChangeBps   uint32
+	ValidatorPowerCapBps                   uint32
+	ValidatorPowerCapSchedule              []ValidatorPowerCapPhase
+	OverflowRewardMultiplierMinBps         uint32
+	OverflowRewardMultiplierMaxBps         uint32
+	UnbondingBlocks                        uint64
+	RewardEpochDurationBlocks              uint64
+	BaseRewardRateBps                      uint32
+	MaxRewardRateBps                       uint32
+	ValidatorChangeDelay                   uint64
+	MinPoolDeposit                         uint64
+	DirectUserValidatorDelegationEnabled   bool
+	DirectUserDelegationEnabled            bool
+	ReputationStakeWeightBps               uint32
+	PoolReceiptDenomOrCodeID               string
+	MaxPoolValidatorAllocationBps          uint32
+	MinPoolValidatorAllocationBps          uint32
+	AllocationRebalanceEpochs              uint64
+	AllocationUptimeWeight                 uint32
+	AllocationCommissionWeight             uint32
+	AllocationReputationWeight             uint32
+	AllocationStakeEfficiencyWeight        uint32
+	AllocationSlashingRiskWeight           uint32
+	AllocationNetworkLoadWeight            uint32
+	PoolProtocolFeeBps                     uint32
+	ValidatorOperatorBonusBps              uint32
+	ValidatorInfrastructureCostModel       string
+	BurnFeeShareBps                        uint32
+	RewardFeeShareBps                      uint32
+	TreasuryFeeShareBps                    uint32
+	InflationMinBps                        uint32
+	InitialInflationBps                    uint32
+	InflationMaxBps                        uint32
+	TargetBondedRatioBps                   uint32
+	AprTargetMinBps                        uint32
+	AprTargetMaxBps                        uint32
+	MinTxFeeBaseUnits                      uint64
+	FeeDenom                               string
+	StorageRentRatePerByteSecond           uint64
+	SystemStorageReserveMinRunwayDays      uint64
+	SystemStorageReserveWarningRunwayDays  uint64
+	SystemStorageReserveCriticalRunwayDays uint64
+}
+
+type ValidatorPowerCapPhase struct {
+	MaxValidatorCount uint32
+	PowerCapBps       uint32
+}
+
+type ValidatorFundingMode string
+
+const (
+	ValidatorFundingSolo       ValidatorFundingMode = "solo"
+	ValidatorFundingPoolBacked ValidatorFundingMode = "pool_backed"
+)
+
+type ValidatorFunding struct {
+	Mode           ValidatorFundingMode
+	SelfStake      uint64
+	NominatorStake uint64
+}
+
+type ValidatorPolicyCandidate struct {
+	ValidatorAddress     string
+	ReputationScore      uint32
+	UptimeBps            uint32
+	CommissionBps        uint32
+	StakeEfficiencyBps   uint32
+	SlashingRiskBps      uint32
+	NetworkLoadBps       uint32
+	CurrentAllocationBps uint32
+	Jailed               bool
+	Slashed              bool
+}
+
+type AllocationWeight struct {
+	ValidatorAddress string
+	Score            uint64
+	WeightBps        uint32
 }
 
 type State struct {
-	Pools []NominatorPool
+	Pools                       []NominatorPool
+	Validators                  []Validator
+	ValidatorPerformanceScores  []ValidatorPerformanceScore
+	ValidatorCommissions        []ValidatorCommission
+	ValidatorSlashingRisks      []ValidatorSlashingRisk
+	ValidatorAllocationLimits   []ValidatorAllocationLimit
+	LiquidStakingPools          []LiquidStakingPool
+	PoolShares                  []PoolShare
+	PoolValidatorAllocations    []PoolValidatorAllocation
+	PoolUnbondingRequests       []PoolUnbondingRequest
+	PoolRewardIndexes           []PoolRewardIndex
+	RewardClaims                []RewardClaim
+	StakeReputationAccumulators []StakeReputationAccumulator
+	EpochStakingSnapshots       []EpochStakingSnapshot
+	ValidatorSetSnapshots       []ValidatorSetSnapshot
 }
 
 type NominatorPool struct {
@@ -234,6 +354,12 @@ type MsgInjectPooledStake struct {
 	Height             uint64
 }
 
+type MsgUpdateParams struct {
+	Authority string
+	Params    Params
+	Height    uint64
+}
+
 type MsgRequestPoolWithdrawal struct {
 	Authority    string
 	PoolID       string
@@ -324,25 +450,86 @@ type QueryStakingRewardsResponse struct {
 
 func DefaultParams() Params {
 	return Params{
-		Authority:                      prototype.DefaultAuthority,
-		MaxPools:                       MaxPoolsV1,
-		MaxDelegators:                  MaxDelegatorsV1,
-		MaxPendingDeposits:             MaxPendingDepositsV1,
-		MaxPendingWithdrawals:          MaxPendingWithdrawalsV1,
-		MaxUnbondingEntries:            MaxUnbondingEntriesV1,
-		MaxPoolIDBytes:                 MaxPoolIDBytesV1,
-		MaxCommissionBps:               DefaultMaxCommissionBps,
-		MaxValidatorCommissionBps:      DefaultMaxValidatorCommissionBps,
-		MaxOperatorPerformanceBonusBps: DefaultMaxOperatorPerformanceBonusBps,
-		UnbondingBlocks:                DefaultUnbondingBlocks,
-		ValidatorChangeDelay:           DefaultValidatorChangeDelay,
-		MinPoolDeposit:                 DefaultMinPoolDeposit,
+		Authority:                            prototype.DefaultAuthority,
+		BaseDenom:                            DefaultBaseDenom,
+		DisplayDenom:                         DefaultDisplayDenom,
+		DisplayExponent:                      DefaultDisplayExponent,
+		MaxPools:                             MaxPoolsV1,
+		MaxDelegators:                        MaxDelegatorsV1,
+		MaxPendingDeposits:                   MaxPendingDepositsV1,
+		MaxPendingWithdrawals:                MaxPendingWithdrawalsV1,
+		MaxUnbondingEntries:                  MaxUnbondingEntriesV1,
+		MaxPoolIDBytes:                       MaxPoolIDBytesV1,
+		MinValidatorStake:                    DefaultMinValidatorStake,
+		SoloValidatorMinSelfStake:            DefaultSoloValidatorMinSelfStake,
+		PoolBackedValidatorMinSelfStake:      DefaultPoolBackedMinSelfStake,
+		PoolBackedValidatorMaxNominatorStake: DefaultPoolBackedMaxNominatorStake,
+		ValidatorSelfStakeMinRatioBps:        4_000,
+		ValidatorNominatorStakeMaxRatioBps:   6_000,
+		GovernanceMinValidatorCount:          100,
+		TargetValidatorCount:                 128,
+		MaxValidatorCount:                    300,
+		GovernanceMaxValidatorCount:          300,
+		MaxCommissionBps:                     DefaultMaxCommissionBps,
+		MaxValidatorCommissionBps:            DefaultMaxValidatorCommissionBps,
+		MaxOperatorPerformanceBonusBps:       DefaultMaxOperatorPerformanceBonusBps,
+		ValidatorCommissionFloorBps:          500,
+		DefaultValidatorCommissionBps:        1_000,
+		ValidatorCommissionCeilingBps:        2_000,
+		ValidatorCommissionMaxDailyChangeBps: 100,
+		ValidatorPowerCapBps:                 DefaultValidatorPowerCapBps,
+		ValidatorPowerCapSchedule: []ValidatorPowerCapPhase{
+			{MaxValidatorCount: 150, PowerCapBps: 300},
+			{MaxValidatorCount: 250, PowerCapBps: 250},
+			{MaxValidatorCount: 0, PowerCapBps: 200},
+		},
+		OverflowRewardMultiplierMinBps:         0,
+		OverflowRewardMultiplierMaxBps:         3_000,
+		UnbondingBlocks:                        DefaultUnbondingBlocks,
+		RewardEpochDurationBlocks:              DefaultRewardEpochDurationBlocks,
+		BaseRewardRateBps:                      350,
+		MaxRewardRateBps:                       600,
+		ValidatorChangeDelay:                   DefaultValidatorChangeDelay,
+		MinPoolDeposit:                         DefaultMinPoolDeposit,
+		DirectUserValidatorDelegationEnabled:   false,
+		ReputationStakeWeightBps:               1_000,
+		PoolReceiptDenomOrCodeID:               "aet-liquid-staking-share-v1",
+		MaxPoolValidatorAllocationBps:          DefaultMaxPoolValidatorAllocationBps,
+		MinPoolValidatorAllocationBps:          DefaultMinPoolValidatorAllocationBps,
+		AllocationRebalanceEpochs:              1,
+		AllocationUptimeWeight:                 2_000,
+		AllocationCommissionWeight:             1_500,
+		AllocationReputationWeight:             2_000,
+		AllocationStakeEfficiencyWeight:        1_500,
+		AllocationSlashingRiskWeight:           1_500,
+		AllocationNetworkLoadWeight:            1_500,
+		PoolProtocolFeeBps:                     100,
+		ValidatorOperatorBonusBps:              100,
+		ValidatorInfrastructureCostModel:       "declared_naet_per_epoch",
+		BurnFeeShareBps:                        5_000,
+		RewardFeeShareBps:                      3_500,
+		TreasuryFeeShareBps:                    1_500,
+		InflationMinBps:                        200,
+		InitialInflationBps:                    350,
+		InflationMaxBps:                        600,
+		TargetBondedRatioBps:                   6_000,
+		AprTargetMinBps:                        400,
+		AprTargetMaxBps:                        700,
+		MinTxFeeBaseUnits:                      DefaultMinTxFeeBaseUnits,
+		FeeDenom:                               DefaultBaseDenom,
+		StorageRentRatePerByteSecond:           1,
+		SystemStorageReserveMinRunwayDays:      365,
+		SystemStorageReserveWarningRunwayDays:  180,
+		SystemStorageReserveCriticalRunwayDays: 90,
 	}
 }
 
 func (p Params) Validate() error {
 	if err := addressing.ValidateAuthorityAddress("nominator pool authority", p.Authority); err != nil {
 		return err
+	}
+	if p.BaseDenom != appparams.BaseDenom || p.DisplayDenom != appparams.DisplayDenom || p.DisplayExponent != appparams.DisplayDenomExponent {
+		return errors.New("nominator pool denom params must match native AET denomination")
 	}
 	if p.MaxPools == 0 || p.MaxPools > MaxPoolsV1 {
 		return fmt.Errorf("nominator pool max pools must be between 1 and %d", MaxPoolsV1)
@@ -362,6 +549,23 @@ func (p Params) Validate() error {
 	if p.MaxPoolIDBytes == 0 || p.MaxPoolIDBytes > MaxPoolIDBytesV1 {
 		return fmt.Errorf("nominator pool max pool id bytes must be between 1 and %d", MaxPoolIDBytesV1)
 	}
+	if err := p.ValidateValidatorFunding(ValidatorFunding{Mode: ValidatorFundingSolo, SelfStake: p.SoloValidatorMinSelfStake}); err != nil {
+		return err
+	}
+	if err := p.ValidateValidatorFunding(ValidatorFunding{Mode: ValidatorFundingPoolBacked, SelfStake: p.PoolBackedValidatorMinSelfStake, NominatorStake: p.PoolBackedValidatorMaxNominatorStake}); err != nil {
+		return err
+	}
+	if p.ValidatorSelfStakeMinRatioBps == 0 || p.ValidatorSelfStakeMinRatioBps > MaxBasisPoints ||
+		p.ValidatorNominatorStakeMaxRatioBps == 0 || p.ValidatorNominatorStakeMaxRatioBps > MaxBasisPoints ||
+		p.ValidatorSelfStakeMinRatioBps+p.ValidatorNominatorStakeMaxRatioBps != MaxBasisPoints {
+		return errors.New("nominator pool validator self/nominator stake ratios are invalid")
+	}
+	if err := p.ValidateActiveValidatorCount(p.TargetValidatorCount, false); err != nil {
+		return err
+	}
+	if p.MaxValidatorCount != p.GovernanceMaxValidatorCount {
+		return errors.New("nominator pool max validator count must match governance max validator count")
+	}
 	if p.MaxCommissionBps > MaxBasisPoints {
 		return fmt.Errorf("nominator pool max commission must be <= %d", MaxBasisPoints)
 	}
@@ -371,14 +575,76 @@ func (p Params) Validate() error {
 	if p.MaxOperatorPerformanceBonusBps > MaxBasisPoints {
 		return fmt.Errorf("nominator pool max operator performance bonus must be <= %d", MaxBasisPoints)
 	}
+	if err := validateCommissionParams(p); err != nil {
+		return err
+	}
+	if p.ValidatorPowerCapBps == 0 || p.ValidatorPowerCapBps > MaxBasisPoints {
+		return errors.New("nominator pool validator power cap is invalid")
+	}
+	if err := validatePowerCapSchedule(p.ValidatorPowerCapSchedule); err != nil {
+		return err
+	}
+	if p.OverflowRewardMultiplierMinBps > p.OverflowRewardMultiplierMaxBps || p.OverflowRewardMultiplierMaxBps > 3_000 {
+		return errors.New("nominator pool overflow reward multiplier must stay within 0-3000 bps")
+	}
 	if err := appparams.ValidateStakingUnbondingBlocks(p.UnbondingBlocks); err != nil {
 		return fmt.Errorf("nominator pool %w", err)
+	}
+	if p.RewardEpochDurationBlocks == 0 {
+		return errors.New("nominator pool reward epoch duration must be positive")
+	}
+	if p.BaseRewardRateBps > p.MaxRewardRateBps || p.MaxRewardRateBps > MaxBasisPoints {
+		return errors.New("nominator pool reward rate params are invalid")
 	}
 	if p.ValidatorChangeDelay == 0 {
 		return errors.New("nominator pool validator change delay must be positive")
 	}
 	if p.MinPoolDeposit == 0 {
 		return errors.New("nominator pool minimum pool deposit must be positive")
+	}
+	if strings.TrimSpace(p.PoolReceiptDenomOrCodeID) == "" {
+		return errors.New("nominator pool receipt denom or code id is required")
+	}
+	if p.MinPoolValidatorAllocationBps == 0 || p.MinPoolValidatorAllocationBps > p.MaxPoolValidatorAllocationBps || p.MaxPoolValidatorAllocationBps > p.ValidatorPowerCapBps {
+		return errors.New("nominator pool validator allocation bounds are invalid")
+	}
+	if p.AllocationRebalanceEpochs == 0 {
+		return errors.New("nominator pool allocation rebalance epochs must be positive")
+	}
+	if err := validateAllocationWeights(p); err != nil {
+		return err
+	}
+	if p.PoolProtocolFeeBps > MaxBasisPoints {
+		return errors.New("nominator pool protocol fee exceeds basis points")
+	}
+	if p.ValidatorOperatorBonusBps > p.MaxOperatorPerformanceBonusBps {
+		return errors.New("nominator pool validator operator bonus exceeds configured bound")
+	}
+	if strings.TrimSpace(p.ValidatorInfrastructureCostModel) == "" {
+		return errors.New("nominator pool validator infrastructure cost model is required")
+	}
+	if p.BurnFeeShareBps+p.RewardFeeShareBps+p.TreasuryFeeShareBps != uint32(MaxBasisPoints) {
+		return errors.New("nominator pool fee split must sum to 10000 bps")
+	}
+	if p.InflationMinBps > p.InitialInflationBps || p.InitialInflationBps > p.InflationMaxBps || p.InflationMaxBps > MaxBasisPoints {
+		return errors.New("nominator pool inflation params are invalid")
+	}
+	if p.TargetBondedRatioBps == 0 || p.TargetBondedRatioBps > MaxBasisPoints {
+		return errors.New("nominator pool target bonded ratio is invalid")
+	}
+	if p.AprTargetMinBps > p.AprTargetMaxBps || p.AprTargetMaxBps > MaxBasisPoints {
+		return errors.New("nominator pool apr target params are invalid")
+	}
+	if p.MinTxFeeBaseUnits == 0 || p.FeeDenom != appparams.BaseDenom {
+		return errors.New("nominator pool min tx fee denom or amount is invalid")
+	}
+	if p.StorageRentRatePerByteSecond == 0 {
+		return errors.New("nominator pool storage rent rate must be positive")
+	}
+	if p.SystemStorageReserveMinRunwayDays < p.SystemStorageReserveWarningRunwayDays ||
+		p.SystemStorageReserveWarningRunwayDays < p.SystemStorageReserveCriticalRunwayDays ||
+		p.SystemStorageReserveCriticalRunwayDays == 0 {
+		return errors.New("nominator pool system storage reserve runway thresholds are invalid")
 	}
 	return nil
 }
@@ -394,6 +660,158 @@ func (p Params) Authorize(authority string) error {
 		return errors.New("nominator pool update requires governance authority")
 	}
 	return nil
+}
+
+func (p Params) ValidateParamsUpdate(authority string, next Params) error {
+	if err := p.Authorize(authority); err != nil {
+		return err
+	}
+	next.Authority = p.Authority
+	return next.Validate()
+}
+
+func (p Params) ValidateValidatorFunding(funding ValidatorFunding) error {
+	totalStake, err := CheckedAddUint64(funding.SelfStake, funding.NominatorStake)
+	if err != nil {
+		return err
+	}
+	if totalStake < p.MinValidatorStake {
+		return errors.New("validator below minimum validator stake")
+	}
+	if totalStake == 0 {
+		return errors.New("validator stake must be positive")
+	}
+	switch funding.Mode {
+	case ValidatorFundingSolo:
+		if funding.NominatorStake != 0 {
+			return errors.New("solo validator cannot use nominator stake")
+		}
+		if funding.SelfStake < p.SoloValidatorMinSelfStake {
+			return errors.New("solo validator self-stake below configured minimum")
+		}
+	case ValidatorFundingPoolBacked:
+		if funding.SelfStake < p.PoolBackedValidatorMinSelfStake {
+			return errors.New("pool-backed validator self-stake below configured minimum")
+		}
+		if funding.NominatorStake > p.PoolBackedValidatorMaxNominatorStake {
+			return errors.New("pool-backed validator nominator stake exceeds configured maximum")
+		}
+		minimumEntryNominatorStake := uint64(0)
+		if p.MinValidatorStake > funding.SelfStake {
+			minimumEntryNominatorStake = p.MinValidatorStake - funding.SelfStake
+		}
+		if minimumEntryNominatorStake > p.PoolBackedValidatorMaxNominatorStake {
+			return errors.New("pool-backed validator exceeds nominator share for minimum entry")
+		}
+	default:
+		return fmt.Errorf("unsupported validator funding mode %q", funding.Mode)
+	}
+	selfRatioBps := funding.SelfStake * uint64(MaxBasisPoints) / totalStake
+	if selfRatioBps < uint64(p.ValidatorSelfStakeMinRatioBps) {
+		return errors.New("validator self-stake ratio below configured minimum")
+	}
+	return nil
+}
+
+func (p Params) ValidateActiveValidatorCount(count uint32, testnetOverride bool) error {
+	if count > p.MaxValidatorCount || count > p.GovernanceMaxValidatorCount {
+		return errors.New("active validator count exceeds configured maximum")
+	}
+	if !testnetOverride && count < p.GovernanceMinValidatorCount {
+		return errors.New("active validator count below governance minimum")
+	}
+	return nil
+}
+
+func (p Params) PowerCapBpsForValidatorCount(count uint32) (uint32, error) {
+	if len(p.ValidatorPowerCapSchedule) == 0 {
+		return 0, errors.New("validator power cap schedule is required")
+	}
+	for _, phase := range p.ValidatorPowerCapSchedule {
+		if phase.MaxValidatorCount == 0 || count <= phase.MaxValidatorCount {
+			return phase.PowerCapBps, nil
+		}
+	}
+	return 0, errors.New("validator power cap schedule did not cover validator count")
+}
+
+func (p Params) ValidateCommission(rateBps, previousRateBps, dailyChangeBps uint32) error {
+	if rateBps < p.ValidatorCommissionFloorBps {
+		return errors.New("validator commission below configured floor")
+	}
+	if rateBps > p.ValidatorCommissionCeilingBps {
+		return errors.New("validator commission above configured ceiling")
+	}
+	if rateBps > previousRateBps {
+		if rateBps-previousRateBps > p.ValidatorCommissionMaxDailyChangeBps || dailyChangeBps > p.ValidatorCommissionMaxDailyChangeBps {
+			return errors.New("validator commission daily change exceeds configured maximum")
+		}
+	}
+	return nil
+}
+
+func (p Params) AllocationWeights(candidates []ValidatorPolicyCandidate) ([]AllocationWeight, error) {
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+	ordered := append([]ValidatorPolicyCandidate(nil), candidates...)
+	sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].ValidatorAddress < ordered[j].ValidatorAddress })
+	weights := make([]AllocationWeight, 0, len(ordered))
+	totalScore := uint64(0)
+	for _, candidate := range ordered {
+		if err := ValidateUserFacingAEAddress("allocation validator address", candidate.ValidatorAddress); err != nil {
+			return nil, err
+		}
+		score := p.AllocationScore(candidate)
+		if candidate.Jailed || candidate.Slashed || candidate.CurrentAllocationBps >= p.MaxPoolValidatorAllocationBps {
+			score = 0
+		}
+		weights = append(weights, AllocationWeight{ValidatorAddress: candidate.ValidatorAddress, Score: score})
+		totalScore += score
+	}
+	remainder := uint32(MaxBasisPoints)
+	lastPositive := -1
+	for idx := range weights {
+		if weights[idx].Score == 0 || totalScore == 0 {
+			continue
+		}
+		weight := uint32(weights[idx].Score * uint64(MaxBasisPoints) / totalScore)
+		weights[idx].WeightBps = weight
+		if weight <= remainder {
+			remainder -= weight
+		} else {
+			remainder = 0
+		}
+		lastPositive = idx
+	}
+	if lastPositive >= 0 {
+		weights[lastPositive].WeightBps += remainder
+	}
+	return weights, nil
+}
+
+func (p Params) AllocationScore(candidate ValidatorPolicyCandidate) uint64 {
+	if candidate.Jailed || candidate.Slashed {
+		return 0
+	}
+	commissionQuality := uint32(0)
+	if candidate.CommissionBps <= p.ValidatorCommissionCeilingBps {
+		commissionQuality = p.ValidatorCommissionCeilingBps - candidate.CommissionBps
+	}
+	slashingSafety := uint32(MaxBasisPoints)
+	if candidate.SlashingRiskBps <= MaxBasisPoints {
+		slashingSafety = uint32(MaxBasisPoints) - candidate.SlashingRiskBps
+	}
+	networkHeadroom := uint32(MaxBasisPoints)
+	if candidate.NetworkLoadBps <= MaxBasisPoints {
+		networkHeadroom = uint32(MaxBasisPoints) - candidate.NetworkLoadBps
+	}
+	return uint64(candidate.UptimeBps)*uint64(p.AllocationUptimeWeight) +
+		uint64(commissionQuality)*uint64(p.AllocationCommissionWeight) +
+		uint64(candidate.ReputationScore)*uint64(p.AllocationReputationWeight) +
+		uint64(candidate.StakeEfficiencyBps)*uint64(p.AllocationStakeEfficiencyWeight) +
+		uint64(slashingSafety)*uint64(p.AllocationSlashingRiskWeight) +
+		uint64(networkHeadroom)*uint64(p.AllocationNetworkLoadWeight)
 }
 
 func (s State) Validate(params Params) error {
@@ -412,6 +830,168 @@ func (s State) Validate(params Params) error {
 			return fmt.Errorf("duplicate nominator pool id %s", pool.PoolID)
 		}
 		ids[pool.PoolID] = struct{}{}
+	}
+	validators := map[string]Validator{}
+	for _, validator := range s.Validators {
+		if err := validator.Validate(params); err != nil {
+			return err
+		}
+		if _, found := validators[validator.Address]; found {
+			return fmt.Errorf("duplicate staking validator %s", validator.Address)
+		}
+		validators[validator.Address] = validator
+	}
+	validatorScores := map[string]struct{}{}
+	for _, score := range s.ValidatorPerformanceScores {
+		if err := score.Validate(); err != nil {
+			return err
+		}
+		key := fmt.Sprintf("%s/%020d", score.Validator, score.Epoch)
+		if _, found := validatorScores[key]; found {
+			return fmt.Errorf("duplicate validator performance score %s", key)
+		}
+		validatorScores[key] = struct{}{}
+	}
+	validatorCommissions := map[string]struct{}{}
+	for _, commission := range s.ValidatorCommissions {
+		if err := commission.Validate(); err != nil {
+			return err
+		}
+		key := fmt.Sprintf("%s/%020d", commission.Validator, commission.Epoch)
+		if _, found := validatorCommissions[key]; found {
+			return fmt.Errorf("duplicate validator commission %s", key)
+		}
+		validatorCommissions[key] = struct{}{}
+	}
+	validatorRisks := map[string]struct{}{}
+	for _, risk := range s.ValidatorSlashingRisks {
+		if err := risk.Validate(); err != nil {
+			return err
+		}
+		key := fmt.Sprintf("%s/%020d", risk.Validator, risk.Epoch)
+		if _, found := validatorRisks[key]; found {
+			return fmt.Errorf("duplicate validator slashing risk %s", key)
+		}
+		validatorRisks[key] = struct{}{}
+	}
+	validatorLimits := map[string]struct{}{}
+	for _, limit := range s.ValidatorAllocationLimits {
+		if err := limit.Validate(); err != nil {
+			return err
+		}
+		key := fmt.Sprintf("%s/%020d", limit.Validator, limit.Epoch)
+		if _, found := validatorLimits[key]; found {
+			return fmt.Errorf("duplicate validator allocation limit %s", key)
+		}
+		validatorLimits[key] = struct{}{}
+	}
+	liquidPools := map[string]struct{}{}
+	byContractUser := map[string]struct{}{}
+	byContractRaw := map[string]struct{}{}
+	for _, pool := range s.LiquidStakingPools {
+		if err := pool.Validate(params); err != nil {
+			return err
+		}
+		if _, found := liquidPools[pool.PoolID]; found {
+			return fmt.Errorf("duplicate liquid staking pool %s", pool.PoolID)
+		}
+		if _, found := byContractUser[pool.ContractAddressUser]; found {
+			return fmt.Errorf("duplicate liquid staking pool contract user address %s", pool.ContractAddressUser)
+		}
+		if _, found := byContractRaw[pool.ContractAddressRaw]; found {
+			return fmt.Errorf("duplicate liquid staking pool contract raw address %s", pool.ContractAddressRaw)
+		}
+		liquidPools[pool.PoolID] = struct{}{}
+		byContractUser[pool.ContractAddressUser] = struct{}{}
+		byContractRaw[pool.ContractAddressRaw] = struct{}{}
+	}
+	poolShares := map[string]struct{}{}
+	for _, share := range s.PoolShares {
+		if err := share.Validate(params); err != nil {
+			return err
+		}
+		key := share.PoolID + "/" + share.Owner
+		if _, found := poolShares[key]; found {
+			return fmt.Errorf("duplicate pool share %s", key)
+		}
+		poolShares[key] = struct{}{}
+	}
+	poolAllocations := map[string]struct{}{}
+	for _, allocation := range s.PoolValidatorAllocations {
+		validator, found := validators[allocation.Validator]
+		if !found {
+			return fmt.Errorf("pool allocation references unknown validator %s", allocation.Validator)
+		}
+		if err := allocation.Validate(params, validator); err != nil {
+			return err
+		}
+		key := allocation.PoolID + "/" + allocation.Validator
+		if _, found := poolAllocations[key]; found {
+			return fmt.Errorf("duplicate pool allocation %s", key)
+		}
+		poolAllocations[key] = struct{}{}
+	}
+	unbondings := map[string]struct{}{}
+	for _, unbonding := range s.PoolUnbondingRequests {
+		if err := unbonding.Validate(params); err != nil {
+			return err
+		}
+		key := unbonding.PoolID + "/" + unbonding.Owner + "/" + unbonding.RequestID
+		if _, found := unbondings[key]; found {
+			return fmt.Errorf("duplicate pool unbonding request %s", key)
+		}
+		unbondings[key] = struct{}{}
+	}
+	rewardIndexes := map[string]struct{}{}
+	for _, index := range s.PoolRewardIndexes {
+		if err := index.Validate(params); err != nil {
+			return err
+		}
+		if _, found := rewardIndexes[index.PoolID]; found {
+			return fmt.Errorf("duplicate pool reward index %s", index.PoolID)
+		}
+		rewardIndexes[index.PoolID] = struct{}{}
+	}
+	rewardClaims := map[string]struct{}{}
+	for _, claim := range s.RewardClaims {
+		if err := claim.Validate(params); err != nil {
+			return err
+		}
+		key := fmt.Sprintf("%s/%s/%020d", claim.PoolID, claim.Owner, claim.Epoch)
+		if _, found := rewardClaims[key]; found {
+			return fmt.Errorf("duplicate reward claim %s", key)
+		}
+		rewardClaims[key] = struct{}{}
+	}
+	reputations := map[string]struct{}{}
+	for _, accumulator := range s.StakeReputationAccumulators {
+		if err := accumulator.Validate(); err != nil {
+			return err
+		}
+		if _, found := reputations[accumulator.Account]; found {
+			return fmt.Errorf("duplicate stake reputation accumulator %s", accumulator.Account)
+		}
+		reputations[accumulator.Account] = struct{}{}
+	}
+	epochs := map[uint64]struct{}{}
+	for _, snapshot := range s.EpochStakingSnapshots {
+		if err := snapshot.Validate(); err != nil {
+			return err
+		}
+		if _, found := epochs[snapshot.Epoch]; found {
+			return fmt.Errorf("duplicate epoch staking snapshot %d", snapshot.Epoch)
+		}
+		epochs[snapshot.Epoch] = struct{}{}
+	}
+	validatorSetSnapshots := map[uint64]struct{}{}
+	for _, snapshot := range s.ValidatorSetSnapshots {
+		if err := snapshot.Validate(); err != nil {
+			return err
+		}
+		if _, found := validatorSetSnapshots[snapshot.HeightOrEpoch]; found {
+			return fmt.Errorf("duplicate validator set snapshot %d", snapshot.HeightOrEpoch)
+		}
+		validatorSetSnapshots[snapshot.HeightOrEpoch] = struct{}{}
 	}
 	return nil
 }
@@ -656,6 +1236,20 @@ func (s State) Normalize(params Params) State {
 		s.Pools[idx].ValidatorOperatorIncome = SortValidatorIncome(s.Pools[idx].ValidatorOperatorIncome)
 		s.Pools[idx].ValidatorAllocations = SortValidatorRewardAllocations(s.Pools[idx].ValidatorAllocations)
 	}
+	s.Validators = SortStateValidators(s.Validators)
+	s.ValidatorPerformanceScores = SortValidatorPerformanceScores(s.ValidatorPerformanceScores)
+	s.ValidatorCommissions = SortValidatorCommissions(s.ValidatorCommissions)
+	s.ValidatorSlashingRisks = SortValidatorSlashingRisks(s.ValidatorSlashingRisks)
+	s.ValidatorAllocationLimits = SortValidatorAllocationLimits(s.ValidatorAllocationLimits)
+	s.LiquidStakingPools = SortLiquidStakingPools(s.LiquidStakingPools)
+	s.PoolShares = SortPoolShares(s.PoolShares)
+	s.PoolValidatorAllocations = SortPoolValidatorAllocations(s.PoolValidatorAllocations)
+	s.PoolUnbondingRequests = SortPoolUnbondingRequests(s.PoolUnbondingRequests)
+	s.PoolRewardIndexes = SortPoolRewardIndexes(s.PoolRewardIndexes)
+	s.RewardClaims = SortRewardClaims(s.RewardClaims)
+	s.StakeReputationAccumulators = SortStakeReputationAccumulators(s.StakeReputationAccumulators)
+	s.EpochStakingSnapshots = SortEpochStakingSnapshots(s.EpochStakingSnapshots)
+	s.ValidatorSetSnapshots = SortValidatorSetSnapshots(s.ValidatorSetSnapshots)
 	return s
 }
 
@@ -675,6 +1269,172 @@ func SortValidatorRewardAllocations(values []ValidatorRewardAllocation) []Valida
 	out := append([]ValidatorRewardAllocation(nil), values...)
 	sort.SliceStable(out, func(i, j int) bool { return out[i].Validator < out[j].Validator })
 	return out
+}
+
+func SortStateValidators(values []Validator) []Validator {
+	out := append([]Validator(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].Address < out[j].Address })
+	return out
+}
+
+func SortValidatorPerformanceScores(values []ValidatorPerformanceScore) []ValidatorPerformanceScore {
+	out := append([]ValidatorPerformanceScore(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].Validator != out[j].Validator {
+			return out[i].Validator < out[j].Validator
+		}
+		return out[i].Epoch < out[j].Epoch
+	})
+	return out
+}
+
+func SortValidatorCommissions(values []ValidatorCommission) []ValidatorCommission {
+	out := append([]ValidatorCommission(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].Validator != out[j].Validator {
+			return out[i].Validator < out[j].Validator
+		}
+		return out[i].Epoch < out[j].Epoch
+	})
+	return out
+}
+
+func SortValidatorSlashingRisks(values []ValidatorSlashingRisk) []ValidatorSlashingRisk {
+	out := append([]ValidatorSlashingRisk(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].Validator != out[j].Validator {
+			return out[i].Validator < out[j].Validator
+		}
+		return out[i].Epoch < out[j].Epoch
+	})
+	return out
+}
+
+func SortValidatorAllocationLimits(values []ValidatorAllocationLimit) []ValidatorAllocationLimit {
+	out := append([]ValidatorAllocationLimit(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].Validator != out[j].Validator {
+			return out[i].Validator < out[j].Validator
+		}
+		return out[i].Epoch < out[j].Epoch
+	})
+	return out
+}
+
+func SortLiquidStakingPools(values []LiquidStakingPool) []LiquidStakingPool {
+	out := append([]LiquidStakingPool(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].PoolID < out[j].PoolID })
+	return out
+}
+
+func SortPoolShares(values []PoolShare) []PoolShare {
+	out := append([]PoolShare(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].PoolID != out[j].PoolID {
+			return out[i].PoolID < out[j].PoolID
+		}
+		return out[i].Owner < out[j].Owner
+	})
+	return out
+}
+
+func SortPoolValidatorAllocations(values []PoolValidatorAllocation) []PoolValidatorAllocation {
+	out := append([]PoolValidatorAllocation(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].PoolID != out[j].PoolID {
+			return out[i].PoolID < out[j].PoolID
+		}
+		return out[i].Validator < out[j].Validator
+	})
+	return out
+}
+
+func SortPoolUnbondingRequests(values []PoolUnbondingRequest) []PoolUnbondingRequest {
+	out := append([]PoolUnbondingRequest(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].PoolID != out[j].PoolID {
+			return out[i].PoolID < out[j].PoolID
+		}
+		if out[i].Owner != out[j].Owner {
+			return out[i].Owner < out[j].Owner
+		}
+		return out[i].RequestID < out[j].RequestID
+	})
+	return out
+}
+
+func SortPoolRewardIndexes(values []PoolRewardIndex) []PoolRewardIndex {
+	out := append([]PoolRewardIndex(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].PoolID < out[j].PoolID })
+	return out
+}
+
+func SortRewardClaims(values []RewardClaim) []RewardClaim {
+	out := append([]RewardClaim(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].PoolID != out[j].PoolID {
+			return out[i].PoolID < out[j].PoolID
+		}
+		if out[i].Owner != out[j].Owner {
+			return out[i].Owner < out[j].Owner
+		}
+		return out[i].Epoch < out[j].Epoch
+	})
+	return out
+}
+
+func SortStakeReputationAccumulators(values []StakeReputationAccumulator) []StakeReputationAccumulator {
+	out := append([]StakeReputationAccumulator(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].Account < out[j].Account })
+	return out
+}
+
+func SortEpochStakingSnapshots(values []EpochStakingSnapshot) []EpochStakingSnapshot {
+	out := append([]EpochStakingSnapshot(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].Epoch < out[j].Epoch })
+	return out
+}
+
+func SortValidatorSetSnapshots(values []ValidatorSetSnapshot) []ValidatorSetSnapshot {
+	out := append([]ValidatorSetSnapshot(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].HeightOrEpoch < out[j].HeightOrEpoch })
+	return out
+}
+
+func PaginatePoolSharesByOwner(shares []PoolShare, owner string, offset, limit uint32) []PoolShare {
+	filtered := []PoolShare{}
+	for _, share := range SortPoolShares(shares) {
+		if share.Owner == owner {
+			filtered = append(filtered, share)
+		}
+	}
+	return paginate(filtered, offset, limit)
+}
+
+func PaginatePoolAllocationsByPool(allocations []PoolValidatorAllocation, poolID string, offset, limit uint32) []PoolValidatorAllocation {
+	filtered := []PoolValidatorAllocation{}
+	for _, allocation := range SortPoolValidatorAllocations(allocations) {
+		if allocation.PoolID == poolID {
+			filtered = append(filtered, allocation)
+		}
+	}
+	return paginate(filtered, offset, limit)
+}
+
+func PaginateValidators(validators []Validator, offset, limit uint32) []Validator {
+	return paginate(SortStateValidators(validators), offset, limit)
+}
+
+func paginate[T any](values []T, offset, limit uint32) []T {
+	if limit == 0 || int(offset) >= len(values) {
+		return []T{}
+	}
+	end := int(offset + limit)
+	if end > len(values) {
+		end = len(values)
+	}
+	start := int(offset)
+	return append([]T(nil), values[start:end]...)
 }
 
 func SortPools(values []NominatorPool) []NominatorPool {
@@ -725,14 +1485,25 @@ func ShareValue(pool NominatorPool, shares uint64) uint64 {
 }
 
 func SharesForDeposit(pool NominatorPool, amount uint64) uint64 {
-	if pool.TotalShares == 0 || pool.TotalBondedStake == 0 {
-		return amount
-	}
-	shares := amount * pool.TotalShares / pool.TotalBondedStake
-	if shares == 0 && amount > 0 {
-		return 1
+	shares, err := SharesForDepositChecked(pool, amount)
+	if err != nil {
+		return 0
 	}
 	return shares
+}
+
+func SharesForDepositChecked(pool NominatorPool, amount uint64) (uint64, error) {
+	if pool.TotalShares == 0 || pool.TotalBondedStake == 0 {
+		return amount, nil
+	}
+	shares, err := MulDivUint64(amount, pool.TotalShares, pool.TotalBondedStake)
+	if err != nil {
+		return 0, err
+	}
+	if shares == 0 && amount > 0 {
+		return 1, nil
+	}
+	return shares, nil
 }
 
 func ValidateOfficialLiquidStakingDeposit(msg MsgDepositToOfficialLiquidStaking, params Params) error {
@@ -758,7 +1529,7 @@ func ValidateDirectUserDelegation(msg MsgDelegateToValidator, params Params) err
 	if err := params.Authorize(msg.Authority); err != nil {
 		return err
 	}
-	if !params.DirectUserDelegationEnabled {
+	if !params.DirectUserDelegationEnabled && !params.DirectUserValidatorDelegationEnabled {
 		return errors.New("direct user delegation to validators is disabled; use official liquid staking pool deposit")
 	}
 	if err := ValidateUserFacingAEAddress("direct delegation user address", msg.UserAddress); err != nil {
@@ -1122,6 +1893,66 @@ func totalInfrastructureCost(values []ValidatorIncome) uint64 {
 
 func IsJailedValidatorStatus(status string) bool {
 	return status == validatorregistrytypes.StatusJailed || status == validatorregistrytypes.StatusTombstoned
+}
+
+func validateCommissionParams(p Params) error {
+	if p.ValidatorCommissionFloorBps > p.DefaultValidatorCommissionBps ||
+		p.DefaultValidatorCommissionBps > p.ValidatorCommissionCeilingBps ||
+		p.ValidatorCommissionCeilingBps > MaxBasisPoints {
+		return errors.New("nominator pool validator commission floor/default/ceiling are invalid")
+	}
+	if p.ValidatorCommissionMaxDailyChangeBps == 0 || p.ValidatorCommissionMaxDailyChangeBps > p.ValidatorCommissionCeilingBps {
+		return errors.New("nominator pool validator commission daily change is invalid")
+	}
+	if p.MaxValidatorCommissionBps < p.ValidatorCommissionCeilingBps || p.MaxCommissionBps < p.PoolProtocolFeeBps {
+		return errors.New("nominator pool commission bounds are inconsistent")
+	}
+	return nil
+}
+
+func validatePowerCapSchedule(schedule []ValidatorPowerCapPhase) error {
+	if len(schedule) == 0 {
+		return errors.New("nominator pool validator power cap schedule is required")
+	}
+	previousMax := uint32(0)
+	for idx, phase := range schedule {
+		if phase.PowerCapBps == 0 || phase.PowerCapBps > MaxBasisPoints {
+			return errors.New("nominator pool validator power cap phase is invalid")
+		}
+		if idx < len(schedule)-1 {
+			if phase.MaxValidatorCount <= previousMax {
+				return errors.New("nominator pool validator power cap schedule must be sorted")
+			}
+			previousMax = phase.MaxValidatorCount
+			continue
+		}
+		if phase.MaxValidatorCount != 0 {
+			return errors.New("nominator pool final validator power cap phase must be open-ended")
+		}
+	}
+	return nil
+}
+
+func validateAllocationWeights(p Params) error {
+	weights := []uint32{
+		p.AllocationUptimeWeight,
+		p.AllocationCommissionWeight,
+		p.AllocationReputationWeight,
+		p.AllocationStakeEfficiencyWeight,
+		p.AllocationSlashingRiskWeight,
+		p.AllocationNetworkLoadWeight,
+	}
+	total := uint32(0)
+	for _, weight := range weights {
+		if weight == 0 {
+			return errors.New("nominator pool allocation weights must be positive")
+		}
+		total += weight
+	}
+	if total != MaxBasisPoints {
+		return errors.New("nominator pool allocation weights must sum to 10000 bps")
+	}
+	return nil
 }
 
 func validateID(field, value string, maxBytes uint32) error {

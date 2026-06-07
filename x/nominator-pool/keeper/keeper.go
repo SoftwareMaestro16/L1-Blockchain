@@ -125,6 +125,23 @@ func (k *Keeper) ResetOperationCounters() {
 	k.counters = OperationCounters{}
 }
 
+func (k *Keeper) UpdateParams(msg types.MsgUpdateParams) (types.Params, error) {
+	if msg.Height == 0 {
+		return types.Params{}, errors.New("nominator pool params update height must be positive")
+	}
+	next := msg.Params
+	if err := k.genesis.Params.ValidateParamsUpdate(msg.Authority, next); err != nil {
+		return types.Params{}, err
+	}
+	next.Authority = k.genesis.Params.Authority
+	k.genesis.Params = next
+	if err := k.genesis.Validate(); err != nil {
+		return types.Params{}, err
+	}
+	k.rebuildIndexes()
+	return k.genesis.Params, nil
+}
+
 func (k *Keeper) rebuildIndexes() {
 	k.indexes = make(map[string]poolIndexEntry, len(k.genesis.State.Pools))
 	for poolIdx, pool := range k.genesis.State.Pools {
@@ -251,7 +268,10 @@ func (k *Keeper) DepositToPool(msg types.MsgDepositToPool) (types.DelegatorShare
 	if pool.Status != types.PoolStatusActive {
 		return types.DelegatorShare{}, errors.New("nominator pool must be active for deposits")
 	}
-	shareAmount := types.SharesForDeposit(pool, msg.Amount)
+	shareAmount, err := types.SharesForDepositChecked(pool, msg.Amount)
+	if err != nil {
+		return types.DelegatorShare{}, err
+	}
 	delegatorIdx, delegator, found := findDelegator(pool.DelegatorShares, msg.Delegator)
 	if found {
 		delegator.PendingRewards = types.AccruedReward(delegator, pool.RewardIndex)
@@ -292,7 +312,10 @@ func (k *Keeper) DepositToOfficialLiquidStaking(msg types.MsgDepositToOfficialLi
 	if pool.Status != types.PoolStatusActive {
 		return types.DelegatorShare{}, errors.New("official liquid staking pool must be active for deposits")
 	}
-	shareAmount := types.SharesForDeposit(pool, msg.Amount)
+	shareAmount, err := types.SharesForDepositChecked(pool, msg.Amount)
+	if err != nil {
+		return types.DelegatorShare{}, err
+	}
 	delegatorIdx, delegator, found := findDelegator(pool.DelegatorShares, rawUserAddress)
 	if found {
 		delegator.PendingRewards = types.AccruedReward(delegator, pool.RewardIndex)
@@ -449,7 +472,10 @@ func (k *Keeper) CancelPoolWithdrawal(msg types.MsgCancelPoolWithdrawal) (types.
 			pool.UnbondingQueue[entryIdx] = entry
 		}
 	}
-	shares := types.SharesForDeposit(pool, withdrawal.Amount)
+	shares, err := types.SharesForDepositChecked(pool, withdrawal.Amount)
+	if err != nil {
+		return types.PendingWithdrawal{}, err
+	}
 	if shares < withdrawal.Shares {
 		shares = withdrawal.Shares
 	}
@@ -540,6 +566,7 @@ func (k *Keeper) StakingProof(req types.StakingProofRequest) (types.StakingProof
 	k.counters.ProofQueries++
 	return types.BuildStakingProofMetadata(req)
 }
+
 func (k *Keeper) UpdatePoolCommission(msg types.MsgUpdatePoolCommission) (types.NominatorPool, error) {
 	if err := k.genesis.Params.Authorize(msg.Authority); err != nil {
 		return types.NominatorPool{}, err

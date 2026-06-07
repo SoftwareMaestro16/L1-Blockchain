@@ -20,11 +20,175 @@ func TestDefaultGenesisValidates(t *testing.T) {
 func TestNominatorPoolUnbondingUsesStakingPolicyWindow(t *testing.T) {
 	gs := DefaultGenesis()
 
-	require.Equal(t, appparams.StakingUnbondingDefaultBlocks, gs.Params.UnbondingBlocks)
+	require.Equal(t, types.DefaultUnbondingBlocks, gs.Params.UnbondingBlocks)
 	require.NoError(t, gs.Validate())
 
 	gs.Params.UnbondingBlocks = appparams.StakingUnbondingMinBlocks - 1
 	require.ErrorContains(t, gs.Validate(), "14-21 days")
+}
+
+func TestDefaultStakingParamsUseArchitectureGenesisValues(t *testing.T) {
+	params := DefaultGenesis().Params
+
+	require.Equal(t, appparams.BaseDenom, params.BaseDenom)
+	require.Equal(t, appparams.DisplayDenom, params.DisplayDenom)
+	require.Equal(t, appparams.DisplayDenomExponent, params.DisplayExponent)
+	require.Equal(t, uint64(1_000_000)*types.DefaultAETBaseUnits, params.MinValidatorStake)
+	require.Equal(t, uint64(1_000_000)*types.DefaultAETBaseUnits, params.SoloValidatorMinSelfStake)
+	require.Equal(t, uint64(400_000)*types.DefaultAETBaseUnits, params.PoolBackedValidatorMinSelfStake)
+	require.Equal(t, uint64(600_000)*types.DefaultAETBaseUnits, params.PoolBackedValidatorMaxNominatorStake)
+	require.Equal(t, uint32(4_000), params.ValidatorSelfStakeMinRatioBps)
+	require.Equal(t, uint32(6_000), params.ValidatorNominatorStakeMaxRatioBps)
+	require.Equal(t, uint64(10)*types.DefaultAETBaseUnits, params.MinPoolDeposit)
+	require.False(t, params.DirectUserValidatorDelegationEnabled)
+	require.Equal(t, uint32(100), params.GovernanceMinValidatorCount)
+	require.Equal(t, uint32(128), params.TargetValidatorCount)
+	require.Equal(t, uint32(300), params.MaxValidatorCount)
+	require.Equal(t, uint32(300), params.GovernanceMaxValidatorCount)
+	require.Equal(t, uint32(300), params.ValidatorPowerCapBps)
+	require.Equal(t, uint32(500), params.ValidatorCommissionFloorBps)
+	require.Equal(t, uint32(1_000), params.DefaultValidatorCommissionBps)
+	require.Equal(t, uint32(2_000), params.ValidatorCommissionCeilingBps)
+	require.Equal(t, uint32(100), params.ValidatorCommissionMaxDailyChangeBps)
+	require.Equal(t, uint64(18*24*60*60/appparams.StakingUnbondingBlockTimeSeconds), params.UnbondingBlocks)
+	require.Equal(t, uint64(24*60*60/appparams.StakingUnbondingBlockTimeSeconds), params.RewardEpochDurationBlocks)
+	require.Equal(t, uint32(5_000), params.BurnFeeShareBps)
+	require.Equal(t, uint32(3_500), params.RewardFeeShareBps)
+	require.Equal(t, uint32(1_500), params.TreasuryFeeShareBps)
+	require.Equal(t, uint64(3_000_000), params.MinTxFeeBaseUnits)
+	require.Equal(t, uint64(1), params.StorageRentRatePerByteSecond)
+	require.Equal(t, uint64(365), params.SystemStorageReserveMinRunwayDays)
+	require.Equal(t, uint64(180), params.SystemStorageReserveWarningRunwayDays)
+	require.Equal(t, uint64(90), params.SystemStorageReserveCriticalRunwayDays)
+	require.NoError(t, params.Validate())
+}
+
+func TestValidatorFundingPolicyRejectsInsufficientStake(t *testing.T) {
+	params := DefaultGenesis().Params
+
+	require.ErrorContains(t, params.ValidateValidatorFunding(types.ValidatorFunding{
+		Mode:      types.ValidatorFundingSolo,
+		SelfStake: params.MinValidatorStake - 1,
+	}), "minimum validator stake")
+	require.ErrorContains(t, params.ValidateValidatorFunding(types.ValidatorFunding{
+		Mode:           types.ValidatorFundingPoolBacked,
+		SelfStake:      params.PoolBackedValidatorMinSelfStake - 1,
+		NominatorStake: params.PoolBackedValidatorMaxNominatorStake + 1,
+	}), "self-stake")
+	require.ErrorContains(t, params.ValidateValidatorFunding(types.ValidatorFunding{
+		Mode:           types.ValidatorFundingPoolBacked,
+		SelfStake:      params.PoolBackedValidatorMinSelfStake,
+		NominatorStake: params.PoolBackedValidatorMaxNominatorStake + 1,
+	}), "nominator stake")
+
+	ratioParams := params
+	ratioParams.PoolBackedValidatorMaxNominatorStake = params.MinValidatorStake
+	require.ErrorContains(t, ratioParams.ValidateValidatorFunding(types.ValidatorFunding{
+		Mode:           types.ValidatorFundingPoolBacked,
+		SelfStake:      params.PoolBackedValidatorMinSelfStake,
+		NominatorStake: params.PoolBackedValidatorMaxNominatorStake + types.DefaultAETBaseUnits,
+	}), "self-stake ratio")
+	require.NoError(t, params.ValidateValidatorFunding(types.ValidatorFunding{
+		Mode:           types.ValidatorFundingPoolBacked,
+		SelfStake:      params.PoolBackedValidatorMinSelfStake,
+		NominatorStake: params.PoolBackedValidatorMaxNominatorStake,
+	}))
+}
+
+func TestValidatorCountCommissionAndPowerCapParams(t *testing.T) {
+	params := DefaultGenesis().Params
+
+	require.NoError(t, params.ValidateActiveValidatorCount(100, false))
+	require.ErrorContains(t, params.ValidateActiveValidatorCount(99, false), "below governance minimum")
+	require.NoError(t, params.ValidateActiveValidatorCount(99, true))
+	require.ErrorContains(t, params.ValidateActiveValidatorCount(301, false), "exceeds configured maximum")
+	cap150, err := params.PowerCapBpsForValidatorCount(150)
+	require.NoError(t, err)
+	cap250, err := params.PowerCapBpsForValidatorCount(250)
+	require.NoError(t, err)
+	cap251, err := params.PowerCapBpsForValidatorCount(251)
+	require.NoError(t, err)
+	require.Equal(t, uint32(300), cap150)
+	require.Equal(t, uint32(250), cap250)
+	require.Equal(t, uint32(200), cap251)
+
+	require.NoError(t, params.ValidateCommission(1_000, 950, 50))
+	require.ErrorContains(t, params.ValidateCommission(499, 500, 1), "below configured floor")
+	require.ErrorContains(t, params.ValidateCommission(2_001, 2_000, 1), "above configured ceiling")
+	require.ErrorContains(t, params.ValidateCommission(1_200, 1_000, 200), "daily change")
+}
+
+func TestAllocationWeightsAreDeterministicAndPolicyBounded(t *testing.T) {
+	params := DefaultGenesis().Params
+	candidates := []types.ValidatorPolicyCandidate{
+		{
+			ValidatorAddress:     aePoolAddress(t, "44"),
+			ReputationScore:      8_000,
+			UptimeBps:            9_000,
+			CommissionBps:        1_000,
+			StakeEfficiencyBps:   7_500,
+			SlashingRiskBps:      250,
+			NetworkLoadBps:       1_000,
+			CurrentAllocationBps: params.MaxPoolValidatorAllocationBps,
+		},
+		{
+			ValidatorAddress:   aePoolAddress(t, "22"),
+			ReputationScore:    6_000,
+			UptimeBps:          9_500,
+			CommissionBps:      500,
+			StakeEfficiencyBps: 8_000,
+			SlashingRiskBps:    100,
+			NetworkLoadBps:     2_000,
+		},
+		{
+			ValidatorAddress:   aePoolAddress(t, "33"),
+			ReputationScore:    9_000,
+			UptimeBps:          8_000,
+			CommissionBps:      1_500,
+			StakeEfficiencyBps: 7_000,
+			SlashingRiskBps:    500,
+			NetworkLoadBps:     1_000,
+			Jailed:             true,
+		},
+	}
+	weights, err := params.AllocationWeights(candidates)
+	require.NoError(t, err)
+	require.Equal(t, aePoolAddress(t, "22"), weights[0].ValidatorAddress)
+	require.Equal(t, aePoolAddress(t, "33"), weights[1].ValidatorAddress)
+	require.Equal(t, aePoolAddress(t, "44"), weights[2].ValidatorAddress)
+	require.Equal(t, uint32(10_000), weights[0].WeightBps)
+	require.Zero(t, weights[1].WeightBps)
+	require.Zero(t, weights[2].WeightBps)
+
+	candidates[1].UptimeBps = 1_000
+	changed, err := params.AllocationWeights(candidates)
+	require.NoError(t, err)
+	require.Less(t, changed[0].Score, weights[0].Score)
+}
+
+func TestGovernanceParamsUpdateAuthorizationAndRoundTrip(t *testing.T) {
+	source := NewKeeper()
+	next := source.ExportGenesis().Params
+	next.TargetValidatorCount = 150
+	_, err := source.UpdateParams(types.MsgUpdateParams{
+		Authority: aePoolAddress(t, "22"),
+		Params:    next,
+		Height:    2,
+	})
+	require.ErrorContains(t, err, "governance authority")
+
+	updated, err := source.UpdateParams(types.MsgUpdateParams{
+		Authority: prototype.DefaultAuthority,
+		Params:    next,
+		Height:    2,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint32(150), updated.TargetValidatorCount)
+
+	exported := source.ExportGenesis()
+	target := NewKeeper()
+	require.NoError(t, target.InitGenesis(exported))
+	require.Equal(t, exported, target.ExportGenesis())
 }
 
 func TestDepositMintsShares(t *testing.T) {
@@ -59,24 +223,34 @@ func TestOfficialLiquidStakingSmallDepositMintsDeterministicShares(t *testing.T)
 		Height:      2,
 	})
 	require.NoError(t, err)
-	require.Equal(t, uint64(10), share.Shares)
+	require.Equal(t, types.DefaultMinPoolDeposit, share.Shares)
 
 	secondShare, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
 		Authority:   prototype.DefaultAuthority,
 		PoolID:      pool.PoolID,
 		UserAddress: user,
-		Amount:      90,
+		Amount:      90 * types.DefaultAETBaseUnits,
 		Height:      3,
 	})
 	require.NoError(t, err)
-	require.Equal(t, uint64(100), secondShare.Shares)
+	require.Equal(t, uint64(100)*types.DefaultAETBaseUnits, secondShare.Shares)
 
 	stored, found := k.NominatorPool(pool.PoolID)
 	require.True(t, found)
-	require.Equal(t, uint64(100), stored.TotalBondedStake)
-	require.Equal(t, uint64(100), stored.TotalShares)
+	require.Equal(t, uint64(100)*types.DefaultAETBaseUnits, stored.TotalBondedStake)
+	require.Equal(t, uint64(100)*types.DefaultAETBaseUnits, stored.TotalShares)
 	require.Equal(t, rawPoolAddress("22"), stored.DelegatorShares[0].Delegator)
-	require.Equal(t, uint64(100), stored.DelegatorShares[0].Shares)
+	require.Equal(t, uint64(100)*types.DefaultAETBaseUnits, stored.DelegatorShares[0].Shares)
+}
+
+func TestPoolShareMintingUsesOverflowSafeBaseUnitMath(t *testing.T) {
+	pool := types.NominatorPool{
+		TotalShares:      types.DefaultMinPoolDeposit,
+		TotalBondedStake: types.DefaultMinPoolDeposit,
+	}
+	shares, err := types.SharesForDepositChecked(pool, 90*types.DefaultAETBaseUnits)
+	require.NoError(t, err)
+	require.Equal(t, uint64(90)*types.DefaultAETBaseUnits, shares)
 }
 
 func TestOfficialLiquidStakingDepositRejectsValidatorAddress(t *testing.T) {
@@ -88,7 +262,7 @@ func TestOfficialLiquidStakingDepositRejectsValidatorAddress(t *testing.T) {
 		PoolID:           pool.PoolID,
 		UserAddress:      aePoolAddress(t, "22"),
 		ValidatorAddress: aePoolAddress(t, "33"),
-		Amount:           100,
+		Amount:           types.DefaultMinPoolDeposit,
 		Height:           2,
 	})
 	require.ErrorContains(t, err, "must not include a validator address")
@@ -116,7 +290,7 @@ func TestOfficialLiquidStakingDepositRequiresAEUserAddress(t *testing.T) {
 		Authority:   prototype.DefaultAuthority,
 		PoolID:      pool.PoolID,
 		UserAddress: rawPoolAddress("22"),
-		Amount:      100,
+		Amount:      types.DefaultMinPoolDeposit,
 		Height:      2,
 	})
 	require.ErrorContains(t, err, "must use AE user-facing address format")
@@ -130,7 +304,7 @@ func TestOfficialLiquidStakingReceiptExportImportRoundTrip(t *testing.T) {
 		Authority:   prototype.DefaultAuthority,
 		PoolID:      pool.PoolID,
 		UserAddress: user,
-		Amount:      100,
+		Amount:      types.DefaultMinPoolDeposit,
 		Height:      2,
 	})
 	require.NoError(t, err)
@@ -166,7 +340,7 @@ func TestOfficialContractCanInjectPooledStake(t *testing.T) {
 		Authority:   prototype.DefaultAuthority,
 		PoolID:      pool.PoolID,
 		UserAddress: aePoolAddress(t, "22"),
-		Amount:      100,
+		Amount:      types.DefaultMinPoolDeposit,
 		Height:      2,
 	})
 	require.NoError(t, err)
@@ -175,13 +349,13 @@ func TestOfficialContractCanInjectPooledStake(t *testing.T) {
 		CallerContractUser: pool.ContractAddressUser,
 		PoolID:             pool.PoolID,
 		ValidatorAddress:   aePoolAddress(t, "33"),
-		Amount:             100,
+		Amount:             types.DefaultMinPoolDeposit,
 		Height:             3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, []types.PoolAllocation{{
 		ValidatorAddress: aePoolAddress(t, "33"),
-		Amount:           100,
+		Amount:           types.DefaultMinPoolDeposit,
 		Height:           3,
 	}}, updated.Allocations)
 }
@@ -193,7 +367,7 @@ func TestUnauthorizedContractCannotInjectPooledStake(t *testing.T) {
 		Authority:   prototype.DefaultAuthority,
 		PoolID:      pool.PoolID,
 		UserAddress: aePoolAddress(t, "22"),
-		Amount:      100,
+		Amount:      types.DefaultMinPoolDeposit,
 		Height:      2,
 	})
 	require.NoError(t, err)
@@ -202,7 +376,7 @@ func TestUnauthorizedContractCannotInjectPooledStake(t *testing.T) {
 		CallerContractUser: aePoolAddress(t, "77"),
 		PoolID:             pool.PoolID,
 		ValidatorAddress:   aePoolAddress(t, "33"),
-		Amount:             100,
+		Amount:             types.DefaultMinPoolDeposit,
 		Height:             3,
 	})
 	require.ErrorContains(t, err, "requires official liquid staking contract")
@@ -215,7 +389,7 @@ func TestPooledStakeInjectionCannotExceedPoolAccounting(t *testing.T) {
 		Authority:   prototype.DefaultAuthority,
 		PoolID:      pool.PoolID,
 		UserAddress: aePoolAddress(t, "22"),
-		Amount:      100,
+		Amount:      types.DefaultMinPoolDeposit,
 		Height:      2,
 	})
 	require.NoError(t, err)
@@ -224,7 +398,7 @@ func TestPooledStakeInjectionCannotExceedPoolAccounting(t *testing.T) {
 		CallerContractUser: pool.ContractAddressUser,
 		PoolID:             pool.PoolID,
 		ValidatorAddress:   aePoolAddress(t, "33"),
-		Amount:             101,
+		Amount:             types.DefaultMinPoolDeposit + 1,
 		Height:             3,
 	})
 	require.ErrorContains(t, err, "exceeds unallocated pool stake")
@@ -241,7 +415,7 @@ func TestFrozenLimitedOfficialPoolRejectsDeposits(t *testing.T) {
 		Authority:   prototype.DefaultAuthority,
 		PoolID:      pool.PoolID,
 		UserAddress: aePoolAddress(t, "22"),
-		Amount:      100,
+		Amount:      types.DefaultMinPoolDeposit,
 		Height:      2,
 	})
 	require.ErrorContains(t, err, "must be active for deposits")
@@ -552,6 +726,7 @@ func TestStakingProofQueryIsBoundedAndReturnsMetadata(t *testing.T) {
 	require.Zero(t, counters.DelegatorLookups)
 	require.Zero(t, counters.DelegatorRewardUpdates)
 }
+
 func TestSlashAppliesProportionally(t *testing.T) {
 	k := NewKeeper()
 	pool := createPool(t, &k, "pool-a")
@@ -732,6 +907,7 @@ func proofUserAddress(hexByte string) string {
 	}
 	return text
 }
+
 func aePoolAddress(t *testing.T, hexByte string) string {
 	t.Helper()
 	return aeFromRaw(t, rawPoolAddress(hexByte))
