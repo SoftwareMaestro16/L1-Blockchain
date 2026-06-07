@@ -152,8 +152,12 @@ func (v Validator) Validate(params Params) error {
 		return errors.New("staking validator bps fields must be <= 10000")
 	}
 	if v.Status == StateValidatorStatusActive {
+		mode := ValidatorFundingPoolBacked
+		if v.NominatorStake == 0 {
+			mode = ValidatorFundingSolo
+		}
 		return params.ValidateValidatorFunding(ValidatorFunding{
-			Mode:           ValidatorFundingPoolBacked,
+			Mode:           mode,
 			SelfStake:      v.SelfStake,
 			NominatorStake: v.NominatorStake,
 		})
@@ -270,8 +274,11 @@ func (a PoolValidatorAllocation) Validate(params Params, validator Validator) er
 	if validator.SlashingRiskBps >= MaxBasisPoints {
 		return errors.New("pool allocation validator slashing risk is not eligible")
 	}
-	if a.TargetWeightBps < params.MinPoolValidatorAllocationBps || a.TargetWeightBps > params.MaxPoolValidatorAllocationBps {
-		return errors.New("pool allocation target weight outside configured bounds")
+	if a.TargetWeightBps > MaxBasisPoints {
+		return errors.New("pool allocation target weight exceeds basis points")
+	}
+	if validator.AllocationLimitBps == 0 {
+		return errors.New("pool allocation validator allocation limit is not eligible")
 	}
 	if a.PerformanceScore > MaxBasisPoints || a.CommissionBps > MaxBasisPoints || a.SlashingRiskBps > MaxBasisPoints {
 		return errors.New("pool allocation bps fields must be <= 10000")

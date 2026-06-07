@@ -163,6 +163,77 @@ type AllocationWeight struct {
 	WeightBps        uint32
 }
 
+type PoolStateMetadata struct {
+	OwnerRaw               string
+	PoolContractAddressRaw string
+	TouchedKeys            []string
+}
+
+type StakingPoolDepositReceipt struct {
+	PoolID                  string
+	OwnerAddress            string
+	PoolContractAddressUser string
+	ReceiptToken            string
+	Amount                  uint64
+	Shares                  uint64
+	Height                  uint64
+	InternalMetadata        PoolStateMetadata
+}
+
+type PoolUnbondReceipt struct {
+	PoolID           string
+	OwnerAddress     string
+	RequestID        string
+	Shares           uint64
+	Amount           uint64
+	RequestHeight    uint64
+	CompleteHeight   uint64
+	InternalMetadata PoolStateMetadata
+}
+
+type PoolWithdrawalReceipt struct {
+	PoolID           string
+	OwnerAddress     string
+	RequestID        string
+	Amount           uint64
+	Height           uint64
+	InternalMetadata PoolStateMetadata
+}
+
+type PoolRewardClaimReceipt struct {
+	PoolID           string
+	OwnerAddress     string
+	Amount           uint64
+	Epoch            uint64
+	Height           uint64
+	InternalMetadata PoolStateMetadata
+}
+
+type StakeReputationClaimReceipt struct {
+	Account          string
+	PoolID           string
+	ReputationDelta  uint64
+	ReputationScore  uint64
+	Height           uint64
+	InternalMetadata PoolStateMetadata
+}
+
+type PoolRebalanceReceipt struct {
+	PoolID           string
+	Epoch            uint64
+	Height           uint64
+	Allocations      []PoolValidatorAllocation
+	InternalMetadata PoolStateMetadata
+}
+
+type ValidatorRegistrationReceipt struct {
+	Validator   string
+	Status      string
+	SelfStake   uint64
+	PoolStake   uint64
+	TouchedKeys []string
+}
+
 type State struct {
 	Pools                       []NominatorPool
 	Validators                  []Validator
@@ -338,6 +409,14 @@ type MsgDepositToOfficialLiquidStaking struct {
 	ValidatorAddress string
 }
 
+type MsgDepositToStakingPool struct {
+	PoolID           string
+	WalletAddress    string
+	Amount           uint64
+	Height           uint64
+	ValidatorAddress string
+}
+
 type MsgDelegateToValidator struct {
 	Authority        string
 	UserAddress      string
@@ -352,6 +431,37 @@ type MsgInjectPooledStake struct {
 	ValidatorAddress   string
 	Amount             uint64
 	Height             uint64
+}
+
+type MsgInjectPoolStake struct {
+	CallerContractUser string
+	PoolID             string
+	Allocations        []PoolAllocation
+	Height             uint64
+}
+
+type MsgWithdrawPoolStake struct {
+	CallerContractUser string
+	PoolID             string
+	OwnerAddress       string
+	RequestID          string
+	Height             uint64
+}
+
+type MsgRebalancePoolAllocations struct {
+	CallerContractUser string
+	PoolID             string
+	Epoch              uint64
+	Height             uint64
+	Candidates         []ValidatorPolicyCandidate
+}
+
+type MsgSetOfficialLiquidStakingContract struct {
+	Authority           string
+	PoolID              string
+	ContractAddressUser string
+	ContractAddressRaw  string
+	Height              uint64
 }
 
 type MsgUpdateParams struct {
@@ -369,6 +479,14 @@ type MsgRequestPoolWithdrawal struct {
 	Height       uint64
 }
 
+type MsgRequestPoolUnbond struct {
+	PoolID       string
+	OwnerAddress string
+	RequestID    string
+	Shares       uint64
+	Height       uint64
+}
+
 type MsgCancelPoolWithdrawal struct {
 	Authority    string
 	PoolID       string
@@ -378,10 +496,17 @@ type MsgCancelPoolWithdrawal struct {
 }
 
 type MsgClaimPoolRewards struct {
-	Authority string
-	PoolID    string
-	Delegator string
-	Height    uint64
+	Authority    string
+	PoolID       string
+	Delegator    string
+	OwnerAddress string
+	Height       uint64
+}
+
+type MsgClaimStakeReputation struct {
+	PoolID       string
+	OwnerAddress string
+	Height       uint64
 }
 
 type MsgSyncPoolRewards struct {
@@ -418,6 +543,34 @@ type MsgChangePoolValidator struct {
 	ValidatorTarget string
 	ValidatorStatus string
 	Height          uint64
+}
+
+type MsgRegisterValidator struct {
+	SignerAddress    string
+	ValidatorAddress string
+	SelfStake        uint64
+	NominatorStake   uint64
+	CommissionBps    uint32
+	Height           uint64
+}
+
+type MsgUpdateValidator struct {
+	SignerAddress      string
+	ValidatorAddress   string
+	SelfStake          uint64
+	NominatorStake     uint64
+	PerformanceScore   uint32
+	CommissionBps      uint32
+	SlashingRiskBps    uint32
+	AllocationLimitBps uint32
+	Status             string
+	Height             uint64
+}
+
+type MsgUpdateStakingParams struct {
+	Authority string
+	Params    Params
+	Height    uint64
 }
 
 type QueryPoolShareRequest struct {
@@ -1070,11 +1223,6 @@ func (p NominatorPool) Validate(params Params) error {
 			return fmt.Errorf("duplicate pool withdrawal %s", withdrawal.WithdrawalID)
 		}
 		withdrawals[withdrawal.WithdrawalID] = struct{}{}
-		if withdrawal.Status == WithdrawalStatusPending {
-			if _, found := delegators[withdrawal.Delegator]; !found {
-				return fmt.Errorf("withdrawal %s references unknown delegator", withdrawal.WithdrawalID)
-			}
-		}
 	}
 	for _, deposit := range p.PendingDeposits {
 		if err := deposit.Validate(); err != nil {
