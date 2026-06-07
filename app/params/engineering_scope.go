@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	EngineeringScopeCoreChainConfiguration = "core_chain_configuration"
+	EngineeringScopeCoreChainConfiguration   = "core_chain_configuration"
+	EngineeringScopeConsensusParameterPolicy = "consensus_parameter_policy"
 
 	FeatureCompletionCode              = "code"
 	FeatureCompletionParams            = "params"
@@ -46,6 +47,32 @@ const (
 	CoreChainTestRejectUnsafeModulePermissions  = "app_rejects_unsafe_module_account_permissions"
 	CoreChainTestExportImportAppHash            = "export_import_preserves_app_hash_where_expected"
 	CoreChainTestModuleInitializationOrder      = "simulation_or_integration_test_covers_module_initialization_order"
+
+	ConsensusParamTaskBlockTimeRange         = "target_block_time_range"
+	ConsensusParamTaskMaxBlockBytes          = "max_block_bytes"
+	ConsensusParamTaskMaxBlockGas            = "max_block_gas"
+	ConsensusParamTaskEvidenceMaxAgeBlocks   = "evidence_max_age_by_blocks"
+	ConsensusParamTaskEvidenceMaxAgeDuration = "evidence_max_age_by_duration"
+	ConsensusParamTaskValidatorPubKeyTypes   = "validator_public_key_types"
+	ConsensusParamTaskTimeoutProfiles        = "cometbft_timeout_profile_for_100_200_300_validators"
+	ConsensusParamTaskSnapshotInterval       = "snapshot_interval"
+	ConsensusParamTaskStateSyncParameters    = "state_sync_parameters"
+	ConsensusParamTaskPruningProfiles        = "pruning_profiles"
+
+	ConsensusParamDeliverableConservativeInitialValues = "conservative_initial_values"
+	ConsensusParamDeliverableBlockTimeTable            = "block_time_target_table_100_200_300_validators"
+	ConsensusParamDeliverableBlockGasBounds            = "max_block_gas_bounds"
+	ConsensusParamDeliverableBlockBytesBounds          = "max_block_bytes_bounds"
+	ConsensusParamDeliverableEvidenceWindowTable       = "evidence_window_table"
+	ConsensusParamDeliverableTimeoutProfileTable       = "timeout_profile_table"
+	ConsensusParamDeliverableStateSyncSnapshotPruning  = "state_sync_snapshot_pruning_table"
+	ConsensusParamDeliverableGovernanceSafetyBounds    = "governance_safety_bounds"
+
+	ConsensusParamTestLocalnetTimeoutStability = "localnet_remains_stable_under_configured_timeout_profile"
+	ConsensusParamTestOversizedBlocksRejected  = "oversized_blocks_are_rejected"
+	ConsensusParamTestInvalidParamsRejected    = "invalid_consensus_params_are_rejected"
+	ConsensusParamTestGovernanceBounds         = "governance_cannot_set_unsafe_block_gas_bytes_outside_bounds"
+	ConsensusParamTestEvidencePeriod           = "evidence_remains_valid_through_configured_evidence_period"
 )
 
 type FeatureCompletionEvidence struct {
@@ -156,6 +183,37 @@ func DefaultCoreChainConfigurationScopePlan() EngineeringScopePlan {
 	}
 }
 
+func DefaultConsensusParameterPolicyScopePlan() EngineeringScopePlan {
+	return EngineeringScopePlan{
+		ScopeID: EngineeringScopeConsensusParameterPolicy,
+		Items: []EngineeringScopeItem{
+			engineeringScopeItem("task", ConsensusParamTaskBlockTimeRange),
+			engineeringScopeItem("task", ConsensusParamTaskMaxBlockBytes),
+			engineeringScopeItem("task", ConsensusParamTaskMaxBlockGas),
+			engineeringScopeItem("task", ConsensusParamTaskEvidenceMaxAgeBlocks),
+			engineeringScopeItem("task", ConsensusParamTaskEvidenceMaxAgeDuration),
+			engineeringScopeItem("task", ConsensusParamTaskValidatorPubKeyTypes),
+			engineeringScopeItem("task", ConsensusParamTaskTimeoutProfiles),
+			engineeringScopeItem("task", ConsensusParamTaskSnapshotInterval),
+			engineeringScopeItem("task", ConsensusParamTaskStateSyncParameters),
+			engineeringScopeItem("task", ConsensusParamTaskPruningProfiles),
+			engineeringScopeItem("deliverable", ConsensusParamDeliverableConservativeInitialValues),
+			engineeringScopeItem("deliverable", ConsensusParamDeliverableBlockTimeTable),
+			engineeringScopeItem("deliverable", ConsensusParamDeliverableBlockGasBounds),
+			engineeringScopeItem("deliverable", ConsensusParamDeliverableBlockBytesBounds),
+			engineeringScopeItem("deliverable", ConsensusParamDeliverableEvidenceWindowTable),
+			engineeringScopeItem("deliverable", ConsensusParamDeliverableTimeoutProfileTable),
+			engineeringScopeItem("deliverable", ConsensusParamDeliverableStateSyncSnapshotPruning),
+			engineeringScopeItem("deliverable", ConsensusParamDeliverableGovernanceSafetyBounds),
+			engineeringScopeItem("test", ConsensusParamTestLocalnetTimeoutStability),
+			engineeringScopeItem("test", ConsensusParamTestOversizedBlocksRejected),
+			engineeringScopeItem("test", ConsensusParamTestInvalidParamsRejected),
+			engineeringScopeItem("test", ConsensusParamTestGovernanceBounds),
+			engineeringScopeItem("test", ConsensusParamTestEvidencePeriod),
+		},
+	}
+}
+
 func ValidateEngineeringScopePlan(plan EngineeringScopePlan) error {
 	report := BuildEngineeringScopeReport(plan)
 	if !report.Ready {
@@ -225,40 +283,70 @@ func engineeringScopeItem(kind, id string) EngineeringScopeItem {
 
 func expectedEngineeringScopeItems(scopeID string) map[string]bool {
 	out := map[string]bool{}
-	if scopeID != EngineeringScopeCoreChainConfiguration {
+	switch scopeID {
+	case EngineeringScopeCoreChainConfiguration:
+		for _, id := range []string{
+			CoreChainTaskChainIDNamingPolicy,
+			CoreChainTaskStakingDenomNaet,
+			CoreChainTaskDisplayDenomAET,
+			CoreChainTaskCoinMetadata,
+			CoreChainTaskAddressPrefixReserved,
+			CoreChainTaskModuleAccountPermissions,
+			CoreChainTaskBlockedAddressPolicy,
+			CoreChainTaskMintAuthority,
+			CoreChainTaskBurnAuthority,
+			CoreChainTaskFeeCollectorAuthority,
+			CoreChainTaskTreasuryAuthority,
+			CoreChainTaskAetraGenesisValidation,
+			CoreChainTaskAllModulesExportImport,
+			CoreChainDeliverableAppWiringReview,
+			CoreChainDeliverableGenesisParamsTable,
+			CoreChainDeliverableModuleAccountsTable,
+			CoreChainDeliverableAuthorityMatrix,
+			CoreChainDeliverableCLICommandMatrix,
+			CoreChainDeliverableQueryMatrix,
+			CoreChainDeliverableEventMatrix,
+			CoreChainDeliverableStartupValidationTests,
+			CoreChainTestDefaultGenesisBoots,
+			CoreChainTestRejectInvalidDenomMetadata,
+			CoreChainTestRejectMissingModuleAccounts,
+			CoreChainTestRejectDuplicateReservedAddress,
+			CoreChainTestRejectUnsafeModulePermissions,
+			CoreChainTestExportImportAppHash,
+			CoreChainTestModuleInitializationOrder,
+		} {
+			out[id] = true
+		}
+	case EngineeringScopeConsensusParameterPolicy:
+		for _, id := range []string{
+			ConsensusParamTaskBlockTimeRange,
+			ConsensusParamTaskMaxBlockBytes,
+			ConsensusParamTaskMaxBlockGas,
+			ConsensusParamTaskEvidenceMaxAgeBlocks,
+			ConsensusParamTaskEvidenceMaxAgeDuration,
+			ConsensusParamTaskValidatorPubKeyTypes,
+			ConsensusParamTaskTimeoutProfiles,
+			ConsensusParamTaskSnapshotInterval,
+			ConsensusParamTaskStateSyncParameters,
+			ConsensusParamTaskPruningProfiles,
+			ConsensusParamDeliverableConservativeInitialValues,
+			ConsensusParamDeliverableBlockTimeTable,
+			ConsensusParamDeliverableBlockGasBounds,
+			ConsensusParamDeliverableBlockBytesBounds,
+			ConsensusParamDeliverableEvidenceWindowTable,
+			ConsensusParamDeliverableTimeoutProfileTable,
+			ConsensusParamDeliverableStateSyncSnapshotPruning,
+			ConsensusParamDeliverableGovernanceSafetyBounds,
+			ConsensusParamTestLocalnetTimeoutStability,
+			ConsensusParamTestOversizedBlocksRejected,
+			ConsensusParamTestInvalidParamsRejected,
+			ConsensusParamTestGovernanceBounds,
+			ConsensusParamTestEvidencePeriod,
+		} {
+			out[id] = true
+		}
+	default:
 		return out
-	}
-	for _, id := range []string{
-		CoreChainTaskChainIDNamingPolicy,
-		CoreChainTaskStakingDenomNaet,
-		CoreChainTaskDisplayDenomAET,
-		CoreChainTaskCoinMetadata,
-		CoreChainTaskAddressPrefixReserved,
-		CoreChainTaskModuleAccountPermissions,
-		CoreChainTaskBlockedAddressPolicy,
-		CoreChainTaskMintAuthority,
-		CoreChainTaskBurnAuthority,
-		CoreChainTaskFeeCollectorAuthority,
-		CoreChainTaskTreasuryAuthority,
-		CoreChainTaskAetraGenesisValidation,
-		CoreChainTaskAllModulesExportImport,
-		CoreChainDeliverableAppWiringReview,
-		CoreChainDeliverableGenesisParamsTable,
-		CoreChainDeliverableModuleAccountsTable,
-		CoreChainDeliverableAuthorityMatrix,
-		CoreChainDeliverableCLICommandMatrix,
-		CoreChainDeliverableQueryMatrix,
-		CoreChainDeliverableEventMatrix,
-		CoreChainDeliverableStartupValidationTests,
-		CoreChainTestDefaultGenesisBoots,
-		CoreChainTestRejectInvalidDenomMetadata,
-		CoreChainTestRejectMissingModuleAccounts,
-		CoreChainTestRejectDuplicateReservedAddress,
-		CoreChainTestRejectUnsafeModulePermissions,
-		CoreChainTestExportImportAppHash,
-		CoreChainTestModuleInitializationOrder,
-	} {
-		out[id] = true
 	}
 	return out
 }

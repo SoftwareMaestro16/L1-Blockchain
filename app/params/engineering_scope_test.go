@@ -92,15 +92,56 @@ func TestDefaultCoreChainConfigurationScopePlanCoversTasksDeliverablesAndTests(t
 	}
 }
 
+func TestDefaultConsensusParameterPolicyScopePlanCoversTasksDeliverablesAndTests(t *testing.T) {
+	plan := DefaultConsensusParameterPolicyScopePlan()
+	report := BuildEngineeringScopeReport(plan)
+	require.True(t, report.Ready, report.Failed)
+	require.Empty(t, report.Failed)
+	require.Equal(t, report.Required, report.Done)
+	require.NoError(t, ValidateEngineeringScopePlan(plan))
+
+	ids := map[string]bool{}
+	for _, item := range plan.Items {
+		ids[item.ID] = true
+	}
+	for _, requiredID := range []string{
+		ConsensusParamTaskBlockTimeRange,
+		ConsensusParamTaskMaxBlockBytes,
+		ConsensusParamTaskMaxBlockGas,
+		ConsensusParamTaskEvidenceMaxAgeBlocks,
+		ConsensusParamTaskEvidenceMaxAgeDuration,
+		ConsensusParamTaskValidatorPubKeyTypes,
+		ConsensusParamTaskTimeoutProfiles,
+		ConsensusParamTaskSnapshotInterval,
+		ConsensusParamTaskStateSyncParameters,
+		ConsensusParamTaskPruningProfiles,
+		ConsensusParamDeliverableConservativeInitialValues,
+		ConsensusParamDeliverableBlockTimeTable,
+		ConsensusParamDeliverableBlockGasBounds,
+		ConsensusParamDeliverableBlockBytesBounds,
+		ConsensusParamDeliverableEvidenceWindowTable,
+		ConsensusParamDeliverableTimeoutProfileTable,
+		ConsensusParamDeliverableStateSyncSnapshotPruning,
+		ConsensusParamDeliverableGovernanceSafetyBounds,
+		ConsensusParamTestLocalnetTimeoutStability,
+		ConsensusParamTestOversizedBlocksRejected,
+		ConsensusParamTestInvalidParamsRejected,
+		ConsensusParamTestGovernanceBounds,
+		ConsensusParamTestEvidencePeriod,
+	} {
+		require.True(t, ids[requiredID], requiredID)
+	}
+}
+
 func TestEngineeringScopeRejectsMissingEvidenceAndRequiredItems(t *testing.T) {
-	plan := DefaultCoreChainConfigurationScopePlan()
+	plan := DefaultConsensusParameterPolicyScopePlan()
 	plan.Items[0].Done = false
 	plan.Items = plan.Items[:len(plan.Items)-1]
 
 	report := BuildEngineeringScopeReport(plan)
 	require.False(t, report.Ready)
-	require.Contains(t, report.Failed, CoreChainTaskChainIDNamingPolicy+":missing_evidence")
-	require.Contains(t, report.Failed, CoreChainTestModuleInitializationOrder+":missing")
+	require.Contains(t, report.Failed, ConsensusParamTaskBlockTimeRange+":missing_evidence")
+	require.Contains(t, report.Failed, ConsensusParamTestEvidencePeriod+":missing")
 	require.Error(t, ValidateEngineeringScopePlan(plan))
 }
 
