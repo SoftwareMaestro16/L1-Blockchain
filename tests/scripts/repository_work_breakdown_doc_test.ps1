@@ -40,6 +40,28 @@ foreach ($term in @(
     'The `proto/` tree owns public wire contracts',
     'Code generation must be reproducible',
     'Service registration tests must prove that query and tx services are reachable',
+    '32.2 `x/`',
+    'implement keepers',
+    'implement message servers',
+    'implement query servers',
+    'implement genesis',
+    'implement params validation',
+    'implement invariants',
+    'implement hooks where needed',
+    'implement events',
+    'implement module interfaces',
+    'keeper unit tests',
+    'msg server tests',
+    'query server tests',
+    'genesis tests',
+    'invariant tests',
+    'fuzz/property tests for math',
+    'The `x/` tree owns module behavior',
+    'Keepers must be deterministic',
+    'Message servers must validate signers',
+    'Query servers must return stable response shapes',
+    'Fuzz/property tests are required for math-heavy logic',
+    'DefaultAetraRepoXWorkEvidence',
     'DefaultAetraRepoProtoWorkEvidence'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "repository work breakdown doc missing: $term"
@@ -47,6 +69,7 @@ foreach ($term in @(
 
 foreach ($term in @(
     'AetraRepoAreaProto',
+    'AetraRepoAreaX',
     'AetraRepoProtoTaskDefineMessages',
     'AetraRepoProtoTaskDefineQueryServices',
     'AetraRepoProtoTaskDefineTxServices',
@@ -57,20 +80,42 @@ foreach ($term in @(
     'AetraRepoProtoTestGeneratedCodeCompiles',
     'AetraRepoProtoTestLintPasses',
     'AetraRepoProtoTestServiceRegistration',
+    'AetraRepoXTaskImplementKeepers',
+    'AetraRepoXTaskImplementMsgServers',
+    'AetraRepoXTaskImplementQueryServers',
+    'AetraRepoXTaskImplementGenesis',
+    'AetraRepoXTaskImplementParamsValidation',
+    'AetraRepoXTaskImplementInvariants',
+    'AetraRepoXTaskImplementHooks',
+    'AetraRepoXTaskImplementEvents',
+    'AetraRepoXTaskImplementModuleInterfaces',
+    'AetraRepoXTestKeeperUnit',
+    'AetraRepoXTestMsgServer',
+    'AetraRepoXTestQueryServer',
+    'AetraRepoXTestGenesis',
+    'AetraRepoXTestInvariant',
+    'AetraRepoXTestFuzzPropertyMath',
     'AetraRepoWorkAreaEvidence',
     'AetraRepoWorkAreaReport',
     'DefaultAetraRepoProtoWorkEvidence',
+    'DefaultAetraRepoXWorkEvidence',
     'ValidateAetraRepoProtoWork',
+    'ValidateAetraRepoXWork',
     'BuildAetraRepoProtoWorkReport',
+    'BuildAetraRepoXWorkReport',
     'RequiredAetraRepoProtoTasks',
-    'RequiredAetraRepoProtoTests'
+    'RequiredAetraRepoProtoTests',
+    'RequiredAetraRepoXTasks',
+    'RequiredAetraRepoXTests'
   )) {
   Assert-Contains -Text $catalogText -Pattern ([regex]::Escape($term)) -Message "repository work breakdown catalog missing: $term"
 }
 
 foreach ($term in @(
     'TestDefaultAetraRepoProtoWorkCoversSection321',
-    'TestAetraRepoProtoWorkRejectsMissingTasksAndTests'
+    'TestAetraRepoProtoWorkRejectsMissingTasksAndTests',
+    'TestDefaultAetraRepoXWorkCoversSection322',
+    'TestAetraRepoXWorkRejectsMissingTasksAndTests'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "repository work breakdown tests missing: $term"
 }
