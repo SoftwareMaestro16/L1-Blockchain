@@ -6,11 +6,12 @@ import (
 )
 
 const (
-	ImplementationPhaseBaselineAudit     = "phase_0_baseline_audit"
-	ImplementationPhaseStakingPolicyCap  = "phase_1_staking_policy_validator_cap"
-	ImplementationPhaseEconomicsFeeSplit = "phase_2_economics_fee_split"
-	ImplementationPhaseValidatorScore    = "phase_3_validator_score_accountability"
-	ImplementationPhaseSlashingHardening = "phase_4_slashing_hardening"
+	ImplementationPhaseBaselineAudit       = "phase_0_baseline_audit"
+	ImplementationPhaseStakingPolicyCap    = "phase_1_staking_policy_validator_cap"
+	ImplementationPhaseEconomicsFeeSplit   = "phase_2_economics_fee_split"
+	ImplementationPhaseValidatorScore      = "phase_3_validator_score_accountability"
+	ImplementationPhaseSlashingHardening   = "phase_4_slashing_hardening"
+	ImplementationPhaseCosmWasmIntegration = "phase_5_cosmwasm_integration"
 
 	PhaseTaskInspectVersions                     = "inspect_current_cosmos_sdk_and_cometbft_versions"
 	PhaseTaskDocumentModuleGraph                 = "document_current_app_module_graph"
@@ -44,6 +45,13 @@ const (
 	PhaseTaskImplementProgressiveDowntime        = "implement_progressive_downtime_if_not_covered_by_standard_module"
 	PhaseTaskAddObjectiveTimestampProposalPolicy = "add_timestamp_proposal_violation_policy_where_objective"
 	PhaseTaskDocumentEvidenceLifecycle           = "document_evidence_lifecycle_and_unbonding_interaction"
+	PhaseTaskFinalizeCosmWasmWiring              = "finalize_cosmwasm_module_wiring"
+	PhaseTaskDefineCodeUploadPolicy              = "define_code_upload_policy"
+	PhaseTaskDefineContractGasLimits             = "define_contract_gas_limits"
+	PhaseTaskDefineContractSizeLimits            = "define_contract_size_limits"
+	PhaseTaskIntegrateStorageRentPricing         = "integrate_storage_rent_or_storage_pricing"
+	PhaseTaskExposeContractIndexerEvents         = "expose_contract_events_for_indexers"
+	PhaseTaskDocumentContractDeveloperFlow       = "document_contract_developer_flow"
 
 	PhaseDeliverableModuleInventory         = "module_inventory"
 	PhaseDeliverableGapAnalysis             = "gap_analysis"
@@ -84,6 +92,13 @@ const (
 	PhaseTestDelegatorLoss              = "delegator_loss_tests"
 	PhaseTestTombstone                  = "tombstone_tests"
 	PhaseTestEvidenceExpiry             = "evidence_expiry_tests"
+	PhaseTestContractTxFlow             = "instantiate_execute_query_tests"
+	PhaseTestContractMigration          = "migration_tests"
+	PhaseTestContractGasLimit           = "gas_limit_tests"
+	PhaseTestContractStorageLimitRent   = "storage_limit_rent_tests"
+	PhaseTestMaliciousContract          = "malicious_contract_tests"
+	PhaseTestContractExportImport       = "export_import_tests_with_contracts"
+	PhaseTestLocalnetCosmWasmSmoke      = "localnet_cosmwasm_smoke_test"
 
 	PhaseAcceptanceNoValidatorExceedsCap      = "no_validator_can_exceed_effective_power_cap"
 	PhaseAcceptanceExcessNoVotingPower        = "excess_stake_does_not_increase_voting_power"
@@ -102,6 +117,10 @@ const (
 	PhaseAcceptanceDowntimeBoundedProgressive = "downtime_penalties_are_bounded_and_progressive"
 	PhaseAcceptanceNoSubjectiveSlashing       = "no_subjective_slashing_path_exists"
 	PhaseAcceptanceSlashingStakeShareSafe     = "slashing_cannot_underflow_stake_or_corrupt_shares"
+	PhaseAcceptanceContractsDeterministic     = "contracts_are_deterministic"
+	PhaseAcceptanceContractGasBounded         = "contract_gas_is_bounded"
+	PhaseAcceptanceMaliciousContractsSafe     = "malicious_contracts_cannot_halt_chain"
+	PhaseAcceptanceContractStateExportImport  = "contract_state_survives_export_import"
 )
 
 type ImplementationPhaseItem struct {
@@ -237,6 +256,29 @@ func DefaultImplementationPhasePlans() []ImplementationPhasePlan {
 				phaseItem("acceptance", PhaseAcceptanceDowntimeBoundedProgressive),
 				phaseItem("acceptance", PhaseAcceptanceNoSubjectiveSlashing),
 				phaseItem("acceptance", PhaseAcceptanceSlashingStakeShareSafe),
+			},
+		},
+		{
+			PhaseID: ImplementationPhaseCosmWasmIntegration,
+			Items: []ImplementationPhaseItem{
+				phaseItem("task", PhaseTaskFinalizeCosmWasmWiring),
+				phaseItem("task", PhaseTaskDefineCodeUploadPolicy),
+				phaseItem("task", PhaseTaskDefineContractGasLimits),
+				phaseItem("task", PhaseTaskDefineContractSizeLimits),
+				phaseItem("task", PhaseTaskIntegrateStorageRentPricing),
+				phaseItem("task", PhaseTaskExposeContractIndexerEvents),
+				phaseItem("task", PhaseTaskDocumentContractDeveloperFlow),
+				phaseItem("test", PhaseTestContractTxFlow),
+				phaseItem("test", PhaseTestContractMigration),
+				phaseItem("test", PhaseTestContractGasLimit),
+				phaseItem("test", PhaseTestContractStorageLimitRent),
+				phaseItem("test", PhaseTestMaliciousContract),
+				phaseItem("test", PhaseTestContractExportImport),
+				phaseItem("test", PhaseTestLocalnetCosmWasmSmoke),
+				phaseItem("acceptance", PhaseAcceptanceContractsDeterministic),
+				phaseItem("acceptance", PhaseAcceptanceContractGasBounded),
+				phaseItem("acceptance", PhaseAcceptanceMaliciousContractsSafe),
+				phaseItem("acceptance", PhaseAcceptanceContractStateExportImport),
 			},
 		},
 	}
@@ -439,6 +481,29 @@ func defaultImplementationPhaseItemIDs() []phaseItemIDs {
 				PhaseAcceptanceDowntimeBoundedProgressive,
 				PhaseAcceptanceNoSubjectiveSlashing,
 				PhaseAcceptanceSlashingStakeShareSafe,
+			},
+		},
+		{
+			phaseID: ImplementationPhaseCosmWasmIntegration,
+			ids: []string{
+				PhaseTaskFinalizeCosmWasmWiring,
+				PhaseTaskDefineCodeUploadPolicy,
+				PhaseTaskDefineContractGasLimits,
+				PhaseTaskDefineContractSizeLimits,
+				PhaseTaskIntegrateStorageRentPricing,
+				PhaseTaskExposeContractIndexerEvents,
+				PhaseTaskDocumentContractDeveloperFlow,
+				PhaseTestContractTxFlow,
+				PhaseTestContractMigration,
+				PhaseTestContractGasLimit,
+				PhaseTestContractStorageLimitRent,
+				PhaseTestMaliciousContract,
+				PhaseTestContractExportImport,
+				PhaseTestLocalnetCosmWasmSmoke,
+				PhaseAcceptanceContractsDeterministic,
+				PhaseAcceptanceContractGasBounded,
+				PhaseAcceptanceMaliciousContractsSafe,
+				PhaseAcceptanceContractStateExportImport,
 			},
 		},
 	}

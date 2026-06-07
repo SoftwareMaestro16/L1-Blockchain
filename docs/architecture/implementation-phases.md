@@ -152,17 +152,47 @@ Acceptance:
 - no subjective slashing path exists;
 - slashing cannot underflow stake or corrupt shares.
 
+## Phase 5 - CosmWasm Integration
+
+Tasks:
+
+- finalize CosmWasm module wiring;
+- define code upload policy;
+- define contract gas limits;
+- define contract size limits;
+- integrate storage rent or storage pricing;
+- expose contract events for indexers;
+- document contract developer flow.
+
+Tests:
+
+- instantiate/execute/query tests;
+- migration tests;
+- gas limit tests;
+- storage limit/rent tests;
+- malicious contract tests;
+- export/import tests with contracts;
+- localnet CosmWasm smoke test.
+
+Acceptance:
+
+- contracts are deterministic;
+- contract gas is bounded;
+- malicious contracts cannot halt chain;
+- contract state survives export/import.
+
 ## Implementation Contract
 
 The implementation phase gate is `app/params/implementation_phases.go`.
 
 Required catalog properties:
 
-- `DefaultImplementationPhasePlans` must include Phase 0 through Phase 4;
+- `DefaultImplementationPhasePlans` must include Phase 0 through Phase 5;
 - Phase 0 must include baseline audit tasks, deliverables, and current test evidence;
 - Phase 1 must include staking cap tasks, tests, and acceptance checks;
 - Phase 2 must include economics, fee split, burn, treasury, APR, reward smoothing, and supply invariant checks;
 - Phase 3 must include validator score, accountability metrics, objective reward modifier, and consensus-safety checks;
 - Phase 4 must include objective slashing hardening, evidence lifecycle, tombstone, downtime, and stake/share safety checks;
+- Phase 5 must include CosmWasm module wiring, upload policy, gas/size limits, storage pricing, indexer events, developer flow, malicious contract safety, and export/import checks;
 - phase items require evidence;
 - missing tasks, deliverables, tests, or acceptance checks fail validation.

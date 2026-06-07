@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDefaultImplementationPhasePlansCoverPhase0ThroughPhase4(t *testing.T) {
+func TestDefaultImplementationPhasePlansCoverPhase0ThroughPhase5(t *testing.T) {
 	plans := DefaultImplementationPhasePlans()
-	require.Len(t, plans, 5)
+	require.Len(t, plans, 6)
 
 	for _, plan := range plans {
 		report := BuildImplementationPhaseReport(plan)
@@ -132,6 +132,39 @@ func TestImplementationPhaseSlashingHardeningRequiresAllAcceptanceGates(t *testi
 		PhaseAcceptanceDowntimeBoundedProgressive,
 		PhaseAcceptanceNoSubjectiveSlashing,
 		PhaseAcceptanceSlashingStakeShareSafe,
+	} {
+		require.True(t, ids[requiredID], requiredID)
+	}
+}
+
+func TestImplementationPhaseCosmWasmIntegrationRequiresAllAcceptanceGates(t *testing.T) {
+	plan := DefaultImplementationPhasePlans()[5]
+	report := BuildImplementationPhaseReport(plan)
+	require.True(t, report.Ready, report.Failed)
+
+	ids := map[string]bool{}
+	for _, item := range plan.Items {
+		ids[item.ID] = true
+	}
+	for _, requiredID := range []string{
+		PhaseTaskFinalizeCosmWasmWiring,
+		PhaseTaskDefineCodeUploadPolicy,
+		PhaseTaskDefineContractGasLimits,
+		PhaseTaskDefineContractSizeLimits,
+		PhaseTaskIntegrateStorageRentPricing,
+		PhaseTaskExposeContractIndexerEvents,
+		PhaseTaskDocumentContractDeveloperFlow,
+		PhaseTestContractTxFlow,
+		PhaseTestContractMigration,
+		PhaseTestContractGasLimit,
+		PhaseTestContractStorageLimitRent,
+		PhaseTestMaliciousContract,
+		PhaseTestContractExportImport,
+		PhaseTestLocalnetCosmWasmSmoke,
+		PhaseAcceptanceContractsDeterministic,
+		PhaseAcceptanceContractGasBounded,
+		PhaseAcceptanceMaliciousContractsSafe,
+		PhaseAcceptanceContractStateExportImport,
 	} {
 		require.True(t, ids[requiredID], requiredID)
 	}

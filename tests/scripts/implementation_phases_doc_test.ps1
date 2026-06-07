@@ -114,7 +114,26 @@ foreach ($term in @(
     'double-sign leads to severe slash and permanent tombstone',
     'downtime penalties are bounded and progressive',
     'no subjective slashing path exists',
-    'slashing cannot underflow stake or corrupt shares'
+    'slashing cannot underflow stake or corrupt shares',
+    'Phase 5 - CosmWasm Integration',
+    'finalize CosmWasm module wiring',
+    'define code upload policy',
+    'define contract gas limits',
+    'define contract size limits',
+    'integrate storage rent or storage pricing',
+    'expose contract events for indexers',
+    'document contract developer flow',
+    'instantiate/execute/query tests',
+    'migration tests',
+    'gas limit tests',
+    'storage limit/rent tests',
+    'malicious contract tests',
+    'export/import tests with contracts',
+    'localnet CosmWasm smoke test',
+    'contracts are deterministic',
+    'contract gas is bounded',
+    'malicious contracts cannot halt chain',
+    'contract state survives export/import'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "implementation phases doc missing: $term"
 }
@@ -125,6 +144,7 @@ foreach ($term in @(
     'ImplementationPhaseEconomicsFeeSplit',
     'ImplementationPhaseValidatorScore',
     'ImplementationPhaseSlashingHardening',
+    'ImplementationPhaseCosmWasmIntegration',
     'ImplementationPhaseItem',
     'ImplementationPhasePlan',
     'ImplementationPhaseReport',
@@ -167,6 +187,13 @@ foreach ($term in @(
     'PhaseTaskImplementProgressiveDowntime',
     'PhaseTaskAddObjectiveTimestampProposalPolicy',
     'PhaseTaskDocumentEvidenceLifecycle',
+    'PhaseTaskFinalizeCosmWasmWiring',
+    'PhaseTaskDefineCodeUploadPolicy',
+    'PhaseTaskDefineContractGasLimits',
+    'PhaseTaskDefineContractSizeLimits',
+    'PhaseTaskIntegrateStorageRentPricing',
+    'PhaseTaskExposeContractIndexerEvents',
+    'PhaseTaskDocumentContractDeveloperFlow',
     'PhaseTestInflationCurve',
     'PhaseTestBondedRatio',
     'PhaseTestFeeSplit',
@@ -190,6 +217,13 @@ foreach ($term in @(
     'PhaseTestDelegatorLoss',
     'PhaseTestTombstone',
     'PhaseTestEvidenceExpiry',
+    'PhaseTestContractTxFlow',
+    'PhaseTestContractMigration',
+    'PhaseTestContractGasLimit',
+    'PhaseTestContractStorageLimitRent',
+    'PhaseTestMaliciousContract',
+    'PhaseTestContractExportImport',
+    'PhaseTestLocalnetCosmWasmSmoke',
     'PhaseAcceptanceNoValidatorExceedsCap',
     'PhaseAcceptanceExcessNoVotingPower',
     'PhaseAcceptanceParamsSafeBounds',
@@ -206,18 +240,23 @@ foreach ($term in @(
     'PhaseAcceptanceDoubleSignTombstone',
     'PhaseAcceptanceDowntimeBoundedProgressive',
     'PhaseAcceptanceNoSubjectiveSlashing',
-    'PhaseAcceptanceSlashingStakeShareSafe'
+    'PhaseAcceptanceSlashingStakeShareSafe',
+    'PhaseAcceptanceContractsDeterministic',
+    'PhaseAcceptanceContractGasBounded',
+    'PhaseAcceptanceMaliciousContractsSafe',
+    'PhaseAcceptanceContractStateExportImport'
   )) {
   Assert-Contains -Text $policyText -Pattern ([regex]::Escape($term)) -Message "implementation phases policy missing: $term"
 }
 
 foreach ($term in @(
-    'TestDefaultImplementationPhasePlansCoverPhase0ThroughPhase4',
+    'TestDefaultImplementationPhasePlansCoverPhase0ThroughPhase5',
     'TestImplementationPhaseRejectsMissingEvidence',
     'TestImplementationPhaseRejectsMissingRequiredItem',
     'TestImplementationPhaseEconomicsFeeSplitRequiresAllAcceptanceGates',
     'TestImplementationPhaseValidatorScoreRequiresAllAcceptanceGates',
     'TestImplementationPhaseSlashingHardeningRequiresAllAcceptanceGates',
+    'TestImplementationPhaseCosmWasmIntegrationRequiresAllAcceptanceGates',
     'TestImplementationPhaseRejectsUnknownPhaseAndUnexpectedItem'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "implementation phases tests missing: $term"
