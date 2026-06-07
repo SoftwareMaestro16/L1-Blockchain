@@ -2,17 +2,37 @@ package keeper
 
 import (
 	"errors"
+	"fmt"
 
 	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	"github.com/sovereign-l1/l1/x/contracts/types"
 )
 
 type Keeper struct {
-	genesis types.GenesisState
+	genesis             types.GenesisState
+	accountStatusReader AccountStatusReader
+}
+
+const (
+	accountStatusActive   = "active"
+	accountStatusInactive = "inactive"
+	accountStatusFrozen   = "frozen"
+)
+
+// AccountStatusReader is a temporary integration boundary for CHAT 1 native-account wiring.
+// It keeps contract auth/freeze checks local until the account keeper interface is finalized.
+type AccountStatusReader interface {
+	AccountStatus(address string) (string, bool)
 }
 
 func NewKeeper() Keeper {
 	return Keeper{genesis: types.DefaultGenesis()}
+}
+
+func NewKeeperWithAccountStatus(reader AccountStatusReader) Keeper {
+	k := NewKeeper()
+	k.accountStatusReader = reader
+	return k
 }
 
 func DefaultGenesis() types.GenesisState {
@@ -20,6 +40,7 @@ func DefaultGenesis() types.GenesisState {
 }
 
 func (k *Keeper) InitGenesis(gs types.GenesisState) error {
+	gs = types.RefreshStateRoot(gs)
 	if err := gs.Validate(); err != nil {
 		return err
 	}
@@ -28,7 +49,7 @@ func (k *Keeper) InitGenesis(gs types.GenesisState) error {
 }
 
 func (k Keeper) ExportGenesis() types.GenesisState {
-	return k.genesis
+	return types.RefreshStateRoot(k.genesis)
 }
 
 func (k Keeper) Params() types.Params {
@@ -47,12 +68,30 @@ func (k *Keeper) StoreCode(msg types.MsgStoreCode) (types.StoreCodeResponse, err
 	if !k.genesis.Params.Enabled {
 		return types.StoreCodeResponse{}, errors.New(types.ErrExecutionFailed + ": module disabled")
 	}
+	if err := types.ValidateUserFacingAEAddress("contract code authority", msg.Authority); err != nil {
+		return types.StoreCodeResponse{}, err
+	}
+	if err := k.ensureActiveWallet(msg.Authority, "contract code store"); err != nil {
+		return types.StoreCodeResponse{}, err
+	}
 	if msg.CodeBytes == 0 || msg.CodeBytes > k.genesis.Params.MaxCodeBytes {
 		return types.StoreCodeResponse{}, errors.New(types.ErrInvalidBytecode + ": code size out of bounds")
 	}
 	if err := coretypes.ValidateHash("contracts code hash", msg.CodeHash); err != nil {
 		return types.StoreCodeResponse{}, err
 	}
+	next := k.genesis
+	next.State.Codes = upsertCode(next.State.Codes, types.CodeRecord{
+		CodeID:    msg.CodeHash,
+		CodeHash:  msg.CodeHash,
+		CodeBytes: msg.CodeBytes,
+		Owner:     msg.Authority,
+	})
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return types.StoreCodeResponse{}, err
+	}
+	k.genesis = next
 	return types.StoreCodeResponse{CodeID: msg.CodeHash, StateRoot: k.genesis.StateRoot}, nil
 }
 
@@ -60,5 +99,437 @@ func (k Keeper) Contract(req types.QueryContractRequest) (types.QueryContractRes
 	if err := types.ValidateContractAddress(req.ContractAddress); err != nil {
 		return types.QueryContractResponse{}, err
 	}
-	return types.QueryContractResponse{ContractAddress: req.ContractAddress, StateRoot: k.genesis.StateRoot, Found: false}, nil
+	contract, found := findContract(k.genesis.State.Contracts, req.ContractAddress)
+	return types.QueryContractResponse{ContractAddress: req.ContractAddress, StateRoot: k.genesis.StateRoot, Found: found, Contract: contract}, nil
+}
+
+func (k *Keeper) InstantiateContract(msg types.MsgInstantiateContract) (types.InstantiateContractResponse, error) {
+	if !k.genesis.Params.Enabled {
+		return types.InstantiateContractResponse{}, errors.New(types.ErrExecutionFailed + ": module disabled")
+	}
+	if err := types.ValidateUserFacingAEAddress("contract creator", msg.Creator); err != nil {
+		return types.InstantiateContractResponse{}, err
+	}
+	if err := k.ensureActiveWallet(msg.Creator, "contract instantiate"); err != nil {
+		return types.InstantiateContractResponse{}, err
+	}
+	if msg.Height == 0 {
+		return types.InstantiateContractResponse{}, errors.New("contract instantiate height must be positive")
+	}
+	code, found := findCode(k.genesis.State.Codes, msg.CodeID)
+	if !found {
+		return types.InstantiateContractResponse{}, errors.New(types.ErrContractNotFound + ": contract code not found")
+	}
+	if code.Owner != msg.Creator {
+		return types.InstantiateContractResponse{}, errors.New(types.ErrUnauthorized + ": contract instantiate requires code owner")
+	}
+	admin := msg.Admin
+	if admin == "" {
+		admin = msg.Creator
+	}
+	if err := types.ValidateUserFacingAEAddress("contract admin", admin); err != nil {
+		return types.InstantiateContractResponse{}, err
+	}
+	user, raw, err := types.DeriveContractAddress(msg.Creator, msg.CodeID, msg.Salt)
+	if err != nil {
+		return types.InstantiateContractResponse{}, err
+	}
+	if _, found := findContract(k.genesis.State.Contracts, user); found {
+		return types.InstantiateContractResponse{}, errors.New(types.ErrContractNotFound + ": contract address already exists")
+	}
+	if msg.StorageBytes > k.genesis.Params.MaxContractStorageBytes {
+		return types.InstantiateContractResponse{}, errors.New(types.ErrStorageRent + ": contract storage exceeds configured limit")
+	}
+	contract := types.Contract{
+		AddressUser:             user,
+		AddressRaw:              raw,
+		CodeID:                  msg.CodeID,
+		Creator:                 msg.Creator,
+		Owner:                   msg.Creator,
+		Admin:                   admin,
+		InitMsg:                 append([]byte(nil), msg.InitMsg...),
+		Data:                    append([]byte(nil), msg.InitMsg...),
+		Balance:                 msg.Funds,
+		Status:                  types.ContractStatusActive,
+		StorageBytes:            msg.StorageBytes,
+		LastStorageChargeHeight: msg.Height,
+		CreatedHeight:           msg.Height,
+		UpdatedHeight:           msg.Height,
+	}
+	next := k.genesis
+	next.State.Contracts = append(next.State.Contracts, contract)
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return types.InstantiateContractResponse{}, err
+	}
+	k.genesis = next
+	return types.InstantiateContractResponse{
+		ContractAddressUser: user,
+		ContractAddressRaw:  raw,
+		Owner:               contract.Owner,
+		Admin:               contract.Admin,
+		Balance:             contract.Balance,
+		Events: []types.ContractEvent{{
+			Type:        types.EventTypeContractInstantiated,
+			Actor:       msg.Creator,
+			Contract:    user,
+			Amount:      msg.Funds,
+			InternalRaw: raw,
+		}},
+	}, nil
+}
+
+func (k *Keeper) ExecuteContract(msg types.MsgExecuteContract) (types.ExecuteContractResponse, error) {
+	if !k.genesis.Params.Enabled {
+		return types.ExecuteContractResponse{}, errors.New(types.ErrExecutionFailed + ": module disabled")
+	}
+	if err := types.ValidateUserFacingAEAddress("contract execute sender", msg.Sender); err != nil {
+		return types.ExecuteContractResponse{}, err
+	}
+	if err := k.ensureActiveWallet(msg.Sender, "contract execute"); err != nil {
+		return types.ExecuteContractResponse{}, err
+	}
+	if msg.Height == 0 {
+		return types.ExecuteContractResponse{}, errors.New("contract execute height must be positive")
+	}
+	idx, contract, found := findContractWithIndex(k.genesis.State.Contracts, msg.ContractAddress)
+	if !found {
+		return types.ExecuteContractResponse{}, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if contract.Status == types.ContractStatusFrozen {
+		return types.ExecuteContractResponse{}, errors.New(types.ErrAccountFrozen + ": frozen contract cannot execute normal calls")
+	}
+	contract = k.chargeRent(contract, msg.Height)
+	if contract.StorageRentDebt > 0 {
+		contract.Status = types.ContractStatusFrozen
+		next := k.genesis
+		next.State.Contracts[idx] = contract
+		next = types.RefreshStateRoot(next)
+		k.genesis = next
+		return types.ExecuteContractResponse{}, errors.New(types.ErrStorageRent + ": contract has storage rent debt")
+	}
+	contract.Balance += msg.Funds
+	contract.Data = append([]byte(nil), msg.Msg...)
+	contract.UpdatedHeight = msg.Height
+	next := k.genesis
+	next.State.Contracts[idx] = contract
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return types.ExecuteContractResponse{}, err
+	}
+	k.genesis = next
+	return types.ExecuteContractResponse{
+		ContractAddressUser: contract.AddressUser,
+		Owner:               contract.Owner,
+		Balance:             contract.Balance,
+		Events: []types.ContractEvent{{
+			Type:        types.EventTypeContractExecuted,
+			Actor:       msg.Sender,
+			Contract:    contract.AddressUser,
+			Amount:      msg.Funds,
+			InternalRaw: contract.AddressRaw,
+		}},
+	}, nil
+}
+
+func (k *Keeper) TopUpContract(msg types.MsgTopUpContract) (types.Contract, error) {
+	if err := types.ValidateUserFacingAEAddress("contract top-up sender", msg.Sender); err != nil {
+		return types.Contract{}, err
+	}
+	if msg.Amount == 0 || msg.Height == 0 {
+		return types.Contract{}, errors.New("contract top-up amount and height must be positive")
+	}
+	idx, contract, found := findContractWithIndex(k.genesis.State.Contracts, msg.ContractAddress)
+	if !found {
+		return types.Contract{}, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	contract.Balance += msg.Amount
+	contract.UpdatedHeight = msg.Height
+	next := k.genesis
+	next.State.Contracts[idx] = contract
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return types.Contract{}, err
+	}
+	k.genesis = next
+	return contract, nil
+}
+
+func (k *Keeper) PayContractStorageDebt(msg types.MsgPayContractStorageDebt) (types.Contract, error) {
+	if err := types.ValidateUserFacingAEAddress("contract rent payer", msg.Sender); err != nil {
+		return types.Contract{}, err
+	}
+	if msg.Amount == 0 || msg.Height == 0 {
+		return types.Contract{}, errors.New("contract storage debt payment amount and height must be positive")
+	}
+	idx, contract, found := findContractWithIndex(k.genesis.State.Contracts, msg.ContractAddress)
+	if !found {
+		return types.Contract{}, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if msg.Amount >= contract.StorageRentDebt {
+		contract.StorageRentDebt = 0
+	} else {
+		contract.StorageRentDebt -= msg.Amount
+	}
+	contract.UpdatedHeight = msg.Height
+	next := k.genesis
+	next.State.Contracts[idx] = contract
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return types.Contract{}, err
+	}
+	k.genesis = next
+	return contract, nil
+}
+
+func (k *Keeper) UnfreezeContract(msg types.MsgUnfreezeContract) (types.Contract, error) {
+	if err := types.ValidateUserFacingAEAddress("contract unfreeze sender", msg.Sender); err != nil {
+		return types.Contract{}, err
+	}
+	if err := k.ensureActiveWallet(msg.Sender, "contract unfreeze"); err != nil {
+		return types.Contract{}, err
+	}
+	if msg.Height == 0 {
+		return types.Contract{}, errors.New("contract unfreeze height must be positive")
+	}
+	idx, contract, found := findContractWithIndex(k.genesis.State.Contracts, msg.ContractAddress)
+	if !found {
+		return types.Contract{}, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if contract.StorageRentDebt > 0 {
+		return types.Contract{}, errors.New(types.ErrStorageRent + ": contract storage rent debt must be paid before unfreeze")
+	}
+	contract.Status = types.ContractStatusActive
+	contract.LastStorageChargeHeight = msg.Height
+	contract.UpdatedHeight = msg.Height
+	next := k.genesis
+	next.State.Contracts[idx] = contract
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return types.Contract{}, err
+	}
+	k.genesis = next
+	return contract, nil
+}
+
+func (k *Keeper) GrantNativeStakingCapability(msg types.MsgGrantNativeStakingCapability) (types.ContractCapability, error) {
+	if msg.Authority == "" {
+		return types.ContractCapability{}, errors.New(types.ErrUnauthorized + ": authority is required")
+	}
+	if msg.Height == 0 {
+		return types.ContractCapability{}, errors.New("contract capability height must be positive")
+	}
+	if _, found := findContract(k.genesis.State.Contracts, msg.ContractAddressUser); !found {
+		return types.ContractCapability{}, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	capability := types.ContractCapability{
+		ContractAddressUser: msg.ContractAddressUser,
+		ContractAddressRaw:  msg.ContractAddressRaw,
+		Capability:          types.NativeStakingCapability,
+		PoolID:              msg.PoolID,
+		GrantedHeight:       msg.Height,
+	}
+	if err := capability.Validate(); err != nil {
+		return types.ContractCapability{}, err
+	}
+	next := k.genesis
+	next.State.StakingCapabilities = upsertCapability(next.State.StakingCapabilities, capability)
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return types.ContractCapability{}, err
+	}
+	k.genesis = next
+	return capability, nil
+}
+
+func (k *Keeper) InjectNativeStaking(msg types.MsgInjectNativeStaking) (types.NativeStakingInjectionRecord, error) {
+	if msg.Amount == 0 || msg.Height == 0 {
+		return types.NativeStakingInjectionRecord{}, errors.New("native staking injection amount and height must be positive")
+	}
+	if err := types.ValidateAddressPair("native staking caller contract", msg.CallerContractUser, msg.CallerContractRaw); err != nil {
+		return types.NativeStakingInjectionRecord{}, err
+	}
+	contract, found := findContract(k.genesis.State.Contracts, msg.CallerContractUser)
+	if !found {
+		return types.NativeStakingInjectionRecord{}, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if contract.Status != types.ContractStatusActive {
+		return types.NativeStakingInjectionRecord{}, errors.New(types.ErrAccountFrozen + ": frozen contract cannot inject native staking")
+	}
+	if !hasCapability(k.genesis.State.StakingCapabilities, msg.CallerContractUser, msg.PoolID) {
+		return types.NativeStakingInjectionRecord{}, errors.New(types.ErrUnauthorized + ": contract lacks native staking capability")
+	}
+	record := types.NativeStakingInjectionRecord{
+		ContractAddressUser: msg.CallerContractUser,
+		ContractAddressRaw:  msg.CallerContractRaw,
+		PoolID:              msg.PoolID,
+		Amount:              msg.Amount,
+		Height:              msg.Height,
+	}
+	next := k.genesis
+	next.State.NativeStakingInjects = append(next.State.NativeStakingInjects, record)
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return types.NativeStakingInjectionRecord{}, err
+	}
+	k.genesis = next
+	return record, nil
+}
+
+func (k *Keeper) ReceiveInternalMessage(msg types.MsgReceiveInternalMessage) (types.InternalMessage, error) {
+	record := types.InternalMessage{
+		SourceContractUser: msg.SourceContractUser,
+		DestinationAccount: msg.DestinationAccount,
+		Funds:              msg.Funds,
+		Body:               append([]byte(nil), msg.Body...),
+		Height:             msg.Height,
+	}
+	if err := record.Validate(); err != nil {
+		return types.InternalMessage{}, err
+	}
+	contract, found := findContract(k.genesis.State.Contracts, msg.SourceContractUser)
+	if !found {
+		return types.InternalMessage{}, errors.New(types.ErrContractNotFound + ": source contract not found")
+	}
+	if contract.Status != types.ContractStatusActive {
+		return types.InternalMessage{}, errors.New(types.ErrAccountFrozen + ": frozen contract cannot send internal messages")
+	}
+	next := k.genesis
+	next.State.InternalMessages = append(next.State.InternalMessages, record)
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return types.InternalMessage{}, err
+	}
+	k.genesis = next
+	return record, nil
+}
+
+func (k Keeper) AssetOwner(req types.QueryAssetOwnerRequest) (types.QueryAssetOwnerResponse, error) {
+	if req.AssetType != types.AssetTypeToken && req.AssetType != types.AssetTypeNFT && req.AssetType != types.AssetTypeDEX {
+		return types.QueryAssetOwnerResponse{}, fmt.Errorf("unsupported contract asset type %q", req.AssetType)
+	}
+	if err := types.ValidateUserFacingAEAddress("asset contract address", req.ContractAddressUser); err != nil {
+		return types.QueryAssetOwnerResponse{}, err
+	}
+	if req.AssetID == "" {
+		return types.QueryAssetOwnerResponse{}, errors.New("asset id is required")
+	}
+	for _, asset := range k.genesis.State.AssetOwnership {
+		if asset.AssetType == req.AssetType && asset.ContractAddressUser == req.ContractAddressUser && asset.AssetID == req.AssetID {
+			return types.QueryAssetOwnerResponse{Owner: asset.Owner, Found: true}, nil
+		}
+	}
+	return types.QueryAssetOwnerResponse{}, nil
+}
+
+func (k *Keeper) SetAssetOwner(record types.AssetOwnershipRecord) error {
+	if err := record.Validate(); err != nil {
+		return err
+	}
+	next := k.genesis
+	next.State.AssetOwnership = upsertAsset(next.State.AssetOwnership, record)
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return err
+	}
+	k.genesis = next
+	return nil
+}
+
+func (k *Keeper) ensureActiveWallet(address string, operation string) error {
+	if k.accountStatusReader == nil {
+		return nil
+	}
+	status, found := k.accountStatusReader.AccountStatus(address)
+	if !found || status == accountStatusInactive {
+		return fmt.Errorf("%s: %s", operation, types.ErrAccountInactive)
+	}
+	if status == accountStatusFrozen {
+		return fmt.Errorf("%s: %s", operation, types.ErrAccountFrozen)
+	}
+	if status != accountStatusActive {
+		return fmt.Errorf("%s: unsupported account status %q", operation, status)
+	}
+	return nil
+}
+
+func (k Keeper) chargeRent(contract types.Contract, height uint64) types.Contract {
+	if height <= contract.LastStorageChargeHeight || contract.StorageBytes == 0 || k.genesis.Params.StorageRentPerByteBlock == 0 {
+		return contract
+	}
+	blocks := height - contract.LastStorageChargeHeight
+	charge := blocks * contract.StorageBytes * k.genesis.Params.StorageRentPerByteBlock
+	if contract.Balance >= charge {
+		contract.Balance -= charge
+	} else {
+		contract.StorageRentDebt += charge - contract.Balance
+		contract.Balance = 0
+	}
+	contract.LastStorageChargeHeight = height
+	return contract
+}
+
+func upsertCode(codes []types.CodeRecord, code types.CodeRecord) []types.CodeRecord {
+	out := append([]types.CodeRecord(nil), codes...)
+	for i := range out {
+		if out[i].CodeID == code.CodeID {
+			out[i] = code
+			return out
+		}
+	}
+	return append(out, code)
+}
+
+func upsertCapability(caps []types.ContractCapability, cap types.ContractCapability) []types.ContractCapability {
+	out := append([]types.ContractCapability(nil), caps...)
+	for i := range out {
+		if out[i].ContractAddressUser == cap.ContractAddressUser && out[i].PoolID == cap.PoolID && out[i].Capability == cap.Capability {
+			out[i] = cap
+			return out
+		}
+	}
+	return append(out, cap)
+}
+
+func upsertAsset(assets []types.AssetOwnershipRecord, record types.AssetOwnershipRecord) []types.AssetOwnershipRecord {
+	out := append([]types.AssetOwnershipRecord(nil), assets...)
+	for i := range out {
+		if out[i].AssetType == record.AssetType && out[i].ContractAddressUser == record.ContractAddressUser && out[i].AssetID == record.AssetID {
+			out[i] = record
+			return out
+		}
+	}
+	return append(out, record)
+}
+
+func findCode(codes []types.CodeRecord, codeID string) (types.CodeRecord, bool) {
+	for _, code := range codes {
+		if code.CodeID == codeID {
+			return code, true
+		}
+	}
+	return types.CodeRecord{}, false
+}
+
+func findContract(contracts []types.Contract, address string) (types.Contract, bool) {
+	_, contract, found := findContractWithIndex(contracts, address)
+	return contract, found
+}
+
+func findContractWithIndex(contracts []types.Contract, address string) (int, types.Contract, bool) {
+	for idx, contract := range contracts {
+		if contract.AddressUser == address {
+			return idx, contract, true
+		}
+	}
+	return -1, types.Contract{}, false
+}
+
+func hasCapability(caps []types.ContractCapability, contract string, poolID string) bool {
+	for _, cap := range caps {
+		if cap.ContractAddressUser == contract && cap.PoolID == poolID && cap.Capability == types.NativeStakingCapability {
+			return true
+		}
+	}
+	return false
 }

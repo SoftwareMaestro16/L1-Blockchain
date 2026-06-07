@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -25,10 +26,12 @@ type Params struct {
 	MaxCodeBytes            uint64
 	MaxContractStorageBytes uint64
 	MaxGasPerExecution      uint64
+	StorageRentPerByteBlock uint64
 }
 
 type GenesisState struct {
 	Params    Params
+	State     State
 	StateRoot string
 }
 
@@ -51,6 +54,7 @@ type QueryContractResponse struct {
 	ContractAddress string
 	StateRoot       string
 	Found           bool
+	Contract        Contract
 }
 
 type MsgServer interface {
@@ -68,11 +72,13 @@ func DefaultParams() Params {
 		MaxCodeBytes:            4 * 1024 * 1024,
 		MaxContractStorageBytes: 64 * 1024 * 1024,
 		MaxGasPerExecution:      100_000_000,
+		StorageRentPerByteBlock: 1,
 	}
 }
 
 func DefaultGenesis() GenesisState {
 	gs := GenesisState{Params: DefaultParams()}
+	gs.State = gs.State.Normalize()
 	gs.StateRoot = ComputeContractsStateRoot(gs)
 	return gs
 }
@@ -94,6 +100,9 @@ func (gs GenesisState) Validate() error {
 	if err := gs.Params.Validate(); err != nil {
 		return err
 	}
+	if err := gs.State.Validate(gs.Params); err != nil {
+		return err
+	}
 	if err := coretypes.ValidateHash("contracts genesis state root", gs.StateRoot); err != nil {
 		return err
 	}
@@ -111,12 +120,18 @@ func RootContribution(gs GenesisState) (coretypes.RootContribution, error) {
 }
 
 func ComputeContractsStateRoot(gs GenesisState) string {
+	stateJSON, err := json.Marshal(gs.State.Normalize())
+	if err != nil {
+		panic(err)
+	}
 	return coretypes.DeterministicEmptyRootCommitment(coretypes.RootType(ModuleName), fmt.Sprintf(
-		"enabled=%t/code=%020d/storage=%020d/gas=%020d",
+		"enabled=%t/code=%020d/storage=%020d/gas=%020d/rent=%020d/state=%s",
 		gs.Params.Enabled,
 		gs.Params.MaxCodeBytes,
 		gs.Params.MaxContractStorageBytes,
 		gs.Params.MaxGasPerExecution,
+		gs.Params.StorageRentPerByteBlock,
+		string(stateJSON),
 	))
 }
 
@@ -125,8 +140,5 @@ func ValidateContractAddress(address string) error {
 	if address == "" {
 		return errors.New(ErrContractNotFound + ": contract address is required")
 	}
-	if len(address) > 128 {
-		return errors.New(ErrContractNotFound + ": contract address is too long")
-	}
-	return nil
+	return ValidateUserFacingAEAddress("contract address", address)
 }
