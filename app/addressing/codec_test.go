@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
@@ -38,6 +39,24 @@ func TestUserFacingAddressFormats(t *testing.T) {
 
 	requireUserFriendlyAddress(t, addressing.FormatValAddress(sdk.ValAddress(addr)))
 	requireUserFriendlyAddress(t, addressing.FormatConsAddress(sdk.ConsAddress(addr)))
+}
+
+func TestAEAccountValidatorAndConsensusAddressRoundTrip(t *testing.T) {
+	addr := sdk.AccAddress(bytes20(0x2a))
+
+	tests := map[string]string{
+		"account":   addressing.FormatAccAddress(addr),
+		"validator": addressing.FormatValAddress(sdk.ValAddress(addr)),
+		"consensus": addressing.FormatConsAddress(sdk.ConsAddress(addr)),
+	}
+	for name, text := range tests {
+		t.Run(name, func(t *testing.T) {
+			requireUserFriendlyAddress(t, text)
+			parsed, err := addressing.Parse(text)
+			require.NoError(t, err)
+			require.Equal(t, addr.Bytes(), parsed)
+		})
+	}
 }
 
 func TestRawLongAddressRoundTrip(t *testing.T) {
@@ -98,16 +117,16 @@ func TestZeroAddressValidationPolicy(t *testing.T) {
 	require.NoError(t, addressing.ValidateContractAddress("contract", validText))
 	require.NoError(t, addressing.RejectZeroAddress("signer", valid.Bytes()))
 
-	require.ErrorContains(t, addressing.ValidateUserAddress("recipient", addressing.ZeroRawAddress), "must not be zero address")
+	require.ErrorContains(t, addressing.ValidateUserAddress("recipient", addressing.ZeroRawAddress), "must use AE user-facing address format")
 	require.ErrorContains(t, addressing.ValidateUserAddress("recipient", addressing.ZeroUserFriendly), "must not be zero address")
 	require.ErrorContains(t, addressing.ValidateAuthorityAddress("authority", addressing.ZeroRawAddress), "must not be zero address")
-	require.ErrorContains(t, addressing.ValidateContractAddress("contract", addressing.ZeroRawAddress), "must not be zero address")
+	require.ErrorContains(t, addressing.ValidateContractAddress("contract", addressing.ZeroRawAddress), "must use AE user-facing address format")
 	require.ErrorContains(t, addressing.RejectZeroAddress("signer", sdk.AccAddress(bytes20(0)).Bytes()), "must not be zero address")
 
 	_, present, err := addressing.ParseOptionalAdminAddress("admin", "")
 	require.NoError(t, err)
 	require.False(t, present)
-	require.ErrorContains(t, addressing.ValidateOptionalAdminAddress("admin", addressing.ZeroRawAddress), "must not be zero address")
+	require.ErrorContains(t, addressing.ValidateOptionalAdminAddress("admin", addressing.ZeroRawAddress), "must use AE user-facing address format")
 }
 
 func TestAddressValidationRejectsEmptyMalformedAndLegacyFormats(t *testing.T) {
@@ -115,6 +134,10 @@ func TestAddressValidationRejectsEmptyMalformedAndLegacyFormats(t *testing.T) {
 	require.NoError(t, err)
 
 	validFriendly, err := addressing.FormatUserFriendly(sdk.AccAddress(bytes20(0x46)))
+	require.NoError(t, err)
+	validValoper, err := sdk.Bech32ifyAddressBytes("aevaloper", bytes20(0x47))
+	require.NoError(t, err)
+	validValcons, err := sdk.Bech32ifyAddressBytes("aevalcons", bytes20(0x48))
 	require.NoError(t, err)
 
 	tests := map[string]string{
@@ -131,6 +154,8 @@ func TestAddressValidationRejectsEmptyMalformedAndLegacyFormats(t *testing.T) {
 		"wrong userfriendly prefix":  "AF" + validFriendly[2:],
 		"non base64url userfriendly": "AE+/" + validFriendly[4:],
 		"old bech32 account prefix":  validLegacy,
+		"legacy validator bech32":    validValoper,
+		"legacy consensus bech32":    validValcons,
 	}
 	for name, text := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -139,7 +164,7 @@ func TestAddressValidationRejectsEmptyMalformedAndLegacyFormats(t *testing.T) {
 	}
 }
 
-func TestAddressValidationAcceptsCurrentSDKBech32Compatibility(t *testing.T) {
+func TestAddressValidationRejectsCurrentSDKBech32InUserFacingAPIs(t *testing.T) {
 	cfg := sdk.GetConfig()
 	cfg.SetBech32PrefixForAccount("ae", "aepub")
 
@@ -147,7 +172,53 @@ func TestAddressValidationAcceptsCurrentSDKBech32Compatibility(t *testing.T) {
 	require.NoError(t, err)
 
 	require.True(t, strings.HasPrefix(valid, "ae1"))
-	require.NoError(t, addressing.ValidateUserAddress("sender", valid))
+	require.ErrorContains(t, addressing.ValidateUserAddress("sender", valid), "must use AE user-facing address format")
+}
+
+func TestAddressPairRoundTripIsStable(t *testing.T) {
+	addr := sdk.AccAddress(bytes20(0x55))
+	user := addressing.FormatAccAddress(addr)
+	raw := addressing.Format(addr)
+
+	fromUser, err := addressing.PairFromUserAddress(addressing.AddressRoleAccount, user)
+	require.NoError(t, err)
+	fromRaw, err := addressing.PairFromRawAddress(addressing.AddressRoleAccount, raw)
+	require.NoError(t, err)
+
+	require.Equal(t, user, fromUser.User)
+	require.Equal(t, raw, fromUser.Raw)
+	require.Equal(t, fromUser, fromRaw)
+	require.NoError(t, fromUser.Validate())
+}
+
+func TestDerivePubKeyAddressGoldenVectors(t *testing.T) {
+	pubKey := &secp256k1.PubKey{Key: mustDecodeHex(t, "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798")}
+
+	account, err := addressing.DeriveAccountAddress(pubKey)
+	require.NoError(t, err)
+	validator, err := addressing.DeriveValidatorAddress(pubKey)
+	require.NoError(t, err)
+	consensus, err := addressing.DeriveConsensusAddress(pubKey)
+	require.NoError(t, err)
+
+	require.Equal(t, addressing.AddressRoleAccount, account.Role)
+	require.Equal(t, "AEAAAQAAAAAAAAAAAAAAAHUedugZkZbUVJQcRdGzoyPxQzvW", account.User)
+	require.Equal(t, "4:000000000000000000000000751e76e8199196d454941c45d1b3a323f1433bd6", account.Raw)
+	require.Equal(t, account.User, validator.User)
+	require.Equal(t, account.Raw, validator.Raw)
+	require.Equal(t, account.User, consensus.User)
+	require.Equal(t, account.Raw, consensus.Raw)
+	require.NoError(t, account.Validate())
+	require.NoError(t, validator.Validate())
+	require.NoError(t, consensus.Validate())
+	require.Equal(t, account.User, "AEAAAQAAAAAAAAAAAAAAAHUedugZkZbUVJQcRdGzoyPxQzvW")
+}
+
+func mustDecodeHex(t *testing.T, text string) []byte {
+	t.Helper()
+	out, err := hex.DecodeString(text)
+	require.NoError(t, err)
+	return out
 }
 
 func bytes20(fill byte) []byte {

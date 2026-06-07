@@ -9,12 +9,12 @@ import (
 	"github.com/sovereign-l1/l1/app/addressing"
 )
 
-const (
-	governanceAddr = "4:0000000000000000000000000000000000000000000000000000000000000001"
-	uploaderAddr   = "4:0000000000000000000000000000000000000000000000000000000000000002"
-	ownerAddr      = "4:0000000000000000000000000000000000000000000000000000000000000003"
-	contractAddr   = "4:0000000000000000000000000000000000000000000000000000000000000004"
-	attackerAddr   = "4:0000000000000000000000000000000000000000000000000000000000000005"
+var (
+	governanceAddr = testAEAddress(0x01)
+	uploaderAddr   = testAEAddress(0x02)
+	ownerAddr      = testAEAddress(0x03)
+	contractAddr   = testAEAddress(0x04)
+	attackerAddr   = testAEAddress(0x05)
 )
 
 func TestDefaultPolicyIsDisabledAndPinnedToCompatibleWasmd(t *testing.T) {
@@ -94,7 +94,7 @@ func TestAllowlistRejectsMalformedEmptyAndZeroAddress(t *testing.T) {
 	policy.UploadAllowlist = []string{"ae1malformed"}
 	require.Error(t, policy.Validate())
 
-	policy.UploadAllowlist = []string{addressing.ZeroRawAddress}
+	policy.UploadAllowlist = []string{addressing.ZeroUserFriendly}
 	require.ErrorContains(t, policy.Validate(), "must not be zero address")
 }
 
@@ -104,7 +104,7 @@ func TestGovernanceOnlyUploadRequiresAuthority(t *testing.T) {
 	require.NoError(t, CanUpload(governanceAddr, policy))
 	require.ErrorContains(t, CanUpload(uploaderAddr, policy), "requires governance authority")
 
-	policy.GovernanceAuthority = addressing.ZeroRawAddress
+	policy.GovernanceAuthority = addressing.ZeroUserFriendly
 	require.ErrorContains(t, CanUpload(governanceAddr, policy), "must not be zero address")
 }
 
@@ -122,7 +122,7 @@ func TestGovernanceAuthorityEnablesAndDisablesCosmWasmOnlyIntentionally(t *testi
 	require.NoError(t, CanUpdatePolicy(governanceAddr, next, disabled))
 
 	badAuthority := next
-	badAuthority.GovernanceAuthority = addressing.ZeroRawAddress
+	badAuthority.GovernanceAuthority = addressing.ZeroUserFriendly
 	require.ErrorContains(t, CanUpdatePolicy(governanceAddr, current, badAuthority), "must not be zero address")
 }
 
@@ -183,9 +183,9 @@ func TestCosmWasmCannotBypassNativeFeeOrZeroAddressPolicy(t *testing.T) {
 	require.Error(t, ValidateProtocolFees(sdkCoins("testtoken", 1)))
 	require.Error(t, ValidateProtocolFees(sdkCoins("naet", 0)))
 
-	require.ErrorContains(t, ValidateInstantiateAddresses(addressing.ZeroRawAddress, ownerAddr, policy), "must not be zero address")
-	require.ErrorContains(t, ValidateInstantiateAddresses(ownerAddr, addressing.ZeroRawAddress, policy), "must not be zero address")
-	require.ErrorContains(t, CanExecute(ownerAddr, addressing.ZeroRawAddress, policy), "must not be zero address")
+	require.ErrorContains(t, ValidateInstantiateAddresses(addressing.ZeroUserFriendly, ownerAddr, policy), "must not be zero address")
+	require.ErrorContains(t, ValidateInstantiateAddresses(ownerAddr, addressing.ZeroUserFriendly, policy), "must not be zero address")
+	require.ErrorContains(t, CanExecute(ownerAddr, addressing.ZeroUserFriendly, policy), "must not be zero address")
 }
 
 func enabledPolicy() Policy {
@@ -201,4 +201,13 @@ func naetFee() sdk.Coins {
 
 func sdkCoins(denom string, amount int64) sdk.Coins {
 	return sdk.NewCoins(sdk.NewInt64Coin(denom, amount))
+}
+
+func testAEAddress(fill byte) string {
+	return addressing.FormatAccAddress(sdk.AccAddress{
+		fill, fill, fill, fill, fill,
+		fill, fill, fill, fill, fill,
+		fill, fill, fill, fill, fill,
+		fill, fill, fill, fill, fill,
+	})
 }

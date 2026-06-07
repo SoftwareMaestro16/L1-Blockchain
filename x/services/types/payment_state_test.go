@@ -43,7 +43,7 @@ func TestServicePaymentModelQueryAndEnvelopeRules(t *testing.T) {
 
 	envelope, err := NewPaymentEnvelope(PaymentEnvelope{
 		Asset:          "uatom",
-		Payer:          coretypes.DefaultAuthority,
+		Payer:          testPaymentPayer(),
 		PayeeService:   descriptor.ServiceID,
 		Denom:          "uatom",
 		Amount:         "1",
@@ -159,7 +159,7 @@ func testPaymentStateEnvelope(t *testing.T, unit coretypes.ServicePricingUnit, m
 	t.Helper()
 	envelope := PaymentEnvelope{
 		Asset:          coretypes.NativeFeePolicyID,
-		Payer:          coretypes.DefaultAuthority,
+		Payer:          testPaymentPayer(),
 		PayeeService:   "portable-service",
 		Denom:          coretypes.NativeFeePolicyID,
 		Amount:         amount,

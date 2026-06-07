@@ -158,7 +158,7 @@ func testPaymentModelEnvelope(t *testing.T, unit coretypes.ServicePricingUnit, m
 	t.Helper()
 	envelope, err := NewPaymentEnvelope(PaymentEnvelope{
 		Asset:          coretypes.NativeFeePolicyID,
-		Payer:          coretypes.DefaultAuthority,
+		Payer:          testPaymentPayer(),
 		PayeeService:   "portable-service",
 		Denom:          coretypes.NativeFeePolicyID,
 		Amount:         amount,

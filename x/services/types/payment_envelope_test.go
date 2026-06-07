@@ -3,8 +3,10 @@ package types
 import (
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
+	"github.com/sovereign-l1/l1/app/addressing"
 	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
@@ -14,10 +16,11 @@ func TestPaymentEnvelopeFromDescriptor(t *testing.T) {
 	descriptor.Payment.ExpiryHeight = 80
 	descriptor = coretypes.CanonicalServiceDescriptor(descriptor)
 
-	envelope, err := NewPaymentEnvelopeFromDescriptor(descriptor, coretypes.DefaultAuthority)
+	payer := testPaymentPayer()
+	envelope, err := NewPaymentEnvelopeFromDescriptor(descriptor, payer)
 	require.NoError(t, err)
 	require.Equal(t, descriptor.Payment.Denom, envelope.Asset)
-	require.Equal(t, coretypes.DefaultAuthority, envelope.Payer)
+	require.Equal(t, payer, envelope.Payer)
 	require.Equal(t, descriptor.ServiceID, envelope.PayeeService)
 	require.Equal(t, descriptor.Payment.Denom, envelope.Denom)
 	require.Equal(t, descriptor.Payment.Amount, envelope.Amount)
@@ -46,7 +49,7 @@ func TestPaymentEnvelopeSettlementModes(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			envelope, err := NewPaymentEnvelope(PaymentEnvelope{
 				Asset:             coretypes.NativeFeePolicyID,
-				Payer:             coretypes.DefaultAuthority,
+				Payer:             testPaymentPayer(),
 				PayeeService:      "portable-service",
 				Denom:             coretypes.NativeFeePolicyID,
 				Amount:            "5",
@@ -68,7 +71,7 @@ func TestPaymentEnvelopeSettlementModes(t *testing.T) {
 func TestPaymentEnvelopeRejectsMalformedOrIncompletePayments(t *testing.T) {
 	base := PaymentEnvelope{
 		Asset:          coretypes.NativeFeePolicyID,
-		Payer:          coretypes.DefaultAuthority,
+		Payer:          testPaymentPayer(),
 		PayeeService:   "portable-service",
 		Denom:          coretypes.NativeFeePolicyID,
 		Amount:         "5",
@@ -90,7 +93,7 @@ func TestPaymentEnvelopeRejectsMalformedOrIncompletePayments(t *testing.T) {
 	badPayer := base
 	badPayer.Payer = "bad"
 	_, err = NewPaymentEnvelope(badPayer)
-	require.ErrorContains(t, err, "invalid services payment envelope payer")
+	require.ErrorContains(t, err, "must use AE user-facing address format")
 
 	streaming := base
 	streaming.SettlementMode = coretypes.ServicePaymentStreaming
@@ -111,7 +114,7 @@ func TestPaymentEnvelopeRejectsMalformedOrIncompletePayments(t *testing.T) {
 func TestPaymentEnvelopeRejectsHashTampering(t *testing.T) {
 	envelope, err := NewPaymentEnvelope(PaymentEnvelope{
 		Asset:          coretypes.NativeFeePolicyID,
-		Payer:          coretypes.DefaultAuthority,
+		Payer:          testPaymentPayer(),
 		PayeeService:   "portable-service",
 		Denom:          coretypes.NativeFeePolicyID,
 		Amount:         "5",
@@ -123,4 +126,13 @@ func TestPaymentEnvelopeRejectsHashTampering(t *testing.T) {
 
 	envelope.Amount = "6"
 	require.ErrorContains(t, envelope.Validate(), "hash mismatch")
+}
+
+func testPaymentPayer() string {
+	return addressing.FormatAccAddress(sdk.AccAddress{
+		0x61, 0x61, 0x61, 0x61, 0x61,
+		0x61, 0x61, 0x61, 0x61, 0x61,
+		0x61, 0x61, 0x61, 0x61, 0x61,
+		0x61, 0x61, 0x61, 0x61, 0x61,
+	})
 }

@@ -8,6 +8,13 @@ import (
 )
 
 func ParseUserAddress(field, text string) (sdk.AccAddress, error) {
+	text = strings.TrimSpace(text)
+	if text == "" {
+		return nil, fmt.Errorf("empty address string is not allowed")
+	}
+	if !strings.HasPrefix(text, UserFriendlyPrefix) {
+		return nil, fmt.Errorf("%s must use AE user-facing address format", field)
+	}
 	addr, err := ParseAccAddress(text)
 	if err != nil {
 		return nil, fmt.Errorf("invalid %s: %w", field, err)
@@ -31,7 +38,14 @@ func RejectZeroAddress(field string, bz []byte) error {
 }
 
 func ParseAuthorityAddress(field, text string) (sdk.AccAddress, error) {
-	return ParseUserAddress(field, text)
+	addr, err := ParseAccAddress(text)
+	if err != nil {
+		return nil, fmt.Errorf("invalid %s: %w", field, err)
+	}
+	if IsZeroAccAddress(addr) {
+		return nil, fmt.Errorf("%s must not be zero address", field)
+	}
+	return addr, nil
 }
 
 func ValidateAuthorityAddress(field, text string) error {

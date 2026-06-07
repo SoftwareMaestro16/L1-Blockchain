@@ -152,7 +152,7 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				fees: fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
 					FromAddress: validSender,
-					ToAddress:   aetraaddress.ZeroRawAddress,
+					ToAddress:   aetraaddress.ZeroUserFriendly,
 					Amount:      fee,
 				}},
 			},
@@ -164,7 +164,7 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				fees: fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
 					FromAddress: validSender,
-					ToAddress:   reservedAddress(t, "AETMint").Raw,
+					ToAddress:   reservedAddress(t, "AETMint").UserFriendly,
 					Amount:      fee,
 				}},
 			},
@@ -176,7 +176,7 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				fees: fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
 					FromAddress: validSender,
-					ToAddress:   reservedAddress(t, "AETConfig").Raw,
+					ToAddress:   reservedAddress(t, "AETConfig").UserFriendly,
 					Amount:      fee,
 				}},
 			},
@@ -188,7 +188,7 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				fees: fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
 					FromAddress: validSender,
-					ToAddress:   reservedAddress(t, "AETTreasury").Raw,
+					ToAddress:   reservedAddress(t, "AETTreasury").UserFriendly,
 					Amount:      fee,
 				}},
 			},
@@ -200,7 +200,7 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				fees: fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
 					FromAddress: validSender,
-					ToAddress:   reservedAddress(t, "AETFeeCollector").Raw,
+					ToAddress:   reservedAddress(t, "AETFeeCollector").UserFriendly,
 					Amount:      fee,
 				}},
 			},
@@ -212,7 +212,7 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				fees: fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
 					FromAddress: validSender,
-					ToAddress:   burn.Raw,
+					ToAddress:   burn.UserFriendly,
 					Amount:      fee,
 				}},
 			},
@@ -247,7 +247,7 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				fees: fee,
 				msgs: []sdk.Msg{&distrtypes.MsgSetWithdrawAddress{
 					DelegatorAddress: validSender,
-					WithdrawAddress:  aetraaddress.ZeroRawAddress,
+					WithdrawAddress:  aetraaddress.ZeroUserFriendly,
 				}},
 			},
 			wantErr: "distribution withdraw address must not be zero address",
@@ -347,7 +347,7 @@ func TestAnteHandlerDecoratorRejectsAddressPolicyBeforeFeesAndNext(t *testing.T)
 		fees: sdk.Coins{},
 		msgs: []sdk.Msg{&banktypes.MsgSend{
 			FromAddress: validRawAddress(1),
-			ToAddress:   aetraaddress.ZeroRawAddress,
+			ToAddress:   aetraaddress.ZeroUserFriendly,
 			Amount:      sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 1)),
 		}},
 	}, false)
