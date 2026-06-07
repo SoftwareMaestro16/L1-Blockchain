@@ -10,8 +10,10 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sims "github.com/cosmos/cosmos-sdk/testutil/sims"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
+	"github.com/sovereign-l1/l1/app/addressing"
 	nominatorpoolkeeper "github.com/sovereign-l1/l1/x/nominator-pool/keeper"
 	nominatorpooltypes "github.com/sovereign-l1/l1/x/nominator-pool/types"
 )
@@ -82,6 +84,65 @@ func TestNominatorPoolStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	require.Equal(t, poolGenesis.State.Pools[0].RewardIndex, exported.State.Pools[0].RewardIndex)
 }
 
+func TestFinalAppWiringOfficialStakingPoolFlowExportImportRestart(t *testing.T) {
+	appOptions := sims.AppOptionsMap{flags.FlagHome: DefaultNodeHome}
+	source := NewL1App(log.NewNopLogger(), dbm.NewMemDB(), true, appOptions)
+	sourceCtx := source.NewUncachedContext(false, cmtproto.Header{Height: 1})
+
+	initial, err := source.NominatorPoolKeeper.ExportGenesisState(sourceCtx)
+	require.NoError(t, err)
+	contractUser, contractRaw := nominatorPoolAddressPair(t, "66")
+	userAddress, userRaw := nominatorPoolAddressPair(t, "33")
+
+	pool, err := source.NominatorPoolKeeper.CreateOfficialLiquidStakingPool(nominatorpooltypes.MsgCreateOfficialLiquidStakingPool{
+		Authority:           initial.Params.Authority,
+		PoolID:              "final-app-official-pool",
+		ContractAddressUser: contractUser,
+		ContractAddressRaw:  contractRaw,
+		PoolOperator:        nominatorPoolRawAddress("11"),
+		PoolCommissionBps:   100,
+		Height:              2,
+	})
+	require.NoError(t, err)
+	require.True(t, pool.OfficialLiquidStaking)
+
+	receipt, err := source.NominatorPoolKeeper.DepositToStakingPool(nominatorpooltypes.MsgDepositToStakingPool{
+		PoolID:        pool.PoolID,
+		WalletAddress: userAddress,
+		Amount:        nominatorpooltypes.DefaultMinPoolDeposit,
+		Height:        3,
+	})
+	require.NoError(t, err)
+	require.Equal(t, userAddress, receipt.OwnerAddress)
+	require.Equal(t, contractUser, receipt.PoolContractAddressUser)
+	require.Equal(t, contractRaw, receipt.InternalMetadata.PoolContractAddressRaw)
+	require.Equal(t, userRaw, receipt.InternalMetadata.OwnerRaw)
+	require.Equal(t, nominatorpooltypes.DefaultMinPoolDeposit, receipt.Shares)
+
+	exported, err := source.NominatorPoolKeeper.ExportGenesisState(sourceCtx)
+	require.NoError(t, err)
+	require.Len(t, exported.State.LiquidStakingPools, 1)
+	require.Len(t, exported.State.PoolShares, 1)
+	require.Equal(t, userAddress, exported.State.PoolShares[0].Owner)
+	require.Equal(t, nominatorpooltypes.DefaultMinPoolDeposit, exported.State.PoolShares[0].Shares)
+
+	restarted := NewL1App(log.NewNopLogger(), dbm.NewMemDB(), true, appOptions)
+	restartedCtx := restarted.NewUncachedContext(false, cmtproto.Header{Height: 4})
+	require.NoError(t, restarted.NominatorPoolKeeper.InitGenesisState(restartedCtx, exported))
+	reexported, err := restarted.NominatorPoolKeeper.ExportGenesisState(restartedCtx)
+	require.NoError(t, err)
+	require.Equal(t, exported, reexported)
+}
+
 func nominatorPoolRawAddress(hexByte string) string {
 	return "4:000000000000000000000000" + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte + hexByte
+}
+
+func nominatorPoolAddressPair(t *testing.T, hexByte string) (string, string) {
+	t.Helper()
+	raw := nominatorPoolRawAddress(hexByte)
+	bz, err := addressing.Parse(raw)
+	require.NoError(t, err)
+	user := addressing.FormatAccAddress(sdk.AccAddress(bz))
+	return user, raw
 }
