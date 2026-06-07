@@ -24,6 +24,12 @@ const (
 	SecurityRequirementJailedValidatorRewardExclusion = "jailed_validators_no_active_rewards"
 	SecurityRequirementNoConsensusPanicOnInvalidInput = "no_consensus_panic_on_invalid_input"
 	SecurityRequirementInvariantTestsRequired         = "invariant_tests_required"
+	SecurityRequirementModulePermissionsStartup       = "module_account_permissions_validated_at_startup"
+	SecurityRequirementReservedCannotSignUserTxs      = "reserved_addresses_cannot_sign_user_txs"
+	SecurityRequirementBlockedCannotReceiveFunds      = "blocked_addresses_cannot_receive_normal_user_funds"
+	SecurityRequirementGovernanceAuthorityChecked     = "governance_authority_checked"
+	SecurityRequirementParamsAuthorityChecked         = "params_authority_checked"
+	SecurityRequirementKeeperWiringTests              = "keeper_wiring_tests"
 )
 
 type ConsensusSafetyRequirements struct {
@@ -60,6 +66,20 @@ type EconomicSafetyRequirements struct {
 	ExportImportSupplyStabilityTests       bool
 }
 
+type PermissionSafetyRequirements struct {
+	ModuleAccountPermissionsValidatedAtStartup bool
+	ReservedAddressesCannotSignUserTxs         bool
+	BlockedAddressesCannotReceiveUserFunds     bool
+	ExplicitReceiveAllowlistRequired           bool
+	GovernanceAuthorityChecked                 bool
+	ParamsAuthorityChecked                     bool
+	KeeperWiringTests                          bool
+	ModuleAccountPermissionsMinimumRequired    bool
+	ReservedAddressCatalogValidated            bool
+	BlockedAddressBankKeeperWiringValidated    bool
+	UserTxSignerValidationUsesReservedCatalog  bool
+}
+
 type ValidatorRewardEligibility struct {
 	ValidatorAddress string
 	ActiveSet        bool
@@ -69,12 +89,14 @@ type ValidatorRewardEligibility struct {
 }
 
 type SecurityRequirementsReport struct {
-	ConsensusRequired int
-	ConsensusPassed   int
-	EconomicRequired  int
-	EconomicPassed    int
-	Failed            []string
-	Passed            bool
+	ConsensusRequired  int
+	ConsensusPassed    int
+	EconomicRequired   int
+	EconomicPassed     int
+	PermissionRequired int
+	PermissionPassed   int
+	Failed             []string
+	Passed             bool
 }
 
 func DefaultConsensusSafetyRequirements() ConsensusSafetyRequirements {
@@ -115,15 +137,35 @@ func DefaultEconomicSafetyRequirements() EconomicSafetyRequirements {
 	}
 }
 
-func ValidateSecurityRequirements(consensus ConsensusSafetyRequirements, economic EconomicSafetyRequirements) error {
-	report := BuildSecurityRequirementsReport(consensus, economic)
+func DefaultPermissionSafetyRequirements() PermissionSafetyRequirements {
+	return PermissionSafetyRequirements{
+		ModuleAccountPermissionsValidatedAtStartup: true,
+		ReservedAddressesCannotSignUserTxs:         true,
+		BlockedAddressesCannotReceiveUserFunds:     true,
+		ExplicitReceiveAllowlistRequired:           true,
+		GovernanceAuthorityChecked:                 true,
+		ParamsAuthorityChecked:                     true,
+		KeeperWiringTests:                          true,
+		ModuleAccountPermissionsMinimumRequired:    true,
+		ReservedAddressCatalogValidated:            true,
+		BlockedAddressBankKeeperWiringValidated:    true,
+		UserTxSignerValidationUsesReservedCatalog:  true,
+	}
+}
+
+func ValidateSecurityRequirements(consensus ConsensusSafetyRequirements, economic EconomicSafetyRequirements, permission ...PermissionSafetyRequirements) error {
+	report := BuildSecurityRequirementsReport(consensus, economic, permission...)
 	if !report.Passed {
 		return fmt.Errorf("security requirements failed: %v", report.Failed)
 	}
 	return nil
 }
 
-func BuildSecurityRequirementsReport(consensus ConsensusSafetyRequirements, economic EconomicSafetyRequirements) SecurityRequirementsReport {
+func BuildSecurityRequirementsReport(consensus ConsensusSafetyRequirements, economic EconomicSafetyRequirements, permission ...PermissionSafetyRequirements) SecurityRequirementsReport {
+	permissionSafety := DefaultPermissionSafetyRequirements()
+	if len(permission) > 0 {
+		permissionSafety = permission[0]
+	}
 	consensusChecks := []requirementCheck{
 		{SecurityRequirementDeterministicStateTransitions, consensus.DeterministicStateTransitions},
 		{SecurityRequirementNoExternalConsensusCalls, consensus.NoNonDeterministicExternalCalls},
@@ -150,9 +192,18 @@ func BuildSecurityRequirementsReport(consensus ConsensusSafetyRequirements, econ
 		{"burn_and_mint_events_after_bank_success", economic.BurnAndMintEventsAfterBankSuccess},
 		{SecurityRequirementInvariantTestsRequired, economic.EconomicInvariantTestsRequired},
 	}
+	permissionChecks := []requirementCheck{
+		{SecurityRequirementModulePermissionsStartup, permissionSafety.ModuleAccountPermissionsValidatedAtStartup && permissionSafety.ModuleAccountPermissionsMinimumRequired},
+		{SecurityRequirementReservedCannotSignUserTxs, permissionSafety.ReservedAddressesCannotSignUserTxs && permissionSafety.UserTxSignerValidationUsesReservedCatalog},
+		{SecurityRequirementBlockedCannotReceiveFunds, permissionSafety.BlockedAddressesCannotReceiveUserFunds && permissionSafety.ExplicitReceiveAllowlistRequired && permissionSafety.BlockedAddressBankKeeperWiringValidated},
+		{SecurityRequirementGovernanceAuthorityChecked, permissionSafety.GovernanceAuthorityChecked},
+		{SecurityRequirementParamsAuthorityChecked, permissionSafety.ParamsAuthorityChecked},
+		{SecurityRequirementKeeperWiringTests, permissionSafety.KeeperWiringTests && permissionSafety.ReservedAddressCatalogValidated},
+	}
 	failed := make([]string, 0)
 	consensusPassed := 0
 	economicPassed := 0
+	permissionPassed := 0
 	for _, check := range consensusChecks {
 		if check.Passed {
 			consensusPassed++
@@ -167,14 +218,23 @@ func BuildSecurityRequirementsReport(consensus ConsensusSafetyRequirements, econ
 			failed = append(failed, check.ID)
 		}
 	}
+	for _, check := range permissionChecks {
+		if check.Passed {
+			permissionPassed++
+		} else {
+			failed = append(failed, check.ID)
+		}
+	}
 	sort.Strings(failed)
 	return SecurityRequirementsReport{
-		ConsensusRequired: len(consensusChecks),
-		ConsensusPassed:   consensusPassed,
-		EconomicRequired:  len(economicChecks),
-		EconomicPassed:    economicPassed,
-		Failed:            failed,
-		Passed:            len(failed) == 0,
+		ConsensusRequired:  len(consensusChecks),
+		ConsensusPassed:    consensusPassed,
+		EconomicRequired:   len(economicChecks),
+		EconomicPassed:     economicPassed,
+		PermissionRequired: len(permissionChecks),
+		PermissionPassed:   permissionPassed,
+		Failed:             failed,
+		Passed:             len(failed) == 0,
 	}
 }
 

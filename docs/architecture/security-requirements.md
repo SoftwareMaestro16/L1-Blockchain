@@ -69,6 +69,38 @@ Required tests:
 - jailed validator reward exclusion tests;
 - export/import supply stability tests.
 
+## Permission Safety
+
+Required:
+
+- module account permissions validated at startup;
+- reserved addresses cannot sign user txs;
+- blocked addresses cannot receive normal user funds unless explicitly allowed;
+- governance authority checked;
+- params authority checked;
+- keeper wiring tests.
+
+Additional permission rules:
+
+- every module account must be registered with the minimum permissions required for its actual keeper flows;
+- startup must validate reserved system module account wiring before the app accepts blocks;
+- reserved system addresses must be rejected as user-controlled signers, user accounts, faucet recipients, validator operator accounts, delegators, and contract owners unless a protocol module explicitly owns that address;
+- blocked addresses must be wired into the bank keeper and must not receive normal user sends;
+- any exception to blocked receiving must be an explicit allowlist rule, not an accidental omission from `BlockedAddresses`;
+- governance authority must be checked before governance-controlled state changes;
+- params authority must be checked before any params update;
+- keeper wiring tests must prove authorities, module accounts, blocked addresses, reserved addresses, and store keys are connected to the expected modules.
+
+Required tests:
+
+- module account permission startup validation tests;
+- reserved address user signer rejection tests;
+- blocked address bank receive tests;
+- governance authority rejection tests;
+- params authority rejection tests;
+- keeper wiring tests for every production keeper that can mutate state;
+- app startup tests that call reserved system module account wiring validation.
+
 ## Implementation Contract
 
 The implementation gate is `app/params/security_requirements.go`.
@@ -77,8 +109,10 @@ Required catalog properties:
 
 - `DefaultConsensusSafetyRequirements` must pass every consensus safety gate;
 - `DefaultEconomicSafetyRequirements` must pass every economic safety gate;
+- `DefaultPermissionSafetyRequirements` must pass every permission safety gate;
 - missing consensus determinism controls must fail the report;
 - missing economic invariant controls must fail the report;
+- missing permission controls must fail the report;
 - `ValidateSlashingDoesNotUnderflowStake` must reject slash amounts above stake;
 - `ValidateActiveValidatorRewardEligibility` must reject rewards for jailed, tombstoned, or inactive validators.
 

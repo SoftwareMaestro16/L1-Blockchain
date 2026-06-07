@@ -42,7 +42,14 @@ foreach ($term in @(
     'delegation share invariants',
     'reward distribution invariants',
     'slashing cannot underflow stake',
-    'jailed validators cannot receive active validator rewards incorrectly'
+    'jailed validators cannot receive active validator rewards incorrectly',
+    'Permission Safety',
+    'module account permissions validated at startup',
+    'reserved addresses cannot sign user txs',
+    'blocked addresses cannot receive normal user funds unless explicitly allowed',
+    'governance authority checked',
+    'params authority checked',
+    'keeper wiring tests'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "security requirements doc missing: $term"
 }
@@ -50,10 +57,12 @@ foreach ($term in @(
 foreach ($term in @(
     'ConsensusSafetyRequirements',
     'EconomicSafetyRequirements',
+    'PermissionSafetyRequirements',
     'ValidatorRewardEligibility',
     'SecurityRequirementsReport',
     'DefaultConsensusSafetyRequirements',
     'DefaultEconomicSafetyRequirements',
+    'DefaultPermissionSafetyRequirements',
     'ValidateSecurityRequirements',
     'BuildSecurityRequirementsReport',
     'ValidateSlashingDoesNotUnderflowStake',
@@ -73,7 +82,13 @@ foreach ($term in @(
     'SecurityRequirementDelegationShareInvariants',
     'SecurityRequirementRewardDistributionInvariants',
     'SecurityRequirementSlashingNoStakeUnderflow',
-    'SecurityRequirementJailedValidatorRewardExclusion'
+    'SecurityRequirementJailedValidatorRewardExclusion',
+    'SecurityRequirementModulePermissionsStartup',
+    'SecurityRequirementReservedCannotSignUserTxs',
+    'SecurityRequirementBlockedCannotReceiveFunds',
+    'SecurityRequirementGovernanceAuthorityChecked',
+    'SecurityRequirementParamsAuthorityChecked',
+    'SecurityRequirementKeeperWiringTests'
   )) {
   Assert-Contains -Text $policyText -Pattern ([regex]::Escape($term)) -Message "security requirements policy missing: $term"
 }
@@ -82,6 +97,8 @@ foreach ($term in @(
     'TestDefaultSecurityRequirementsPass',
     'TestConsensusSafetyRejectsNonDeterministicRisks',
     'TestEconomicSafetyRejectsInvariantGaps',
+    'TestPermissionSafetyRejectsAuthorityAndWiringGaps',
+    'TestPermissionSafetyRequiresExplicitAllowlistAndReservedCatalog',
     'TestSlashingCannotUnderflowStake',
     'TestJailedValidatorsCannotReceiveActiveRewards'
   )) {
