@@ -46,3 +46,25 @@ The executable policy lives in `app/params`:
   validator count.
 - `ValidateConsensusFinalityReport` validates localnet, degraded-scenario, and
   testnet-report acceptance evidence.
+
+## Vote Extensions
+
+Vote extensions may be used only for small deterministic-adjacent data:
+
+- validator telemetry summary.
+- oracle-like future extensions.
+- encrypted mempool shares if implemented later.
+
+Rules:
+
+- keep vote extensions small.
+- verify signatures before trusting extension data. In the ABCI handler this
+  means rejecting extension verification requests that do not include a
+  validator address from the signed vote path.
+- avoid large payloads that hurt consensus latency.
+- avoid non-deterministic validation.
+- cover handlers with tests.
+
+The current handler enforces explicit vote extension kinds, a maximum encoded
+extension size, a maximum data size, deterministic data validation, non-empty
+validator address, and tamper rejection.

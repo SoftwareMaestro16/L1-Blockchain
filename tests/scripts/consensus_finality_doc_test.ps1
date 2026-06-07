@@ -2,7 +2,9 @@ param(
   [string]$Doc = "docs\architecture\consensus-finality.md",
   [string]$Policy = "app\params\consensus_finality.go",
   [string]$Profile = "app\params\network_profile.go",
-  [string]$Tests = "app\params\consensus_finality_test.go"
+  [string]$Tests = "app\params\consensus_finality_test.go",
+  [string]$VoteExtension = "app\abcihandlers\vote_extension.go",
+  [string]$VoteExtensionTests = "app\abcihandlers\vote_extension_test.go"
 )
 
 $ErrorActionPreference = "Stop"
@@ -24,6 +26,8 @@ $docText = Get-Content -Raw -LiteralPath (Resolve-RepoPath $Doc)
 $policyText = Get-Content -Raw -LiteralPath (Resolve-RepoPath $Policy)
 $profileText = Get-Content -Raw -LiteralPath (Resolve-RepoPath $Profile)
 $testText = Get-Content -Raw -LiteralPath (Resolve-RepoPath $Tests)
+$voteExtensionText = Get-Content -Raw -LiteralPath (Resolve-RepoPath $VoteExtension)
+$voteExtensionTestText = Get-Content -Raw -LiteralPath (Resolve-RepoPath $VoteExtensionTests)
 
 foreach ($term in @(
     'Consensus, Block Production, and Finality',
@@ -39,7 +43,16 @@ foreach ($term in @(
     'localnet/load profile must demonstrate block production under configured',
     'degraded validator scenarios must preserve liveness when >= 2/3 voting power',
     'finality measurements must be included in testnet reports',
-    'ValidateConsensusFinalityReport'
+    'ValidateConsensusFinalityReport',
+    'Vote Extensions',
+    'validator telemetry summary',
+    'oracle-like future extensions',
+    'encrypted mempool shares if implemented later',
+    'keep vote extensions small',
+    'verify signatures before trusting extension data',
+    'avoid large payloads that hurt consensus latency',
+    'avoid non-deterministic validation',
+    'cover handlers with tests'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "consensus finality doc missing: $term"
 }
@@ -75,6 +88,27 @@ foreach ($term in @(
     'TestConsensusFinalityReportRequiresTestnetReportMeasurements'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "consensus finality tests missing: $term"
+}
+
+foreach ($term in @(
+    'VoteExtensionKindValidatorTelemetrySummary',
+    'VoteExtensionKindOracleFutureExtension',
+    'VoteExtensionKindEncryptedMempoolShare',
+    'MaxVoteExtensionBytes',
+    'MaxVoteExtensionDataBytes',
+    'AllowedVoteExtensionKind',
+    'ValidatorAddress',
+    'DeterministicVoteExtensionData'
+  )) {
+  Assert-Contains -Text $voteExtensionText -Pattern ([regex]::Escape($term)) -Message "vote extension handler missing: $term"
+}
+
+foreach ($term in @(
+    'TestVoteExtensionHandlerIsDeterministicAndRejectsTampering',
+    'TestVoteExtensionPolicyRejectsUnsignedOversizedAndUnknownKinds',
+    'TestVoteExtensionAllowedKindsAreExplicitAndSmall'
+  )) {
+  Assert-Contains -Text $voteExtensionTestText -Pattern ([regex]::Escape($term)) -Message "vote extension tests missing: $term"
 }
 
 Write-Host "consensus finality doc test passed"
