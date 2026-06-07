@@ -8,7 +8,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
-	aethercoretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	aetracoretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	feecollectortypes "github.com/sovereign-l1/l1/x/fee-collector/types"
 )
 
@@ -19,7 +19,7 @@ func TestNewKVStoreKeysIncludesCoreAndNativeSystemModules(t *testing.T) {
 		authtypes.StoreKey,
 		banktypes.StoreKey,
 		stakingtypes.StoreKey,
-		aethercoretypes.StoreKey,
+		aetracoretypes.StoreKey,
 		feecollectortypes.StoreKey,
 	} {
 		require.Contains(t, keys, storeKey)

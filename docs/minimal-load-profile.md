@@ -8,8 +8,8 @@ Run against a running localnet:
 ```powershell
 .\scripts\localnet\load-profile.ps1 `
   -OutputDir .localnet `
-  -Binary build\aetherisd.exe `
-  -ChainId aetheris-local-1 `
+  -Binary build\aetrad.exe `
+  -ChainId aetra-local-1 `
   -Scenario mixed `
   -Count 12 `
   -RatePerSecond 2

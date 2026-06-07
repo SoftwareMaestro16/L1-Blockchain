@@ -7,7 +7,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 func DefaultParams() Params {
@@ -79,7 +79,7 @@ func (p Params) Validate() error {
 	}
 	seen := map[string]struct{}{}
 	for _, recipient := range p.RecipientAllowlist {
-		if err := aetherisaddress.ValidateUserAddress("recipient_allowlist", recipient); err != nil {
+		if err := aetraaddress.ValidateUserAddress("recipient_allowlist", recipient); err != nil {
 			return err
 		}
 		if _, ok := seen[recipient]; ok {
@@ -114,10 +114,10 @@ func (s TreasurySpend) Validate(params Params) error {
 	if s.Id == 0 {
 		return fmt.Errorf("spend id must be positive")
 	}
-	if err := aetherisaddress.ValidateUserAddress("proposer", s.Proposer); err != nil {
+	if err := aetraaddress.ValidateUserAddress("proposer", s.Proposer); err != nil {
 		return err
 	}
-	if err := aetherisaddress.ValidateUserAddress("recipient", s.Recipient); err != nil {
+	if err := aetraaddress.ValidateUserAddress("recipient", s.Recipient); err != nil {
 		return err
 	}
 	if err := ValidateTreasuryCoins(params, s.Amount, false); err != nil {

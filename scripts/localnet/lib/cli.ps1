@@ -35,7 +35,7 @@ function Invoke-LocalnetCliJson {
   }
 
   if ($exitCode -ne 0) {
-    throw "aetherisd command failed: $Binary $($Arguments -join ' ')`n$($output -join "`n")"
+    throw "aetrad command failed: $Binary $($Arguments -join ' ')`n$($output -join "`n")"
   }
 
   $text = $output -join "`n"
@@ -44,7 +44,7 @@ function Invoke-LocalnetCliJson {
     $jsonStart = $text.IndexOf("[")
   }
   if ($jsonStart -lt 0) {
-    throw "aetherisd command did not return JSON: $Binary $($Arguments -join ' ')`n$text"
+    throw "aetrad command did not return JSON: $Binary $($Arguments -join ' ')`n$text"
   }
   return $text.Substring($jsonStart) | ConvertFrom-Json
 }
@@ -87,7 +87,7 @@ function Invoke-LocalnetCliJsonAllowFailure {
     $jsonStart = $text.IndexOf("[")
   }
   if ($jsonStart -lt 0) {
-    throw "aetherisd command did not return JSON: $Binary $($Arguments -join ' ')`n$text"
+    throw "aetrad command did not return JSON: $Binary $($Arguments -join ' ')`n$text"
   }
   return $text.Substring($jsonStart) | ConvertFrom-Json
 }
@@ -109,12 +109,12 @@ function Assert-LocalnetCliFailure {
   }
 
   if ($exitCode -eq 0) {
-    throw "aetherisd command succeeded but failure was expected: $Binary $($Arguments -join ' ')"
+    throw "aetrad command succeeded but failure was expected: $Binary $($Arguments -join ' ')"
   }
 
   $text = $output -join "`n"
   if ($ExpectedLog -and ($text -notmatch [regex]::Escape($ExpectedLog))) {
-    throw "aetherisd command failed, but output did not contain '$ExpectedLog': $text"
+    throw "aetrad command failed, but output did not contain '$ExpectedLog': $text"
   }
   return $text
 }
@@ -355,10 +355,10 @@ function Assert-LocalnetSignedTxReplayFailure {
     $ErrorActionPreference = $previousErrorActionPreference
   }
   if ($signExitCode -ne 0) {
-    throw "aetherisd tx sign failed: $Binary $($signArgs -join ' ')`n$($signOutput -join "`n")"
+    throw "aetrad tx sign failed: $Binary $($signArgs -join ' ')`n$($signOutput -join "`n")"
   }
   if (-not (Test-Path -LiteralPath $signedPath)) {
-    throw "aetherisd tx sign did not create signed tx file: $signedPath"
+    throw "aetrad tx sign did not create signed tx file: $signedPath"
   }
 
   $broadcastArgs = @(

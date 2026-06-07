@@ -126,7 +126,7 @@ from default, while still supporting restart export from the KV snapshot.
 Coverage:
 
 - `TestPrototypeGenesisInitializesRuntimeKeeperState`
-- `TestAetherCorePrototypeStateSurvivesRestartWhenDisabled`
+- `TestAetraCorePrototypeStateSurvivesRestartWhenDisabled`
 - prototype keeper package tests
 
 Residual limitation:

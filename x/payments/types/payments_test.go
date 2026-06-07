@@ -119,7 +119,7 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	alice := testAddress(0x41)
 	bob := testAddress(0x42)
 	openReq := ChannelOpenRequest{
-		ChainID:                      "aetheris-test-1",
+		ChainID:                      "aetra-test-1",
 		Participants:                 []string{alice, bob},
 		InitialBalances:              []Balance{{Participant: alice, Amount: "1000"}, {Participant: bob, Amount: "0"}},
 		ChannelType:                  ChannelTypeBidirectional,
@@ -678,7 +678,7 @@ func TestPaymentPerformanceCoverageProfilesPerBlockWorkloads(t *testing.T) {
 		openMessages = append(openMessages, MsgOpenChannel{
 			Signer: opener,
 			Request: ChannelOpenRequest{
-				ChainID:         "aetheris-test-1",
+				ChainID:         "aetra-test-1",
 				Participants:    []string{opener, counterparty},
 				InitialBalances: []Balance{{Participant: opener, Amount: "100"}, {Participant: counterparty, Amount: "0"}},
 				ChannelType:     ChannelTypeBidirectional,
@@ -802,9 +802,16 @@ func TestPaymentObservabilityMetricsCoverOperationalSignals(t *testing.T) {
 	bob := testAddress(0xd2)
 	currentHeight := uint64(29)
 
-	state, _, _ := virtualChannelFixture(t, "observability-virtual", alice, router, bob, "100", 40)
-	state.Channels[0].RoutingAdvertised = true
-	conditionChannel := state.Channels[0]
+	state, vc, _ := virtualChannelFixture(t, "observability-virtual", alice, router, bob, "100", 40)
+	conditionChannel, found := state.ChannelByID(vc.ParentChannelIDs[0])
+	require.True(t, found)
+	conditionChannel.RoutingAdvertised = true
+	for i := range state.Channels {
+		if state.Channels[i].ChannelID == conditionChannel.ChannelID {
+			state.Channels[i] = conditionChannel
+			break
+		}
+	}
 	activePromise := signedPromiseWithHashLock(t, conditionChannel, "observability-active", alice, router, "5", "0", 3, 40, HashParts("observability-active-preimage"))
 	conditioned, _, err := BuildConditionRootUpdateFromPromises(conditionChannel, conditionChannel.LatestState, []ConditionalPromise{activePromise}, nil)
 	require.NoError(t, err)
@@ -1019,7 +1026,7 @@ func TestPaymentGovernanceParametersValidateChannelAndConditionalBounds(t *testi
 	require.Equal(t, "3", schedule.ConditionalPromiseSettlementFee)
 
 	openReq := ChannelOpenRequest{
-		ChainID:         "aetheris-test-1",
+		ChainID:         "aetra-test-1",
 		ChannelID:       HashParts("governance-open", alice, bob),
 		Participants:    []string{alice, bob},
 		InitialBalances: []Balance{{Participant: alice, Amount: "250"}, {Participant: bob, Amount: "0"}},
@@ -1706,11 +1713,19 @@ func TestHashLockedPreimageRevealResolvesLinkedPromisesAndTracksPreimage(t *test
 	})
 	require.NoError(t, err)
 	require.Len(t, resolutions, 2)
-	require.Equal(t, bob, resolutions[0].Recipient)
-	require.Equal(t, first.PromiseID, resolutions[0].ConditionID)
+	resolutionsByID := map[string]ConditionResolution{}
+	for _, resolution := range resolutions {
+		resolutionsByID[resolution.ConditionID] = resolution
+	}
+	require.Equal(t, bob, resolutionsByID[first.PromiseID].Recipient)
+	require.Equal(t, bob, resolutionsByID[second.PromiseID].Recipient)
 	require.Len(t, state.ConditionClaims, 2)
-	require.Equal(t, hashLock, state.ConditionClaims[0].PreimageHash)
-	require.Equal(t, hashLock, state.ConditionClaims[1].PreimageHash)
+	claimsByID := map[string]ConditionClaimRecord{}
+	for _, claim := range state.ConditionClaims {
+		claimsByID[claim.ConditionID] = claim
+	}
+	require.Equal(t, hashLock, claimsByID[first.PromiseID].PreimageHash)
+	require.Equal(t, hashLock, claimsByID[second.PromiseID].PreimageHash)
 
 	_, _, err = RevealPromisePreimage(state, PreimageRevealRequest{
 		ChannelID:     channel.ChannelID,
@@ -2304,7 +2319,7 @@ func TestChannelOpenLifecycleLocksFeeAndEmitsEvent(t *testing.T) {
 	alice := testAddress(0x33)
 	bob := testAddress(0x34)
 	req := ChannelOpenRequest{
-		ChainID:                      "aetheris-test-1",
+		ChainID:                      "aetra-test-1",
 		ChannelID:                    HashParts("open-lifecycle", alice, bob),
 		Participants:                 []string{alice, bob},
 		InitialBalances:              []Balance{{Participant: alice, Amount: "700"}, {Participant: bob, Amount: "300"}},
@@ -2682,7 +2697,7 @@ func TestFraudProofVerificationModuleDedupGasPenaltyAndRewardClaim(t *testing.T)
 
 func FuzzCanonicalFraudEvidenceHashMalformedInputs(f *testing.F) {
 	f.Add("bad-chain", "bad-channel", uint64(0), uint64(0))
-	f.Add("aetheris-test-1", HashParts("fuzz-channel"), uint64(1), uint64(2))
+	f.Add("aetra-test-1", HashParts("fuzz-channel"), uint64(1), uint64(2))
 	f.Fuzz(func(t *testing.T, chainID, channelID string, epoch, nonce uint64) {
 		alice := testAddress(0xb3)
 		bob := testAddress(0xb4)
@@ -2990,7 +3005,7 @@ func TestLiquidityAdvertisementReservationScoreAndDepositPenalty(t *testing.T) {
 
 	reservation, err := BuildSignedLiquidityReservation(SignedLiquidityReservation{
 		AdvertisementID:  ad.AdvertisementID,
-		ChainID:          "aetheris-test-chain",
+		ChainID:          "aetra-test-chain",
 		ChannelID:        channelID,
 		Reserver:         alice,
 		Counterparty:     bob,
@@ -3562,7 +3577,7 @@ func TestCommitmentModelBindsChannelDomainAndPayloads(t *testing.T) {
 	penaltyRoute.Penalties = []Penalty{{Offender: bob, Recipient: alice, Denom: NativeDenom, Amount: "1"}}
 	otherDomain := settlement
 	otherDomain.ChannelID = second.ChannelID
-	otherDomain.ChainID = "aetheris-test-2"
+	otherDomain.ChainID = "aetra-test-2"
 	require.NotEqual(t, ComputeSettlementResultCommitment(first, settlement), ComputeSettlementResultCommitment(first, penaltyRoute))
 	require.NotEqual(t, ComputeSettlementHash(settlement), ComputeSettlementHash(otherDomain))
 }
@@ -4863,7 +4878,7 @@ func TestRoutingFeePolicyUpdateAndHopFeeCalculation(t *testing.T) {
 	alice := testAddress(0x41)
 	router := testAddress(0x42)
 	policy, err := BuildRoutingFeePolicyUpdate(RoutingFeePolicyUpdate{
-		ChainID:                 "aetheris-test-chain",
+		ChainID:                 "aetra-test-chain",
 		ChannelID:               HashParts("routing-fee-policy-channel"),
 		From:                    router,
 		To:                      alice,
@@ -6172,7 +6187,7 @@ func TestPaymentChannelModuleMessagesDispatchAnteAndInvariants(t *testing.T) {
 	alice := testAddress(0x8b)
 	bob := testAddress(0x8c)
 	openReq := ChannelOpenRequest{
-		ChainID:         "aetheris-test-1",
+		ChainID:         "aetra-test-1",
 		Participants:    []string{alice, bob},
 		InitialBalances: []Balance{{Participant: alice, Amount: "100"}, {Participant: bob, Amount: "0"}},
 		ChannelType:     ChannelTypeBidirectional,
@@ -6350,13 +6365,13 @@ func TestStoreV2PrunesExpiredTombstonesAndConditions(t *testing.T) {
 				Key:       StoreV2SettlementTombstoneKey(HashParts("old-channel")),
 				Version:   StoreV2MigrationVersion,
 				ChannelID: HashParts("old-channel"),
-				Tombstone: ClosedChannelTombstone{ChainID: "aetheris-test-1", ChannelID: HashParts("old-channel"), FinalizedNonce: 1, StateHash: HashParts("old-state"), ClosedHeight: 5, ExpiresHeight: 15},
+				Tombstone: ClosedChannelTombstone{ChainID: "aetra-test-1", ChannelID: HashParts("old-channel"), FinalizedNonce: 1, StateHash: HashParts("old-state"), ClosedHeight: 5, ExpiresHeight: 15},
 			},
 			{
 				Key:       StoreV2SettlementTombstoneKey(HashParts("kept-channel")),
 				Version:   StoreV2MigrationVersion,
 				ChannelID: HashParts("kept-channel"),
-				Tombstone: ClosedChannelTombstone{ChainID: "aetheris-test-1", ChannelID: HashParts("kept-channel"), FinalizedNonce: 1, StateHash: HashParts("kept-state"), ClosedHeight: 5, ExpiresHeight: 35},
+				Tombstone: ClosedChannelTombstone{ChainID: "aetra-test-1", ChannelID: HashParts("kept-channel"), FinalizedNonce: 1, StateHash: HashParts("kept-state"), ClosedHeight: 5, ExpiresHeight: 35},
 			},
 		},
 	}
@@ -6854,7 +6869,7 @@ func signedChannel(t *testing.T, salt, collateral, left, right string) ChannelRe
 
 	channelID := HashParts(salt, left, right)
 	channel := ChannelRecord{
-		ChainID:             "aetheris-test-1",
+		ChainID:             "aetra-test-1",
 		ChannelID:           channelID,
 		ChannelType:         ChannelTypeBidirectional,
 		Participants:        []string{left, right},
@@ -7201,7 +7216,7 @@ func signedUnidirectionalChannel(t *testing.T, salt, collateral, payer, receiver
 	t.Helper()
 
 	channel := ChannelRecord{
-		ChainID:             "aetheris-test-1",
+		ChainID:             "aetra-test-1",
 		ChannelID:           HashParts(salt, payer, receiver),
 		ChannelType:         ChannelTypeUnidirectional,
 		Participants:        []string{payer, receiver},
@@ -7278,7 +7293,7 @@ func signedAsyncChannel(t *testing.T, salt, collateral string, balances []Balanc
 	t.Helper()
 
 	channel := ChannelRecord{
-		ChainID:        "aetheris-test-1",
+		ChainID:        "aetra-test-1",
 		ChannelID:      HashParts(append([]string{salt}, participants...)...),
 		ChannelType:    ChannelTypeAsync,
 		Participants:   participants,

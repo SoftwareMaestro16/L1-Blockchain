@@ -335,7 +335,7 @@ func IsAVMContractBackendKind(kind AVMContractBackendKind) bool {
 func ComputeAVMContractBackendHash(backend AVMContractBackendDescriptor) string {
 	backend = canonicalAVMContractBackendDescriptor(backend)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-backend-v1")
+	writeEnginePart(h, "aetra-avm-contract-backend-v1")
 	writeEnginePart(h, string(backend.Kind))
 	writeEnginePart(h, string(backend.RouterBackend))
 	writeEnginePart(h, backend.Runtime)
@@ -350,7 +350,7 @@ func ComputeAVMContractBackendHash(backend AVMContractBackendDescriptor) string 
 func ComputeAVMContractBackendRegistryHash(registry AVMContractBackendRegistry) string {
 	registry = canonicalAVMContractBackendRegistry(registry)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-backend-registry-v1")
+	writeEnginePart(h, "aetra-avm-contract-backend-registry-v1")
 	writeEngineUint64(h, uint64(len(registry.Backends)))
 	for _, backend := range registry.Backends {
 		writeEnginePart(h, backend.BackendHash)
@@ -361,7 +361,7 @@ func ComputeAVMContractBackendRegistryHash(registry AVMContractBackendRegistry) 
 func ComputeAVMNativeModuleDescriptorHash(descriptor AVMNativeModuleDescriptor) string {
 	descriptor = canonicalAVMNativeModuleDescriptor(descriptor)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-native-module-descriptor-v1")
+	writeEnginePart(h, "aetra-avm-native-module-descriptor-v1")
 	writeEnginePart(h, descriptor.ModuleName)
 	writeEnginePart(h, string(descriptor.ZoneID))
 	writeEnginePart(h, descriptor.KeeperService)
@@ -381,7 +381,7 @@ func ComputeAVMNativeModuleDescriptorHash(descriptor AVMNativeModuleDescriptor) 
 func ComputeAVMNativeModuleRouteCallHash(call AVMNativeModuleRouteCall) string {
 	call = canonicalAVMNativeModuleRouteCall(call)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-native-module-route-call-v1")
+	writeEnginePart(h, "aetra-avm-native-module-route-call-v1")
 	writeEnginePart(h, call.Descriptor.DescriptorHash)
 	writeEnginePart(h, call.RouteKey)
 	writeEnginePart(h, call.Method)

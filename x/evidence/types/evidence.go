@@ -368,7 +368,7 @@ func RequiredDeposit(params Params, submitterRole string) sdkmath.Int {
 }
 
 func ComputeSubmissionHash(submission EvidenceSubmission) string {
-	return hashParts("aetheris-evidence-submission-v1",
+	return hashParts("aetra-evidence-submission-v1",
 		submission.Evidence.EvidenceID,
 		submission.Evidence.ObjectHash,
 		submission.Evidence.ProofPayloadHash,
@@ -382,7 +382,7 @@ func ComputeSubmissionHash(submission EvidenceSubmission) string {
 }
 
 func ComputeMarketSettlementHash(settlement EvidenceMarketSettlement) string {
-	return hashParts("aetheris-evidence-market-settlement-v1",
+	return hashParts("aetra-evidence-market-settlement-v1",
 		settlement.EvidenceID,
 		settlement.SubmitterID,
 		settlement.SubmitterRole,

@@ -20,7 +20,7 @@ import (
 func TestValidatorElectionSystemModuleWiringAndGenesis(t *testing.T) {
 	app, genesis := setup(true, 5)
 
-	require.NoError(t, app.ValidateAetherCoreWiringGate())
+	require.NoError(t, app.ValidateAetraCoreWiringGate())
 	require.Contains(t, app.ModuleManager.Modules, validatorelectiontypes.ModuleName)
 	require.Contains(t, app.keys, validatorelectiontypes.StoreKey)
 	require.Contains(t, genesis, validatorelectiontypes.ModuleName)

@@ -13,7 +13,7 @@ import (
 func TestConfigVotingPrototypeModuleWiringAndGenesis(t *testing.T) {
 	app, genesis := setup(true, 5)
 
-	require.NoError(t, app.ValidateAetherCoreWiringGate())
+	require.NoError(t, app.ValidateAetraCoreWiringGate())
 	require.Contains(t, app.ModuleManager.Modules, configvotingtypes.ModuleName)
 	require.Contains(t, app.keys, configvotingtypes.StoreKey)
 	require.Contains(t, genesis, configvotingtypes.ModuleName)

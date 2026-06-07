@@ -45,7 +45,7 @@ try {
   Assert-True ($result.campaign_id -match '^aexs-[0-9a-f]{12}-[0-9a-f]{16}$') "campaign id must be deterministic and commit-based"
   Assert-True ($result.output_dir.StartsWith($resolvedOutput, [System.StringComparison]::OrdinalIgnoreCase)) "runtime report must be under requested .work output"
   Assert-True ($result.source_task_file -eq "TO_AUDIT.md") "TO_AUDIT must be the task source"
-  Assert-True ($result.source_pipeline_doc -eq "docs\security\aetheris-fuzzing-invariant-pipeline.md") "pipeline doc must be the primary source"
+  Assert-True ($result.source_pipeline_doc -eq "docs\security\aetra-fuzzing-invariant-pipeline.md") "pipeline doc must be the primary source"
   Assert-True ($result.planned_coverage_percent -ge 95) "planned coverage must meet 95 percent threshold"
   Assert-True ($result.audit_passed -eq $false) "pre-campaign audit must not be marked passed"
   Assert-True ($result.production_safe -eq $false) "pre-campaign audit must not be production safe"
@@ -97,9 +97,9 @@ try {
   foreach ($module in @(
       "app",
       "x/fees",
-      "x/aetherisvm/standards/aft",
+      "x/aetravm/standards/aft",
       "avm-dex-contract",
-      "x/aetherisvm",
+      "x/aetravm",
       "x/execution",
       "x/vm",
       "x/messaging",

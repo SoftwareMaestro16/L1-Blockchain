@@ -6,7 +6,7 @@ function Invoke-ExecutionOSProfileLocalnet {
     [string]$Profile,
     [string]$OutputDir = "",
     [string]$Binary = "",
-    [string]$ChainId = "aetheris-local-1",
+    [string]$ChainId = "aetra-local-1",
     [int]$ValidatorCount = 3,
     [int]$MinHeight = 3,
     [int]$TimeoutSeconds = 120,
@@ -23,7 +23,7 @@ function Invoke-ExecutionOSProfileLocalnet {
   . (Join-Path $RepoRoot "scripts\localnet\common.ps1")
 
   $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-  $Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+  $Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
   Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "execution OS smoke output directory"
 
   $node0Ports = Get-LocalnetPortProfile `
@@ -40,7 +40,7 @@ function Invoke-ExecutionOSProfileLocalnet {
     & .\scripts\localnet\stop.ps1 -OutputDir $OutputDir
 
     if (-not $SkipBuild) {
-      & .\scripts\build-aetherisd.ps1 -Binary $Binary
+      & .\scripts\build-aetrad.ps1 -Binary $Binary
     } elseif (-not (Test-Path -LiteralPath $Binary)) {
       throw "Binary not found at $Binary and -SkipBuild was specified"
     }

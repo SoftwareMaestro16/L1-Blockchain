@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/wasmconfig"
-	"github.com/sovereign-l1/l1/x/aetherisvm/avm"
+	"github.com/sovereign-l1/l1/x/aetravm/avm"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -611,7 +611,7 @@ func (s AVMGasSchedule) ClassBudget(class AVMGasClass) uint64 {
 func ComputeVMRuntimeTraitHash(trait VMRuntimeTrait) string {
 	trait = canonicalVMRuntimeTrait(trait)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-vm-runtime-trait-v1")
+	writeEnginePart(h, "aetra-vm-runtime-trait-v1")
 	writeEnginePart(h, trait.Runtime)
 	writeEnginePart(h, string(trait.AdapterKind))
 	writeEnginePart(h, trait.DeterminismProfile.ProfileHash)
@@ -629,7 +629,7 @@ func ComputeVMRuntimeTraitHash(trait VMRuntimeTrait) string {
 func ComputeVMBytecodeValidationHash(validation VMBytecodeValidation) string {
 	validation = canonicalVMBytecodeValidation(validation)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-vm-bytecode-validation-v1")
+	writeEnginePart(h, "aetra-vm-bytecode-validation-v1")
 	writeEnginePart(h, validation.Runtime)
 	writeEnginePart(h, validation.BytecodeHash)
 	writeEngineUint64(h, validation.CodeBytes)
@@ -641,7 +641,7 @@ func ComputeVMBytecodeValidationHash(validation VMBytecodeValidation) string {
 func ComputeVMGasTableHash(table VMGasTable) string {
 	table = canonicalVMGasTable(table)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-vm-gas-table-v1")
+	writeEnginePart(h, "aetra-vm-gas-table-v1")
 	writeEnginePart(h, table.Runtime)
 	writeEnginePart(h, table.AVMSchedule.ScheduleHash)
 	writeEnginePart(h, table.WASMConversion.ConversionHash)
@@ -651,7 +651,7 @@ func ComputeVMGasTableHash(table VMGasTable) string {
 func ComputeVMStorageAdapterHash(adapter VMStorageAdapter) string {
 	adapter = canonicalVMStorageAdapter(adapter)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-vm-storage-adapter-v1")
+	writeEnginePart(h, "aetra-vm-storage-adapter-v1")
 	writeEnginePart(h, adapter.Runtime)
 	writeEnginePart(h, string(adapter.ZoneID))
 	writeEnginePart(h, adapter.StoreKey)
@@ -666,7 +666,7 @@ func ComputeVMStorageAdapterHash(adapter VMStorageAdapter) string {
 func ComputeVMOutboundMessageSyscallHash(syscall VMOutboundMessageSyscall) string {
 	syscall = canonicalVMOutboundMessageSyscall(syscall)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-vm-outbound-message-syscall-v1")
+	writeEnginePart(h, "aetra-vm-outbound-message-syscall-v1")
 	writeEnginePart(h, syscall.Runtime)
 	writeSyscallMeter(h, syscall.Syscall)
 	writeEnginePart(h, syscall.Message.ID)
@@ -679,7 +679,7 @@ func ComputeVMOutboundMessageSyscallHash(syscall VMOutboundMessageSyscall) strin
 func ComputeVMReceiptEmissionHash(emission VMReceiptEmission) string {
 	emission = canonicalVMReceiptEmission(emission)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-vm-receipt-emission-v1")
+	writeEnginePart(h, "aetra-vm-receipt-emission-v1")
 	writeEnginePart(h, emission.Runtime)
 	writeEnginePart(h, emission.Receipt.ReceiptHash)
 	writeEnginePart(h, emission.ReceiptRoot)
@@ -689,7 +689,7 @@ func ComputeVMReceiptEmissionHash(emission VMReceiptEmission) string {
 func ComputeVMRuntimeAdapterHash(adapter VMRuntimeAdapter) string {
 	adapter = canonicalVMRuntimeAdapter(adapter)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-vm-runtime-adapter-v1")
+	writeEnginePart(h, "aetra-vm-runtime-adapter-v1")
 	writeEnginePart(h, adapter.Trait.TraitHash)
 	writeEnginePart(h, adapter.BoundaryManifest.ManifestHash)
 	writeEnginePart(h, adapter.BytecodeValidation.ValidationHash)
@@ -705,7 +705,7 @@ func ComputeVMRuntimeAdapterHash(adapter VMRuntimeAdapter) string {
 func ComputeVMRuntimeRootCommitmentHash(root VMRuntimeRootCommitment) string {
 	root = canonicalVMRuntimeRootCommitment(root)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-vm-runtime-root-commitment-v1")
+	writeEnginePart(h, "aetra-vm-runtime-root-commitment-v1")
 	writeEngineUint64(h, root.Height)
 	writeEnginePart(h, string(root.ZoneID))
 	writeEnginePart(h, root.Runtime)

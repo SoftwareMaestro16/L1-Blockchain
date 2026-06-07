@@ -73,7 +73,7 @@ type AetherMeshDelivery struct {
 func NewAetherMeshMessage(msg AetherMeshMessage) (AetherMeshMessage, error) {
 	msg = NormalizeAetherMeshMessage(msg)
 	if msg.PayloadHash == "" && len(msg.Payload) > 0 {
-		msg.PayloadHash = hashBytes("aetheris-mesh-payload-v1", msg.Payload)
+		msg.PayloadHash = hashBytes("aetra-mesh-payload-v1", msg.Payload)
 	}
 	if msg.MessageID == "" {
 		msg.MessageID = ComputeAetherMeshMessageID(msg)
@@ -193,7 +193,7 @@ func (m AetherMeshMessage) ValidateBasic(currentHeight uint64) error {
 	if len(msg.Payload) == 0 || len(msg.Payload) > MaxAetherMeshPayloadBytes {
 		return fmt.Errorf("networking mesh payload bytes must be between 1 and %d", MaxAetherMeshPayloadBytes)
 	}
-	if hashBytes("aetheris-mesh-payload-v1", msg.Payload) != msg.PayloadHash {
+	if hashBytes("aetra-mesh-payload-v1", msg.Payload) != msg.PayloadHash {
 		return errors.New("networking mesh payload hash mismatch")
 	}
 	if err := ValidateHash("networking mesh payload hash", msg.PayloadHash); err != nil {

@@ -9,7 +9,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/mint-authority/types"
 )
 
@@ -78,7 +78,7 @@ func (k Keeper) MintProtocolCoins(ctx context.Context, msg types.MsgMintProtocol
 		return types.MintEvent{}, err
 	}
 	if k.bankKeeper != nil {
-		recipient, err := aetherisaddress.ParseAccAddress(msg.Recipient)
+		recipient, err := aetraaddress.ParseAccAddress(msg.Recipient)
 		if err != nil {
 			return types.MintEvent{}, err
 		}

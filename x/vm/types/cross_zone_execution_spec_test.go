@@ -65,9 +65,9 @@ func TestAVMZoneRouterTableZoneRootsCoreCommitmentAndProofQuery(t *testing.T) {
 		ContinuationRoot: engineHash("zone-continuation"),
 	})
 	require.NoError(t, err)
-	core, err := NewAVMAetherCoreZoneCommitmentSet(AVMAetherCoreZoneCommitmentSet{Height: 14, ZoneRoots: []AVMZoneStateRoot{zoneRoot}})
+	core, err := NewAVMAetraCoreZoneCommitmentSet(AVMAetraCoreZoneCommitmentSet{Height: 14, ZoneRoots: []AVMZoneStateRoot{zoneRoot}})
 	require.NoError(t, err)
-	require.Equal(t, ComputeAVMAetherCoreZoneCommitmentRoot(core), core.CoreRoot)
+	require.Equal(t, ComputeAVMAetraCoreZoneCommitmentRoot(core), core.CoreRoot)
 
 	execution := testAVMCrossZoneExecution(t, msg, policy, entry, receipt, msg.ValueNAET)
 	proof, err := QueryAVMCrossZoneProof(AVMCrossZoneProofIndex{

@@ -372,7 +372,7 @@ func ValidateIdentityCoreStoreV2IndexesV2(state IdentityState, observed Identity
 
 func ComputeIdentityCoreModuleBreakdownHashV2(breakdown IdentityCoreModuleBreakdownV2) string {
 	breakdown = canonicalIdentityCoreModuleBreakdownV2(breakdown)
-	parts := []string{"aetheris-identity-core-module-breakdown-v2", breakdown.ModulePath}
+	parts := []string{"aetra-identity-core-module-breakdown-v2", breakdown.ModulePath}
 	parts = append(parts, "purpose", fmt.Sprint(len(breakdown.Purpose)))
 	parts = append(parts, breakdown.Purpose...)
 	parts = append(parts, "state", fmt.Sprint(len(breakdown.StateObjects)))
@@ -417,7 +417,7 @@ func ComputeIdentityCoreInvariantReportHashV2(report IdentityCoreInvariantReport
 	report.Issues = sortedIdentityCoreStringsV2(report.Issues)
 	sortIdentityCoreIndexEntriesV2(report.DerivedIndexes.ExpiryIndex)
 	sortIdentityCoreIndexEntriesV2(report.DerivedIndexes.OwnerIndex)
-	parts := []string{"aetheris-identity-core-invariant-report-v2", fmt.Sprintf("valid=%t", report.Valid)}
+	parts := []string{"aetra-identity-core-invariant-report-v2", fmt.Sprintf("valid=%t", report.Valid)}
 	parts = append(parts, report.Issues...)
 	for _, entry := range report.DerivedIndexes.ExpiryIndex {
 		parts = append(parts, entry.Kind, entry.StoreKey, entry.Name, entry.NameHash, entry.Owner, fmt.Sprint(entry.ExpiryHeight))

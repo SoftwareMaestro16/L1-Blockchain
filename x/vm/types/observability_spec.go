@@ -198,7 +198,7 @@ func IsAVMObservabilityAlert(alert AVMObservabilityAlert) bool {
 func ComputeAVMObservabilitySpecHash(spec AVMObservabilitySpec) string {
 	spec = canonicalAVMObservabilitySpec(spec)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-observability-spec-v1")
+	writeEnginePart(h, "aetra-avm-observability-spec-v1")
 	writeEngineUint64(h, uint64(len(spec.Metrics)))
 	for _, metric := range spec.Metrics {
 		writeEnginePart(h, string(metric))

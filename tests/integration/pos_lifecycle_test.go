@@ -19,7 +19,7 @@ import (
 )
 
 func TestStakingTxReturnsValidatorSetUpdates(t *testing.T) {
-	app := testutil.NewInitializedApp(t, "aetheris-integration-pos-updates")
+	app := testutil.NewInitializedApp(t, "aetra-integration-pos-updates")
 	ctx := testutil.NewContext(app, 1)
 	delegatorPriv, delegator := testutil.AddFundedSigner(t, app, ctx, sdkmath.NewInt(20_000_000))
 	validator := bondedValidator(t, app, ctx)
@@ -64,7 +64,7 @@ func TestStakingTxReturnsValidatorSetUpdates(t *testing.T) {
 }
 
 func TestStakingStateSurvivesExportImportRestart(t *testing.T) {
-	app := testutil.NewInitializedApp(t, "aetheris-integration-pos-restart")
+	app := testutil.NewInitializedApp(t, "aetra-integration-pos-restart")
 	ctx := testutil.NewContext(app, 1)
 	delegatorPriv, delegator := testutil.AddFundedSigner(t, app, ctx, sdkmath.NewInt(20_000_000))
 	validator := bondedValidator(t, app, ctx)

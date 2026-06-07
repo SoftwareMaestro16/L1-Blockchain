@@ -3,7 +3,7 @@ param(
   [int]$TimeoutSeconds = 90,
   [string]$OutputDir = "",
   [string]$Binary = "",
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [string]$Fees = "1000000naet",
   [int]$BaseP2PPort = 26656,
   [int]$BaseRPCPort = 26657,
@@ -19,7 +19,7 @@ Set-StrictMode -Version 2.0
 
 $RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
 . (Join-Path $RepoRoot "scripts\localnet\common.ps1")
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 if ([string]::IsNullOrWhiteSpace($OutputDir)) {
   $OutputDir = Join-Path $RepoRoot ".localnet-adversarial"
 }
@@ -48,7 +48,7 @@ function Get-CliJson {
 function Invoke-AetraJson {
   param([Parameter(Mandatory = $true)][string[]]$Arguments)
 
-  $output = Invoke-ExternalChecked -FilePath $Binary -Arguments $Arguments -FailureMessage "aetherisd command failed"
+  $output = Invoke-ExternalChecked -FilePath $Binary -Arguments $Arguments -FailureMessage "aetrad command failed"
   return Get-CliJson -Output $output
 }
 

@@ -7,7 +7,7 @@ import (
 	corestore "cosmossdk.io/core/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/reputation/types"
 )
 
@@ -80,7 +80,7 @@ func (k Keeper) ExportGenesis(ctx context.Context) (*types.ReputationState, erro
 }
 
 func parseAddress(text string) (sdk.AccAddress, error) {
-	return aetherisaddress.ParseAccAddress(text)
+	return aetraaddress.ParseAccAddress(text)
 }
 
 func mustJSON(v any) (string, error) {

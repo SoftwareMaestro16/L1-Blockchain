@@ -294,7 +294,7 @@ func AVMZoneContinuationRootPrefix(zoneID zonestypes.ZoneID) string {
 func ComputeAVMStateModelRoot(model AVMStateModel) string {
 	model = canonicalAVMStateModel(model)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-state-model-v1")
+	writeEnginePart(h, "aetra-avm-state-model-v1")
 	writeEngineUint64(h, uint64(len(model.Prefixes)))
 	for _, descriptor := range model.Prefixes {
 		writeEnginePart(h, descriptor.Prefix)
@@ -307,7 +307,7 @@ func ComputeAVMStateModelRoot(model AVMStateModel) string {
 func ComputeAVMZoneRuntimeConfigRoot(config AVMZoneRuntimeConfig) string {
 	config = canonicalAVMZoneRuntimeConfig(config)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-zone-runtime-config-v1")
+	writeEnginePart(h, "aetra-avm-zone-runtime-config-v1")
 	writeEnginePart(h, string(config.ZoneID))
 	writeEngineBool(h, config.Enabled)
 	writeEngineUint64(h, config.ExecutionBudgetPerBlock.MaxGas)

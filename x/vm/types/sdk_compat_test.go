@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/sovereign-l1/l1/x/aetherisvm/avm"
+	"github.com/sovereign-l1/l1/x/aetravm/avm"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -52,8 +52,8 @@ func TestFinalizeBlockPlanSortsDispatchesAndRejectsBlockSTMConflictOverlap(t *te
 	policy := DefaultRuntimePolicy()
 	binding := DefaultAVMSDKBinding(zonestypes.ZoneIDContract)
 	dispatches := []SDKDispatch{
-		testSDKDispatch(zonestypes.ZoneIDContract, "/aetheris.avm.v1.MsgExecute", "vm/CONTRACT_ZONE/contract/b"),
-		testSDKDispatch(zonestypes.ZoneIDApplication, "/l1.aetherisvm.async.v1.MsgDeliver", "vm/APPLICATION_ZONE/queue/a"),
+		testSDKDispatch(zonestypes.ZoneIDContract, "/aetra.avm.v1.MsgExecute", "vm/CONTRACT_ZONE/contract/b"),
+		testSDKDispatch(zonestypes.ZoneIDApplication, "/l1.aetravm.async.v1.MsgDeliver", "vm/APPLICATION_ZONE/queue/a"),
 	}
 
 	plan, err := BuildFinalizeBlockPlan(100, binding, dispatches, policy)
@@ -63,8 +63,8 @@ func TestFinalizeBlockPlanSortsDispatchesAndRejectsBlockSTMConflictOverlap(t *te
 	require.Equal(t, uint64(100), plan.Dispatches[0].ExecutionHeight)
 
 	conflicting := []SDKDispatch{
-		testSDKDispatch(zonestypes.ZoneIDContract, "/aetheris.avm.v1.MsgExecute", "vm/CONTRACT_ZONE/contract/a"),
-		testSDKDispatch(zonestypes.ZoneIDContract, "/aetheris.avm.v1.MsgExecute", "vm/CONTRACT_ZONE/contract/a/storage"),
+		testSDKDispatch(zonestypes.ZoneIDContract, "/aetra.avm.v1.MsgExecute", "vm/CONTRACT_ZONE/contract/a"),
+		testSDKDispatch(zonestypes.ZoneIDContract, "/aetra.avm.v1.MsgExecute", "vm/CONTRACT_ZONE/contract/a/storage"),
 	}
 	_, err = BuildFinalizeBlockPlan(100, binding, conflicting, policy)
 	require.ErrorContains(t, err, "BlockSTM conflict")
@@ -73,7 +73,7 @@ func TestFinalizeBlockPlanSortsDispatchesAndRejectsBlockSTMConflictOverlap(t *te
 func TestFinalizeBlockPlanRejectsInvalidLifecycleHeightAndStakingPower(t *testing.T) {
 	policy := DefaultRuntimePolicy()
 	binding := DefaultAVMSDKBinding(zonestypes.ZoneIDContract)
-	dispatch := testSDKDispatch(zonestypes.ZoneIDContract, "/aetheris.avm.v1.MsgExecute", "vm/CONTRACT_ZONE/contract/a")
+	dispatch := testSDKDispatch(zonestypes.ZoneIDContract, "/aetra.avm.v1.MsgExecute", "vm/CONTRACT_ZONE/contract/a")
 
 	_, err := BuildFinalizeBlockPlan(0, binding, []SDKDispatch{dispatch}, policy)
 	require.ErrorContains(t, err, "height")

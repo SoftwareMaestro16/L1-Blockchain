@@ -76,11 +76,11 @@ func deterministicGenesisWithValidator(t testing.TB) (*L1App, GenesisState, *cmt
 	t.Helper()
 
 	app, genesis := setup(true, 5)
-	validatorPrivKey := cmted25519.GenPrivKeyFromSecret([]byte("aetheris-deterministic-validator"))
+	validatorPrivKey := cmted25519.GenPrivKeyFromSecret([]byte("aetra-deterministic-validator"))
 	validator := cmttypes.NewValidator(validatorPrivKey.PubKey(), 1)
 	valSet := cmttypes.NewValidatorSet([]*cmttypes.Validator{validator})
 
-	accountPrivKey := secp256k1.GenPrivKeyFromSecret([]byte("aetheris-deterministic-account"))
+	accountPrivKey := secp256k1.GenPrivKeyFromSecret([]byte("aetra-deterministic-account"))
 	account := authtypes.NewBaseAccount(accountPrivKey.PubKey().Address().Bytes(), accountPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
 		Address: account.GetAddress().String(),

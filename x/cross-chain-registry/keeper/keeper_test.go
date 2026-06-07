@@ -85,7 +85,7 @@ func TestDuplicateChainRejected(t *testing.T) {
 
 func TestRegisterChannelAndRoute(t *testing.T) {
 	k := setupKeeper(t)
-	registerChain(t, &k, "aetheris")
+	registerChain(t, &k, "aetra")
 	registerChain(t, &k, "ethereum")
 
 	channel, err := k.RegisterChannel(types.MsgRegisterChannel{
@@ -93,7 +93,7 @@ func TestRegisterChannelAndRoute(t *testing.T) {
 		Channel: types.ChannelRecord{
 			ChannelID:           "channel-0",
 			ChainID:             "ethereum",
-			CounterpartyChainID: "aetheris",
+			CounterpartyChainID: "aetra",
 			ClientID:            "client-eth",
 			Active:              true,
 			RegisteredHeight:    2,
@@ -101,7 +101,7 @@ func TestRegisterChannelAndRoute(t *testing.T) {
 		Routes: []types.BridgeRoute{{
 			RouteID:       "eth-aet",
 			SourceChainID: "ethereum",
-			TargetChainID: "aetheris",
+			TargetChainID: "aetra",
 			ChannelID:     "channel-0",
 			BridgeID:      "bridge-eth",
 			Enabled:       true,
@@ -117,14 +117,14 @@ func TestRegisterChannelAndRoute(t *testing.T) {
 
 func TestPauseChainDisablesRoutes(t *testing.T) {
 	k := setupKeeper(t)
-	registerChain(t, &k, "aetheris")
+	registerChain(t, &k, "aetra")
 	registerChain(t, &k, "ethereum")
 	_, err := k.RegisterChannel(types.MsgRegisterChannel{
 		Authority: authority,
 		Channel: types.ChannelRecord{
 			ChannelID:           "channel-0",
 			ChainID:             "ethereum",
-			CounterpartyChainID: "aetheris",
+			CounterpartyChainID: "aetra",
 			ClientID:            "client-eth",
 			Active:              true,
 			RegisteredHeight:    2,
@@ -132,7 +132,7 @@ func TestPauseChainDisablesRoutes(t *testing.T) {
 		Routes: []types.BridgeRoute{{
 			RouteID:       "eth-aet",
 			SourceChainID: "ethereum",
-			TargetChainID: "aetheris",
+			TargetChainID: "aetra",
 			ChannelID:     "channel-0",
 			BridgeID:      "bridge-eth",
 			Enabled:       true,
@@ -158,7 +158,7 @@ func TestRegisterActiveChainWithoutRiskPolicyRejected(t *testing.T) {
 func TestExportImportPreservesRegistryOrder(t *testing.T) {
 	k := setupKeeper(t)
 	registerChain(t, &k, "zeta")
-	registerChain(t, &k, "aetheris")
+	registerChain(t, &k, "aetra")
 	registerChain(t, &k, "ethereum")
 
 	exported := k.ExportGenesis()
@@ -166,5 +166,5 @@ func TestExportImportPreservesRegistryOrder(t *testing.T) {
 	require.NoError(t, imported.InitGenesis(exported))
 	chains, err := imported.RegisteredChains()
 	require.NoError(t, err)
-	require.Equal(t, []string{"aetheris", "ethereum", "zeta"}, []string{chains[0].ChainID, chains[1].ChainID, chains[2].ChainID})
+	require.Equal(t, []string{"aetra", "ethereum", "zeta"}, []string{chains[0].ChainID, chains[1].ChainID, chains[2].ChainID})
 }

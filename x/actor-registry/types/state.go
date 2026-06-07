@@ -299,15 +299,15 @@ func (m ActorMigrationRecord) Validate() error {
 }
 
 func DeriveActorID(owner, codeHash, salt string) string {
-	return hashParts("aetheris-actor-id-v1", strings.TrimSpace(owner), strings.TrimSpace(codeHash), strings.TrimSpace(salt))
+	return hashParts("aetra-actor-id-v1", strings.TrimSpace(owner), strings.TrimSpace(codeHash), strings.TrimSpace(salt))
 }
 
 func DeriveContractAddress(actorID string) string {
-	return hashParts("aetheris-contract-address-v1", strings.TrimSpace(actorID))
+	return hashParts("aetra-contract-address-v1", strings.TrimSpace(actorID))
 }
 
 func DefaultRoot(seed string) string {
-	return hashParts("aetheris-empty-root-v1", seed)
+	return hashParts("aetra-empty-root-v1", seed)
 }
 
 func CanExecuteNormalMessage(actor ActorRecord) bool {

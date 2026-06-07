@@ -693,7 +693,7 @@ func validateBps(fieldName string, value uint32) error {
 }
 
 func computeSlashingPenaltyHash(penalty SlashingPenalty) string {
-	return posHashRoot("aetheris-pos-slashing-penalty-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-slashing-penalty-v1", func(w posByteWriter) {
 		posWritePart(w, penalty.PenaltyID)
 		posWritePart(w, penalty.ValidatorID)
 		posWritePart(w, penalty.SeverityLevel)
@@ -727,7 +727,7 @@ func computeSlashingPenaltyHash(penalty SlashingPenalty) string {
 }
 
 func computeSlashingPenaltyRoutingHash(routing SlashingPenaltyRouting) string {
-	return posHashRoot("aetheris-pos-slashing-penalty-routing-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-slashing-penalty-routing-v1", func(w posByteWriter) {
 		posWritePart(w, routing.PenaltyID)
 		posWritePart(w, routing.ValidatorID)
 		posWritePart(w, routing.ReporterID)
@@ -747,7 +747,7 @@ func computeSlashingPenaltyRoutingHash(routing SlashingPenaltyRouting) string {
 }
 
 func computeSlashingRecordHash(record SlashingRecord) string {
-	return posHashRoot("aetheris-pos-slashing-record-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-slashing-record-v1", func(w posByteWriter) {
 		posWritePart(w, record.PenaltyID)
 		posWritePart(w, record.ValidatorAddress)
 		posWritePart(w, record.EvidenceID)

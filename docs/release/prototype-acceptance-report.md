@@ -3,7 +3,7 @@
 
 Date: 2026-06-04
 
-Scope: final local prototype acceptance pass for current source commit `216b50ca6a43` on branch `build/one-command-aetherisd`.
+Scope: final local prototype acceptance pass for current source commit `216b50ca6a43` on branch `build/one-command-aetrad`.
 
 ## Release Decision
 
@@ -102,7 +102,7 @@ Baseline test results:
 This e2e transcript shows binary commit `27d88b54f069` because it ran before later docs/lifecycle commits landed. Current quick gates, full audit, determinism gate, and dry-run package were rerun at `216b50ca6a43`.
 
 ```text
-Binary: C:\Users\Ryzen\Desktop\L1\build\aetherisd.exe
+Binary: C:\Users\Ryzen\Desktop\L1\build\aetrad.exe
 Version: dev-27d88b54f069
 Commit: 27d88b54f069
 Dirty: true

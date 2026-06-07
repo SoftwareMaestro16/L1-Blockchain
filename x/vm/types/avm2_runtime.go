@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -495,7 +495,7 @@ func EncodeAVM2Bytecode(module AVM2BytecodeModule) []byte {
 func ComputeAVM2BytecodeHash(module AVM2BytecodeModule) string {
 	module = canonicalAVM2BytecodeModule(module)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-bytecode-v1")
+	writeEnginePart(h, "aetra-avm2-bytecode-v1")
 	writeEnginePart(h, string(EncodeAVM2Bytecode(module)))
 	return hex.EncodeToString(h.Sum(nil))
 }
@@ -504,7 +504,7 @@ func ComputeAVM2StoreV2EntryHash(entry AVM2StoreV2Entry) string {
 	entry = canonicalAVM2StoreV2Entry(entry)
 	entry.EntryHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-storev2-entry-v1")
+	writeEnginePart(h, "aetra-avm2-storev2-entry-v1")
 	writeEnginePart(h, entry.Key)
 	writeEnginePart(h, entry.ValueHash)
 	writeEngineUint64(h, entry.ValueBytes)
@@ -514,7 +514,7 @@ func ComputeAVM2StoreV2EntryHash(entry AVM2StoreV2Entry) string {
 func ComputeAVM2StoreV2AdapterRoot(adapter AVM2StoreV2Adapter) string {
 	adapter = canonicalAVM2StoreV2Adapter(adapter)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-storev2-root-v1")
+	writeEnginePart(h, "aetra-avm2-storev2-root-v1")
 	writeEnginePart(h, adapter.ContractAddress)
 	writeEngineUint64(h, uint64(len(adapter.Entries)))
 	for _, entry := range adapter.Entries {
@@ -527,7 +527,7 @@ func ComputeAVM2MessageDrivenInputHash(input AVM2MessageDrivenInput) string {
 	input = canonicalAVM2MessageDrivenInput(input)
 	input.InputHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-message-driven-input-v1")
+	writeEnginePart(h, "aetra-avm2-message-driven-input-v1")
 	writeEnginePart(h, input.Message.ID)
 	writeEnginePart(h, input.CurrentState.AdapterRoot)
 	writeEnginePart(h, input.Context.ContextHash)
@@ -539,7 +539,7 @@ func ComputeAVM2StateTransitionHash(transition AVM2StateTransition) string {
 	transition = canonicalAVM2StateTransition(transition)
 	transition.StateTransitionHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-state-transition-v1")
+	writeEnginePart(h, "aetra-avm2-state-transition-v1")
 	writeEnginePart(h, transition.Input.InputHash)
 	writeEnginePart(h, transition.Execution.ExecutionHash)
 	writeEnginePart(h, transition.UpdatedState.AdapterRoot)
@@ -558,7 +558,7 @@ func ComputeAVM2ReceiptRoot(receipts []AVMExecutionReceipt) string {
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].ReceiptID < out[j].ReceiptID })
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-receipt-root-v1")
+	writeEnginePart(h, "aetra-avm2-receipt-root-v1")
 	writeEngineUint64(h, uint64(len(out)))
 	for _, receipt := range out {
 		writeEnginePart(h, receipt.ReceiptHash)
@@ -570,7 +570,7 @@ func ComputeAVM2ContractShardRouteSetHash(set AVM2ContractShardRouteSet) string 
 	set = canonicalAVM2ContractShardRouteSet(set)
 	set.RouteSetHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-contract-shard-routes-v1")
+	writeEnginePart(h, "aetra-avm2-contract-shard-routes-v1")
 	writeEngineUint64(h, set.LayoutEpoch)
 	writeCoreRouteParts(h, set.InstanceRoute)
 	writeEngineUint64(h, uint64(len(set.StorageRoutes)))

@@ -13,7 +13,7 @@ func TestIdentityLightweightResolutionFlowV2VerifiesCachesAndChecks(t *testing.T
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
 
 	result, err := ResolveIdentityLightweightV2(IdentityLightweightResolutionRequestV2{
-		ExpectedChainID:    "aetheris-local-1",
+		ExpectedChainID:    "aetra-local-1",
 		RequestedName:      "alice.aet",
 		TrustedHeader:      trustedHeaderForProofV2(proof),
 		Proof:              proof,
@@ -55,11 +55,11 @@ func TestIdentityLightweightResolutionFlowV2RecursiveAndReverseChecks(t *testing
 	state, _, err = SetIdentityReverse(state, addr(2), addr(2), "alice.aet", 14)
 	require.NoError(t, err)
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolveReverse, 15, 30, addr(2))
-	recursive, err := BuildRecursiveResolutionProofV2(state, "aetheris-local-1", "alice.aet", "alice.aet", 15, 30, nil)
+	recursive, err := BuildRecursiveResolutionProofV2(state, "aetra-local-1", "alice.aet", "alice.aet", 15, 30, nil)
 	require.NoError(t, err)
 
 	result, err := ResolveIdentityLightweightV2(IdentityLightweightResolutionRequestV2{
-		ExpectedChainID:          "aetheris-local-1",
+		ExpectedChainID:          "aetra-local-1",
 		RequestedName:            "alice.aet",
 		TrustedHeader:            trustedHeaderForProofV2(proof),
 		Proof:                    proof,
@@ -83,7 +83,7 @@ func TestIdentityLightweightResolutionFlowV2FailureChecklist(t *testing.T) {
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
 
 	stale, err := ResolveIdentityLightweightV2(IdentityLightweightResolutionRequestV2{
-		ExpectedChainID: "aetheris-local-1",
+		ExpectedChainID: "aetra-local-1",
 		RequestedName:   "alice.aet",
 		TrustedHeader:   trustedHeaderForProofV2(proof),
 		Proof:           proof,
@@ -108,7 +108,7 @@ func TestIdentityLightweightResolutionFlowV2FailureChecklist(t *testing.T) {
 	requireLightClientCheckStatusV2(t, badChain, IdentityLightClientCheckChainIDV2, IdentityLightClientCheckFailedV2)
 
 	missingTarget, err := ResolveIdentityLightweightV2(IdentityLightweightResolutionRequestV2{
-		ExpectedChainID: "aetheris-local-1",
+		ExpectedChainID: "aetra-local-1",
 		RequestedName:   "alice.aet",
 		TrustedHeader:   trustedHeaderForProofV2(proof),
 		Proof:           proof,

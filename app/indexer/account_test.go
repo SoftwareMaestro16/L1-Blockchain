@@ -7,7 +7,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 func TestNewAccountMetadataFormatsAetraAddress(t *testing.T) {
@@ -16,7 +16,7 @@ func TestNewAccountMetadataFormatsAetraAddress(t *testing.T) {
 
 	metadata, err := NewAccountMetadata(account)
 	require.NoError(t, err)
-	require.Equal(t, aetherisaddress.FormatAccAddress(account.GetAddress()), metadata.Address)
+	require.Equal(t, aetraaddress.FormatAccAddress(account.GetAddress()), metadata.Address)
 	require.Equal(t, uint64(12), metadata.AccountNumber)
 	require.Equal(t, uint64(34), metadata.Sequence)
 	require.Contains(t, metadata.PubKeyType, "secp256k1")

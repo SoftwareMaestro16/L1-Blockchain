@@ -184,7 +184,7 @@ func IsAVMExecutionComparisonFeature(feature AVMExecutionComparisonFeature) bool
 func ComputeAVMExecutionComparisonRowHash(row AVMExecutionComparisonRow) string {
 	row = canonicalAVMExecutionComparisonRow(row)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-execution-comparison-row-v1")
+	writeEnginePart(h, "aetra-avm-execution-comparison-row-v1")
 	writeEnginePart(h, string(row.Feature))
 	writeEnginePart(h, row.ClassicCosmosSDK)
 	writeEnginePart(h, row.AVM)
@@ -195,7 +195,7 @@ func ComputeAVMExecutionComparisonRowHash(row AVMExecutionComparisonRow) string 
 func ComputeAVMExecutionModelComparisonHash(model AVMExecutionModelComparison) string {
 	model = canonicalAVMExecutionModelComparison(model)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-execution-model-comparison-v1")
+	writeEnginePart(h, "aetra-avm-execution-model-comparison-v1")
 	writeEnginePart(h, model.ModelName)
 	writeEngineUint64(h, uint64(len(model.Rows)))
 	for _, row := range model.Rows {

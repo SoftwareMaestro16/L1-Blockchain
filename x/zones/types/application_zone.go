@@ -634,7 +634,7 @@ func BuildApplicationZoneRoot(roots ApplicationZoneRoots) (ZoneRoot, error) {
 	stateRoot := roots.StateRoot
 	if stateRoot == "" {
 		stateRoot = hashRuntimeParts(
-			"aetheris-application-zone-state-v2",
+			"aetra-application-zone-state-v2",
 			roots.AppRoot,
 			roots.WorkflowRoot,
 			roots.SchedulerRoot,
@@ -1094,14 +1094,14 @@ func (r ApplicationZoneRoots) Validate() error {
 func ComputeApplicationRuntimeBoundaryHash(boundary ApplicationRuntimeBoundary) string {
 	prefixes := append([]string(nil), boundary.AllowedStatePrefixes...)
 	sort.Strings(prefixes)
-	parts := []string{"aetheris-application-runtime-boundary-v1", string(boundary.ZoneID), boundary.RuntimeID, boundary.CrossZoneEffectMechanism, fmt.Sprint(len(prefixes))}
+	parts := []string{"aetra-application-runtime-boundary-v1", string(boundary.ZoneID), boundary.RuntimeID, boundary.CrossZoneEffectMechanism, fmt.Sprint(len(prefixes))}
 	parts = append(parts, prefixes...)
 	return hashRuntimeParts(parts...)
 }
 
 func ComputeApplicationShardRouteHash(route ApplicationShardRoute) string {
 	return hashRuntimeParts(
-		"aetheris-application-shard-route-v1",
+		"aetra-application-shard-route-v1",
 		string(route.ZoneID),
 		fmt.Sprint(route.LayoutEpoch),
 		fmt.Sprint(route.ShardCount),
@@ -1113,7 +1113,7 @@ func ComputeApplicationShardRouteHash(route ApplicationShardRoute) string {
 }
 
 func ComputeApplicationAsyncOutputID(output ApplicationAsyncOutput) string {
-	return hashRuntimeParts("aetheris-application-async-output-id-v1", output.AppID, output.WorkflowID, string(output.DestinationZone), output.Destination, fmt.Sprint(output.CreatedHeight), fmt.Sprint(output.RetryNonce))
+	return hashRuntimeParts("aetra-application-async-output-id-v1", output.AppID, output.WorkflowID, string(output.DestinationZone), output.Destination, fmt.Sprint(output.CreatedHeight), fmt.Sprint(output.RetryNonce))
 }
 
 func ComputeApplicationAsyncOutputHash(output ApplicationAsyncOutput) string {
@@ -1121,12 +1121,12 @@ func ComputeApplicationAsyncOutputHash(output ApplicationAsyncOutput) string {
 	if outputID == "" {
 		outputID = ComputeApplicationAsyncOutputID(output)
 	}
-	return hashRuntimeParts("aetheris-application-async-output-v1", outputID, output.AppID, output.WorkflowID, string(output.DestinationZone), output.Destination, output.PayloadHash, fmt.Sprint(output.GasLimit), fmt.Sprint(output.RetryNonce), fmt.Sprint(output.CreatedHeight))
+	return hashRuntimeParts("aetra-application-async-output-v1", outputID, output.AppID, output.WorkflowID, string(output.DestinationZone), output.Destination, output.PayloadHash, fmt.Sprint(output.GasLimit), fmt.Sprint(output.RetryNonce), fmt.Sprint(output.CreatedHeight))
 }
 
 func ComputeApplicationReceiptHash(receipt ApplicationExecutionReceipt) string {
 	return hashRuntimeParts(
-		"aetheris-application-receipt-v2",
+		"aetra-application-receipt-v2",
 		string(receipt.ZoneID),
 		fmt.Sprintf("%020d", receipt.Height),
 		receipt.ExecutionID,
@@ -1144,7 +1144,7 @@ func ComputeApplicationReceiptHash(receipt ApplicationExecutionReceipt) string {
 func ComputeApplicationZoneStateRoot(state ApplicationZoneState) string {
 	normalized := state.Normalize()
 	return hashRuntimeParts(
-		"aetheris-application-zone-state-v2",
+		"aetra-application-zone-state-v2",
 		ComputeApplicationAppRoot(normalized.Apps),
 		ComputeApplicationWorkflowRoot(normalized.Workflows),
 		ComputeApplicationTaskRoot(normalized.Tasks),
@@ -1183,7 +1183,7 @@ func BuildApplicationProofRootExports(height uint64, roots ApplicationZoneRoots)
 
 func ComputeApplicationAppRoot(apps []ApplicationRecord) string {
 	ordered := normalizeApplicationRecords(apps)
-	parts := []string{"aetheris-application-app-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-application-app-root-v1", fmt.Sprint(len(ordered))}
 	for _, app := range ordered {
 		parts = append(parts, app.AppID, app.Owner, app.RuntimeID, fmt.Sprint(app.Version), fmt.Sprint(app.Enabled), app.ConfigHash, fmt.Sprint(app.UpdatedHeight))
 	}
@@ -1192,7 +1192,7 @@ func ComputeApplicationAppRoot(apps []ApplicationRecord) string {
 
 func ComputeApplicationWorkflowRoot(workflows []ApplicationWorkflowState) string {
 	ordered := normalizeApplicationWorkflows(workflows)
-	parts := []string{"aetheris-application-workflow-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-application-workflow-root-v1", fmt.Sprint(len(ordered))}
 	for _, workflow := range ordered {
 		parts = append(parts, workflow.WorkflowID, workflow.AppID, workflow.Owner, string(workflow.Status), fmt.Sprint(workflow.CurrentStep), fmt.Sprint(workflow.TotalSteps), workflow.PayloadHash, fmt.Sprint(workflow.UpdatedHeight))
 	}
@@ -1201,7 +1201,7 @@ func ComputeApplicationWorkflowRoot(workflows []ApplicationWorkflowState) string
 
 func ComputeApplicationTaskRoot(tasks []ApplicationScheduledTask) string {
 	ordered := cloneApplicationScheduledTasks(tasks)
-	parts := []string{"aetheris-application-task-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-application-task-root-v1", fmt.Sprint(len(ordered))}
 	for _, task := range ordered {
 		key, _ := ApplicationSchedulerTaskKey(task)
 		parts = append(parts, key, task.WorkflowID, task.AppID, fmt.Sprint(task.ScheduledHeight), fmt.Sprint(task.Priority), fmt.Sprint(task.Sequence), fmt.Sprint(task.GasLimit), task.PayloadHash, string(task.Status))
@@ -1211,7 +1211,7 @@ func ComputeApplicationTaskRoot(tasks []ApplicationScheduledTask) string {
 
 func ComputeApplicationAutomationRoot(automations []ApplicationAutomation) string {
 	ordered := normalizeApplicationAutomations(automations)
-	parts := []string{"aetheris-application-automation-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-application-automation-root-v1", fmt.Sprint(len(ordered))}
 	for _, automation := range ordered {
 		parts = append(parts, automation.AutomationID, automation.AppID, automation.WorkflowID, fmt.Sprint(automation.Enabled), automation.TriggerHash, fmt.Sprint(automation.NextRunHeight), fmt.Sprint(automation.UpdatedHeight))
 	}
@@ -1220,7 +1220,7 @@ func ComputeApplicationAutomationRoot(automations []ApplicationAutomation) strin
 
 func ComputeApplicationPermissionRoot(permissions []ApplicationPermission) string {
 	ordered := normalizeApplicationPermissions(permissions)
-	parts := []string{"aetheris-application-permission-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-application-permission-root-v1", fmt.Sprint(len(ordered))}
 	for _, permission := range ordered {
 		parts = append(parts, permission.AppID, permission.Address, string(permission.Scope), fmt.Sprint(permission.ExpiresHeight), permission.GrantHash)
 	}
@@ -1229,7 +1229,7 @@ func ComputeApplicationPermissionRoot(permissions []ApplicationPermission) strin
 
 func ComputeApplicationReceiptRoot(receipts []ApplicationExecutionReceipt) string {
 	ordered := normalizeApplicationReceipts(receipts)
-	parts := []string{"aetheris-application-receipt-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-application-receipt-root-v1", fmt.Sprint(len(ordered))}
 	for _, receipt := range ordered {
 		parts = append(parts, receipt.ReceiptHash)
 	}
@@ -1238,7 +1238,7 @@ func ComputeApplicationReceiptRoot(receipts []ApplicationExecutionReceipt) strin
 
 func ComputeApplicationExecutionRoot(receipts []ApplicationExecutionReceipt) string {
 	ordered := normalizeApplicationReceipts(receipts)
-	parts := []string{"aetheris-application-execution-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-application-execution-root-v1", fmt.Sprint(len(ordered))}
 	for _, receipt := range ordered {
 		parts = append(parts, receipt.ExecutionID, receipt.OutputHash, string(receipt.Status), fmt.Sprint(receipt.GasUsed))
 	}
@@ -1250,7 +1250,7 @@ func ComputeApplicationSchedulerRoot(queue ApplicationSchedulerQueue) (string, e
 		return "", err
 	}
 	parts := []string{
-		"aetheris-application-scheduler-root-v1",
+		"aetra-application-scheduler-root-v1",
 		fmt.Sprintf("%020d", queue.Height),
 		fmt.Sprintf("%010d", queue.MaxWorkPerBlock),
 	}
@@ -1455,7 +1455,7 @@ func routeApplicationStateKey(mode ApplicationShardRoutingMode, routeKey string,
 	if err := validateRuntimeToken("application shard state key", stateKey, MaxZoneNamespaceLength); err != nil {
 		return ApplicationShardRoute{}, err
 	}
-	hash := hashRuntimeParts("aetheris-application-route-key-v1", string(mode), routeKey, fmt.Sprint(layoutEpoch))
+	hash := hashRuntimeParts("aetra-application-route-key-v1", string(mode), routeKey, fmt.Sprint(layoutEpoch))
 	bytes, err := hex.DecodeString(hash[:16])
 	if err != nil {
 		return ApplicationShardRoute{}, err

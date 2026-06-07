@@ -5,11 +5,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestServiceReplayProtectionProofBindsAllControlsAndTombstone(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 30}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 30}
 	descriptor := testInterfaceSystemDescriptor()
 	index, err := NewServiceCallReplayIndex(25)
 	require.NoError(t, err)
@@ -57,7 +57,7 @@ func TestServiceReplayProtectionProofBindsAllControlsAndTombstone(t *testing.T) 
 }
 
 func TestServiceReplayProtectionProofRejectsMismatchedReplayEntry(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 30}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 30}
 	descriptor := testInterfaceSystemDescriptor()
 	index, err := NewServiceCallReplayIndex(25)
 	require.NoError(t, err)

@@ -10,7 +10,7 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
 	l1app "github.com/sovereign-l1/l1/app"
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	burnkeeper "github.com/sovereign-l1/l1/x/burn/keeper"
 	"github.com/sovereign-l1/l1/x/burn/types"
 )
@@ -24,7 +24,7 @@ func TestUserBurnReducesBalanceSupplyAndRecordsCounters(t *testing.T) {
 	userBefore := app.BankKeeper.GetBalance(ctx, user, types.BaseDenom)
 
 	res, err := msgServer.BurnUserCoins(ctx, &types.MsgBurnUserCoins{
-		Burner: aetherisaddress.FormatAccAddress(user),
+		Burner: aetraaddress.FormatAccAddress(user),
 		Amount: sdk.NewCoins(coin(125)),
 		Epoch:  7,
 		Reason: "user-opt-in",
@@ -86,7 +86,7 @@ func TestZeroAndNegativeBurnRejectedWithoutMutation(t *testing.T) {
 	supplyBefore := app.BankKeeper.GetSupply(ctx, types.BaseDenom)
 
 	_, err := msgServer.BurnUserCoins(ctx, &types.MsgBurnUserCoins{
-		Burner: aetherisaddress.FormatAccAddress(user),
+		Burner: aetraaddress.FormatAccAddress(user),
 		Amount: sdk.NewCoins(),
 		Epoch:  1,
 	})
@@ -117,7 +117,7 @@ func TestUnauthorizedProtocolBurnRejectedWithoutSupplyMutation(t *testing.T) {
 	require.Equal(t, supplyBefore, app.BankKeeper.GetSupply(ctx, types.BaseDenom))
 
 	_, err = msgServer.BurnProtocolCoins(ctx, &types.MsgBurnProtocolCoins{
-		Authority:    aetherisaddress.FormatAccAddress(sdk.AccAddress(bytes20(1))),
+		Authority:    aetraaddress.FormatAccAddress(sdk.AccAddress(bytes20(1))),
 		SourceModule: types.ModuleName,
 		Amount:       sdk.NewCoins(coin(10)),
 		Epoch:        2,

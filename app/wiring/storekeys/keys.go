@@ -18,7 +18,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	actorregistrytypes "github.com/sovereign-l1/l1/x/actor-registry/types"
-	aethercoretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	aetracoretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	bridgehubtypes "github.com/sovereign-l1/l1/x/bridge-hub/types"
 	burntypes "github.com/sovereign-l1/l1/x/burn/types"
@@ -94,7 +94,7 @@ func NewKVStoreKeys() map[string]*storetypes.KVStoreKey {
 		stakeconcentrationtypes.StoreKey,
 		feecollectortypes.StoreKey,
 		feestypes.StoreKey,
-		aethercoretypes.StoreKey,
+		aetracoretypes.StoreKey,
 		loadtypes.StoreKey,
 		routingtypes.StoreKey,
 		zonestypes.StoreKey,

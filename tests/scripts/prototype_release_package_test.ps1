@@ -31,8 +31,8 @@ if (Test-Path -LiteralPath $OutputRoot) {
 }
 New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null
 
-$fakeBin = Join-Path $OutputRoot "fake-aetherisd.exe"
-"fake aetherisd binary for package test" | Set-Content -LiteralPath $fakeBin
+$fakeBin = Join-Path $OutputRoot "fake-aetrad.exe"
+"fake aetrad binary for package test" | Set-Content -LiteralPath $fakeBin
 
 Push-Location $RepoRoot
 try {
@@ -49,11 +49,11 @@ try {
   Pop-Location
 }
 
-$packageDir = Join-Path $OutputRoot "prototype-test\aetheris-prototype-test-windows-amd64"
-$archive = Join-Path $OutputRoot "prototype-test\aetheris-prototype-test-windows-amd64.zip"
+$packageDir = Join-Path $OutputRoot "prototype-test\aetra-prototype-test-windows-amd64"
+$archive = Join-Path $OutputRoot "prototype-test\aetra-prototype-test-windows-amd64.zip"
 $archiveSha = "$archive.sha256"
 
-Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "bin\aetherisd.exe")) "missing packaged binary"
+Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "bin\aetrad.exe")) "missing packaged binary"
 Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "release-manifest.json")) "missing manifest"
 Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "QUICKSTART.md")) "missing quickstart"
 Assert-True (Test-Path -LiteralPath (Join-Path $packageDir "RELEASE-NOTES.md")) "missing release notes"
@@ -72,15 +72,15 @@ Assert-True (($manifest.excluded -join " ") -match "\.localnet") "manifest must 
 Assert-True (($manifest.required_checks -join " ") -match "prototype-audit") "manifest must list security audit check"
 
 $checksumText = Get-Content -Raw -LiteralPath (Join-Path $packageDir "SHA256SUMS.txt")
-Assert-True ($checksumText -match "bin/aetherisd.exe") "binary checksum missing"
+Assert-True ($checksumText -match "bin/aetrad.exe") "binary checksum missing"
 Assert-True ($checksumText -match "release-manifest.json") "manifest checksum missing"
 Assert-True ($checksumText -match "QUICKSTART.md") "quickstart checksum missing"
 Assert-True ($checksumText -match "RELEASE-NOTES.md") "release notes checksum missing"
 Assert-True ($checksumText -match "docs/operator-troubleshooting.md") "troubleshooting runbook checksum missing"
 Assert-True ($checksumText -match "docs/release/prototype-limitations.md") "limitations doc checksum missing"
 
-$binaryHash = (Get-FileHash -LiteralPath (Join-Path $packageDir "bin\aetherisd.exe") -Algorithm SHA256).Hash.ToLowerInvariant()
-Assert-True ($checksumText -match [regex]::Escape("$binaryHash  bin/aetherisd.exe")) "binary checksum does not match packaged binary"
+$binaryHash = (Get-FileHash -LiteralPath (Join-Path $packageDir "bin\aetrad.exe") -Algorithm SHA256).Hash.ToLowerInvariant()
+Assert-True ($checksumText -match [regex]::Escape("$binaryHash  bin/aetrad.exe")) "binary checksum does not match packaged binary"
 
 $archiveHash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
 $archiveHashText = Get-Content -Raw -LiteralPath $archiveSha

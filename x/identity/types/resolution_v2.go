@@ -828,7 +828,7 @@ func validateInterfaceSchemaURIV2(uri string) error {
 		return errors.New("identity v2 interface schema_uri_optional must include an allowed scheme")
 	}
 	switch scheme {
-	case "https", "ipfs", "ar", "aetheris":
+	case "https", "ipfs", "ar", "aetra":
 		return nil
 	default:
 		return fmt.Errorf("identity v2 interface schema_uri_optional scheme %q is not allowed", scheme)
@@ -1152,7 +1152,7 @@ func validateServiceEndpointSchemeV2(endpoint string) error {
 		return errors.New("identity v2 service endpoint must include an allowed scheme")
 	}
 	switch scheme {
-	case "https", "grpcs", "wss", "aetheris", "ipfs":
+	case "https", "grpcs", "wss", "aetra", "ipfs":
 		return nil
 	default:
 		return fmt.Errorf("identity v2 service endpoint scheme %q is not allowed", scheme)

@@ -373,7 +373,7 @@ func benchmarkBlockSTMPlan(b *testing.B, msg IdentityMsgV2) IdentityBlockSTMPlan
 
 func benchmarkIdentityTxAuth(scope IdentitySignerScopeV2, nonce uint64) IdentityTxAuthV2 {
 	return IdentityTxAuthV2{
-		ChainID:                  "aetheris-local-1",
+		ChainID:                  "aetra-local-1",
 		Signer:                   benchmarkIdentityAddress(int(nonce + 40_000)),
 		Scope:                    scope,
 		NameNormalizationVersion: NameNormalizationVersionV2,

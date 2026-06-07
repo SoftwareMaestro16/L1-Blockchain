@@ -267,14 +267,14 @@ func validateRequiredCoverageCases(class RequiredCoverageClass, cases []Required
 func ComputeRequiredTestCoverageReportHash(report RequiredTestCoverageReport) string {
 	failed := normalizeStringSet(report.Failed)
 	evidence := normalizeStringSet(report.Evidence)
-	parts := []string{"aetheris-required-test-coverage-report", strings.TrimSpace(report.CoverageVersion), fmt.Sprintf("%t", report.Passed)}
+	parts := []string{"aetra-required-test-coverage-report", strings.TrimSpace(report.CoverageVersion), fmt.Sprintf("%t", report.Passed)}
 	parts = append(parts, failed...)
 	parts = append(parts, evidence...)
 	return hashStrings(parts...)
 }
 
 func hashRequiredCoverageCases(class RequiredCoverageClass, cases []RequiredTestCoverageCase) string {
-	parts := []string{"aetheris-required-test-coverage-cases", string(class)}
+	parts := []string{"aetra-required-test-coverage-cases", string(class)}
 	for _, coverage := range cases {
 		coverage = coverage.Normalize()
 		parts = append(parts, coverage.CaseID, string(coverage.Class), coverage.Target, coverage.EvidenceHash, fmt.Sprintf("%t", coverage.Deterministic), fmt.Sprintf("%t", coverage.Covered))

@@ -486,7 +486,7 @@ func ValidateProofModuleSchemaDescriptorV2(descriptor ProofModuleSchemaDescripto
 
 func ComputeAuctionModuleBreakdownHashV2(breakdown AuctionModuleBreakdownV2) string {
 	breakdown = canonicalAuctionModuleBreakdownV2(breakdown)
-	parts := []string{"aetheris-auction-module-breakdown-v2", breakdown.ModulePath}
+	parts := []string{"aetra-auction-module-breakdown-v2", breakdown.ModulePath}
 	parts = appendBreakdownStringsV2(parts, "purpose", breakdown.Purpose)
 	for _, value := range breakdown.StateObjects {
 		parts = append(parts, "state", string(value))
@@ -510,7 +510,7 @@ func ComputeAuctionModuleBreakdownHashV2(breakdown AuctionModuleBreakdownV2) str
 
 func ComputeProofVerificationModuleBreakdownHashV2(breakdown ProofVerificationModuleBreakdownV2) string {
 	breakdown = canonicalProofModuleBreakdownV2(breakdown)
-	parts := []string{"aetheris-proof-verification-module-breakdown-v2", breakdown.ModulePath}
+	parts := []string{"aetra-proof-verification-module-breakdown-v2", breakdown.ModulePath}
 	parts = appendBreakdownStringsV2(parts, "purpose", breakdown.Purpose)
 	for _, value := range breakdown.StateObjects {
 		parts = append(parts, "state", string(value))
@@ -536,7 +536,7 @@ func ComputeProofModuleSchemaDescriptorHashV2(descriptor ProofModuleSchemaDescri
 	descriptor.ResolutionFields = sortedBreakdownStringsV2(descriptor.ResolutionFields)
 	descriptor.RecursiveFields = sortedBreakdownStringsV2(descriptor.RecursiveFields)
 	descriptor.SupportedQueries = sortedBreakdownTypedStringsV2(descriptor.SupportedQueries)
-	parts := []string{"aetheris-proof-module-schema-descriptor-v2", fmt.Sprint(descriptor.SchemaVersion)}
+	parts := []string{"aetra-proof-module-schema-descriptor-v2", fmt.Sprint(descriptor.SchemaVersion)}
 	parts = appendBreakdownStringsV2(parts, "resolution", descriptor.ResolutionFields)
 	parts = appendBreakdownStringsV2(parts, "recursive", descriptor.RecursiveFields)
 	for _, query := range descriptor.SupportedQueries {

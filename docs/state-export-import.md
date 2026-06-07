@@ -30,7 +30,7 @@ The script uses `.localnet-export-import` and shifted ports by default, then wri
 The smoke copies the exported state, corrupts `app_state.dex.pools[0].reserve0`, and expects:
 
 ```powershell
-build\aetherisd.exe genesis validate-genesis .work\genesis\export-import\node0-export-corrupt.json --home .localnet-export-import\node0\aetherisd
+build\aetrad.exe genesis validate-genesis .work\genesis\export-import\node0-export-corrupt.json --home .localnet-export-import\node0\aetrad
 ```
 
 to fail with an `invalid` or `reserve0` validation error. The app unit test `TestStateImportRejectsCorruptedExportedPrototypeData` covers the same risk through `BasicModuleManager.ValidateGenesis`.

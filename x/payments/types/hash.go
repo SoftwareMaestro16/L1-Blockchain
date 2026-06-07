@@ -13,24 +13,24 @@ import (
 const HashHexLength = 64
 
 const (
-	domainHashParts               = "aetheris-payments-hash-parts-v1"
-	domainOpeningCommitment       = "aetheris-payment-opening-commitment"
-	domainBalanceCommitment       = "aetheris-payment-balance-state-commitment"
-	domainChannelState            = "aetheris-payment-channel-state"
-	domainAsyncDelta              = "aetheris-payment-async-delta"
-	domainAsyncDeltaRoot          = "aetheris-payment-async-delta-root"
-	domainConditionalPromise      = "aetheris-payment-conditional-promise"
-	domainConditionRootCommitment = "aetheris-payment-condition-root-commitment"
-	domainConditionsRoot          = "aetheris-payment-conditions-root"
-	domainCooperativeClose        = "aetheris-payment-cooperative-close"
-	domainDisputeProof            = "aetheris-payment-dispute-proof"
-	domainSettlementResult        = "aetheris-payment-settlement-result"
-	domainVirtualChannelState     = "aetheris-virtual-payment-channel-state"
-	domainVirtualChannelAnchor    = "aetheris-virtual-payment-channel-anchor"
-	domainStateSignaturePreimage  = "aetheris-payment-state-signature-preimage-hash"
-	domainSignatureEnvelope       = "aetheris-payment-signature-envelope"
-	domainSignedNonceWAL          = "aetheris-payment-signed-nonce-wal"
-	domainValidatorPaymentService = "aetheris-payment-validator-service-metadata"
+	domainHashParts               = "aetra-payments-hash-parts-v1"
+	domainOpeningCommitment       = "aetra-payment-opening-commitment"
+	domainBalanceCommitment       = "aetra-payment-balance-state-commitment"
+	domainChannelState            = "aetra-payment-channel-state"
+	domainAsyncDelta              = "aetra-payment-async-delta"
+	domainAsyncDeltaRoot          = "aetra-payment-async-delta-root"
+	domainConditionalPromise      = "aetra-payment-conditional-promise"
+	domainConditionRootCommitment = "aetra-payment-condition-root-commitment"
+	domainConditionsRoot          = "aetra-payment-conditions-root"
+	domainCooperativeClose        = "aetra-payment-cooperative-close"
+	domainDisputeProof            = "aetra-payment-dispute-proof"
+	domainSettlementResult        = "aetra-payment-settlement-result"
+	domainVirtualChannelState     = "aetra-virtual-payment-channel-state"
+	domainVirtualChannelAnchor    = "aetra-virtual-payment-channel-anchor"
+	domainStateSignaturePreimage  = "aetra-payment-state-signature-preimage-hash"
+	domainSignatureEnvelope       = "aetra-payment-signature-envelope"
+	domainSignedNonceWAL          = "aetra-payment-signed-nonce-wal"
+	domainValidatorPaymentService = "aetra-payment-validator-service-metadata"
 )
 
 func HashParts(parts ...string) string {
@@ -184,7 +184,7 @@ func ComputeBalanceStateCommitment(channel ChannelRecord, state ChannelState) st
 
 func ComputeParticipantSetHash(participants []string) string {
 	h := sha256.New()
-	writeString(h, "aetheris-payment-participant-set-v1")
+	writeString(h, "aetra-payment-participant-set-v1")
 	for _, participant := range normalizeAddressSet(participants) {
 		writeString(h, participant)
 	}
@@ -402,7 +402,7 @@ func ComputeConditionalTransferPromiseHash(promise ConditionalPromise) string {
 
 func SignaturePreimage(signer, stateHash string) []byte {
 	var buf bytes.Buffer
-	writeString(&buf, "aetheris-payment-state-signature-preimage-v1")
+	writeString(&buf, "aetra-payment-state-signature-preimage-v1")
 	writeString(&buf, signer)
 	writeString(&buf, stateHash)
 	return buf.Bytes()
@@ -441,7 +441,7 @@ func ComputeSignedNonceWALHash(record SignedNonceRecord) string {
 
 func ComputeSignatureHash(signer, stateHash string) string {
 	h := sha256.New()
-	writeString(h, "aetheris-payment-state-signature-v1")
+	writeString(h, "aetra-payment-state-signature-v1")
 	_, _ = h.Write(SignaturePreimage(signer, stateHash))
 	return hex.EncodeToString(h.Sum(nil))
 }
@@ -449,7 +449,7 @@ func ComputeSignatureHash(signer, stateHash string) string {
 func ComputeUnidirectionalClaimHash(claim UnidirectionalClaim) string {
 	claim = claim.Normalize()
 	h := sha256.New()
-	writeString(h, "aetheris-payment-unidirectional-claim-v1")
+	writeString(h, "aetra-payment-unidirectional-claim-v1")
 	writeByte(h, CanonicalEncodingVersion)
 	writeString(h, claim.ChainID)
 	writeString(h, claim.ChannelID)
@@ -465,7 +465,7 @@ func ComputeUnidirectionalClaimHash(claim UnidirectionalClaim) string {
 
 func ClaimSignaturePreimage(signer, claimHash string) []byte {
 	var buf bytes.Buffer
-	writeString(&buf, "aetheris-payment-unidirectional-claim-signature-preimage-v1")
+	writeString(&buf, "aetra-payment-unidirectional-claim-signature-preimage-v1")
 	writeString(&buf, signer)
 	writeString(&buf, claimHash)
 	return buf.Bytes()
@@ -473,7 +473,7 @@ func ClaimSignaturePreimage(signer, claimHash string) []byte {
 
 func ComputeClaimSignatureHash(signer, claimHash string) string {
 	h := sha256.New()
-	writeString(h, "aetheris-payment-unidirectional-claim-signature-v1")
+	writeString(h, "aetra-payment-unidirectional-claim-signature-v1")
 	_, _ = h.Write(ClaimSignaturePreimage(signer, claimHash))
 	return hex.EncodeToString(h.Sum(nil))
 }
@@ -530,7 +530,7 @@ func ComputeAsyncDeltaRootForChannel(channel ChannelRecord, deltas []AsyncPaymen
 
 func DeltaSignaturePreimage(signer, deltaHash string) []byte {
 	var buf bytes.Buffer
-	writeString(&buf, "aetheris-payment-async-delta-signature-preimage-v1")
+	writeString(&buf, "aetra-payment-async-delta-signature-preimage-v1")
 	writeString(&buf, signer)
 	writeString(&buf, deltaHash)
 	return buf.Bytes()
@@ -538,7 +538,7 @@ func DeltaSignaturePreimage(signer, deltaHash string) []byte {
 
 func ComputeDeltaSignatureHash(signer, deltaHash string) string {
 	h := sha256.New()
-	writeString(h, "aetheris-payment-async-delta-signature-v1")
+	writeString(h, "aetra-payment-async-delta-signature-v1")
 	_, _ = h.Write(DeltaSignaturePreimage(signer, deltaHash))
 	return hex.EncodeToString(h.Sum(nil))
 }
@@ -679,7 +679,7 @@ func ComputeSettlementResultCommitment(channel ChannelRecord, settlement Settlem
 func ComputeBatchRoot(operations []SettlementOperation) string {
 	ordered := SortSettlementOperations(operations)
 	h := sha256.New()
-	writeString(h, "aetheris-payment-settlement-batch-v1")
+	writeString(h, "aetra-payment-settlement-batch-v1")
 	for _, op := range ordered {
 		writeString(h, op.OperationID)
 		writeString(h, string(op.OperationType))

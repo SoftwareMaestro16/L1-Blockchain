@@ -1277,7 +1277,7 @@ func ComputeAVM2InstructionSetHash(set AVM2InstructionSet) string {
 	set = canonicalAVM2InstructionSet(set)
 	set.SetHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-instruction-set-v1")
+	writeEnginePart(h, "aetra-avm2-instruction-set-v1")
 	writeEngineUint64(h, set.Version)
 	writeEngineUint64(h, uint64(len(set.Opcodes)))
 	for _, opcode := range set.Opcodes {
@@ -1293,7 +1293,7 @@ func ComputeAVM2GasTableHash(table AVM2GasTable) string {
 	table = canonicalAVM2GasTable(table)
 	table.TableHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-gas-table-v1")
+	writeEnginePart(h, "aetra-avm2-gas-table-v1")
 	writeEngineUint64(h, table.BaseInstructionGas)
 	writeEngineUint64(h, uint64(len(table.OpcodeCosts)))
 	for _, entry := range table.OpcodeCosts {
@@ -1320,7 +1320,7 @@ func ComputeAVM2GasTableHash(table AVM2GasTable) string {
 func ComputeAVM2ContextHash(ctx AVM2ExecutionContext) string {
 	ctx.ContextHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-context-v1")
+	writeEnginePart(h, "aetra-avm2-context-v1")
 	writeEnginePart(h, ctx.ChainID)
 	writeEngineUint64(h, ctx.Height)
 	writeEnginePart(h, string(ctx.ZoneID))
@@ -1336,7 +1336,7 @@ func ComputeAVM2ContextHash(ctx AVM2ExecutionContext) string {
 func ComputeAVM2ProgramHash(program AVM2Program) string {
 	program = canonicalAVM2Program(program)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-program-v1")
+	writeEnginePart(h, "aetra-avm2-program-v1")
 	writeEngineUint64(h, program.VMVersion)
 	writeEngineUint64(h, program.InstructionSetVersion)
 	writeEngineUint64(h, uint64(program.MaxRecursionDepth))
@@ -1351,7 +1351,7 @@ func ComputeAVM2ProofHash(proof AVM2ProofInput) string {
 	proof = canonicalAVM2ProofInput(proof)
 	proof.ProofHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-proof-v1")
+	writeEnginePart(h, "aetra-avm2-proof-v1")
 	writeEngineUint64(h, proof.ProofVersion)
 	writeEnginePart(h, proof.ChainID)
 	writeEngineUint64(h, proof.Height)
@@ -1367,7 +1367,7 @@ func ComputeAVM2PromiseHash(promise AVM2PromiseState) string {
 	promise = canonicalAVM2PromiseState(promise)
 	promise.PromiseHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-promise-v1")
+	writeEnginePart(h, "aetra-avm2-promise-v1")
 	writeEnginePart(h, promise.PromiseID)
 	writeEnginePart(h, promise.Contract)
 	writeEnginePart(h, promise.MessageID)
@@ -1383,7 +1383,7 @@ func ComputeAVM2ABIInterfaceHash(abi AVM2ABIDescriptor) string {
 	abi = canonicalAVM2ABIDescriptor(abi)
 	abi.InterfaceHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-abi-v1")
+	writeEnginePart(h, "aetra-avm2-abi-v1")
 	writeEngineUint64(h, abi.ABIVersion)
 	writeEngineUint64(h, abi.CodeID)
 	writeStringSet(h, abi.Methods)
@@ -1398,7 +1398,7 @@ func ComputeAVM2EventHash(event AVM2Event) string {
 	event = canonicalAVM2Event(event)
 	event.EventHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-event-v1")
+	writeEnginePart(h, "aetra-avm2-event-v1")
 	writeEngineUint64(h, event.Height)
 	writeEnginePart(h, event.ContractAddress)
 	writeEnginePart(h, event.EventID)
@@ -1411,7 +1411,7 @@ func ComputeAVM2StorageRoot(reads []AVM2StorageRead, writes []AVM2StorageWrite) 
 	reads = canonicalAVM2StorageReads(reads)
 	writes = canonicalAVM2StorageWrites(writes)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-storage-root-v1")
+	writeEnginePart(h, "aetra-avm2-storage-root-v1")
 	writeEngineUint64(h, uint64(len(reads)))
 	for _, read := range reads {
 		writeEnginePart(h, read.Key)
@@ -1429,7 +1429,7 @@ func ComputeAVM2StorageRoot(reads []AVM2StorageRead, writes []AVM2StorageWrite) 
 func ComputeAVM2MessageRoot(messages []AVMAsyncMessage) string {
 	messages = canonicalAVM2Messages(messages)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-message-root-v1")
+	writeEnginePart(h, "aetra-avm2-message-root-v1")
 	writeEngineUint64(h, uint64(len(messages)))
 	for _, msg := range messages {
 		writeAVMAsyncMessageParts(h, msg)
@@ -1440,7 +1440,7 @@ func ComputeAVM2MessageRoot(messages []AVMAsyncMessage) string {
 func ComputeAVM2PromiseRoot(promises []AVM2PromiseState) string {
 	promises = canonicalAVM2Promises(promises)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-promise-root-v1")
+	writeEnginePart(h, "aetra-avm2-promise-root-v1")
 	writeEngineUint64(h, uint64(len(promises)))
 	for _, promise := range promises {
 		writeEnginePart(h, promise.PromiseHash)
@@ -1451,7 +1451,7 @@ func ComputeAVM2PromiseRoot(promises []AVM2PromiseState) string {
 func ComputeAVM2ABIRoot(abis []AVM2ABIDescriptor) string {
 	abis = canonicalAVM2ABIs(abis)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-abi-root-v1")
+	writeEnginePart(h, "aetra-avm2-abi-root-v1")
 	writeEngineUint64(h, uint64(len(abis)))
 	for _, abi := range abis {
 		writeEnginePart(h, abi.InterfaceHash)
@@ -1462,7 +1462,7 @@ func ComputeAVM2ABIRoot(abis []AVM2ABIDescriptor) string {
 func ComputeAVM2EventRoot(events []AVM2Event) string {
 	events = canonicalAVM2Events(events)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-event-root-v1")
+	writeEnginePart(h, "aetra-avm2-event-root-v1")
 	writeEngineUint64(h, uint64(len(events)))
 	for _, event := range events {
 		writeEnginePart(h, event.EventHash)
@@ -1474,7 +1474,7 @@ func ComputeAVM2ExecutionHash(result AVM2ExecutionResult) string {
 	result = canonicalAVM2ExecutionResult(result)
 	result.ExecutionHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-execution-v1")
+	writeEnginePart(h, "aetra-avm2-execution-v1")
 	writeEngineUint64(h, result.GasUsed)
 	writeEngineUint64(h, result.MemoryBytes)
 	writeStringSet(h, result.Stack)

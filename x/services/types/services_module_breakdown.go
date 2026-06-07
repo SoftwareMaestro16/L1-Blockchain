@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type XServicesStateObject string
@@ -356,7 +356,7 @@ func IsXServicesIntegrationPoint(point XServicesIntegrationPoint) bool {
 func ComputeXServicesModuleBreakdownHash(breakdown XServicesModuleBreakdown) string {
 	breakdown = canonicalXServicesModuleBreakdown(breakdown)
 	parts := []string{
-		"aetheris-x-services-module-breakdown-v1",
+		"aetra-x-services-module-breakdown-v1",
 		breakdown.ModulePath,
 		"purpose",
 		fmt.Sprint(len(breakdown.Purpose)),
@@ -387,7 +387,7 @@ func ComputeXServicesModuleBreakdownHash(breakdown XServicesModuleBreakdown) str
 
 func ComputeXServicesCallDescriptorCheckHash(check XServicesCallDescriptorCheck) string {
 	return servicesHashParts(
-		"aetheris-x-services-call-descriptor-check-v1",
+		"aetra-x-services-call-descriptor-check-v1",
 		check.ServiceID,
 		check.ExpectedInterfaceHash,
 		fmt.Sprint(check.CurrentHeight),
@@ -399,7 +399,7 @@ func ComputeXServicesCallDescriptorCheckHash(check XServicesCallDescriptorCheck)
 
 func ComputeXServicesIdentityBindingFreshnessCheckHash(check XServicesIdentityBindingFreshnessCheck) string {
 	return servicesHashParts(
-		"aetheris-x-services-identity-binding-freshness-v1",
+		"aetra-x-services-identity-binding-freshness-v1",
 		check.ServiceID,
 		check.IdentityName,
 		check.BoundOwner,

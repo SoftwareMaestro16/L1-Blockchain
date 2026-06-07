@@ -1,19 +1,19 @@
 > Deprecated/migration note: this document contains historical native asset-factory or native exchange references. Those runtime modules have been removed from the active app graph; token, NFT, market, and exchange-style application logic now targets AVM contracts and standards such as AFT-44/ANFT-66.
 # Aetra Local Bootstrap Profile
 
-This document defines the reproducible local bootstrap contract for the prototype profile `aetheris-local-1`.
+This document defines the reproducible local bootstrap contract for the prototype profile `aetra-local-1`.
 
 The profile is structurally reproducible: the same commands create the same chain-id, validator count, account layout, balances, staking denom, custom module genesis, and endpoint layout. Validator keys, account addresses, gentx signatures, and `genesis_time` are generated per run and are not expected to be byte-identical across fresh initializations. Within one initialization run, every node must receive the same `genesis.json` hash.
 
 ## Profile
 
-- Chain ID: `aetheris-local-1`
+- Chain ID: `aetra-local-1`
 - Base denom: `naet`
 - Display denom: `AET`
 - Address prefixes: account `ae`, validator `aevaloper`, consensus `aevalcons`
 - Default validator count: `3`
 - Supported scale smoke profiles: `1`, `3`, and `5` validators
-- Node directories: `.localnet\node<N>\aetherisd`
+- Node directories: `.localnet\node<N>\aetrad`
 - Test accounts: one generated key per validator, named `node0`, `node1`, ...
 - Keyring backend: `test`
 - Minimum gas prices: `0naet`
@@ -89,7 +89,7 @@ Initialize a 5-validator profile without copying scripts:
 Custom local profiles can override chain ID, timeout, log level, endpoint base ports, and endpoint toggles:
 
 ```powershell
-.\scripts\localnet\init.ps1 -ChainId aetheris-local-1 -TimeoutCommit 1s -LogLevel info -BaseRPCPort 27657 -ValidatorCount 3
+.\scripts\localnet\init.ps1 -ChainId aetra-local-1 -TimeoutCommit 1s -LogLevel info -BaseRPCPort 27657 -ValidatorCount 3
 .\scripts\localnet\start.ps1 -BaseRPCPort 27657 -ValidatorCount 3 -Wait
 ```
 
@@ -113,7 +113,7 @@ If validation fails on an existing localnet after module genesis changes, reset 
 Equivalent single-node manual validation:
 
 ```powershell
-build\aetherisd.exe genesis validate-genesis .localnet\node0\aetherisd\config\genesis.json --home .localnet\node0\aetherisd
+build\aetrad.exe genesis validate-genesis .localnet\node0\aetrad\config\genesis.json --home .localnet\node0\aetrad
 ```
 
 Start, stop, and reset:
@@ -195,7 +195,7 @@ Export state after the network has started:
 .\scripts\localnet\export-genesis.ps1 -OutputDir .localnet-5 -NodeIndex 0
 ```
 
-`export-genesis.ps1` writes under ignored `.work\genesis`, validates the exported genesis with `aetherisd genesis validate-genesis`, checks the expected chain ID, and refuses to export while the localnet process for that output directory is still running.
+`export-genesis.ps1` writes under ignored `.work\genesis`, validates the exported genesis with `aetrad genesis validate-genesis`, checks the expected chain ID, and refuses to export while the localnet process for that output directory is still running.
 
 ## Audit Notes
 
@@ -212,7 +212,7 @@ Export state after the network has started:
 go test ./...
 go vet ./...
 buf lint
-go build -o build/aetherisd.exe ./cmd/l1d
+go build -o build/aetrad.exe ./cmd/l1d
 .\scripts\localnet\validate-genesis.ps1
 .\scripts\localnet\export-genesis.ps1
 .\tests\e2e\prototype_acceptance.ps1

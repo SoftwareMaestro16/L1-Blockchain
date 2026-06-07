@@ -219,6 +219,8 @@ func DefaultFinancialZoneKeeperBoundary() FinancialZoneKeeperBoundary {
 		OwnsPrefixes: []string{
 			FinancialAccountsPrefix,
 			FinancialBalancesPrefix,
+			FinancialContractAssetAuthorityPrefix,
+			FinancialContractAssetDenomPrefix,
 			FinancialDEXOrderPrefix,
 			FinancialDEXPoolPrefix,
 			FinancialFeeBucketPrefix,
@@ -226,8 +228,6 @@ func DefaultFinancialZoneKeeperBoundary() FinancialZoneKeeperBoundary {
 			FinancialPaymentChannelPrefix,
 			FinancialPaymentConditionPrefix,
 			FinancialTransferEscrowPrefix,
-			FinancialContractAssetAuthorityPrefix,
-			FinancialContractAssetDenomPrefix,
 		},
 		Components: []FinancialZoneComponent{
 			FinancialComponentBank,
@@ -784,7 +784,7 @@ func BuildFinancialZoneRoot(roots FinancialZoneRoots) (ZoneRoot, error) {
 	stateRoot := roots.FinancialStateRoot
 	if stateRoot == "" {
 		stateRoot = hashRuntimeParts(
-			"aetheris-financial-zone-state-v2",
+			"aetra-financial-zone-state-v2",
 			roots.AccountRoot,
 			roots.BalanceRoot,
 			roots.FeeBucketRoot,
@@ -1101,7 +1101,7 @@ func (e FinancialTransferEscrow) ValidateHash() error {
 func ComputeFinancialZoneStateRoot(state FinancialZoneState) string {
 	normalized := state.Normalize()
 	return hashRuntimeParts(
-		"aetheris-financial-zone-state-v2",
+		"aetra-financial-zone-state-v2",
 		ComputeFinancialAccountsRoot(normalized.Accounts),
 		ComputeFinancialBalancesRoot(normalized.Balances),
 		ComputeFinancialFeeBucketRoot(normalized.FeeBuckets),
@@ -1113,14 +1113,14 @@ func ComputeFinancialZoneStateRoot(state FinancialZoneState) string {
 
 func ComputeFinancialAccountsRoot(accounts []string) string {
 	ordered := normalizeFinancialAccounts(accounts)
-	parts := []string{"aetheris-financial-accounts-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-financial-accounts-root-v1", fmt.Sprint(len(ordered))}
 	parts = append(parts, ordered...)
 	return hashRuntimeParts(parts...)
 }
 
 func ComputeFinancialBalancesRoot(balances []FinancialBalance) string {
 	ordered := normalizeFinancialBalances(balances)
-	parts := []string{"aetheris-financial-balances-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-financial-balances-root-v1", fmt.Sprint(len(ordered))}
 	for _, balance := range ordered {
 		parts = append(parts, balance.Address, balance.Denom, fmt.Sprint(balance.Amount))
 	}
@@ -1129,7 +1129,7 @@ func ComputeFinancialBalancesRoot(balances []FinancialBalance) string {
 
 func ComputeFinancialFeeBucketRoot(buckets []FinancialFeeBucket) string {
 	ordered := normalizeFinancialFeeBuckets(buckets)
-	parts := []string{"aetheris-financial-fee-bucket-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-financial-fee-bucket-root-v1", fmt.Sprint(len(ordered))}
 	for _, bucket := range ordered {
 		parts = append(parts, bucket.BucketID, bucket.Denom, fmt.Sprint(bucket.Amount))
 	}
@@ -1148,7 +1148,7 @@ func ComputeFinancialContractAssetRoot(denoms []FinancialFactoryDenom) string {
 func ComputeFinancialDEXRoot(pools []FinancialDEXPool, orders []FinancialDEXOrder) string {
 	orderedPools := normalizeFinancialDEXPools(pools)
 	orderedOrders := normalizeFinancialDEXOrders(orders)
-	parts := []string{"aetheris-financial-dex-root-v1", fmt.Sprint(len(orderedPools))}
+	parts := []string{"aetra-financial-dex-root-v1", fmt.Sprint(len(orderedPools))}
 	for _, pool := range orderedPools {
 		parts = append(parts, fmt.Sprint(pool.PoolID), pool.BaseDenom, pool.QuoteDenom, fmt.Sprint(pool.BaseReserve), fmt.Sprint(pool.QuoteReserve))
 	}
@@ -1163,7 +1163,7 @@ func ComputeFinancialPaymentRoot(channels []FinancialPaymentChannel, conditions 
 	orderedChannels := normalizeFinancialPaymentChannels(channels)
 	orderedConditions := normalizeFinancialPaymentConditions(conditions)
 	orderedEscrows := normalizeFinancialTransferEscrows(escrows)
-	parts := []string{"aetheris-financial-payment-root-v1", fmt.Sprint(len(orderedChannels))}
+	parts := []string{"aetra-financial-payment-root-v1", fmt.Sprint(len(orderedChannels))}
 	for _, channel := range orderedChannels {
 		parts = append(parts, channel.ChannelID, channel.Payer, channel.Receiver, channel.Denom, fmt.Sprint(channel.EscrowAmount), fmt.Sprint(channel.Finalized), fmt.Sprint(channel.Disputed), fmt.Sprint(channel.FinalizedHeight))
 	}
@@ -1180,7 +1180,7 @@ func ComputeFinancialPaymentRoot(channels []FinancialPaymentChannel, conditions 
 
 func ComputeFinancialTransferEscrowHash(escrow FinancialTransferEscrow) string {
 	return hashRuntimeParts(
-		"aetheris-financial-transfer-escrow-v1",
+		"aetra-financial-transfer-escrow-v1",
 		escrow.TransferID,
 		escrow.FromAddress,
 		escrow.ToAddress,
@@ -1261,7 +1261,7 @@ func (r FinancialShardRoute) ValidateHash() error {
 
 func ComputeFinancialShardRouteHash(route FinancialShardRoute) string {
 	return hashRuntimeParts(
-		"aetheris-financial-shard-route-v1",
+		"aetra-financial-shard-route-v1",
 		string(route.ZoneID),
 		fmt.Sprint(route.LayoutEpoch),
 		fmt.Sprint(route.ShardCount),
@@ -1452,7 +1452,7 @@ func routeFinancialStateKey(mode FinancialShardRoutingMode, stateKey string, rou
 	if err := validateRuntimeToken("financial shard route key", routeKey, MaxZoneEndpointLength); err != nil {
 		return FinancialShardRoute{}, err
 	}
-	hash := hashRuntimeParts("aetheris-financial-route-key-v1", string(mode), routeKey, fmt.Sprint(layoutEpoch))
+	hash := hashRuntimeParts("aetra-financial-route-key-v1", string(mode), routeKey, fmt.Sprint(layoutEpoch))
 	shardID := uint32(binary.BigEndian.Uint64([]byte(hash[:8])) % uint64(shardCount))
 	route := FinancialShardRoute{
 		ZoneID:      ZoneIDFinancial,

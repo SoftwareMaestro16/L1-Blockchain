@@ -63,15 +63,15 @@ Recovery:
 Initialize and start localnet:
 
 ```powershell
-.\scripts\localnet\init.ps1 -ChainId aetheris-local-1
-.\scripts\localnet\validate-genesis.ps1 -ChainId aetheris-local-1
-.\scripts\localnet\start.ps1 -ChainId aetheris-local-1 -NoInit -Wait
+.\scripts\localnet\init.ps1 -ChainId aetra-local-1
+.\scripts\localnet\validate-genesis.ps1 -ChainId aetra-local-1
+.\scripts\localnet\start.ps1 -ChainId aetra-local-1 -NoInit -Wait
 ```
 
 Query metadata:
 
 ```powershell
-build\aetherisd.exe query bank denom-metadata naet --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query bank denom-metadata naet --node tcp://127.0.0.1:26657 --output json
 ```
 
 Expected fields:
@@ -94,33 +94,33 @@ Expected fields:
 Query supply and balances:
 
 ```powershell
-build\aetherisd.exe query bank total-supply-of naet --node tcp://127.0.0.1:26657 --output json
-$node0 = build\aetherisd.exe keys show node0 -a --home .localnet\node0\aetherisd --keyring-backend test
-$node1 = build\aetherisd.exe keys show node1 -a --home .localnet\node1\aetherisd --keyring-backend test
-build\aetherisd.exe query bank balance $node0 naet --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query bank balance $node1 naet --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query bank total-supply-of naet --node tcp://127.0.0.1:26657 --output json
+$node0 = build\aetrad.exe keys show node0 -a --home .localnet\node0\aetrad --keyring-backend test
+$node1 = build\aetrad.exe keys show node1 -a --home .localnet\node1\aetrad --keyring-backend test
+build\aetrad.exe query bank balance $node0 naet --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query bank balance $node1 naet --node tcp://127.0.0.1:26657 --output json
 ```
 
 Send `naet` and pay fees in `naet`:
 
 ```powershell
-build\aetherisd.exe tx bank send node0 $node1 1000naet --home .localnet\node0\aetherisd --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe tx bank send node0 $node1 1000naet --home .localnet\node0\aetrad --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
 ```
 
 Delegate `naet` to a bonded validator:
 
 ```powershell
-$validator = (build\aetherisd.exe query staking validators --node tcp://127.0.0.1:26657 --output json | ConvertFrom-Json).validators[0].operator_address
-build\aetherisd.exe tx staking delegate $validator 5000000naet --from node0 --home .localnet\node0\aetherisd --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query staking delegation $node0 $validator --node tcp://127.0.0.1:26657 --output json
+$validator = (build\aetrad.exe query staking validators --node tcp://127.0.0.1:26657 --output json | ConvertFrom-Json).validators[0].operator_address
+build\aetrad.exe tx staking delegate $validator 5000000naet --from node0 --home .localnet\node0\aetrad --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query staking delegation $node0 $validator --node tcp://127.0.0.1:26657 --output json
 ```
 
 Query fee, staking, and mint params:
 
 ```powershell
-build\aetherisd.exe query fees params --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query staking params --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query mint params --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query fees params --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query staking params --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query mint params --node tcp://127.0.0.1:26657 --output json
 ```
 
 Expected values:
@@ -153,7 +153,7 @@ go test ./app ./app/params ./x/fees/... ./x/tokenfactory/... ./x/dex/...
 go test ./...
 go vet ./...
 buf lint
-go build -o build/aetherisd.exe ./cmd/l1d
+go build -o build/aetrad.exe ./cmd/l1d
 .\tests\e2e\native_token_smoke.ps1
 .\tests\e2e\native_token_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5
 .\tests\e2e\pos_smoke.ps1

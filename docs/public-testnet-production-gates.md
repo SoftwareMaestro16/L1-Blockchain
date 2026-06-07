@@ -39,9 +39,9 @@ Required checks:
 - CosmWasm smoke passes if CosmWasm is enabled:
   - `tests\e2e\cosmwasm_smoke.ps1 -EnableWasm`
 - AVM smoke passes if AVM is enabled:
-  - `go test ./x/aetherisvm/avm ./x/aetherisvm/async`
+  - `go test ./x/aetravm/avm ./x/aetravm/async`
 - Contract standard smoke passes if async contracts are enabled:
-  - `go test ./x/aetherisvm/standards/...`
+  - `go test ./x/aetravm/standards/...`
 
 Blocking rule:
 
@@ -71,7 +71,7 @@ Required gates:
 - State-sync and snapshot restore pass.
 - Load score and routing simulator pass:
   - `go test ./x/load/... ./x/routing/...`
-  - `aetherisd execution-os smoke --profile execution-os-sim`
+  - `aetrad execution-os smoke --profile execution-os-sim`
 - Sharding simulator pass:
   - `go test ./x/sharding/sim`
 - Mesh simulator pass:
@@ -79,7 +79,7 @@ Required gates:
 - Identity executable spec pass:
   - `go test ./x/identity/types`
 - VM readiness tests pass:
-  - `go test ./x/aetherisvm/avm ./x/aetherisvm/async ./x/vm/types`
+  - `go test ./x/aetravm/avm ./x/aetravm/async ./x/vm/types`
 - Security scans pass or findings are owner-triaged:
   - `govulncheck`
   - `gosec`
@@ -196,18 +196,18 @@ Production exclusions:
 | Determinism | `scripts\security\determinism-gate.ps1`, `docs/security/prototype-audit-gate.md` |
 | Localnet 3/5/10 profiles | `scripts\testnet\public-testnet-preflight.ps1` |
 | Snapshot/state-sync | `docs/public-testnet-preparation.md`, `scripts\localnet\snapshot.ps1`, `scripts\localnet\statesync.ps1` |
-| Load/routing simulator | `x/load`, `x/routing`, `aetherisd execution-os smoke --profile execution-os-sim` |
+| Load/routing simulator | `x/load`, `x/routing`, `aetrad execution-os smoke --profile execution-os-sim` |
 | Sharding simulator | `x/sharding/sim`, `docs/architecture/sharding-rd.md` |
 | Mesh simulator | `x/mesh`, `tests/adversarial/modular_execution_invariants_test.go` |
 | Identity executable spec | `x/identity/types` |
-| VM readiness | `x/aetherisvm/avm`, `x/aetherisvm/async`, `x/vm/types`, `app/wasmconfig` |
+| VM readiness | `x/aetravm/avm`, `x/aetravm/async`, `x/vm/types`, `app/wasmconfig` |
 | Validator onboarding | `docs/validator-onboarding.md` |
 | Faucet | `docs/public-testnet-preparation.md#faucet-plan` |
 | Explorer/indexer | `docs/public-testnet-preparation.md#explorer-and-indexer-plan` |
 | Incident/rollback | `docs/testnet-incident-response.md`, `docs/public-testnet-preparation.md#rollback-and-restart-procedure` |
 | CosmWasm | `app/wasmconfig`, `tests\e2e\cosmwasm_smoke.ps1`, `docs/security/cosmwasm-readiness.md` |
-| AVM | `x/aetherisvm/avm`, `docs/architecture/avm.md` |
-| Contract standards | `x/aetherisvm/standards/...`, `docs/standards` |
+| AVM | `x/aetravm/avm`, `docs/architecture/avm.md` |
+| Contract standards | `x/aetravm/standards/...`, `docs/standards` |
 | Sharding R&D | `x/sharding/sim`, `docs/architecture/sharding-rd.md` |
 
 ## Decision Record

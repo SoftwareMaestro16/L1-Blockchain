@@ -33,7 +33,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 
 	actorregistrymodule "github.com/sovereign-l1/l1/x/actor-registry"
-	aethercoremodule "github.com/sovereign-l1/l1/x/aethercore"
+	aetracoremodule "github.com/sovereign-l1/l1/x/aetracore"
 	avmschedulermodule "github.com/sovereign-l1/l1/x/avm-scheduler"
 	bridgehubmodule "github.com/sovereign-l1/l1/x/bridge-hub"
 	burnmodule "github.com/sovereign-l1/l1/x/burn"
@@ -105,7 +105,7 @@ func (app *L1App) initModules(
 		validatorregistrymodule.NewAppModule(&app.ValidatorRegistryKeeper),
 		configmodule.NewAppModule(&app.ConfigKeeper),
 		configvotingmodule.NewAppModule(&app.ConfigVotingKeeper),
-		aethercoremodule.NewAppModule(&app.AetherCoreKeeper),
+		aetracoremodule.NewAppModule(&app.AetraCoreKeeper),
 		loadmodule.NewAppModule(&app.LoadKeeper),
 		routingmodule.NewAppModule(&app.RoutingKeeper),
 		zonesmodule.NewAppModule(&app.ZonesKeeper),

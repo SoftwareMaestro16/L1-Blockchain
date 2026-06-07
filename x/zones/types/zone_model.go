@@ -118,7 +118,7 @@ func IsExecutionZoneSurface(surface ExecutionZoneSurface) bool {
 
 func ComputeExecutionZoneModelHash(spec ExecutionZoneModelSpec) string {
 	spec = canonicalExecutionZoneModelSpec(spec)
-	parts := []string{"aetheris-execution-zone-model-v1", string(spec.ZoneID), string(spec.Kind), spec.StatePrefix, fmt.Sprint(len(spec.Surfaces))}
+	parts := []string{"aetra-execution-zone-model-v1", string(spec.ZoneID), string(spec.Kind), spec.StatePrefix, fmt.Sprint(len(spec.Surfaces))}
 	for _, surface := range spec.Surfaces {
 		parts = append(parts, string(surface.Surface), surface.Requirement)
 	}

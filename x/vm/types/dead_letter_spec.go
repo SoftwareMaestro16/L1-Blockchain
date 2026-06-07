@@ -118,7 +118,7 @@ func (r AVMDeadLetterRecord) CanTriggerBounce(message AVMAsyncMessage) bool {
 func ComputeAVMDeadLetterRecordHash(record AVMDeadLetterRecord) string {
 	record = canonicalAVMDeadLetterRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-dead-letter-record-v1")
+	writeEnginePart(h, "aetra-avm-dead-letter-record-v1")
 	writeEnginePart(h, record.MessageID)
 	writeEnginePart(h, string(record.ZoneID))
 	writeEnginePart(h, record.Reason)

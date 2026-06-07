@@ -16,7 +16,7 @@ This document defines the prototype user flow for the Aetra DEX module.
 `lp/<pool_id>` is a bank denom minted by the `dex` module. Users see LP balances with the normal bank balance query:
 
 ```powershell
-build\aetherisd.exe query bank balance $node0 lp/1 --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query bank balance $node0 lp/1 --node tcp://127.0.0.1:26657 --output json
 ```
 
 ## One-Command Smoke
@@ -70,25 +70,25 @@ Load node0:
 
 ```powershell
 $node = "tcp://127.0.0.1:26657"
-$home = ".localnet\node0\aetherisd"
-$node0 = build\aetherisd.exe keys show node0 -a --home $home --keyring-backend test
+$home = ".localnet\node0\aetrad"
+$node0 = build\aetrad.exe keys show node0 -a --home $home --keyring-backend test
 $denom = "factory/$node0/dexgold"
 ```
 
 Create and fund the factory denom:
 
 ```powershell
-build\aetherisd.exe tx tokenfactory create-denom dexgold --from node0 --home $home --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
-build\aetherisd.exe tx tokenfactory mint "100000000$denom" $node0 --from node0 --home $home --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
-build\aetherisd.exe query bank balance $node0 $denom --node $node --output json
+build\aetrad.exe tx tokenfactory create-denom dexgold --from node0 --home $home --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
+build\aetrad.exe tx tokenfactory mint "100000000$denom" $node0 --from node0 --home $home --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
+build\aetrad.exe query bank balance $node0 $denom --node $node --output json
 ```
 
 Create a pool:
 
 ```powershell
-build\aetherisd.exe tx dex create-pool 10000000naet "10000000$denom" --from node0 --home $home --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
-build\aetherisd.exe query dex pool 1 --node $node --output json
-build\aetherisd.exe query bank balance $node0 lp/1 --node $node --output json
+build\aetrad.exe tx dex create-pool 10000000naet "10000000$denom" --from node0 --home $home --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
+build\aetrad.exe query dex pool 1 --node $node --output json
+build\aetrad.exe query bank balance $node0 lp/1 --node $node --output json
 ```
 
 Expected pool fields:
@@ -110,13 +110,13 @@ Expected pool fields:
 Add liquidity with slippage protection:
 
 ```powershell
-build\aetherisd.exe tx dex add-liquidity 1 1000000naet "1000000$denom" 1000000 --from node0 --home $home --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
+build\aetrad.exe tx dex add-liquidity 1 1000000naet "1000000$denom" 1000000 --from node0 --home $home --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
 ```
 
 Expected failure when `min_shares` is too high:
 
 ```powershell
-build\aetherisd.exe tx dex add-liquidity 1 1000000naet "1000000$denom" 1000001 --from node0 --home $home --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
+build\aetrad.exe tx dex add-liquidity 1 1000000naet "1000000$denom" 1000001 --from node0 --home $home --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
 ```
 
 Expected rejection log includes:
@@ -128,14 +128,14 @@ minted shares below minimum
 Swap exact amount in:
 
 ```powershell
-build\aetherisd.exe tx dex swap-exact-in 1 100000naet $denom 1 --from node0 --home $home --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
-build\aetherisd.exe query bank balance $node0 $denom --node $node --output json
+build\aetrad.exe tx dex swap-exact-in 1 100000naet $denom 1 --from node0 --home $home --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
+build\aetrad.exe query bank balance $node0 $denom --node $node --output json
 ```
 
 Expected failure when `min_amount_out` is too high:
 
 ```powershell
-build\aetherisd.exe tx dex swap-exact-in 1 100000naet $denom 1000000 --from node0 --home $home --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
+build\aetrad.exe tx dex swap-exact-in 1 100000naet $denom 1000000 --from node0 --home $home --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
 ```
 
 Expected rejection log includes:
@@ -147,9 +147,9 @@ amount out below minimum
 Remove liquidity:
 
 ```powershell
-build\aetherisd.exe tx dex remove-liquidity 1 1000000lp/1 --from node0 --home $home --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
-build\aetherisd.exe query dex pool 1 --node $node --output json
-build\aetherisd.exe query bank balance $node0 lp/1 --node $node --output json
+build\aetrad.exe tx dex remove-liquidity 1 1000000lp/1 --from node0 --home $home --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node $node --output json
+build\aetrad.exe query dex pool 1 --node $node --output json
+build\aetrad.exe query bank balance $node0 lp/1 --node $node --output json
 ```
 
 ## Audit Notes
@@ -170,7 +170,7 @@ go test ./x/dex/...
 go test ./...
 go vet ./...
 buf lint
-go build -o build/aetherisd.exe ./cmd/l1d
+go build -o build/aetrad.exe ./cmd/l1d
 .\tests\e2e\dex_smoke.ps1
 .\tests\e2e\dex_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5
 ```

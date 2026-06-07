@@ -24,7 +24,7 @@ func TestMessageIDUsesReplayProtectionFormula(t *testing.T) {
 	require.NotEqual(t, msg.MessageID, changedPayload.MessageID)
 
 	changedChain := params
-	changedChain.ChainID = "aetheris-test-b"
+	changedChain.ChainID = "aetra-test-b"
 	changedChain.ParamsHash = EmptyHash()
 	msgOnOtherChain := testMessage(t, changedChain, 1, 1, []byte("payload"))
 	require.NotEqual(t, msg.MessageID, msgOnOtherChain.MessageID)
@@ -251,7 +251,7 @@ func TestMessageRootsAndProofQueries(t *testing.T) {
 }
 
 func testMessageParams() MessageParams {
-	params := DefaultMessageParams("aetheris-test")
+	params := DefaultMessageParams("aetra-test")
 	params.MaxPayloadSize = 256
 	params.MinGasLimit = 1
 	params.MaxGasLimit = 1_000

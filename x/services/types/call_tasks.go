@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ServiceCallAnteValidation struct {
@@ -370,7 +370,7 @@ func (result SDKServiceCallBuildResult) ValidateForContext(ctx coretypes.Service
 
 func ComputeServiceCallAnteValidationHash(ante ServiceCallAnteValidation) string {
 	return servicesHashParts(
-		"aetheris-services-call-ante-v1",
+		"aetra-services-call-ante-v1",
 		ante.CallID,
 		ante.ServiceID,
 		ante.Caller,
@@ -391,12 +391,12 @@ func ComputeServiceReceiptAnchorHash(call UnifiedServiceCall, receipt ServiceRec
 }
 
 func ComputeServiceReceiptAnchorHashForParts(callID, receiptHash, tombstoneHash string) string {
-	return servicesHashParts("aetheris-services-receipt-anchor-v1", callID, receiptHash, tombstoneHash)
+	return servicesHashParts("aetra-services-receipt-anchor-v1", callID, receiptHash, tombstoneHash)
 }
 
 func ComputeServiceReceiptAnchorResultHash(result ServiceReceiptAnchorResult) string {
 	return servicesHashParts(
-		"aetheris-services-receipt-anchor-result-v1",
+		"aetra-services-receipt-anchor-result-v1",
 		result.Msg.MessageHash,
 		result.Receipt.ReceiptHash,
 		result.Tombstone.TombstoneHash,
@@ -407,7 +407,7 @@ func ComputeServiceReceiptAnchorResultHash(result ServiceReceiptAnchorResult) st
 
 func ComputeServiceCallProofHash(proof ServiceCallProof) string {
 	return servicesHashParts(
-		"aetheris-services-call-proof-v1",
+		"aetra-services-call-proof-v1",
 		proof.ServiceID,
 		proof.CallID,
 		proof.ReceiptHash,
@@ -419,7 +419,7 @@ func ComputeServiceCallProofHash(proof ServiceCallProof) string {
 
 func ComputeSDKServiceCallBuildResultHash(result SDKServiceCallBuildResult) string {
 	return servicesHashParts(
-		"aetheris-services-sdk-call-build-v1",
+		"aetra-services-sdk-call-build-v1",
 		result.Call.UnifiedCallHash,
 		coretypes.ComputeServiceCallEnvelopeHash(result.Envelope),
 		result.Routing.RoutingHash,

@@ -19,7 +19,7 @@ func TestProofPolicyMustMatchRegisteredBridge(t *testing.T) {
 	state.Bridges = append(state.Bridges, BridgeRecord{
 		BridgeID:         "eth-mainnet",
 		SourceChain:      "ethereum",
-		TargetChain:      "aetheris",
+		TargetChain:      "aetra",
 		Operators:        []string{"op1"},
 		ProofPolicy:      ProofPolicyLightClient,
 		DailyLimit:       100,
@@ -48,7 +48,7 @@ func TestAssetMappingConflictInvariant(t *testing.T) {
 	state.Bridges = append(state.Bridges, BridgeRecord{
 		BridgeID:         "eth-mainnet",
 		SourceChain:      "ethereum",
-		TargetChain:      "aetheris",
+		TargetChain:      "aetra",
 		Operators:        []string{"op1"},
 		ProofPolicy:      ProofPolicyLightClient,
 		DailyLimit:       100,

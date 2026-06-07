@@ -19,7 +19,7 @@ import (
 func TestValidatorInsuranceSystemModuleWiringAndGenesis(t *testing.T) {
 	app, genesis := setup(true, 5)
 
-	require.NoError(t, app.ValidateAetherCoreWiringGate())
+	require.NoError(t, app.ValidateAetraCoreWiringGate())
 	require.Contains(t, app.ModuleManager.Modules, validatorinsurancetypes.ModuleName)
 	require.Contains(t, app.keys, validatorinsurancetypes.StoreKey)
 	require.Contains(t, genesis, validatorinsurancetypes.ModuleName)

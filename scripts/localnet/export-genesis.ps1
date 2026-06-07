@@ -3,14 +3,14 @@ param(
   [string]$Binary = "",
   [int]$NodeIndex = 0,
   [string]$ExportDir = "",
-  [string]$ChainId = "aetheris-local-1"
+  [string]$ChainId = "aetra-local-1"
 )
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "common.ps1")
 
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 $ExportDir = Resolve-LocalnetPath -Path $ExportDir -DefaultRelativePath ".work\genesis"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "localnet output directory"
 Assert-LocalnetWorkspacePath -Path $ExportDir -Purpose "genesis export directory"
@@ -39,7 +39,7 @@ if ($NodeIndex -lt 0 -or $NodeIndex -ge $nodes.Count) {
 
 New-Item -ItemType Directory -Force -Path $ExportDir | Out-Null
 $node = $nodes[$NodeIndex]
-$nodeHome = Join-Path $node.FullName "aetherisd"
+$nodeHome = Join-Path $node.FullName "aetrad"
 $exportPath = Join-Path $ExportDir "$($node.Name)-export.json"
 $stderrPath = Join-Path $ExportDir "$($node.Name)-export.err.log"
 

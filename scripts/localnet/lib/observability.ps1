@@ -54,7 +54,7 @@ function Get-LocalnetProcessSnapshot {
   if ($processes.Count -eq 0) {
     $escaped = [regex]::Escape($resolved)
     foreach ($proc in @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -like "aetherisd*" -and $_.CommandLine -match $escaped } |
+        Where-Object { $_.Name -like "aetrad*" -and $_.CommandLine -match $escaped } |
         Sort-Object ProcessId)) {
       $processes += [ordered]@{
         node    = "unknown"

@@ -451,7 +451,7 @@ func AVMNonceKeeperScope(state AVMReplayNonceState) string {
 func ComputeAVMNonceKeeperRoot(keeper AVMNonceKeeper) string {
 	keeper = canonicalAVMNonceKeeper(keeper)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-nonce-keeper-v1")
+	writeEnginePart(h, "aetra-avm-nonce-keeper-v1")
 	writeEngineUint64(h, uint64(len(keeper.States)))
 	for _, state := range keeper.States {
 		writeEnginePart(h, state.StateHash)
@@ -463,7 +463,7 @@ func ComputeAVMNonceKeeperRoot(keeper AVMNonceKeeper) string {
 func ComputeAVMReplayTombstoneStoreRoot(store AVMReplayTombstoneStore) string {
 	store = canonicalAVMReplayTombstoneStore(store)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-replay-tombstone-store-v1")
+	writeEnginePart(h, "aetra-avm-replay-tombstone-store-v1")
 	writeEngineUint64(h, uint64(len(store.ConsumedTombstones)))
 	for _, tombstone := range store.ConsumedTombstones {
 		writeEnginePart(h, tombstone.MessageID)
@@ -480,7 +480,7 @@ func ComputeAVMReplayTombstoneStoreRoot(store AVMReplayTombstoneStore) string {
 func ComputeAVMZoneAccessCapabilityHash(capability AVMZoneAccessCapability) string {
 	capability = canonicalAVMZoneAccessCapability(capability)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-zone-access-capability-v1")
+	writeEnginePart(h, "aetra-avm-zone-access-capability-v1")
 	writeEnginePart(h, string(capability.SourceZone))
 	writeEnginePart(h, capability.ActorIDOptional)
 	writeEnginePart(h, capability.ContractAddress)
@@ -490,7 +490,7 @@ func ComputeAVMZoneAccessCapabilityHash(capability AVMZoneAccessCapability) stri
 func ComputeAVMStateAccessRequestHash(request AVMStateAccessRequest) string {
 	request = canonicalAVMStateAccessRequest(request)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-state-access-request-v1")
+	writeEnginePart(h, "aetra-avm-state-access-request-v1")
 	writeEnginePart(h, string(request.SourceZone))
 	writeEnginePart(h, string(request.TargetZone))
 	writeEnginePart(h, string(request.Mode))
@@ -506,7 +506,7 @@ func ComputeAVMStateAccessRequestHash(request AVMStateAccessRequest) string {
 func ComputeAVMSchedulerSafetyCheckHash(check AVMSchedulerSafetyCheck) string {
 	check = canonicalAVMSchedulerSafetyCheck(check)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-scheduler-safety-v1")
+	writeEnginePart(h, "aetra-avm-scheduler-safety-v1")
 	writeEnginePart(h, string(check.ZoneID))
 	writeEngineUint64(h, check.Height)
 	writeEngineBool(h, check.RequireSenderNonceOrdering)

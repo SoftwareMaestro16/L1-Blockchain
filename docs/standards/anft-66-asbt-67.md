@@ -113,7 +113,7 @@ immutable after mint.
 
 ## Executable Specification
 
-The pure Go package `x/aetherisvm/standards/anft` is the current executable
+The pure Go package `x/aetravm/standards/anft` is the current executable
 specification for ANFT-66 and ASBT-67. It does not wire SDK stores or keepers
 into the app, but it does expose an async/AVM-compatible collection handler
 and deterministic message codec. It defines:
@@ -135,7 +135,7 @@ package's message ABI or explicitly migrate the standard version.
 ## Required Tests
 
 ```powershell
-go test ./x/aetherisvm/standards/anft
+go test ./x/aetravm/standards/anft
 go test ./...
 ```
 

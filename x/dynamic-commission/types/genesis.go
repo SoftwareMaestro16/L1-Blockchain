@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 const (
@@ -156,7 +156,7 @@ func (c ValidatorCommission) Validate(params Params) error {
 	if err := params.Validate(); err != nil {
 		return err
 	}
-	if err := aetherisaddress.ValidateUserAddress("validator address", c.ValidatorAddress); err != nil {
+	if err := aetraaddress.ValidateUserAddress("validator address", c.ValidatorAddress); err != nil {
 		return err
 	}
 	if c.BaseCommissionBps > BasisPoints || c.EffectiveCommissionBps > BasisPoints {
@@ -176,7 +176,7 @@ func (c ValidatorCommission) Validate(params Params) error {
 
 func (e CommissionHistoryEntry) Validate(params Params) error {
 	params = NormalizeParams(params)
-	if err := aetherisaddress.ValidateUserAddress("validator address", e.ValidatorAddress); err != nil {
+	if err := aetraaddress.ValidateUserAddress("validator address", e.ValidatorAddress); err != nil {
 		return err
 	}
 	if e.Height == 0 {

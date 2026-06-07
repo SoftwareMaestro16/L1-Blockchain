@@ -309,7 +309,7 @@ func BuildPaymentAbstractionReceipt(receipt PaymentAbstractionReceipt) (PaymentA
 func ComputePaymentID(payment Payment) string {
 	payment = payment.Normalize()
 	return HashParts(
-		"aetheris-payment-envelope-id-v1",
+		"aetra-payment-envelope-id-v1",
 		payment.SourceZone,
 		payment.DestinationZone,
 		payment.From,
@@ -328,7 +328,7 @@ func ComputePaymentID(payment Payment) string {
 func ComputePaymentSignatureHash(payment Payment) string {
 	payment = payment.Normalize()
 	return HashParts(
-		"aetheris-payment-envelope-signature-v1",
+		"aetra-payment-envelope-signature-v1",
 		payment.From,
 		payment.SourceZone,
 		fmt.Sprintf("%020d", payment.Nonce),
@@ -339,7 +339,7 @@ func ComputePaymentSignatureHash(payment Payment) string {
 func ComputePaymentAbstractionReceiptHash(receipt PaymentAbstractionReceipt) string {
 	receipt = receipt.Normalize()
 	return HashParts(
-		"aetheris-payment-receipt-v1",
+		"aetra-payment-receipt-v1",
 		receipt.PaymentID,
 		string(receipt.Status),
 		receipt.SettlementZone,
@@ -354,7 +354,7 @@ func ComputePaymentRouteScoreHash(payment Payment, quote PaymentRouteQuote) stri
 	payment = payment.Normalize()
 	quote = quote.Normalize()
 	return HashParts(
-		"aetheris-payment-route-score-v1",
+		"aetra-payment-route-score-v1",
 		payment.PaymentID,
 		quote.RouteHint,
 		quote.SourceZone,
@@ -367,7 +367,7 @@ func ComputePaymentRouteScoreHash(payment Payment, quote PaymentRouteQuote) stri
 
 func ComputePaymentAbstractionStateRoot(state PaymentAbstractionState) string {
 	state = state.Export()
-	parts := []string{"aetheris-payment-abstraction-state-root-v1", fmt.Sprintf("%020d", state.Height)}
+	parts := []string{"aetra-payment-abstraction-state-root-v1", fmt.Sprintf("%020d", state.Height)}
 	for _, payment := range state.Payments {
 		parts = append(parts, payment.PaymentID)
 	}

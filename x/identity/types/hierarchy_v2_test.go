@@ -126,7 +126,7 @@ func TestIdentityPathCommitmentAndOptimizedRecursiveProofV2(t *testing.T) {
 	require.NoError(t, err)
 	proof, optimizedCommitment, err := BuildOptimizedRecursiveResolutionProofV2(OptimizedRecursiveResolutionProofRequestV2{
 		State:         state,
-		ChainID:       "aetheris-local-1",
+		ChainID:       "aetra-local-1",
 		RootName:      "alice.aet",
 		TargetName:    "api.alice.aet",
 		Height:        14,
@@ -150,7 +150,7 @@ func TestIdentityPathCommitmentAndOptimizedRecursiveProofV2(t *testing.T) {
 	require.ErrorContains(t, ValidateResolutionCacheRecordV2(staleParent), "valid_until_height")
 	_, _, err = BuildOptimizedRecursiveResolutionProofV2(OptimizedRecursiveResolutionProofRequestV2{
 		State:         state,
-		ChainID:       "aetheris-local-1",
+		ChainID:       "aetra-local-1",
 		RootName:      "alice.aet",
 		TargetName:    "api.alice.aet",
 		Height:        14,

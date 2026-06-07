@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	appparams "github.com/sovereign-l1/l1/app/params"
-	"github.com/sovereign-l1/l1/x/aetherisvm/async"
+	"github.com/sovereign-l1/l1/x/aetravm/async"
 )
 
 func TestActorLifecycleAndOneTransitionPerMessage(t *testing.T) {

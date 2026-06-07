@@ -117,17 +117,17 @@ Build a simple test contract:
 rustup target add wasm32-unknown-unknown
 cargo install cargo-generate
 cargo install cosmwasm-check
-cargo generate --git https://github.com/CosmWasm/cw-template.git --name aetheris-smoke
-cd aetheris-smoke
+cargo generate --git https://github.com/CosmWasm/cw-template.git --name aetra-smoke
+cd aetra-smoke
 cargo wasm
-cosmwasm-check .\target\wasm32-unknown-unknown\release\aetheris_smoke.wasm
+cosmwasm-check .\target\wasm32-unknown-unknown\release\aetra_smoke.wasm
 ```
 
 Deploy only on a localnet or testnet where the explicit wasm gate is enabled:
 
 ```powershell
-build\aetherisd.exe tx wasm store .\target\wasm32-unknown-unknown\release\aetheris_smoke.wasm --from node0 --home .localnet\node0\aetherisd --keyring-backend test --chain-id aetheris-local-1 --node tcp://127.0.0.1:26657 --fees 1000000naet -y
-build\aetherisd.exe tx wasm instantiate 1 "{}" --from node0 --label aetheris-smoke --admin <admin-address> --home .localnet\node0\aetherisd --keyring-backend test --chain-id aetheris-local-1 --node tcp://127.0.0.1:26657 --fees 1000000naet -y
-build\aetherisd.exe tx wasm execute <contract-address> "{}" --from node0 --home .localnet\node0\aetherisd --keyring-backend test --chain-id aetheris-local-1 --node tcp://127.0.0.1:26657 --fees 1000000naet -y
-build\aetherisd.exe query wasm contract-state smart <contract-address> "{}" --node tcp://127.0.0.1:26657
+build\aetrad.exe tx wasm store .\target\wasm32-unknown-unknown\release\aetra_smoke.wasm --from node0 --home .localnet\node0\aetrad --keyring-backend test --chain-id aetra-local-1 --node tcp://127.0.0.1:26657 --fees 1000000naet -y
+build\aetrad.exe tx wasm instantiate 1 "{}" --from node0 --label aetra-smoke --admin <admin-address> --home .localnet\node0\aetrad --keyring-backend test --chain-id aetra-local-1 --node tcp://127.0.0.1:26657 --fees 1000000naet -y
+build\aetrad.exe tx wasm execute <contract-address> "{}" --from node0 --home .localnet\node0\aetrad --keyring-backend test --chain-id aetra-local-1 --node tcp://127.0.0.1:26657 --fees 1000000naet -y
+build\aetrad.exe query wasm contract-state smart <contract-address> "{}" --node tcp://127.0.0.1:26657
 ```

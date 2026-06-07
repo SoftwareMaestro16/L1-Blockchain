@@ -419,7 +419,7 @@ func IsAVMBlockSTMConflictKeyKind(kind AVMBlockSTMConflictKeyKind) bool {
 func ComputeAVMPerformanceModelHash(model AVMPerformanceModel) string {
 	model = canonicalAVMPerformanceModel(model)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-performance-model-v1")
+	writeEnginePart(h, "aetra-avm-performance-model-v1")
 	writeEngineUint64(h, uint64(len(model.Targets)))
 	for _, target := range model.Targets {
 		writeEnginePart(h, string(target))
@@ -430,7 +430,7 @@ func ComputeAVMPerformanceModelHash(model AVMPerformanceModel) string {
 func ComputeAVMBlockSTMWorkloadHash(workload AVMBlockSTMWorkload) string {
 	workload = canonicalAVMBlockSTMWorkload(workload)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-blockstm-workload-v1")
+	writeEnginePart(h, "aetra-avm-blockstm-workload-v1")
 	writeEnginePart(h, workload.WorkloadID)
 	writeEnginePart(h, string(workload.ZoneID))
 	writeEnginePart(h, workload.ActorIDOptional)
@@ -453,7 +453,7 @@ func ComputeAVMBlockSTMWorkloadHash(workload AVMBlockSTMWorkload) string {
 func ComputeAVMBlockSTMPartitionHash(partition AVMBlockSTMPartition) string {
 	partition = canonicalAVMBlockSTMPartition(partition)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-blockstm-partition-v1")
+	writeEnginePart(h, "aetra-avm-blockstm-partition-v1")
 	writeEnginePart(h, partition.PartitionID)
 	writeEnginePart(h, string(partition.ZoneID))
 	writeEnginePart(h, partition.ActorID)
@@ -468,7 +468,7 @@ func ComputeAVMBlockSTMPartitionHash(partition AVMBlockSTMPartition) string {
 func ComputeAVMZoneExecutionAccumulatorHash(acc AVMZoneExecutionAccumulator) string {
 	acc = canonicalAVMZoneExecutionAccumulator(acc)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-zone-execution-accumulator-v1")
+	writeEnginePart(h, "aetra-avm-zone-execution-accumulator-v1")
 	writeEnginePart(h, string(acc.ZoneID))
 	writeEngineUint64(h, uint64(acc.MessageCount))
 	writeEngineUint64(h, uint64(acc.StoreWriteCount))
@@ -480,7 +480,7 @@ func ComputeAVMZoneExecutionAccumulatorHash(acc AVMZoneExecutionAccumulator) str
 func ComputeAVMBlockSTMExecutionPlanHash(plan AVMBlockSTMExecutionPlan) string {
 	plan = canonicalAVMBlockSTMExecutionPlan(plan)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-blockstm-execution-plan-v1")
+	writeEnginePart(h, "aetra-avm-blockstm-execution-plan-v1")
 	writeEngineUint64(h, uint64(len(plan.Workloads)))
 	for _, workload := range plan.Workloads {
 		writeEnginePart(h, workload.WorkloadHash)

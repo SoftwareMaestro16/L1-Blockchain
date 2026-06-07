@@ -142,7 +142,7 @@ try {
 
   $OutputRoot = Resolve-ReleasePath -Path $OutputRoot -DefaultRelativePath "dist\prototype"
   Assert-ReleaseWorkspacePath -Path $OutputRoot -Purpose "release output root"
-  $packageName = "aetheris-$Version-$TargetOS-$TargetArch"
+  $packageName = "aetra-$Version-$TargetOS-$TargetArch"
   $packageRoot = Join-Path $OutputRoot $Version
   $packageDir = Join-Path $packageRoot $packageName
   Assert-ReleaseWorkspacePath -Path $packageRoot -Purpose "release package root"
@@ -155,15 +155,15 @@ try {
   New-Item -ItemType Directory -Force -Path (Join-Path $packageDir "docs") | Out-Null
   New-Item -ItemType Directory -Force -Path (Join-Path $packageDir "evidence") | Out-Null
 
-  $binName = if ($TargetOS -eq "windows") { "aetherisd.exe" } else { "aetherisd" }
+  $binName = if ($TargetOS -eq "windows") { "aetrad.exe" } else { "aetrad" }
   $packageBinary = Join-Path (Join-Path $packageDir "bin") $binName
 
   if ($SkipBuild) {
-    $Binary = Resolve-ReleasePath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+    $Binary = Resolve-ReleasePath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
     if (!(Test-Path -LiteralPath $Binary)) { throw "Binary not found: $Binary" }
     Copy-Item -LiteralPath $Binary -Destination $packageBinary -Force
   } else {
-    & (Join-Path $RepoRoot "scripts\build-aetherisd.ps1") `
+    & (Join-Path $RepoRoot "scripts\build-aetrad.ps1") `
       -Version $Version `
       -Commit $Commit `
       -TargetOS $TargetOS `

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type PaymentSettlementTiming string
@@ -475,26 +475,26 @@ func (quote PaymentModelQuote) Validate() error {
 
 func ComputePaymentMeteringRecordHash(record PaymentMeteringRecord) string {
 	record = canonicalPaymentMeteringRecord(record)
-	return servicesHashParts("aetheris-services-payment-meter-v1", record.ServiceID, record.CallID, fmt.Sprint(record.RequestBytes), fmt.Sprint(record.ResponseBytes), fmt.Sprint(record.StorageBytes), record.MeterID, fmt.Sprint(record.MeterHeight))
+	return servicesHashParts("aetra-services-payment-meter-v1", record.ServiceID, record.CallID, fmt.Sprint(record.RequestBytes), fmt.Sprint(record.ResponseBytes), fmt.Sprint(record.StorageBytes), record.MeterID, fmt.Sprint(record.MeterHeight))
 }
 
 func ComputePaymentUsageReceiptHash(receipt PaymentUsageReceipt) string {
 	receipt = canonicalPaymentUsageReceipt(receipt)
-	return servicesHashParts("aetheris-services-payment-usage-receipt-v1", receipt.ServiceID, receipt.CallID, receipt.ProviderID, fmt.Sprint(receipt.ComputeUnits), fmt.Sprint(receipt.ReceiptHeight), receipt.SignedBy, receipt.SignatureHash, receipt.ProofHash)
+	return servicesHashParts("aetra-services-payment-usage-receipt-v1", receipt.ServiceID, receipt.CallID, receipt.ProviderID, fmt.Sprint(receipt.ComputeUnits), fmt.Sprint(receipt.ReceiptHeight), receipt.SignedBy, receipt.SignatureHash, receipt.ProofHash)
 }
 
 func ComputePaymentSubscriptionEntitlementHash(entitlement PaymentSubscriptionEntitlement) string {
 	entitlement = canonicalPaymentSubscriptionEntitlement(entitlement)
-	return servicesHashParts("aetheris-services-payment-subscription-v1", entitlement.SubscriptionID, entitlement.Payer, entitlement.ServiceID, fmt.Sprint(entitlement.StartHeight), fmt.Sprint(entitlement.EndHeight), fmt.Sprint(entitlement.StartUnix), fmt.Sprint(entitlement.EndUnix), fmt.Sprint(entitlement.StateBacked), entitlement.ProofHash)
+	return servicesHashParts("aetra-services-payment-subscription-v1", entitlement.SubscriptionID, entitlement.Payer, entitlement.ServiceID, fmt.Sprint(entitlement.StartHeight), fmt.Sprint(entitlement.EndHeight), fmt.Sprint(entitlement.StartUnix), fmt.Sprint(entitlement.EndUnix), fmt.Sprint(entitlement.StateBacked), entitlement.ProofHash)
 }
 
 func ComputePaymentEscrowSettlementHash(settlement PaymentEscrowSettlement) string {
 	settlement = canonicalPaymentEscrowSettlement(settlement)
-	return servicesHashParts("aetheris-services-payment-escrow-settlement-v1", settlement.EscrowID, settlement.ServiceID, fmt.Sprint(settlement.ReceiptHeight), fmt.Sprint(settlement.ProofHeight), fmt.Sprint(settlement.ChallengeWindow), fmt.Sprint(settlement.SettleAfterHeight))
+	return servicesHashParts("aetra-services-payment-escrow-settlement-v1", settlement.EscrowID, settlement.ServiceID, fmt.Sprint(settlement.ReceiptHeight), fmt.Sprint(settlement.ProofHeight), fmt.Sprint(settlement.ChallengeWindow), fmt.Sprint(settlement.SettleAfterHeight))
 }
 
 func ComputePaymentModelQuoteHash(quote PaymentModelQuote) string {
-	return servicesHashParts("aetheris-services-payment-model-quote-v1", quote.Envelope.EnvelopeHash, fmt.Sprint(quote.Units), quote.UnitAmount, quote.AmountDue, string(quote.SettlementTiming), fmt.Sprint(quote.RequiresDeterministicMeterRecord), fmt.Sprint(quote.RequiresUsageReceipt), fmt.Sprint(quote.RequiresSubscriptionEntitlement), fmt.Sprint(quote.RequiresEscrowLock), fmt.Sprint(quote.SettleAfterHeight))
+	return servicesHashParts("aetra-services-payment-model-quote-v1", quote.Envelope.EnvelopeHash, fmt.Sprint(quote.Units), quote.UnitAmount, quote.AmountDue, string(quote.SettlementTiming), fmt.Sprint(quote.RequiresDeterministicMeterRecord), fmt.Sprint(quote.RequiresUsageReceipt), fmt.Sprint(quote.RequiresSubscriptionEntitlement), fmt.Sprint(quote.RequiresEscrowLock), fmt.Sprint(quote.SettleAfterHeight))
 }
 
 func IsPaymentSettlementTiming(timing PaymentSettlementTiming) bool {

@@ -108,7 +108,7 @@ func (r AVMExecutionReceipt) Validate() error {
 func DeriveAVMReceiptID(receipt AVMExecutionReceipt) string {
 	receipt = canonicalAVMExecutionReceipt(receipt)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-receipt-id-v1")
+	writeEnginePart(h, "aetra-avm-receipt-id-v1")
 	writeEnginePart(h, receipt.MessageID)
 	writeEnginePart(h, string(receipt.ZoneID))
 	writeEnginePart(h, receipt.Executor)
@@ -119,7 +119,7 @@ func DeriveAVMReceiptID(receipt AVMExecutionReceipt) string {
 func ComputeAVMExecutionReceiptHash(receipt AVMExecutionReceipt) string {
 	receipt = canonicalAVMExecutionReceipt(receipt)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-execution-receipt-v1")
+	writeEnginePart(h, "aetra-avm-execution-receipt-v1")
 	writeEnginePart(h, receipt.ReceiptID)
 	writeEnginePart(h, receipt.MessageID)
 	writeEnginePart(h, string(receipt.ZoneID))

@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ServiceRequiredTestKind string
@@ -314,7 +314,7 @@ func ComputeServiceRequiredTestCoverageHash(coverage ServiceRequiredTestCoverage
 	sortServiceRequiredTestCases(invariant)
 	sortServiceRequiredTestCases(fuzz)
 	sortServiceRequiredTestCases(performance)
-	parts := []string{"aetheris-services-required-test-coverage-v1"}
+	parts := []string{"aetra-services-required-test-coverage-v1"}
 	for _, testCase := range unit {
 		parts = append(parts, "unit", testCase.CaseHash)
 	}
@@ -335,7 +335,7 @@ func ComputeServiceRequiredTestCoverageHash(coverage ServiceRequiredTestCoverage
 
 func ComputeServiceRequiredTestCaseHash(testCase ServiceRequiredTestCase) string {
 	return servicesHashParts(
-		"aetheris-services-required-test-case-v1",
+		"aetra-services-required-test-case-v1",
 		string(testCase.Kind),
 		string(testCase.UnitCase),
 		string(testCase.Integration),
@@ -419,7 +419,7 @@ func newServiceUnitTestCase(caseID ServiceUnitTestCaseID, testName, evidence str
 		UnitCase:     caseID,
 		PackagePath:  "x/services/types",
 		TestName:     strings.TrimSpace(testName),
-		EvidenceHash: servicesHashParts("aetheris-services-required-test-evidence-v1", string(caseID), evidence),
+		EvidenceHash: servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
 	}
 	testCase.CaseHash = ComputeServiceRequiredTestCaseHash(testCase)
 	return testCase
@@ -431,7 +431,7 @@ func newServiceIntegrationTestCase(caseID ServiceIntegrationTestCaseID, testName
 		Integration:  caseID,
 		PackagePath:  "x/services/types",
 		TestName:     strings.TrimSpace(testName),
-		EvidenceHash: servicesHashParts("aetheris-services-required-test-evidence-v1", string(caseID), evidence),
+		EvidenceHash: servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
 	}
 	testCase.CaseHash = ComputeServiceRequiredTestCaseHash(testCase)
 	return testCase
@@ -443,7 +443,7 @@ func newServiceInvariantTestCase(caseID ServiceInvariantTestCaseID, testName, ev
 		Invariant:    caseID,
 		PackagePath:  "x/services/types",
 		TestName:     strings.TrimSpace(testName),
-		EvidenceHash: servicesHashParts("aetheris-services-required-test-evidence-v1", string(caseID), evidence),
+		EvidenceHash: servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
 	}
 	testCase.CaseHash = ComputeServiceRequiredTestCaseHash(testCase)
 	return testCase
@@ -455,7 +455,7 @@ func newServiceFuzzTestCase(caseID ServiceFuzzTestCaseID, testName, evidence str
 		Fuzz:         caseID,
 		PackagePath:  "x/services/types",
 		TestName:     strings.TrimSpace(testName),
-		EvidenceHash: servicesHashParts("aetheris-services-required-test-evidence-v1", string(caseID), evidence),
+		EvidenceHash: servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
 	}
 	testCase.CaseHash = ComputeServiceRequiredTestCaseHash(testCase)
 	return testCase
@@ -467,7 +467,7 @@ func newServicePerformanceTestCase(caseID ServicePerformanceTestCaseID, testName
 		Performance:  caseID,
 		PackagePath:  "x/services/types",
 		TestName:     strings.TrimSpace(testName),
-		EvidenceHash: servicesHashParts("aetheris-services-required-test-evidence-v1", string(caseID), evidence),
+		EvidenceHash: servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
 	}
 	testCase.CaseHash = ComputeServiceRequiredTestCaseHash(testCase)
 	return testCase

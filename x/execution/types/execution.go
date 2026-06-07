@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	"github.com/sovereign-l1/l1/x/aetherisvm/async"
+	"github.com/sovereign-l1/l1/x/aetravm/async"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
 	identitytypes "github.com/sovereign-l1/l1/x/identity/types"
 	memotypes "github.com/sovereign-l1/l1/x/memo/types"

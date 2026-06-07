@@ -6,13 +6,13 @@ security review.
 
 ## Scope
 
-- `x/aetherisvm/async`
-- async contract standard callers under `x/aetherisvm/standards`
+- `x/aetravm/async`
+- async contract standard callers under `x/aetravm/standards`
 - repository-wide scan for obvious Cosmos consensus-risk patterns
 
 ## Refactor Result
 
-The former monolithic `x/aetherisvm/async/async.go` was split into focused
+The former monolithic `x/aetravm/async/async.go` was split into focused
 files:
 
 - `types.go`

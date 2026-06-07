@@ -292,7 +292,7 @@ func IsAVMFutureExtensionStatus(status AVMFutureExtensionStatus) bool {
 func ComputeAVMFutureExtensionDescriptorHash(descriptor AVMFutureExtensionDescriptor) string {
 	descriptor = canonicalAVMFutureExtensionDescriptor(descriptor)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-future-extension-descriptor-v1")
+	writeEnginePart(h, "aetra-avm-future-extension-descriptor-v1")
 	writeEnginePart(h, string(descriptor.Area))
 	writeEnginePart(h, descriptor.Name)
 	writeEnginePart(h, descriptor.Description)
@@ -309,7 +309,7 @@ func ComputeAVMFutureExtensionDescriptorHash(descriptor AVMFutureExtensionDescri
 func ComputeAVMFutureExtensionRegistryHash(registry AVMFutureExtensionRegistry) string {
 	registry = canonicalAVMFutureExtensionRegistry(registry)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-future-extension-registry-v1")
+	writeEnginePart(h, "aetra-avm-future-extension-registry-v1")
 	writeEnginePart(h, registry.RegistryName)
 	writeEngineUint64(h, uint64(len(registry.Extensions)))
 	for _, descriptor := range registry.Extensions {

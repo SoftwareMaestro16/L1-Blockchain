@@ -112,8 +112,8 @@ foreach ($term in @(
 foreach ($term in @(
     "Supply: uncapped PoS supply",
     "mint.params.max_supply = `"0`"",
-    "aetherisd.exe",
-    "aetheris-local-1",
+    "aetrad.exe",
+    "aetra-local-1",
     "1000000naet",
     "-ValidatorCount 5"
   )) {

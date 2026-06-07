@@ -403,7 +403,7 @@ func IsAVMUpgradeMigrationKind(kind AVMUpgradeMigrationKind) bool {
 func ComputeAVMRuntimeVersionSetHash(versions AVMRuntimeVersionSet) string {
 	versions = canonicalAVMRuntimeVersionSet(versions)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-runtime-version-set-v1")
+	writeEnginePart(h, "aetra-avm-runtime-version-set-v1")
 	writeEnginePart(h, versions.VMInterpreterVersion)
 	writeEnginePart(h, versions.SchedulerVersion)
 	writeEnginePart(h, versions.GasPolicyVersion)
@@ -418,7 +418,7 @@ func ComputeAVMRuntimeVersionSetHash(versions AVMRuntimeVersionSet) string {
 func ComputeAVMScheduledUpgradeStateHash(state AVMScheduledUpgradeState) string {
 	state = canonicalAVMScheduledUpgradeState(state)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-scheduled-upgrade-state-v1")
+	writeEnginePart(h, "aetra-avm-scheduled-upgrade-state-v1")
 	writeEnginePart(h, state.UpgradeID)
 	writeEnginePart(h, string(state.Component))
 	writeEnginePart(h, state.FromVersion)
@@ -433,7 +433,7 @@ func ComputeAVMScheduledUpgradeStateHash(state AVMScheduledUpgradeState) string 
 func ComputeAVMUpgradeMigrationHandlerHash(handler AVMUpgradeMigrationHandler) string {
 	handler = canonicalAVMUpgradeMigrationHandler(handler)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-upgrade-migration-handler-v1")
+	writeEnginePart(h, "aetra-avm-upgrade-migration-handler-v1")
 	writeEnginePart(h, handler.UpgradeID)
 	writeEnginePart(h, string(handler.Kind))
 	writeEnginePart(h, handler.FromVersion)
@@ -449,7 +449,7 @@ func ComputeAVMUpgradeMigrationHandlerHash(handler AVMUpgradeMigrationHandler) s
 func ComputeAVMVersionedGasTableRoot(table AVMVersionedGasTable) string {
 	table = canonicalAVMVersionedGasTable(table)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-versioned-gas-table-v1")
+	writeEnginePart(h, "aetra-avm-versioned-gas-table-v1")
 	writeEngineUint64(h, uint64(len(table.Tables)))
 	for _, activation := range table.Tables {
 		writeEnginePart(h, activation.TableHash)
@@ -460,7 +460,7 @@ func ComputeAVMVersionedGasTableRoot(table AVMVersionedGasTable) string {
 func ComputeAVMUpgradeStateRegistryHash(registry AVMUpgradeStateRegistry) string {
 	registry = canonicalAVMUpgradeStateRegistry(registry)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-upgrade-state-registry-v1")
+	writeEnginePart(h, "aetra-avm-upgrade-state-registry-v1")
 	writeEnginePart(h, registry.RuntimeVersions.RuntimeVersionSetHash)
 	writeEngineUint64(h, uint64(len(registry.States)))
 	for _, state := range registry.States {
@@ -476,7 +476,7 @@ func ComputeAVMUpgradeStateRegistryHash(registry AVMUpgradeStateRegistry) string
 
 func ComputeAVMUpgradeMigratedRoot(sourceRoot, toVersion string, migratedCount uint32) string {
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-upgrade-migrated-root-v1")
+	writeEnginePart(h, "aetra-avm-upgrade-migrated-root-v1")
 	writeEnginePart(h, strings.TrimSpace(sourceRoot))
 	writeEnginePart(h, strings.TrimSpace(toVersion))
 	writeEngineUint64(h, uint64(migratedCount))
@@ -487,7 +487,7 @@ func ComputeAVMUpgradeContinuationSetRoot(continuations []ContinuationRecord) st
 	records := append([]ContinuationRecord(nil), continuations...)
 	sort.SliceStable(records, func(i, j int) bool { return compareContinuationRecords(records[i], records[j]) < 0 })
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-upgrade-continuation-set-v1")
+	writeEnginePart(h, "aetra-avm-upgrade-continuation-set-v1")
 	writeEngineUint64(h, uint64(len(records)))
 	for _, continuation := range records {
 		writeContinuationRecord(h, continuation)

@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/treasury/types"
 )
 
@@ -139,10 +139,10 @@ func (k Keeper) SubmitSpend(ctx context.Context, proposer, recipient string, amo
 	if err != nil {
 		return types.TreasurySpend{}, err
 	}
-	if err := aetherisaddress.ValidateUserAddress("proposer", proposer); err != nil {
+	if err := aetraaddress.ValidateUserAddress("proposer", proposer); err != nil {
 		return types.TreasurySpend{}, types.ErrUnauthorized.Wrap(err.Error())
 	}
-	if err := aetherisaddress.ValidateUserAddress("recipient", recipient); err != nil {
+	if err := aetraaddress.ValidateUserAddress("recipient", recipient); err != nil {
 		return types.TreasurySpend{}, types.ErrInvalidSpend.Wrap(err.Error())
 	}
 	if !types.IsRecipientAllowed(params, recipient) {
@@ -249,7 +249,7 @@ func (k Keeper) ExecuteSpend(ctx context.Context, id, epoch uint64) (types.Treas
 	if !types.IsRecipientAllowed(params, spend.Recipient) {
 		return types.TreasurySpend{}, types.ErrUnauthorized.Wrap("recipient is not allowlisted")
 	}
-	recipient, err := aetherisaddress.ParseAccAddress(spend.Recipient)
+	recipient, err := aetraaddress.ParseAccAddress(spend.Recipient)
 	if err != nil {
 		return types.TreasurySpend{}, types.ErrInvalidSpend.Wrap(err.Error())
 	}

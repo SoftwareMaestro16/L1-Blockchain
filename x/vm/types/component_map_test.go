@@ -14,7 +14,7 @@ func TestDefaultAVMComponentMapMatchesCoreComponentDiagram(t *testing.T) {
 	require.Equal(t, ComputeAVMComponentMapRoot(componentMap), componentMap.Root)
 
 	components := componentMapByID(componentMap)
-	requireComponent(t, components, ComponentAetherCore, ComponentLayerCore,
+	requireComponent(t, components, ComponentAetraCore, ComponentLayerCore,
 		ComponentCapabilityConsensus,
 		ComponentCapabilityBlockLifecycle,
 		ComponentCapabilityGlobalRoots,
@@ -46,7 +46,7 @@ func TestDefaultAVMComponentMapMatchesCoreComponentDiagram(t *testing.T) {
 		ComponentCapabilityZoneRoots,
 	)
 
-	requireComponentEdge(t, componentMap, ComponentAetherCore, ComponentAVMRouter)
+	requireComponentEdge(t, componentMap, ComponentAetraCore, ComponentAVMRouter)
 	requireComponentEdge(t, componentMap, ComponentAVMRouter, ComponentSyncEngine)
 	requireComponentEdge(t, componentMap, ComponentAVMRouter, ComponentAsyncEngine)
 	requireComponentEdge(t, componentMap, ComponentAVMRouter, ComponentActorRuntime)
@@ -117,7 +117,7 @@ func TestAVMComponentMapRejectsMissingRequiredCapabilitiesEdgesAndInvalidFlow(t 
 	require.ErrorContains(t, missingEdge.Validate(), "missing edge")
 
 	invalidFlow := DefaultAVMComponentMap()
-	invalidFlow.Edges = append(invalidFlow.Edges, AVMComponentEdge{From: ComponentZoneStateRoots, To: ComponentAetherCore})
+	invalidFlow.Edges = append(invalidFlow.Edges, AVMComponentEdge{From: ComponentZoneStateRoots, To: ComponentAetraCore})
 	invalidFlow = CanonicalAVMComponentMap(invalidFlow)
 	invalidFlow.Root = ComputeAVMComponentMapRoot(invalidFlow)
 	require.ErrorContains(t, invalidFlow.Validate(), "lower runtime layers")

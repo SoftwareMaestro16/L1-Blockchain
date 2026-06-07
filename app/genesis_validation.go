@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"cosmossdk.io/collections"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
@@ -14,7 +15,7 @@ import (
 	protocolpooltypes "github.com/cosmos/cosmos-sdk/x/protocolpool/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	appparams "github.com/sovereign-l1/l1/app/params"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
 )
@@ -52,11 +53,11 @@ func (app *L1App) validateAetraAuthGenesis(genesisState GenesisState) error {
 		addr := account.GetAddress()
 		addrText := addr.String()
 		if _, found := seenAccounts[addrText]; found {
-			return fmt.Errorf("duplicate auth genesis account: %s", aetherisaddress.FormatAccAddress(addr))
+			return fmt.Errorf("duplicate auth genesis account: %s", aetraaddress.FormatAccAddress(addr))
 		}
 		seenAccounts[addrText] = struct{}{}
-		if aetherisaddress.IsZeroAccAddress(addr) {
-			return fmt.Errorf("auth genesis account %s must not be zero address", aetherisaddress.ZeroRawAddress)
+		if aetraaddress.IsZeroAccAddress(addr) {
+			return fmt.Errorf("auth genesis account %s must not be zero address", aetraaddress.ZeroRawAddress)
 		}
 	}
 	return nil
@@ -74,12 +75,12 @@ func (app *L1App) validateAetraBankGenesis(genesisState GenesisState) error {
 		return err
 	}
 	for _, balance := range bankGenesis.Balances {
-		addr, err := aetherisaddress.ParseAccAddress(balance.Address)
+		addr, err := aetraaddress.ParseAccAddress(balance.Address)
 		if err != nil {
 			return fmt.Errorf("invalid bank balance address %s: %w", balance.Address, err)
 		}
-		if aetherisaddress.IsZeroAccAddress(addr) {
-			return fmt.Errorf("bank balance address %s must not be zero address", aetherisaddress.ZeroRawAddress)
+		if aetraaddress.IsZeroAccAddress(addr) {
+			return fmt.Errorf("bank balance address %s must not be zero address", aetraaddress.ZeroRawAddress)
 		}
 	}
 	return nil

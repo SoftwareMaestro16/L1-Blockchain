@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	reputationkeeper "github.com/sovereign-l1/l1/x/reputation/keeper"
 	"github.com/sovereign-l1/l1/x/reputation/types"
 	reputationpb "github.com/sovereign-l1/l1/x/reputation/types/reputationpb"
@@ -52,5 +52,5 @@ func addr(fill byte) string {
 	for i := range bz {
 		bz[i] = fill
 	}
-	return aetherisaddress.FormatAccAddress(sdk.AccAddress(bz))
+	return aetraaddress.FormatAccAddress(sdk.AccAddress(bz))
 }

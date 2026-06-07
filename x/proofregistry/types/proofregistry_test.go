@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestProofFailureCodeCatalogCoversSectionSevenSix(t *testing.T) {
@@ -194,7 +194,7 @@ func testProofRegistrySnapshotWithRoots(t *testing.T, height uint64, appHash str
 	snapshot, err := NewProofRegistrySnapshot(ProofRegistrySnapshot{
 		Height:            height,
 		AppHash:           appHash,
-		AetherCoreRoot:    proofRegistryTestHash("core", fmt.Sprint(height)),
+		AetraCoreRoot:     proofRegistryTestHash("core", fmt.Sprint(height)),
 		GlobalZoneRoot:    proofRegistryTestHash("zones", fmt.Sprint(height)),
 		GlobalMessageRoot: proofRegistryTestHash("messages", fmt.Sprint(height)),
 		ReceiptRoot:       proofRegistryTestHash("receipts", fmt.Sprint(height)),
@@ -221,7 +221,7 @@ func testProofRegistryEnvelope(t *testing.T, proofType coretypes.UniversalProofT
 	path := testProofRegistryPath(t, appHash, rootType, storeRoot)
 	proof, err := BuildStoreV2ProofEnvelope(StoreV2ProofAdapterRequest{
 		ProofType:          proofType,
-		ChainID:            "aetheris-test",
+		ChainID:            "aetra-test",
 		Height:             height,
 		AppHash:            appHash,
 		RootType:           rootType,
@@ -245,7 +245,7 @@ func testProofRegistryZoneProof(t *testing.T, height uint64, appHash string, zon
 	require.NoError(t, err)
 	proof, err := BuildStoreV2ProofEnvelope(StoreV2ProofAdapterRequest{
 		ProofType:        coretypes.ProofTypeZoneRoot,
-		ChainID:          "aetheris-test",
+		ChainID:          "aetra-test",
 		Height:           height,
 		AppHash:          appHash,
 		RootType:         coretypes.ZoneStateProofRootType,
@@ -271,7 +271,7 @@ func testProofRegistryShardProof(t *testing.T, height uint64, appHash string, zo
 	require.NoError(t, err)
 	proof, err := BuildStoreV2ProofEnvelope(StoreV2ProofAdapterRequest{
 		ProofType:        coretypes.ProofTypeShardRoot,
-		ChainID:          "aetheris-test",
+		ChainID:          "aetra-test",
 		Height:           height,
 		AppHash:          appHash,
 		RootType:         coretypes.ShardStateProofRootType,
@@ -299,7 +299,7 @@ func testProofRegistryScopedProof(t *testing.T, height uint64, appHash string, p
 	require.NoError(t, err)
 	proof, err := BuildStoreV2ProofEnvelope(StoreV2ProofAdapterRequest{
 		ProofType:        proofType,
-		ChainID:          "aetheris-test",
+		ChainID:          "aetra-test",
 		Height:           height,
 		AppHash:          appHash,
 		RootType:         rootType,

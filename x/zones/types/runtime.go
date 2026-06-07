@@ -404,7 +404,7 @@ func ComputeZoneMessageRoot(messages []ZoneMessage) string {
 	queue := cloneZoneMessages(messages)
 	sortZoneMessages(queue)
 	h := sha256.New()
-	writeRuntimePart(h, "aetheris-zone-message-root-v1")
+	writeRuntimePart(h, "aetra-zone-message-root-v1")
 	writeRuntimeUint64(h, uint64(len(queue)))
 	for _, msg := range queue {
 		writeRuntimePart(h, string(msg.ZoneID))
@@ -420,7 +420,7 @@ func ComputeZoneMessageRoot(messages []ZoneMessage) string {
 
 func ComputeZoneRuntimeProofRoot(runtime ZoneRuntimeState) string {
 	h := sha256.New()
-	writeRuntimePart(h, "aetheris-zone-runtime-proof-v1")
+	writeRuntimePart(h, "aetra-zone-runtime-proof-v1")
 	writeRuntimePart(h, string(runtime.ZoneID))
 	writeRuntimePart(h, runtime.StoreKey)
 	writeRuntimePart(h, runtime.StateNamespace)
@@ -453,7 +453,7 @@ func ComputeZoneModuleSetRoot(modules []string) string {
 	ordered := append([]string(nil), modules...)
 	sort.Strings(ordered)
 	h := sha256.New()
-	writeRuntimePart(h, "aetheris-zone-module-set-v1")
+	writeRuntimePart(h, "aetra-zone-module-set-v1")
 	writeRuntimeUint64(h, uint64(len(ordered)))
 	for _, module := range ordered {
 		writeRuntimePart(h, module)

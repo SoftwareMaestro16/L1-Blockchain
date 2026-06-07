@@ -204,12 +204,12 @@ func IsCoreMessageType(messageType CoreMessageType) bool {
 
 func ComputeCoreMessageTypeDescriptorHash(desc CoreMessageTypeDescriptor) string {
 	desc = desc.Normalize()
-	return hashParts("aetheris-core-message-type-descriptor-v1", string(desc.MessageType), desc.Purpose, desc.PrimaryZone)
+	return hashParts("aetra-core-message-type-descriptor-v1", string(desc.MessageType), desc.Purpose, desc.PrimaryZone)
 }
 
 func ComputeCoreMessageTypeSpecRoot(types []CoreMessageTypeDescriptor) string {
 	ordered := normalizeCoreMessageTypeDescriptors(types)
-	parts := []string{"aetheris-core-message-type-spec-v1", fmt.Sprintf("%020d", CoreMessageSpecVersion)}
+	parts := []string{"aetra-core-message-type-spec-v1", fmt.Sprintf("%020d", CoreMessageSpecVersion)}
 	for _, desc := range ordered {
 		parts = append(parts, string(desc.MessageType), desc.DescriptorHash)
 	}

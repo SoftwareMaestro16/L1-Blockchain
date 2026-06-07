@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type UnifiedServiceRoute string
@@ -423,7 +423,7 @@ func (plan UnifiedCallRoutingPlan) Validate() error {
 
 func ComputeUnifiedServicePaymentHash(payment UnifiedServicePayment) string {
 	return servicesHashParts(
-		"aetheris-services-unified-payment-v1",
+		"aetra-services-unified-payment-v1",
 		payment.Model,
 		payment.Denom,
 		payment.MaxFee,
@@ -434,7 +434,7 @@ func ComputeUnifiedServicePaymentHash(payment UnifiedServicePayment) string {
 
 func ComputeUnifiedServiceCallHash(call UnifiedServiceCall) string {
 	parts := []string{
-		"aetheris-services-unified-call-v1",
+		"aetra-services-unified-call-v1",
 		call.CallID,
 		call.TargetService,
 		call.Method,
@@ -465,7 +465,7 @@ func ComputeUnifiedCallRoutingPlanHash(plan UnifiedCallRoutingPlan) string {
 	routes := append([]UnifiedServiceRoute(nil), plan.Routes...)
 	sortUnifiedRoutes(routes)
 	parts := []string{
-		"aetheris-services-unified-routing-v1",
+		"aetra-services-unified-routing-v1",
 		plan.CallID,
 		plan.TargetService,
 		plan.MethodID,

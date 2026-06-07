@@ -1311,5 +1311,5 @@ func ComputeDiscoveryOnChainProofHash(resultHash, stateRoot string, proofHeight 
 }
 
 func drtBucketID(localNodeID, remoteNodeID string, bucketCount uint32) uint32 {
-	return uint32(hashBytes("aetheris-drt-bucket-v1", []byte(localNodeID+"/"+remoteNodeID))[0]) % bucketCount
+	return uint32(hashBytes("aetra-drt-bucket-v1", []byte(localNodeID+"/"+remoteNodeID))[0]) % bucketCount
 }

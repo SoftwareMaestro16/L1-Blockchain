@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	identitytypes "github.com/sovereign-l1/l1/x/identity/types"
 )
 
@@ -79,7 +79,7 @@ func TestAETServiceBindingRequiresIdentityAndServiceProofs(t *testing.T) {
 	require.NoError(t, verification.Validate())
 
 	tamperedEndpoint := proof
-	tamperedEndpoint.Binding.Endpoint = "https://wrong.aetheris.local/v1"
+	tamperedEndpoint.Binding.Endpoint = "https://wrong.aetra.local/v1"
 	tamperedEndpoint.Binding.BindingHash = ""
 	tamperedEndpoint.Binding, err = NewAETServiceBinding(tamperedEndpoint.Binding)
 	require.NoError(t, err)

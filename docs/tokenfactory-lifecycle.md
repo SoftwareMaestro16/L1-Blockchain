@@ -56,12 +56,12 @@ Set local variables:
 ```powershell
 $NODE = "tcp://127.0.0.1:26657"
 $REST = "http://127.0.0.1:1317"
-$CHAIN_ID = "aetheris-local-1"
+$CHAIN_ID = "aetra-local-1"
 $KEYRING = "test"
-$HOME0 = ".localnet\node0\aetherisd"
-$HOME1 = ".localnet\node1\aetherisd"
-$NODE0 = build\aetherisd.exe keys show node0 -a --home $HOME0 --keyring-backend $KEYRING
-$NODE1 = build\aetherisd.exe keys show node1 -a --home $HOME1 --keyring-backend $KEYRING
+$HOME0 = ".localnet\node0\aetrad"
+$HOME1 = ".localnet\node1\aetrad"
+$NODE0 = build\aetrad.exe keys show node0 -a --home $HOME0 --keyring-backend $KEYRING
+$NODE1 = build\aetrad.exe keys show node1 -a --home $HOME1 --keyring-backend $KEYRING
 $GOLD = "factory/$NODE0/gold"
 $FEES = "1000000naet"
 ```
@@ -69,28 +69,28 @@ $FEES = "1000000naet"
 Create and query:
 
 ```powershell
-build\aetherisd.exe tx tokenfactory create-denom gold --from node0 --home $HOME0 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
-build\aetherisd.exe query tokenfactory denom $GOLD --node $NODE --output json
+build\aetrad.exe tx tokenfactory create-denom gold --from node0 --home $HOME0 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
+build\aetrad.exe query tokenfactory denom $GOLD --node $NODE --output json
 Invoke-RestMethod "$REST/l1/tokenfactory/v1/denom/$GOLD"
-build\aetherisd.exe query bank denom-metadata $GOLD --node $NODE --output json
+build\aetrad.exe query bank denom-metadata $GOLD --node $NODE --output json
 ```
 
 Mint, query balance and supply, then burn:
 
 ```powershell
-build\aetherisd.exe tx tokenfactory mint "1000000$GOLD" $NODE0 --from node0 --home $HOME0 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
-build\aetherisd.exe query bank balance $NODE0 $GOLD --node $NODE --output json
-build\aetherisd.exe query bank total-supply-of $GOLD --node $NODE --output json
-build\aetherisd.exe tx tokenfactory burn "250000$GOLD" $NODE0 --from node0 --home $HOME0 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
+build\aetrad.exe tx tokenfactory mint "1000000$GOLD" $NODE0 --from node0 --home $HOME0 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
+build\aetrad.exe query bank balance $NODE0 $GOLD --node $NODE --output json
+build\aetrad.exe query bank total-supply-of $GOLD --node $NODE --output json
+build\aetrad.exe tx tokenfactory burn "250000$GOLD" $NODE0 --from node0 --home $HOME0 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
 ```
 
 Transfer admin and prove authorization:
 
 ```powershell
-build\aetherisd.exe tx tokenfactory change-admin $GOLD $NODE1 --from node0 --home $HOME0 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
-build\aetherisd.exe query tokenfactory denom $GOLD --node $NODE --output json
-build\aetherisd.exe tx tokenfactory mint "1$GOLD" $NODE0 --from node0 --home $HOME0 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
-build\aetherisd.exe tx tokenfactory mint "100$GOLD" $NODE1 --from node1 --home $HOME1 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
+build\aetrad.exe tx tokenfactory change-admin $GOLD $NODE1 --from node0 --home $HOME0 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
+build\aetrad.exe query tokenfactory denom $GOLD --node $NODE --output json
+build\aetrad.exe tx tokenfactory mint "1$GOLD" $NODE0 --from node0 --home $HOME0 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
+build\aetrad.exe tx tokenfactory mint "100$GOLD" $NODE1 --from node1 --home $HOME1 --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json
 ```
 
 The old-admin mint command must fail with an authorization error; the new-admin mint command must commit.

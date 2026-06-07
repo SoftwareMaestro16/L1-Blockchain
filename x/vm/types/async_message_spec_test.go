@@ -102,7 +102,7 @@ func TestAVMAsyncMessageRegistryRequiresReplayTombstoneForConsumedMessages(t *te
 
 func testAVMAsyncMessage(source string, sourceZone zonestypes.ZoneID, destination string, destinationZone zonestypes.ZoneID, nonce uint64, createdHeight uint64) AVMAsyncMessage {
 	return AVMAsyncMessage{
-		ChainID:         "aetheris-1",
+		ChainID:         "aetra-1",
 		Source:          source,
 		Destination:     destination,
 		Payload:         []byte("payload"),

@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/sovereign-l1/l1/app/wasmconfig"
-	"github.com/sovereign-l1/l1/x/aetherisvm/avm"
+	"github.com/sovereign-l1/l1/x/aetravm/avm"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -61,7 +61,7 @@ func TestAVMRuntimeAdapterEmitsOutboundMessageReceiptAndRootCommitment(t *testin
 	storageAdapter, err := NewVMStorageAdapter(RuntimeAVM, zoneID, manifest)
 	require.NoError(t, err)
 	outbound, err := NewVMOutboundMessageSyscall(RuntimeAVM, manifest.AVM.MessageSyscall, VMOutboundMessageRequest{
-		ChainID:         "aetheris-test-1",
+		ChainID:         "aetra-test-1",
 		Source:          "contract-a",
 		Destination:     "app-b",
 		SourceZone:      zoneID,

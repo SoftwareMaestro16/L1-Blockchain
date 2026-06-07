@@ -39,9 +39,9 @@ Medium:
 Collect:
 
 ```powershell
-build\aetherisd.exe status --node <rpc> --output json
-build\aetherisd.exe query block --node <rpc> --output json
-build\aetherisd.exe query tendermint-validator-set --node <rpc> --output json
+build\aetrad.exe status --node <rpc> --output json
+build\aetrad.exe query block --node <rpc> --output json
+build\aetrad.exe query tendermint-validator-set --node <rpc> --output json
 ```
 
 Then:

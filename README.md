@@ -18,7 +18,7 @@ Aetra is not just a base Cosmos SDK skeleton. The current chain surface is split
 
 - native `x/` modules are for chain safety, PoS, accounting, protocol configuration, system entities, scheduling, storage rent, identity root, and AVM runtime coordination;
 - user/application logic such as fungible tokens, NFTs, marketplaces, workflow apps, and exchange-style liquidity should live as AVM contracts;
-- native contract-assets and native DEX runtime modules have been removed from the app graph. AFT/ANFT standards remain under `x/aetherisvm/standards` as contract standards.
+- native contract-assets and native DEX runtime modules have been removed from the app graph. AFT/ANFT standards remain under `x/aetravm/standards` as contract standards.
 
 ```mermaid
 flowchart TD
@@ -91,15 +91,15 @@ Aetra keeps native code for protocol responsibilities:
 - execution coordination: `x/scheduler`, `x/avm-scheduler`, `x/actor-registry`, `x/storage-rent`;
 - identity root: `x/identity-root` for `.aet` root policy, reserved names, normalization, expiry bounds, and root registry policy;
 - future coordination: `x/bridge-hub`, `x/cross-chain-registry`, `x/sharding-coordinator`;
-- infrastructure/spec layers: `x/aethercore`, `x/load`, `x/routing`, `x/zones`, `x/mesh`, `x/networking`, `x/payments`, `x/contracts`, `x/vm`, `x/aetherisvm`.
+- infrastructure/spec layers: `x/aetracore`, `x/load`, `x/routing`, `x/zones`, `x/mesh`, `x/networking`, `x/payments`, `x/contracts`, `x/vm`, `x/aetravm`.
 
 ## AVM Contract Surface
 
 User application logic is moving to AVM contracts:
 
-- fungible tokens use AFT-44 contracts under `x/aetherisvm/standards/aft`;
-- NFTs/SBTs use ANFT-66 contracts under `x/aetherisvm/standards/anft`;
-- wallet behavior uses the wallet standard under `x/aetherisvm/standards/aw`;
+- fungible tokens use AFT-44 contracts under `x/aetravm/standards/aft`;
+- NFTs/SBTs use ANFT-66 contracts under `x/aetravm/standards/anft`;
+- wallet behavior uses the wallet standard under `x/aetravm/standards/aw`;
 - old service, market, workflow, permissions, and identity app-specific surfaces are marked as migration targets;
 - exchange-style liquidity and other app logic should be implemented as AVM contracts, not native Cosmos SDK modules.
 
@@ -150,20 +150,20 @@ Fund-capable or accounting-relevant reserved accounts include `AETMint`, `AETBur
 ## Build
 
 ```powershell
-.\scripts\build-aetherisd.ps1
+.\scripts\build-aetrad.ps1
 ```
 
 The build output is:
 
 ```text
-build\aetherisd.exe
+build\aetrad.exe
 ```
 
 ## Localnet
 
 ```powershell
-.\scripts\localnet\init.ps1 -ChainId aetheris-local-1 -ValidatorCount 3
-.\scripts\localnet\start.ps1 -ChainId aetheris-local-1
+.\scripts\localnet\init.ps1 -ChainId aetra-local-1 -ValidatorCount 3
+.\scripts\localnet\start.ps1 -ChainId aetra-local-1
 ```
 
 Default local endpoints:
@@ -175,22 +175,22 @@ Default local endpoints:
 ## Common Commands
 
 ```powershell
-build\aetherisd.exe query block --node tcp://127.0.0.1:26657
-build\aetherisd.exe query bank denom-metadata naet --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query bank total-supply-of naet --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query fees params --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query block --node tcp://127.0.0.1:26657
+build\aetrad.exe query bank denom-metadata naet --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query bank total-supply-of naet --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query fees params --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
 ```
 
 Send native funds on localnet:
 
 ```powershell
-$node0 = build\aetherisd.exe keys show node0 -a --home .localnet\node0\aetherisd --keyring-backend test
-$node1 = build\aetherisd.exe keys show node1 -a --home .localnet\node1\aetherisd --keyring-backend test
+$node0 = build\aetrad.exe keys show node0 -a --home .localnet\node0\aetrad --keyring-backend test
+$node1 = build\aetrad.exe keys show node1 -a --home .localnet\node1\aetrad --keyring-backend test
 
-build\aetherisd.exe tx bank send node0 $node1 1000naet `
-  --home .localnet\node0\aetherisd `
+build\aetrad.exe tx bank send node0 $node1 1000naet `
+  --home .localnet\node0\aetrad `
   --keyring-backend test `
-  --chain-id aetheris-local-1 `
+  --chain-id aetra-local-1 `
   --node tcp://127.0.0.1:26657 `
   --fees 1000000naet `
   -y

@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	"github.com/sovereign-l1/l1/x/aetherisvm/async"
+	"github.com/sovereign-l1/l1/x/aetravm/async"
 	"github.com/stretchr/testify/require"
 )
 

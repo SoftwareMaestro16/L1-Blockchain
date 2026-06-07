@@ -244,7 +244,7 @@ func ReadyServiceImplementationPlanningGate() ServiceImplementationPlanningGate 
 func ComputeServiceImplementationAcceptanceCriterionHash(criterion ServiceImplementationAcceptanceCriterion) string {
 	criterion = canonicalServiceImplementationAcceptanceCriterion(criterion)
 	parts := []string{
-		"aetheris-services-implementation-acceptance-criterion-v1",
+		"aetra-services-implementation-acceptance-criterion-v1",
 		string(criterion.CriterionID),
 		string(criterion.Category),
 		"evidence",
@@ -261,7 +261,7 @@ func ComputeServiceImplementationAcceptanceCriterionHash(criterion ServiceImplem
 func ComputeServiceImplementationAcceptanceManifestHash(manifest ServiceImplementationAcceptanceManifest) string {
 	manifest.Criteria = canonicalServiceImplementationAcceptanceCriteria(manifest.Criteria)
 	parts := []string{
-		"aetheris-services-implementation-acceptance-manifest-v1",
+		"aetra-services-implementation-acceptance-manifest-v1",
 		fmt.Sprint(len(manifest.Criteria)),
 	}
 	for _, criterion := range manifest.Criteria {

@@ -6,7 +6,7 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 type AccountMetadata struct {
@@ -28,7 +28,7 @@ func NewAccountMetadata(account Account) (AccountMetadata, error) {
 		return AccountMetadata{}, fmt.Errorf("account must not be nil")
 	}
 	address := account.GetAddress()
-	if err := aetherisaddress.RejectZeroAddress("account metadata address", address); err != nil {
+	if err := aetraaddress.RejectZeroAddress("account metadata address", address); err != nil {
 		return AccountMetadata{}, err
 	}
 	pubKeyType := ""
@@ -36,7 +36,7 @@ func NewAccountMetadata(account Account) (AccountMetadata, error) {
 		pubKeyType = fmt.Sprintf("%T", pubKey)
 	}
 	return AccountMetadata{
-		Address:       aetherisaddress.FormatAccAddress(address),
+		Address:       aetraaddress.FormatAccAddress(address),
 		AccountNumber: account.GetAccountNumber(),
 		Sequence:      account.GetSequence(),
 		PubKeyType:    pubKeyType,

@@ -38,15 +38,15 @@ type NativePaymentChannelSettlementState struct {
 }
 
 type NativePaymentChannelFinalityCommitment struct {
-	ChannelID           string
-	SettlementHash      string
-	FinalStateHash      string
-	FinalNonce          uint64
-	FinancialZoneRoot   string
-	AetherCoreProofRoot string
-	PaymentReceiptRoot  string
-	SettledHeight       uint64
-	FinalityCommitment  string
+	ChannelID          string
+	SettlementHash     string
+	FinalStateHash     string
+	FinalNonce         uint64
+	FinancialZoneRoot  string
+	AetraCoreProofRoot string
+	PaymentReceiptRoot string
+	SettledHeight      uint64
+	FinalityCommitment string
 }
 
 func NewNativePaymentChannelSettlementStateFromRecord(channel ChannelRecord, zoneID string, shardID uint32, expiryHeight uint64) (NativePaymentChannelSettlementState, error) {
@@ -312,14 +312,14 @@ func BuildNativePaymentChannelFinalityCommitment(settlement NativePaymentChannel
 	settlement = settlement.Normalize()
 	record = record.Normalize()
 	commitment := NativePaymentChannelFinalityCommitment{
-		ChannelID:           settlement.ChannelID,
-		SettlementHash:      record.SettlementHash,
-		FinalStateHash:      record.StateHash,
-		FinalNonce:          record.Nonce,
-		FinancialZoneRoot:   normalizeHash(financialZoneRoot),
-		AetherCoreProofRoot: normalizeHash(aetherCoreProofRoot),
-		PaymentReceiptRoot:  normalizeHash(receiptRoot),
-		SettledHeight:       record.SettledHeight,
+		ChannelID:          settlement.ChannelID,
+		SettlementHash:     record.SettlementHash,
+		FinalStateHash:     record.StateHash,
+		FinalNonce:         record.Nonce,
+		FinancialZoneRoot:  normalizeHash(financialZoneRoot),
+		AetraCoreProofRoot: normalizeHash(aetherCoreProofRoot),
+		PaymentReceiptRoot: normalizeHash(receiptRoot),
+		SettledHeight:      record.SettledHeight,
 	}
 	if err := settlement.Validate(); err != nil {
 		return NativePaymentChannelFinalityCommitment{}, err
@@ -339,7 +339,7 @@ func BuildNativePaymentChannelFinalityCommitment(settlement NativePaymentChannel
 	if err := ValidateHash("payments native finality financial zone root", commitment.FinancialZoneRoot); err != nil {
 		return NativePaymentChannelFinalityCommitment{}, err
 	}
-	if err := ValidateHash("payments native finality aether core proof root", commitment.AetherCoreProofRoot); err != nil {
+	if err := ValidateHash("payments native finality aether core proof root", commitment.AetraCoreProofRoot); err != nil {
 		return NativePaymentChannelFinalityCommitment{}, err
 	}
 	if err := ValidateHash("payments native finality receipt root", commitment.PaymentReceiptRoot); err != nil {
@@ -357,7 +357,7 @@ func (commitment NativePaymentChannelFinalityCommitment) Validate() error {
 	commitment.SettlementHash = normalizeHash(commitment.SettlementHash)
 	commitment.FinalStateHash = normalizeHash(commitment.FinalStateHash)
 	commitment.FinancialZoneRoot = normalizeHash(commitment.FinancialZoneRoot)
-	commitment.AetherCoreProofRoot = normalizeHash(commitment.AetherCoreProofRoot)
+	commitment.AetraCoreProofRoot = normalizeHash(commitment.AetraCoreProofRoot)
 	commitment.PaymentReceiptRoot = normalizeHash(commitment.PaymentReceiptRoot)
 	commitment.FinalityCommitment = normalizeHash(commitment.FinalityCommitment)
 	if err := ValidateHash("payments native finality channel id", commitment.ChannelID); err != nil {
@@ -375,7 +375,7 @@ func (commitment NativePaymentChannelFinalityCommitment) Validate() error {
 	if err := ValidateHash("payments native finality financial zone root", commitment.FinancialZoneRoot); err != nil {
 		return err
 	}
-	if err := ValidateHash("payments native finality aether core proof root", commitment.AetherCoreProofRoot); err != nil {
+	if err := ValidateHash("payments native finality aether core proof root", commitment.AetraCoreProofRoot); err != nil {
 		return err
 	}
 	if err := ValidateHash("payments native finality receipt root", commitment.PaymentReceiptRoot); err != nil {
@@ -396,7 +396,7 @@ func (commitment NativePaymentChannelFinalityCommitment) Validate() error {
 func ComputeNativePaymentChannelSettlementStateRoot(state NativePaymentChannelSettlementState) string {
 	state = state.Normalize()
 	parts := []string{
-		"aetheris-native-payment-channel-settlement-state-v1",
+		"aetra-native-payment-channel-settlement-state-v1",
 		state.ChannelID,
 		state.ZoneID,
 		fmt.Sprintf("%020d", uint64(state.ShardID)),
@@ -419,16 +419,16 @@ func ComputeNativePaymentChannelFinalityCommitmentHash(commitment NativePaymentC
 	commitment.SettlementHash = normalizeHash(commitment.SettlementHash)
 	commitment.FinalStateHash = normalizeHash(commitment.FinalStateHash)
 	commitment.FinancialZoneRoot = normalizeHash(commitment.FinancialZoneRoot)
-	commitment.AetherCoreProofRoot = normalizeHash(commitment.AetherCoreProofRoot)
+	commitment.AetraCoreProofRoot = normalizeHash(commitment.AetraCoreProofRoot)
 	commitment.PaymentReceiptRoot = normalizeHash(commitment.PaymentReceiptRoot)
 	return HashParts(
-		"aetheris-native-payment-channel-finality-v1",
+		"aetra-native-payment-channel-finality-v1",
 		commitment.ChannelID,
 		commitment.SettlementHash,
 		commitment.FinalStateHash,
 		fmt.Sprintf("%020d", commitment.FinalNonce),
 		commitment.FinancialZoneRoot,
-		commitment.AetherCoreProofRoot,
+		commitment.AetraCoreProofRoot,
 		commitment.PaymentReceiptRoot,
 		fmt.Sprintf("%020d", commitment.SettledHeight),
 	)

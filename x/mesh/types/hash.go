@@ -10,7 +10,7 @@ import (
 
 func ComputeMessageID(msg MeshMessage) string {
 	h := sha256.New()
-	writeString(h, "aetheris-mesh-message-v1")
+	writeString(h, "aetra-mesh-message-v1")
 	writeString(h, string(msg.SourceZone))
 	writeString(h, string(msg.SourceShard))
 	writeString(h, string(msg.DestinationZone))
@@ -33,7 +33,7 @@ func BuildProof(msg MeshMessage, commitment FinalizedCommitment) MeshProof {
 func ComputeProofHash(msg MeshMessage, commitment FinalizedCommitment) string {
 	msg = msg.Normalize()
 	h := sha256.New()
-	writeString(h, "aetheris-mesh-proof-v1")
+	writeString(h, "aetra-mesh-proof-v1")
 	writeString(h, msg.MessageID)
 	writeString(h, string(msg.SourceZone))
 	writeString(h, string(msg.SourceShard))
@@ -46,7 +46,7 @@ func ComputeProofHash(msg MeshMessage, commitment FinalizedCommitment) string {
 
 func ComputeReceiptHash(receipt MeshReceipt) string {
 	h := sha256.New()
-	writeString(h, "aetheris-mesh-receipt-v1")
+	writeString(h, "aetra-mesh-receipt-v1")
 	writeString(h, receipt.MessageID)
 	writeString(h, string(receipt.SourceZone))
 	writeString(h, string(receipt.SourceShard))
@@ -63,7 +63,7 @@ func ComputeReceiptHash(receipt MeshReceipt) string {
 
 func ComputeBounceReceiptHash(receipt BounceReceipt) string {
 	h := sha256.New()
-	writeString(h, "aetheris-mesh-bounce-receipt-v1")
+	writeString(h, "aetra-mesh-bounce-receipt-v1")
 	writeString(h, receipt.MessageID)
 	writeString(h, receipt.SourceMessageID)
 	writeString(h, receipt.BounceMessageID)
@@ -76,7 +76,7 @@ func ComputeBounceReceiptHash(receipt BounceReceipt) string {
 
 func ComputeRefundReceiptHash(receipt RefundReceipt) string {
 	h := sha256.New()
-	writeString(h, "aetheris-mesh-refund-receipt-v1")
+	writeString(h, "aetra-mesh-refund-receipt-v1")
 	writeString(h, receipt.MessageID)
 	writeString(h, receipt.SourceMessageID)
 	writeBytes(h, receipt.Recipient)
@@ -88,7 +88,7 @@ func ComputeRefundReceiptHash(receipt RefundReceipt) string {
 
 func HashParts(parts ...string) string {
 	h := sha256.New()
-	writeString(h, "aetheris-mesh-hash-parts-v1")
+	writeString(h, "aetra-mesh-hash-parts-v1")
 	for _, part := range parts {
 		writeString(h, part)
 	}

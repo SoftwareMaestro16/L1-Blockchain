@@ -5,11 +5,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestUnifiedInteractionClassesCoverServiceExecutionModes(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 20}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 20}
 
 	onChain := testUnifiedOnChainDescriptor()
 	onChainCall := testInteractionCall(t, ctx, onChain, "query", 1, "onchain")
@@ -51,7 +51,7 @@ func TestUnifiedInteractionClassesCoverServiceExecutionModes(t *testing.T) {
 }
 
 func TestUnifiedServiceCallbackValidatesTargetInterfaceAndReplaySafety(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 20}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 20}
 	originalDescriptor := testInterfaceSystemDescriptor()
 	original := testInteractionCall(t, ctx, originalDescriptor, "submit", 7, "original")
 	target := testCallbackTargetDescriptor()
@@ -92,7 +92,7 @@ func TestUnifiedServiceCallbackValidatesTargetInterfaceAndReplaySafety(t *testin
 }
 
 func TestUnifiedServiceCallbackExecutionEmitsReceipt(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 20}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 20}
 	original := testInteractionCall(t, ctx, testInterfaceSystemDescriptor(), "submit", 9, "original")
 	target := testCallbackTargetDescriptor()
 	callback, err := NewUnifiedServiceCallback(ctx, original, target, "notify", testInterfaceHash("callback/payload"), "callback-prepaid:naet:0", 35, 10, "callback-idem")

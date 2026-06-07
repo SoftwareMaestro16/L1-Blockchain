@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestResolveServiceFromOnChainRegistryReturnsDiscoveryOutput(t *testing.T) {
@@ -113,7 +113,7 @@ func TestResolveServiceFromDistributedMeshIncludesCommitmentChain(t *testing.T) 
 		EndpointID:    "mesh-primary",
 		Kind:          DistributedEndpointHybrid,
 		ZoneID:        string(descriptor.ZoneID),
-		Target:        "https://mesh.aetheris.local/portable",
+		Target:        "https://mesh.aetra.local/portable",
 		InterfaceHash: descriptor.Interface.InterfaceHash,
 		Priority:      1,
 		Weight:        10,

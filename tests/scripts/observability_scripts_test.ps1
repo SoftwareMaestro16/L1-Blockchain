@@ -30,13 +30,13 @@ if (Test-Path -LiteralPath $OutputDir) {
   Remove-Item -LiteralPath $OutputDir -Recurse -Force
 }
 
-$nodeHome = Join-Path $OutputDir "node0\aetherisd"
+$nodeHome = Join-Path $OutputDir "node0\aetrad"
 $configDir = Join-Path $nodeHome "config"
 $logDir = Join-Path $OutputDir "logs"
 $keyringDir = Join-Path $nodeHome "keyring-test"
 New-Item -ItemType Directory -Force -Path $configDir, $logDir, $keyringDir | Out-Null
 
-'{"genesis_time":"2026-06-04T00:00:00Z","chain_id":"aetheris-test"}' | Set-Content -LiteralPath (Join-Path $configDir "genesis.json")
+'{"genesis_time":"2026-06-04T00:00:00Z","chain_id":"aetra-test"}' | Set-Content -LiteralPath (Join-Path $configDir "genesis.json")
 @'
 [api]
 enable = false

@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/sovereign-l1/l1/app/wasmconfig"
-	"github.com/sovereign-l1/l1/x/aetherisvm/avm"
+	"github.com/sovereign-l1/l1/x/aetravm/avm"
 )
 
 const governance = "4:0000000000000000000000000000000000000000000000000000000000000001"

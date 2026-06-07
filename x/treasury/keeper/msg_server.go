@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/treasury/types"
 )
 
@@ -79,7 +79,7 @@ func (m msgServer) CancelTreasurySpend(ctx context.Context, msg *types.MsgCancel
 	if msg == nil {
 		return nil, types.ErrInvalidSpend.Wrap("empty request")
 	}
-	if err := aetherisaddress.ValidateAuthorityAddress("actor", msg.Actor); err != nil {
+	if err := aetraaddress.ValidateAuthorityAddress("actor", msg.Actor); err != nil {
 		return nil, types.ErrUnauthorized.Wrap(err.Error())
 	}
 	spend, err := m.Keeper.CancelSpend(ctx, msg.SpendId, msg.Actor, msg.Metadata)
@@ -108,7 +108,7 @@ func (m msgServer) UpdateTreasuryParams(ctx context.Context, msg *types.MsgUpdat
 }
 
 func (m msgServer) requireAuthority(authority string) error {
-	if err := aetherisaddress.ValidateAuthorityAddress("authority", authority); err != nil {
+	if err := aetraaddress.ValidateAuthorityAddress("authority", authority); err != nil {
 		return types.ErrUnauthorized.Wrap(err.Error())
 	}
 	if authority != m.Authority() {

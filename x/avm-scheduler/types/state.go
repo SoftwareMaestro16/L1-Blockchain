@@ -570,7 +570,7 @@ func ComputeSerialStateRoot(batch AVMExecutionBatch, failedTaskIDs []string) (st
 func ApplyTaskStateRoot(root string, task AVMExecutionTask) string {
 	task = task.Normalize()
 	h := sha256.New()
-	writePart(h, "aetheris-avm-state-root-v1")
+	writePart(h, "aetra-avm-state-root-v1")
 	writePart(h, root)
 	writePart(h, task.TaskID)
 	for _, write := range task.StateWrites {
@@ -584,7 +584,7 @@ func ComputeDependencyGraphHash(graph AVMDependencyGraph) string {
 	graph = graph.Normalize()
 	graph.GraphHash = ""
 	h := sha256.New()
-	writePart(h, "aetheris-avm-dependency-graph-v1")
+	writePart(h, "aetra-avm-dependency-graph-v1")
 	writePart(h, graph.BatchID)
 	writeBool(h, graph.FallbackSerial)
 	for _, node := range graph.Nodes {
@@ -606,7 +606,7 @@ func ComputeReceiptID(receipt AVMExecutionReceipt) string {
 	receipt = receipt.Normalize()
 	receipt.ReceiptID = ""
 	h := sha256.New()
-	writePart(h, "aetheris-avm-execution-receipt-v1")
+	writePart(h, "aetra-avm-execution-receipt-v1")
 	writePart(h, receipt.BatchID)
 	writePart(h, receipt.TaskID)
 	writeUint64(h, uint64(receipt.Order))

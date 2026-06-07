@@ -1,7 +1,7 @@
 param(
   [string]$OutputDir = ".work\aexs",
   [string]$TaskFile = "TO_AUDIT.md",
-  [string]$PipelineDoc = "docs\security\aetheris-fuzzing-invariant-pipeline.md",
+  [string]$PipelineDoc = "docs\security\aetra-fuzzing-invariant-pipeline.md",
   [switch]$Json,
   [switch]$EnforceSafe
 )
@@ -2530,14 +2530,14 @@ function Get-AexsTxAuthBankExploitOverrides {
     "TXEXP-10" = [ordered]@{
       path            = "replay a state transition that fails after partial writes and attempt rollback bypass or cache context leakage"
       expected_state  = "failed state transition rolls back all writes and replay observes the original pre-failure state"
-      affected        = @("app cache context", "x/bank", "x/fees", "x/aetherisvm/standards/aft", "avm-dex-contract")
+      affected        = @("app cache context", "x/bank", "x/fees", "x/aetravm/standards/aft", "avm-dex-contract")
       severity        = "High"
       fix             = "add replayed failure rollback tests across bank, fees, contract-assets, and DEX handlers"
     }
     "TXEXP-11" = [ordered]@{
       path            = "inject zero address as signer, recipient, admin, authority, or bank transfer endpoint"
       expected_state  = "zero-address signer or recipient path rejects before account, balance, authority, resolver, or module state mutation"
-      affected        = @("x/auth", "x/bank", "x/aetherisvm/standards/aft", "x/fees", "app address validation")
+      affected        = @("x/auth", "x/bank", "x/aetravm/standards/aft", "x/fees", "app address validation")
       severity        = "Critical"
       fix             = "add zero-address adversarial tests for signer, recipient, admin, authority, and fee/bank paths"
     }
@@ -2550,14 +2550,14 @@ function Get-AexsTokenEconomyExploitOverrides {
     "TOKENEXP-01" = [ordered]@{
       path            = "attempt contract-assets admin takeover by spoofing denom admin, changing admin out of order, or replaying stale authority"
       expected_state  = "factory denom admin cannot be changed or used for mint authority unless the current canonical admin authorizes it"
-      affected        = @("x/aetherisvm/standards/aft", "x/bank", "app auth")
+      affected        = @("x/aetravm/standards/aft", "x/bank", "app auth")
       severity        = "Critical"
       fix             = "add admin takeover regression tests for create denom, change admin, mint, stale admin replay, and zero-admin boundaries"
     }
     "TOKENEXP-02" = [ordered]@{
       path            = "attempt unauthorized burn from another account, module account, or native denom through contract-assets burn paths"
       expected_state  = "burn requires exact authority and source ownership; unauthorized burn cannot debit balances or reduce supply"
-      affected        = @("x/aetherisvm/standards/aft", "x/bank")
+      affected        = @("x/aetravm/standards/aft", "x/bank")
       severity        = "Critical"
       fix             = "add burn-from mismatch, wrong admin, module account, native denom, and supply delta tests"
     }
@@ -2599,14 +2599,14 @@ function Get-AexsTokenEconomyExploitOverrides {
     "TOKENEXP-08" = [ordered]@{
       path            = "manipulate supply through edge-case mint amount, metadata, duplicate denom, zero admin, max amount, or export/import paths"
       expected_state  = "mint amount and denom validation reject edge cases and accepted mints change supply by exactly the requested amount"
-      affected        = @("x/aetherisvm/standards/aft", "x/bank", "genesis export/import")
+      affected        = @("x/aetravm/standards/aft", "x/bank", "genesis export/import")
       severity        = "Critical"
       fix             = "add edge-case mint tests for zero/max amounts, duplicate denom, invalid metadata, export/import, and exact supply delta"
     }
     "TOKENEXP-09" = [ordered]@{
       path            = "spoof native denom through contract-assets subdenom, bank metadata, display denom, LP denom, or fee denom aliases"
       expected_state  = "factory assets cannot spoof native denom, native metadata, protocol fee denom, staking denom, or LP denom namespace"
-      affected        = @("x/aetherisvm/standards/aft", "x/bank", "x/fees", "x/staking")
+      affected        = @("x/aetravm/standards/aft", "x/bank", "x/fees", "x/staking")
       severity        = "Critical"
       fix             = "add native denom spoof tests for metadata, base/display denom, contract-assets subdenom, fee denom, staking denom, and LP namespace"
     }
@@ -2647,7 +2647,7 @@ function Get-AexsDexExploitOverrides {
     "DEXEXP-04" = [ordered]@{
       path            = "inflate LP tokens by forged LP denom, duplicate pool id, add-liquidity rounding, or LP mint without matching reserves"
       expected_state  = "LP supply equals pool total shares and cannot be minted without matching reserve deposits"
-      affected        = @("avm-dex-contract", "x/bank", "x/aetherisvm/standards/aft")
+      affected        = @("avm-dex-contract", "x/bank", "x/aetravm/standards/aft")
       severity        = "Critical"
       fix             = "add LP inflation tests for forged LP denom, duplicate pool id, share rounding, and reserve/share reconciliation"
     }
@@ -2854,14 +2854,14 @@ function Get-AexsExecutionZoneAvmExploitOverrides {
     "EXECZONEEXP-03" = [ordered]@{
       path            = "invoke AVM host behavior that depends on local time, randomness, map order, platform integers, or external APIs"
       expected_state  = "AVM execution rejects nondeterministic host behavior and identical replay produces identical writes and receipts"
-      affected        = @("x/aetherisvm/avm", "x/vm", "x/execution")
+      affected        = @("x/aetravm/avm", "x/vm", "x/execution")
       severity        = "Critical"
       fix             = "add AVM determinism tests for forbidden host calls, local time, randomness, map order, platform variation, and replay"
     }
     "EXECZONEEXP-04" = [ordered]@{
       path            = "execute the same contract call sequence on separate nodes and attempt different emitted messages, events, or writes"
       expected_state  = "contract execution trace, gas, writes, events, and emitted messages are deterministic for the same state and input"
-      affected        = @("x/aetherisvm/avm", "x/execution", "x/events")
+      affected        = @("x/aetravm/avm", "x/execution", "x/events")
       severity        = "Critical"
       fix             = "add contract execution trace comparison tests with same genesis, tx sequence, and export/import replay"
     }
@@ -2889,21 +2889,21 @@ function Get-AexsExecutionZoneAvmExploitOverrides {
     "EXECZONEEXP-08" = [ordered]@{
       path            = "execute opcodes or host calls with nondeterministic ordering, local data, random values, or wall-clock dependencies"
       expected_state  = "nondeterministic opcodes and host calls are unavailable or reject before state mutation"
-      affected        = @("x/aetherisvm/avm", "x/vm")
+      affected        = @("x/aetravm/avm", "x/vm")
       severity        = "Critical"
       fix             = "add opcode/host allowlist tests and fuzz malformed host call selectors"
     }
     "EXECZONEEXP-09" = [ordered]@{
       path            = "submit gas-exhausting contracts, deep queries, storage writes, or message fanout to deny service"
       expected_state  = "gas limits and per-block limits stop execution deterministically without unbounded resource use or partial commits"
-      affected        = @("x/vm", "x/aetherisvm/avm", "x/queue")
+      affected        = @("x/vm", "x/aetravm/avm", "x/queue")
       severity        = "High"
       fix             = "add gas exhaustion benchmarks and adversarial tests for deploy, execute, query, storage writes, and emitted messages"
     }
     "EXECZONEEXP-10" = [ordered]@{
       path            = "run infinite loops, recursive calls, or bounce loops to grief validators or keep queues busy forever"
       expected_state  = "gas, instruction, depth, and per-block queue limits stop loops and preserve deterministic failure state"
-      affected        = @("x/aetherisvm/avm", "x/queue", "x/messaging")
+      affected        = @("x/aetravm/avm", "x/queue", "x/messaging")
       severity        = "High"
       fix             = "add infinite-loop, recursive-call, and bounce-loop tests with gas/depth/per-block bounds"
     }
@@ -2917,7 +2917,7 @@ function Get-AexsExecutionZoneAvmExploitOverrides {
     "EXECZONEEXP-12" = [ordered]@{
       path            = "hijack contract upgrade by spoofing admin, governance gate, code owner, migration authority, or zero-admin path"
       expected_state  = "contract upgrade and migration require authorized admin or governance gate and reject zero or spoofed authority"
-      affected        = @("x/vm", "x/aetherisvm/avm", "x/gov", "app/wasmconfig")
+      affected        = @("x/vm", "x/aetravm/avm", "x/gov", "app/wasmconfig")
       severity        = "Critical"
       fix             = "add upgrade authority tests for admin, governance gate, code owner, zero admin, and migration-disabled params"
     }
@@ -2931,14 +2931,14 @@ function Get-AexsExecutionZoneAvmExploitOverrides {
     "EXECZONEEXP-14" = [ordered]@{
       path            = "construct deeply nested calls, stack frames, or parser inputs to overflow AVM stack or host recursion"
       expected_state  = "stack and recursion limits reject before panic, node crash, or partial state mutation"
-      affected        = @("x/aetherisvm/avm", "x/vm")
+      affected        = @("x/aetravm/avm", "x/vm")
       severity        = "High"
       fix             = "add stack-depth fuzz tests, parser recursion limits, and panic-safety assertions"
     }
     "EXECZONEEXP-15" = [ordered]@{
       path            = "attempt sandbox escape through forbidden host function, direct state mutation, filesystem/network access, or cross-contract state write"
       expected_state  = "AVM sandbox denies external APIs, direct foreign state mutation, filesystem/network access, and unauthorized host functions"
-      affected        = @("x/aetherisvm/avm", "x/vm", "x/storage")
+      affected        = @("x/aetravm/avm", "x/vm", "x/storage")
       severity        = "Critical"
       fix             = "add sandbox escape tests for host function allowlist, foreign state mutation, external API denial, and filesystem/network denial"
     }
@@ -3048,7 +3048,7 @@ function Get-AexsMeshCrossZoneExploitOverrides {
     "MESHEXP-04" = [ordered]@{
       path            = "duplicate asset commitments across source and destination zones during transfer, bounce, or refund processing"
       expected_state  = "asset commitments are consumed exactly once and destination mint/release cannot exceed finalized source lock/burn"
-      affected        = @("x/mesh", "x/bank", "x/aetherisvm/standards/aft", "x/queue")
+      affected        = @("x/mesh", "x/bank", "x/aetravm/standards/aft", "x/queue")
       severity        = "Critical"
       fix             = "add cross-zone asset conservation tests for lock/burn, release/mint, bounce, refund, and replay markers"
     }
@@ -3248,7 +3248,7 @@ function Get-AexsGenesisUpgradeStateExploitOverrides {
     "STATEEXP-01" = [ordered]@{
       path            = "inject malformed genesis accounts, balances, params, module state, zone roots, or custom module records"
       expected_state  = "genesis validation rejects malformed state before node start and never panics on corrupt but parseable input"
-      affected        = @("app", "x/bank", "x/fees", "x/aetherisvm/standards/aft", "avm-dex-contract")
+      affected        = @("app", "x/bank", "x/fees", "x/aetravm/standards/aft", "avm-dex-contract")
       severity        = "Critical"
       fix             = "add malformed genesis fixtures for accounts, balances, params, custom modules, roots, and panic-free validation"
     }
@@ -3283,14 +3283,14 @@ function Get-AexsGenesisUpgradeStateExploitOverrides {
     "STATEEXP-06" = [ordered]@{
       path            = "inject hidden privileged account, module account, authority, admin, or mint permission into genesis/export state"
       expected_state  = "privileged accounts and module permissions are explicitly validated and unauthorized hidden authorities are rejected"
-      affected        = @("app", "x/auth", "x/bank", "x/aetherisvm/standards/aft", "x/fees")
+      affected        = @("app", "x/auth", "x/bank", "x/aetravm/standards/aft", "x/fees")
       severity        = "Critical"
       fix             = "add privileged account injection tests for module accounts, authority fields, admin state, mint permissions, and export/import"
     }
     "STATEEXP-07" = [ordered]@{
       path            = "bypass InitGenesis validation with duplicate ids, duplicate denoms, invalid reserves, invalid params, or nil-like records"
       expected_state  = "InitGenesis validates duplicates, params, reserves, denoms, and nil-like records before state writes"
-      affected        = @("app", "avm-dex-contract", "x/aetherisvm/standards/aft", "x/fees", "x/identity")
+      affected        = @("app", "avm-dex-contract", "x/aetravm/standards/aft", "x/fees", "x/identity")
       severity        = "Critical"
       fix             = "add InitGenesis bypass tests for duplicates, invalid params, reserves, denoms, nil records, and panic-free errors"
     }
@@ -3428,7 +3428,7 @@ function Get-AexsCombinedFullStackExploitOverrides {
     "FULLSTACKEXP-05" = [ordered]@{
       path            = "coordinate cross-zone value extraction through mesh replay, stale receipt, proof forgery, and queue refund timing"
       expected_state  = "cross-zone value remains conserved and replay, receipt, proof, bounce, and refund paths cannot extract extra funds"
-      affected        = @("x/mesh", "x/queue", "x/messaging", "x/bank", "x/aetherisvm/standards/aft")
+      affected        = @("x/mesh", "x/queue", "x/messaging", "x/bank", "x/aetravm/standards/aft")
       severity        = "Critical"
       fix             = "add cross-zone value extraction tests for replay markers, receipts, proofs, bounce/refund, and asset conservation"
     }
@@ -3671,15 +3671,15 @@ $moduleCatalog = @(
   [ordered]@{ Module = "x/distribution"; Label = '`x/distribution`'; Prefix = "DIST"; Value = $true; EvidenceRoots = @("app", "docs\security\pos-staking-correctness.md", "tests\integration"); EvidenceTerms = @("distribution", "reward", "commission", "community pool") },
   [ordered]@{ Module = "app"; Label = '`app` / BaseApp'; Prefix = "APP"; Value = $true; EvidenceRoots = @("app", "tests\integration", "docs\genesis-migrations.md", "docs\state-export-import.md"); EvidenceTerms = @("BaseApp", "app hash", "genesis", "export", "determinism") },
   [ordered]@{ Module = "x/fees"; Label = '`x/fees`'; Prefix = "FEES"; Value = $true; EvidenceRoots = @("x\fees", "tests\adversarial", "tests\integration", "docs\fees-ante-policy.md"); EvidenceTerms = @("fees", "fee", "naet", "ante") },
-  [ordered]@{ Module = "x/aetherisvm/standards/aft"; Label = '`x/aetherisvm/standards/aft`'; Prefix = "TF"; Value = $true; EvidenceRoots = @("x\aetherisvm\standards\aft", "tests\adversarial", "tests\e2e", "docs\security\module-bank-movement-audit.md"); EvidenceTerms = @("contract-assets", "mint", "burn", "admin") },
+  [ordered]@{ Module = "x/aetravm/standards/aft"; Label = '`x/aetravm/standards/aft`'; Prefix = "TF"; Value = $true; EvidenceRoots = @("x\aetravm\standards\aft", "tests\adversarial", "tests\e2e", "docs\security\module-bank-movement-audit.md"); EvidenceTerms = @("contract-assets", "mint", "burn", "admin") },
   [ordered]@{ Module = "avm-dex-contract"; Label = '`avm-dex-contract`'; Prefix = "DEX"; Value = $true; EvidenceRoots = @("avm-dex-contract", "tests\adversarial", "tests\e2e", "docs\architecture\dex-direction.md"); EvidenceTerms = @("dex", "pool", "swap", "liquidity", "reserve") },
-  [ordered]@{ Module = "x/identity"; Label = '`x/identity`'; Prefix = "ID"; Value = $true; EvidenceRoots = @("x\identity", "tests\adversarial", "docs\architecture\aetheris-modular-execution-os.md"); EvidenceTerms = @("identity", ".aet", "domain", "resolver") },
+  [ordered]@{ Module = "x/identity"; Label = '`x/identity`'; Prefix = "ID"; Value = $true; EvidenceRoots = @("x\identity", "tests\adversarial", "docs\architecture\aetra-modular-execution-os.md"); EvidenceTerms = @("identity", ".aet", "domain", "resolver") },
   [ordered]@{ Module = "x/reputation"; Label = '`x/reputation`'; Prefix = "REP"; Value = $true; EvidenceRoots = @("x\reputation", "docs\module-boundaries.md", "docs\test-production-gates.md"); EvidenceTerms = @("reputation", "score", "rate limit", "priority") },
   [ordered]@{ Module = "x/execution"; Label = '`x/execution`'; Prefix = "EXEC"; Value = $true; EvidenceRoots = @("x\execution", "docs\architecture\execution-os.md", "docs\module-boundaries.md"); EvidenceTerms = @("execution", "dispatch", "route", "receipt") },
-  [ordered]@{ Module = "x/vm"; Label = '`x/vm` / AVM'; Prefix = "VM"; Value = $true; EvidenceRoots = @("x\vm", "x\aetherisvm", "docs\architecture\avm.md", "docs\architecture\vm-direction.md"); EvidenceTerms = @("vm", "AVM", "bytecode", "gas") },
-  [ordered]@{ Module = "x/aetherisvm"; Label = '`x/vm` / AVM'; Prefix = "VM"; Value = $true; EvidenceRoots = @("x\aetherisvm", "docs\architecture\avm.md", "docs\architecture\vm-direction.md"); EvidenceTerms = @("AVM", "async", "contract", "gas") },
+  [ordered]@{ Module = "x/vm"; Label = '`x/vm` / AVM'; Prefix = "VM"; Value = $true; EvidenceRoots = @("x\vm", "x\aetravm", "docs\architecture\avm.md", "docs\architecture\vm-direction.md"); EvidenceTerms = @("vm", "AVM", "bytecode", "gas") },
+  [ordered]@{ Module = "x/aetravm"; Label = '`x/vm` / AVM'; Prefix = "VM"; Value = $true; EvidenceRoots = @("x\aetravm", "docs\architecture\avm.md", "docs\architecture\vm-direction.md"); EvidenceTerms = @("AVM", "async", "contract", "gas") },
   [ordered]@{ Module = "x/messaging"; Label = '`x/messaging`'; Prefix = "MSG"; Value = $true; EvidenceRoots = @("x\messaging", "x\mesh", "tests\adversarial", "docs\architecture\execution-os.md"); EvidenceTerms = @("messaging", "message", "receipt", "proof") },
-  [ordered]@{ Module = "x/queue"; Label = '`x/queue`'; Prefix = "QUEUE"; Value = $true; EvidenceRoots = @("x\queue", "x\aetherisvm\async", "docs\architecture\async-smart-contract-execution.md"); EvidenceTerms = @("queue", "bounce", "refund", "delayed") },
+  [ordered]@{ Module = "x/queue"; Label = '`x/queue`'; Prefix = "QUEUE"; Value = $true; EvidenceRoots = @("x\queue", "x\aetravm\async", "docs\architecture\async-smart-contract-execution.md"); EvidenceTerms = @("queue", "bounce", "refund", "delayed") },
   [ordered]@{ Module = "x/events"; Label = '`x/events`'; Prefix = "EVENTS"; Value = $false; EvidenceRoots = @("x\events", "docs\event-contract.md", "tests\scripts\event_contract_doc_test.ps1"); EvidenceTerms = @("events", "event", "receipt", "attributes") },
   [ordered]@{ Module = "x/actors"; Label = '`x/actors`'; Prefix = "ACTOR"; Value = $true; EvidenceRoots = @("x\actors", "docs\module-boundaries.md"); EvidenceTerms = @("actor", "mailbox", "logical time") },
   [ordered]@{ Module = "x/scheduler"; Label = '`x/scheduler`'; Prefix = "SCHED"; Value = $true; EvidenceRoots = @("x\scheduler", "x\schedulerv2", "docs\module-boundaries.md"); EvidenceTerms = @("scheduler", "schedule", "task", "priority") },
@@ -3690,7 +3690,7 @@ $moduleCatalog = @(
 )
 
 $requiredSourceTerms = @(
-  "docs/security/aetheris-fuzzing-invariant-pipeline.md",
+  "docs/security/aetra-fuzzing-invariant-pipeline.md",
   ".work/aexs/",
   "100%",
   "95%",
@@ -4221,7 +4221,7 @@ foreach ($record in $txAuthBankExploitRecords) {
   $record["invalid_reasons"] = $invalidReasons
 }
 $invalidTxAuthBankExploitRecords = @($txAuthBankExploitRecords | Where-Object { -not $_["valid"] })
-$tokenEconomyExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 4 -SectionTitle "Token And Economy Exploits" -IdPrefix "TOKENEXP" -SeedNamespace "token-economy-exploit" -Overrides (Get-AexsTokenEconomyExploitOverrides) -DefaultAffectedModules @("x/aetherisvm/standards/aft", "x/fees", "x/bank", "x/gov", "x/staking", "x/distribution") -DefaultSeverity "High")
+$tokenEconomyExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 4 -SectionTitle "Token And Economy Exploits" -IdPrefix "TOKENEXP" -SeedNamespace "token-economy-exploit" -Overrides (Get-AexsTokenEconomyExploitOverrides) -DefaultAffectedModules @("x/aetravm/standards/aft", "x/fees", "x/bank", "x/gov", "x/staking", "x/distribution") -DefaultSeverity "High")
 foreach ($record in $tokenEconomyExploitRecords) {
   $invalidReasons = @(Test-AexsExploitRecord -Record $record)
   $record["valid"] = $invalidReasons.Count -eq 0
@@ -4249,7 +4249,7 @@ foreach ($record in $routingEngineExploitRecords) {
   $record["invalid_reasons"] = $invalidReasons
 }
 $invalidRoutingEngineExploitRecords = @($routingEngineExploitRecords | Where-Object { -not $_["valid"] })
-$executionZoneAvmExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 8 -SectionTitle "Execution Zone And AVM Exploits" -IdPrefix "EXECZONEEXP" -SeedNamespace "execution-zone-avm-exploit" -Overrides (Get-AexsExecutionZoneAvmExploitOverrides) -DefaultAffectedModules @("x/execution", "x/aetherisvm", "x/vm", "x/queue", "x/storage") -DefaultSeverity "High")
+$executionZoneAvmExploitRecords = @(Get-AexsExploitRecordsForSection -Text $taskText -CampaignId $campaignId -SectionNumber 8 -SectionTitle "Execution Zone And AVM Exploits" -IdPrefix "EXECZONEEXP" -SeedNamespace "execution-zone-avm-exploit" -Overrides (Get-AexsExecutionZoneAvmExploitOverrides) -DefaultAffectedModules @("x/execution", "x/aetravm", "x/vm", "x/queue", "x/storage") -DefaultSeverity "High")
 foreach ($record in $executionZoneAvmExploitRecords) {
   $invalidReasons = @(Test-AexsExploitRecord -Record $record)
   $record["valid"] = $invalidReasons.Count -eq 0
@@ -4564,7 +4564,7 @@ $transactionMutators = @(
     id                = "malformed_addresses"
     name              = "inject malformed addresses"
     mutation_type     = "address_corruption"
-    target_modules    = @("x/auth", "x/bank", "x/aetherisvm/standards/aft", "avm-dex-contract", "x/identity")
+    target_modules    = @("x/auth", "x/bank", "x/aetravm/standards/aft", "avm-dex-contract", "x/identity")
     flow_covered      = "address parsing, signer checks, recipient/admin/resolver validation"
     state_transitions = "malformed address rejection before state mutation"
     attack_surfaces   = "bad bech32, wrong prefix, truncated bytes, overlong bytes"
@@ -4578,7 +4578,7 @@ $transactionMutators = @(
     id                = "zero_address_fields"
     name              = "inject zero address in signer, recipient, admin, authority, resolver, and DEX actor fields"
     mutation_type     = "zero_address"
-    target_modules    = @("x/auth", "x/bank", "x/aetherisvm/standards/aft", "avm-dex-contract", "x/identity", "x/vm")
+    target_modules    = @("x/auth", "x/bank", "x/aetravm/standards/aft", "avm-dex-contract", "x/identity", "x/vm")
     flow_covered      = "zero address validation across value-bearing actor fields"
     state_transitions = "zero address input fails before ownership or balance mutation"
     attack_surfaces   = "zero signer, recipient, admin, authority, resolver, DEX actor"
@@ -4648,7 +4648,7 @@ $transactionMutators = @(
     id                = "queue_depth_abuse"
     name              = "inject queue depth abuse"
     mutation_type     = "queue_dos"
-    target_modules    = @("x/queue", "x/messaging", "x/aetherisvm")
+    target_modules    = @("x/queue", "x/messaging", "x/aetravm")
     flow_covered      = "enqueue, delayed execution, depth limit, per-block processing limit"
     state_transitions = "queue depth and sequence counters remain bounded"
     attack_surfaces   = "queue flood, message loop, starvation, duplicate sequence"
@@ -4662,7 +4662,7 @@ $transactionMutators = @(
     id                = "oversized_avm_payloads"
     name              = "inject oversized AVM payloads"
     mutation_type     = "vm_size_boundary"
-    target_modules    = @("x/vm", "x/aetherisvm")
+    target_modules    = @("x/vm", "x/aetravm")
     flow_covered      = "AVM code size, payload size, query response size, storage size"
     state_transitions = "oversized payload rejected without contract state commit"
     attack_surfaces   = "oversized code, oversized message, oversized query response, storage bloat"
@@ -4676,7 +4676,7 @@ $transactionMutators = @(
     id                = "invalid_avm_entrypoints"
     name              = "inject invalid AVM entrypoint inputs"
     mutation_type     = "vm_entrypoint_corruption"
-    target_modules    = @("x/vm", "x/aetherisvm")
+    target_modules    = @("x/vm", "x/aetravm")
     flow_covered      = "deploy, execute, query, migrate, bounced-call entrypoint validation"
     state_transitions = "invalid entrypoint rejects before contract state transition"
     attack_surfaces   = "missing entrypoint, malformed args, invalid migrate, bounced-call spoof"
@@ -4690,7 +4690,7 @@ $transactionMutators = @(
     id                = "malformed_genesis_fragments"
     name              = "inject malformed genesis fragments for simulator startup tests"
     mutation_type     = "genesis_corruption"
-    target_modules    = @("app", "x/auth", "x/bank", "x/staking", "x/fees", "x/aetherisvm/standards/aft", "avm-dex-contract")
+    target_modules    = @("app", "x/auth", "x/bank", "x/staking", "x/fees", "x/aetravm/standards/aft", "avm-dex-contract")
     flow_covered      = "genesis validation, InitGenesis, export/import startup path"
     state_transitions = "invalid genesis rejected before app startup state commit"
     attack_surfaces   = "duplicate accounts, duplicate denoms, invalid params, hidden privileged account"

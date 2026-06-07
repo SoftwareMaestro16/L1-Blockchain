@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 func NewAddressCmd() *cobra.Command {
@@ -24,12 +24,12 @@ func NewAddressConvertCmd() *cobra.Command {
 		Short: "Convert an address to Aetra raw and userfriendly forms",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			bz, err := aetherisaddress.Parse(args[0])
+			bz, err := aetraaddress.Parse(args[0])
 			if err != nil {
 				return err
 			}
-			raw := aetherisaddress.Format(bz)
-			userFriendly, err := aetherisaddress.FormatUserFriendly(bz)
+			raw := aetraaddress.Format(bz)
+			userFriendly, err := aetraaddress.FormatUserFriendly(bz)
 			if err != nil {
 				return err
 			}

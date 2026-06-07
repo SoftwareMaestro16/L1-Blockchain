@@ -62,15 +62,15 @@ foreach ($term in @(
     "go vet -p=1 ./...",
     "buf lint",
     "1000000naet",
-    "aetherisd"
+    "aetrad"
   )) {
   Assert-Contains -Text $runbookText -Pattern ([regex]::Escape($term)) -Message "public testnet runbook missing: $term"
 }
 
 foreach ($term in @(
     "Validator Onboarding",
-    "scripts\build-aetherisd.ps1",
-    ".aetheris",
+    "scripts\build-aetrad.ps1",
+    ".aetra",
     "100000000naet",
     "1000000naet",
     "catching_up",
@@ -86,7 +86,7 @@ foreach ($term in @(
     "Faucet Incident",
     "Snapshot Or State-Sync Incident",
     "Communication",
-    "aetherisd"
+    "aetrad"
   )) {
   Assert-Contains -Text $incidentText -Pattern ([regex]::Escape($term)) -Message "incident runbook missing: $term"
 }
@@ -94,9 +94,9 @@ foreach ($term in @(
 foreach ($term in @(
     'ValidateSet("3", "5", "10", "All")',
     '@(3, 5, 10)',
-    "aetheris-testnet-preflight-1",
-    "build\aetherisd.exe",
-    "scripts\build-aetherisd.ps1",
+    "aetra-testnet-preflight-1",
+    "build\aetrad.exe",
+    "scripts\build-aetrad.ps1",
     "ValidatorCount `$validators",
     "cosmwasm_smoke.ps1"
   )) {
@@ -107,23 +107,23 @@ foreach ($term in @(
     "Assert-LocalnetWorkspacePath",
     "Assert-LocalnetPortsAvailable",
     "startup-timing.json",
-    "aetherisd"
+    "aetrad"
   )) {
   Assert-Contains -Text $startText -Pattern ([regex]::Escape($term)) -Message "localnet start missing hardening/timing term: $term"
 }
 
 foreach ($term in @(
-    'NodeDaemonHome = "aetherisd"',
+    'NodeDaemonHome = "aetrad"',
     'MinimumGasPrices = "0naet"',
-    'node$i\aetherisd'
+    'node$i\aetrad'
   )) {
   Assert-Contains -Text $portsText -Pattern ([regex]::Escape($term)) -Message "localnet ports helper missing Aetra term: $term"
 }
 
-Assert-Contains -Text $pathsText -Pattern ([regex]::Escape('node$Index\aetherisd')) -Message "localnet paths helper must use aetherisd homes"
+Assert-Contains -Text $pathsText -Pattern ([regex]::Escape('node$Index\aetrad')) -Message "localnet paths helper must use aetrad homes"
 
 foreach ($workflowText in @($adversarialText, $prototypeText)) {
-  Assert-Contains -Text $workflowText -Pattern "aetherisd|Aetra|AETHERIS_BINARY" -Message "workflow missing Aetra runtime naming"
+  Assert-Contains -Text $workflowText -Pattern "aetrad|Aetra|AETRA_BINARY" -Message "workflow missing Aetra runtime naming"
 }
 
 $oldNamingPattern = "Orbitalis|orbitalisd|ORBITALIS|norb|ORB\b|orbitalis-local-1|\.orbitalis"

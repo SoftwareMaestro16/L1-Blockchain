@@ -337,7 +337,7 @@ func IsAVMWASMHostFunctionKind(kind AVMWASMHostFunctionKind) bool {
 
 func ComputeAVMWASMGasConversionHash(table AVMWASMGasConversionTable) string {
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-wasm-gas-conversion-v1")
+	writeEnginePart(h, "aetra-avm-wasm-gas-conversion-v1")
 	writeEngineUint64(h, table.WASMGasUnit)
 	writeEngineUint64(h, table.AVMGasPerWASMGas)
 	writeEngineUint64(h, table.StorageReadGas)
@@ -349,7 +349,7 @@ func ComputeAVMWASMGasConversionHash(table AVMWASMGasConversionTable) string {
 func ComputeAVMWASMStoreV2KVAdapterHash(adapter AVMWASMStoreV2KVAdapter) string {
 	adapter = canonicalAVMWASMStoreV2KVAdapter(adapter)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-wasm-store-v2-adapter-v1")
+	writeEnginePart(h, "aetra-avm-wasm-store-v2-adapter-v1")
 	writeEnginePart(h, string(adapter.ZoneID))
 	writeEnginePart(h, adapter.StoreKey)
 	writeEnginePart(h, adapter.KeyPrefix)
@@ -361,7 +361,7 @@ func ComputeAVMWASMStoreV2KVAdapterHash(adapter AVMWASMStoreV2KVAdapter) string 
 func ComputeAVMWASMSandboxPolicyHash(policy AVMWASMSandboxPolicy) string {
 	policy = canonicalAVMWASMSandboxPolicy(policy)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-wasm-sandbox-policy-v1")
+	writeEnginePart(h, "aetra-avm-wasm-sandbox-policy-v1")
 	writeEngineBool(h, policy.Enabled)
 	writeEngineBool(h, policy.Optional)
 	writeEngineUint64(h, policy.RuntimePolicy.MaxContractSizeBytes)
@@ -390,7 +390,7 @@ func ComputeAVMWASMSandboxPolicyHash(policy AVMWASMSandboxPolicy) string {
 func ComputeAVMWASMContractRouteCallHash(call AVMWASMContractRouteCall) string {
 	call = canonicalAVMWASMContractRouteCall(call)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-wasm-contract-route-call-v1")
+	writeEnginePart(h, "aetra-avm-wasm-contract-route-call-v1")
 	writeEnginePart(h, call.SandboxPolicy.SandboxPolicyHash)
 	writeEnginePart(h, call.Call.Runtime)
 	writeEnginePart(h, call.Call.Action)

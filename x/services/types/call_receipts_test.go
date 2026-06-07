@@ -5,11 +5,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestServiceReceiptCanonicalViewMatchesCallReceiptFields(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 30}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 30}
 	descriptor := testInterfaceSystemDescriptor()
 	call := testReceiptUnifiedCall(t, ctx, descriptor, 1, "receipt/payload")
 	receipt, err := coretypes.NewServiceCallReceipt(call.ToServiceCallEnvelope(), coretypes.ServiceExecutionOutcome{
@@ -58,7 +58,7 @@ func TestServiceReceiptCanonicalViewMatchesCallReceiptFields(t *testing.T) {
 }
 
 func TestServiceReplayIndexRejectsSameCallerNonceForService(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 30}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 30}
 	descriptor := testInterfaceSystemDescriptor()
 	index, err := NewServiceCallReplayIndex(25)
 	require.NoError(t, err)
@@ -81,7 +81,7 @@ func TestServiceReplayIndexRejectsSameCallerNonceForService(t *testing.T) {
 }
 
 func TestServiceRetryReferencesOriginalAndTombstoneProofHorizon(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 40}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 40}
 	descriptor := testInterfaceSystemDescriptor()
 	index, err := NewServiceCallReplayIndex(10)
 	require.NoError(t, err)

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestDefaultXServiceReceiptsModuleBreakdownCoversSection156(t *testing.T) {
@@ -121,7 +121,7 @@ func TestXServiceReceiptsQueriesRootsAndProof(t *testing.T) {
 
 func testServiceReceiptForReceipts(t *testing.T, nonce uint64) (ServiceReceipt, UnifiedServiceCall) {
 	t.Helper()
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 70}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 70}
 	descriptor := testInterfaceSystemDescriptor()
 	call := testInteractionCall(t, ctx, descriptor, "submit", nonce, "servicereceipts/call")
 	call.Kind = coretypes.ServiceCallKindOnChain

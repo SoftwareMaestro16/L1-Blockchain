@@ -205,7 +205,7 @@ func (s ZoneExecutionSummary) Validate() error {
 func ComputeZoneExecutionSummaryHash(summary ZoneExecutionSummary) string {
 	summary = canonicalZoneExecutionSummary(summary)
 	h := sha256.New()
-	writeRuntimePart(h, "aetheris-zone-execution-summary-v1")
+	writeRuntimePart(h, "aetra-zone-execution-summary-v1")
 	writeRuntimePart(h, string(summary.ZoneID))
 	writeRuntimeUint64(h, summary.Height)
 	writeRuntimeUint64(h, summary.TxCount)

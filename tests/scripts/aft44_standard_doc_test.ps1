@@ -29,14 +29,14 @@ foreach ($term in @(
     'Token balances are never accepted as protocol fee payment',
     'Replayed wallet query ids are rejected',
     'Bounce/finalize handling',
-    'x/aetherisvm/standards/aft',
-    'go test ./x/aetherisvm/standards/aft'
+    'x/aetravm/standards/aft',
+    'go test ./x/aetravm/standards/aft'
   )) {
   Assert-Contains -Text $standardText -Pattern ([regex]::Escape($term)) -Message "AFT-44 standard doc missing: $term"
 }
 
 foreach ($term in @(
-    'x/aetherisvm/standards',
+    'x/aetravm/standards',
     'No chain state',
     'AFT-44 fungible token master/wallet contract model',
     'Native `AET`/`naet` is not a user token standard instance',

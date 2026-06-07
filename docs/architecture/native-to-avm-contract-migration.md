@@ -46,8 +46,8 @@ the module is referenced from app code or app tests. `Proto` checks
 |---|---|---:|---:|---:|---:|---:|---|---|---|---|
 | x/actor-registry | Actor/system registry | yes | yes | yes | no | 2 | KEEP_NATIVE | Keep native and integrate with `x/avm` deploy/execute routing | none | genesis, actor authority, AVM deploy integration |
 | x/actors | Actor types/runtime helpers | yes | no | no | no | 1 | CONSOLIDATE_AVM_RUNTIME | Move under `x/avm` runtime stack or internal runtime package later | stable `x/avm` API | actor lifecycle and compatibility tests |
-| x/aethercore | Core execution/system package | yes | yes | no | no | 32 | KEEP_NATIVE | Keep native protocol core | none | existing app and keeper tests |
-| x/aetherisvm | AVM implementation and standards | no | no | no | no | 15 | CONSOLIDATE_AVM_RUNTIME | Keep native, consolidate with `x/avm` | `x/avm` boundary finalized | AVM runtime, async, AFT/ANFT/AW tests |
+| x/aetracore | Core execution/system package | yes | yes | no | no | 32 | KEEP_NATIVE | Keep native protocol core | none | existing app and keeper tests |
+| x/aetravm | AVM implementation and standards | no | no | no | no | 15 | CONSOLIDATE_AVM_RUNTIME | Keep native, consolidate with `x/avm` | `x/avm` boundary finalized | AVM runtime, async, AFT/ANFT/AW tests |
 | x/avm-scheduler | AVM scheduler | yes | yes | yes | no | 2 | KEEP_NATIVE | Keep native runtime infrastructure | none | scheduler genesis/export/import, gas limits |
 | x/bridge-hub | Cross-chain bridge coordination | yes | yes | yes | no | 2 | KEEP_NATIVE | Keep native if it owns trust roots and bridge safety | none if only trust registry | bridge trust and replay tests |
 | x/burn | Native burn/accounting | yes | yes | yes | no | 1 | KEEP_NATIVE | Keep native if tied to supply accounting | none | supply accounting and authority tests |
@@ -122,7 +122,7 @@ Completed by this document:
 ### Phase 2: `x/avm` Runtime Boundary
 
 Create a native `x/avm` boundary that owns the runtime surface while reusing the
-existing `x/aetherisvm`, `x/vm`, `x/actors`, `x/messages`, `x/messaging`,
+existing `x/aetravm`, `x/vm`, `x/actors`, `x/messages`, `x/messaging`,
 `x/execution`, `x/queue`, and `x/storage` packages as implementation layers.
 
 Required `x/avm` protocol surface:
@@ -213,7 +213,7 @@ replacement is being built.
 Phase 1 validation:
 
 - `go test -count=1 ./app`
-- `go test -count=1 ./x/aetherisvm/...`
+- `go test -count=1 ./x/aetravm/...`
 - `go test -count=1 ./x/vm/...`
 - `go test -count=1 ./x/tokenfactory/... ./x/dex/...`
 - `go test -count=1 ./x/config/... ./x/constitution/... ./x/actor-registry/... ./x/avm-scheduler/...`

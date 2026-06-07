@@ -90,7 +90,7 @@ func IsAVMAcceptanceCriterion(criterion AVMAcceptanceCriterion) bool {
 func ComputeAVMAcceptanceCriteriaSpecHash(spec AVMAcceptanceCriteriaSpec) string {
 	spec = canonicalAVMAcceptanceCriteriaSpec(spec)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-acceptance-criteria-spec-v1")
+	writeEnginePart(h, "aetra-avm-acceptance-criteria-spec-v1")
 	writeEngineUint64(h, uint64(len(spec.Criteria)))
 	for _, criterion := range spec.Criteria {
 		writeEnginePart(h, string(criterion))

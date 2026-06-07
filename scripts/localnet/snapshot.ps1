@@ -11,7 +11,7 @@ Set-StrictMode -Version 2.0
 . (Join-Path $PSScriptRoot "common.ps1")
 
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 $manifest = Read-LocalnetManifest -OutputDir $OutputDir
 if ($null -eq $manifest) {
   throw "localnet manifest not found in $OutputDir"

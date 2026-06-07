@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"sort"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 const (
@@ -53,7 +53,7 @@ type ProofRootMetadata struct {
 type ProofRegistrySnapshot struct {
 	Height            uint64
 	AppHash           string
-	AetherCoreRoot    string
+	AetraCoreRoot     string
 	GlobalZoneRoot    string
 	GlobalMessageRoot string
 	ReceiptRoot       string
@@ -378,7 +378,7 @@ func (s ProofRegistrySnapshot) Validate() error {
 		value string
 	}{
 		{"proofregistry app hash", s.AppHash},
-		{"proofregistry aether core root", s.AetherCoreRoot},
+		{"proofregistry aether core root", s.AetraCoreRoot},
 		{"proofregistry global zone root", s.GlobalZoneRoot},
 		{"proofregistry global message root", s.GlobalMessageRoot},
 		{"proofregistry receipt root", s.ReceiptRoot},
@@ -602,11 +602,11 @@ func missingFailureForQueryKind(kind ProofRegistryQueryKind) coretypes.Universal
 }
 
 func ComputeProofRootMetadataHash(metadata ProofRootMetadata) string {
-	return hashParts("aetheris-next-proofregistry-metadata-v1", string(metadata.RootType), metadata.Source, metadata.Description, fmt.Sprint(metadata.ExpiresAtHeight))
+	return hashParts("aetra-next-proofregistry-metadata-v1", string(metadata.RootType), metadata.Source, metadata.Description, fmt.Sprint(metadata.ExpiresAtHeight))
 }
 
 func ComputeProofRegistrySnapshotHash(snapshot ProofRegistrySnapshot) string {
-	parts := []string{"aetheris-next-proofregistry-snapshot-v1", fmt.Sprint(snapshot.Height), snapshot.AppHash, snapshot.AetherCoreRoot, snapshot.GlobalZoneRoot, snapshot.GlobalMessageRoot, snapshot.ReceiptRoot}
+	parts := []string{"aetra-next-proofregistry-snapshot-v1", fmt.Sprint(snapshot.Height), snapshot.AppHash, snapshot.AetraCoreRoot, snapshot.GlobalZoneRoot, snapshot.GlobalMessageRoot, snapshot.ReceiptRoot}
 	for _, root := range snapshot.Roots {
 		parts = append(parts, string(root.RootType), string(root.ZoneID), root.RootHash, root.Source)
 	}
@@ -618,7 +618,7 @@ func ComputeProofRegistrySnapshotHash(snapshot ProofRegistrySnapshot) string {
 
 func ComputeProofRegistryEntryHash(entry ProofRegistryEntry) string {
 	return hashParts(
-		"aetheris-next-proofregistry-entry-v1",
+		"aetra-next-proofregistry-entry-v1",
 		string(entry.Kind),
 		fmt.Sprint(entry.Height),
 		string(entry.ProofType),
@@ -633,7 +633,7 @@ func ComputeProofRegistryEntryHash(entry ProofRegistryEntry) string {
 
 func ComputeProofRegistryResponseHash(resp ProofRegistryResponse) string {
 	return hashParts(
-		"aetheris-next-proofregistry-response-v1",
+		"aetra-next-proofregistry-response-v1",
 		fmt.Sprint(resp.Found),
 		resp.Snapshot.SnapshotHash,
 		resp.Root.RootHash,
@@ -644,7 +644,7 @@ func ComputeProofRegistryResponseHash(resp ProofRegistryResponse) string {
 
 func ComputeProofTestVectorHash(vector ProofTestVector) string {
 	return hashParts(
-		"aetheris-next-proofregistry-vector-v1",
+		"aetra-next-proofregistry-vector-v1",
 		vector.VectorID,
 		vector.Name,
 		fmt.Sprint(vector.Positive),

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestServiceDiscoveryCacheRejectsStaleAndOutlivingBounds(t *testing.T) {
@@ -129,7 +129,7 @@ func TestSignedServiceAdvertisementRejectsForgedDiscoveryRecords(t *testing.T) {
 	require.Equal(t, ad.SignatureHash, source.SignatureHash)
 
 	forged := ad
-	forged.Endpoint = "https://forged.aetheris.local/v1"
+	forged.Endpoint = "https://forged.aetra.local/v1"
 	require.ErrorContains(t, forged.Validate(), "endpoint mismatch")
 
 	tampered := ad

@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sovereign-l1/l1/x/aetherisvm/async"
+	"github.com/sovereign-l1/l1/x/aetravm/async"
 )
 
 func TestMessageEnqueueDeliveryAndDeterministicOrder(t *testing.T) {

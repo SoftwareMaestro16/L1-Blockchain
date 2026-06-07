@@ -1,7 +1,7 @@
 param(
   [string]$OutputDir = "",
   [string]$Binary = "",
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [ValidateSet("bank", "contract-assets", "dex", "mixed")]
   [string]$Scenario = "mixed",
   [int]$Count = 12,
@@ -33,7 +33,7 @@ if ($Fees -notmatch '^[0-9]+naet$') {
 }
 
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "localnet output directory"
 
 if (!(Test-Path -LiteralPath $Binary)) {
@@ -46,8 +46,8 @@ if ($status.result.node_info.network -ne $ChainId) {
   throw "connected chain-id mismatch: expected $ChainId, got $($status.result.node_info.network)"
 }
 
-$node0Home = Join-Path $OutputDir "node0\aetherisd"
-$node1Home = Join-Path $OutputDir "node1\aetherisd"
+$node0Home = Join-Path $OutputDir "node0\aetrad"
+$node1Home = Join-Path $OutputDir "node1\aetrad"
 if (!(Test-Path -LiteralPath $node0Home) -or !(Test-Path -LiteralPath $node1Home)) {
   throw "load-profile requires local node0 and node1 homes under $OutputDir"
 }

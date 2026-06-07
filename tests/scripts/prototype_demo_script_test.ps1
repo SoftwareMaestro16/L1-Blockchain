@@ -47,7 +47,7 @@ $checkText = $checkOutput -join "`n"
 foreach ($needle in @(
     "Aetra prototype demo check",
     "local-only: true",
-    "build aetherisd",
+    "build aetrad",
     "start 3-validator localnet",
     "send bank tx",
     "create and mint contract-assets denom",

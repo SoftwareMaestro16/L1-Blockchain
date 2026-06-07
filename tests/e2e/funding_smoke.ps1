@@ -1,7 +1,7 @@
 param(
   [string]$OutputDir = ".localnet-funding",
   [string]$Binary = "",
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [int]$ValidatorCount = 3,
   [int]$MinHeight = 3,
   [int]$TimeoutSeconds = 90,
@@ -64,7 +64,7 @@ function Assert-ScriptFails {
 }
 
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet-funding"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 $node0Ports = Get-LocalnetPortProfile -Index 0 -BaseP2PPort $BaseP2PPort -BaseRPCPort $BaseRPCPort -BaseRESTPort $BaseRESTPort -BaseGRPCPort $BaseGRPCPort -BasePprofPort $BasePprofPort -PortStride $PortStride
 
 Push-Location $RepoRoot
@@ -78,8 +78,8 @@ try {
   $height = Wait-LocalnetHeight -TargetHeight $MinHeight -RPCPort $node0Ports.RPC -TimeoutSeconds $TimeoutSeconds
   Write-Host "localnet reached height $height"
 
-  $node1Home = Join-Path $OutputDir "node1\aetherisd"
-  $node2Home = Join-Path $OutputDir "node2\aetherisd"
+  $node1Home = Join-Path $OutputDir "node1\aetrad"
+  $node2Home = Join-Path $OutputDir "node2\aetrad"
   $node1 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node1Home -KeyName "node1"
   $node2 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node2Home -KeyName "node2"
 
@@ -113,10 +113,10 @@ try {
   Write-Host "local funding increased node1 and node2 balances"
 
   Assert-ScriptFails -ExpectedText "non-local chain-id" -Script {
-    & .\scripts\localnet\fund.ps1 -OutputDir $OutputDir -Binary $Binary -ChainId "aetheris-main-1" -RPCPort $node0Ports.RPC -Recipients @($node1) -Amount "1naet"
+    & .\scripts\localnet\fund.ps1 -OutputDir $OutputDir -Binary $Binary -ChainId "aetra-main-1" -RPCPort $node0Ports.RPC -Recipients @($node1) -Amount "1naet"
   }
-  Assert-ScriptFails -ExpectedText "RPC network $ChainId does not match requested local chain-id aetheris-local-2" -Script {
-    & .\scripts\localnet\fund.ps1 -OutputDir $OutputDir -Binary $Binary -ChainId "aetheris-local-2" -RPCPort $node0Ports.RPC -Recipients @($node1) -Amount "1naet"
+  Assert-ScriptFails -ExpectedText "RPC network $ChainId does not match requested local chain-id aetra-local-2" -Script {
+    & .\scripts\localnet\fund.ps1 -OutputDir $OutputDir -Binary $Binary -ChainId "aetra-local-2" -RPCPort $node0Ports.RPC -Recipients @($node1) -Amount "1naet"
   }
   Assert-ScriptFails -ExpectedText "key not found" -Script {
     & .\scripts\localnet\fund.ps1 -OutputDir $OutputDir -Binary $Binary -ChainId $ChainId -RPCPort $node0Ports.RPC -FromKey "missing-funder" -Recipients @($node1) -Amount "1naet"

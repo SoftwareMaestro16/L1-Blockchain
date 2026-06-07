@@ -61,7 +61,7 @@ func ComputeIdentityTransitionID(record IdentityTransitionRecord) string {
 	normalized.OldSignature = nil
 	normalized.NewSignature = nil
 	bz, _ := json.Marshal(normalized)
-	return hashBytes("aetheris-identity-transition-v1", bz)
+	return hashBytes("aetra-identity-transition-v1", bz)
 }
 
 func SignIdentityTransition(oldRecord, newRecord NodeRecord, oldPrivateKey, newPrivateKey ed25519.PrivateKey, networkSalt []byte, effectiveHeight, expiresHeight uint64, nonce []byte) (IdentityTransitionRecord, error) {

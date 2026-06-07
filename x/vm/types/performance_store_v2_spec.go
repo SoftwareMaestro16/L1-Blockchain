@@ -412,7 +412,7 @@ func AVMStoreV2CompactMessageBytes(msg AVMAsyncMessage) uint32 {
 func ComputeAVMStoreV2MessageRecordHash(record AVMStoreV2MessageRecord) string {
 	record = canonicalAVMStoreV2MessageRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-store-v2-message-record-v1")
+	writeEnginePart(h, "aetra-avm-store-v2-message-record-v1")
 	writeEnginePart(h, record.MessageID)
 	writeEnginePart(h, record.MessageKey)
 	writeEnginePart(h, record.PayloadHash)
@@ -425,7 +425,7 @@ func ComputeAVMStoreV2MessageRecordHash(record AVMStoreV2MessageRecord) string {
 func ComputeAVMStoreV2PayloadRecordHash(record AVMStoreV2PayloadRecord) string {
 	record = canonicalAVMStoreV2PayloadRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-store-v2-payload-record-v1")
+	writeEnginePart(h, "aetra-avm-store-v2-payload-record-v1")
 	writeEnginePart(h, record.PayloadHash)
 	writeEnginePart(h, record.PayloadKey)
 	writeEngineUint64(h, uint64(record.PayloadSize))
@@ -436,7 +436,7 @@ func ComputeAVMStoreV2PayloadRecordHash(record AVMStoreV2PayloadRecord) string {
 func ComputeAVMStoreV2ActorStatePrefixHash(prefix AVMStoreV2ActorStatePrefix) string {
 	prefix = canonicalAVMStoreV2ActorStatePrefix(prefix)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-store-v2-actor-prefix-v1")
+	writeEnginePart(h, "aetra-avm-store-v2-actor-prefix-v1")
 	writeEnginePart(h, prefix.ActorID)
 	writeEnginePart(h, prefix.Prefix)
 	return hex.EncodeToString(h.Sum(nil))
@@ -445,7 +445,7 @@ func ComputeAVMStoreV2ActorStatePrefixHash(prefix AVMStoreV2ActorStatePrefix) st
 func ComputeAVMStoreV2ContractStatePrefixHash(prefix AVMStoreV2ContractStatePrefix) string {
 	prefix = canonicalAVMStoreV2ContractStatePrefix(prefix)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-store-v2-contract-prefix-v1")
+	writeEnginePart(h, "aetra-avm-store-v2-contract-prefix-v1")
 	writeEnginePart(h, prefix.ContractAddress)
 	writeEnginePart(h, prefix.Prefix)
 	return hex.EncodeToString(h.Sum(nil))
@@ -454,7 +454,7 @@ func ComputeAVMStoreV2ContractStatePrefixHash(prefix AVMStoreV2ContractStatePref
 func ComputeAVMStoreV2DelayedQueueBucketHash(bucket AVMStoreV2DelayedQueueBucket) string {
 	bucket = canonicalAVMStoreV2DelayedQueueBucket(bucket)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-store-v2-delayed-bucket-v1")
+	writeEnginePart(h, "aetra-avm-store-v2-delayed-bucket-v1")
 	writeEnginePart(h, string(bucket.ZoneID))
 	writeEngineUint64(h, bucket.Height)
 	writeEnginePart(h, bucket.BucketKey)
@@ -468,7 +468,7 @@ func ComputeAVMStoreV2DelayedQueueBucketHash(bucket AVMStoreV2DelayedQueueBucket
 func ComputeAVMStoreV2TombstonePruningPlanHash(plan AVMStoreV2TombstonePruningPlan) string {
 	plan = canonicalAVMStoreV2TombstonePruningPlan(plan)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-store-v2-tombstone-pruning-v1")
+	writeEnginePart(h, "aetra-avm-store-v2-tombstone-pruning-v1")
 	writeEngineUint64(h, plan.CurrentHeight)
 	writeEngineUint64(h, plan.ProofHorizon)
 	writeEngineUint64(h, plan.RetainAfterHeight)
@@ -486,7 +486,7 @@ func ComputeAVMStoreV2TombstonePruningPlanHash(plan AVMStoreV2TombstonePruningPl
 func ComputeAVMStoreV2LayoutRoot(layout AVMStoreV2LayoutStrategy) string {
 	layout = canonicalAVMStoreV2LayoutStrategy(layout)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-store-v2-layout-v1")
+	writeEnginePart(h, "aetra-avm-store-v2-layout-v1")
 	writeEngineUint64(h, uint64(len(layout.MessageRecords)))
 	for _, record := range layout.MessageRecords {
 		writeEnginePart(h, record.RecordHash)

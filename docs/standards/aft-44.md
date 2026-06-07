@@ -103,7 +103,7 @@ the base chain coin for fees, staking, bank balances, and mint inflation.
 
 ## Executable Specification
 
-The pure Go package `x/aetherisvm/standards/aft` is the current executable
+The pure Go package `x/aetravm/standards/aft` is the current executable
 specification for AFT-44. It does not wire SDK stores or keepers into the app,
 but it does expose an async/AVM-compatible token master handler and
 deterministic message codec. It defines:
@@ -125,7 +125,7 @@ package's message ABI or explicitly migrate the standard version.
 ## Required Tests
 
 ```powershell
-go test ./x/aetherisvm/standards/aft
+go test ./x/aetravm/standards/aft
 go test ./...
 ```
 

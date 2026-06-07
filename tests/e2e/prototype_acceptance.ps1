@@ -3,7 +3,7 @@ param(
   [string]$Profile = "Smoke",
   [string]$OutputDir = "",
   [string]$Binary = "",
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [int]$ValidatorCount = 3,
   [int]$MinHeight = 4,
   [int]$TimeoutSeconds = 120,
@@ -40,7 +40,7 @@ $RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
 . (Join-Path $RepoRoot "tests\e2e\prototype_acceptance_helpers.ps1")
 
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "acceptance localnet output directory"
 if (-not $SkipBuild) {
   Assert-LocalnetWorkspacePath -Path (Split-Path $Binary) -Purpose "acceptance binary output directory"
@@ -92,7 +92,7 @@ try {
   & .\scripts\localnet\stop.ps1 -OutputDir $OutputDir
 
   if (-not $SkipBuild) {
-    Write-AcceptanceStep "build aetherisd"
+    Write-AcceptanceStep "build aetrad"
     Invoke-AcceptanceBuild -Context $ctx
   } elseif (!(Test-Path -LiteralPath $Binary)) {
     throw "Binary not found at $Binary and -SkipBuild was specified"
@@ -125,8 +125,8 @@ try {
     -EnableRPC $EnableRPC | Out-Null
   Write-Host "localnet healthy at height $height"
 
-  $node0Home = Join-Path $OutputDir "node0\aetherisd"
-  $node1Home = Join-Path $OutputDir "node1\aetherisd"
+  $node0Home = Join-Path $OutputDir "node0\aetrad"
+  $node1Home = Join-Path $OutputDir "node1\aetrad"
   $node0 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node0Home -KeyName "node0"
   $node1 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node1Home -KeyName "node1"
 

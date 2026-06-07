@@ -458,7 +458,7 @@ func ValidateSubdomainModulePathPolicyV2(rootName string, targetName string, sou
 
 func ComputeResolverModuleBreakdownHashV2(breakdown ResolverModuleBreakdownV2) string {
 	breakdown = canonicalResolverModuleBreakdownV2(breakdown)
-	parts := []string{"aetheris-resolver-module-breakdown-v2", breakdown.ModulePath}
+	parts := []string{"aetra-resolver-module-breakdown-v2", breakdown.ModulePath}
 	parts = appendBreakdownStringsV2(parts, "purpose", breakdown.Purpose)
 	for _, value := range breakdown.StateObjects {
 		parts = append(parts, "state", string(value))
@@ -482,7 +482,7 @@ func ComputeResolverModuleBreakdownHashV2(breakdown ResolverModuleBreakdownV2) s
 
 func ComputeSubdomainModuleBreakdownHashV2(breakdown SubdomainModuleBreakdownV2) string {
 	breakdown = canonicalSubdomainModuleBreakdownV2(breakdown)
-	parts := []string{"aetheris-subdomain-module-breakdown-v2", breakdown.ModulePath}
+	parts := []string{"aetra-subdomain-module-breakdown-v2", breakdown.ModulePath}
 	parts = appendBreakdownStringsV2(parts, "purpose", breakdown.Purpose)
 	for _, value := range breakdown.StateObjects {
 		parts = append(parts, "state", string(value))
@@ -507,7 +507,7 @@ func ComputeSubdomainModuleBreakdownHashV2(breakdown SubdomainModuleBreakdownV2)
 func ComputeSubdomainModuleIndexReportHashV2(report SubdomainModuleIndexReportV2) string {
 	sort.Strings(report.Issues)
 	sort.Slice(report.Index, func(i, j int) bool { return report.Index[i].StoreKey < report.Index[j].StoreKey })
-	parts := []string{"aetheris-subdomain-module-index-report-v2", fmt.Sprintf("valid=%t", report.Valid)}
+	parts := []string{"aetra-subdomain-module-index-report-v2", fmt.Sprintf("valid=%t", report.Valid)}
 	parts = append(parts, report.Issues...)
 	for _, entry := range report.Index {
 		parts = append(parts, entry.ParentName, entry.ChildName, entry.ChildLabel, entry.ParentNameHash, entry.ChildNameHash, entry.StoreKey, fmt.Sprintf("detached=%t", entry.Detached))

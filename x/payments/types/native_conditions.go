@@ -603,7 +603,7 @@ func (message CrossZonePaymentMessage) Validate() error {
 func ComputeNativeConditionalPaymentRoot(condition NativeConditionalPayment) string {
 	condition = condition.Normalize()
 	return HashParts(
-		"aetheris-native-conditional-payment-v1",
+		"aetra-native-conditional-payment-v1",
 		condition.ConditionID,
 		condition.Payer,
 		condition.Payee,
@@ -620,7 +620,7 @@ func ComputeNativeConditionalPaymentRoot(condition NativeConditionalPayment) str
 func ComputeNativeConditionalPaymentOutcomeRoot(outcome NativeConditionalPaymentOutcome) string {
 	outcome = outcome.Normalize()
 	return HashParts(
-		"aetheris-native-conditional-payment-outcome-v1",
+		"aetra-native-conditional-payment-outcome-v1",
 		outcome.ConditionID,
 		string(outcome.Status),
 		outcome.Recipient,
@@ -634,7 +634,7 @@ func ComputeNativeConditionalPaymentOutcomeRoot(outcome NativeConditionalPayment
 func ComputeCrossZonePaymentRoutingInputRoot(input CrossZonePaymentRoutingInput) string {
 	input = input.Normalize()
 	parts := []string{
-		"aetheris-cross-zone-payment-routing-input-v1",
+		"aetra-cross-zone-payment-routing-input-v1",
 		input.SourceAccount,
 		input.TargetAccount,
 		input.TargetIdentity,
@@ -661,7 +661,7 @@ func ComputeCrossZonePaymentRoutingInputRoot(input CrossZonePaymentRoutingInput)
 func ComputeCrossZonePaymentMessageHash(message CrossZonePaymentMessage) string {
 	message = message.Normalize()
 	return HashParts(
-		"aetheris-cross-zone-payment-message-v1",
+		"aetra-cross-zone-payment-message-v1",
 		message.SourceZoneID,
 		message.DestinationZoneID,
 		fmt.Sprintf("%020d", uint64(message.SourceShardID)),

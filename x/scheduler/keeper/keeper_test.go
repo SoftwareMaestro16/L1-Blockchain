@@ -32,11 +32,11 @@ func TestOnlyAuthorizedModulesCanRegisterJobs(t *testing.T) {
 func TestPeriodicJobExecutesAtCorrectHeight(t *testing.T) {
 	k := enabledKeeper(t)
 	executed := make([]uint64, 0)
-	require.NoError(t, k.RegisterJobHandler("aethercore", func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
+	require.NoError(t, k.RegisterJobHandler("aetracore", func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
 		executed = append(executed, height)
 		return schedulertypes.JobExecutionResult{Success: true, GasUsed: 20}
 	}))
-	require.NoError(t, k.RegisterScheduledJob(register(testJob("aethercore", "periodic", schedulertypes.JobTypePeriodic, 10))))
+	require.NoError(t, k.RegisterScheduledJob(register(testJob("aetracore", "periodic", schedulertypes.JobTypePeriodic, 10))))
 
 	result, err := k.ExecuteDueJobs(execute(9))
 	require.NoError(t, err)
@@ -46,7 +46,7 @@ func TestPeriodicJobExecutesAtCorrectHeight(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, uint32(1), result.ExecutedJobs)
 	require.Equal(t, []uint64{10}, executed)
-	job, found, err := k.ScheduledJob("aethercore", "periodic")
+	job, found, err := k.ScheduledJob("aetracore", "periodic")
 	require.NoError(t, err)
 	require.True(t, found)
 	require.Equal(t, uint64(15), job.NextExecutionHeight)
@@ -56,11 +56,11 @@ func TestPeriodicJobExecutesAtCorrectHeight(t *testing.T) {
 func TestDelayedJobExecutesOnce(t *testing.T) {
 	k := enabledKeeper(t)
 	calls := 0
-	require.NoError(t, k.RegisterJobHandler("aethercore", func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
+	require.NoError(t, k.RegisterJobHandler("aetracore", func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
 		calls++
 		return schedulertypes.JobExecutionResult{Success: true, GasUsed: 10}
 	}))
-	job := testJob("aethercore", "delayed", schedulertypes.JobTypeDelayed, 7)
+	job := testJob("aetracore", "delayed", schedulertypes.JobTypeDelayed, 7)
 	job.Interval = 0
 	require.NoError(t, k.RegisterScheduledJob(register(job)))
 
@@ -71,7 +71,7 @@ func TestDelayedJobExecutesOnce(t *testing.T) {
 	require.NoError(t, err)
 	require.Zero(t, result.ExecutedJobs)
 	require.Equal(t, 1, calls)
-	stored, found, err := k.ScheduledJob("aethercore", "delayed")
+	stored, found, err := k.ScheduledJob("aetracore", "delayed")
 	require.NoError(t, err)
 	require.True(t, found)
 	require.True(t, stored.Cancelled)
@@ -79,10 +79,10 @@ func TestDelayedJobExecutesOnce(t *testing.T) {
 
 func TestJobFailureIncrementsFailureCountAndDoesNotPanicBlock(t *testing.T) {
 	k := enabledKeeper(t)
-	require.NoError(t, k.RegisterJobHandler("aethercore", func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
+	require.NoError(t, k.RegisterJobHandler("aetracore", func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
 		panic("boom")
 	}))
-	require.NoError(t, k.RegisterScheduledJob(register(testJob("aethercore", "panic", schedulertypes.JobTypePeriodic, 3))))
+	require.NoError(t, k.RegisterScheduledJob(register(testJob("aetracore", "panic", schedulertypes.JobTypePeriodic, 3))))
 
 	result, err := k.ExecuteDueJobs(execute(3))
 	require.NoError(t, err)
@@ -90,7 +90,7 @@ func TestJobFailureIncrementsFailureCountAndDoesNotPanicBlock(t *testing.T) {
 	require.Len(t, result.History, 1)
 	require.Equal(t, schedulertypes.HistoryStatusFailure, result.History[0].Status)
 	require.Contains(t, result.History[0].Error, "panicked")
-	job, found, err := k.ScheduledJob("aethercore", "panic")
+	job, found, err := k.ScheduledJob("aetracore", "panic")
 	require.NoError(t, err)
 	require.True(t, found)
 	require.Equal(t, uint32(1), job.FailureCount)
@@ -100,19 +100,19 @@ func TestJobFailureIncrementsFailureCountAndDoesNotPanicBlock(t *testing.T) {
 func TestJobOrderIsDeterministic(t *testing.T) {
 	k := enabledKeeper(t)
 	order := make([]string, 0)
-	for _, module := range []string{"aethercore", "dex"} {
+	for _, module := range []string{"aetracore", "avm-dex-contract"} {
 		require.NoError(t, k.RegisterJobHandler(module, func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
 			order = append(order, schedulertypes.JobKey(job))
 			return schedulertypes.JobExecutionResult{Success: true, GasUsed: 1}
 		}))
 	}
-	require.NoError(t, k.RegisterScheduledJob(register(testJob("dex", "b", schedulertypes.JobTypePeriodic, 5))))
-	require.NoError(t, k.RegisterScheduledJob(register(testJob("aethercore", "z", schedulertypes.JobTypePeriodic, 5))))
-	require.NoError(t, k.RegisterScheduledJob(register(testJob("aethercore", "a", schedulertypes.JobTypePeriodic, 5))))
+	require.NoError(t, k.RegisterScheduledJob(register(testJob("avm-dex-contract", "b", schedulertypes.JobTypePeriodic, 5))))
+	require.NoError(t, k.RegisterScheduledJob(register(testJob("aetracore", "z", schedulertypes.JobTypePeriodic, 5))))
+	require.NoError(t, k.RegisterScheduledJob(register(testJob("aetracore", "a", schedulertypes.JobTypePeriodic, 5))))
 
 	_, err := k.ExecuteDueJobs(execute(5))
 	require.NoError(t, err)
-	require.Equal(t, []string{"aethercore/a", "aethercore/z", "dex/b"}, order)
+	require.Equal(t, []string{"aetracore/a", "aetracore/z", "avm-dex-contract/b"}, order)
 }
 
 func TestBlockGasLimitAndJobCountAreRespected(t *testing.T) {
@@ -123,11 +123,11 @@ func TestBlockGasLimitAndJobCountAreRespected(t *testing.T) {
 	schedulerParams.MaxSchedulerGas = 150
 	schedulerParams.MaxGasPerJob = 100
 	require.NoError(t, k.UpdateParams(prototype.DefaultAuthority, params, schedulerParams))
-	require.NoError(t, k.RegisterJobHandler("aethercore", func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
+	require.NoError(t, k.RegisterJobHandler("aetracore", func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
 		return schedulertypes.JobExecutionResult{Success: true, GasUsed: 75}
 	}))
 	for _, id := range []string{"a", "b", "c"} {
-		job := testJob("aethercore", id, schedulertypes.JobTypePeriodic, 10)
+		job := testJob("aetracore", id, schedulertypes.JobTypePeriodic, 10)
 		job.MaxGas = 75
 		require.NoError(t, k.RegisterScheduledJob(register(job)))
 	}
@@ -143,10 +143,10 @@ func TestBlockGasLimitAndJobCountAreRespected(t *testing.T) {
 
 func TestExportImportPreservesJobQueueAndHistory(t *testing.T) {
 	source := enabledKeeper(t)
-	require.NoError(t, source.RegisterJobHandler("aethercore", func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
+	require.NoError(t, source.RegisterJobHandler("aetracore", func(job schedulertypes.ScheduledJob, height uint64) schedulertypes.JobExecutionResult {
 		return schedulertypes.JobExecutionResult{Success: true, GasUsed: 9}
 	}))
-	require.NoError(t, source.RegisterScheduledJob(register(testJob("aethercore", "periodic", schedulertypes.JobTypePeriodic, 4))))
+	require.NoError(t, source.RegisterScheduledJob(register(testJob("aetracore", "periodic", schedulertypes.JobTypePeriodic, 4))))
 	_, err := source.ExecuteDueJobs(execute(4))
 	require.NoError(t, err)
 

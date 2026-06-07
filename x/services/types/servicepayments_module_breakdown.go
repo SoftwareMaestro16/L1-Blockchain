@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type XServicePaymentsStateObject string
@@ -578,7 +578,7 @@ func IsXServicePaymentsIntegrationPoint(point XServicePaymentsIntegrationPoint) 
 
 func ComputeXServicePaymentsModuleBreakdownHash(breakdown XServicePaymentsModuleBreakdown) string {
 	breakdown = canonicalXServicePaymentsModuleBreakdown(breakdown)
-	parts := []string{"aetheris-x-servicepayments-module-breakdown-v1", breakdown.ModulePath, "purpose", fmt.Sprint(len(breakdown.Purpose))}
+	parts := []string{"aetra-x-servicepayments-module-breakdown-v1", breakdown.ModulePath, "purpose", fmt.Sprint(len(breakdown.Purpose))}
 	parts = append(parts, breakdown.Purpose...)
 	parts = append(parts, "state", fmt.Sprint(len(breakdown.StateObjects)))
 	for _, object := range breakdown.StateObjects {
@@ -604,31 +604,31 @@ func ComputeXServicePaymentsModuleBreakdownHash(breakdown XServicePaymentsModule
 }
 
 func ComputeMsgSetServicePaymentModelHash(msg MsgSetServicePaymentModel) string {
-	return servicesHashParts("aetheris-x-servicepayments-msg-set-model-v1", msg.Authority, msg.Model.ServiceID, msg.Model.ModelHash)
+	return servicesHashParts("aetra-x-servicepayments-msg-set-model-v1", msg.Authority, msg.Model.ServiceID, msg.Model.ModelHash)
 }
 
 func ComputeMsgCreateServiceEscrowHash(msg MsgCreateServiceEscrow) string {
-	return servicesHashParts("aetheris-x-servicepayments-msg-create-escrow-v1", msg.Authority, msg.Envelope.EnvelopeHash, msg.Escrow.LockHash)
+	return servicesHashParts("aetra-x-servicepayments-msg-create-escrow-v1", msg.Authority, msg.Envelope.EnvelopeHash, msg.Escrow.LockHash)
 }
 
 func ComputeMsgSettleServiceEscrowHash(msg MsgSettleServiceEscrow) string {
-	return servicesHashParts("aetheris-x-servicepayments-msg-settle-escrow-v1", msg.Authority, msg.EscrowID, msg.Settlement.SettlementHash)
+	return servicesHashParts("aetra-x-servicepayments-msg-settle-escrow-v1", msg.Authority, msg.EscrowID, msg.Settlement.SettlementHash)
 }
 
 func ComputeMsgOpenPaymentStreamHash(msg MsgOpenPaymentStream) string {
-	return servicesHashParts("aetheris-x-servicepayments-msg-open-stream-v1", msg.Authority, msg.Envelope.EnvelopeHash, msg.Stream.StreamHash)
+	return servicesHashParts("aetra-x-servicepayments-msg-open-stream-v1", msg.Authority, msg.Envelope.EnvelopeHash, msg.Stream.StreamHash)
 }
 
 func ComputeMsgClosePaymentStreamHash(msg MsgClosePaymentStream) string {
-	return servicesHashParts("aetheris-x-servicepayments-msg-close-stream-v1", msg.Authority, msg.StreamID, fmt.Sprint(msg.CloseHeight), msg.AmountSettled)
+	return servicesHashParts("aetra-x-servicepayments-msg-close-stream-v1", msg.Authority, msg.StreamID, fmt.Sprint(msg.CloseHeight), msg.AmountSettled)
 }
 
 func ComputeMsgSubmitMeteredUsageHash(msg MsgSubmitMeteredUsage) string {
-	return servicesHashParts("aetheris-x-servicepayments-msg-submit-metered-v1", msg.Authority, msg.Usage.UsageHash)
+	return servicesHashParts("aetra-x-servicepayments-msg-submit-metered-v1", msg.Authority, msg.Usage.UsageHash)
 }
 
 func ComputeServicePaymentSignedModelSnapshotHash(snapshot ServicePaymentSignedModelSnapshot) string {
-	return servicesHashParts("aetheris-x-servicepayments-model-snapshot-v1", snapshot.ServiceID, snapshot.CallID, snapshot.ModelHash, fmt.Sprint(snapshot.SignedHeight))
+	return servicesHashParts("aetra-x-servicepayments-model-snapshot-v1", snapshot.ServiceID, snapshot.CallID, snapshot.ModelHash, fmt.Sprint(snapshot.SignedHeight))
 }
 
 func validateServicePaymentMsgHash(label string, actual string, expected string) error {

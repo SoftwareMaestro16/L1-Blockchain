@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type XServiceCallsStateObject string
@@ -654,7 +654,7 @@ func IsXServiceCallsIntegrationPoint(point XServiceCallsIntegrationPoint) bool {
 
 func ComputeXServiceCallsModuleBreakdownHash(breakdown XServiceCallsModuleBreakdown) string {
 	breakdown = canonicalXServiceCallsModuleBreakdown(breakdown)
-	parts := []string{"aetheris-x-servicecalls-module-breakdown-v1", breakdown.ModulePath, "purpose", fmt.Sprint(len(breakdown.Purpose))}
+	parts := []string{"aetra-x-servicecalls-module-breakdown-v1", breakdown.ModulePath, "purpose", fmt.Sprint(len(breakdown.Purpose))}
 	parts = append(parts, breakdown.Purpose...)
 	parts = append(parts, "state", fmt.Sprint(len(breakdown.StateObjects)))
 	for _, object := range breakdown.StateObjects {
@@ -680,37 +680,37 @@ func ComputeXServiceCallsModuleBreakdownHash(breakdown XServiceCallsModuleBreakd
 }
 
 func ComputeMsgSubmitServiceCallHash(msg MsgSubmitServiceCall) string {
-	return servicesHashParts("aetheris-x-servicecalls-msg-submit-v1", msg.Authority, msg.Call.CallID, msg.Call.UnifiedCallHash)
+	return servicesHashParts("aetra-x-servicecalls-msg-submit-v1", msg.Authority, msg.Call.CallID, msg.Call.UnifiedCallHash)
 }
 
 func ComputeMsgAnchorServiceResultHash(msg MsgAnchorServiceResult) string {
-	return servicesHashParts("aetheris-x-servicecalls-msg-anchor-result-v1", msg.Authority, msg.CallID, msg.ExpectedResultHash, msg.Outcome.ResponseHash, msg.Outcome.ProofHash, string(msg.Outcome.Status), fmt.Sprint(msg.Outcome.ExecutedHeight))
+	return servicesHashParts("aetra-x-servicecalls-msg-anchor-result-v1", msg.Authority, msg.CallID, msg.ExpectedResultHash, msg.Outcome.ResponseHash, msg.Outcome.ProofHash, string(msg.Outcome.Status), fmt.Sprint(msg.Outcome.ExecutedHeight))
 }
 
 func ComputeMsgRetryServiceCallHash(msg MsgRetryServiceCall) string {
-	return servicesHashParts("aetheris-x-servicecalls-msg-retry-v1", msg.Authority, msg.OriginalCallID, msg.RetryCall.CallID, msg.RetryCall.UnifiedCallHash)
+	return servicesHashParts("aetra-x-servicecalls-msg-retry-v1", msg.Authority, msg.OriginalCallID, msg.RetryCall.CallID, msg.RetryCall.UnifiedCallHash)
 }
 
 func ComputeMsgSubmitCallbackHash(msg MsgSubmitCallback) string {
-	return servicesHashParts("aetheris-x-servicecalls-msg-callback-v1", msg.Authority, msg.Callback.CallbackCallID, msg.Callback.CallbackHash)
+	return servicesHashParts("aetra-x-servicecalls-msg-callback-v1", msg.Authority, msg.Callback.CallbackCallID, msg.Callback.CallbackHash)
 }
 
 func ComputeMsgExpireServiceCallHash(msg MsgExpireServiceCall) string {
-	return servicesHashParts("aetheris-x-servicecalls-msg-expire-v1", msg.Authority, msg.ServiceID, msg.CallID, fmt.Sprint(msg.ExpireHeight))
+	return servicesHashParts("aetra-x-servicecalls-msg-expire-v1", msg.Authority, msg.ServiceID, msg.CallID, fmt.Sprint(msg.ExpireHeight))
 }
 
 func ComputeServiceCallIdempotencyRecordHash(record ServiceCallIdempotencyRecord) string {
-	return servicesHashParts("aetheris-x-servicecalls-idempotency-v1", record.ServiceID, record.Caller, record.IdempotencyKey, record.PayloadHash, record.CallID)
+	return servicesHashParts("aetra-x-servicecalls-idempotency-v1", record.ServiceID, record.Caller, record.IdempotencyKey, record.PayloadHash, record.CallID)
 }
 
 func ComputeServiceCallExpiryRecordHash(record ServiceCallExpiryRecord) string {
-	return servicesHashParts("aetheris-x-servicecalls-expiry-v1", record.ServiceID, record.CallID, fmt.Sprint(record.DeadlineHeight), fmt.Sprint(record.AnchorHeight))
+	return servicesHashParts("aetra-x-servicecalls-expiry-v1", record.ServiceID, record.CallID, fmt.Sprint(record.DeadlineHeight), fmt.Sprint(record.AnchorHeight))
 }
 
 func ComputeQueryCallsByCallerResponseHash(response QueryCallsByCallerResponse) string {
 	calls := append([]UnifiedServiceCall(nil), response.Calls...)
 	sort.SliceStable(calls, func(i, j int) bool { return calls[i].CallID < calls[j].CallID })
-	parts := []string{"aetheris-x-servicecalls-by-caller-v1", fmt.Sprint(response.Total)}
+	parts := []string{"aetra-x-servicecalls-by-caller-v1", fmt.Sprint(response.Total)}
 	for _, call := range calls {
 		parts = append(parts, call.CallID, call.UnifiedCallHash)
 	}
@@ -719,7 +719,7 @@ func ComputeQueryCallsByCallerResponseHash(response QueryCallsByCallerResponse) 
 
 func ComputeServiceCallsABCIProposalContractHash(contract ServiceCallsABCIProposalContract) string {
 	return servicesHashParts(
-		"aetheris-x-servicecalls-abci-contract-v1",
+		"aetra-x-servicecalls-abci-contract-v1",
 		fmt.Sprint(contract.ClassifyByTargetService),
 		fmt.Sprint(contract.VerifySameSenderOrdering),
 		fmt.Sprint(contract.RejectExpiredCalls),

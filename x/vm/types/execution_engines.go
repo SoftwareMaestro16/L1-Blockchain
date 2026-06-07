@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sovereign-l1/l1/x/aetherisvm/async"
+	"github.com/sovereign-l1/l1/x/aetravm/async"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -335,7 +335,7 @@ func IsAsyncEngineLane(lane AsyncEngineLane) bool {
 func ComputeSyncExecutionReceiptRoot(plan SyncExecutionPlan) string {
 	plan = canonicalSyncExecutionPlan(plan)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-sync-engine-receipt-v1")
+	writeEnginePart(h, "aetra-sync-engine-receipt-v1")
 	writeEngineUint64(h, plan.Height)
 	writeEnginePart(h, string(plan.Module))
 	writeEnginePart(h, plan.Route)
@@ -364,7 +364,7 @@ func ComputeSyncExecutionReceiptRoot(plan SyncExecutionPlan) string {
 func ComputeAsyncExecutionPlanRoot(plan AsyncExecutionPlan) string {
 	plan = canonicalAsyncExecutionPlan(plan)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-async-engine-plan-v1")
+	writeEnginePart(h, "aetra-async-engine-plan-v1")
 	writeEngineUint64(h, plan.Height)
 	writeEngineUint64(h, uint64(plan.RetryPolicy.MaxRetries))
 	writeEngineUint64(h, plan.RetryPolicy.RetryDelayBlocks)

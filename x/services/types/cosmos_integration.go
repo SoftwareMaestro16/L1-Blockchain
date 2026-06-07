@@ -290,12 +290,12 @@ func IsServiceKeeperBoundaryName(name ServiceKeeperBoundaryName) bool {
 }
 
 func ComputeServiceIntegrationModuleHash(module ServiceIntegrationModule) string {
-	return servicesHashParts("aetheris-services-cosmos-module-v1", module.ModulePath, string(module.Kind), module.Purpose, module.StoreKey)
+	return servicesHashParts("aetra-services-cosmos-module-v1", module.ModulePath, string(module.Kind), module.Purpose, module.StoreKey)
 }
 
 func ComputeServiceKeeperBoundaryHash(boundary ServiceKeeperBoundary) string {
 	return servicesHashParts(
-		"aetheris-services-cosmos-keeper-boundary-v1",
+		"aetra-services-cosmos-keeper-boundary-v1",
 		string(boundary.KeeperName),
 		boundary.ModulePath,
 		strings.Join(boundary.Responsibilities, ","),
@@ -305,7 +305,7 @@ func ComputeServiceKeeperBoundaryHash(boundary ServiceKeeperBoundary) string {
 
 func ComputeServiceKeeperIntegrationRulesHash(rules ServiceKeeperIntegrationRules) string {
 	return servicesHashParts(
-		"aetheris-services-cosmos-integration-rules-v1",
+		"aetra-services-cosmos-integration-rules-v1",
 		fmt.Sprint(rules.StoreV2IsolatedPrefixes),
 		rules.CrossZoneOperationMode,
 		rules.PaymentSettlementIntegration,
@@ -319,7 +319,7 @@ func ComputeCosmosSDKServiceIntegrationManifestHash(manifest CosmosSDKServiceInt
 	optional := normalizeServiceIntegrationModules(manifest.OptionalModules)
 	boundaries := normalizeServiceKeeperBoundaries(manifest.KeeperBoundaries)
 	parts := []string{
-		"aetheris-services-cosmos-integration-manifest-v1",
+		"aetra-services-cosmos-integration-manifest-v1",
 		fmt.Sprint(len(required)),
 		fmt.Sprint(len(optional)),
 		fmt.Sprint(len(boundaries)),

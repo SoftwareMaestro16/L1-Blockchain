@@ -9,7 +9,7 @@ import (
 
 	"cosmossdk.io/log/v2"
 	l1app "github.com/sovereign-l1/l1/app"
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/app/params"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -25,7 +25,7 @@ import (
 	txsigning "github.com/cosmos/cosmos-sdk/x/tx/signing"
 )
 
-// NewRootCmd creates a new root command for aetherisd. It is called once in the
+// NewRootCmd creates a new root command for aetrad. It is called once in the
 // main function.
 func NewRootCmd() *cobra.Command {
 	extraVersionInfo := initVersionInfo()
@@ -50,7 +50,7 @@ func NewRootCmd() *cobra.Command {
 		WithViper("") // uses by default the binary name as prefix
 
 	rootCmd := &cobra.Command{
-		Use:           "aetherisd",
+		Use:           "aetrad",
 		Short:         "Aetra sovereign L1 app",
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
@@ -76,7 +76,7 @@ func NewRootCmd() *cobra.Command {
 				enabledSignModes := append(tx.DefaultSignModes, signing.SignMode_SIGN_MODE_TEXTUAL)
 				txConfigOpts := tx.ConfigOptions{
 					EnabledSignModes:           enabledSignModes,
-					SigningOptions:             &txsigning.Options{AddressCodec: aetherisaddress.Codec{}, ValidatorAddressCodec: aetherisaddress.Codec{}},
+					SigningOptions:             &txsigning.Options{AddressCodec: aetraaddress.Codec{}, ValidatorAddressCodec: aetraaddress.Codec{}},
 					TextualCoinMetadataQueryFn: authtxconfig.NewGRPCCoinMetadataQueryFn(initClientCtx),
 				}
 				txConfig, err := tx.NewTxConfigWithOptions(

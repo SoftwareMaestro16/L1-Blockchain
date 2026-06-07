@@ -17,7 +17,7 @@ $RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
 . (Join-Path $PSScriptRoot "execution_os_profile_helpers.ps1")
 . (Join-Path $RepoRoot "scripts\localnet\common.ps1")
 
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 $result = Invoke-ExecutionOSProfileLocalnet `
   -Profile "execution-os-sim" `
   -OutputDir $OutputDir `

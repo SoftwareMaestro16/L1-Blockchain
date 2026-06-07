@@ -2,7 +2,7 @@ param(
   [string]$OutputDir = "",
   [string]$Binary = "",
   [int]$ValidatorCount = 0,
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [int]$BaseP2PPort = 26656,
   [int]$BaseRPCPort = 26657,
   [int]$BaseRESTPort = 1317,
@@ -32,7 +32,7 @@ $launchElapsedMs = 0
 $waitElapsedMs = 0
 
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "localnet output directory"
 Assert-LocalnetProfile -Profile $Profile
 
@@ -107,7 +107,7 @@ Repair-LocalnetProcessPathEnvironment
 $launchTimer = [System.Diagnostics.Stopwatch]::StartNew()
 foreach ($node in $nodes) {
   $nodeName = $node.Name
-  $nodeHome = Join-Path $node.FullName "aetherisd"
+  $nodeHome = Join-Path $node.FullName "aetrad"
   $stdout = Join-Path $logDir "$nodeName.out.log"
   $stderr = Join-Path $logDir "$nodeName.err.log"
   $proc = Start-Process -FilePath $Binary `

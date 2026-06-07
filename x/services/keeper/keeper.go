@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"sort"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	servicestypes "github.com/sovereign-l1/l1/x/services/types"
 )
 
@@ -34,7 +34,7 @@ func (k Keeper) ExportGenesis() servicestypes.GenesisState {
 	return cloneGenesis(k.genesis)
 }
 
-func (k Keeper) Params() coretypes.AetherCoreParams {
+func (k Keeper) Params() coretypes.AetraCoreParams {
 	return k.genesis.Params
 }
 

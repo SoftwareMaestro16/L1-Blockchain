@@ -58,7 +58,7 @@ foreach ($securityTerm in @(
 
 foreach ($evidence in @(
     'x/fees/keeper/ante_test.go',
-    'x/aetherisvm/standards/aft/keeper/msg_server_test.go',
+    'x/aetravm/standards/aft/keeper/msg_server_test.go',
     'avm-dex-contract/keeper/msg_server_test.go',
     'app/pos_test.go',
     'tests/e2e/contract-assets_smoke.ps1',

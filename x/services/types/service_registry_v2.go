@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sort"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 const (
@@ -557,24 +557,24 @@ func (binding ServiceIdentityBindingV2) Validate() error {
 }
 
 func ComputeServiceRegistryMethodHashV2(interfaceHash, method string) string {
-	return servicesHashParts("aetheris-services-method-index-v1", interfaceHash, method)
+	return servicesHashParts("aetra-services-method-index-v1", interfaceHash, method)
 }
 
 func ComputeServiceReceiptV2Hash(receipt ServiceReceiptV2) string {
-	return servicesHashParts("aetheris-services-registry-receipt-v1", receipt.ServiceID, receipt.ReceiptID, receipt.CallID, receipt.Status, receipt.ResultHash, fmt.Sprint(receipt.Height))
+	return servicesHashParts("aetra-services-registry-receipt-v1", receipt.ServiceID, receipt.ReceiptID, receipt.CallID, receipt.Status, receipt.ResultHash, fmt.Sprint(receipt.Height))
 }
 
 func ComputeServiceIdentityBindingV2Hash(binding ServiceIdentityBindingV2) string {
-	return servicesHashParts("aetheris-services-identity-binding-v1", binding.ServiceID, binding.IdentityName, binding.Owner, fmt.Sprint(binding.BoundHeight))
+	return servicesHashParts("aetra-services-identity-binding-v1", binding.ServiceID, binding.IdentityName, binding.Owner, fmt.Sprint(binding.BoundHeight))
 }
 
 func ComputeServiceRegistryIndexEntryV2Hash(entry ServiceRegistryIndexEntryV2) string {
-	return servicesHashParts("aetheris-services-registry-index-entry-v1", entry.Key, entry.Value)
+	return servicesHashParts("aetra-services-registry-index-entry-v1", entry.Key, entry.Value)
 }
 
 func ComputeServiceRegistryDescriptorRootV2(descriptors []CanonicalServiceDescriptor) string {
 	ordered := normalizeServiceRegistryDescriptorsV2(descriptors)
-	parts := []string{"aetheris-services-registry-descriptor-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-services-registry-descriptor-root-v1", fmt.Sprint(len(ordered))}
 	for _, descriptor := range ordered {
 		parts = append(parts, descriptor.DescriptorHash)
 	}
@@ -587,7 +587,7 @@ func ComputeServiceRegistryInterfaceRootV2(interfaces []DistributedInterfaceDesc
 
 func ComputeServiceRegistryIndexRootV2(kind string, entries []ServiceRegistryIndexEntryV2) string {
 	ordered := normalizeServiceRegistryIndexEntriesV2(entries)
-	parts := []string{"aetheris-services-registry-index-root-v1", kind, fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-services-registry-index-root-v1", kind, fmt.Sprint(len(ordered))}
 	for _, entry := range ordered {
 		parts = append(parts, entry.EntryHash)
 	}
@@ -596,7 +596,7 @@ func ComputeServiceRegistryIndexRootV2(kind string, entries []ServiceRegistryInd
 
 func ComputeServiceReceiptRootV2(receipts []ServiceReceiptV2) string {
 	ordered := normalizeServiceReceiptsV2(receipts)
-	parts := []string{"aetheris-services-registry-receipt-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-services-registry-receipt-root-v1", fmt.Sprint(len(ordered))}
 	for _, receipt := range ordered {
 		parts = append(parts, receipt.ReceiptHash)
 	}
@@ -605,7 +605,7 @@ func ComputeServiceReceiptRootV2(receipts []ServiceReceiptV2) string {
 
 func ComputeServiceIdentityBindingRootV2(bindings []ServiceIdentityBindingV2) string {
 	ordered := normalizeServiceIdentityBindingsV2(bindings)
-	parts := []string{"aetheris-services-identity-binding-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-services-identity-binding-root-v1", fmt.Sprint(len(ordered))}
 	for _, binding := range ordered {
 		parts = append(parts, binding.BindingHash)
 	}
@@ -623,7 +623,7 @@ func ComputeServiceRegistryRootsV2(state ServiceRegistryStateV2) ServiceRegistry
 		BindingRoot:    ComputeServiceIdentityBindingRootV2(state.IdentityBindings),
 	}
 	roots.StateRoot = servicesHashParts(
-		"aetheris-services-registry-state-root-v1",
+		"aetra-services-registry-state-root-v1",
 		roots.DescriptorRoot,
 		roots.InterfaceRoot,
 		roots.OwnerRoot,

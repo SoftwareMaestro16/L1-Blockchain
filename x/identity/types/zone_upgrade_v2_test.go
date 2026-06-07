@@ -49,10 +49,10 @@ func TestIdentityZoneUpgradeRejectsMissingCapabilityAndBadAEKDescriptor(t *testi
 	require.NoError(t, err)
 
 	capabilities := DefaultIdentityZoneCapabilities()
-	_, err = BuildIdentityZoneUpgradeManifest(DefaultAetherCoreIdentityZoneDescriptor(), DefaultIdentityZoneStateMachineDescriptor(), DefaultIdentityV2Architecture(), roots, capabilities[:len(capabilities)-1])
+	_, err = BuildIdentityZoneUpgradeManifest(DefaultAetraCoreIdentityZoneDescriptor(), DefaultIdentityZoneStateMachineDescriptor(), DefaultIdentityV2Architecture(), roots, capabilities[:len(capabilities)-1])
 	require.ErrorContains(t, err, "complete capability set")
 
-	descriptor := DefaultAetherCoreIdentityZoneDescriptor()
+	descriptor := DefaultAetraCoreIdentityZoneDescriptor()
 	descriptor.Enabled = false
 	_, err = BuildIdentityZoneUpgradeManifest(descriptor, DefaultIdentityZoneStateMachineDescriptor(), DefaultIdentityV2Architecture(), roots, capabilities)
 	require.ErrorContains(t, err, "must be enabled")
@@ -81,7 +81,7 @@ func TestIdentityZoneUpgradeArtifactsRequireRuntimeSubsystems(t *testing.T) {
 }
 
 func TestIdentityZoneAEKDescriptorRequiresIdentityZone(t *testing.T) {
-	descriptor := DefaultAetherCoreIdentityZoneDescriptor()
+	descriptor := DefaultAetraCoreIdentityZoneDescriptor()
 	require.NoError(t, ValidateIdentityZoneAEKDescriptor(descriptor))
 
 	descriptor.RootPrefix = "identity-v1"

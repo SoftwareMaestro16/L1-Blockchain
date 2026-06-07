@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	"github.com/sovereign-l1/l1/x/contracts/types"
 )
 

@@ -78,6 +78,6 @@ foreach ($rule in @(
   Assert-Contains -Text $text -Pattern ([regex]::Escape($rule)) -Message "event contract missing rule: $rule"
 }
 
-Assert-NotContains -Text $text -Pattern '(?i)private[_-]?key\s*[:=]|mnemonic:\s*[a-z]|C:\\Users\\|\.localnet\\node\d+\\aetherisd' -Message "event contract must not include secrets or local runtime paths"
+Assert-NotContains -Text $text -Pattern '(?i)private[_-]?key\s*[:=]|mnemonic:\s*[a-z]|C:\\Users\\|\.localnet\\node\d+\\aetrad' -Message "event contract must not include secrets or local runtime paths"
 
 Write-Host "event contract doc test passed"

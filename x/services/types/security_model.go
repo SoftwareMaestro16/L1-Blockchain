@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ServiceTrustModelLabel string
@@ -356,7 +356,7 @@ func ComputeServiceSecurityPolicyHash(policy ServiceSecurityPolicy) string {
 	methods := append([]ServiceMethodSecurityPolicy(nil), policy.MethodPolicies...)
 	sortServiceMethodSecurityPolicies(methods)
 	parts := []string{
-		"aetheris-services-security-policy-v1",
+		"aetra-services-security-policy-v1",
 		policy.ServiceID,
 		string(policy.ServiceType),
 		string(policy.TrustModel),
@@ -388,7 +388,7 @@ func ComputeServiceSecurityPolicyHash(policy ServiceSecurityPolicy) string {
 
 func ComputeServiceMethodSecurityPolicyHash(policy ServiceMethodSecurityPolicy) string {
 	return servicesHashParts(
-		"aetheris-services-method-security-policy-v1",
+		"aetra-services-method-security-policy-v1",
 		policy.MethodID,
 		string(policy.TrustModel),
 		string(policy.TrustModelLabel),

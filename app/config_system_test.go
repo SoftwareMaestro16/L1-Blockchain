@@ -19,7 +19,7 @@ import (
 func TestConfigSystemModuleWiringAndGenesis(t *testing.T) {
 	app, genesis := setup(true, 5)
 
-	require.NoError(t, app.ValidateAetherCoreWiringGate())
+	require.NoError(t, app.ValidateAetraCoreWiringGate())
 	require.Contains(t, app.ModuleManager.Modules, configtypes.ModuleName)
 	require.Contains(t, app.keys, configtypes.StoreKey)
 	require.Contains(t, genesis, configtypes.ModuleName)

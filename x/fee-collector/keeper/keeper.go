@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/fee-collector/types"
 )
 
@@ -153,7 +153,7 @@ func (k Keeper) GetProtocolIncomePolicy(ctx context.Context) (types.ProtocolInco
 }
 
 func (k Keeper) CollectAndDistributeProtocolIncomeFromAccount(ctx context.Context, sender sdk.AccAddress, fees sdk.Coins) ([]types.ProtocolIncomeAllocation, sdk.Coins, error) {
-	if len(sender) == 0 || aetherisaddress.IsZeroAccAddress(sender) {
+	if len(sender) == 0 || aetraaddress.IsZeroAccAddress(sender) {
 		return nil, nil, types.ErrInvalidFee.Wrap("fee sender must not be empty or zero")
 	}
 	policy, err := k.GetProtocolIncomePolicy(ctx)
@@ -202,7 +202,7 @@ func (k Keeper) CollectFeesFromAccount(ctx context.Context, sender sdk.AccAddres
 	if err := types.ValidateFeeCoins(params.BaseDenom, fees); err != nil {
 		return err
 	}
-	if len(sender) == 0 || aetherisaddress.IsZeroAccAddress(sender) {
+	if len(sender) == 0 || aetraaddress.IsZeroAccAddress(sender) {
 		return types.ErrInvalidFee.Wrap("fee sender must not be empty or zero")
 	}
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
@@ -424,7 +424,7 @@ func (k Keeper) ModuleAccountAddress() string {
 	if addr == nil {
 		return ""
 	}
-	return aetherisaddress.FormatAccAddress(addr)
+	return aetraaddress.FormatAccAddress(addr)
 }
 
 func (k Keeper) InitGenesis(ctx context.Context, gs types.GenesisState) error {

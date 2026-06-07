@@ -412,7 +412,7 @@ func QueryRoutingIntegrationResolvedExecutionTargetV2(request RoutingIntegration
 		mapping, err := BuildRoutingIntegrationServiceMappingV2(IdentityServiceDiscoveryRequestV2{
 			Name:                normalized,
 			ServiceID:           request.TargetKey,
-			SupportedTransports: []string{"https", "grpcs", "wss", "aetheris", "ipfs"},
+			SupportedTransports: []string{"https", "grpcs", "wss", "aetra", "ipfs"},
 			AllowedAuthPolicies: []string{"none", "token"},
 			State:               request.State,
 			Height:              request.Height,
@@ -642,7 +642,7 @@ func ValidateInterfaceMappingV2(mapping InterfaceMappingV2) error {
 
 func ComputeRoutingIntegrationModuleBreakdownHashV2(breakdown RoutingIntegrationModuleBreakdownV2) string {
 	breakdown = canonicalRoutingIntegrationModuleBreakdownV2(breakdown)
-	parts := []string{"aetheris-routing-integration-module-breakdown-v2", breakdown.ModulePath}
+	parts := []string{"aetra-routing-integration-module-breakdown-v2", breakdown.ModulePath}
 	parts = appendBreakdownStringsV2(parts, "purpose", breakdown.Purpose)
 	for _, value := range breakdown.StateObjects {
 		parts = append(parts, "state", string(value))

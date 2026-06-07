@@ -112,7 +112,7 @@ func DefaultSchedulerParams() SchedulerParams {
 		MaxGasPerJob:     100_000,
 		HistoryRetention: 200,
 		AuthorizedModules: []string{
-			"aethercore",
+			"aetracore",
 			"avm-dex-contract",
 			"epoch",
 			"fees",

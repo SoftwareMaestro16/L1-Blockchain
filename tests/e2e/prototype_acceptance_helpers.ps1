@@ -9,7 +9,7 @@ function Write-AcceptanceStep {
 function Invoke-AcceptanceBuild {
   param([pscustomobject]$Context)
 
-  & (Join-Path $Context.RepoRoot "scripts\build-aetherisd.ps1") -Binary $Context.Binary
+  & (Join-Path $Context.RepoRoot "scripts\build-aetrad.ps1") -Binary $Context.Binary
 }
 
 function Invoke-AcceptanceLocalnetScript {

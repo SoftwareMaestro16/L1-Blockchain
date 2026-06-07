@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sovereign-l1/l1/x/aetherisvm/async"
+	"github.com/sovereign-l1/l1/x/aetravm/async"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -158,7 +158,7 @@ func BenchmarkAVMRootGeneration(b *testing.B) {
 
 func benchAVMMessage(source string, nonce, createdHeight, delayHeight, expiryHeight, gasLimit uint64) AVMAsyncMessage {
 	msg := AVMAsyncMessage{
-		ChainID:         "aetheris-1",
+		ChainID:         "aetra-1",
 		Source:          source,
 		Destination:     "contract",
 		Payload:         []byte("payload"),

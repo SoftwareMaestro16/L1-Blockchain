@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	l1testutil "github.com/sovereign-l1/l1/tests/testutil"
 	"github.com/sovereign-l1/l1/x/fees/types"
 )
@@ -80,7 +80,7 @@ func (tx noFeeTx) GetMsgsV2() ([]protov2.Message, error) {
 }
 
 func validRawAddress(fill byte) string {
-	return aetherisaddress.FormatAccAddress(sdk.AccAddress{
+	return aetraaddress.FormatAccAddress(sdk.AccAddress{
 		fill, fill, fill, fill, fill,
 		fill, fill, fill, fill, fill,
 		fill, fill, fill, fill, fill,
@@ -88,9 +88,9 @@ func validRawAddress(fill byte) string {
 	})
 }
 
-func reservedAddress(t *testing.T, name string) aetherisaddress.SystemAddress {
+func reservedAddress(t *testing.T, name string) aetraaddress.SystemAddress {
 	t.Helper()
-	address, found := aetherisaddress.SystemAddressByName(name)
+	address, found := aetraaddress.SystemAddressByName(name)
 	require.True(t, found)
 	return address
 }
@@ -98,7 +98,7 @@ func reservedAddress(t *testing.T, name string) aetherisaddress.SystemAddress {
 func reservedBytes(t *testing.T, name string) []byte {
 	t.Helper()
 	address := reservedAddress(t, name)
-	bz, err := aetherisaddress.Parse(address.Raw)
+	bz, err := aetraaddress.Parse(address.Raw)
 	require.NoError(t, err)
 	return bz
 }
@@ -152,7 +152,7 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				fees: fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
 					FromAddress: validSender,
-					ToAddress:   aetherisaddress.ZeroRawAddress,
+					ToAddress:   aetraaddress.ZeroRawAddress,
 					Amount:      fee,
 				}},
 			},
@@ -236,7 +236,7 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				fees: fee,
 				msgs: []sdk.Msg{&banktypes.MsgMultiSend{
 					Inputs:  []banktypes.Input{{Address: validSender, Coins: fee}},
-					Outputs: []banktypes.Output{{Address: aetherisaddress.ZeroUserFriendly, Coins: fee}},
+					Outputs: []banktypes.Output{{Address: aetraaddress.ZeroUserFriendly, Coins: fee}},
 				}},
 			},
 			wantErr: "output 0: bank multisend output must not be zero address",
@@ -247,7 +247,7 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 				fees: fee,
 				msgs: []sdk.Msg{&distrtypes.MsgSetWithdrawAddress{
 					DelegatorAddress: validSender,
-					WithdrawAddress:  aetherisaddress.ZeroRawAddress,
+					WithdrawAddress:  aetraaddress.ZeroRawAddress,
 				}},
 			},
 			wantErr: "distribution withdraw address must not be zero address",
@@ -347,7 +347,7 @@ func TestAnteHandlerDecoratorRejectsAddressPolicyBeforeFeesAndNext(t *testing.T)
 		fees: sdk.Coins{},
 		msgs: []sdk.Msg{&banktypes.MsgSend{
 			FromAddress: validRawAddress(1),
-			ToAddress:   aetherisaddress.ZeroRawAddress,
+			ToAddress:   aetraaddress.ZeroRawAddress,
 			Amount:      sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 1)),
 		}},
 	}, false)

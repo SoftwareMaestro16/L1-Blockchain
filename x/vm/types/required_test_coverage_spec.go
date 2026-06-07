@@ -267,7 +267,7 @@ func IsAVMRequiredTestCoverageCategory(category AVMRequiredTestCoverageCategory)
 func ComputeAVMRequiredTestCoverageGroupHash(group AVMRequiredTestCoverageGroup) string {
 	group = canonicalAVMRequiredTestCoverageGroup(group)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-required-test-coverage-group-v1")
+	writeEnginePart(h, "aetra-avm-required-test-coverage-group-v1")
 	writeEnginePart(h, string(group.Category))
 	writeEngineUint64(h, uint64(len(group.Cases)))
 	for _, coverageCase := range group.Cases {
@@ -279,7 +279,7 @@ func ComputeAVMRequiredTestCoverageGroupHash(group AVMRequiredTestCoverageGroup)
 func ComputeAVMRequiredTestCoverageSpecHash(spec AVMRequiredTestCoverageSpec) string {
 	spec = canonicalAVMRequiredTestCoverageSpec(spec)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-required-test-coverage-spec-v1")
+	writeEnginePart(h, "aetra-avm-required-test-coverage-spec-v1")
 	writeEnginePart(h, spec.SpecName)
 	writeEngineUint64(h, uint64(len(spec.Groups)))
 	for _, group := range spec.Groups {

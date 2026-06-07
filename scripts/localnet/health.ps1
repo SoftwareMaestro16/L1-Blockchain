@@ -50,7 +50,7 @@ $summary = [ordered]@{
 }
 
 foreach ($node in $nodes) {
-  $nodeHome = Join-Path $node.FullName "aetherisd"
+  $nodeHome = Join-Path $node.FullName "aetrad"
   $summary.telemetry += [ordered]@{
     node      = $node.Name
     telemetry = Get-LocalnetNodeTelemetry -NodeHome $nodeHome

@@ -39,12 +39,12 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/app/keeperconfig"
 	actorregistrykeeper "github.com/sovereign-l1/l1/x/actor-registry/keeper"
 	actorregistrytypes "github.com/sovereign-l1/l1/x/actor-registry/types"
-	aethercorekeeper "github.com/sovereign-l1/l1/x/aethercore/keeper"
-	aethercoretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	aetracorekeeper "github.com/sovereign-l1/l1/x/aetracore/keeper"
+	aetracoretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	avmschedulerkeeper "github.com/sovereign-l1/l1/x/avm-scheduler/keeper"
 	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	bridgehubkeeper "github.com/sovereign-l1/l1/x/bridge-hub/keeper"
@@ -124,7 +124,7 @@ func (app *L1App) initKeepers(
 	appOpts servertypes.AppOptions,
 	keys map[string]*storetypes.KVStoreKey,
 ) client.TxConfig {
-	govAuthority := aetherisaddress.FormatAccAddress(authtypes.NewModuleAddress(govtypes.ModuleName))
+	govAuthority := aetraaddress.FormatAccAddress(authtypes.NewModuleAddress(govtypes.ModuleName))
 	app.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[consensusparamtypes.StoreKey]),
@@ -138,7 +138,7 @@ func (app *L1App) initKeepers(
 		runtime.NewKVStoreService(keys[authtypes.StoreKey]),
 		authtypes.ProtoBaseAccount,
 		GetMaccPerms(),
-		aetherisaddress.Codec{},
+		aetraaddress.Codec{},
 		AccountAddressPrefix,
 		govAuthority,
 		authkeeper.WithUnorderedTransactions(true),
@@ -162,8 +162,8 @@ func (app *L1App) initKeepers(
 		app.AccountKeeper,
 		app.BankKeeper,
 		govAuthority,
-		aetherisaddress.Codec{},
-		aetherisaddress.Codec{},
+		aetraaddress.Codec{},
+		aetraaddress.Codec{},
 	)
 	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
@@ -325,7 +325,7 @@ func (app *L1App) initKeepers(
 		app.DistrKeeper,
 		govAuthority,
 	)
-	app.AetherCoreKeeper = aethercorekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[aethercoretypes.StoreKey]))
+	app.AetraCoreKeeper = aetracorekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[aetracoretypes.StoreKey]))
 	app.LoadKeeper = loadkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[loadtypes.StoreKey]))
 	app.RoutingKeeper = routingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[routingtypes.StoreKey]))
 	app.ZonesKeeper = zoneskeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[zonestypes.StoreKey]))

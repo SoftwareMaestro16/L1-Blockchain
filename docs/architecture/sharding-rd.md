@@ -14,7 +14,7 @@ Aetra must define and audit its own consensus-safe architecture before
 implementation.
 
 The broader target-system design is defined in
-[Aetra Modular L1 Execution OS](aetheris-modular-execution-os.md). This
+[Aetra Modular L1 Execution OS](aetra-modular-execution-os.md). This
 document remains the narrower sharding and partitioning R&D safety gate.
 
 ## Terminology

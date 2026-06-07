@@ -936,7 +936,7 @@ func RootForNativePaymentObject(snapshot NativePaymentRoutingSnapshot, object Na
 func ComputePaymentChannelRoot(channel PaymentChannel) string {
 	channel = channel.Normalize()
 	return HashParts(
-		"aetheris-native-payment-channel-v1",
+		"aetra-native-payment-channel-v1",
 		channel.ChannelID,
 		channel.ChainID,
 		channel.ZoneID,
@@ -954,7 +954,7 @@ func ComputePaymentChannelRoot(channel PaymentChannel) string {
 func ComputeVirtualPaymentChannelRoot(channel VirtualPaymentChannel) string {
 	channel = channel.Normalize()
 	parts := []string{
-		"aetheris-native-virtual-payment-channel-v1",
+		"aetra-native-virtual-payment-channel-v1",
 		channel.VirtualChannelID,
 		channel.ChainID,
 		channel.ZoneID,
@@ -977,7 +977,7 @@ func ComputeVirtualPaymentChannelRoot(channel VirtualPaymentChannel) string {
 func ComputeNativePaymentRouteRoot(route PaymentRoute) string {
 	route = route.Normalize()
 	parts := []string{
-		"aetheris-native-payment-route-v1",
+		"aetra-native-payment-route-v1",
 		route.RouteID,
 		route.Payer,
 		route.Payee,
@@ -997,7 +997,7 @@ func ComputeNativePaymentRouteRoot(route PaymentRoute) string {
 func ComputeLiquidityReservationRoot(reservation LiquidityReservation) string {
 	reservation = reservation.Normalize()
 	return HashParts(
-		"aetheris-native-liquidity-reservation-v1",
+		"aetra-native-liquidity-reservation-v1",
 		reservation.ReservationID,
 		reservation.RouteID,
 		reservation.ChannelID,
@@ -1012,7 +1012,7 @@ func ComputeLiquidityReservationRoot(reservation LiquidityReservation) string {
 func ComputeSettlementProofRoot(proof SettlementProof) string {
 	proof = proof.Normalize()
 	return HashParts(
-		"aetheris-native-settlement-proof-v1",
+		"aetra-native-settlement-proof-v1",
 		proof.ProofID,
 		string(proof.ProofType),
 		proof.ChannelID,
@@ -1028,7 +1028,7 @@ func ComputeSettlementProofRoot(proof SettlementProof) string {
 func ComputeNativePaymentReceiptHash(receipt PaymentReceipt) string {
 	receipt = receipt.Normalize()
 	return HashParts(
-		"aetheris-native-payment-receipt-v1",
+		"aetra-native-payment-receipt-v1",
 		receipt.PaymentID,
 		receipt.RouteID,
 		receipt.ChannelID,
@@ -1041,7 +1041,7 @@ func ComputeNativePaymentReceiptHash(receipt PaymentReceipt) string {
 }
 
 func ComputePaymentChannelSetRoot(channels []PaymentChannel) string {
-	parts := []string{"aetheris-native-payment-channel-root-v1"}
+	parts := []string{"aetra-native-payment-channel-root-v1"}
 	for _, channel := range normalizePaymentChannels(channels) {
 		parts = append(parts, channel.ChannelRoot)
 	}
@@ -1049,7 +1049,7 @@ func ComputePaymentChannelSetRoot(channels []PaymentChannel) string {
 }
 
 func ComputeVirtualPaymentChannelSetRoot(channels []VirtualPaymentChannel) string {
-	parts := []string{"aetheris-native-virtual-payment-channel-root-v1"}
+	parts := []string{"aetra-native-virtual-payment-channel-root-v1"}
 	for _, channel := range normalizeVirtualPaymentChannels(channels) {
 		parts = append(parts, channel.VirtualRoot)
 	}
@@ -1057,7 +1057,7 @@ func ComputeVirtualPaymentChannelSetRoot(channels []VirtualPaymentChannel) strin
 }
 
 func ComputeNativePaymentRouteSetRoot(routes []PaymentRoute) string {
-	parts := []string{"aetheris-native-payment-route-root-v1"}
+	parts := []string{"aetra-native-payment-route-root-v1"}
 	for _, route := range normalizeNativePaymentRoutes(routes) {
 		parts = append(parts, route.RouteRoot)
 	}
@@ -1065,7 +1065,7 @@ func ComputeNativePaymentRouteSetRoot(routes []PaymentRoute) string {
 }
 
 func ComputeLiquidityReservationSetRoot(reservations []LiquidityReservation) string {
-	parts := []string{"aetheris-native-liquidity-reservation-root-v1"}
+	parts := []string{"aetra-native-liquidity-reservation-root-v1"}
 	for _, reservation := range normalizeLiquidityReservations(reservations) {
 		parts = append(parts, reservation.ReservationRoot)
 	}
@@ -1073,7 +1073,7 @@ func ComputeLiquidityReservationSetRoot(reservations []LiquidityReservation) str
 }
 
 func ComputeSettlementProofSetRoot(proofs []SettlementProof) string {
-	parts := []string{"aetheris-native-settlement-proof-root-v1"}
+	parts := []string{"aetra-native-settlement-proof-root-v1"}
 	for _, proof := range normalizeSettlementProofs(proofs) {
 		parts = append(parts, proof.ProofRoot)
 	}
@@ -1081,7 +1081,7 @@ func ComputeSettlementProofSetRoot(proofs []SettlementProof) string {
 }
 
 func ComputeNativePaymentReceiptSetRoot(receipts []PaymentReceipt) string {
-	parts := []string{"aetheris-native-payment-receipt-root-v1"}
+	parts := []string{"aetra-native-payment-receipt-root-v1"}
 	for _, receipt := range normalizePaymentReceipts(receipts) {
 		parts = append(parts, receipt.ReceiptHash)
 	}
@@ -1091,7 +1091,7 @@ func ComputeNativePaymentReceiptSetRoot(receipts []PaymentReceipt) string {
 func ComputeNativePaymentRoutingSnapshotRoot(snapshot NativePaymentRoutingSnapshot) string {
 	snapshot = snapshot.Normalize()
 	return HashParts(
-		"aetheris-native-payment-routing-snapshot-v1",
+		"aetra-native-payment-routing-snapshot-v1",
 		fmt.Sprintf("%020d", snapshot.Height),
 		snapshot.ChannelRoot,
 		snapshot.VirtualChannelRoot,

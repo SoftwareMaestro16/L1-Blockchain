@@ -25,7 +25,7 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 
 	actorregistrykeeper "github.com/sovereign-l1/l1/x/actor-registry/keeper"
-	aethercorekeeper "github.com/sovereign-l1/l1/x/aethercore/keeper"
+	aetracorekeeper "github.com/sovereign-l1/l1/x/aetracore/keeper"
 	avmschedulerkeeper "github.com/sovereign-l1/l1/x/avm-scheduler/keeper"
 	bridgehubkeeper "github.com/sovereign-l1/l1/x/bridge-hub/keeper"
 	burnkeeper "github.com/sovereign-l1/l1/x/burn/keeper"
@@ -112,7 +112,7 @@ type L1App struct {
 	StakeConcentrationKeeper  stakeconcentrationkeeper.Keeper
 	FeeCollectorKeeper        feecollectorkeeper.Keeper
 	FeesKeeper                feeskeeper.Keeper
-	AetherCoreKeeper          aethercorekeeper.Keeper
+	AetraCoreKeeper           aetracorekeeper.Keeper
 	LoadKeeper                loadkeeper.Keeper
 	RoutingKeeper             routingkeeper.Keeper
 	ZonesKeeper               zoneskeeper.Keeper

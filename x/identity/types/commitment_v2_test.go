@@ -147,7 +147,7 @@ func commitmentV2TestContext(currentHeight uint64) DomainCommitmentV2Context {
 	return DomainCommitmentV2Context{
 		CurrentHeight:      currentHeight,
 		RevealWindowBlocks: 20,
-		ChainID:            "aetheris-local-1",
+		ChainID:            "aetra-local-1",
 		ModuleVersion:      DefaultDomainCommitmentVersion,
 		RegistrationIntent: DomainRegistrationIntent,
 		RegistrationClass:  DefaultRegistrationClass,

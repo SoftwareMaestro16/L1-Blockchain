@@ -367,7 +367,7 @@ func (proof PaymentProofEnvelope) Validate() error {
 func ComputePaymentProofEnvelopeHash(proof PaymentProofEnvelope) string {
 	proof = proof.Normalize()
 	parts := []string{
-		"aetheris-financial-payment-proof-envelope-v1",
+		"aetra-financial-payment-proof-envelope-v1",
 		string(proof.ObjectType),
 		proof.ObjectID,
 		proof.StateKey,

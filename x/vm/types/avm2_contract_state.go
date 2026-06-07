@@ -558,7 +558,7 @@ func ComputeAVM2ContractStateEntryHash(entry AVM2ContractStateEntry) string {
 	entry = canonicalAVM2ContractStateEntry(entry)
 	entry.EntryHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-contract-state-entry-v1")
+	writeEnginePart(h, "aetra-avm2-contract-state-entry-v1")
 	writeEnginePart(h, entry.Key)
 	writeEnginePart(h, entry.ValueType)
 	writeEnginePart(h, entry.Purpose)
@@ -569,7 +569,7 @@ func ComputeAVM2ContractStateEntryHash(entry AVM2ContractStateEntry) string {
 func ComputeAVM2ContractStateLayoutRoot(layout AVM2ContractStateLayout) string {
 	layout = canonicalAVM2ContractStateLayout(layout)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-contract-state-layout-v1")
+	writeEnginePart(h, "aetra-avm2-contract-state-layout-v1")
 	writeEngineUint64(h, uint64(len(layout.Entries)))
 	for _, entry := range layout.Entries {
 		writeEnginePart(h, entry.EntryHash)
@@ -581,7 +581,7 @@ func ComputeAVM2CodeRecordHash(record AVM2CodeRecord) string {
 	record = canonicalAVM2CodeRecord(record)
 	record.RecordHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-code-record-v1")
+	writeEnginePart(h, "aetra-avm2-code-record-v1")
 	writeEngineUint64(h, record.CodeID)
 	writeEnginePart(h, record.CodeHash)
 	writeEngineUint64(h, record.VMVersion)
@@ -599,7 +599,7 @@ func ComputeAVM2ContractRecordHash(record AVM2ContractRecord) string {
 	record = canonicalAVM2ContractRecord(record)
 	record.RecordHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-contract-record-v1")
+	writeEnginePart(h, "aetra-avm2-contract-record-v1")
 	writeEnginePart(h, record.ContractAddr)
 	writeEngineUint64(h, record.CodeID)
 	writeEnginePart(h, record.Creator)
@@ -617,7 +617,7 @@ func ComputeAVM2ContractStorageValueHash(value AVM2ContractStorageValue) string 
 	value = canonicalAVM2ContractStorageValue(value)
 	value.RecordHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-contract-storage-value-v1")
+	writeEnginePart(h, "aetra-avm2-contract-storage-value-v1")
 	writeEnginePart(h, value.ContractAddr)
 	writeEnginePart(h, value.StorageKey)
 	writeEnginePart(h, value.ValueHash)
@@ -630,7 +630,7 @@ func ComputeAVM2ContractABIDescriptorRecordHash(record AVM2ContractABIDescriptor
 	record = canonicalAVM2ContractABIDescriptorRecord(record)
 	record.RecordHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-contract-abi-record-v1")
+	writeEnginePart(h, "aetra-avm2-contract-abi-record-v1")
 	writeEngineUint64(h, record.CodeID)
 	writeEnginePart(h, record.ABI.InterfaceHash)
 	writeEnginePart(h, record.Key)
@@ -642,7 +642,7 @@ func ComputeAVM2ContractEventRecordHash(record AVM2ContractEventRecord) string {
 	record = canonicalAVM2ContractEventRecord(record)
 	record.RecordHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-contract-event-record-v1")
+	writeEnginePart(h, "aetra-avm2-contract-event-record-v1")
 	writeEnginePart(h, record.Event.EventHash)
 	writeEnginePart(h, record.Key)
 	writeEnginePart(h, record.ShardKey)
@@ -653,7 +653,7 @@ func ComputeAVM2ContractMessageNonceRecordHash(record AVM2ContractMessageNonceRe
 	record = canonicalAVM2ContractMessageNonceRecord(record)
 	record.RecordHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-contract-message-nonce-v1")
+	writeEnginePart(h, "aetra-avm2-contract-message-nonce-v1")
 	writeEnginePart(h, record.ContractAddr)
 	writeEngineUint64(h, record.Nonce)
 	writeEnginePart(h, record.Key)
@@ -664,7 +664,7 @@ func ComputeAVM2ContractMessageNonceRecordHash(record AVM2ContractMessageNonceRe
 func ComputeAVM2ContractStateIndexRoot(index AVM2ContractStateIndex) string {
 	index = canonicalAVM2ContractStateIndex(index)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-contract-state-index-v1")
+	writeEnginePart(h, "aetra-avm2-contract-state-index-v1")
 	writeEnginePart(h, index.Layout.LayoutRoot)
 	writeEngineUint64(h, uint64(len(index.Codes)))
 	for _, code := range index.Codes {

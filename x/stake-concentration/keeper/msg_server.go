@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/stake-concentration/types"
 )
 
@@ -56,7 +56,7 @@ func (m msgServer) RecomputeConcentration(ctx context.Context, msg *types.MsgRec
 }
 
 func (m msgServer) requireAuthority(authority string) error {
-	if err := aetherisaddress.ValidateAuthorityAddress("authority", authority); err != nil {
+	if err := aetraaddress.ValidateAuthorityAddress("authority", authority); err != nil {
 		return types.ErrUnauthorized.Wrap(err.Error())
 	}
 	if authority != m.Authority() {

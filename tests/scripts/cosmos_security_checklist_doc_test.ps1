@@ -58,7 +58,7 @@ foreach ($module in @("contract-assets", "dex", "fees", "naet", "MsgUpdateParams
 foreach ($testRef in @(
     "app/determinism_test.go",
     "scripts/security/determinism-gate.ps1",
-    "x/aetherisvm/standards/aft/keeper/msg_server_test.go",
+    "x/aetravm/standards/aft/keeper/msg_server_test.go",
     "avm-dex-contract/keeper/msg_server_test.go",
     "x/fees/keeper/ante_test.go",
     "tests/e2e/query_surface_smoke.ps1",

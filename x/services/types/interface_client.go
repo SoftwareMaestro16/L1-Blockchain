@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type InterfaceUXStep string
@@ -676,7 +676,7 @@ func (report InterfaceCompatibilityReport) Validate() error {
 
 func ComputeInterfaceSchemaFormatHash(format InterfaceSchemaFormat) string {
 	return servicesHashParts(
-		"aetheris-services-interface-schema-format-v1",
+		"aetra-services-interface-schema-format-v1",
 		format.InterfaceHash,
 		format.MethodID,
 		format.SchemaEncoding,
@@ -690,7 +690,7 @@ func ComputeInterfaceSchemaFormatHash(format InterfaceSchemaFormat) string {
 
 func ComputeInterfaceDrivenUXFlowHash(flow InterfaceDrivenUXFlow) string {
 	parts := []string{
-		"aetheris-services-interface-ux-flow-v1",
+		"aetra-services-interface-ux-flow-v1",
 		flow.ServiceID,
 		flow.InterfaceHash,
 		flow.MethodName,
@@ -710,9 +710,9 @@ func ComputeInterfaceDrivenUXFlowHash(flow InterfaceDrivenUXFlow) string {
 func ComputeInterfaceRegistryMessageHash(msg interface{}) string {
 	switch m := msg.(type) {
 	case MsgRegisterInterface:
-		return servicesHashParts("aetheris-services-msg-register-interface-v1", m.Authority, m.Interface.InterfaceHash, m.Schema.FormatHash)
+		return servicesHashParts("aetra-services-msg-register-interface-v1", m.Authority, m.Interface.InterfaceHash, m.Schema.FormatHash)
 	case MsgUpdateInterface:
-		return servicesHashParts("aetheris-services-msg-update-interface-v1", m.Authority, m.PreviousInterfaceHash, m.Interface.InterfaceHash, m.Schema.FormatHash, fmt.Sprint(m.ExpectedVersion))
+		return servicesHashParts("aetra-services-msg-update-interface-v1", m.Authority, m.PreviousInterfaceHash, m.Interface.InterfaceHash, m.Schema.FormatHash, fmt.Sprint(m.ExpectedVersion))
 	default:
 		return coretypes.EmptyRootHash
 	}
@@ -720,12 +720,12 @@ func ComputeInterfaceRegistryMessageHash(msg interface{}) string {
 
 func ComputeInterfaceProofRecordHash(iface ServiceInterface) string {
 	key, _ := coretypes.ServiceInterfaceStateKey(iface.InterfaceHash)
-	return servicesHashParts("aetheris-services-interface-proof-record-v1", key, coretypes.ComputeServiceInterfaceHash(iface))
+	return servicesHashParts("aetra-services-interface-proof-record-v1", key, coretypes.ComputeServiceInterfaceHash(iface))
 }
 
 func ComputeInterfaceProofHash(proof InterfaceProof) string {
 	return servicesHashParts(
-		"aetheris-services-interface-proof-v1",
+		"aetra-services-interface-proof-v1",
 		proof.InterfaceHash,
 		proof.RegistryRoot,
 		proof.RecordHash,
@@ -735,7 +735,7 @@ func ComputeInterfaceProofHash(proof InterfaceProof) string {
 
 func ComputeSDKInterfaceVerificationHash(verification SDKInterfaceVerification) string {
 	return servicesHashParts(
-		"aetheris-services-sdk-interface-verification-v1",
+		"aetra-services-sdk-interface-verification-v1",
 		verification.ServiceID,
 		verification.InterfaceHash,
 		verification.Definition.DefinitionHash,
@@ -747,7 +747,7 @@ func ComputeSDKInterfaceVerificationHash(verification SDKInterfaceVerification) 
 
 func ComputeWalletCLISchemaHash(schema WalletCLISchema) string {
 	return servicesHashParts(
-		"aetheris-services-wallet-cli-schema-v1",
+		"aetra-services-wallet-cli-schema-v1",
 		schema.ServiceID,
 		schema.InterfaceHash,
 		schema.MethodID,
@@ -765,7 +765,7 @@ func ComputeWalletCLISchemaHash(schema WalletCLISchema) string {
 
 func ComputeInterfaceCompatibilityReportHash(report InterfaceCompatibilityReport) string {
 	parts := []string{
-		"aetheris-services-interface-compatibility-v1",
+		"aetra-services-interface-compatibility-v1",
 		report.PreviousInterfaceHash,
 		report.NextInterfaceHash,
 		fmt.Sprint(report.PreviousVersion),

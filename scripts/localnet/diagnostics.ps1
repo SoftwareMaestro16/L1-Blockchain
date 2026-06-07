@@ -23,7 +23,7 @@ $ErrorActionPreference = "Stop"
 
 $RepoRoot = Get-LocalnetRepoRoot
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "localnet output directory"
 Assert-LocalnetProfile -Profile $Profile
 
@@ -64,7 +64,7 @@ if (Test-Path -LiteralPath $logDir) {
 
 foreach ($node in $nodes) {
   $nodeName = $node.Name
-  $nodeHome = Join-Path $node.FullName "aetherisd"
+  $nodeHome = Join-Path $node.FullName "aetrad"
   $safeConfigDir = Join-Path $BundleDir "$nodeName\config"
   New-Item -ItemType Directory -Force -Path $safeConfigDir | Out-Null
 

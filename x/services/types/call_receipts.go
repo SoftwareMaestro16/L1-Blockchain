@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ServiceReceiptStatusText string
@@ -435,7 +435,7 @@ func (index ServiceCallReplayIndex) ContainsCallID(callID string) bool {
 
 func ComputeServiceReceiptCanonicalViewHash(view ServiceReceiptCanonicalView) string {
 	return servicesHashParts(
-		"aetheris-services-receipt-view-v1",
+		"aetra-services-receipt-view-v1",
 		view.CallID,
 		view.ServiceID,
 		view.MethodID,
@@ -456,7 +456,7 @@ func ComputeServiceReceiptCanonicalViewHash(view ServiceReceiptCanonicalView) st
 
 func ComputeServiceCallReplayEntryHash(entry ServiceCallReplayEntry) string {
 	return servicesHashParts(
-		"aetheris-services-replay-entry-v1",
+		"aetra-services-replay-entry-v1",
 		entry.ServiceID,
 		entry.Caller,
 		fmt.Sprint(entry.Nonce),
@@ -471,7 +471,7 @@ func ComputeServiceCallReplayEntryHash(entry ServiceCallReplayEntry) string {
 
 func ComputeServiceReceiptTombstoneHash(tombstone ServiceReceiptTombstone) string {
 	return servicesHashParts(
-		"aetheris-services-receipt-tombstone-v1",
+		"aetra-services-receipt-tombstone-v1",
 		tombstone.CallID,
 		tombstone.ServiceID,
 		tombstone.Caller,
@@ -490,7 +490,7 @@ func ComputeServiceCallReplayIndexHash(index ServiceCallReplayIndex) string {
 	sortServiceCallReplayEntries(entries)
 	sortServiceReceiptTombstones(tombstones)
 	parts := []string{
-		"aetheris-services-replay-index-v1",
+		"aetra-services-replay-index-v1",
 		fmt.Sprint(index.ProofHorizon),
 		fmt.Sprint(len(entries)),
 		fmt.Sprint(len(tombstones)),

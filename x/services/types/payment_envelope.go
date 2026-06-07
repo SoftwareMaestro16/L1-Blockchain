@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type PaymentEnvelope struct {
@@ -135,7 +135,7 @@ func (envelope PaymentEnvelope) Validate() error {
 func ComputePaymentEnvelopeHash(envelope PaymentEnvelope) string {
 	envelope = canonicalPaymentEnvelope(envelope)
 	return servicesHashParts(
-		"aetheris-services-payment-envelope-v1",
+		"aetra-services-payment-envelope-v1",
 		envelope.Asset,
 		envelope.Payer,
 		envelope.PayeeService,

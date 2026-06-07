@@ -4,7 +4,7 @@ This flow is local-only prototype tooling. It funds accounts by sending `naet` f
 
 ## Safety Rules
 
-- Only local chain IDs are accepted. The default is `aetheris-local-1`.
+- Only local chain IDs are accepted. The default is `aetra-local-1`.
 - The script reads CometBFT `/status` from `127.0.0.1:<RPCPort>` and refuses to run if the network does not match `-ChainId`.
 - The sender key is read from an ignored localnet home with `--keyring-backend test`.
 - No mnemonics, private keys, or keyring files are printed.
@@ -13,11 +13,11 @@ This flow is local-only prototype tooling. It funds accounts by sending `naet` f
 ## Single Recipient
 
 ```powershell
-$NODE1 = build\aetherisd.exe keys show node1 -a --home .localnet\node1\aetherisd --keyring-backend test
+$NODE1 = build\aetrad.exe keys show node1 -a --home .localnet\node1\aetrad --keyring-backend test
 .\scripts\localnet\fund.ps1 `
   -OutputDir .localnet `
-  -Binary build\aetherisd.exe `
-  -ChainId aetheris-local-1 `
+  -Binary build\aetrad.exe `
+  -ChainId aetra-local-1 `
   -RPCPort 26657 `
   -Recipients @($NODE1) `
   -Amount 1000000naet
@@ -28,13 +28,13 @@ $NODE1 = build\aetherisd.exe keys show node1 -a --home .localnet\node1\aetherisd
 Use `-Recipients` when every account receives the same `-Amount`, and `-Transfers` for explicit `address=amount` entries.
 
 ```powershell
-$NODE1 = build\aetherisd.exe keys show node1 -a --home .localnet\node1\aetherisd --keyring-backend test
-$NODE2 = build\aetherisd.exe keys show node2 -a --home .localnet\node2\aetherisd --keyring-backend test
+$NODE1 = build\aetrad.exe keys show node1 -a --home .localnet\node1\aetrad --keyring-backend test
+$NODE2 = build\aetrad.exe keys show node2 -a --home .localnet\node2\aetrad --keyring-backend test
 
 .\scripts\localnet\fund.ps1 `
   -OutputDir .localnet `
-  -Binary build\aetherisd.exe `
-  -ChainId aetheris-local-1 `
+  -Binary build\aetrad.exe `
+  -ChainId aetra-local-1 `
   -RPCPort 26657 `
   -Recipients @($NODE1) `
   -Transfers @("$NODE2=2500000naet") `

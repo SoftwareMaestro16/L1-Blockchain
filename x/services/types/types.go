@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 const CurrentGenesisVersion = 1
@@ -128,7 +128,7 @@ type ServiceDisputeRecord struct {
 
 type GenesisState struct {
 	Version  uint64
-	Params   coretypes.AetherCoreParams
+	Params   coretypes.AetraCoreParams
 	Registry ServiceRegistryState
 	Disputes []ServiceDisputeRecord
 }
@@ -161,7 +161,7 @@ func NewServiceDisputeRecord(msg MsgSubmitServiceDispute) (ServiceDisputeRecord,
 		return ServiceDisputeRecord{}, err
 	}
 	record := ServiceDisputeRecord{
-		DisputeID:    servicesHashParts("aetheris-services-dispute-id-v1", msg.ServiceID, msg.CallID, msg.ProviderID, msg.EvidenceHash),
+		DisputeID:    servicesHashParts("aetra-services-dispute-id-v1", msg.ServiceID, msg.CallID, msg.ProviderID, msg.EvidenceHash),
 		ServiceID:    msg.ServiceID,
 		CallID:       msg.CallID,
 		ProviderID:   msg.ProviderID,
@@ -189,7 +189,7 @@ func (record ServiceDisputeRecord) Validate() error {
 
 func ComputeServiceDisputeHash(record ServiceDisputeRecord) string {
 	return servicesHashParts(
-		"aetheris-services-dispute-v1",
+		"aetra-services-dispute-v1",
 		record.DisputeID,
 		record.ServiceID,
 		record.CallID,

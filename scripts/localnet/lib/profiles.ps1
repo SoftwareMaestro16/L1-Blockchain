@@ -134,7 +134,7 @@ function Set-LocalnetProfileGenesis {
   $nodes = Get-LocalnetNodes -OutputDir $resolved
 
   foreach ($node in $nodes) {
-    $genesisPath = Join-Path $node.FullName "aetherisd\config\genesis.json"
+    $genesisPath = Join-Path $node.FullName "aetrad\config\genesis.json"
     $doc = Get-Content -Raw -LiteralPath $genesisPath | ConvertFrom-Json
     $appState = $doc.app_state
 

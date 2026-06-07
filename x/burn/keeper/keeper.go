@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/burn/types"
 )
 
@@ -67,7 +67,7 @@ func (k Keeper) BurnUserCoins(ctx context.Context, burner sdk.AccAddress, amount
 	if len(reason) > int(params.MaxReasonBytes) {
 		return types.BurnReason{}, types.ErrInvalidBurn.Wrap("reason exceeds max_reason_bytes")
 	}
-	if len(burner) == 0 || aetherisaddress.IsZeroAccAddress(burner) {
+	if len(burner) == 0 || aetraaddress.IsZeroAccAddress(burner) {
 		return types.BurnReason{}, types.ErrInvalidBurn.Wrap("burner must not be empty or zero")
 	}
 	if err := types.ValidateBurnCoins(params, amount); err != nil {
@@ -82,7 +82,7 @@ func (k Keeper) BurnUserCoins(ctx context.Context, burner sdk.AccAddress, amount
 	if err := k.bankKeeper.BurnCoins(cacheCtx, types.ModuleName, amount); err != nil {
 		return types.BurnReason{}, err
 	}
-	record, err := k.recordBurn(cacheCtx, amount, epoch, aetherisaddress.FormatAccAddress(burner), "", reason, false)
+	record, err := k.recordBurn(cacheCtx, amount, epoch, aetraaddress.FormatAccAddress(burner), "", reason, false)
 	if err != nil {
 		return types.BurnReason{}, err
 	}

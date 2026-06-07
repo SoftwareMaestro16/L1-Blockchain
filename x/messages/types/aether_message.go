@@ -225,7 +225,7 @@ func AetherMessageFromMessage(msg Message, route UnifiedMessageRoute, traceID st
 		return AetherMessage{}, err
 	}
 	if traceID == "" {
-		traceID = hashParts("aetheris-aether-message-trace-v1", hex.EncodeToString(msg.MessageID))
+		traceID = hashParts("aetra-aether-message-trace-v1", hex.EncodeToString(msg.MessageID))
 	}
 	return NewAetherMessage(AetherMessage{
 		ParentMsgID:     parentMsgID,
@@ -255,14 +255,14 @@ func AetherMessageFromMessage(msg Message, route UnifiedMessageRoute, traceID st
 func ComputeAetherMessageID(msg AetherMessage) string {
 	msg = normalizeAetherMessage(msg)
 	parts := aetherMessageCanonicalParts(msg)
-	parts = append([]string{"aetheris-aether-message-id-v1"}, parts...)
+	parts = append([]string{"aetra-aether-message-id-v1"}, parts...)
 	return hashParts(parts...)
 }
 
 func ComputeAetherTraceID(msg AetherMessage) string {
 	msg = normalizeAetherMessage(msg)
 	return hashParts(
-		"aetheris-aether-message-trace-v1",
+		"aetra-aether-message-trace-v1",
 		string(msg.SenderZoneID),
 		msg.SenderShardID,
 		msg.Sender,
@@ -272,7 +272,7 @@ func ComputeAetherTraceID(msg AetherMessage) string {
 }
 
 func ComputeAetherPayloadHash(payload []byte) string {
-	return hashParts("aetheris-aether-message-payload-v1", hex.EncodeToString(payload))
+	return hashParts("aetra-aether-message-payload-v1", hex.EncodeToString(payload))
 }
 
 func CanonicalAetherMessageBinary(msg AetherMessage) ([]byte, error) {

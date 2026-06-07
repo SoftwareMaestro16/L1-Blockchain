@@ -7,7 +7,7 @@ import (
 )
 
 func TestDNLRecursiveLookupUsesProofsAndIgnoresExpiredNodes(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	node := testDNLNodeRecord(t, 0x71, salt, []string{"financial"}, []string{"svc-pay"}, 100)
 	expired := testDNLNodeRecord(t, 0x72, salt, []string{"financial"}, []string{"svc-pay"}, 20)
 	reputation := testDNLReputation(t, node.NodeID, 30)
@@ -48,7 +48,7 @@ func TestDNLRecursiveLookupUsesProofsAndIgnoresExpiredNodes(t *testing.T) {
 }
 
 func TestDNLConsensusRouteSelectionUsesCommittedMetricsOnly(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	fast := testDNLNodeRecord(t, 0x81, salt, []string{"contract"}, []string{"svc-contract"}, 100)
 	slow := testDNLNodeRecord(t, 0x82, salt, []string{"contract"}, []string{"svc-contract"}, 100)
 	fastRoute := testDNLRouteForNode(t, "contract", "svc-contract", fast.NodeID, 1, 8_000, 100)

@@ -248,7 +248,7 @@ func TestUnifiedResolutionRecordV2RoutingMetadataValidation(t *testing.T) {
 			TargetType:             string(IdentityResolutionTargetContract),
 			PreferredTarget:        "swap",
 			FallbackTargets:        []string{"swap-backup", "swap-cold"},
-			ChainContext:           "aetheris-main",
+			ChainContext:           "aetra-main",
 			FeeHint:                "standard",
 			TimeoutHint:            30,
 			MemoPolicy:             "optional",

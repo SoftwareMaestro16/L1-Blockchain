@@ -10,7 +10,7 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
 	l1app "github.com/sovereign-l1/l1/app"
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	feecollectortypes "github.com/sovereign-l1/l1/x/fee-collector/types"
 	treasurykeeper "github.com/sovereign-l1/l1/x/treasury/keeper"
 	"github.com/sovereign-l1/l1/x/treasury/types"
@@ -48,8 +48,8 @@ func TestSpendProposalLifecycle(t *testing.T) {
 	msgServer := treasurykeeper.NewMsgServerImpl(app.TreasuryKeeper)
 
 	submit, err := msgServer.SubmitTreasurySpend(ctx, &types.MsgSubmitTreasurySpend{
-		Proposer:  aetherisaddress.FormatAccAddress(proposer),
-		Recipient: aetherisaddress.FormatAccAddress(recipient),
+		Proposer:  aetraaddress.FormatAccAddress(proposer),
+		Recipient: aetraaddress.FormatAccAddress(recipient),
 		Amount:    sdk.NewCoins(coin(100)),
 		Bucket:    types.BucketEcosystem,
 		Epoch:     4,
@@ -77,7 +77,7 @@ func TestSpendProposalLifecycle(t *testing.T) {
 	require.NoError(t, app.TreasuryKeeper.AssertTreasuryAccountingInvariant(ctx))
 
 	_, err = msgServer.CancelTreasurySpend(ctx, &types.MsgCancelTreasurySpend{
-		Actor:   aetherisaddress.FormatAccAddress(proposer),
+		Actor:   aetraaddress.FormatAccAddress(proposer),
 		SpendId: submit.Spend.Id,
 	})
 	require.ErrorIs(t, err, types.ErrInvalidSpend)
@@ -148,13 +148,13 @@ func TestRecipientAllowlistEnforced(t *testing.T) {
 	params, err := app.TreasuryKeeper.GetParams(ctx)
 	require.NoError(t, err)
 	params.RecipientAllowlistEnabled = true
-	params.RecipientAllowlist = []string{aetherisaddress.FormatAccAddress(proposer)}
+	params.RecipientAllowlist = []string{aetraaddress.FormatAccAddress(proposer)}
 	require.NoError(t, app.TreasuryKeeper.SetParams(ctx, params))
 	msgServer := treasurykeeper.NewMsgServerImpl(app.TreasuryKeeper)
 
 	_, err = msgServer.SubmitTreasurySpend(ctx, &types.MsgSubmitTreasurySpend{
-		Proposer:  aetherisaddress.FormatAccAddress(proposer),
-		Recipient: aetherisaddress.FormatAccAddress(recipient),
+		Proposer:  aetraaddress.FormatAccAddress(proposer),
+		Recipient: aetraaddress.FormatAccAddress(recipient),
 		Amount:    sdk.NewCoins(coin(1)),
 		Bucket:    types.BucketEcosystem,
 		Epoch:     1,
@@ -170,8 +170,8 @@ func TestExportImportPreservesPendingSpends(t *testing.T) {
 	l1app.FundTestAddr(t, source, sourceCtx, proposer, sdk.NewCoins(coin(10)))
 	spend, err := source.TreasuryKeeper.SubmitSpend(
 		sourceCtx,
-		aetherisaddress.FormatAccAddress(proposer),
-		aetherisaddress.FormatAccAddress(recipient),
+		aetraaddress.FormatAccAddress(proposer),
+		aetraaddress.FormatAccAddress(recipient),
 		sdk.NewCoins(coin(77)),
 		types.BucketEcosystem,
 		12,
@@ -197,8 +197,8 @@ func TestExportImportPreservesPendingSpends(t *testing.T) {
 func submitAndApprove(t *testing.T, ctx sdk.Context, msgServer types.MsgServer, authority string, proposer, recipient sdk.AccAddress, amount int64, epoch, vestingEnd uint64) types.TreasurySpend {
 	t.Helper()
 	submit, err := msgServer.SubmitTreasurySpend(ctx, &types.MsgSubmitTreasurySpend{
-		Proposer:        aetherisaddress.FormatAccAddress(proposer),
-		Recipient:       aetherisaddress.FormatAccAddress(recipient),
+		Proposer:        aetraaddress.FormatAccAddress(proposer),
+		Recipient:       aetraaddress.FormatAccAddress(recipient),
 		Amount:          sdk.NewCoins(coin(amount)),
 		Bucket:          types.BucketEcosystem,
 		Epoch:           epoch,

@@ -1509,7 +1509,7 @@ func (m PosCompatibilityMiddleware) Validate(extensions map[string]struct{}, mod
 }
 
 func ComputeCosmosSDKCompatibilityRoot(manifest CosmosSDKCompatibilityManifest) string {
-	return posHashRoot("aetheris-pos-cosmos-sdk-compatibility-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-cosmos-sdk-compatibility-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Extensions)))
 		for _, extension := range manifest.Extensions {
 			posWritePart(w, extension.ModuleName)
@@ -1677,7 +1677,7 @@ func PoSModuleBoundaryByName(manifest PosModuleBoundaryManifest, moduleName stri
 }
 
 func ComputePoSModuleBoundaryRoot(manifest PosModuleBoundaryManifest) string {
-	return posHashRoot("aetheris-pos-module-boundaries-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-module-boundaries-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Boundaries)))
 		for _, boundary := range manifest.Boundaries {
 			posWritePart(w, boundary.ModuleName)
@@ -1945,7 +1945,7 @@ func (q PosQuerySpec) Validate(knownModules map[string]struct{}) error {
 }
 
 func ComputePosMessageQueryRoot(manifest PosMessageQueryManifest) string {
-	return posHashRoot("aetheris-pos-messages-queries-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-messages-queries-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Messages)))
 		for _, message := range manifest.Messages {
 			posWritePart(w, message.ModuleName)
@@ -2172,7 +2172,7 @@ func (p PosMigrationPhaseSpec) Validate(knownModules map[string]struct{}, priorP
 }
 
 func ComputePosMigrationStrategyRoot(manifest PosMigrationStrategyManifest) string {
-	return posHashRoot("aetheris-pos-migration-strategy-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-migration-strategy-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Phases)))
 		for _, phase := range manifest.Phases {
 			posWriteUint64(w, uint64(phase.PhaseID))
@@ -2426,7 +2426,7 @@ func (s PosTestCoverageSpec) Validate(expectedType string, knownModules map[stri
 }
 
 func ComputePosRequiredTestCoverageRoot(manifest PosRequiredTestCoverageManifest) string {
-	return posHashRoot("aetheris-pos-required-test-coverage-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-required-test-coverage-v1", func(w posByteWriter) {
 		posWriteCoverageSpecs(w, manifest.UnitTests)
 		posWriteCoverageSpecs(w, manifest.IntegrationTests)
 		posWriteCoverageSpecs(w, manifest.InvariantTests)
@@ -2776,7 +2776,7 @@ func validatePosAlertSeverity(severity string) error {
 }
 
 func ComputePosObservabilityRoot(manifest PosObservabilityManifest) string {
-	return posHashRoot("aetheris-pos-observability-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-observability-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Metrics)))
 		for _, metric := range manifest.Metrics {
 			posWritePart(w, metric.Name)
@@ -2959,7 +2959,7 @@ func validatePosGovernanceSafetyLevel(level string) error {
 }
 
 func ComputePosGovernanceParameterRoot(manifest PosGovernanceParameterManifest) string {
-	return posHashRoot("aetheris-pos-governance-parameters-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-governance-parameters-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Parameters)))
 		for _, parameter := range manifest.Parameters {
 			posWritePart(w, parameter.Category)
@@ -3280,7 +3280,7 @@ func (c PosAcceptanceCriterionSpec) Validate(
 }
 
 func ComputePosAcceptanceCriteriaRoot(manifest PosAcceptanceCriteriaManifest) string {
-	return posHashRoot("aetheris-pos-acceptance-criteria-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-acceptance-criteria-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Criteria)))
 		for _, criterion := range manifest.Criteria {
 			posWritePart(w, criterion.Name)
@@ -3528,7 +3528,7 @@ func (r RewardMultiplierIntegration) Validate(knownModules map[string]struct{}) 
 }
 
 func ComputeKeeperIntegrationRoot(manifest KeeperIntegrationManifest) string {
-	return posHashRoot("aetheris-pos-keeper-integration-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-keeper-integration-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.KeeperInterfaces)))
 		for _, keeper := range manifest.KeeperInterfaces {
 			posWritePart(w, keeper.KeeperName)
@@ -3761,7 +3761,7 @@ func (s StateKeySpec) Validate() error {
 }
 
 func ComputeStateModelRoot(manifest StateModelManifest) string {
-	return posHashRoot("aetheris-pos-state-model-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-state-model-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Keys)))
 		for _, key := range manifest.Keys {
 			posWritePart(w, key.Domain)
@@ -3896,7 +3896,7 @@ func (s RootCommitmentSpec) Validate() error {
 }
 
 func ComputeRootCommitmentManifestRoot(manifest RootCommitmentManifest) string {
-	return posHashRoot("aetheris-pos-root-commitments-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-root-commitments-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Roots)))
 		for _, root := range manifest.Roots {
 			posWritePart(w, root.Name)
@@ -3937,7 +3937,7 @@ func ComputeEpochRoot(records []EpochRecord) (string, error) {
 			return "", err
 		}
 	}
-	return posHashRoot("aetheris-pos-epoch-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-epoch-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, record := range ordered {
 			posWriteUint64(w, record.EpochID)
@@ -3969,7 +3969,7 @@ func ComputeValidatorScoreRoot(records []PosStateValidatorScoreRecord) (string, 
 			return "", err
 		}
 	}
-	return posHashRoot("aetheris-pos-validator-score-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-validator-score-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, record := range ordered {
 			posWriteUint64(w, record.EpochID)
@@ -4025,7 +4025,7 @@ func ComputeEvidenceRoot(records []EvidenceRecord, groups []EvidenceVerification
 			return "", err
 		}
 	}
-	return posHashRoot("aetheris-pos-evidence-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-evidence-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(orderedRecords)))
 		for _, record := range orderedRecords {
 			posWritePart(w, computeEvidenceRecordHash(record))
@@ -4054,7 +4054,7 @@ func ComputePerformanceRoot(records []PerformanceRecord) (string, error) {
 			return "", err
 		}
 	}
-	return posHashRoot("aetheris-pos-performance-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-performance-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, record := range ordered {
 			posWriteUint64(w, record.EpochID)
@@ -4078,7 +4078,7 @@ func ComputeSlashingRoot(records []SlashingRecord) (string, error) {
 			return "", err
 		}
 	}
-	return posHashRoot("aetheris-pos-slashing-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-slashing-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, record := range ordered {
 			posWritePart(w, record.RecordHash)
@@ -4103,7 +4103,7 @@ func ComputeRiskWindowSetRoot(records []RiskWindowRecord) (string, error) {
 			return "", err
 		}
 	}
-	return posHashRoot("aetheris-pos-risk-window-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-risk-window-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, record := range ordered {
 			posWritePart(w, record.RiskHistoryRoot)
@@ -4290,7 +4290,7 @@ func DefaultPosLayerOrder() []PosLayer {
 }
 
 func ComputeLayeredPosArchitectureRoot(layers []PosLayerSpec) string {
-	return posHashRoot("aetheris-pos-layered-architecture-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-layered-architecture-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(layers)))
 		for _, layer := range layers {
 			posWritePart(w, string(layer.Layer))
@@ -4610,7 +4610,7 @@ func (r PerformanceRewardRecord) Validate() error {
 }
 
 func ComputePerformanceRewardHash(record PerformanceRewardRecord) string {
-	return posHashRoot("aetheris-pos-performance-reward-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-performance-reward-v1", func(w posByteWriter) {
 		posWriteUint64(w, record.EpochID)
 		posWritePart(w, record.ValidatorID)
 		posWritePart(w, record.BaseEmissionNaet.String())
@@ -5719,7 +5719,7 @@ func QuerySlashExposure(windows []RiskWindowRecord, query SlashExposureQuery) (S
 }
 
 func ComputeRiskWindowRoot(record RiskWindowRecord) string {
-	return posHashRoot("aetheris-pos-risk-window-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-risk-window-v1", func(w posByteWriter) {
 		posWritePart(w, record.StakeOwner)
 		posWritePart(w, record.ValidatorAddress)
 		posWritePart(w, record.AmountNaet.String())
@@ -5731,7 +5731,7 @@ func ComputeRiskWindowRoot(record RiskWindowRecord) string {
 }
 
 func ComputeUnbondingRiskHistoryKey(record UnbondingRiskRecord) string {
-	return posHashRoot("aetheris-pos-unbonding-risk-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-unbonding-risk-v1", func(w posByteWriter) {
 		posWritePart(w, record.DelegatorID)
 		posWritePart(w, record.ValidatorID)
 		posWritePart(w, record.AmountNaet.String())
@@ -5742,7 +5742,7 @@ func ComputeUnbondingRiskHistoryKey(record UnbondingRiskRecord) string {
 }
 
 func ComputeRedelegationRiskHistoryKey(record RedelegationRiskRecord) string {
-	return posHashRoot("aetheris-pos-redelegation-risk-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-redelegation-risk-v1", func(w posByteWriter) {
 		posWritePart(w, record.DelegatorID)
 		posWritePart(w, record.SourceValidatorID)
 		posWritePart(w, record.DestinationValidatorID)
@@ -5969,7 +5969,7 @@ func ComputeValidatorSetHash(validators []ScoredValidator) (string, error) {
 			return "", err
 		}
 	}
-	return posHashRoot("aetheris-pos-validator-set-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-validator-set-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, validator := range ordered {
 			posWritePart(w, validator.ValidatorID)
@@ -6002,7 +6002,7 @@ func DeriveEpochSeedWithSource(source EpochSeedSource, epochID uint64, startHeig
 	if err := validatePosHash("validator set hash", validatorSetHash); err != nil {
 		return "", err
 	}
-	return posHashRoot("aetheris-pos-epoch-seed-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-epoch-seed-v1", func(w posByteWriter) {
 		posWritePart(w, string(source))
 		posWriteUint64(w, epochID)
 		posWriteUint64(w, startHeight)
@@ -6972,7 +6972,7 @@ func (s TaskGroupSet) Validate() error {
 }
 
 func ComputeTaskAssignmentHash(epochID uint64, seed string, assignment TaskAssignment) string {
-	return posHashRoot("aetheris-pos-task-assignment-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-task-assignment-v1", func(w posByteWriter) {
 		posWriteUint64(w, epochID)
 		posWritePart(w, seed)
 		posWritePart(w, assignment.TaskID)
@@ -6990,7 +6990,7 @@ func ComputeTaskAssignmentHash(epochID uint64, seed string, assignment TaskAssig
 }
 
 func ComputeTaskAssignmentRoot(epochID uint64, seed string, assignments []TaskAssignment) string {
-	return posHashRoot("aetheris-pos-task-assignment-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-task-assignment-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, epochID)
 		posWritePart(w, seed)
 		posWriteUint64(w, uint64(len(assignments)))
@@ -7001,7 +7001,7 @@ func ComputeTaskAssignmentRoot(epochID uint64, seed string, assignments []TaskAs
 }
 
 func ComputeTaskGroupID(group TaskGroup) string {
-	return posHashRoot("aetheris-pos-task-group-id-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-task-group-id-v1", func(w posByteWriter) {
 		posWriteUint64(w, group.EpochID)
 		posWritePart(w, group.WorkloadID)
 		posWritePart(w, string(group.WorkloadType))
@@ -7012,7 +7012,7 @@ func ComputeTaskGroupID(group TaskGroup) string {
 }
 
 func ComputeTaskGroupStakeWeightRoot(epochID uint64, task WorkloadTask, members []string, validators map[string]ScoredValidator) string {
-	return posHashRoot("aetheris-pos-task-group-stake-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-task-group-stake-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, epochID)
 		posWritePart(w, task.TaskID)
 		posWritePart(w, task.WorkloadID)
@@ -7028,7 +7028,7 @@ func ComputeTaskGroupStakeWeightRoot(epochID uint64, task WorkloadTask, members 
 }
 
 func ComputeTaskGroupRoot(epochID uint64, seed string, groups []TaskGroup) string {
-	return posHashRoot("aetheris-pos-task-group-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-task-group-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, epochID)
 		posWritePart(w, seed)
 		posWriteUint64(w, uint64(len(groups)))
@@ -7584,7 +7584,7 @@ func (o CollatorCandidateOutput) Validate() error {
 }
 
 func ComputeCollatorCandidateOutputHash(output CollatorCandidateOutput) string {
-	return posHashRoot("aetheris-pos-collator-output-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-collator-output-v1", func(w posByteWriter) {
 		posWriteUint64(w, output.EpochID)
 		posWritePart(w, output.CollatorID)
 		posWritePart(w, output.OperatorAddress)
@@ -7679,7 +7679,7 @@ func (r CollatorRegistry) ActiveCollatorsForWorkload(workloadType WorkloadType) 
 }
 
 func ComputeCollatorRegistryRoot(registry CollatorRegistry) string {
-	return posHashRoot("aetheris-pos-collator-registry-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-collator-registry-v1", func(w posByteWriter) {
 		posWriteUint64(w, registry.EpochID)
 		posWriteUint64(w, uint64(len(registry.Collators)))
 		for _, collator := range registry.Collators {
@@ -7839,7 +7839,7 @@ func (r CollatorOutputVerificationResult) Validate() error {
 }
 
 func ComputeCollatorOutputVerificationRoot(result CollatorOutputVerificationResult) string {
-	return posHashRoot("aetheris-pos-collator-verification-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-collator-verification-v1", func(w posByteWriter) {
 		posWritePart(w, result.OutputHash)
 		posWriteUint64(w, uint64(result.ValidVotes))
 		posWriteUint64(w, uint64(result.InvalidVotes))
@@ -7890,7 +7890,7 @@ func BuildInvalidCollatorOutputEvidence(evidenceID string, reporterID string, co
 }
 
 func ComputeInvalidCollatorOutputEvidenceHash(collator CollatorRecord, output CollatorCandidateOutput, verification CollatorOutputVerificationResult) string {
-	return posHashRoot("aetheris-pos-invalid-collator-output-evidence-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-invalid-collator-output-evidence-v1", func(w posByteWriter) {
 		posWritePart(w, collator.CollatorID)
 		posWritePart(w, output.CandidateOutputHash)
 		posWritePart(w, verification.VerificationRoot)
@@ -8425,7 +8425,7 @@ func selectTaskValidatorIDs(seed string, task WorkloadTask, role ValidatorRole, 
 		ranked[i] = rankedValidator{
 			validatorID: validator.ValidatorID,
 			score:       validator.Score,
-			rankHash: posHashRoot("aetheris-pos-task-rank-v1", func(w posByteWriter) {
+			rankHash: posHashRoot("aetra-pos-task-rank-v1", func(w posByteWriter) {
 				posWritePart(w, seed)
 				posWritePart(w, task.TaskID)
 				posWritePart(w, task.WorkloadID)
@@ -8515,7 +8515,7 @@ func taskGroupProposerOrder(seed string, task WorkloadTask, members []string) []
 	for i, validatorID := range members {
 		ranks[i] = proposerRank{
 			validatorID: validatorID,
-			hash: posHashRoot("aetheris-pos-task-group-proposer-v1", func(w posByteWriter) {
+			hash: posHashRoot("aetra-pos-task-group-proposer-v1", func(w posByteWriter) {
 				posWritePart(w, seed)
 				posWritePart(w, task.TaskID)
 				posWritePart(w, task.WorkloadID)
@@ -8696,7 +8696,7 @@ func compareDelegationIntents(left, right DelegationIntent) int {
 }
 
 func computeDelegationActivationKey(epoch uint64, validatorID string, nominations []Nomination) string {
-	return posHashRoot("aetheris-pos-delegation-activation-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-delegation-activation-v1", func(w posByteWriter) {
 		posWriteUint64(w, epoch)
 		posWritePart(w, validatorID)
 		posWriteUint64(w, uint64(len(nominations)))
@@ -8708,7 +8708,7 @@ func computeDelegationActivationKey(epoch uint64, validatorID string, nomination
 }
 
 func computeEvidenceSettlementHash(settlement EvidenceSettlement) string {
-	return posHashRoot("aetheris-pos-evidence-settlement-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-evidence-settlement-v1", func(w posByteWriter) {
 		posWritePart(w, settlement.EvidenceID)
 		posWritePart(w, settlement.ReporterID)
 		posWritePart(w, settlement.Slash.ValidatorID)
@@ -8721,7 +8721,7 @@ func computeEvidenceSettlementHash(settlement EvidenceSettlement) string {
 }
 
 func computeStructuredEvidenceHash(evidence StructuredEvidenceRecord) string {
-	return posHashRoot("aetheris-pos-structured-evidence-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-structured-evidence-v1", func(w posByteWriter) {
 		posWritePart(w, evidence.EvidenceID)
 		posWritePart(w, evidence.EvidenceType)
 		posWritePart(w, evidence.ReporterID)
@@ -8737,7 +8737,7 @@ func computeStructuredEvidenceHash(evidence StructuredEvidenceRecord) string {
 }
 
 func computeEvidenceRecordHash(record EvidenceRecord) string {
-	return posHashRoot("aetheris-pos-evidence-record-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-evidence-record-v1", func(w posByteWriter) {
 		posWritePart(w, record.EvidenceID)
 		posWritePart(w, record.EvidenceType)
 		posWritePart(w, record.AccusedValidator)
@@ -8755,14 +8755,14 @@ func computeEvidenceRecordHash(record EvidenceRecord) string {
 }
 
 func computeEvidenceVerificationAssignmentSeed(epochSeed string, evidenceID string) string {
-	return posHashRoot("aetheris-pos-evidence-verification-seed-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-evidence-verification-seed-v1", func(w posByteWriter) {
 		posWritePart(w, epochSeed)
 		posWritePart(w, evidenceID)
 	})
 }
 
 func computeEvidenceVerifierSelectionHash(epochSeed string, evidenceID string, validatorID string) string {
-	return posHashRoot("aetheris-pos-evidence-verifier-rank-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-evidence-verifier-rank-v1", func(w posByteWriter) {
 		posWritePart(w, epochSeed)
 		posWritePart(w, evidenceID)
 		posWritePart(w, validatorID)
@@ -8770,7 +8770,7 @@ func computeEvidenceVerifierSelectionHash(epochSeed string, evidenceID string, v
 }
 
 func computeEvidenceVerificationGroupID(group EvidenceVerificationGroup) string {
-	return posHashRoot("aetheris-pos-evidence-verification-group-id-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-evidence-verification-group-id-v1", func(w posByteWriter) {
 		posWritePart(w, group.EvidenceID)
 		posWriteUint64(w, group.EpochID)
 		posWritePart(w, group.AssignmentSeed)
@@ -8780,7 +8780,7 @@ func computeEvidenceVerificationGroupID(group EvidenceVerificationGroup) string 
 }
 
 func computeEvidenceVerificationGroupHash(group EvidenceVerificationGroup) string {
-	return posHashRoot("aetheris-pos-evidence-verification-group-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-evidence-verification-group-v1", func(w posByteWriter) {
 		posWritePart(w, group.EvidenceID)
 		posWriteUint64(w, group.EpochID)
 		posWritePart(w, group.VerificationGroupID)
@@ -8807,7 +8807,7 @@ func computeEvidenceVerificationRoot(evidenceID string, votes []EvidenceVerifica
 		}
 		return ordered[i].VoteHeight < ordered[j].VoteHeight
 	})
-	return posHashRoot("aetheris-pos-evidence-verification-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-evidence-verification-root-v1", func(w posByteWriter) {
 		posWritePart(w, evidenceID)
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, vote := range ordered {
@@ -8828,7 +8828,7 @@ func computeEvidenceFinalityVoteRoot(evidenceID string, votes []EvidenceFinality
 		}
 		return ordered[i].FinalityHeight < ordered[j].FinalityHeight
 	})
-	return posHashRoot("aetheris-pos-evidence-finality-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-evidence-finality-root-v1", func(w posByteWriter) {
 		posWritePart(w, evidenceID)
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, vote := range ordered {
@@ -8842,7 +8842,7 @@ func computeEvidenceFinalityVoteRoot(evidenceID string, votes []EvidenceFinality
 }
 
 func computeWorkloadRewardRoot(settlement WorkloadRewardSettlement) string {
-	return posHashRoot("aetheris-pos-workload-reward-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetra-pos-workload-reward-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, settlement.EpochID)
 		posWriteUint64(w, uint64(len(settlement.Rewards)))
 		for _, reward := range settlement.Rewards {

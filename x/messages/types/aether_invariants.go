@@ -359,13 +359,13 @@ func NewAetherValueEscrow(escrow AetherValueEscrow) (AetherValueEscrow, error) {
 }
 
 func ComputeAetherGlobalMessageRoot(outbox []AetherMessage, inbox []AetherMessage) string {
-	return hashParts("aetheris-aether-global-message-root-v1", ComputeAetherMessageListRoot(outbox), ComputeAetherMessageListRoot(inbox))
+	return hashParts("aetra-aether-global-message-root-v1", ComputeAetherMessageListRoot(outbox), ComputeAetherMessageListRoot(inbox))
 }
 
 func ComputeAetherMessageListRoot(messages []AetherMessage) string {
 	ordered := cloneAetherMessages(messages)
 	sortAetherMessages(ordered)
-	parts := []string{"aetheris-aether-message-list-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-aether-message-list-root-v1", fmt.Sprint(len(ordered))}
 	for _, msg := range ordered {
 		parts = append(parts, ComputeAetherMessageLeafHash(msg))
 	}
@@ -373,19 +373,19 @@ func ComputeAetherMessageListRoot(messages []AetherMessage) string {
 }
 
 func ComputeAetherMessageLeafHash(msg AetherMessage) string {
-	return hashParts("aetheris-aether-message-leaf-v1", msg.MsgID, ComputeAetherPayloadHash(msg.Payload), msg.RouteCommitment, msg.ValueNAET.String(), fmt.Sprint(msg.CreatedAtHeight), fmt.Sprint(msg.Nonce))
+	return hashParts("aetra-aether-message-leaf-v1", msg.MsgID, ComputeAetherPayloadHash(msg.Payload), msg.RouteCommitment, msg.ValueNAET.String(), fmt.Sprint(msg.CreatedAtHeight), fmt.Sprint(msg.Nonce))
 }
 
 func ComputeAetherMsgBusStateRoot(state AetherMsgBusState) string {
 	escrowRoot := ComputeAetherEscrowRoot(state.Escrows)
 	replayRoot := ComputeAetherReplayRoot(state.ReplayMsgIDs)
-	return hashParts("aetheris-aether-msgbus-state-root-v1", state.MessageRoot, state.ReceiptRoot, escrowRoot, replayRoot)
+	return hashParts("aetra-aether-msgbus-state-root-v1", state.MessageRoot, state.ReceiptRoot, escrowRoot, replayRoot)
 }
 
 func ComputeAetherEscrowRoot(escrows []AetherValueEscrow) string {
 	ordered := cloneAetherValueEscrows(escrows)
 	sortAetherValueEscrows(ordered)
-	parts := []string{"aetheris-aether-escrow-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-aether-escrow-root-v1", fmt.Sprint(len(ordered))}
 	for _, escrow := range ordered {
 		parts = append(parts, escrow.EscrowHash)
 	}
@@ -395,24 +395,24 @@ func ComputeAetherEscrowRoot(escrows []AetherValueEscrow) string {
 func ComputeAetherReplayRoot(msgIDs []string) string {
 	ordered := append([]string(nil), msgIDs...)
 	sort.Strings(ordered)
-	parts := []string{"aetheris-aether-replay-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-aether-replay-root-v1", fmt.Sprint(len(ordered))}
 	parts = append(parts, ordered...)
 	return hashParts(parts...)
 }
 
 func ComputeAetherValueEscrowHash(escrow AetherValueEscrow) string {
 	escrow = normalizeAetherValueEscrow(escrow)
-	return hashParts("aetheris-aether-value-escrow-v1", escrow.MsgID, escrow.ValueLocked.String(), escrow.FeeLocked.String(), string(escrow.Status), escrow.ReceiptHash)
+	return hashParts("aetra-aether-value-escrow-v1", escrow.MsgID, escrow.ValueLocked.String(), escrow.FeeLocked.String(), string(escrow.Status), escrow.ReceiptHash)
 }
 
 func ComputeAetherInclusionProofHash(proof AetherInclusionProof) string {
-	parts := []string{"aetheris-aether-inclusion-proof-v1", string(proof.Kind), proof.MsgID, proof.Root, proof.ValueHash}
+	parts := []string{"aetra-aether-inclusion-proof-v1", string(proof.Kind), proof.MsgID, proof.Root, proof.ValueHash}
 	parts = append(parts, proof.Path...)
 	return hashParts(parts...)
 }
 
 func ComputeAetherPayloadExecutionPolicyHash(policy AetherPayloadExecutionPolicy) string {
-	return hashParts("aetheris-aether-payload-policy-v1", fmt.Sprint(policy.NoExternalAPIs), fmt.Sprint(policy.NoWallClockTime), fmt.Sprint(policy.MeteredIteration))
+	return hashParts("aetra-aether-payload-policy-v1", fmt.Sprint(policy.NoExternalAPIs), fmt.Sprint(policy.NoWallClockTime), fmt.Sprint(policy.MeteredIteration))
 }
 
 func MsgBusEnvelopeKey(msgID string) (string, error) {

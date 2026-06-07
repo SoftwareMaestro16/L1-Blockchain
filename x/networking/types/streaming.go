@@ -622,7 +622,7 @@ func StreamReassemblyRoot(payload []byte) (string, error) {
 	if len(payload) == 0 {
 		return "", errors.New("networking stream reassembly payload is required")
 	}
-	return hashBytes("aetheris-networking-payload-v1", payload), nil
+	return hashBytes("aetra-networking-payload-v1", payload), nil
 }
 
 func VerifyStreamChunkHash(chunk PayloadChunk) error {

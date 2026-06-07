@@ -152,7 +152,7 @@ func testXServicesRegistryState(t *testing.T) (ServiceRegistryStateV2, Canonical
 		AuthModel:        "owner",
 		StateDependency:  "service_root",
 		Owner:            "owner.dex",
-		ZoneID:           "aetheris",
+		ZoneID:           "aetra",
 		Version:          1,
 		EndpointURIHash:  testInterfaceHash("x-services/endpoint"),
 		MetadataHash:     testInterfaceHash("x-services/metadata"),

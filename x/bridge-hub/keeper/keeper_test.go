@@ -29,7 +29,7 @@ func bridge(height uint64) types.BridgeRecord {
 	return types.BridgeRecord{
 		BridgeID:         bridgeID,
 		SourceChain:      "ethereum",
-		TargetChain:      "aetheris",
+		TargetChain:      "aetra",
 		Operators:        []string{"op2", "op1"},
 		ProofPolicy:      types.ProofPolicyLightClient,
 		DailyLimit:       100,

@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestFormalServiceInterfaceProjectsExtendedFields(t *testing.T) {
@@ -169,7 +169,7 @@ func testInterfaceSystemDescriptor() coretypes.ServiceDescriptor {
 		Execution: coretypes.ServiceExecutionDescriptor{
 			Location:        coretypes.ServiceLocationHybrid,
 			Target:          "portable.target",
-			Endpoint:        "https://portable.aetheris.local/v1",
+			Endpoint:        "https://portable.aetra.local/v1",
 			Mode:            coretypes.ExecutionModeAsync,
 			FailureBehavior: coretypes.ServiceFailureChallenge,
 			ResultExpiry:    30,

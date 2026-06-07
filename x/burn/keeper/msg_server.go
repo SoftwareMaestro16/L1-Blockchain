@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/burn/types"
 )
 
@@ -44,10 +44,10 @@ func (m msgServer) BurnUserCoins(ctx context.Context, msg *types.MsgBurnUserCoin
 	if msg == nil {
 		return nil, types.ErrInvalidBurn.Wrap("empty request")
 	}
-	if err := aetherisaddress.ValidateUserAddress("burner", msg.Burner); err != nil {
+	if err := aetraaddress.ValidateUserAddress("burner", msg.Burner); err != nil {
 		return nil, types.ErrInvalidBurn.Wrap(err.Error())
 	}
-	burner, err := aetherisaddress.ParseAccAddress(msg.Burner)
+	burner, err := aetraaddress.ParseAccAddress(msg.Burner)
 	if err != nil {
 		return nil, types.ErrInvalidBurn.Wrap(err.Error())
 	}
@@ -83,7 +83,7 @@ func (m msgServer) UpdateBurnParams(ctx context.Context, msg *types.MsgUpdateBur
 }
 
 func (m msgServer) requireAuthority(authority string) error {
-	if err := aetherisaddress.ValidateAuthorityAddress("authority", authority); err != nil {
+	if err := aetraaddress.ValidateAuthorityAddress("authority", authority); err != nil {
 		return types.ErrUnauthorized.Wrap(err.Error())
 	}
 	if authority != m.Authority() {

@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 const (
@@ -380,7 +380,7 @@ func (export ServiceRegistryExportV2) Validate() error {
 func ComputeServiceRegistryParamsV2Hash(params ServiceRegistryParamsV2) string {
 	params = CanonicalizeServiceRegistryParamsV2(params)
 	parts := []string{
-		"aetheris-services-registry-params-v1",
+		"aetra-services-registry-params-v1",
 		fmt.Sprint(params.MaxTTLDelta),
 		fmt.Sprint(params.ProofHorizon),
 		"endpoint_types",
@@ -396,7 +396,7 @@ func ComputeServiceRegistryParamsV2Hash(params ServiceRegistryParamsV2) string {
 
 func ComputeServiceInterfaceDescriptorBytesHashV2(descriptor DistributedInterfaceDescriptor) string {
 	return servicesHashParts(
-		"aetheris-services-interface-descriptor-bytes-v1",
+		"aetra-services-interface-descriptor-bytes-v1",
 		descriptor.InterfaceName,
 		fmt.Sprint(descriptor.Version),
 		descriptor.SchemaHash,
@@ -407,7 +407,7 @@ func ComputeServiceInterfaceDescriptorBytesHashV2(descriptor DistributedInterfac
 }
 
 func ComputeServiceVersionedInterfaceEntryV2Hash(entry ServiceVersionedInterfaceEntryV2) string {
-	return servicesHashParts("aetheris-services-versioned-interface-entry-v1", entry.InterfaceHash, fmt.Sprint(entry.Version), entry.Key, entry.DescriptorHash)
+	return servicesHashParts("aetra-services-versioned-interface-entry-v1", entry.InterfaceHash, fmt.Sprint(entry.Version), entry.Key, entry.DescriptorHash)
 }
 
 func ComputeServiceVersionedInterfaceRootV2(interfaces []DistributedInterfaceDescriptor) (string, error) {
@@ -415,7 +415,7 @@ func ComputeServiceVersionedInterfaceRootV2(interfaces []DistributedInterfaceDes
 	if err != nil {
 		return "", err
 	}
-	parts := []string{"aetheris-services-versioned-interface-root-v1", fmt.Sprint(len(entries))}
+	parts := []string{"aetra-services-versioned-interface-root-v1", fmt.Sprint(len(entries))}
 	for _, entry := range entries {
 		parts = append(parts, entry.EntryHash)
 	}
@@ -424,7 +424,7 @@ func ComputeServiceVersionedInterfaceRootV2(interfaces []DistributedInterfaceDes
 
 func ComputeServiceRegistryExportV2Hash(export ServiceRegistryExportV2) string {
 	return servicesHashParts(
-		"aetheris-services-registry-export-v1",
+		"aetra-services-registry-export-v1",
 		export.State.StateRoot,
 		export.Params.ParamsHash,
 		export.Roots.StateRoot,

@@ -206,7 +206,7 @@ func (alert ServiceObservabilityAlert) ValidateFormat() error {
 
 func ComputeServiceObservabilityEventHash(event ServiceObservabilityEvent) string {
 	return servicesHashParts(
-		"aetheris-services-observability-event-v1",
+		"aetra-services-observability-event-v1",
 		string(event.EventID),
 		string(event.Category),
 		event.Source,
@@ -215,7 +215,7 @@ func ComputeServiceObservabilityEventHash(event ServiceObservabilityEvent) strin
 
 func ComputeServiceObservabilityAlertHash(alert ServiceObservabilityAlert) string {
 	return servicesHashParts(
-		"aetheris-services-observability-alert-v1",
+		"aetra-services-observability-alert-v1",
 		string(alert.AlertID),
 		string(alert.Severity),
 		string(alert.MetricID),
@@ -229,7 +229,7 @@ func ComputeServiceObservabilitySignalsManifestHash(manifest ServiceObservabilit
 	manifest.Events = canonicalServiceObservabilityEvents(manifest.Events)
 	manifest.Alerts = canonicalServiceObservabilityAlerts(manifest.Alerts)
 	parts := []string{
-		"aetheris-services-observability-signals-manifest-v1",
+		"aetra-services-observability-signals-manifest-v1",
 		"events",
 		fmt.Sprint(len(manifest.Events)),
 	}

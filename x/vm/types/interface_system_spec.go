@@ -519,7 +519,7 @@ func QueryAVMInterfaceByService(registry AVMInterfaceRegistry, serviceID string)
 func ComputeAVMInterfaceHash(descriptor AVMInterfaceDescriptor) string {
 	descriptor = canonicalAVMInterfaceDescriptor(descriptor)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-interface-descriptor-v1")
+	writeEnginePart(h, "aetra-avm-interface-descriptor-v1")
 	writeEnginePart(h, descriptor.InterfaceVersion)
 	writeEnginePart(h, descriptor.Owner)
 	writeEnginePart(h, string(descriptor.TargetType))
@@ -562,7 +562,7 @@ func ComputeAVMInterfaceHash(descriptor AVMInterfaceDescriptor) string {
 func ComputeAVMInterfaceRegistryRoot(registry AVMInterfaceRegistry) string {
 	registry = canonicalAVMInterfaceRegistry(registry)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-interface-registry-v1")
+	writeEnginePart(h, "aetra-avm-interface-registry-v1")
 	writeEngineUint64(h, uint64(len(registry.Interfaces)))
 	for _, descriptor := range registry.Interfaces {
 		writeEnginePart(h, descriptor.InterfaceHash)
@@ -581,7 +581,7 @@ func ComputeAVMInterfaceRegistryRoot(registry AVMInterfaceRegistry) string {
 func ComputeAVMInterfaceDescriptorRoot(descriptor AVMInterfaceDescriptor) string {
 	descriptor = canonicalAVMInterfaceDescriptor(descriptor)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-interface-descriptor-root-v1")
+	writeEnginePart(h, "aetra-avm-interface-descriptor-root-v1")
 	writeEngineUint64(h, uint64(len(descriptor.MethodDescriptors)))
 	for _, method := range descriptor.MethodDescriptors {
 		writeAVMMethodDescriptor(h, method)
@@ -609,7 +609,7 @@ func ComputeAVMInterfaceDescriptorRoot(descriptor AVMInterfaceDescriptor) string
 func ComputeAVMInterfaceSchemaHash(schema AVMInterfaceSchema) string {
 	schema = canonicalAVMInterfaceSchema(schema)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-interface-schema-v1")
+	writeEnginePart(h, "aetra-avm-interface-schema-v1")
 	writeEnginePart(h, schema.InterfaceHash)
 	writeEnginePart(h, string(schema.SchemaEncoding))
 	writeEnginePart(h, schema.DescriptorRoot)
@@ -623,7 +623,7 @@ func ComputeAVMInterfaceSchemaHash(schema AVMInterfaceSchema) string {
 func ComputeAVMInterfaceBindingHash(binding AVMInterfaceBinding) string {
 	binding = canonicalAVMInterfaceBinding(binding)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-interface-binding-v1")
+	writeEnginePart(h, "aetra-avm-interface-binding-v1")
 	writeEnginePart(h, binding.TargetID)
 	writeEnginePart(h, string(binding.TargetType))
 	writeEnginePart(h, binding.InterfaceHash)
@@ -633,7 +633,7 @@ func ComputeAVMInterfaceBindingHash(binding AVMInterfaceBinding) string {
 func ComputeAVMSDKCodeGenerationHash(format AVMSDKCodeGenerationFormat) string {
 	format = canonicalAVMSDKCodeGenerationFormat(format)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-interface-sdk-codegen-v1")
+	writeEnginePart(h, "aetra-avm-interface-sdk-codegen-v1")
 	writeEnginePart(h, format.InterfaceHash)
 	writeEnginePart(h, string(format.Format))
 	writeEnginePart(h, format.PackageName)

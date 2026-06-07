@@ -52,7 +52,7 @@ Validation:
 
 ## Local Bootstrap Profile
 
-The tracked local profile is `aetheris-local-1`. Its operator-facing genesis, account, validator, endpoint, and audit contract is defined in [Aetra Local Bootstrap Profile](bootstrap-profile.md).
+The tracked local profile is `aetra-local-1`. Its operator-facing genesis, account, validator, endpoint, and audit contract is defined in [Aetra Local Bootstrap Profile](bootstrap-profile.md).
 
 ## Upgrade Policy
 

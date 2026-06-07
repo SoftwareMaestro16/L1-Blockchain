@@ -603,7 +603,7 @@ func ComputeAVM2AsyncCallPlanHash(plan AVM2AsyncCallPlan) string {
 	plan = canonicalAVM2AsyncCallPlan(plan)
 	plan.PlanHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-async-call-plan-v1")
+	writeEnginePart(h, "aetra-avm2-async-call-plan-v1")
 	writeEngineUint64(h, plan.Height)
 	writeEnginePart(h, plan.CallerContract)
 	writeEnginePart(h, plan.Message.ID)
@@ -619,7 +619,7 @@ func ComputeAVM2PromiseResolutionHash(resolution AVM2PromiseResolution) string {
 	resolution = canonicalAVM2PromiseResolution(resolution)
 	resolution.ResolutionHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-promise-resolution-v1")
+	writeEnginePart(h, "aetra-avm2-promise-resolution-v1")
 	writeEnginePart(h, resolution.PromiseID)
 	writeEnginePart(h, resolution.OriginalMessageID)
 	writeEnginePart(h, resolution.ResolutionMessage.ID)
@@ -634,7 +634,7 @@ func ComputeAVM2PromiseTimeoutTaskHash(task AVM2PromiseTimeoutTask) string {
 	task = canonicalAVM2PromiseTimeoutTask(task)
 	task.TaskHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-promise-timeout-task-v1")
+	writeEnginePart(h, "aetra-avm2-promise-timeout-task-v1")
 	writeEnginePart(h, task.PromiseID)
 	writeEnginePart(h, task.Contract)
 	writeEngineUint64(h, task.DueHeight)
@@ -647,7 +647,7 @@ func ComputeAVM2MethodDescriptorHash(method AVM2MethodDescriptor) string {
 	method = canonicalAVM2MethodDescriptor(method)
 	method.MethodHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-method-descriptor-v1")
+	writeEnginePart(h, "aetra-avm2-method-descriptor-v1")
 	writeEnginePart(h, method.Selector)
 	writeEnginePart(h, method.Name)
 	writeEnginePart(h, method.ArgumentSchemaHash)
@@ -661,7 +661,7 @@ func ComputeAVM2EventDescriptorHash(event AVM2EventDescriptor) string {
 	event = canonicalAVM2EventDescriptor(event)
 	event.EventHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-abi-event-descriptor-v1")
+	writeEnginePart(h, "aetra-avm2-abi-event-descriptor-v1")
 	writeEnginePart(h, event.Name)
 	writeEnginePart(h, event.SchemaHash)
 	return hex.EncodeToString(h.Sum(nil))
@@ -671,7 +671,7 @@ func ComputeAVM2ErrorDescriptorHash(errDesc AVM2ErrorDescriptor) string {
 	errDesc = canonicalAVM2ErrorDescriptor(errDesc)
 	errDesc.ErrorHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-error-descriptor-v1")
+	writeEnginePart(h, "aetra-avm2-error-descriptor-v1")
 	writeEnginePart(h, errDesc.Code)
 	writeEnginePart(h, errDesc.SchemaHash)
 	return hex.EncodeToString(h.Sum(nil))
@@ -681,7 +681,7 @@ func ComputeAVM2FundRequirementHash(requirement AVM2FundRequirement) string {
 	requirement = canonicalAVM2FundRequirement(requirement)
 	requirement.RequirementHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-fund-requirement-v1")
+	writeEnginePart(h, "aetra-avm2-fund-requirement-v1")
 	writeEnginePart(h, requirement.Selector)
 	writeEnginePart(h, requirement.Denom)
 	writeEnginePart(h, requirement.Minimum.String())
@@ -692,7 +692,7 @@ func ComputeAVM2GasHintHash(hint AVM2GasHint) string {
 	hint = canonicalAVM2GasHint(hint)
 	hint.HintHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-gas-hint-v1")
+	writeEnginePart(h, "aetra-avm2-gas-hint-v1")
 	writeEnginePart(h, hint.Selector)
 	writeEngineUint64(h, hint.Estimate)
 	return hex.EncodeToString(h.Sum(nil))
@@ -702,7 +702,7 @@ func ComputeAVM2ABIIntrospectionHash(descriptor AVM2ABIIntrospectionDescriptor) 
 	descriptor = canonicalAVM2ABIIntrospectionDescriptor(descriptor)
 	descriptor.InterfaceHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-abi-introspection-v1")
+	writeEnginePart(h, "aetra-avm2-abi-introspection-v1")
 	writeEngineUint64(h, descriptor.ABIVersion)
 	writeEngineUint64(h, descriptor.CodeID)
 	writeEnginePart(h, descriptor.CodeHash)
@@ -734,7 +734,7 @@ func ComputeAVM2ABIMethodCallHash(call AVM2ABIMethodCall) string {
 	call = canonicalAVM2ABIMethodCall(call)
 	call.CallHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-method-call-v1")
+	writeEnginePart(h, "aetra-avm2-method-call-v1")
 	writeEnginePart(h, call.InterfaceHash)
 	writeEnginePart(h, call.MethodSelector)
 	writeEnginePart(h, call.ArgumentEncoding)
@@ -751,7 +751,7 @@ func ComputeAVM2ABIIdentityBindingHash(binding AVM2ABIIdentityBinding) string {
 	binding = canonicalAVM2ABIIdentityBinding(binding)
 	binding.BindingHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm2-abi-identity-binding-v1")
+	writeEnginePart(h, "aetra-avm2-abi-identity-binding-v1")
 	writeEnginePart(h, binding.Name)
 	writeEnginePart(h, binding.InterfaceHash)
 	writeEnginePart(h, binding.ResolverRecordHash)

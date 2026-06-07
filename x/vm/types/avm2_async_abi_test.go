@@ -143,7 +143,7 @@ func TestAVM2ABIIdentityBindingIsProofCommitted(t *testing.T) {
 func mustAVM2AsyncCallMessage(t *testing.T) AVMAsyncMessage {
 	t.Helper()
 	msg, err := NewAVMAsyncMessage(AVMAsyncMessage{
-		ChainID:         "aetheris-local",
+		ChainID:         "aetra-local",
 		Source:          "contract-a",
 		Destination:     "contract-b",
 		Payload:         []byte("remote-call"),
@@ -167,7 +167,7 @@ func mustAVM2AsyncCallMessage(t *testing.T) AVMAsyncMessage {
 func mustAVM2PromiseMessage(t *testing.T, payloadType string, createdHeight, expiryHeight uint64) AVMAsyncMessage {
 	t.Helper()
 	msg, err := NewAVMAsyncMessage(AVMAsyncMessage{
-		ChainID:         "aetheris-local",
+		ChainID:         "aetra-local",
 		Source:          "contract-b",
 		Destination:     "contract-a",
 		Payload:         []byte(payloadType),

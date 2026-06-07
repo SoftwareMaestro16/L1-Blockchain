@@ -254,7 +254,7 @@ func (policy ServiceExecutionHardConstraintPolicy) HasOffChainCanonicalizationGa
 func ComputeServiceHardConstraintHash(constraint ServiceHardConstraint) string {
 	constraint = canonicalServiceHardConstraint(constraint)
 	parts := []string{
-		"aetheris-services-hard-constraint-v1",
+		"aetra-services-hard-constraint-v1",
 		string(constraint.ConstraintID),
 		string(constraint.Category),
 		fmt.Sprint(constraint.ConsensusCritical),
@@ -272,7 +272,7 @@ func ComputeServiceHardConstraintHash(constraint ServiceHardConstraint) string {
 func ComputeServiceHardConstraintsManifestHash(manifest ServiceHardConstraintsManifest) string {
 	manifest.Constraints = canonicalServiceHardConstraints(manifest.Constraints)
 	parts := []string{
-		"aetheris-services-hard-constraints-manifest-v1",
+		"aetra-services-hard-constraints-manifest-v1",
 		fmt.Sprint(len(manifest.Constraints)),
 	}
 	for _, constraint := range manifest.Constraints {

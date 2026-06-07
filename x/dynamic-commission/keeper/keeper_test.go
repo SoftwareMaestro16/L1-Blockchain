@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	dynamiccommissionkeeper "github.com/sovereign-l1/l1/x/dynamic-commission/keeper"
 	"github.com/sovereign-l1/l1/x/dynamic-commission/types"
 )
@@ -179,5 +179,5 @@ func TestExportImportPreservesEffectiveCommission(t *testing.T) {
 }
 
 func validatorAddress() string {
-	return aetherisaddress.FormatAccAddress(simtestutil.CreateIncrementalAccounts(1)[0])
+	return aetraaddress.FormatAccAddress(simtestutil.CreateIncrementalAccounts(1)[0])
 }

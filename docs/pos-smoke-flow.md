@@ -6,7 +6,7 @@ The flow verifies that a multi-validator localnet exposes staking and slashing s
 
 ## Supported Profiles
 
-- Chain ID: `aetheris-local-1`
+- Chain ID: `aetra-local-1`
 - Bond denom: `naet`
 - Default profile: `3` validators under `.localnet`
 - Heavy profile: `5` validators under `.localnet-5`
@@ -66,7 +66,7 @@ Initialize and start the default localnet:
 Query staking params:
 
 ```powershell
-build\aetherisd.exe query staking params --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query staking params --node tcp://127.0.0.1:26657 --output json
 ```
 
 Expected output includes:
@@ -82,7 +82,7 @@ Expected output includes:
 Query validators and select any bonded `operator_address`:
 
 ```powershell
-build\aetherisd.exe query staking validators --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query staking validators --node tcp://127.0.0.1:26657 --output json
 ```
 
 Expected output includes `BOND_STATUS_BONDED` validators with `aevaloper...` operator addresses. Do not assume only one validator or a fixed order.
@@ -90,25 +90,25 @@ Expected output includes `BOND_STATUS_BONDED` validators with `aevaloper...` ope
 Show the funded delegator account:
 
 ```powershell
-build\aetherisd.exe keys show node0 -a --home .localnet\node0\aetherisd --keyring-backend test
+build\aetrad.exe keys show node0 -a --home .localnet\node0\aetrad --keyring-backend test
 ```
 
 Delegate from `node0` to a bonded validator:
 
 ```powershell
-build\aetherisd.exe tx staking delegate <aevaloper...> 5000000naet --from node0 --home .localnet\node0\aetherisd --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe tx staking delegate <aevaloper...> 5000000naet --from node0 --home .localnet\node0\aetrad --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
 ```
 
 Expected output includes a `txhash`. Query the transaction until it returns `code = 0`:
 
 ```powershell
-build\aetherisd.exe query tx <txhash> --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query tx <txhash> --node tcp://127.0.0.1:26657 --output json
 ```
 
 Verify the delegation:
 
 ```powershell
-build\aetherisd.exe query staking delegation <AE...delegator> <aevaloper...> --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query staking delegation <AE...delegator> <aevaloper...> --node tcp://127.0.0.1:26657 --output json
 ```
 
 Expected output includes:
@@ -127,8 +127,8 @@ Expected output includes:
 Query slashing params and signing infos:
 
 ```powershell
-build\aetherisd.exe query slashing params --node tcp://127.0.0.1:26657 --output json
-build\aetherisd.exe query slashing signing-infos --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query slashing params --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query slashing signing-infos --node tcp://127.0.0.1:26657 --output json
 ```
 
 Expected output:
@@ -160,7 +160,7 @@ go test ./app
 go test ./...
 go vet ./...
 buf lint
-go build -o build/aetherisd.exe ./cmd/l1d
+go build -o build/aetrad.exe ./cmd/l1d
 .\tests\e2e\pos_smoke.ps1
 .\tests\e2e\pos_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5
 ```

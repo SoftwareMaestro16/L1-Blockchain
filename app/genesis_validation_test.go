@@ -16,7 +16,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	appparams "github.com/sovereign-l1/l1/app/params"
 	feestypes "github.com/sovereign-l1/l1/x/fees/types"
 	loadkeeper "github.com/sovereign-l1/l1/x/load/keeper"
@@ -110,7 +110,7 @@ func TestInitChainRejectsZeroGenesisAccount(t *testing.T) {
 	genesis[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(&authGenesis)
 
 	err = app.validateAetraAuthGenesis(genesis)
-	require.ErrorContains(t, err, aetherisaddress.ZeroRawAddress)
+	require.ErrorContains(t, err, aetraaddress.ZeroRawAddress)
 
 	stateBytes, err := json.MarshalIndent(genesis, "", " ")
 	require.NoError(t, err)
@@ -140,7 +140,7 @@ func TestGenesisRejectsDuplicateAndMalformedAccounts(t *testing.T) {
 			mutate: func(app *L1App, genesis GenesisState) {
 				var authRaw map[string]json.RawMessage
 				require.NoError(t, json.Unmarshal(genesis[authtypes.ModuleName], &authRaw))
-				authRaw["accounts"] = json.RawMessage(`[{"@type":"/aetheris.malformed.GenesisAccount"}]`)
+				authRaw["accounts"] = json.RawMessage(`[{"@type":"/aetra.malformed.GenesisAccount"}]`)
 				raw, err := json.Marshal(authRaw)
 				require.NoError(t, err)
 				genesis[authtypes.ModuleName] = raw
@@ -177,7 +177,7 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 			mutate: func(app *L1App, genesis GenesisState) {
 				bankGenesis := banktypes.GetGenesisStateFromAppState(app.AppCodec(), genesis)
 				bankGenesis.Balances = append(bankGenesis.Balances, banktypes.Balance{
-					Address: "not-an-aetheris-address",
+					Address: "not-an-aetra-address",
 					Coins:   sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 1)),
 				})
 				genesis[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)

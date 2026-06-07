@@ -800,31 +800,31 @@ func QueryPaymentSettlementProofFromState(state FinancialZonePaymentState, query
 
 func ComputePaymentIntentHash(intent PaymentIntent) string {
 	intent = intent.Normalize()
-	return HashParts("aetheris-financial-payment-intent-v1", intent.PaymentID, string(intent.IntentType), intent.Payer, intent.Payee, intent.TargetIdentity, intent.Amount, intent.MaxFee, intent.RouteIDOptional, fmt.Sprintf("%020d", intent.ExpiryHeight))
+	return HashParts("aetra-financial-payment-intent-v1", intent.PaymentID, string(intent.IntentType), intent.Payer, intent.Payee, intent.TargetIdentity, intent.Amount, intent.MaxFee, intent.RouteIDOptional, fmt.Sprintf("%020d", intent.ExpiryHeight))
 }
 
 func ComputePaymentSettlementStateHash(settlement PaymentSettlement) string {
 	settlement = settlement.Normalize()
-	return HashParts("aetheris-financial-payment-settlement-v1", settlement.PaymentID, settlement.ChannelID, settlement.RouteID, settlement.FinalStateHash, settlement.ReceiptHash, settlement.RefundHash, settlement.TimeoutHash, string(settlement.CloseStatus), settlement.ProofRoot, fmt.Sprintf("%020d", settlement.SettledHeight))
+	return HashParts("aetra-financial-payment-settlement-v1", settlement.PaymentID, settlement.ChannelID, settlement.RouteID, settlement.FinalStateHash, settlement.ReceiptHash, settlement.RefundHash, settlement.TimeoutHash, string(settlement.CloseStatus), settlement.ProofRoot, fmt.Sprintf("%020d", settlement.SettledHeight))
 }
 
 func ComputePaymentDisputeRoot(dispute PaymentDispute) string {
 	dispute = dispute.Normalize()
-	return HashParts("aetheris-financial-payment-dispute-v1", dispute.DisputeID, dispute.PaymentID, dispute.ChannelID, dispute.FraudProofHash, dispute.StaleStateHash, dispute.NewerStateHash, dispute.SubmittedBy, fmt.Sprintf("%020d", dispute.OpenedHeight), fmt.Sprintf("%020d", dispute.ChallengeEnd), string(dispute.Status))
+	return HashParts("aetra-financial-payment-dispute-v1", dispute.DisputeID, dispute.PaymentID, dispute.ChannelID, dispute.FraudProofHash, dispute.StaleStateHash, dispute.NewerStateHash, dispute.SubmittedBy, fmt.Sprintf("%020d", dispute.OpenedHeight), fmt.Sprintf("%020d", dispute.ChallengeEnd), string(dispute.Status))
 }
 
 func ComputePaymentFeeAccountingRoot(record PaymentFeeAccountingRecord) string {
 	record = record.Normalize()
-	return HashParts("aetheris-financial-payment-fee-v1", record.FeeID, record.RouteID, record.ForwardingFee, record.RouteFee, record.ReserveFee, record.SettlementGasFee, fmt.Sprintf("%020d", record.RecordedHeight))
+	return HashParts("aetra-financial-payment-fee-v1", record.FeeID, record.RouteID, record.ForwardingFee, record.RouteFee, record.ReserveFee, record.SettlementGasFee, fmt.Sprintf("%020d", record.RecordedHeight))
 }
 
 func ComputePaymentEnvelopeCanonicalHash(record PaymentEnvelopeCanonicalRecord) string {
 	record = record.Normalize()
-	return HashParts("aetheris-financial-payment-canonical-envelope-v1", string(record.ObjectType), record.ObjectID, record.StateKey, record.ObjectHash, fmt.Sprintf("%03d", record.EncodingVersion))
+	return HashParts("aetra-financial-payment-canonical-envelope-v1", string(record.ObjectType), record.ObjectID, record.StateKey, record.ObjectHash, fmt.Sprintf("%03d", record.EncodingVersion))
 }
 
 func ComputePaymentIntentSetRoot(intents []PaymentIntent) string {
-	parts := []string{"aetheris-financial-payment-intent-root-v1"}
+	parts := []string{"aetra-financial-payment-intent-root-v1"}
 	for _, intent := range normalizePaymentIntents(intents) {
 		parts = append(parts, intent.IntentHash)
 	}
@@ -832,7 +832,7 @@ func ComputePaymentIntentSetRoot(intents []PaymentIntent) string {
 }
 
 func ComputeNativeConditionalPaymentSetRoot(conditions []NativeConditionalPayment) string {
-	parts := []string{"aetheris-financial-native-condition-root-v1"}
+	parts := []string{"aetra-financial-native-condition-root-v1"}
 	for _, condition := range normalizeNativeConditionalPayments(conditions) {
 		parts = append(parts, condition.ConditionRoot)
 	}
@@ -840,7 +840,7 @@ func ComputeNativeConditionalPaymentSetRoot(conditions []NativeConditionalPaymen
 }
 
 func ComputePaymentRouteCommitmentSetRoot(routes []PaymentRouteCommitment) string {
-	parts := []string{"aetheris-financial-payment-route-commitment-root-v1"}
+	parts := []string{"aetra-financial-payment-route-commitment-root-v1"}
 	for _, route := range normalizePaymentRouteCommitments(routes) {
 		parts = append(parts, route.RouteID, route.Committer, route.CommitmentHash, fmt.Sprintf("%t", route.Signed), fmt.Sprintf("%t", route.Reserved), fmt.Sprintf("%020d", route.ExpiresHeight))
 	}
@@ -848,7 +848,7 @@ func ComputePaymentRouteCommitmentSetRoot(routes []PaymentRouteCommitment) strin
 }
 
 func ComputePaymentSettlementSetRoot(settlements []PaymentSettlement) string {
-	parts := []string{"aetheris-financial-payment-settlement-root-v1"}
+	parts := []string{"aetra-financial-payment-settlement-root-v1"}
 	for _, settlement := range normalizePaymentSettlements(settlements) {
 		parts = append(parts, settlement.SettlementHash)
 	}
@@ -856,7 +856,7 @@ func ComputePaymentSettlementSetRoot(settlements []PaymentSettlement) string {
 }
 
 func ComputePaymentDisputeSetRoot(disputes []PaymentDispute) string {
-	parts := []string{"aetheris-financial-payment-dispute-root-v1"}
+	parts := []string{"aetra-financial-payment-dispute-root-v1"}
 	for _, dispute := range normalizePaymentDisputes(disputes) {
 		parts = append(parts, dispute.DisputeRoot)
 	}
@@ -864,7 +864,7 @@ func ComputePaymentDisputeSetRoot(disputes []PaymentDispute) string {
 }
 
 func ComputePaymentFeeAccountingSetRoot(records []PaymentFeeAccountingRecord) string {
-	parts := []string{"aetheris-financial-payment-fee-root-v1"}
+	parts := []string{"aetra-financial-payment-fee-root-v1"}
 	for _, record := range normalizePaymentFeeRecords(records) {
 		parts = append(parts, record.FeeRoot)
 	}
@@ -872,7 +872,7 @@ func ComputePaymentFeeAccountingSetRoot(records []PaymentFeeAccountingRecord) st
 }
 
 func ComputeCrossZonePaymentMessageSetRoot(messages []CrossZonePaymentMessage) string {
-	parts := []string{"aetheris-financial-payment-message-root-v1"}
+	parts := []string{"aetra-financial-payment-message-root-v1"}
 	for _, message := range normalizeCrossZonePaymentMessages(messages) {
 		parts = append(parts, message.MessageHash)
 	}
@@ -880,7 +880,7 @@ func ComputeCrossZonePaymentMessageSetRoot(messages []CrossZonePaymentMessage) s
 }
 
 func ComputePaymentEnvelopeCanonicalSetRoot(records []PaymentEnvelopeCanonicalRecord) string {
-	parts := []string{"aetheris-financial-payment-canonical-root-v1"}
+	parts := []string{"aetra-financial-payment-canonical-root-v1"}
 	for _, record := range normalizePaymentCanonicalEnvelopes(records) {
 		parts = append(parts, record.EnvelopeHash)
 	}
@@ -889,7 +889,7 @@ func ComputePaymentEnvelopeCanonicalSetRoot(records []PaymentEnvelopeCanonicalRe
 
 func ComputeFinancialZonePaymentStateRoot(state FinancialZonePaymentState) string {
 	state = state.Normalize()
-	return HashParts("aetheris-financial-payment-state-root-v1", fmt.Sprintf("%020d", state.Height), state.IntentRoot, state.ChannelRoot, state.ConditionRoot, state.RouteRoot, state.SettlementRoot, state.DisputeRoot, state.ReceiptRoot, state.ProofRoot, state.FeeRoot, state.MessageRoot, state.CanonicalRoot)
+	return HashParts("aetra-financial-payment-state-root-v1", fmt.Sprintf("%020d", state.Height), state.IntentRoot, state.ChannelRoot, state.ConditionRoot, state.RouteRoot, state.SettlementRoot, state.DisputeRoot, state.ReceiptRoot, state.ProofRoot, state.FeeRoot, state.MessageRoot, state.CanonicalRoot)
 }
 
 func IsPaymentIntentType(value PaymentIntentType) bool {

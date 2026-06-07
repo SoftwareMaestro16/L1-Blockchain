@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ServiceDiscoveryCacheTrust string
@@ -492,7 +492,7 @@ func serviceResolverFallbackRank(policy ServiceResolverFallbackPolicy) map[Servi
 func ComputeServiceDiscoveryCacheRecordHash(record ServiceDiscoveryCacheRecord) string {
 	record = canonicalServiceDiscoveryCacheRecord(record)
 	return servicesHashParts(
-		"aetheris-services-discovery-cache-v1",
+		"aetra-services-discovery-cache-v1",
 		record.ServiceID,
 		record.DescriptorHash,
 		record.InterfaceHash,
@@ -507,7 +507,7 @@ func ComputeServiceDiscoveryCacheRecordHash(record ServiceDiscoveryCacheRecord) 
 
 func ComputeServiceDiscoveryUpdateEventHash(event ServiceDiscoveryUpdateEvent) string {
 	return servicesHashParts(
-		"aetheris-services-discovery-update-event-v1",
+		"aetra-services-discovery-update-event-v1",
 		event.ServiceID,
 		event.DescriptorHash,
 		event.InterfaceHash,
@@ -518,7 +518,7 @@ func ComputeServiceDiscoveryUpdateEventHash(event ServiceDiscoveryUpdateEvent) s
 func ComputeSignedServiceAdvertisementHash(ad SignedServiceAdvertisement) string {
 	ad = canonicalSignedServiceAdvertisement(ad)
 	return servicesHashParts(
-		"aetheris-services-signed-advertisement-v1",
+		"aetra-services-signed-advertisement-v1",
 		ad.ServiceName,
 		ad.Descriptor.DescriptorHash,
 		ad.Endpoint,
@@ -534,14 +534,14 @@ func ComputeSignedServiceAdvertisementHash(ad SignedServiceAdvertisement) string
 func ComputeSignedServiceAdvertisementSignatureHash(ad SignedServiceAdvertisement) string {
 	ad = canonicalSignedServiceAdvertisement(ad)
 	return servicesHashParts(
-		"aetheris-services-signed-advertisement-signature-v1",
+		"aetra-services-signed-advertisement-signature-v1",
 		ad.Signer,
 		ComputeSignedServiceAdvertisementHash(ad),
 	)
 }
 
 func ComputeServiceResolverFallbackPolicyHash(policy ServiceResolverFallbackPolicy) string {
-	parts := []string{"aetheris-services-resolver-fallback-policy-v1", fmt.Sprint(len(policy.Order))}
+	parts := []string{"aetra-services-resolver-fallback-policy-v1", fmt.Sprint(len(policy.Order))}
 	for _, source := range policy.Order {
 		parts = append(parts, string(source))
 	}

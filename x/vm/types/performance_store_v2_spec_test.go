@@ -48,7 +48,7 @@ func TestAVMStoreV2PrefixesBucketsAndPruning(t *testing.T) {
 
 	consumed := AVMAsyncReplayTombstone{MessageID: engineHash("old-consumed"), ConsumedHeight: 10}
 	expired := AVMExpiredNonceTombstone{
-		ChainID:      "aetheris-1",
+		ChainID:      "aetra-1",
 		SourceZone:   zonestypes.ZoneIDApplication,
 		Sender:       "alice",
 		SenderNonce:  9,

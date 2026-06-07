@@ -67,7 +67,7 @@ No future Aetra VM may be implemented before the R&D spec defines:
 - upgrade/migration policy
 - adversarial audit
 
-The async execution package `x/aetherisvm/async` is not a VM. It is an
+The async execution package `x/aetravm/async` is not a VM. It is an
 executable semantics specification for deterministic queue behavior, bounce
 behavior, fee/value denomination, limits, observability, and export/import.
 Production sharding is separate sharding R&D and remains experimental until
@@ -75,7 +75,7 @@ Production sharding is separate sharding R&D and remains experimental until
 adversarial tests, long-run testnet, independent audit, and consensus-safety
 proof are complete.
 
-The AVM package `x/aetherisvm/avm` is the current pure Go executable
+The AVM package `x/aetravm/avm` is the current pure Go executable
 specification for the native Aetra Virtual Machine. It defines deterministic
 bytecode encoding, verifier, local runner, storage snapshot ABI, gas schedule,
 host function allowlist, forbidden opcode checks, and an async handler adapter.
@@ -84,7 +84,7 @@ It is not wired into SDK stores or keepers.
 ## Compatibility Boundaries
 
 Contract standards are VM-independent until a runtime is selected. The Go
-packages under `x/aetherisvm/standards` define executable specifications,
+packages under `x/aetravm/standards` define executable specifications,
 deterministic message codecs, and async/AVM-compatible conformance handlers,
 not SDK modules or store wiring.
 
@@ -109,6 +109,6 @@ either match the same standards or declare a versioned migration.
 - Aetra async VM research has a written spec before implementation.
 - Contract standards can be tested independent of the VM choice.
 - `go test ./app/wasmconfig`
-- `go test ./x/aetherisvm/standards/...`
-- `go test ./x/aetherisvm/async`
-- `go test ./x/aetherisvm/avm`
+- `go test ./x/aetravm/standards/...`
+- `go test ./x/aetravm/async`
+- `go test ./x/aetravm/avm`

@@ -65,7 +65,7 @@ protocol fee payment remains native-only in `naet`.
 
 ## Executable Specification
 
-The pure Go package `x/aetherisvm/standards/aw` is the current executable
+The pure Go package `x/aetravm/standards/aw` is the current executable
 specification for AW-5. It does not wire SDK stores or keepers into the app,
 but it does expose an async/AVM-compatible contract handler and deterministic
 message codec. It defines:
@@ -90,7 +90,7 @@ package's message ABI or explicitly migrate the standard version.
 ## Required Tests
 
 ```powershell
-go test ./x/aetherisvm/standards/aw
+go test ./x/aetravm/standards/aw
 go test ./...
 ```
 

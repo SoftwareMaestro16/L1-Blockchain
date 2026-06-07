@@ -1,7 +1,7 @@
 param(
   [string]$OutputDir = "",
   [string]$Binary = "",
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [int]$RPCPort = 26657,
   [string]$FromHome = "",
   [string]$FromKey = "node0",
@@ -65,10 +65,10 @@ function Get-CoinParts {
 }
 
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
-$FromHome = Resolve-LocalnetPath -Path $FromHome -DefaultRelativePath "node0\aetherisd"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
+$FromHome = Resolve-LocalnetPath -Path $FromHome -DefaultRelativePath "node0\aetrad"
 if ([string]::IsNullOrWhiteSpace($FromHome) -or -not (Test-Path -LiteralPath $FromHome)) {
-  $FromHome = Join-Path $OutputDir "node0\aetherisd"
+  $FromHome = Join-Path $OutputDir "node0\aetrad"
 }
 
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "local funding output directory"

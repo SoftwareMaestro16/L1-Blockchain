@@ -89,7 +89,7 @@ func (c ZoneCommitment) ValidateHash() error {
 
 func ComputeCommitmentHash(c ZoneCommitment) string {
 	h := sha256.New()
-	writePart(h, "aetheris-zone-commitment-v1")
+	writePart(h, "aetra-zone-commitment-v1")
 	writePart(h, string(c.ZoneID))
 	writeUint64(h, c.ZoneHeight)
 	writePart(h, c.StateRoot)

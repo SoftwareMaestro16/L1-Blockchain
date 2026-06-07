@@ -114,9 +114,9 @@ The public-testnet audit pack is [Security Audit Pack](security-audit-pack.md).
 | Unbounded loop or state bloat | list queries, tx paths, localnet scripts | query server tests, `docs/query-surface.md`, `scripts/security/determinism-gate.ps1` |
 | Malformed query request | fees, tokenfactory, dex, bank/staking examples | `x/*/keeper/query_server_test.go`, `tests/e2e/query_surface_smoke.ps1` |
 | Local secret exposure | localnet scripts, diagnostics, release package | `scripts/security/prototype-audit.ps1`, `tests/scripts/prototype_release_package_test.ps1` |
-| Contract wallet replay or extension takeover | AW-5 standard | `x/aetherisvm/standards/aw/*_test.go` |
-| Token supply divergence or admin takeover | AFT-44 standard | `x/aetherisvm/standards/aft/*_test.go` |
-| NFT/SBT transfer bypass | ANFT-66/ASBT-67 standard | `x/aetherisvm/standards/anft/*_test.go` |
-| Async queue DoS or bounce/refund double-spend | async execution spec | `x/aetherisvm/async/*_test.go` |
+| Contract wallet replay or extension takeover | AW-5 standard | `x/aetravm/standards/aw/*_test.go` |
+| Token supply divergence or admin takeover | AFT-44 standard | `x/aetravm/standards/aft/*_test.go` |
+| NFT/SBT transfer bypass | ANFT-66/ASBT-67 standard | `x/aetravm/standards/anft/*_test.go` |
+| Async queue DoS or bounce/refund double-spend | async execution spec | `x/aetravm/async/*_test.go` |
 
 Future modules must add rows before merging their first keeper or message implementation.

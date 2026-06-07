@@ -34,7 +34,7 @@ const (
 	DefaultMaxMessageBytes    = 1 << 20
 	DefaultFlowWindowBytes    = 4 << 20
 	DefaultHandshakeVersion   = uint32(1)
-	DefaultProtocolVersion    = "aetheris-networking-v1"
+	DefaultProtocolVersion    = "aetra-networking-v1"
 	DefaultCipherSuite        = CipherSuiteEd25519X25519ChaCha20Poly1305
 	DefaultCompressionMode    = CompressionModeNone
 	DefaultQoSPolicy          = QoSPolicyBalanced
@@ -999,7 +999,7 @@ func ChunkPayload(payload []byte, maxChunkBytes uint64) ([]PayloadChunk, error) 
 	if total == 0 || total > MaxPayloadChunks {
 		return nil, fmt.Errorf("networking payload chunks must be between 1 and %d", MaxPayloadChunks)
 	}
-	payloadHash := hashBytes("aetheris-networking-payload-v1", payload)
+	payloadHash := hashBytes("aetra-networking-payload-v1", payload)
 	payloadID := HashParts("payload", payloadHash, fmt.Sprintf("%d", total))
 	chunks := make([]PayloadChunk, 0, total)
 	for offset, index := uint64(0), uint32(0); offset < uint64(len(payload)); index++ {
@@ -1023,7 +1023,7 @@ func ChunkPayload(payload []byte, maxChunkBytes uint64) ([]PayloadChunk, error) 
 }
 
 func ComputeChunkHash(chunk PayloadChunk) string {
-	h := sha256Digest("aetheris-networking-chunk-v1", chunk.PayloadID, chunk.PayloadHash, uint64(chunk.Index), uint64(chunk.Total), chunk.Bytes)
+	h := sha256Digest("aetra-networking-chunk-v1", chunk.PayloadID, chunk.PayloadHash, uint64(chunk.Index), uint64(chunk.Total), chunk.Bytes)
 	return h
 }
 
@@ -1056,7 +1056,7 @@ func ReassemblePayload(chunks []PayloadChunk) ([]byte, error) {
 		}
 		payload = append(payload, chunk.Bytes...)
 	}
-	if hashBytes("aetheris-networking-payload-v1", payload) != first.PayloadHash {
+	if hashBytes("aetra-networking-payload-v1", payload) != first.PayloadHash {
 		return nil, errors.New("networking payload hash mismatch")
 	}
 	return payload, nil

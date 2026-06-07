@@ -76,7 +76,7 @@ func TestIdentitySpamSubdomainCreationStressV2(t *testing.T) {
 }
 
 func TestIdentityAuctionFairnessV2StateMachineTieForfeitAndFinalization(t *testing.T) {
-	params := DefaultIdentityAuctionFairnessParamsV2("aetheris-local-1")
+	params := DefaultIdentityAuctionFairnessParamsV2("aetra-local-1")
 	state := EmptyIdentityState(DefaultIdentityParams())
 	state, auction, err := StartSealedAuction(state, "market.aet", 100)
 	require.NoError(t, err)
@@ -127,7 +127,7 @@ func TestIdentityAuctionFairnessV2StateMachineTieForfeitAndFinalization(t *testi
 }
 
 func TestIdentityAuctionCommitmentV2BindsChainDomain(t *testing.T) {
-	params := DefaultIdentityAuctionFairnessParamsV2("aetheris-local-1")
+	params := DefaultIdentityAuctionFairnessParamsV2("aetra-local-1")
 	commitment, err := ComputeAuctionCommitmentV2("market.aet", addr(1), 500, "salt", params.ChainID, params.ModuleVersion)
 	require.NoError(t, err)
 	require.True(t, AuctionCommitmentMatchesChainDomainV2("market.aet", addr(1), 500, "salt", params.ChainID, params.ModuleVersion, commitment))

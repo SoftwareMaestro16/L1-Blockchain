@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type XServiceInterfaceStateObject string
@@ -403,7 +403,7 @@ func IsXServiceInterfaceIntegrationPoint(point XServiceInterfaceIntegrationPoint
 func ComputeXServiceInterfaceModuleBreakdownHash(breakdown XServiceInterfaceModuleBreakdown) string {
 	breakdown = canonicalXServiceInterfaceModuleBreakdown(breakdown)
 	parts := []string{
-		"aetheris-x-serviceinterface-module-breakdown-v1",
+		"aetra-x-serviceinterface-module-breakdown-v1",
 		breakdown.ModulePath,
 		"purpose",
 		fmt.Sprint(len(breakdown.Purpose)),
@@ -434,7 +434,7 @@ func ComputeXServiceInterfaceModuleBreakdownHash(breakdown XServiceInterfaceModu
 
 func ComputeMsgDeprecateInterfaceHash(msg MsgDeprecateInterface) string {
 	return servicesHashParts(
-		"aetheris-x-serviceinterface-msg-deprecate-v1",
+		"aetra-x-serviceinterface-msg-deprecate-v1",
 		msg.Authority,
 		msg.Marker.MarkerHash,
 	)
@@ -443,7 +443,7 @@ func ComputeMsgDeprecateInterfaceHash(msg MsgDeprecateInterface) string {
 func ComputeQueryInterfacesByOwnerResponseHash(response QueryInterfacesByOwnerResponse) string {
 	definitions := append([]FormalServiceInterface(nil), response.Interfaces...)
 	sort.SliceStable(definitions, func(i, j int) bool { return definitions[i].InterfaceHash < definitions[j].InterfaceHash })
-	parts := []string{"aetheris-x-serviceinterface-owner-query-v1", fmt.Sprint(response.Total)}
+	parts := []string{"aetra-x-serviceinterface-owner-query-v1", fmt.Sprint(response.Total)}
 	for _, definition := range definitions {
 		parts = append(parts, definition.DefinitionHash)
 	}
@@ -452,7 +452,7 @@ func ComputeQueryInterfacesByOwnerResponseHash(response QueryInterfacesByOwnerRe
 
 func ComputeServiceInterfaceContractAdapterSchemaHash(schema ServiceInterfaceContractAdapterSchema) string {
 	return servicesHashParts(
-		"aetheris-x-serviceinterface-contract-adapter-v1",
+		"aetra-x-serviceinterface-contract-adapter-v1",
 		schema.InterfaceHash,
 		schema.MethodID,
 		schema.ABIHash,

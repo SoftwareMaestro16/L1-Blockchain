@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type UnifiedInteractionClass string
@@ -334,7 +334,7 @@ func ComputeUnifiedInteractionPlanHash(plan UnifiedInteractionPlan) string {
 	routes := append([]UnifiedServiceRoute(nil), plan.Routes...)
 	sortUnifiedRoutes(routes)
 	parts := []string{
-		"aetheris-services-interaction-plan-v1",
+		"aetra-services-interaction-plan-v1",
 		plan.CallID,
 		plan.ServiceID,
 		plan.MethodID,
@@ -351,7 +351,7 @@ func ComputeUnifiedInteractionPlanHash(plan UnifiedInteractionPlan) string {
 
 func ComputeUnifiedServiceCallbackHash(callback UnifiedServiceCallback) string {
 	return servicesHashParts(
-		"aetheris-services-callback-v1",
+		"aetra-services-callback-v1",
 		callback.OriginalCallID,
 		callback.CallbackTarget,
 		callback.CallbackMethod,
@@ -366,7 +366,7 @@ func ComputeUnifiedServiceCallbackHash(callback UnifiedServiceCallback) string {
 }
 
 func ComputeServiceCallbackReceiptEmissionHash(emission ServiceCallbackReceiptEmission) string {
-	return servicesHashParts("aetheris-services-callback-receipt-emission-v1", emission.CallbackHash, emission.Receipt.ReceiptHash)
+	return servicesHashParts("aetra-services-callback-receipt-emission-v1", emission.CallbackHash, emission.Receipt.ReceiptHash)
 }
 
 func normalizeUnifiedInteractionPlans(plans []UnifiedInteractionPlan) []UnifiedInteractionPlan {

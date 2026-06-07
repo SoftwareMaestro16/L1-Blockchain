@@ -430,7 +430,7 @@ func IsAVMBlockStage(stage AVMBlockStage) bool {
 func ComputeAVMABCIProposalRoot(plan AVMABCIProposalPlan) string {
 	plan.Phase = canonicalAVMABCIPhase(plan.Phase, AVMABCIProcessProposal)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-abci-proposal-v1")
+	writeEnginePart(h, "aetra-avm-abci-proposal-v1")
 	writeEngineUint64(h, plan.Height)
 	writeEngineUint64(h, uint64(len(plan.ZoneBudgets)))
 	for _, item := range plan.ZoneBudgets {
@@ -449,7 +449,7 @@ func ComputeAVMABCIProposalRoot(plan AVMABCIProposalPlan) string {
 
 func ComputeAVMFinalizeBlockRoot(plan AVMFinalizeBlockPlan) string {
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-finalize-block-v1")
+	writeEnginePart(h, "aetra-avm-finalize-block-v1")
 	writeEngineUint64(h, plan.Height)
 	writeEnginePart(h, plan.RouterRoot)
 	writeEnginePart(h, plan.SyncRoot)
@@ -479,7 +479,7 @@ func ComputeAVMFinalizeBlockRoot(plan AVMFinalizeBlockPlan) string {
 
 func ComputeAVMEndBlockCleanupRoot(plan AVMEndBlockCleanupPlan) string {
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-end-block-cleanup-v1")
+	writeEnginePart(h, "aetra-avm-end-block-cleanup-v1")
 	writeEngineUint64(h, plan.Height)
 	writeEngineUint64(h, plan.ProofHorizon)
 	writeEngineUint64(h, uint64(len(plan.ExpiredMessages)))
@@ -500,7 +500,7 @@ func ComputeAVMEndBlockCleanupRoot(plan AVMEndBlockCleanupPlan) string {
 
 func ComputeAVMBlockLifecycleRoot(plan AVMBlockLifecyclePlan) string {
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-block-lifecycle-v1")
+	writeEnginePart(h, "aetra-avm-block-lifecycle-v1")
 	writeEngineUint64(h, plan.Height)
 	writeEnginePart(h, plan.PrepareProposal.ProposalRoot)
 	writeEnginePart(h, plan.ProcessProposal.ProposalRoot)

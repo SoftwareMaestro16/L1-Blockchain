@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/stake-concentration/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,7 +15,7 @@ func (k Keeper) ValidatorConcentration(ctx context.Context, req *types.QueryVali
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
-	if err := aetherisaddress.ValidateUserAddress("operator_address", req.OperatorAddress); err != nil {
+	if err := aetraaddress.ValidateUserAddress("operator_address", req.OperatorAddress); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	validator, found, err := k.GetValidatorConcentration(ctx, req.OperatorAddress)

@@ -7,7 +7,7 @@ import (
 )
 
 func TestDNLMessagesRegisterUpdateReputationTableAndExpire(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	state, err := BuildDNLRoutingState(nil, nil, nil, nil, 1)
 	require.NoError(t, err)
 	node := testDNLNodeRecord(t, 0x91, salt, []string{"financial"}, []string{"svc-pay"}, 100)
@@ -71,7 +71,7 @@ func TestDNLMessagesRegisterUpdateReputationTableAndExpire(t *testing.T) {
 }
 
 func TestDNLQueriesReturnProofAttachedResponses(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	node := testDNLNodeRecord(t, 0x92, salt, []string{"contract"}, []string{"svc-contract"}, 100)
 	reputation := testDNLReputation(t, node.NodeID, 20)
 	route := testDNLRouteForNode(t, "contract", "svc-contract", node.NodeID, 1, 8_000, 100)
@@ -116,7 +116,7 @@ func TestDNLQueriesReturnProofAttachedResponses(t *testing.T) {
 }
 
 func TestDNLRoutingExportImportRoundTrip(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	node := testDNLNodeRecord(t, 0x93, salt, []string{"storage"}, []string{"svc-store"}, 100)
 	reputation := testDNLReputation(t, node.NodeID, 20)
 	table := testRoutingTableForRoutes(t, 5, testDNLRouteForNode(t, "storage", "svc-store", node.NodeID, 1, 8_000, 100))
@@ -139,7 +139,7 @@ func TestDNLRoutingExportImportRoundTrip(t *testing.T) {
 }
 
 func TestDNLMessagesRejectUnauthorizedMutations(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	node := testDNLNodeRecord(t, 0x94, salt, []string{"apps"}, []string{"svc-app"}, 100)
 	state, err := BuildDNLRoutingState([]NodeRecord{node}, []ReputationCommitment{testDNLReputation(t, node.NodeID, 20)}, nil, nil, 20)
 	require.NoError(t, err)

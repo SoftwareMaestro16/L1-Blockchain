@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestDefaultXServiceCallsModuleBreakdownCoversSection153(t *testing.T) {
@@ -53,7 +53,7 @@ func TestXServiceCallsModuleBreakdownRejectsMissingSurface(t *testing.T) {
 }
 
 func TestXServiceCallsMessagesAndNonceReplayGuard(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 70}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 70}
 	descriptor := testInterfaceSystemDescriptor()
 	index, err := NewServiceCallReplayIndex(25)
 	require.NoError(t, err)
@@ -79,7 +79,7 @@ func TestXServiceCallsMessagesAndNonceReplayGuard(t *testing.T) {
 }
 
 func TestXServiceCallsIdempotencyMisuseGuard(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 70}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 70}
 	descriptor := testInterfaceSystemDescriptor()
 	call := testInteractionCall(t, ctx, descriptor, "submit", 1, "servicecalls/idempotency")
 
@@ -100,7 +100,7 @@ func TestXServiceCallsIdempotencyMisuseGuard(t *testing.T) {
 }
 
 func TestXServiceCallsCallbackMismatchGuardAndMessage(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 70}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 70}
 	original := testInteractionCall(t, ctx, testInterfaceSystemDescriptor(), "submit", 3, "servicecalls/original")
 	target := testCallbackTargetDescriptor()
 	callback, err := NewUnifiedServiceCallback(ctx, original, target, "notify", testInterfaceHash("servicecalls/callback/payload"), "callback-prepaid:naet:0", 85, 4, "callback-idem")
@@ -123,7 +123,7 @@ func TestXServiceCallsCallbackMismatchGuardAndMessage(t *testing.T) {
 }
 
 func TestXServiceCallsAnchorWindowAndResultHashGuards(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 70}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 70}
 	call := testInteractionCall(t, ctx, testInterfaceSystemDescriptor(), "submit", 5, "servicecalls/result")
 	outcome := coretypes.ServiceExecutionOutcome{
 		CallID:        call.CallID,
@@ -150,7 +150,7 @@ func TestXServiceCallsAnchorWindowAndResultHashGuards(t *testing.T) {
 }
 
 func TestXServiceCallsRetryAndQueries(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 70}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 70}
 	descriptor := testInterfaceSystemDescriptor()
 	retryIndex, err := NewServiceCallReplayIndex(25)
 	require.NoError(t, err)

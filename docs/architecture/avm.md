@@ -2,7 +2,7 @@
 
 AVM is the native Aetra Virtual Machine research track for asynchronous
 contracts. The current implementation is a pure Go executable specification in
-`x/aetherisvm/avm`; it is not wired into SDK keepers, module accounts, genesis,
+`x/aetravm/avm`; it is not wired into SDK keepers, module accounts, genesis,
 CLI, or ABCI hooks.
 
 AVM cannot mutate production chain state until the base-chain safety gate,
@@ -80,7 +80,7 @@ AVM receives the Aetra async message envelope:
 - depth
 
 AVM output messages are normal async `MessageEnvelope` values. They inherit
-deterministic queue semantics from `x/aetherisvm/async`.
+deterministic queue semantics from `x/aetravm/async`.
 
 ## Storage ABI
 
@@ -174,8 +174,8 @@ checks, malformed transaction handling, or genesis validation.
 ## Required Tests
 
 ```powershell
-go test ./x/aetherisvm/avm
-go test ./x/aetherisvm/async
+go test ./x/aetravm/avm
+go test ./x/aetravm/async
 go test ./...
 ```
 

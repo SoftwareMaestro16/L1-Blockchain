@@ -77,7 +77,7 @@ Recovery:
 Query fee params:
 
 ```powershell
-build\aetherisd.exe query fees params --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query fees params --node tcp://127.0.0.1:26657 --output json
 Invoke-RestMethod http://127.0.0.1:1317/l1/fees/v1/params
 ```
 
@@ -96,13 +96,13 @@ Expected params:
 Accepted fee:
 
 ```powershell
-build\aetherisd.exe tx bank send node0 <AE-address> 1000naet --home .localnet\node0\aetherisd --chain-id aetheris-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe tx bank send node0 <AE-address> 1000naet --home .localnet\node0\aetrad --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
 ```
 
 Rejected fee:
 
 ```powershell
-build\aetherisd.exe tx bank send node0 <AE-address> 1000naet --home .localnet\node0\aetherisd --chain-id aetheris-local-1 --keyring-backend test --fees 1000testtoken --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe tx bank send node0 <AE-address> 1000naet --home .localnet\node0\aetrad --chain-id aetra-local-1 --keyring-backend test --fees 1000testtoken --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
 ```
 
 Expected rejection log includes:
@@ -131,7 +131,7 @@ go test ./x/fees/...
 go test ./...
 go vet ./...
 buf lint
-go build -o build/aetherisd.exe ./cmd/l1d
+go build -o build/aetrad.exe ./cmd/l1d
 .\tests\e2e\fees_ante_smoke.ps1
 .\tests\e2e\fees_ante_smoke.ps1 -OutputDir .localnet-5 -ValidatorCount 5
 ```

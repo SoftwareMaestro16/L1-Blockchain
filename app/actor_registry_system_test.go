@@ -13,7 +13,7 @@ import (
 func TestActorRegistryPrototypeModuleWiringAndGenesis(t *testing.T) {
 	app, genesis := setup(true, 5)
 
-	require.NoError(t, app.ValidateAetherCoreWiringGate())
+	require.NoError(t, app.ValidateAetraCoreWiringGate())
 	require.Contains(t, app.ModuleManager.Modules, actorregistrytypes.ModuleName)
 	require.Contains(t, app.keys, actorregistrytypes.StoreKey)
 	require.Contains(t, genesis, actorregistrytypes.ModuleName)

@@ -152,11 +152,11 @@ becoming the scheduler.
 ## Queries
 
 ```powershell
-build\aetherisd.exe query fees params --node tcp://127.0.0.1:26657
-build\aetherisd.exe query fees network-load --node tcp://127.0.0.1:26657
-build\aetherisd.exe query fees estimate-fee 200000 --node tcp://127.0.0.1:26657
-build\aetherisd.exe query fees accounting --node tcp://127.0.0.1:26657
-build\aetherisd.exe query fees module-balances --node tcp://127.0.0.1:26657
+build\aetrad.exe query fees params --node tcp://127.0.0.1:26657
+build\aetrad.exe query fees network-load --node tcp://127.0.0.1:26657
+build\aetrad.exe query fees estimate-fee 200000 --node tcp://127.0.0.1:26657
+build\aetrad.exe query fees accounting --node tcp://127.0.0.1:26657
+build\aetrad.exe query fees module-balances --node tcp://127.0.0.1:26657
 ```
 
 REST:

@@ -37,12 +37,12 @@ func TestDuplicateChainRejectedByInvariant(t *testing.T) {
 
 func validState() CrossChainRegistryState {
 	state := EmptyCrossChainRegistryState()
-	state.Chains = append(state.Chains, chain("aetheris", ChainStatusActive), chain("ethereum", ChainStatusActive))
-	state.RiskPolicies = append(state.RiskPolicies, policy("aetheris"), policy("ethereum"))
+	state.Chains = append(state.Chains, chain("aetra", ChainStatusActive), chain("ethereum", ChainStatusActive))
+	state.RiskPolicies = append(state.RiskPolicies, policy("aetra"), policy("ethereum"))
 	state.Channels = append(state.Channels, ChannelRecord{
 		ChannelID:           "channel-0",
 		ChainID:             "ethereum",
-		CounterpartyChainID: "aetheris",
+		CounterpartyChainID: "aetra",
 		ClientID:            "client-eth",
 		Active:              true,
 		RegisteredHeight:    2,
@@ -50,7 +50,7 @@ func validState() CrossChainRegistryState {
 	state.BridgeRoutes = append(state.BridgeRoutes, BridgeRoute{
 		RouteID:       "eth-aet",
 		SourceChainID: "ethereum",
-		TargetChainID: "aetheris",
+		TargetChainID: "aetra",
 		ChannelID:     "channel-0",
 		BridgeID:      "bridge-eth",
 		Enabled:       true,

@@ -10,8 +10,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	appparams "github.com/sovereign-l1/l1/app/params"
-	"github.com/sovereign-l1/l1/x/aetherisvm/async"
-	"github.com/sovereign-l1/l1/x/aetherisvm/avm"
+	"github.com/sovereign-l1/l1/x/aetravm/async"
+	"github.com/sovereign-l1/l1/x/aetravm/avm"
 )
 
 func EmptyContractZoneState(policy ContractZonePolicy) ContractZoneState {
@@ -344,7 +344,7 @@ func safeAddMul(base uint64, count uint64, price uint64) (uint64, error) {
 
 func deriveContractAddress(codeID uint64, actor sdk.AccAddress, salt []byte) sdk.AccAddress {
 	h := sha256.New()
-	h.Write([]byte("aetheris-contract-address-v1"))
+	h.Write([]byte("aetra-contract-address-v1"))
 	var id [8]byte
 	binary.BigEndian.PutUint64(id[:], codeID)
 	h.Write(id[:])

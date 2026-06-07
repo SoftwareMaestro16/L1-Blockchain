@@ -5,7 +5,7 @@ This gate blocks an Aetra prototype release when consensus-critical or fund-safe
 
 Scope: custom modules `x/tokenfactory`, `x/dex`, `x/fees`; app wiring and ABCI paths; genesis/bootstrap; fees ante policy; DEX math/accounting; tokenfactory admin rights; localnet/prototype acceptance scripts.
 
-Contract-standard and async execution specs under `x/aetherisvm` are included
+Contract-standard and async execution specs under `x/aetravm` are included
 for public-testnet readiness even before VM runtime wiring.
 
 The consensus node does not require Redis, PostgreSQL, or any external database. Do not commit database URLs, credentials, mnemonics, validator keys, localnet keyrings, or environment dumps. Off-chain indexers can use databases later through environment variables or a secret manager, outside this gate.
@@ -134,10 +134,10 @@ Each release candidate needs a reviewer to mark every item `PASS`, `FINDING`, or
 | Tokenfactory query malformed/not found/bounded list | `x/tokenfactory/keeper/query_server_test.go` |
 | DEX duplicate pair, wrong denom, corrupted pool, LP accounting, slippage | `x/dex/keeper/msg_server_test.go`, `x/dex/keeper/math_test.go`, `tests/e2e/dex_smoke.ps1` |
 | DEX query malformed/not found/bounded list | `x/dex/keeper/query_server_test.go` |
-| AW-5 wallet replay/wallet_id/extension takeover | `x/aetherisvm/standards/aw/*_test.go` |
-| AFT-44 token supply divergence/admin takeover/metadata spoofing | `x/aetherisvm/standards/aft/*_test.go` |
-| ANFT-66/ASBT-67 unauthorized transfer/SBT bypass/metadata spoofing | `x/aetherisvm/standards/anft/*_test.go` |
-| Async queue DoS and bounce/refund behavior | `x/aetherisvm/async/*_test.go` |
+| AW-5 wallet replay/wallet_id/extension takeover | `x/aetravm/standards/aw/*_test.go` |
+| AFT-44 token supply divergence/admin takeover/metadata spoofing | `x/aetravm/standards/aft/*_test.go` |
+| ANFT-66/ASBT-67 unauthorized transfer/SBT bypass/metadata spoofing | `x/aetravm/standards/anft/*_test.go` |
+| Async queue DoS and bounce/refund behavior | `x/aetravm/async/*_test.go` |
 | Full prototype tx/query composition | `tests/e2e/prototype_acceptance.ps1` |
 
 ## Current Known Triage

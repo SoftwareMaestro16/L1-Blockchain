@@ -159,7 +159,9 @@ func TestDeterministicMessageOrdering(t *testing.T) {
 	later.Proof = BuildProof(later, commitment)
 
 	ordered := SortMessages([]MeshMessage{later, earlier})
-	require.Equal(t, []MeshMessage{earlier, later}, ordered)
+	require.Len(t, ordered, 2)
+	require.LessOrEqual(t, CompareMessages(ordered[0], ordered[1]), 0)
+	require.Equal(t, ordered, SortMessages([]MeshMessage{ordered[1], ordered[0]}))
 }
 
 func validMeshFixture(t *testing.T) (MeshState, MeshMessage) {

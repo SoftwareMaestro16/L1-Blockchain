@@ -108,7 +108,7 @@ func TestIdentityResolutionCacheV2KeyMetadataFreshnessAndInvalidation(t *testing
 	require.Contains(t, formatted, key.NameHash)
 	require.Contains(t, formatted, "00000000000000000007")
 
-	header := IdentityTrustedHeaderV2{ChainID: "aetheris-local-1", Height: 20, AppHash: identityHash("app"), Trusted: true}
+	header := IdentityTrustedHeaderV2{ChainID: "aetra-local-1", Height: 20, AppHash: identityHash("app"), Trusted: true}
 	metadata, err := NewIdentityVerifiedCacheMetadataV2(key, 20, header, 10, 25, 20, true)
 	require.NoError(t, err)
 	require.Equal(t, uint64(25), metadata.FreshUntilHeight)

@@ -191,7 +191,7 @@ func AVMQueueSortKey(priority uint8, scheduledHeight uint64, senderHash string, 
 
 func AVMQueueSenderHash(sourceZone zonestypes.ZoneID, source string) string {
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-queue-sender-v1")
+	writeEnginePart(h, "aetra-avm-queue-sender-v1")
 	writeEnginePart(h, string(sourceZone))
 	writeEnginePart(h, strings.TrimSpace(source))
 	return hex.EncodeToString(h.Sum(nil))
@@ -479,7 +479,7 @@ func (p AVMZoneQueueProof) Validate() error {
 func ComputeAVMZoneQueueRoot(queue AVMZoneQueue) string {
 	queue = canonicalAVMZoneQueue(queue)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-zone-queue-v1")
+	writeEnginePart(h, "aetra-avm-zone-queue-v1")
 	writeEnginePart(h, string(queue.ZoneID))
 	writeAVMQueueEntries(h, queue.PriorityQueue)
 	writeAVMQueueEntries(h, queue.DelayedQueue)

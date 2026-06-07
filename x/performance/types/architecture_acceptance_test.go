@@ -64,13 +64,13 @@ func validArchitectureAcceptanceInput() ArchitectureAcceptanceInput {
 	return ArchitectureAcceptanceInput{
 		AcceptanceVersion: "acceptance_18",
 		Criteria: []ArchitectureAcceptanceCriterion{
-			architectureAcceptance(AcceptanceAetherCoreRoots, "x_aethercore_roots"),
+			architectureAcceptance(AcceptanceAetraCoreRoots, "x_aetracore_roots"),
 			architectureAcceptance(AcceptanceZoneAdapterExecution, "x_zones_adapter"),
 			architectureAcceptance(AcceptanceMessageProofReceipts, "x_msgbus_receipts"),
 			architectureAcceptance(AcceptanceStoreV2ZoneShardProof, "store_v2_proofs"),
 			architectureAcceptance(AcceptanceBlockSTMParallelism, "blockstm_shards"),
 			architectureAcceptance(AcceptanceShardSplitMergeRules, "x_shards_scheduler"),
-			architectureAcceptance(AcceptanceAVM20Spec, "x_aetherisvm_avm"),
+			architectureAcceptance(AcceptanceAVM20Spec, "x_aetravm_avm"),
 			architectureAcceptance(AcceptanceIdentityProofLookup, "x_identity_zone"),
 			architectureAcceptance(AcceptancePaymentSettlement, "x_payments_settlement"),
 			architectureAcceptance(AcceptanceMigrationPreservation, "x_migration_invariants"),

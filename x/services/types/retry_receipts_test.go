@@ -5,11 +5,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestServiceRetryPolicyBoundsAttemptsDeadlineAndPayment(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 20}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 20}
 	descriptor := testInterfaceSystemDescriptor()
 	original := testRetryCall(t, ctx, descriptor, 1, "original")
 	retry := testRetryAttemptCall(t, ctx, descriptor, original, 2, "retry")
@@ -48,7 +48,7 @@ func TestServiceRetryPolicyBoundsAttemptsDeadlineAndPayment(t *testing.T) {
 }
 
 func TestServiceRetryCanChargeAttemptsWhenPolicyAllows(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 20}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 20}
 	descriptor := testInterfaceSystemDescriptor()
 	original := testRetryCall(t, ctx, descriptor, 1, "original")
 	retry := testRetryAttemptCall(t, ctx, descriptor, original, 2, "retry")
@@ -66,7 +66,7 @@ func TestServiceRetryCanChargeAttemptsWhenPolicyAllows(t *testing.T) {
 }
 
 func TestServiceRetryReceiptLinkReferencesOriginalCall(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 20}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 20}
 	descriptor := testInterfaceSystemDescriptor()
 	original := testRetryCall(t, ctx, descriptor, 1, "original")
 	retry := testRetryAttemptCall(t, ctx, descriptor, original, 2, "retry")
@@ -85,7 +85,7 @@ func TestServiceRetryReceiptLinkReferencesOriginalCall(t *testing.T) {
 }
 
 func TestDeterministicReceiptRootsCommitAllReceiptClasses(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 20}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 20}
 	onChain := testRetryCall(t, ctx, testUnifiedOnChainDescriptor(), 1, "onchain")
 	offChain := testRetryCall(t, ctx, testUnifiedOffChainDescriptor(), 2, "offchain")
 	mixed := testRetryCall(t, ctx, testInterfaceSystemDescriptor(), 3, "mixed")

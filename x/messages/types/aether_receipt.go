@@ -132,7 +132,7 @@ func (r AetherMessageReceipt) Clone() AetherMessageReceipt {
 func ComputeAetherMessageReceiptHash(receipt AetherMessageReceipt) string {
 	receipt = normalizeAetherMessageReceipt(receipt)
 	return hashParts(
-		"aetheris-aether-message-receipt-v1",
+		"aetra-aether-message-receipt-v1",
 		receipt.MsgID,
 		fmt.Sprint(receipt.Height),
 		string(receipt.ReceiverZoneID),
@@ -150,7 +150,7 @@ func ComputeAetherMessageReceiptHash(receipt AetherMessageReceipt) string {
 func ComputeAetherReceiptRoot(receipts []AetherMessageReceipt) (string, error) {
 	ordered := cloneAetherMessageReceipts(receipts)
 	sortAetherMessageReceipts(ordered)
-	parts := []string{"aetheris-aether-message-receipt-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-aether-message-receipt-root-v1", fmt.Sprint(len(ordered))}
 	for _, receipt := range ordered {
 		if err := receipt.Validate(); err != nil {
 			return "", err

@@ -8,7 +8,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/stretchr/testify/require"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	appparams "github.com/sovereign-l1/l1/app/params"
 	mintauthoritytypes "github.com/sovereign-l1/l1/x/mint-authority/types"
 )
@@ -17,7 +17,7 @@ func TestAppBootsWithReservedSystemModuleAccounts(t *testing.T) {
 	app := Setup(t, false)
 	ctx := app.NewContext(false)
 
-	require.NoError(t, app.ValidateAetherCoreWiringGate())
+	require.NoError(t, app.ValidateAetraCoreWiringGate())
 	require.NoError(t, ValidateReservedSystemModuleAccountWiring(BlockedAddresses()))
 
 	permissions := GetMaccPerms()
@@ -41,11 +41,11 @@ func TestReservedSystemModuleAccountAddressesMatchConstants(t *testing.T) {
 		require.NoError(t, err)
 		require.True(t, found, account.ModuleAccountName)
 
-		rawBytes, err := aetherisaddress.Parse(account.Raw)
+		rawBytes, err := aetraaddress.Parse(account.Raw)
 		require.NoError(t, err)
 		require.Equal(t, rawBytes, []byte(addr), account.Name)
 
-		catalogAddress, found := aetherisaddress.SystemAddressByName(account.Name)
+		catalogAddress, found := aetraaddress.SystemAddressByName(account.Name)
 		require.True(t, found, account.Name)
 		require.Equal(t, catalogAddress.Raw, account.Raw, account.Name)
 		require.Equal(t, catalogAddress.UserFriendly, account.UserFriendly, account.Name)
@@ -63,8 +63,8 @@ func TestReservedSystemModuleAccountAddressesMatchConstants(t *testing.T) {
 func TestBankBlockedAddressesIncludeNonReceivableSystemAccounts(t *testing.T) {
 	blocked := BlockedAddresses()
 
-	for _, address := range aetherisaddress.AllSystemAddresses() {
-		bz, err := aetherisaddress.Parse(address.Raw)
+	for _, address := range aetraaddress.AllSystemAddresses() {
+		bz, err := aetraaddress.Parse(address.Raw)
 		require.NoError(t, err)
 
 		key := sdk.AccAddress(bz).String()
@@ -72,7 +72,7 @@ func TestBankBlockedAddressesIncludeNonReceivableSystemAccounts(t *testing.T) {
 	}
 
 	for _, account := range ReservedSystemModuleAccounts() {
-		bz, err := aetherisaddress.Parse(account.Raw)
+		bz, err := aetraaddress.Parse(account.Raw)
 		require.NoError(t, err)
 
 		require.Equal(t, !account.CanReceiveUserFunds, blocked[sdk.AccAddress(bz).String()], account.Name)

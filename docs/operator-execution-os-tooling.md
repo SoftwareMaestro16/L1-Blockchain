@@ -18,9 +18,9 @@ validation only. They do not make production sharding, Mesh settlement, or
 ## CLI
 
 ```powershell
-build\aetherisd.exe execution-os profiles
-build\aetherisd.exe execution-os smoke --profile execution-os-sim
-build\aetherisd.exe execution-os diagnostics --profile zones-prototype --genesis .localnet\node0\aetherisd\config\genesis.json
+build\aetrad.exe execution-os profiles
+build\aetrad.exe execution-os smoke --profile execution-os-sim
+build\aetrad.exe execution-os diagnostics --profile zones-prototype --genesis .localnet\node0\aetrad\config\genesis.json
 ```
 
 The smoke command runs deterministic executable specs for:

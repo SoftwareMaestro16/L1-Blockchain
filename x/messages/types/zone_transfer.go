@@ -261,7 +261,7 @@ func (m MsgZoneTransfer) Validate(admission ZoneTransferAdmission, params Messag
 func (m MsgZoneTransfer) CanonicalPayload() []byte {
 	m = m.Normalize()
 	parts := []string{
-		"aetheris-msg-zone-transfer-payload-v1",
+		"aetra-msg-zone-transfer-payload-v1",
 		hex.EncodeToString(m.FromAddress),
 		hex.EncodeToString(m.ToAddress),
 		string(m.SourceZoneID),
@@ -426,7 +426,7 @@ func (f ZoneTransferRouteFee) Validate() error {
 func ZoneTransferRouteID(req MsgZoneTransfer) string {
 	req = req.Normalize()
 	routeHash := hashParts(
-		"aetheris-msg-zone-transfer-route-id-v1",
+		"aetra-msg-zone-transfer-route-id-v1",
 		string(req.SourceZoneID),
 		string(req.DestinationZoneID),
 		req.Denom,
@@ -440,7 +440,7 @@ func ComputeZoneTransferRouteCommitment(req MsgZoneTransfer, admission ZoneTrans
 	req = req.Normalize()
 	admission = admission.Normalize()
 	return hashParts(
-		"aetheris-msg-zone-transfer-route-v1",
+		"aetra-msg-zone-transfer-route-v1",
 		ZoneTransferRouteID(req),
 		string(req.SourceZoneID),
 		admission.SourceShardID,
@@ -457,7 +457,7 @@ func ComputeZoneTransferStateWriteSummary(req MsgZoneTransfer, admission ZoneTra
 	req = req.Normalize()
 	admission = admission.Normalize()
 	return hashParts(
-		"aetheris-msg-zone-transfer-state-write-summary-v1",
+		"aetra-msg-zone-transfer-state-write-summary-v1",
 		hex.EncodeToString(req.FromAddress),
 		hex.EncodeToString(req.ToAddress),
 		string(req.SourceZoneID),

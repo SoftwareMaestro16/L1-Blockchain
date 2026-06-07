@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 const (
@@ -719,7 +719,7 @@ func BuildFinancialZonePaymentRoute(envelope PaymentEnvelope, bankKeeper, financ
 		return FinancialZonePaymentRoute{}, err
 	}
 	route := FinancialZonePaymentRoute{
-		RouteID:       servicesHashParts("aetheris-services-financial-route-id-v1", envelope.EnvelopeHash),
+		RouteID:       servicesHashParts("aetra-services-financial-route-id-v1", envelope.EnvelopeHash),
 		ServiceID:     envelope.PayeeService,
 		Payer:         envelope.Payer,
 		Denom:         envelope.Denom,
@@ -770,33 +770,33 @@ func (route FinancialZonePaymentRoute) Validate() error {
 
 func ComputeServicePaymentModelHash(model ServicePaymentModel) string {
 	model = canonicalServicePaymentModel(model)
-	parts := []string{"aetheris-services-payment-model-v1", model.ServiceID, model.DefaultDenom, string(model.PricingUnit), string(model.SettlementMode), model.UnitAmount, model.MaxAmountOptional, string(model.FailurePolicy), fmt.Sprint(model.ProtocolNative), fmt.Sprint(model.KnownBeforeSigning), fmt.Sprint(model.UpdatedHeight), fmt.Sprint(len(model.SupportedDenoms))}
+	parts := []string{"aetra-services-payment-model-v1", model.ServiceID, model.DefaultDenom, string(model.PricingUnit), string(model.SettlementMode), model.UnitAmount, model.MaxAmountOptional, string(model.FailurePolicy), fmt.Sprint(model.ProtocolNative), fmt.Sprint(model.KnownBeforeSigning), fmt.Sprint(model.UpdatedHeight), fmt.Sprint(len(model.SupportedDenoms))}
 	parts = append(parts, model.SupportedDenoms...)
 	return servicesHashParts(parts...)
 }
 
 func ComputeServiceEscrowHash(escrow ServiceEscrow) string {
 	escrow = canonicalServiceEscrow(escrow)
-	return servicesHashParts("aetheris-services-payment-escrow-v1", escrow.EscrowID, escrow.ServiceID, escrow.Payer, escrow.Denom, escrow.Amount, fmt.Sprint(escrow.LockedHeight), fmt.Sprint(escrow.ExpiryHeight))
+	return servicesHashParts("aetra-services-payment-escrow-v1", escrow.EscrowID, escrow.ServiceID, escrow.Payer, escrow.Denom, escrow.Amount, fmt.Sprint(escrow.LockedHeight), fmt.Sprint(escrow.ExpiryHeight))
 }
 
 func ComputePaymentStreamHash(stream PaymentStream) string {
 	stream = canonicalPaymentStream(stream)
-	return servicesHashParts("aetheris-services-payment-stream-v1", stream.StreamID, stream.ServiceID, stream.Payer, stream.Denom, stream.RatePerHeight, fmt.Sprint(stream.StartHeight), fmt.Sprint(stream.EndHeight), fmt.Sprint(stream.PaidThrough))
+	return servicesHashParts("aetra-services-payment-stream-v1", stream.StreamID, stream.ServiceID, stream.Payer, stream.Denom, stream.RatePerHeight, fmt.Sprint(stream.StartHeight), fmt.Sprint(stream.EndHeight), fmt.Sprint(stream.PaidThrough))
 }
 
 func ComputeMeteredUsageHash(usage MeteredUsage) string {
 	usage = canonicalMeteredUsage(usage)
-	return servicesHashParts("aetheris-services-payment-metered-usage-v1", usage.MeterID, usage.ServiceID, usage.CallID, usage.UsageReceipt.ReceiptHash, usage.AmountDue, fmt.Sprint(usage.RecordedHeight))
+	return servicesHashParts("aetra-services-payment-metered-usage-v1", usage.MeterID, usage.ServiceID, usage.CallID, usage.UsageReceipt.ReceiptHash, usage.AmountDue, fmt.Sprint(usage.RecordedHeight))
 }
 
 func ComputePaymentSettlementHash(settlement PaymentSettlement) string {
 	settlement = canonicalPaymentSettlement(settlement)
-	return servicesHashParts("aetheris-services-payment-settlement-v1", settlement.CallID, settlement.ServiceID, settlement.EnvelopeHash, settlement.QuoteHash, settlement.AmountSettled, settlement.Denom, string(settlement.Status), string(settlement.FailurePolicy), fmt.Sprint(settlement.SettlementHeight))
+	return servicesHashParts("aetra-services-payment-settlement-v1", settlement.CallID, settlement.ServiceID, settlement.EnvelopeHash, settlement.QuoteHash, settlement.AmountSettled, settlement.Denom, string(settlement.Status), string(settlement.FailurePolicy), fmt.Sprint(settlement.SettlementHeight))
 }
 
 func ComputeServicePaymentStateRoot(state ServicePaymentState) string {
-	parts := []string{"aetheris-services-payment-state-root-v1", fmt.Sprint(state.Height)}
+	parts := []string{"aetra-services-payment-state-root-v1", fmt.Sprint(state.Height)}
 	for _, model := range normalizeServicePaymentModels(state.Models) {
 		parts = append(parts, model.ModelHash)
 	}
@@ -816,11 +816,11 @@ func ComputeServicePaymentStateRoot(state ServicePaymentState) string {
 }
 
 func ComputeServicePaymentProofHash(proof ServicePaymentProof) string {
-	return servicesHashParts("aetheris-services-payment-proof-v1", proof.Key, proof.ValueHash, proof.StateRoot, fmt.Sprint(proof.Height))
+	return servicesHashParts("aetra-services-payment-proof-v1", proof.Key, proof.ValueHash, proof.StateRoot, fmt.Sprint(proof.Height))
 }
 
 func ComputeFinancialZonePaymentRouteHash(route FinancialZonePaymentRoute) string {
-	return servicesHashParts("aetheris-services-financial-route-v1", route.RouteID, route.ServiceID, route.Payer, route.Denom, route.Amount, route.BankKeeper, route.FinancialZone)
+	return servicesHashParts("aetra-services-financial-route-v1", route.RouteID, route.ServiceID, route.Payer, route.Denom, route.Amount, route.BankKeeper, route.FinancialZone)
 }
 
 func canonicalServicePaymentModel(model ServicePaymentModel) ServicePaymentModel {
@@ -878,7 +878,7 @@ func isProtocolNativePaymentDescriptor(descriptor ServiceDescriptor) bool {
 		return true
 	}
 	switch descriptor.ZoneID {
-	case coretypes.ZoneIDAetherCore, coretypes.ZoneIDFinancial, coretypes.ZoneIDIdentity:
+	case coretypes.ZoneIDAetraCore, coretypes.ZoneIDFinancial, coretypes.ZoneIDIdentity:
 		return true
 	default:
 		return false

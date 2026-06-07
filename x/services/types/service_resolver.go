@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ServiceResolutionSource string
@@ -324,7 +324,7 @@ func (out ServiceResolutionOutput) Validate() error {
 func ComputeServiceResolverSourceHash(record ServiceResolverSourceRecord) string {
 	record = canonicalResolverSourceRecord(record)
 	return servicesHashParts(
-		"aetheris-services-resolver-source-v1",
+		"aetra-services-resolver-source-v1",
 		string(record.Source),
 		record.ServiceName,
 		record.ServiceID,
@@ -346,7 +346,7 @@ func ComputeServiceResolverSourceHash(record ServiceResolverSourceRecord) string
 
 func ComputeServiceResolutionProofChainHash(chain ServiceResolutionProofChain) string {
 	return servicesHashParts(
-		"aetheris-services-resolution-proof-chain-v1",
+		"aetra-services-resolution-proof-chain-v1",
 		strings.Join(sortedStrings(chain.SourceHashes), ","),
 		chain.RegistryProofHash,
 		strings.Join(sortedStrings(chain.SignatureHashes), ","),
@@ -360,7 +360,7 @@ func ComputeServiceResolutionProofChainHash(chain ServiceResolutionProofChain) s
 
 func ComputeServiceResolutionOutputHash(out ServiceResolutionOutput) string {
 	return servicesHashParts(
-		"aetheris-services-resolution-output-v1",
+		"aetra-services-resolution-output-v1",
 		out.ServiceName,
 		out.ServiceID,
 		string(out.Source),

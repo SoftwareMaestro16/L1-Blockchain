@@ -39,7 +39,7 @@
 ## Ownership Rules
 
 - `app/` wires keepers, stores, module order, hooks, and upgrade handlers.
-- `cmd/l1d/` owns the Aetra daemon entrypoint; build artifacts are named `aetherisd`.
+- `cmd/l1d/` owns the Aetra daemon entrypoint; build artifacts are named `aetrad`.
 - `proto/` owns public wire contracts for Msg, Query, state, and genesis.
 - `x/<module>/keeper/` owns state access and business logic.
 - `x/<module>/types/` owns generated types, constants, errors, and expected keeper interfaces.

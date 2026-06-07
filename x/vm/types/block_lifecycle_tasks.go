@@ -267,7 +267,7 @@ func VerifyAVMBlockReplayDeterminism(left, right AVMBlockLifecyclePlan) error {
 func ComputeAVMAppExecutionPipelineRoot(pipeline AVMAppExecutionPipeline) string {
 	pipeline = canonicalAVMAppExecutionPipeline(pipeline)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-app-execution-pipeline-v1")
+	writeEnginePart(h, "aetra-avm-app-execution-pipeline-v1")
 	writeEngineUint64(h, uint64(len(pipeline.Hooks)))
 	for _, hook := range pipeline.Hooks {
 		writeEnginePart(h, string(hook.Name))

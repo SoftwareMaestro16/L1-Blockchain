@@ -161,7 +161,7 @@ func TestAVM2ContextAndStackOpcodesAreDeterministic(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, result.Stack, 3)
 	require.Equal(t, "00000000000000000010", result.Stack[0])
-	require.Equal(t, "aetheris-local", result.Stack[1])
+	require.Equal(t, "aetra-local", result.Stack[1])
 	require.NotEmpty(t, result.Stack[2])
 }
 
@@ -262,7 +262,7 @@ func mustAVM2GasTable(t *testing.T) AVM2GasTable {
 func mustAVM2Context(t *testing.T, readOnly bool) AVM2ExecutionContext {
 	t.Helper()
 	ctx := AVM2ExecutionContext{
-		ChainID:         "aetheris-local",
+		ChainID:         "aetra-local",
 		Height:          10,
 		ZoneID:          zonestypes.ZoneID("CONTRACT"),
 		ShardID:         1,
@@ -279,7 +279,7 @@ func mustAVM2Context(t *testing.T, readOnly bool) AVM2ExecutionContext {
 func mustAVM2Message(t *testing.T) AVMAsyncMessage {
 	t.Helper()
 	msg, err := NewAVMAsyncMessage(AVMAsyncMessage{
-		ChainID:         "aetheris-local",
+		ChainID:         "aetra-local",
 		Source:          "contract-a",
 		Destination:     "contract-b",
 		Payload:         []byte("call"),
@@ -304,7 +304,7 @@ func mustAVM2Proof(t *testing.T, limits AVM2Limits) AVM2ProofInput {
 	t.Helper()
 	proof := AVM2ProofInput{
 		ProofVersion: 1,
-		ChainID:      "aetheris-local",
+		ChainID:      "aetra-local",
 		Height:       9,
 		RootType:     AVM2ProofRootContractState,
 		RootHash:     ComputeAVM2BytesHash([]byte("root")),

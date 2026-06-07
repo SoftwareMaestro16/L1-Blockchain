@@ -113,13 +113,13 @@ func TestBuildRecursiveResolutionProofV2UsesCanonicalRootToTargetPath(t *testing
 	state, _, err := PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{Primary: addr(2)}, 12)
 	require.NoError(t, err)
 
-	proof, err := BuildRecursiveResolutionProofV2(state, "aetheris-local-1", "alice.aet", "api.alice.aet", 14, 30, nil)
+	proof, err := BuildRecursiveResolutionProofV2(state, "aetra-local-1", "alice.aet", "api.alice.aet", 14, 30, nil)
 	require.NoError(t, err)
 	path, err := CanonicalResolutionPathV2("api.alice.aet")
 	require.NoError(t, err)
 	require.Equal(t, []string{"alice", "api"}, proof.PathLabels)
 	require.Equal(t, path.PathHashes, proof.PathHashes)
 
-	_, err = BuildRecursiveResolutionProofV2(state, "aetheris-local-1", "bob.aet", "api.alice.aet", 14, 30, nil)
+	_, err = BuildRecursiveResolutionProofV2(state, "aetra-local-1", "bob.aet", "api.alice.aet", 14, 30, nil)
 	require.ErrorContains(t, err, "root_name")
 }

@@ -73,7 +73,7 @@ foreach ($term in @(
     'non-`naet` fee rejection',
     'zero admin, zero recipient, and zero contract address rejection',
     'Query limits are part of the feature gate',
-    'aetherisd',
+    'aetrad',
     'naet'
   )) {
   Assert-Contains -Text $cosmWasmText -Pattern ([regex]::Escape($term)) -Message "CosmWasm readiness doc missing: $term"

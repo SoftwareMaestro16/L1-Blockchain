@@ -435,7 +435,7 @@ func IsAVMImplementationRoadmapPhaseID(phaseID AVMImplementationRoadmapPhaseID) 
 func ComputeAVMImplementationRoadmapPhaseHash(phase AVMImplementationRoadmapPhase) string {
 	phase = canonicalAVMImplementationRoadmapPhase(phase)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-implementation-roadmap-phase-v1")
+	writeEnginePart(h, "aetra-avm-implementation-roadmap-phase-v1")
 	writeEnginePart(h, string(phase.PhaseID))
 	writeEnginePart(h, phase.Name)
 	writeEngineUint64(h, uint64(len(phase.Tasks)))
@@ -457,7 +457,7 @@ func ComputeAVMImplementationRoadmapPhaseHash(phase AVMImplementationRoadmapPhas
 func ComputeAVMImplementationRoadmapHash(roadmap AVMImplementationRoadmap) string {
 	roadmap = canonicalAVMImplementationRoadmap(roadmap)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-implementation-roadmap-v1")
+	writeEnginePart(h, "aetra-avm-implementation-roadmap-v1")
 	writeEnginePart(h, roadmap.RoadmapName)
 	writeEngineUint64(h, uint64(len(roadmap.Phases)))
 	for _, phase := range roadmap.Phases {

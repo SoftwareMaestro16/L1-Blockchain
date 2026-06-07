@@ -30,15 +30,15 @@ foreach ($term in @(
     'Recovery policy is explicit and bounded',
     'Wallet cannot silently pay protocol fees in non-`naet`',
     'A relayer can submit a command, but on-chain fee payment is still `naet`',
-    'x/aetherisvm/standards/aw',
+    'x/aetravm/standards/aw',
     'recovery policy bounded',
-    'go test ./x/aetherisvm/standards/aw'
+    'go test ./x/aetravm/standards/aw'
   )) {
   Assert-Contains -Text $standardText -Pattern ([regex]::Escape($term)) -Message "AW-5 standard doc missing: $term"
 }
 
 foreach ($term in @(
-    'x/aetherisvm/standards',
+    'x/aetravm/standards',
     'No chain state',
     'AW-5 replay-safe contract wallet model',
     'Wallet `seqno`, `wallet_id`, `valid_until`, signature, extension auth, and',

@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ServiceInterfaceMethodSchema struct {
@@ -387,7 +387,7 @@ func (preparation ServiceInterfaceCallPreparation) Validate() error {
 
 func ComputeServiceInterfaceMethodSchemaHash(method ServiceInterfaceMethodSchema) string {
 	return servicesHashParts(
-		"aetheris-services-interface-method-v1",
+		"aetra-services-interface-method-v1",
 		method.MethodID,
 		method.Name,
 		method.InputSchemaHash,
@@ -404,7 +404,7 @@ func ComputeServiceInterfaceMethodSchemaHash(method ServiceInterfaceMethodSchema
 
 func ComputeServiceMethodTimeoutPolicyHash(policy ServiceMethodTimeoutPolicy) string {
 	return servicesHashParts(
-		"aetheris-services-interface-timeout-policy-v1",
+		"aetra-services-interface-timeout-policy-v1",
 		fmt.Sprint(policy.TimeoutHeightDelta),
 		string(policy.FailureBehavior),
 	)
@@ -414,7 +414,7 @@ func ComputeFormalServiceInterfaceHash(definition FormalServiceInterface) string
 	methods := append([]ServiceInterfaceMethodSchema(nil), definition.Methods...)
 	sortServiceInterfaceMethodSchemas(methods)
 	parts := []string{
-		"aetheris-services-interface-definition-v1",
+		"aetra-services-interface-definition-v1",
 		definition.InterfaceHash,
 		definition.InterfaceName,
 		fmt.Sprint(definition.Version),
@@ -434,7 +434,7 @@ func ComputeFormalServiceInterfaceHash(definition FormalServiceInterface) string
 
 func ComputeServiceInterfaceCallPreparationHash(preparation ServiceInterfaceCallPreparation) string {
 	return servicesHashParts(
-		"aetheris-services-interface-call-preparation-v1",
+		"aetra-services-interface-call-preparation-v1",
 		preparation.ServiceID,
 		preparation.InterfaceHash,
 		preparation.MethodID,

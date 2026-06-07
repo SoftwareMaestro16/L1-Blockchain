@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sovereign-l1/l1/x/aetherisvm/async"
+	"github.com/sovereign-l1/l1/x/aetravm/async"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -204,7 +204,7 @@ func (s AVMStateInvariantSet) Validate() error {
 func ComputeAVMRootHash(root AVMRoot) string {
 	root = canonicalAVMRoot(root)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-root-v1")
+	writeEnginePart(h, "aetra-avm-root-v1")
 	writeEngineUint64(h, root.Height)
 	writeEnginePart(h, root.RouterRoot)
 	writeEnginePart(h, root.AsyncMessageRoot)
@@ -219,7 +219,7 @@ func ComputeAVMRootHash(root AVMRoot) string {
 func ComputeAVMZoneStateRootHash(root AVMZoneStateRoot) string {
 	root = canonicalAVMZoneStateRoot(root)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-zone-root-v2")
+	writeEnginePart(h, "aetra-zone-root-v2")
 	writeEnginePart(h, string(root.ZoneID))
 	writeEngineUint64(h, root.Height)
 	writeEnginePart(h, root.StateRoot)
@@ -232,7 +232,7 @@ func ComputeAVMZoneStateRootHash(root AVMZoneStateRoot) string {
 func ComputeAVMStateInvariantRoot(set AVMStateInvariantSet) string {
 	set = canonicalAVMStateInvariantSet(set)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-state-invariants-v1")
+	writeEnginePart(h, "aetra-avm-state-invariants-v1")
 	writeEngineUint64(h, uint64(len(set.StoredMessages)))
 	for _, msg := range set.StoredMessages {
 		writeEnginePart(h, msg.MessageID)

@@ -107,7 +107,7 @@ func TestResolverSpoofingPreventionServiceEndpointDisplayPolicyV2(t *testing.T) 
 		SupportedTransports: []string{"https"},
 		AllowedAuthPolicies: []string{"none"},
 		CurrentHeight:       20,
-		ExpectedChainID:     "aetheris-local-1",
+		ExpectedChainID:     "aetra-local-1",
 		TrustedHeader:       trustedHeaderForProofV2(proof),
 		Proof:               &proof,
 	})

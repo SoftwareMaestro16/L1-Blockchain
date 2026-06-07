@@ -49,13 +49,13 @@ func TestVerifiedReverseProofFormatAndWalletDisplayV2(t *testing.T) {
 	appHash, err := IdentityStateRoot(state)
 	require.NoError(t, err)
 
-	proof, err := BuildVerifiedReverseResolutionProofV2(state, addr(2), "aetheris-local-1", appHash, 14, 30, nil)
+	proof, err := BuildVerifiedReverseResolutionProofV2(state, addr(2), "aetra-local-1", appHash, 14, 30, nil)
 	require.NoError(t, err)
 	require.Equal(t, IdentityReverseProofFormatVersionV2, proof.ProofVersion)
 	require.True(t, proof.Record.Verified)
 	require.NotEmpty(t, proof.ProofHash)
 	require.NoError(t, ValidateVerifiedReverseResolutionProofV2(proof, IdentityLightClientVerificationRequestV2{
-		ExpectedChainID:      "aetheris-local-1",
+		ExpectedChainID:      "aetra-local-1",
 		RequestedName:        domain.Name,
 		TrustedHeader:        trustedHeaderForProofV2(proof.Proof),
 		CurrentHeight:        14,

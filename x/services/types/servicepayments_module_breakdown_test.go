@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestDefaultXServicePaymentsModuleBreakdownCoversSection154(t *testing.T) {
@@ -130,7 +130,7 @@ func TestXServicePaymentsStreamSettlementLimit(t *testing.T) {
 }
 
 func TestXServicePaymentsModelSnapshotRejectsChangedAfterSigning(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 70}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 70}
 	descriptor := testInterfaceSystemDescriptor()
 	call := testInteractionCall(t, ctx, descriptor, "submit", 1, "servicepayments/model")
 	model, err := NewServicePaymentModelFromDescriptor(descriptor)

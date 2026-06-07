@@ -8,7 +8,7 @@ import (
 )
 
 func TestNodeRecordCanonicalFieldsAndSignature(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	node := testDNLNodeRecord(t, 0x41, salt, []string{"financial"}, []string{"svc-pay"}, 100)
 
 	require.Equal(t, DefaultNodeRecordVersion, node.RecordVersion)
@@ -52,7 +52,7 @@ func TestDNLRoutingStateKeysMatchSpec(t *testing.T) {
 }
 
 func TestDNLRoutingStateBuildsDeterministicIndexesAndRoots(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	first := testDNLNodeRecord(t, 0x51, salt, []string{"financial", "identity"}, []string{"svc-pay"}, 100)
 	second := testDNLNodeRecord(t, 0x52, salt, []string{"contract"}, []string{"svc-contract"}, 100)
 	firstReputation := testDNLReputation(t, first.NodeID, 20)
@@ -91,7 +91,7 @@ func TestDNLRoutingStateBuildsDeterministicIndexesAndRoots(t *testing.T) {
 }
 
 func TestDNLRoutingStateRejectsMissingReputationAndExpiredCache(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	node := testDNLNodeRecord(t, 0x61, salt, []string{"apps"}, []string{"svc-app"}, 100)
 	_, err := BuildDNLRoutingState([]NodeRecord{node}, nil, nil, nil, 20)
 	require.ErrorContains(t, err, "reputation")

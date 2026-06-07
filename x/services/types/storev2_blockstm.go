@@ -400,7 +400,7 @@ func IsServiceBlockSTMOperationKind(kind ServiceBlockSTMOperationKind) bool {
 
 func ComputeServiceStoreV2EntryHash(entry ServiceStoreV2Entry) string {
 	return servicesHashParts(
-		"aetheris-services-store-v2-entry-v1",
+		"aetra-services-store-v2-entry-v1",
 		entry.Name,
 		entry.Prefix,
 		string(entry.Keeper),
@@ -415,7 +415,7 @@ func ComputeServiceStoreV2EntryHash(entry ServiceStoreV2Entry) string {
 
 func ComputeServiceStoreV2LayoutHash(layout ServiceStoreV2Layout) string {
 	entries := normalizeServiceStoreV2Entries(layout.Entries)
-	parts := []string{"aetheris-services-store-v2-layout-v1", fmt.Sprint(len(entries))}
+	parts := []string{"aetra-services-store-v2-layout-v1", fmt.Sprint(len(entries))}
 	for _, entry := range entries {
 		parts = append(parts, entry.EntryHash)
 	}
@@ -423,12 +423,12 @@ func ComputeServiceStoreV2LayoutHash(layout ServiceStoreV2Layout) string {
 }
 
 func ComputeServiceBlockSTMPartitionRuleHash(rule ServiceBlockSTMPartitionRule) string {
-	return servicesHashParts("aetheris-services-blockstm-partition-rule-v1", rule.StateFamily, strings.Join(rule.PartitionBy, ","), rule.PartitionKey)
+	return servicesHashParts("aetra-services-blockstm-partition-rule-v1", rule.StateFamily, strings.Join(rule.PartitionBy, ","), rule.PartitionKey)
 }
 
 func ComputeServiceBlockSTMStrategyHash(strategy ServiceBlockSTMStrategy) string {
 	rules := normalizeServiceBlockSTMPartitionRules(strategy.PartitionRules)
-	parts := []string{"aetheris-services-blockstm-strategy-v1", fmt.Sprint(len(rules))}
+	parts := []string{"aetra-services-blockstm-strategy-v1", fmt.Sprint(len(rules))}
 	for _, rule := range rules {
 		parts = append(parts, rule.RuleHash)
 	}
@@ -437,7 +437,7 @@ func ComputeServiceBlockSTMStrategyHash(strategy ServiceBlockSTMStrategy) string
 
 func ComputeServiceBlockSTMOperationHash(op ServiceBlockSTMOperation) string {
 	return servicesHashParts(
-		"aetheris-services-blockstm-operation-v1",
+		"aetra-services-blockstm-operation-v1",
 		string(op.Kind),
 		op.SubjectKey,
 		strings.Join(op.ReadPartitions, ","),

@@ -2,9 +2,9 @@ param(
   [string]$Doc = "docs\architecture\avm.md",
   [string]$Direction = "docs\architecture\vm-direction.md",
   [string]$Boundaries = "docs\module-boundaries.md",
-  [string]$Code = "x\aetherisvm\avm\avm.go",
-  [string]$Tests = "x\aetherisvm\avm\avm_test.go",
-  [string]$FuzzTests = "x\aetherisvm\avm\fuzz_test.go"
+  [string]$Code = "x\aetravm\avm\avm.go",
+  [string]$Tests = "x\aetravm\avm\avm_test.go",
+  [string]$FuzzTests = "x\aetravm\avm\fuzz_test.go"
 )
 
 $ErrorActionPreference = "Stop"
@@ -31,7 +31,7 @@ $fuzzTestText = Get-Content -Raw -LiteralPath (Resolve-RepoPath $FuzzTests)
 
 foreach ($term in @(
     'Aetra Virtual Machine',
-    'x/aetherisvm/avm',
+    'x/aetravm/avm',
     'binary serialization spec',
     'message ABI',
     'storage ABI',
@@ -84,7 +84,7 @@ foreach ($term in @(
     'process internal queue',
     'execute getters',
     'export/import state',
-    'go test ./x/aetherisvm/avm',
+    'go test ./x/aetravm/avm',
     'AVM can execute a minimal contract deterministically'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "AVM doc missing: $term"
@@ -134,15 +134,15 @@ foreach ($term in @(
 Assert-Contains -Text $fuzzTestText -Pattern ([regex]::Escape('FuzzDecodeModuleRejectsMalformedWithoutPanic')) -Message "AVM fuzz test missing decoder fuzz target"
 
 foreach ($term in @(
-    'x/aetherisvm/avm',
+    'x/aetravm/avm',
     'Aetra Virtual Machine',
-    'go test ./x/aetherisvm/avm'
+    'go test ./x/aetravm/avm'
   )) {
   Assert-Contains -Text $directionText -Pattern ([regex]::Escape($term)) -Message "VM direction missing AVM term: $term"
 }
 
 foreach ($term in @(
-    'x/aetherisvm/avm',
+    'x/aetravm/avm',
     'pure Go executable specification',
     'No SDK stores, keepers, module accounts, genesis, CLI, or ABCI hooks'
   )) {

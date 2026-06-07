@@ -8,8 +8,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/sovereign-l1/l1/x/aetherisvm/async"
-	"github.com/sovereign-l1/l1/x/aetherisvm/avm"
+	"github.com/sovereign-l1/l1/x/aetravm/async"
+	"github.com/sovereign-l1/l1/x/aetravm/avm"
 )
 
 func (s ContractZoneState) Validate() error {

@@ -517,7 +517,7 @@ func (k AVMExecutionKeeper) Execute(instance ContractInstance, msg ContractInbox
 
 func (k AVMExecutionKeeper) MeterInstructions(instructions []AVMInstruction) (uint64, string, error) {
 	var gasUsed uint64
-	parts := []string{"aetheris-avm-instruction-trace-v1", fmt.Sprint(len(instructions))}
+	parts := []string{"aetra-avm-instruction-trace-v1", fmt.Sprint(len(instructions))}
 	for _, instruction := range instructions {
 		if err := instruction.Validate(); err != nil {
 			return 0, "", err
@@ -657,7 +657,7 @@ func BuildContractZoneRoot(roots ContractZoneRoots) (ZoneRoot, error) {
 	stateRoot := roots.StateRoot
 	if stateRoot == "" {
 		stateRoot = hashRuntimeParts(
-			"aetheris-contract-zone-state-v1",
+			"aetra-contract-zone-state-v1",
 			roots.CodeRoot,
 			roots.InstanceRoot,
 			roots.StorageRoot,
@@ -1237,7 +1237,7 @@ func (r ContractZoneRoots) Validate() error {
 
 func ComputeContractBytecodeInterfaceHash(iface ContractBytecodeInterface) string {
 	return hashRuntimeParts(
-		"aetheris-contract-bytecode-interface-v1",
+		"aetra-contract-bytecode-interface-v1",
 		string(iface.Runtime),
 		iface.InstructionSet,
 		iface.BytecodeHash,
@@ -1249,7 +1249,7 @@ func ComputeContractBytecodeInterfaceHash(iface ContractBytecodeInterface) strin
 
 func ComputeAVMGasTableHash(table AVMGasTable) string {
 	ordered := normalizeAVMInstructionGasCosts(table.Costs)
-	parts := []string{"aetheris-avm-gas-table-v1", fmt.Sprint(table.Version), fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-avm-gas-table-v1", fmt.Sprint(table.Version), fmt.Sprint(len(ordered))}
 	for _, cost := range ordered {
 		parts = append(parts, cost.Instruction, fmt.Sprint(cost.BaseGas))
 	}
@@ -1260,16 +1260,16 @@ func ComputeAVMGasTableRoot(table AVMGasTable) string {
 	if table.Version == 0 {
 		return EmptyRootHash()
 	}
-	return hashRuntimeParts("aetheris-contract-gas-table-root-v1", fmt.Sprint(table.Version), table.TableHash)
+	return hashRuntimeParts("aetra-contract-gas-table-root-v1", fmt.Sprint(table.Version), table.TableHash)
 }
 
 func ComputeAVMExecutionKeeperHash(keeper AVMExecutionKeeper) string {
-	return hashRuntimeParts("aetheris-avm-execution-keeper-v1", keeper.RuntimeID, keeper.GasTable.TableHash, fmt.Sprint(keeper.ZoneGasLimit), fmt.Sprint(keeper.MaxInstructions))
+	return hashRuntimeParts("aetra-avm-execution-keeper-v1", keeper.RuntimeID, keeper.GasTable.TableHash, fmt.Sprint(keeper.ZoneGasLimit), fmt.Sprint(keeper.MaxInstructions))
 }
 
 func ComputeContractShardRouteHash(route ContractShardRoute) string {
 	return hashRuntimeParts(
-		"aetheris-contract-shard-route-v1",
+		"aetra-contract-shard-route-v1",
 		string(route.ZoneID),
 		fmt.Sprint(route.LayoutEpoch),
 		fmt.Sprint(route.ShardCount),
@@ -1281,7 +1281,7 @@ func ComputeContractShardRouteHash(route ContractShardRoute) string {
 }
 
 func ComputeContractAsyncCallID(call ContractAsyncCall) string {
-	return hashRuntimeParts("aetheris-contract-async-call-id-v1", call.Source, string(call.SourceZone), call.TargetContract, fmt.Sprint(call.CreatedHeight), fmt.Sprint(call.RetryNonce))
+	return hashRuntimeParts("aetra-contract-async-call-id-v1", call.Source, string(call.SourceZone), call.TargetContract, fmt.Sprint(call.CreatedHeight), fmt.Sprint(call.RetryNonce))
 }
 
 func ComputeContractAsyncCallHash(call ContractAsyncCall) string {
@@ -1289,16 +1289,16 @@ func ComputeContractAsyncCallHash(call ContractAsyncCall) string {
 	if callID == "" {
 		callID = ComputeContractAsyncCallID(call)
 	}
-	return hashRuntimeParts("aetheris-contract-async-call-v1", callID, call.Source, string(call.SourceZone), call.TargetContract, call.PayloadHash, fmt.Sprint(call.GasLimit), fmt.Sprint(call.RetryNonce), fmt.Sprint(call.ExpiryHeight), fmt.Sprint(call.CreatedHeight))
+	return hashRuntimeParts("aetra-contract-async-call-v1", callID, call.Source, string(call.SourceZone), call.TargetContract, call.PayloadHash, fmt.Sprint(call.GasLimit), fmt.Sprint(call.RetryNonce), fmt.Sprint(call.ExpiryHeight), fmt.Sprint(call.CreatedHeight))
 }
 
 func ComputeContractEventHash(event ContractEvent) string {
-	return hashRuntimeParts("aetheris-contract-event-v1", event.ContractAddr, event.EventID, event.Topic, event.PayloadHash, fmt.Sprint(event.Height), fmt.Sprint(event.Sequence))
+	return hashRuntimeParts("aetra-contract-event-v1", event.ContractAddr, event.EventID, event.Topic, event.PayloadHash, fmt.Sprint(event.Height), fmt.Sprint(event.Sequence))
 }
 
 func ComputeContractCosmWasmAdapterHash(adapter ContractCosmWasmAdapterDescriptor) string {
 	return hashRuntimeParts(
-		"aetheris-contract-cosmwasm-adapter-v1",
+		"aetra-contract-cosmwasm-adapter-v1",
 		adapter.AdapterID,
 		adapter.Version,
 		adapter.PolicyHash,
@@ -1308,7 +1308,7 @@ func ComputeContractCosmWasmAdapterHash(adapter ContractCosmWasmAdapterDescripto
 
 func ComputeContractExecutionReceiptHash(receipt ContractExecutionReceipt) string {
 	return hashRuntimeParts(
-		"aetheris-contract-zone-receipt-v1",
+		"aetra-contract-zone-receipt-v1",
 		receipt.ContractAddr,
 		receipt.ReceiptID,
 		receipt.MsgID,
@@ -1326,7 +1326,7 @@ func ComputeContractExecutionReceiptHash(receipt ContractExecutionReceipt) strin
 func ComputeContractZoneStateRoot(state ContractZoneState) string {
 	normalized := state.Normalize()
 	return hashRuntimeParts(
-		"aetheris-contract-zone-state-v1",
+		"aetra-contract-zone-state-v1",
 		ComputeContractCodeRoot(normalized.Codes),
 		ComputeContractInstanceRoot(normalized.Instances),
 		ComputeContractStorageRoot(normalized.Storage),
@@ -1343,7 +1343,7 @@ func ComputeContractZoneStateRoot(state ContractZoneState) string {
 
 func ComputeContractCodeRoot(codes []ContractCode) string {
 	ordered := normalizeContractCodes(codes)
-	parts := []string{"aetheris-contract-code-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-code-root-v1", fmt.Sprint(len(ordered))}
 	for _, code := range ordered {
 		parts = append(parts, code.CodeID, string(code.Runtime), code.BytecodeHash, fmt.Sprint(code.BytecodeSize), code.ABIHash, code.InterfaceHash, code.Uploader, fmt.Sprint(code.UploadedHeight))
 	}
@@ -1352,7 +1352,7 @@ func ComputeContractCodeRoot(codes []ContractCode) string {
 
 func ComputeContractInstanceRoot(instances []ContractInstance) string {
 	ordered := normalizeContractInstances(instances)
-	parts := []string{"aetheris-contract-instance-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-instance-root-v1", fmt.Sprint(len(ordered))}
 	for _, instance := range ordered {
 		parts = append(parts, instance.ContractAddr, instance.CodeID, string(instance.Runtime), instance.Admin, instance.StorageRoot, fmt.Sprint(instance.CreatedHeight), fmt.Sprint(instance.UpdatedHeight))
 	}
@@ -1361,7 +1361,7 @@ func ComputeContractInstanceRoot(instances []ContractInstance) string {
 
 func ComputeContractStorageRoot(entries []ContractStorageEntry) string {
 	ordered := normalizeContractStorage(entries)
-	parts := []string{"aetheris-contract-storage-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-storage-root-v1", fmt.Sprint(len(ordered))}
 	for _, entry := range ordered {
 		key, _ := ContractStorageKey(entry.ContractAddr, entry.Key)
 		parts = append(parts, key, entry.ValueHash)
@@ -1371,7 +1371,7 @@ func ComputeContractStorageRoot(entries []ContractStorageEntry) string {
 
 func ComputeContractABIRoot(abis []ContractABIDescriptor) string {
 	ordered := normalizeContractABIs(abis)
-	parts := []string{"aetheris-contract-abi-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-abi-root-v1", fmt.Sprint(len(ordered))}
 	for _, abi := range ordered {
 		methods := append([]string(nil), abi.ExportedMethods...)
 		sort.Strings(methods)
@@ -1383,7 +1383,7 @@ func ComputeContractABIRoot(abis []ContractABIDescriptor) string {
 
 func ComputeContractInboxRoot(inbox []ContractInboxMessage) string {
 	ordered := normalizeContractInbox(inbox)
-	parts := []string{"aetheris-contract-inbox-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-inbox-root-v1", fmt.Sprint(len(ordered))}
 	for _, msg := range ordered {
 		key, _ := ContractInboxKey(msg.ContractAddr, msg.MsgID)
 		parts = append(parts, key, string(msg.MessageKind), msg.Source, msg.PayloadHash, fmt.Sprint(msg.GasLimit), fmt.Sprint(msg.Sequence), fmt.Sprint(msg.ReceivedHeight))
@@ -1393,7 +1393,7 @@ func ComputeContractInboxRoot(inbox []ContractInboxMessage) string {
 
 func ComputeContractOutboxRoot(outbox []ContractInboxMessage) string {
 	ordered := normalizeContractInbox(outbox)
-	parts := []string{"aetheris-contract-outbox-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-outbox-root-v1", fmt.Sprint(len(ordered))}
 	for _, msg := range ordered {
 		key, _ := ContractOutboxKey(msg.ContractAddr, msg.MsgID)
 		parts = append(parts, key, string(msg.MessageKind), msg.Source, msg.PayloadHash, fmt.Sprint(msg.GasLimit), fmt.Sprint(msg.Sequence), fmt.Sprint(msg.ReceivedHeight))
@@ -1403,7 +1403,7 @@ func ComputeContractOutboxRoot(outbox []ContractInboxMessage) string {
 
 func ComputeContractReceiptRoot(receipts []ContractExecutionReceipt) string {
 	ordered := normalizeContractReceipts(receipts)
-	parts := []string{"aetheris-contract-receipt-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-receipt-root-v1", fmt.Sprint(len(ordered))}
 	for _, receipt := range ordered {
 		parts = append(parts, receipt.ReceiptHash)
 	}
@@ -1412,7 +1412,7 @@ func ComputeContractReceiptRoot(receipts []ContractExecutionReceipt) string {
 
 func ComputeContractExecutionRoot(receipts []ContractExecutionReceipt) string {
 	ordered := normalizeContractReceipts(receipts)
-	parts := []string{"aetheris-contract-execution-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-execution-root-v1", fmt.Sprint(len(ordered))}
 	for _, receipt := range ordered {
 		parts = append(parts, receipt.ContractAddr, receipt.MsgID, string(receipt.Status), receipt.OutputHash, receipt.StorageRoot, fmt.Sprint(receipt.GasUsed))
 	}
@@ -1421,7 +1421,7 @@ func ComputeContractExecutionRoot(receipts []ContractExecutionReceipt) string {
 
 func ComputeContractEventRoot(events []ContractEvent) string {
 	ordered := normalizeContractEvents(events)
-	parts := []string{"aetheris-contract-event-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-event-root-v1", fmt.Sprint(len(ordered))}
 	for _, event := range ordered {
 		parts = append(parts, event.EventHash)
 	}
@@ -1456,7 +1456,7 @@ func BuildContractProofRootExports(height uint64, roots ContractZoneRoots) ([]Co
 
 func ComputeContractBytecodeInterfaceRoot(interfaces []ContractBytecodeInterface) string {
 	ordered := normalizeContractBytecodeInterfaces(interfaces)
-	parts := []string{"aetheris-contract-bytecode-interface-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-bytecode-interface-root-v1", fmt.Sprint(len(ordered))}
 	for _, iface := range ordered {
 		parts = append(parts, string(iface.Runtime), iface.InstructionSet, iface.BytecodeHash, iface.ABIHash, iface.DeterminismHash, fmt.Sprint(iface.MaxCodeBytes), iface.InterfaceHash)
 	}
@@ -1465,7 +1465,7 @@ func ComputeContractBytecodeInterfaceRoot(interfaces []ContractBytecodeInterface
 
 func ComputeContractCosmWasmAdapterRoot(adapters []ContractCosmWasmAdapterDescriptor) string {
 	ordered := normalizeContractCosmWasmAdapters(adapters)
-	parts := []string{"aetheris-contract-cosmwasm-adapter-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-contract-cosmwasm-adapter-root-v1", fmt.Sprint(len(ordered))}
 	for _, adapter := range ordered {
 		parts = append(parts, adapter.AdapterID, adapter.Version, adapter.PolicyHash, adapter.CapabilityRoot, adapter.DescriptorHash)
 	}
@@ -1643,7 +1643,7 @@ func routeContractStateKey(mode ContractShardRoutingMode, routeKey string, state
 	if err := validateRuntimeToken("contract shard state key", stateKey, MaxZoneNamespaceLength); err != nil {
 		return ContractShardRoute{}, err
 	}
-	hash := hashRuntimeParts("aetheris-contract-route-key-v1", string(mode), routeKey, fmt.Sprint(layoutEpoch))
+	hash := hashRuntimeParts("aetra-contract-route-key-v1", string(mode), routeKey, fmt.Sprint(layoutEpoch))
 	bytes, err := hex.DecodeString(hash[:16])
 	if err != nil {
 		return ContractShardRoute{}, err

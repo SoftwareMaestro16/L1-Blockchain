@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type XServiceReceiptsStateObject string
@@ -609,7 +609,7 @@ func (proof ServiceReceiptProofRecord) Validate() error {
 
 func ComputeXServiceReceiptsModuleBreakdownHash(breakdown XServiceReceiptsModuleBreakdown) string {
 	breakdown = canonicalXServiceReceiptsModuleBreakdown(breakdown)
-	parts := []string{"aetheris-x-servicereceipts-breakdown-v1", breakdown.ModulePath}
+	parts := []string{"aetra-x-servicereceipts-breakdown-v1", breakdown.ModulePath}
 	parts = appendStringParts(parts, "purpose", breakdown.Purpose)
 	for _, state := range breakdown.StateObjects {
 		parts = append(parts, "state", string(state))
@@ -631,7 +631,7 @@ func ComputeXServiceReceiptsModuleBreakdownHash(breakdown XServiceReceiptsModule
 
 func ComputeReceiptRecordHash(record ReceiptRecord) string {
 	return servicesHashParts(
-		"aetheris-x-servicereceipts-record-v1",
+		"aetra-x-servicereceipts-record-v1",
 		record.ReceiptID,
 		record.ServiceID,
 		record.CallID,
@@ -646,7 +646,7 @@ func ComputeReceiptRecordHash(record ReceiptRecord) string {
 func ComputeReceiptRecordRootHash(kind ServiceReceiptRecordKind, records []ReceiptRecord) string {
 	ordered := cloneReceiptRecords(records)
 	sortReceiptRecords(ordered)
-	parts := []string{"aetheris-x-servicereceipts-root-v1", string(kind), fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-x-servicereceipts-root-v1", string(kind), fmt.Sprint(len(ordered))}
 	for _, record := range ordered {
 		parts = append(parts, record.RecordHash)
 	}
@@ -654,25 +654,25 @@ func ComputeReceiptRecordRootHash(kind ServiceReceiptRecordKind, records []Recei
 }
 
 func ComputeReceiptRootCommitmentHash(root ReceiptRoot) string {
-	return servicesHashParts("aetheris-x-servicereceipts-root-commitment-v1", string(root.RootKind), fmt.Sprint(root.Height), fmt.Sprint(root.RecordCount), root.RootHash)
+	return servicesHashParts("aetra-x-servicereceipts-root-commitment-v1", string(root.RootKind), fmt.Sprint(root.Height), fmt.Sprint(root.RecordCount), root.RootHash)
 }
 
 func ComputeReceiptParamsHash(params ReceiptParams) string {
-	return servicesHashParts("aetheris-x-servicereceipts-params-v1", fmt.Sprint(params.ProofHorizon), fmt.Sprint(params.PruneBatchSize))
+	return servicesHashParts("aetra-x-servicereceipts-params-v1", fmt.Sprint(params.ProofHorizon), fmt.Sprint(params.PruneBatchSize))
 }
 
 func ComputeMsgAnchorReceiptHash(msg MsgAnchorReceipt) string {
-	return servicesHashParts("aetheris-x-servicereceipts-msg-anchor-v1", msg.Authority, msg.Receipt.CallID, msg.ExpectedReceiptHash)
+	return servicesHashParts("aetra-x-servicereceipts-msg-anchor-v1", msg.Authority, msg.Receipt.CallID, msg.ExpectedReceiptHash)
 }
 
 func ComputeMsgPruneReceiptHash(msg MsgPruneReceipt) string {
-	return servicesHashParts("aetheris-x-servicereceipts-msg-prune-v1", msg.Authority, msg.ReceiptID, fmt.Sprint(msg.CurrentHeight))
+	return servicesHashParts("aetra-x-servicereceipts-msg-prune-v1", msg.Authority, msg.ReceiptID, fmt.Sprint(msg.CurrentHeight))
 }
 
 func ComputeReceiptsByServiceResponseHash(serviceID string, records []ReceiptRecord) string {
 	ordered := cloneReceiptRecords(records)
 	sortReceiptRecords(ordered)
-	parts := []string{"aetheris-x-servicereceipts-by-service-v1", serviceID, fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-x-servicereceipts-by-service-v1", serviceID, fmt.Sprint(len(ordered))}
 	for _, record := range ordered {
 		parts = append(parts, record.RecordHash)
 	}
@@ -682,7 +682,7 @@ func ComputeReceiptsByServiceResponseHash(serviceID string, records []ReceiptRec
 func ComputeServiceReceiptProofRecordHash(proof ServiceReceiptProofRecord) string {
 	hashes := append([]string(nil), proof.ProofHashes...)
 	sort.Strings(hashes)
-	parts := []string{"aetheris-x-servicereceipts-proof-v1", proof.ReceiptID, proof.ServiceID, proof.ReceiptHash, proof.RootHash, fmt.Sprint(proof.ProofHeight)}
+	parts := []string{"aetra-x-servicereceipts-proof-v1", proof.ReceiptID, proof.ServiceID, proof.ReceiptHash, proof.RootHash, fmt.Sprint(proof.ProofHeight)}
 	parts = append(parts, hashes...)
 	return servicesHashParts(parts...)
 }

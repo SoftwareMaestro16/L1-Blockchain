@@ -18,12 +18,12 @@ Run the demo:
 Use an existing binary:
 
 ```powershell
-.\scripts\demo\prototype-demo.ps1 -SkipBuild -Binary build\aetherisd.exe
+.\scripts\demo\prototype-demo.ps1 -SkipBuild -Binary build\aetrad.exe
 ```
 
 ## What It Shows
 
-1. Builds `aetherisd` unless `-SkipBuild` is set.
+1. Builds `aetrad` unless `-SkipBuild` is set.
 2. Starts a default 3-validator localnet under `.localnet-demo`.
 3. Shows block height through CLI and node info through REST.
 4. Sends `1000naet` from `node0` to `node1`.

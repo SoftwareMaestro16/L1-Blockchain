@@ -434,7 +434,7 @@ func IsAVMCosmosModulePath(path AVMCosmosModulePath) bool {
 func ComputeAVMCosmosModuleBreakdownHash(breakdown AVMCosmosModuleBreakdown) string {
 	breakdown = canonicalAVMCosmosModuleBreakdown(breakdown)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cosmos-module-breakdown-v1")
+	writeEnginePart(h, "aetra-avm-cosmos-module-breakdown-v1")
 	writeEnginePart(h, string(breakdown.ModulePath))
 	writeEngineUint64(h, uint64(len(breakdown.Purpose)))
 	for _, purpose := range breakdown.Purpose {
@@ -458,7 +458,7 @@ func ComputeAVMCosmosModuleBreakdownHash(breakdown AVMCosmosModuleBreakdown) str
 func ComputeAVMCosmosModuleRegistryHash(registry AVMCosmosModuleRegistry) string {
 	registry = canonicalAVMCosmosModuleRegistry(registry)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cosmos-module-registry-v1")
+	writeEnginePart(h, "aetra-avm-cosmos-module-registry-v1")
 	writeEngineUint64(h, uint64(len(registry.Modules)))
 	for _, module := range registry.Modules {
 		writeEnginePart(h, module.BreakdownHash)

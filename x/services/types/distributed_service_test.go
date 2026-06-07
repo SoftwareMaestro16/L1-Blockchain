@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestDistributedServiceRecordsEndpointsAndKeys(t *testing.T) {
@@ -146,7 +146,7 @@ func testDistributedEndpoint(t *testing.T, serviceID, endpointID string, kind Di
 	t.Helper()
 	target := "app/" + endpointID
 	if kind == DistributedEndpointAPI {
-		target = "https://api.aetheris.local/" + endpointID
+		target = "https://api.aetra.local/" + endpointID
 	}
 	endpoint, err := NewDistributedServiceEndpoint(DistributedServiceEndpoint{
 		ServiceID:     serviceID,

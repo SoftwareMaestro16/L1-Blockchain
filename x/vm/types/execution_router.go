@@ -551,7 +551,7 @@ func IsRouterBackend(backend RouterBackend) bool {
 
 func ComputeExecutionRouterPlanRoot(plan ExecutionRouterPlan) string {
 	h := sha256.New()
-	writeRouterPart(h, "aetheris-avm-router-plan-v1")
+	writeRouterPart(h, "aetra-avm-router-plan-v1")
 	writeRouterUint64(h, plan.Height)
 	writeRouterUint64(h, uint64(len(plan.Dispatches)))
 	for _, dispatch := range plan.Dispatches {

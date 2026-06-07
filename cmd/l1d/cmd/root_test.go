@@ -34,7 +34,7 @@ func TestInitCmd(t *testing.T) {
 func TestRootCommandBranding(t *testing.T) {
 	rootCmd := cmd.NewRootCmd()
 
-	require.Equal(t, "aetherisd", rootCmd.Use)
+	require.Equal(t, "aetrad", rootCmd.Use)
 	require.Contains(t, rootCmd.Short, "Aetra")
 }
 
@@ -99,7 +99,7 @@ func TestVersionCommandShowsOperatorMetadata(t *testing.T) {
 	}
 	require.NoError(t, json.Unmarshal(out.Bytes(), &info), out.String())
 	require.Equal(t, "Aetra", info.Name)
-	require.Equal(t, "aetherisd", info.ServerName)
+	require.Equal(t, "aetrad", info.ServerName)
 	require.NotEmpty(t, info.Version)
 	require.NotEmpty(t, info.Commit)
 	require.NotEmpty(t, firstNonEmpty(info.CosmosSDKVersion, info.ExtraInfo["cosmos_sdk_version"]))

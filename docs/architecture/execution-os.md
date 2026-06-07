@@ -74,8 +74,8 @@ AVM minimum contract:
 - bounced call;
 - query/getter.
 
-`x/vm/types` is the boundary facade over the existing `x/aetherisvm/avm`,
-`x/aetherisvm/async`, and `app/wasmconfig` executable specifications. It
+`x/vm/types` is the boundary facade over the existing `x/aetravm/avm`,
+`x/aetravm/async`, and `app/wasmconfig` executable specifications. It
 validates runtime selection, action-to-entrypoint mapping, code size, gas
 limits, query limits, and CosmWasm feature gating.
 
@@ -125,7 +125,7 @@ Message {
 `MessageEnvelope`, validates `naet` value, source/destination addresses, body
 size, gas limit, deterministic message id, and forwarding fee. Delivery,
 bounce, expiry, and refund/no-double-spend behavior are inherited from
-`x/aetherisvm/async`.
+`x/aetravm/async`.
 
 ## x/queue
 

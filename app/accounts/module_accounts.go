@@ -13,7 +13,7 @@ import (
 	protocolpooltypes "github.com/cosmos/cosmos-sdk/x/protocolpool/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	burntypes "github.com/sovereign-l1/l1/x/burn/types"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
 	delegatorprotectiontypes "github.com/sovereign-l1/l1/x/delegator-protection/types"
@@ -96,8 +96,8 @@ func BlockedAddresses() map[string]bool {
 	for acc := range ModuleAccountPermissions() {
 		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
 	}
-	for _, address := range aetherisaddress.AllSystemAddresses() {
-		bz, err := aetherisaddress.Parse(address.Raw)
+	for _, address := range aetraaddress.AllSystemAddresses() {
+		bz, err := aetraaddress.Parse(address.Raw)
 		if err != nil {
 			panic(fmt.Errorf("invalid reserved system address %s: %w", address.Name, err))
 		}
@@ -117,7 +117,7 @@ func BlockedAddresses() map[string]bool {
 func ReservedSystemModuleAccounts() []ReservedSystemModuleAccount {
 	out := make([]ReservedSystemModuleAccount, 0, len(reservedSystemModuleAccountSpecs))
 	for _, spec := range reservedSystemModuleAccountSpecs {
-		address, found := aetherisaddress.SystemAddressByName(spec.addressName)
+		address, found := aetraaddress.SystemAddressByName(spec.addressName)
 		if !found {
 			panic(fmt.Sprintf("reserved system address %s is not registered", spec.addressName))
 		}
@@ -165,7 +165,7 @@ func ReservedSystemModuleAccountAddress(moduleAccountName string) (sdk.AccAddres
 	if !found {
 		return nil, false, nil
 	}
-	bz, err := aetherisaddress.Parse(account.Raw)
+	bz, err := aetraaddress.Parse(account.Raw)
 	if err != nil {
 		return nil, true, err
 	}
@@ -174,12 +174,12 @@ func ReservedSystemModuleAccountAddress(moduleAccountName string) (sdk.AccAddres
 
 func ValidateReservedSystemModuleAccountWiring(blocked map[string]bool) error {
 	seen := map[string]string{}
-	for _, address := range aetherisaddress.AllSystemAddresses() {
-		bz, err := aetherisaddress.Parse(address.Raw)
+	for _, address := range aetraaddress.AllSystemAddresses() {
+		bz, err := aetraaddress.Parse(address.Raw)
 		if err != nil {
 			return fmt.Errorf("reserved system address %s raw address invalid: %w", address.Name, err)
 		}
-		if aetherisaddress.IsZero(bz) {
+		if aetraaddress.IsZero(bz) {
 			return fmt.Errorf("reserved system address %s must not use zero address", address.Name)
 		}
 		key := sdk.AccAddress(bz).String()
@@ -193,7 +193,7 @@ func ValidateReservedSystemModuleAccountWiring(blocked map[string]bool) error {
 	}
 
 	for _, account := range ReservedSystemModuleAccounts() {
-		address, found := aetherisaddress.SystemAddressByName(account.Name)
+		address, found := aetraaddress.SystemAddressByName(account.Name)
 		if !found {
 			return fmt.Errorf("reserved module account %s is missing address catalog entry", account.Name)
 		}
@@ -209,11 +209,11 @@ func ValidateReservedSystemModuleAccountWiring(blocked map[string]bool) error {
 		} else if !sameStringSet(permissions, account.Permissions) {
 			return fmt.Errorf("reserved module account %s permission mismatch", account.Name)
 		}
-		bz, err := aetherisaddress.Parse(account.Raw)
+		bz, err := aetraaddress.Parse(account.Raw)
 		if err != nil {
 			return fmt.Errorf("reserved module account %s raw address invalid: %w", account.Name, err)
 		}
-		if aetherisaddress.IsZero(bz) {
+		if aetraaddress.IsZero(bz) {
 			return fmt.Errorf("reserved module account %s must not use zero address", account.Name)
 		}
 		key := sdk.AccAddress(bz).String()

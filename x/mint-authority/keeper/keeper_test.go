@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/mint-authority/types"
 )
 
@@ -16,7 +16,7 @@ func TestNativeMintAuthorityMintsAndAccounts(t *testing.T) {
 	app := l1app.Setup(t, false)
 	ctx := app.NewContext(false)
 	recipient := sdk.AccAddress(bytes20(0x44))
-	recipientText := aetherisaddress.FormatAccAddress(recipient)
+	recipientText := aetraaddress.FormatAccAddress(recipient)
 	decision := types.EmissionDecision{
 		Caller:   types.DefaultEmissionCaller,
 		Denom:    types.DefaultBaseDenom,

@@ -389,7 +389,7 @@ func IsAVMBytecodeKind(kind AVMBytecodeKind) bool {
 func ComputeVMDeterminismProfileHash(profile VMDeterminismProfile) string {
 	profile = canonicalVMDeterminismProfile(profile)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-vm-determinism-profile-v1")
+	writeEnginePart(h, "aetra-vm-determinism-profile-v1")
 	writeEnginePart(h, profile.Runtime)
 	writeEngineBool(h, profile.NoExternalAPICalls)
 	writeEngineBool(h, profile.NoTimeBasedRandomness)
@@ -407,7 +407,7 @@ func ComputeVMDeterminismProfileHash(profile VMDeterminismProfile) string {
 func ComputeAVMAdapterBoundaryHash(boundary AVMAdapterBoundary) string {
 	boundary = canonicalAVMAdapterBoundary(boundary)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-adapter-boundary-v1")
+	writeEnginePart(h, "aetra-avm-adapter-boundary-v1")
 	writeEnginePart(h, string(boundary.BytecodeKind))
 	writeEnginePart(h, boundary.Runtime)
 	writeEnginePart(h, boundary.DeterministicGasSchedule.ScheduleHash)
@@ -422,7 +422,7 @@ func ComputeAVMAdapterBoundaryHash(boundary AVMAdapterBoundary) string {
 func ComputeCosmWasmAdapterBoundaryHash(boundary CosmWasmAdapterBoundary) string {
 	boundary = canonicalCosmWasmAdapterBoundary(boundary)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-cosmwasm-adapter-boundary-v1")
+	writeEnginePart(h, "aetra-cosmwasm-adapter-boundary-v1")
 	writeEnginePart(h, boundary.Runtime)
 	writeEngineBool(h, boundary.IsolatedAdapterModule)
 	writeEnginePart(h, boundary.GasConversion.ConversionHash)
@@ -444,7 +444,7 @@ func ComputeCosmWasmAdapterBoundaryHash(boundary CosmWasmAdapterBoundary) string
 func ComputeVMAdapterBoundaryManifestHash(manifest VMAdapterBoundaryManifest) string {
 	manifest = canonicalVMAdapterBoundaryManifest(manifest)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-vm-adapter-boundary-manifest-v1")
+	writeEnginePart(h, "aetra-vm-adapter-boundary-manifest-v1")
 	writeEnginePart(h, string(manifest.ZoneID))
 	writeEnginePart(h, manifest.DeterminismProfile.ProfileHash)
 	writeEnginePart(h, manifest.AVM.BoundaryHash)

@@ -13,7 +13,7 @@ This suite is split into fast PR gates and heavier localnet checks. The attacker
 - `go vet ./...`
 - `buf lint`
 - `buf generate`
-- `go build -o build\aetherisd.exe .\cmd\l1d`
+- `go build -o build\aetrad.exe .\cmd\l1d`
 - `tests\e2e\adversarial_smoke.ps1`
   - Starts a 3-validator localnet.
   - Submits malformed broadcast bytes, repeated wrong-fee-denom transactions, and a DEX same-denom pool attempt.

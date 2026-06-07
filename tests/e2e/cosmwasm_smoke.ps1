@@ -1,8 +1,8 @@
 param(
-  [string]$Binary = "build\aetherisd.exe",
+  [string]$Binary = "build\aetrad.exe",
   [string]$Node = "tcp://127.0.0.1:26657",
-  [string]$ChainId = "aetheris-local-1",
-  [string]$AppHome = ".localnet\node0\aetherisd",
+  [string]$ChainId = "aetra-local-1",
+  [string]$AppHome = ".localnet\node0\aetrad",
   [string]$From = "node0",
   [string]$ContractWasm = "",
   [string]$InstantiateMsg = "{}",
@@ -10,7 +10,7 @@ param(
   [string]$QueryMsg = "{}",
   [string]$MigrateWasm = "",
   [string]$MigrateMsg = "{}",
-  [string]$Label = "aetheris-smoke",
+  [string]$Label = "aetra-smoke",
   [string]$Admin = "",
   [int]$TxWaitSeconds = 4,
   [switch]$EnableWasm
@@ -28,7 +28,7 @@ function Resolve-SmokePath {
 
 $binaryPath = Resolve-SmokePath $Binary
 if (-not (Test-Path -LiteralPath $binaryPath)) {
-  throw "aetherisd binary not found: $binaryPath"
+  throw "aetrad binary not found: $binaryPath"
 }
 
 if (-not $EnableWasm) {

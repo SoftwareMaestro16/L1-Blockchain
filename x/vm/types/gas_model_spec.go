@@ -642,7 +642,7 @@ func IsAVMGasClass(class AVMGasClass) bool {
 func ComputeAVMGasScheduleHash(schedule AVMGasSchedule) string {
 	schedule = canonicalAVMGasSchedule(schedule)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-gas-schedule-v1")
+	writeEnginePart(h, "aetra-avm-gas-schedule-v1")
 	writeEngineUint64(h, uint64(len(schedule.ClassBudgets)))
 	for _, budget := range schedule.ClassBudgets {
 		writeEnginePart(h, string(budget.Class))
@@ -663,7 +663,7 @@ func ComputeAVMGasScheduleHash(schedule AVMGasSchedule) string {
 func ComputeAVMGasPolicyHash(policy AVMGasPolicy) string {
 	policy = canonicalAVMGasPolicy(policy)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-gas-policy-v1")
+	writeEnginePart(h, "aetra-avm-gas-policy-v1")
 	writeEngineUint64(h, policy.BaseMessageGas)
 	writeEngineUint64(h, policy.PerBytePayloadGas)
 	writeEngineUint64(h, policy.StorageReadGas)
@@ -680,7 +680,7 @@ func ComputeAVMGasPolicyHash(policy AVMGasPolicy) string {
 func ComputeAVMAsyncGasReserveHash(reserve AVMAsyncGasReserve) string {
 	reserve = canonicalAVMAsyncGasReserve(reserve)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-async-gas-reserve-v1")
+	writeEnginePart(h, "aetra-avm-async-gas-reserve-v1")
 	writeEnginePart(h, reserve.MessageID)
 	writeEnginePart(h, string(reserve.ZoneID))
 	writeEngineUint64(h, reserve.ReservedGas)
@@ -699,7 +699,7 @@ func ComputeAVMAsyncGasReserveHash(reserve AVMAsyncGasReserve) string {
 func ComputeAVMZoneAsyncGasMeterHash(meter AVMZoneAsyncGasMeter) string {
 	meter = canonicalAVMZoneAsyncGasMeter(meter)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-zone-async-gas-meter-v1")
+	writeEnginePart(h, "aetra-avm-zone-async-gas-meter-v1")
 	writeEnginePart(h, string(meter.ZoneID))
 	writeEngineUint64(h, meter.Budget.MaxGas)
 	writeEngineUint64(h, meter.Budget.GasUsed)

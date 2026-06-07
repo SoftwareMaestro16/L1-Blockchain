@@ -1,7 +1,7 @@
 param(
   [string]$OutputDir = "",
   [string]$Binary = "",
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [int]$ValidatorCount = 3,
   [int]$MinHeight = 4,
   [int]$TimeoutSeconds = 120,

@@ -57,7 +57,7 @@ func TestIdentityNodeAPIV2EndpointsReturnOptionalProofPassthrough(t *testing.T) 
 	require.NotNil(t, primary.ProofPassthrough)
 	require.NoError(t, ValidateIdentityProofPassthroughFormatV2(*primary.ProofPassthrough))
 	verified, err := IdentityWalletSDKVerifyResolutionProofV2(IdentityLightClientVerificationRequestV2{
-		ExpectedChainID:      "aetheris-local-1",
+		ExpectedChainID:      "aetra-local-1",
 		RequestedName:        "alice.aet",
 		TrustedHeader:        trustedHeaderForProofV2(*primary.ProofPassthrough.Proof),
 		Proof:                *primary.ProofPassthrough.Proof,
@@ -143,7 +143,7 @@ func TestIdentityWalletSDKV2VerifiedHelpersBuildTransactions(t *testing.T) {
 		Name:             "alice.aet",
 		CurrentHeight:    15,
 		IncludeAuditMemo: true,
-		ExpectedChainID:  "aetheris-local-1",
+		ExpectedChainID:  "aetra-local-1",
 		TrustedHeader:    header,
 		Proof:            &proof,
 	})
@@ -162,7 +162,7 @@ func TestIdentityWalletSDKV2VerifiedHelpersBuildTransactions(t *testing.T) {
 		Method:                "swap",
 		PayloadHash:           identityHash("payload"),
 		CurrentHeight:         15,
-		ExpectedChainID:       "aetheris-local-1",
+		ExpectedChainID:       "aetra-local-1",
 		TrustedHeader:         header,
 		Proof:                 &proof,
 	})
@@ -179,7 +179,7 @@ func TestIdentityWalletSDKV2VerifiedHelpersBuildTransactions(t *testing.T) {
 		SupportedTransports: []string{"https"},
 		AllowedAuthPolicies: []string{"none"},
 		CurrentHeight:       15,
-		ExpectedChainID:     "aetheris-local-1",
+		ExpectedChainID:     "aetra-local-1",
 		TrustedHeader:       header,
 		Proof:               &proof,
 	})
@@ -195,7 +195,7 @@ func TestIdentityWalletSDKV2VerifiedHelpersBuildTransactions(t *testing.T) {
 		ExpectedSchemaHash: inlineHash,
 		WalletPolicy:       DefaultIdentityInterfaceWalletPolicyV2(),
 		CurrentHeight:      15,
-		ExpectedChainID:    "aetheris-local-1",
+		ExpectedChainID:    "aetra-local-1",
 		TrustedHeader:      trustedHeaderForProofV2(inlineProof),
 		Proof:              &inlineProof,
 	})
@@ -257,7 +257,7 @@ func newIdentityNodeAPITestAPI(t *testing.T, state IdentityState, height uint64)
 	t.Helper()
 	appHash, err := IdentityStateRoot(state)
 	require.NoError(t, err)
-	api, err := NewIdentityNodeAPIV2(IdentityQueryContextV2{State: state, Height: height, DefaultTTL: 30}, "aetheris-local-1", appHash)
+	api, err := NewIdentityNodeAPIV2(IdentityQueryContextV2{State: state, Height: height, DefaultTTL: 30}, "aetra-local-1", appHash)
 	require.NoError(t, err)
 	return api
 }

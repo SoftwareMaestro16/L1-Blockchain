@@ -156,7 +156,7 @@ type QueryNetworkEvidenceRequest struct {
 
 func DefaultXNetworkParams(networkSalt []byte) XNetworkParams {
 	return XNetworkParams{
-		NetworkSaltHash:       hashBytes("aetheris-x-network-salt-v1", networkSalt),
+		NetworkSaltHash:       hashBytes("aetra-x-network-salt-v1", networkSalt),
 		MaxNodeRecordTTL:      100_000,
 		MaxDiscoveryRecordTTL: 25_000,
 		EvidenceHorizon:       DefaultSecurityReplayHorizon,

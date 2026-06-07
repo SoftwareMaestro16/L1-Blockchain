@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sort"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type IdentityZoneCapability string
@@ -60,7 +60,7 @@ func DefaultIdentityZoneCapabilities() []IdentityZoneCapability {
 	}
 }
 
-func DefaultAetherCoreIdentityZoneDescriptor() coretypes.ZoneDescriptor {
+func DefaultAetraCoreIdentityZoneDescriptor() coretypes.ZoneDescriptor {
 	return coretypes.ZoneDescriptor{
 		ZoneID:              coretypes.ZoneIDIdentity,
 		ZoneName:            "identity",
@@ -132,7 +132,7 @@ func BuildDefaultIdentityZoneUpgradeManifest(artifacts IdentityZoneUpgradeArtifa
 		return IdentityZoneUpgradeManifest{}, IdentityZoneRoots{}, err
 	}
 	manifest, err := BuildIdentityZoneUpgradeManifest(
-		DefaultAetherCoreIdentityZoneDescriptor(),
+		DefaultAetraCoreIdentityZoneDescriptor(),
 		DefaultIdentityZoneStateMachineDescriptor(),
 		DefaultIdentityV2Architecture(),
 		roots,

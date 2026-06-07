@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
-	aethercoretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	aetracoretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	"github.com/stretchr/testify/require"
 
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
@@ -76,7 +76,7 @@ func TestAetherRoutingRejectsHopLimitAndMissingCommittedZone(t *testing.T) {
 
 	badTable := table
 	badTable.Entries = badTable.Entries[:1]
-	badTable.TableHash = aethercoretypes.ComputeRoutingTableHash(badTable)
+	badTable.TableHash = aetracoretypes.ComputeRoutingTableHash(badTable)
 	_, err = SelectDeterministicAetherRoute(msg, badTable, nil, nil, testRoutingParams())
 	require.ErrorContains(t, err, "routing table")
 }
@@ -133,13 +133,13 @@ func testAetherMessageNoT(t *testing.T, route UnifiedMessageRoute) AetherMessage
 	return out
 }
 
-func testRoutingTable(t *testing.T) aethercoretypes.RoutingTableCommitment {
+func testRoutingTable(t *testing.T) aetracoretypes.RoutingTableCommitment {
 	t.Helper()
-	table, err := aethercoretypes.NewRoutingTableCommitment(7, 150, []aethercoretypes.RoutingZoneEntry{
-		{ZoneID: aethercoretypes.ZoneID("FINANCIAL_ZONE"), LayoutEpoch: 1, ActiveShards: 2, LayoutHash: testCoreHash("financial-layout")},
-		{ZoneID: aethercoretypes.ZoneID("APPLICATION_ZONE"), LayoutEpoch: 1, ActiveShards: 2, LayoutHash: testCoreHash("application-layout")},
-		{ZoneID: aethercoretypes.ZoneID("IDENTITY_ZONE"), LayoutEpoch: 1, ActiveShards: 2, LayoutHash: testCoreHash("identity-layout")},
-		{ZoneID: aethercoretypes.ZoneID("CONTRACT_ZONE"), LayoutEpoch: 1, ActiveShards: 2, LayoutHash: testCoreHash("contract-layout")},
+	table, err := aetracoretypes.NewRoutingTableCommitment(7, 150, []aetracoretypes.RoutingZoneEntry{
+		{ZoneID: aetracoretypes.ZoneID("FINANCIAL_ZONE"), LayoutEpoch: 1, ActiveShards: 2, LayoutHash: testCoreHash("financial-layout")},
+		{ZoneID: aetracoretypes.ZoneID("APPLICATION_ZONE"), LayoutEpoch: 1, ActiveShards: 2, LayoutHash: testCoreHash("application-layout")},
+		{ZoneID: aetracoretypes.ZoneID("IDENTITY_ZONE"), LayoutEpoch: 1, ActiveShards: 2, LayoutHash: testCoreHash("identity-layout")},
+		{ZoneID: aetracoretypes.ZoneID("CONTRACT_ZONE"), LayoutEpoch: 1, ActiveShards: 2, LayoutHash: testCoreHash("contract-layout")},
 	})
 	require.NoError(t, err)
 	return table

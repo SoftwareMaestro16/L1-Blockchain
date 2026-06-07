@@ -1,7 +1,7 @@
 param(
   [string]$OutputDir = "",
   [string]$Binary = "",
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [int]$ValidatorCount = 3,
   [int]$MinHeight = 4,
   [int]$TimeoutSeconds = 120,
@@ -36,7 +36,7 @@ $RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
 . (Join-Path $RepoRoot "scripts\localnet\common.ps1")
 
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet-demo"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "demo localnet output directory"
 if (-not $SkipBuild) {
   Assert-LocalnetWorkspacePath -Path (Split-Path $Binary) -Purpose "demo binary output directory"
@@ -163,7 +163,7 @@ function Invoke-DemoCheck {
   Write-Output "rest: $restBase"
   Write-Output "steps:"
   foreach ($step in @(
-      "build aetherisd unless -SkipBuild",
+      "build aetrad unless -SkipBuild",
       "stop/init/validate/start 3-validator localnet",
       "show height and REST node info",
       "send bank tx in naet",
@@ -193,12 +193,12 @@ try {
   Write-DemoStep "Build binary"
   & .\scripts\localnet\stop.ps1 -OutputDir $OutputDir
   if (-not $SkipBuild) {
-    & .\scripts\build-aetherisd.ps1 -Binary $Binary
+    & .\scripts\build-aetrad.ps1 -Binary $Binary
   } elseif (!(Test-Path -LiteralPath $Binary)) {
     throw "Binary not found at $Binary and -SkipBuild was specified"
   }
   $version = & $Binary version 2>&1
-  Write-DemoNote "aetherisd version: $($version | Select-Object -First 1)"
+  Write-DemoNote "aetrad version: $($version | Select-Object -First 1)"
 
   Write-DemoStep "Start localnet"
   Invoke-DemoLocalnetScript -ScriptName "init.ps1" -Extra @{ SkipBuild = $true }
@@ -216,8 +216,8 @@ try {
   $restNode = Invoke-RestMethod -Uri "$restBase/cosmos/base/tendermint/v1beta1/node_info" -TimeoutSec 5
   Write-DemoNote "REST network=$($restNode.default_node_info.network)"
 
-  $node0Home = Join-Path $OutputDir "node0\aetherisd"
-  $node1Home = Join-Path $OutputDir "node1\aetherisd"
+  $node0Home = Join-Path $OutputDir "node0\aetrad"
+  $node1Home = Join-Path $OutputDir "node1\aetrad"
   $node0 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node0Home -KeyName "node0"
   $node1 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node1Home -KeyName "node1"
   Write-DemoNote "node0=$node0"

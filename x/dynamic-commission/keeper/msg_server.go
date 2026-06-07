@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/dynamic-commission/types"
 )
 
@@ -22,7 +22,7 @@ func (m msgServer) SetBaseCommission(ctx context.Context, msg *types.MsgSetBaseC
 	if msg == nil {
 		return nil, types.ErrInvalidCommission.Wrap("empty request")
 	}
-	if err := aetherisaddress.ValidateUserAddress("validator address", msg.ValidatorAddress); err != nil {
+	if err := aetraaddress.ValidateUserAddress("validator address", msg.ValidatorAddress); err != nil {
 		return nil, types.ErrUnauthorized.Wrap(err.Error())
 	}
 	commission, err := m.Keeper.SetBaseCommission(ctx, msg.ValidatorAddress, msg.BaseCommissionBps, msg.Height)
@@ -62,7 +62,7 @@ func (m msgServer) RecomputeEffectiveCommission(ctx context.Context, msg *types.
 	if err := m.requireAuthority(msg.Authority); err != nil {
 		return nil, err
 	}
-	if err := aetherisaddress.ValidateUserAddress("validator address", msg.ValidatorAddress); err != nil {
+	if err := aetraaddress.ValidateUserAddress("validator address", msg.ValidatorAddress); err != nil {
 		return nil, types.ErrInvalidCommission.Wrap(err.Error())
 	}
 	commission, err := m.Keeper.RecomputeEffectiveCommission(ctx, msg.ValidatorAddress, msg.PerformanceScoreBps, msg.ReputationScoreBps, msg.Jailed, msg.Height)
@@ -79,7 +79,7 @@ func (m msgServer) RecomputeEffectiveCommission(ctx context.Context, msg *types.
 }
 
 func (m msgServer) requireAuthority(authority string) error {
-	if err := aetherisaddress.ValidateAuthorityAddress("authority", authority); err != nil {
+	if err := aetraaddress.ValidateAuthorityAddress("authority", authority); err != nil {
 		return types.ErrUnauthorized.Wrap(err.Error())
 	}
 	if authority != m.Authority() {

@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	AcceptanceAetherCoreRoots       = "aether_core_commits_zone_and_message_roots"
+	AcceptanceAetraCoreRoots        = "aetra_core_commits_zone_and_message_roots"
 	AcceptanceZoneAdapterExecution  = "zone_executes_through_zone_adapter"
 	AcceptanceMessageProofReceipts  = "messages_have_routing_inclusion_proofs_receipts"
 	AcceptanceStoreV2ZoneShardProof = "store_v2_layout_supports_zone_shard_proofs"
@@ -21,7 +21,7 @@ const (
 )
 
 var requiredArchitectureAcceptanceCriteria = map[string]struct{}{
-	AcceptanceAetherCoreRoots:       {},
+	AcceptanceAetraCoreRoots:        {},
 	AcceptanceZoneAdapterExecution:  {},
 	AcceptanceMessageProofReceipts:  {},
 	AcceptanceStoreV2ZoneShardProof: {},
@@ -161,14 +161,14 @@ func validateArchitectureAcceptanceCriteria(criteria []ArchitectureAcceptanceCri
 func ComputeArchitectureAcceptanceReportHash(report ArchitectureAcceptanceReport) string {
 	failed := normalizeStringSet(report.Failed)
 	evidence := normalizeStringSet(report.Evidence)
-	parts := []string{"aetheris-architecture-acceptance-report", strings.TrimSpace(report.AcceptanceVersion), fmt.Sprintf("%t", report.Ready)}
+	parts := []string{"aetra-architecture-acceptance-report", strings.TrimSpace(report.AcceptanceVersion), fmt.Sprintf("%t", report.Ready)}
 	parts = append(parts, failed...)
 	parts = append(parts, evidence...)
 	return hashStrings(parts...)
 }
 
 func hashArchitectureAcceptanceCriteria(criteria []ArchitectureAcceptanceCriterion) string {
-	parts := []string{"aetheris-architecture-acceptance-criteria"}
+	parts := []string{"aetra-architecture-acceptance-criteria"}
 	for _, criterion := range criteria {
 		criterion = criterion.Normalize()
 		parts = append(parts, criterion.CriterionID, criterion.Component, criterion.EvidenceHash, criterion.TestHash, fmt.Sprintf("%t", criterion.Ready), fmt.Sprintf("%t", criterion.Deterministic), fmt.Sprintf("%t", criterion.ProofBacked))

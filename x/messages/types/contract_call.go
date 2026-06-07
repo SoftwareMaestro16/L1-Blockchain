@@ -219,7 +219,7 @@ func (m MsgContractCall) Validate(admission ContractCallAdmission, params Messag
 func (m MsgContractCall) CanonicalPayload() []byte {
 	m = m.Normalize()
 	parts := []string{
-		"aetheris-msg-contract-call-payload-v1",
+		"aetra-msg-contract-call-payload-v1",
 		hex.EncodeToString(m.Caller),
 		hex.EncodeToString(m.ContractAddr),
 		m.Method,
@@ -366,7 +366,7 @@ func (e ContractCallFundsEscrow) Validate() error {
 func ContractCallRouteID(req MsgContractCall) string {
 	req = req.Normalize()
 	return "contract-call/" + hashParts(
-		"aetheris-msg-contract-call-route-id-v1",
+		"aetra-msg-contract-call-route-id-v1",
 		hex.EncodeToString(req.Caller),
 		hex.EncodeToString(req.ContractAddr),
 		req.Method,
@@ -377,7 +377,7 @@ func ComputeContractCallRouteCommitment(req MsgContractCall, admission ContractC
 	req = req.Normalize()
 	admission = admission.Normalize()
 	return hashParts(
-		"aetheris-msg-contract-call-route-v1",
+		"aetra-msg-contract-call-route-v1",
 		ContractCallRouteID(req),
 		admission.ContractShardID,
 		admission.ReplyShardID,
@@ -388,7 +388,7 @@ func ComputeContractCallRouteCommitment(req MsgContractCall, admission ContractC
 }
 
 func ComputeContractMethodSelectorHash(method string) string {
-	return hashParts("aetheris-msg-contract-method-selector-v1", strings.TrimSpace(method))
+	return hashParts("aetra-msg-contract-method-selector-v1", strings.TrimSpace(method))
 }
 
 func MaxPayloadBytesForParamsSafety() uint32 {

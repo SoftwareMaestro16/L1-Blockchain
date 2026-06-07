@@ -112,7 +112,7 @@ func DefaultIdentityServiceEndpointTypeRegistryV2() []IdentityServiceEndpointTyp
 		{ServiceType: IdentityServiceTypeRPCV1, SupportedTransports: []string{"https", "grpcs"}, AllowedAuthPolicies: []string{"none", "token"}},
 		{ServiceType: IdentityServiceTypeIndexerV1, SupportedTransports: []string{"https"}, AllowedAuthPolicies: []string{"none", "token"}},
 		{ServiceType: IdentityServiceTypeGatewayV1, SupportedTransports: []string{"https", "wss"}, AllowedAuthPolicies: []string{"none", "token"}},
-		{ServiceType: IdentityServiceTypeGenericV1, SupportedTransports: []string{"https", "grpcs", "wss", "aetheris", "ipfs"}, AllowedAuthPolicies: []string{"none", "token"}},
+		{ServiceType: IdentityServiceTypeGenericV1, SupportedTransports: []string{"https", "grpcs", "wss", "aetra", "ipfs"}, AllowedAuthPolicies: []string{"none", "token"}},
 	}
 }
 

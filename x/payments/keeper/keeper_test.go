@@ -77,7 +77,7 @@ func TestKeeperPaymentChannelModuleMessagesAndReplayGuards(t *testing.T) {
 	bob := keeperAddress(0x72)
 	outsider := keeperAddress(0x73)
 	openReq := paymentstypes.ChannelOpenRequest{
-		ChainID:         "aetheris-test-1",
+		ChainID:         "aetra-test-1",
 		Participants:    []string{alice, bob},
 		InitialBalances: []paymentstypes.Balance{{Participant: alice, Amount: "100"}, {Participant: bob, Amount: "0"}},
 		ChannelType:     paymentstypes.ChannelTypeBidirectional,
@@ -172,7 +172,7 @@ func TestKeeperPaymentAPISurfaceMessagesAndQueries(t *testing.T) {
 	alice := keeperAddress(0x81)
 	bob := keeperAddress(0x82)
 	openReq := paymentstypes.ChannelOpenRequest{
-		ChainID:         "aetheris-test-1",
+		ChainID:         "aetra-test-1",
 		Participants:    []string{alice, bob},
 		InitialBalances: []paymentstypes.Balance{{Participant: alice, Amount: "200"}, {Participant: bob, Amount: "0"}},
 		ChannelType:     paymentstypes.ChannelTypeBidirectional,
@@ -677,7 +677,7 @@ func keeperSignedChannel(t *testing.T, salt, collateral, left, right string) pay
 	t.Helper()
 
 	channel := paymentstypes.ChannelRecord{
-		ChainID:             "aetheris-test-1",
+		ChainID:             "aetra-test-1",
 		ChannelID:           paymentstypes.HashParts(salt, left, right),
 		ChannelType:         paymentstypes.ChannelTypeBidirectional,
 		Participants:        []string{left, right},

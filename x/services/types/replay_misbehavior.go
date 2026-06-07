@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ProviderMisbehaviorFaultClass string
@@ -746,7 +746,7 @@ func IsProviderPenaltySource(source ProviderPenaltySource) bool {
 
 func ComputeServiceReplayProtectionProofHash(proof ServiceReplayProtectionProof) string {
 	return servicesHashParts(
-		"aetheris-services-replay-protection-proof-v1",
+		"aetra-services-replay-protection-proof-v1",
 		proof.CallID,
 		proof.ServiceID,
 		proof.MethodID,
@@ -765,7 +765,7 @@ func ComputeServiceReplayProtectionProofHash(proof ServiceReplayProtectionProof)
 func ComputeProviderMisbehaviorReportHash(report ProviderMisbehaviorReport) string {
 	report = canonicalProviderMisbehaviorReport(report)
 	parts := []string{
-		"aetheris-services-provider-misbehavior-v1",
+		"aetra-services-provider-misbehavior-v1",
 		report.ServiceID,
 		report.ProviderID,
 		report.CallID,
@@ -790,7 +790,7 @@ func ComputeProviderMisbehaviorReportHash(report ProviderMisbehaviorReport) stri
 
 func ComputeServiceFaultProofHash(proof ServiceFaultProof) string {
 	return servicesHashParts(
-		"aetheris-services-fault-proof-v1",
+		"aetra-services-fault-proof-v1",
 		proof.ServiceID,
 		proof.ProviderID,
 		proof.CallID,
@@ -808,7 +808,7 @@ func ComputeServiceFaultProofHash(proof ServiceFaultProof) string {
 
 func ComputeProviderPenaltyRouteEntryHash(entry ProviderPenaltyRouteEntry) string {
 	return servicesHashParts(
-		"aetheris-services-penalty-route-entry-v1",
+		"aetra-services-penalty-route-entry-v1",
 		string(entry.Source),
 		entry.Denom,
 		entry.Amount,
@@ -821,7 +821,7 @@ func ComputeProviderPenaltyRouteHash(route ProviderPenaltyRoute) string {
 	entries := append([]ProviderPenaltyRouteEntry(nil), route.Entries...)
 	sortProviderPenaltyRouteEntries(entries)
 	parts := []string{
-		"aetheris-services-penalty-route-v1",
+		"aetra-services-penalty-route-v1",
 		route.ServiceID,
 		route.ProviderID,
 		route.CallID,
@@ -836,12 +836,12 @@ func ComputeProviderPenaltyRouteHash(route ProviderPenaltyRoute) string {
 }
 
 func ComputeServiceChallengeID(flow ServiceChallengeFlow) string {
-	return servicesHashParts("aetheris-services-challenge-id-v1", flow.ServiceID, flow.CallID, flow.ProviderID, string(flow.FaultClass), flow.DisputeMessageHash)
+	return servicesHashParts("aetra-services-challenge-id-v1", flow.ServiceID, flow.CallID, flow.ProviderID, string(flow.FaultClass), flow.DisputeMessageHash)
 }
 
 func ComputeServiceChallengeFlowHash(flow ServiceChallengeFlow) string {
 	return servicesHashParts(
-		"aetheris-services-challenge-flow-v1",
+		"aetra-services-challenge-flow-v1",
 		flow.ChallengeID,
 		flow.ServiceID,
 		flow.ProviderID,
@@ -857,7 +857,7 @@ func ComputeServiceChallengeFlowHash(flow ServiceChallengeFlow) string {
 
 func ComputeServiceReceiptFreshnessProofHash(proof ServiceReceiptFreshnessProof) string {
 	return servicesHashParts(
-		"aetheris-services-receipt-freshness-v1",
+		"aetra-services-receipt-freshness-v1",
 		proof.CallID,
 		proof.ReceiptHash,
 		proof.TombstoneHash,
@@ -870,7 +870,7 @@ func ComputeServiceReceiptFreshnessProofHash(proof ServiceReceiptFreshnessProof)
 
 func ComputeServiceSecurityImplementationBundleHash(bundle ServiceSecurityImplementationBundle) string {
 	return servicesHashParts(
-		"aetheris-services-security-implementation-v1",
+		"aetra-services-security-implementation-v1",
 		bundle.ServiceID,
 		string(bundle.TrustModelLabel),
 		string(bundle.ExecutionFailureBehaviorLabel),

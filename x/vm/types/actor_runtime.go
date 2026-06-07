@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sovereign-l1/l1/x/aetherisvm/async"
+	"github.com/sovereign-l1/l1/x/aetravm/async"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -307,7 +307,7 @@ func IsContinuationStatus(status ContinuationStatus) bool {
 func ComputeActorRuntimePlanRoot(plan ActorRuntimePlan) string {
 	plan = canonicalActorRuntimePlan(plan)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-actor-runtime-plan-v1")
+	writeEnginePart(h, "aetra-actor-runtime-plan-v1")
 	writeEngineUint64(h, plan.Height)
 	writeEngineUint64(h, uint64(len(plan.Actors)))
 	for _, actor := range plan.Actors {

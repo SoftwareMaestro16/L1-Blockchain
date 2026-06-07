@@ -13,7 +13,7 @@ import (
 func TestCrossChainRegistryPrototypeModuleWiringAndGenesis(t *testing.T) {
 	app, genesis := setup(true, 5)
 
-	require.NoError(t, app.ValidateAetherCoreWiringGate())
+	require.NoError(t, app.ValidateAetraCoreWiringGate())
 	require.Contains(t, app.ModuleManager.Modules, crosschainregistrytypes.ModuleName)
 	require.Contains(t, app.keys, crosschainregistrytypes.StoreKey)
 	require.Contains(t, genesis, crosschainregistrytypes.ModuleName)

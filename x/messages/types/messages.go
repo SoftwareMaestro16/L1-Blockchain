@@ -808,7 +808,7 @@ func (s KeeperState) Normalize() KeeperState {
 
 func ComputeMessageIDRoot(messages []Message) string {
 	ordered := cloneMessages(messages)
-	parts := []string{"aetheris-messages-id-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-messages-id-root-v1", fmt.Sprint(len(ordered))}
 	for _, msg := range ordered {
 		parts = append(parts, hex.EncodeToString(msg.MessageID), fmt.Sprint(msg.SourceSequence), fmt.Sprint(msg.Nonce))
 	}
@@ -817,7 +817,7 @@ func ComputeMessageIDRoot(messages []Message) string {
 
 func ComputeMessageRoot(outbox []QueueItem, inbox []QueueItem) string {
 	return hashParts(
-		"aetheris-messages-root-v1",
+		"aetra-messages-root-v1",
 		ComputeQueueRoot("outbox", outbox),
 		ComputeQueueRoot("inbox", inbox),
 	)
@@ -825,7 +825,7 @@ func ComputeMessageRoot(outbox []QueueItem, inbox []QueueItem) string {
 
 func ComputeReceiptRoot(receipts []MessageReceipt) string {
 	ordered := normalizeReceipts(receipts)
-	parts := []string{"aetheris-message-receipts-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-message-receipts-root-v1", fmt.Sprint(len(ordered))}
 	for _, receipt := range ordered {
 		parts = append(parts, hex.EncodeToString(receipt.ReceiptHash))
 	}
@@ -843,8 +843,8 @@ func ComputeKeeperRoots(state KeeperState) MessageRoots {
 		ExpiryRoot:    ComputeExpiryRoot(state.Expiry),
 		ParamsHash:    state.Params.ParamsHash,
 	}
-	roots.MessageRoot = hashParts("aetheris-message-queue-pair-root-v1", roots.OutboxRoot, roots.InboxRoot)
-	roots.StateRoot = hashParts("aetheris-message-keeper-state-root-v1", roots.MessageRoot, roots.ReceiptRoot, roots.NonceRoot, roots.TombstoneRoot, roots.ExpiryRoot, roots.ParamsHash)
+	roots.MessageRoot = hashParts("aetra-message-queue-pair-root-v1", roots.OutboxRoot, roots.InboxRoot)
+	roots.StateRoot = hashParts("aetra-message-keeper-state-root-v1", roots.MessageRoot, roots.ReceiptRoot, roots.NonceRoot, roots.TombstoneRoot, roots.ExpiryRoot, roots.ParamsHash)
 	return roots
 }
 
@@ -854,7 +854,7 @@ func ComputeKeeperStateRoot(state KeeperState) string {
 
 func ComputeQueueRoot(kind string, items []QueueItem) string {
 	ordered := normalizeQueueItems(items)
-	parts := []string{"aetheris-message-queue-root-v1", kind, fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-message-queue-root-v1", kind, fmt.Sprint(len(ordered))}
 	for _, item := range ordered {
 		parts = append(parts, QueueItemHash(item))
 	}
@@ -862,12 +862,12 @@ func ComputeQueueRoot(kind string, items []QueueItem) string {
 }
 
 func QueueItemHash(item QueueItem) string {
-	return hashParts("aetheris-message-queue-item-v1", hex.EncodeToString(item.Message.MessageID), fmt.Sprint(item.EnqueuedHeight), fmt.Sprint(item.Message.SourceSequence), fmt.Sprint(item.Message.Nonce))
+	return hashParts("aetra-message-queue-item-v1", hex.EncodeToString(item.Message.MessageID), fmt.Sprint(item.EnqueuedHeight), fmt.Sprint(item.Message.SourceSequence), fmt.Sprint(item.Message.Nonce))
 }
 
 func ComputeNonceRoot(nonces []SenderNonce) string {
 	ordered := normalizeNonces(nonces)
-	parts := []string{"aetheris-message-nonce-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-message-nonce-root-v1", fmt.Sprint(len(ordered))}
 	for _, nonce := range ordered {
 		parts = append(parts, string(nonce.SourceZone), hex.EncodeToString(nonce.Sender), fmt.Sprint(nonce.Nonce))
 	}
@@ -876,7 +876,7 @@ func ComputeNonceRoot(nonces []SenderNonce) string {
 
 func ComputeTombstoneRoot(tombstones []ReplayTombstone) string {
 	ordered := normalizeTombstones(tombstones)
-	parts := []string{"aetheris-message-tombstone-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-message-tombstone-root-v1", fmt.Sprint(len(ordered))}
 	for _, tombstone := range ordered {
 		parts = append(parts, hex.EncodeToString(tombstone.TombstoneHash))
 	}
@@ -885,7 +885,7 @@ func ComputeTombstoneRoot(tombstones []ReplayTombstone) string {
 
 func ComputeExpiryRoot(expiry []ExpiryItem) string {
 	ordered := normalizeExpiry(expiry)
-	parts := []string{"aetheris-message-expiry-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-message-expiry-root-v1", fmt.Sprint(len(ordered))}
 	for _, item := range ordered {
 		parts = append(parts, fmt.Sprint(item.Deadline), hex.EncodeToString(item.MessageID))
 	}
@@ -894,7 +894,7 @@ func ComputeExpiryRoot(expiry []ExpiryItem) string {
 
 func ComputeReceiptHash(receipt MessageReceipt) []byte {
 	buf := bytes.NewBuffer(nil)
-	writeString(buf.Write, "aetheris-message-receipt-v1")
+	writeString(buf.Write, "aetra-message-receipt-v1")
 	writeBytes(buf.Write, receipt.MessageID)
 	writeString(buf.Write, string(receipt.SourceZone))
 	writeString(buf.Write, string(receipt.DestinationZone))
@@ -911,7 +911,7 @@ func ComputeReceiptHash(receipt MessageReceipt) []byte {
 
 func ComputeTombstoneHash(tombstone ReplayTombstone) []byte {
 	buf := bytes.NewBuffer(nil)
-	writeString(buf.Write, "aetheris-message-tombstone-v1")
+	writeString(buf.Write, "aetra-message-tombstone-v1")
 	writeBytes(buf.Write, tombstone.MessageID)
 	writeString(buf.Write, string(tombstone.SourceZone))
 	writeBytes(buf.Write, tombstone.Sender)
@@ -924,7 +924,7 @@ func ComputeTombstoneHash(tombstone ReplayTombstone) []byte {
 }
 
 func ComputeProofHash(proof QueryProofResponse) string {
-	parts := []string{"aetheris-message-proof-v1", string(proof.Kind), hex.EncodeToString(proof.MessageID), proof.Root, proof.ValueHash}
+	parts := []string{"aetra-message-proof-v1", string(proof.Kind), hex.EncodeToString(proof.MessageID), proof.Root, proof.ValueHash}
 	parts = append(parts, proof.Path...)
 	return hashParts(parts...)
 }

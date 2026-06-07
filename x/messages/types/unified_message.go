@@ -334,7 +334,7 @@ func (o UnifiedMessageObject) Clone() UnifiedMessageObject {
 func ComputeUnifiedRouteCommitment(route UnifiedMessageRoute) string {
 	route = normalizeUnifiedMessageRoute(route)
 	return hashParts(
-		"aetheris-unified-message-route-v1",
+		"aetra-unified-message-route-v1",
 		string(route.SourceZoneID),
 		route.SourceShardID,
 		string(route.DestinationZoneID),
@@ -350,7 +350,7 @@ func ComputeUnifiedRouteCommitment(route UnifiedMessageRoute) string {
 
 func ComputeUnifiedMessageObjectHash(object UnifiedMessageObject) string {
 	return hashParts(
-		"aetheris-unified-message-object-v1",
+		"aetra-unified-message-object-v1",
 		hex.EncodeToString(object.Message.MessageID),
 		string(object.Capability),
 		object.TraceID,
@@ -365,7 +365,7 @@ func ComputeUnifiedMessageObjectHash(object UnifiedMessageObject) string {
 
 func ComputeMessageLifecycleRecordHash(record MessageLifecycleRecord) string {
 	return hashParts(
-		"aetheris-unified-message-lifecycle-record-v1",
+		"aetra-unified-message-lifecycle-record-v1",
 		hex.EncodeToString(record.MessageID),
 		string(record.Stage),
 		fmt.Sprint(record.Height),
@@ -378,7 +378,7 @@ func ComputeMessageLifecycleRecordHash(record MessageLifecycleRecord) string {
 func ComputeMessageLifecycleRoot(records []MessageLifecycleRecord) (string, error) {
 	ordered := cloneMessageLifecycleRecords(records)
 	sortMessageLifecycleRecords(ordered)
-	parts := []string{"aetheris-unified-message-lifecycle-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-unified-message-lifecycle-root-v1", fmt.Sprint(len(ordered))}
 	for _, record := range ordered {
 		if err := record.Validate(); err != nil {
 			return "", err

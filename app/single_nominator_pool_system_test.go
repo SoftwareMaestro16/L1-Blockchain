@@ -19,7 +19,7 @@ import (
 func TestSingleNominatorPoolSystemModuleWiringAndGenesis(t *testing.T) {
 	app, genesis := setup(true, 5)
 
-	require.NoError(t, app.ValidateAetherCoreWiringGate())
+	require.NoError(t, app.ValidateAetraCoreWiringGate())
 	require.Contains(t, app.ModuleManager.Modules, singlenominatorpooltypes.ModuleName)
 	require.Contains(t, app.keys, singlenominatorpooltypes.StoreKey)
 	require.Contains(t, genesis, singlenominatorpooltypes.ModuleName)

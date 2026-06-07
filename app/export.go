@@ -14,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 // ExportAppStateAndValidators exports the state of the application for a genesis
@@ -217,7 +217,7 @@ func (app *L1App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []s
 		}
 
 		validator.UnbondingHeight = 0
-		if applyAllowedAddrs && !allowedAddrsMap[aetherisaddress.FormatValAddress(addr)] {
+		if applyAllowedAddrs && !allowedAddrsMap[aetraaddress.FormatValAddress(addr)] {
 			validator.Jailed = true
 		}
 

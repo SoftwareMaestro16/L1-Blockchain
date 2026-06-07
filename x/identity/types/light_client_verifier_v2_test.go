@@ -13,7 +13,7 @@ func TestIdentityResolutionProofLightClientV2ReturnsVerifiedPrimary(t *testing.T
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
 
 	target, err := VerifyIdentityResolutionProofLightClientV2(IdentityLightClientVerificationRequestV2{
-		ExpectedChainID: "aetheris-local-1",
+		ExpectedChainID: "aetra-local-1",
 		RequestedName:   "alice.aet",
 		TrustedHeader:   trustedHeaderForProofV2(proof),
 		Proof:           proof,
@@ -35,7 +35,7 @@ func TestIdentityResolutionProofLightClientV2FailureCodes(t *testing.T) {
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
 
 	base := IdentityLightClientVerificationRequestV2{
-		ExpectedChainID: "aetheris-local-1",
+		ExpectedChainID: "aetra-local-1",
 		RequestedName:   "alice.aet",
 		TrustedHeader:   trustedHeaderForProofV2(proof),
 		Proof:           proof,
@@ -86,7 +86,7 @@ func TestIdentityResolutionProofLightClientV2ReverseConsistency(t *testing.T) {
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolveReverse, 14, 30, addr(2))
 
 	base := IdentityLightClientVerificationRequestV2{
-		ExpectedChainID:          "aetheris-local-1",
+		ExpectedChainID:          "aetra-local-1",
 		RequestedName:            "alice.aet",
 		TrustedHeader:            trustedHeaderForProofV2(proof),
 		Proof:                    proof,
@@ -106,11 +106,11 @@ func TestIdentityResolutionProofLightClientV2VerifiesRecursivePath(t *testing.T)
 	state, _, err := PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{Primary: addr(2)}, 12)
 	require.NoError(t, err)
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
-	recursive, err := BuildRecursiveResolutionProofV2(state, "aetheris-local-1", "alice.aet", "alice.aet", 14, 30, nil)
+	recursive, err := BuildRecursiveResolutionProofV2(state, "aetra-local-1", "alice.aet", "alice.aet", 14, 30, nil)
 	require.NoError(t, err)
 
 	_, err = VerifyIdentityResolutionProofLightClientV2(IdentityLightClientVerificationRequestV2{
-		ExpectedChainID: "aetheris-local-1",
+		ExpectedChainID: "aetra-local-1",
 		RequestedName:   "alice.aet",
 		TrustedHeader:   trustedHeaderForProofV2(proof),
 		Proof:           proof,
@@ -121,7 +121,7 @@ func TestIdentityResolutionProofLightClientV2VerifiesRecursivePath(t *testing.T)
 
 	recursive.PathDomainRecords = nil
 	req := IdentityLightClientVerificationRequestV2{
-		ExpectedChainID: "aetheris-local-1",
+		ExpectedChainID: "aetra-local-1",
 		RequestedName:   "alice.aet",
 		TrustedHeader:   trustedHeaderForProofV2(proof),
 		Proof:           proof,
@@ -164,7 +164,7 @@ func buildLightClientFormatProofV2(t *testing.T, state IdentityState, name strin
 	t.Helper()
 	appHash, err := IdentityStateRoot(state)
 	require.NoError(t, err)
-	proof, err := BuildIdentityResolutionProofFormatV2(state, "aetheris-local-1", appHash, name, queryType, height, ttl, reverseAddress)
+	proof, err := BuildIdentityResolutionProofFormatV2(state, "aetra-local-1", appHash, name, queryType, height, ttl, reverseAddress)
 	require.NoError(t, err)
 	return proof
 }

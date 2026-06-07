@@ -741,7 +741,7 @@ func AVMAsyncBounceRouteHint(originalMessageID string) string {
 func ComputeAVMAsyncFailureHash(record AVMAsyncFailureRecord) string {
 	record = canonicalAVMAsyncFailureRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-async-failure-v1")
+	writeEnginePart(h, "aetra-avm-async-failure-v1")
 	writeEnginePart(h, record.MessageID)
 	writeEnginePart(h, string(record.ZoneID))
 	writeEnginePart(h, string(record.FailureClass))
@@ -756,7 +756,7 @@ func ComputeAVMAsyncFailureHash(record AVMAsyncFailureRecord) string {
 func ComputeAVMAsyncBounceMessageRoot(message AVMAsyncMessage) string {
 	message = canonicalAVMAsyncMessage(message)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-async-bounce-message-root-v1")
+	writeEnginePart(h, "aetra-avm-async-bounce-message-root-v1")
 	writeAVMAsyncMessageParts(h, message)
 	return hex.EncodeToString(h.Sum(nil))
 }
@@ -764,7 +764,7 @@ func ComputeAVMAsyncBounceMessageRoot(message AVMAsyncMessage) string {
 func ComputeAVMAsyncFailureOutputRoot(failure AVMAsyncFailureRecord) string {
 	failure = canonicalAVMAsyncFailureRecord(failure)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-async-failure-output-root-v1")
+	writeEnginePart(h, "aetra-avm-async-failure-output-root-v1")
 	writeAVMAsyncFailureParts(h, failure)
 	return hex.EncodeToString(h.Sum(nil))
 }
@@ -772,7 +772,7 @@ func ComputeAVMAsyncFailureOutputRoot(failure AVMAsyncFailureRecord) string {
 func ComputeAVMAsyncFailedReceiptModelHash(model AVMAsyncFailedReceiptModel) string {
 	model = canonicalAVMAsyncFailedReceiptModel(model)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-async-failed-receipt-model-v1")
+	writeEnginePart(h, "aetra-avm-async-failed-receipt-model-v1")
 	writeAVMAsyncMessageParts(h, model.Message)
 	writeAVMAsyncFailureParts(h, model.Failure)
 	writeEnginePart(h, model.Receipt.ReceiptHash)
@@ -782,7 +782,7 @@ func ComputeAVMAsyncFailedReceiptModelHash(model AVMAsyncFailedReceiptModel) str
 func ComputeAVMAsyncBounceOutcomeHash(outcome AVMAsyncBounceOutcome) string {
 	outcome = canonicalAVMAsyncBounceOutcome(outcome)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-async-bounce-outcome-v1")
+	writeEnginePart(h, "aetra-avm-async-bounce-outcome-v1")
 	writeAVMAsyncMessageParts(h, outcome.OriginalMessage)
 	writeAVMAsyncFailureParts(h, outcome.Failure)
 	writeAVMAsyncMessageParts(h, outcome.BounceMessage)
@@ -796,7 +796,7 @@ func ComputeAVMAsyncBounceOutcomeHash(outcome AVMAsyncBounceOutcome) string {
 func ComputeAVMZoneDeadLetterQueueRoot(queue AVMZoneDeadLetterQueue) string {
 	queue = canonicalAVMZoneDeadLetterQueue(queue)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-zone-dead-letter-queue-v1")
+	writeEnginePart(h, "aetra-avm-zone-dead-letter-queue-v1")
 	writeEnginePart(h, string(queue.ZoneID))
 	writeEngineUint64(h, uint64(len(queue.Records)))
 	for _, record := range queue.Records {
@@ -809,7 +809,7 @@ func ComputeAVMZoneDeadLetterQueueRoot(queue AVMZoneDeadLetterQueue) string {
 func ComputeAVMRetryExhaustionOutcomeHash(outcome AVMRetryExhaustionOutcome) string {
 	outcome = canonicalAVMRetryExhaustionOutcome(outcome)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-retry-exhaustion-outcome-v1")
+	writeEnginePart(h, "aetra-avm-retry-exhaustion-outcome-v1")
 	writeEnginePart(h, outcome.Queue.QueueRoot)
 	writeAVMAsyncMessageParts(h, outcome.Message)
 	writeAVMAsyncFailureParts(h, outcome.Failure)
@@ -821,7 +821,7 @@ func ComputeAVMRetryExhaustionOutcomeHash(outcome AVMRetryExhaustionOutcome) str
 func ComputeAVMAsyncFailureValueConservationHash(check AVMAsyncFailureValueConservationCheck) string {
 	check = canonicalAVMAsyncFailureValueConservationCheck(check)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-async-failure-value-conservation-v1")
+	writeEnginePart(h, "aetra-avm-async-failure-value-conservation-v1")
 	writeEnginePart(h, check.OriginalMessageID)
 	writeEngineUint64(h, check.OriginalValueNAET)
 	writeEngineUint64(h, check.BounceValueNAET)
@@ -837,7 +837,7 @@ func AVMZoneDeadLetterSortKey(record AVMDeadLetterRecord) string {
 func ComputeAVMAsyncBounceDeadLetterOutcomeHash(outcome AVMAsyncBounceDeadLetterOutcome) string {
 	outcome = canonicalAVMAsyncBounceDeadLetterOutcome(outcome)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-async-bounce-dead-letter-v1")
+	writeEnginePart(h, "aetra-avm-async-bounce-dead-letter-v1")
 	writeEnginePart(h, outcome.BounceOutcome.OutcomeHash)
 	writeEnginePart(h, outcome.DeadLetter.RecordHash)
 	writeEnginePart(h, outcome.DeadLetterReceipt.ReceiptHash)
@@ -847,7 +847,7 @@ func ComputeAVMAsyncBounceDeadLetterOutcomeHash(outcome AVMAsyncBounceDeadLetter
 func ComputeAVMAsyncBounceDeadLetterOutputRoot(bounceMessageID string) string {
 	bounceMessageID = strings.TrimSpace(bounceMessageID)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-async-bounce-dead-letter-output-root-v1")
+	writeEnginePart(h, "aetra-avm-async-bounce-dead-letter-output-root-v1")
 	writeEnginePart(h, bounceMessageID)
 	return hex.EncodeToString(h.Sum(nil))
 }

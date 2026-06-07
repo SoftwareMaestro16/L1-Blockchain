@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	aethercoretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	aetracoretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -140,14 +140,14 @@ func ComputeAetherLifecycleRoot(records []AetherMessageLifecycleRecord) (string,
 	}
 	ordered := cloneAetherLifecycleRecords(records)
 	sortAetherLifecycleRecords(ordered)
-	parts := []string{"aetheris-aether-message-lifecycle-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-aether-message-lifecycle-root-v1", fmt.Sprint(len(ordered))}
 	for _, record := range ordered {
 		parts = append(parts, record.RecordHash)
 	}
 	return hashParts(parts...), nil
 }
 
-func CommitAetherMessageDeterministicRoute(msg AetherMessage, table aethercoretypes.RoutingTableCommitment, metrics []AetherRoutingMetric, adjacency []AetherRoutingEdge, params AetherRoutingParams) (AetherMessage, AetherRoutePlan, error) {
+func CommitAetherMessageDeterministicRoute(msg AetherMessage, table aetracoretypes.RoutingTableCommitment, metrics []AetherRoutingMetric, adjacency []AetherRoutingEdge, params AetherRoutingParams) (AetherMessage, AetherRoutePlan, error) {
 	if msg.MsgID != "" {
 		return AetherMessage{}, AetherRoutePlan{}, errors.New("aether route planning requires message id to be empty")
 	}
@@ -171,7 +171,7 @@ func CommitAetherMessageDeterministicRoute(msg AetherMessage, table aethercorety
 	return committed, plan, nil
 }
 
-func SelectDeterministicAetherRoute(msg AetherMessage, table aethercoretypes.RoutingTableCommitment, metrics []AetherRoutingMetric, adjacency []AetherRoutingEdge, params AetherRoutingParams) (AetherRoutePlan, error) {
+func SelectDeterministicAetherRoute(msg AetherMessage, table aetracoretypes.RoutingTableCommitment, metrics []AetherRoutingMetric, adjacency []AetherRoutingEdge, params AetherRoutingParams) (AetherRoutePlan, error) {
 	msg = normalizeAetherMessage(msg)
 	if err := msg.ValidateForID(); err != nil {
 		return AetherRoutePlan{}, err
@@ -338,22 +338,22 @@ func (r AetherMessageLifecycleRecord) ValidateForHash() error {
 
 func ComputeAetherMessageLifecycleRecordHash(record AetherMessageLifecycleRecord) string {
 	record = normalizeAetherLifecycleRecord(record)
-	return hashParts("aetheris-aether-message-lifecycle-record-v1", record.MsgID, string(record.Stage), fmt.Sprint(record.Height), record.RouteCommitment, record.ReceiptHash)
+	return hashParts("aetra-aether-message-lifecycle-record-v1", record.MsgID, string(record.Stage), fmt.Sprint(record.Height), record.RouteCommitment, record.ReceiptHash)
 }
 
-func ComputeAetherRouteCoordinate(table aethercoretypes.RoutingTableCommitment, zoneID zonestypes.ZoneID, shardID string) string {
-	return hashParts("aetheris-aether-route-coordinate-v1", table.TableHash, fmt.Sprint(table.RoutingEpoch), string(zoneID), shardID)
+func ComputeAetherRouteCoordinate(table aetracoretypes.RoutingTableCommitment, zoneID zonestypes.ZoneID, shardID string) string {
+	return hashParts("aetra-aether-route-coordinate-v1", table.TableHash, fmt.Sprint(table.RoutingEpoch), string(zoneID), shardID)
 }
 
 func ComputeAetherMessageClassHash(msg AetherMessage) string {
 	msg = normalizeAetherMessage(msg)
-	return hashParts("aetheris-aether-message-class-v1", msg.PayloadType, string(msg.ExecutionMode), string(msg.OrderingClass))
+	return hashParts("aetra-aether-message-class-v1", msg.PayloadType, string(msg.ExecutionMode), string(msg.OrderingClass))
 }
 
 func ComputeAetherRoutingMetricHash(metric AetherRoutingMetric) string {
 	metric = normalizeAetherRoutingMetric(metric)
 	return hashParts(
-		"aetheris-aether-routing-metric-v2",
+		"aetra-aether-routing-metric-v2",
 		string(metric.ZoneID),
 		metric.ShardID,
 		fmt.Sprint(metric.CommittedHeight),
@@ -372,18 +372,18 @@ func ComputeAetherRoutingMetricHash(metric AetherRoutingMetric) string {
 }
 
 func ComputeAetherRoutePlanCommitment(plan AetherRoutePlan) string {
-	return hashParts("aetheris-aether-route-plan-v1", fmt.Sprint(plan.RoutingEpoch), plan.RoutingTableHash, plan.MessageClassHash, plan.SelectedPath.PathCommitment, fmt.Sprint(plan.SelectedPath.TotalCost), fmt.Sprint(plan.SelectedPath.HopCount), plan.SelectedPath.DestinationShardID)
+	return hashParts("aetra-aether-route-plan-v1", fmt.Sprint(plan.RoutingEpoch), plan.RoutingTableHash, plan.MessageClassHash, plan.SelectedPath.PathCommitment, fmt.Sprint(plan.SelectedPath.TotalCost), fmt.Sprint(plan.SelectedPath.HopCount), plan.SelectedPath.DestinationShardID)
 }
 
 func ComputeAetherPathCommitment(path []AetherRoutingHop) string {
-	parts := []string{"aetheris-aether-route-path-v1", fmt.Sprint(len(path))}
+	parts := []string{"aetra-aether-route-path-v1", fmt.Sprint(len(path))}
 	for _, hop := range path {
 		parts = append(parts, string(hop.ZoneID), hop.ShardID, hop.Coordinate)
 	}
 	return hashParts(parts...)
 }
 
-func buildAetherRouteCandidate(path []AetherRoutingHop, table aethercoretypes.RoutingTableCommitment, metricMap map[string]AetherRoutingMetric, params AetherRoutingParams) AetherRouteCandidate {
+func buildAetherRouteCandidate(path []AetherRoutingHop, table aetracoretypes.RoutingTableCommitment, metricMap map[string]AetherRoutingMetric, params AetherRoutingParams) AetherRouteCandidate {
 	hops := cloneAetherRoutingHops(path)
 	hopCount := uint32(len(hops) - 1)
 	total := uint64(hopCount)*params.BaseHopCost + uint64(hopCount)*params.LatencyWeight
@@ -466,7 +466,7 @@ func routingMetricMap(metrics []AetherRoutingMetric) (map[string]AetherRoutingMe
 	return out, nil
 }
 
-func routingTableHasZone(table aethercoretypes.RoutingTableCommitment, zoneID zonestypes.ZoneID) bool {
+func routingTableHasZone(table aetracoretypes.RoutingTableCommitment, zoneID zonestypes.ZoneID) bool {
 	for _, entry := range table.Entries {
 		if string(entry.ZoneID) == string(zoneID) {
 			return true

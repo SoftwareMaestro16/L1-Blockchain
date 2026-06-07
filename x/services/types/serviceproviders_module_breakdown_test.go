@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestDefaultXServiceProvidersModuleBreakdownCoversSection155(t *testing.T) {
@@ -162,7 +162,7 @@ func testServiceProviderRecord(t *testing.T) ProviderRecord {
 
 func testServiceProviderFaultProof(t *testing.T) (ProviderMisbehaviorReport, ServiceFaultProof) {
 	t.Helper()
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 70}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 70}
 	descriptor := testInterfaceSystemDescriptor()
 	call := testInteractionCall(t, ctx, descriptor, "submit", 11, "serviceproviders/fault")
 	receipt, err := coretypes.NewServiceCallReceipt(call.ToServiceCallEnvelope(), coretypes.ServiceExecutionOutcome{

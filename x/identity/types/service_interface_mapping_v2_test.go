@@ -30,7 +30,7 @@ func TestIdentityServiceDiscoveryV2ProofAwareFreshnessAndFallback(t *testing.T) 
 		SupportedServiceTypes: []string{"service.v1"},
 		CurrentHeight:         20,
 		FreshnessThreshold:    10,
-		ExpectedChainID:       "aetheris-local-1",
+		ExpectedChainID:       "aetra-local-1",
 		TrustedHeader:         trustedHeaderForProofV2(proof),
 		Proof:                 &proof,
 	})
@@ -45,7 +45,7 @@ func TestIdentityServiceDiscoveryV2ProofAwareFreshnessAndFallback(t *testing.T) 
 		Name:                "alice.aet",
 		ServiceID:           "rpc",
 		SupportedTransports: []string{"grpcs"},
-		ExpectedChainID:     "aetheris-local-1",
+		ExpectedChainID:     "aetra-local-1",
 		TrustedHeader:       trustedHeaderForProofV2(proof),
 		Proof:               &proof,
 	})
@@ -87,7 +87,7 @@ func TestIdentityServiceDiscoveryV2ExternalMetadataHash(t *testing.T) {
 		AllowedAuthPolicies: []string{"none"},
 		ExternalMetadata:    metadata,
 		CurrentHeight:       20,
-		ExpectedChainID:     "aetheris-local-1",
+		ExpectedChainID:     "aetra-local-1",
 		TrustedHeader:       trustedHeaderForProofV2(proof),
 		Proof:               &proof,
 	})
@@ -101,7 +101,7 @@ func TestIdentityServiceDiscoveryV2ExternalMetadataHash(t *testing.T) {
 		AllowedAuthPolicies: []string{"none"},
 		ExternalMetadata:    `{"service":"rpc","version":"v2"}`,
 		CurrentHeight:       20,
-		ExpectedChainID:     "aetheris-local-1",
+		ExpectedChainID:     "aetra-local-1",
 		TrustedHeader:       trustedHeaderForProofV2(proof),
 		Proof:               &proof,
 	})
@@ -136,7 +136,7 @@ func TestIdentityInterfaceSchemaMappingV2PolicyAndHashVerification(t *testing.T)
 		ExpectedSchemaHash: hash,
 		WalletPolicy:       DefaultIdentityInterfaceWalletPolicyV2(),
 		CurrentHeight:      20,
-		ExpectedChainID:    "aetheris-local-1",
+		ExpectedChainID:    "aetra-local-1",
 		TrustedHeader:      trustedHeaderForProofV2(proof),
 		Proof:              &proof,
 	})
@@ -156,7 +156,7 @@ func TestIdentityInterfaceSchemaMappingV2PolicyAndHashVerification(t *testing.T)
 		ExpectedSchemaHash: hash,
 		WalletPolicy:       rejectInline,
 		CurrentHeight:      20,
-		ExpectedChainID:    "aetheris-local-1",
+		ExpectedChainID:    "aetra-local-1",
 		TrustedHeader:      trustedHeaderForProofV2(proof),
 		Proof:              &proof,
 	})
@@ -170,7 +170,7 @@ func TestIdentityInterfaceSchemaMappingV2PolicyAndHashVerification(t *testing.T)
 		ExpectedSchemaHash: hash,
 		WalletPolicy:       unsupportedRender,
 		CurrentHeight:      20,
-		ExpectedChainID:    "aetheris-local-1",
+		ExpectedChainID:    "aetra-local-1",
 		TrustedHeader:      trustedHeaderForProofV2(proof),
 		Proof:              &proof,
 	})
@@ -185,7 +185,7 @@ func TestIdentityInterfaceSchemaMappingV2PolicyAndHashVerification(t *testing.T)
 		ExpectedSchemaHash: hash,
 		WalletPolicy:       noConfirmation,
 		CurrentHeight:      20,
-		ExpectedChainID:    "aetheris-local-1",
+		ExpectedChainID:    "aetra-local-1",
 		TrustedHeader:      trustedHeaderForProofV2(proof),
 		Proof:              &proof,
 	})

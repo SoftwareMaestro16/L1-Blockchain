@@ -17,7 +17,7 @@ const (
 
 const (
 	BacklogTaskZoneDescriptors                = "zone_descriptors"
-	BacklogTaskAetherCoreSkeleton             = "aethercore_skeleton"
+	BacklogTaskAetraCoreSkeleton              = "aetracore_skeleton"
 	BacklogTaskGlobalRootHierarchy            = "global_root_hierarchy"
 	BacklogTaskMsgBusMessageEncoding          = "msgbus_message_encoding"
 	BacklogTaskLocalMessageStores             = "local_message_stores"
@@ -45,7 +45,7 @@ const (
 
 var requiredHighPriorityBacklogTasks = map[string]struct{}{
 	BacklogTaskZoneDescriptors:                {},
-	BacklogTaskAetherCoreSkeleton:             {},
+	BacklogTaskAetraCoreSkeleton:              {},
 	BacklogTaskGlobalRootHierarchy:            {},
 	BacklogTaskMsgBusMessageEncoding:          {},
 	BacklogTaskLocalMessageStores:             {},

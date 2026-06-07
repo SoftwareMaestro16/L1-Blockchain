@@ -19,7 +19,7 @@ import (
 func TestSchedulerSystemModuleWiringAndGenesis(t *testing.T) {
 	app, genesis := setup(true, 5)
 
-	require.NoError(t, app.ValidateAetherCoreWiringGate())
+	require.NoError(t, app.ValidateAetraCoreWiringGate())
 	require.Contains(t, app.ModuleManager.Modules, schedulertypes.ModuleName)
 	require.Contains(t, app.keys, schedulertypes.StoreKey)
 	require.Contains(t, genesis, schedulertypes.ModuleName)
@@ -42,7 +42,7 @@ func TestSchedulerSystemStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	schedulerGenesis.State.Jobs = []schedulertypes.ScheduledJob{
 		{
 			ID:                  "rent-collection",
-			OwnerModule:         "aethercore",
+			OwnerModule:         "aetracore",
 			Type:                schedulertypes.JobTypePeriodic,
 			NextExecutionHeight: 10,
 			Interval:            10,

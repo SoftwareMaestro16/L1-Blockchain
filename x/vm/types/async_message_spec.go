@@ -325,7 +325,7 @@ func (r AVMAsyncMessageRegistry) Validate() error {
 func DeriveAVMAsyncMessageID(msg AVMAsyncMessage) string {
 	msg = canonicalAVMAsyncMessage(msg)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-async-message-id-v1")
+	writeEnginePart(h, "aetra-async-message-id-v1")
 	writeEnginePart(h, msg.ChainID)
 	writeEnginePart(h, string(msg.SourceZone))
 	writeEnginePart(h, msg.Source)

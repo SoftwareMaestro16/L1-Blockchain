@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 const (
@@ -500,24 +500,24 @@ func (state DistributedServiceDiscoveryState) Validate() error {
 }
 
 func ComputeDistributedServiceRecordHash(record DistributedServiceRecord) string {
-	return servicesHashParts("aetheris-services-distributed-record-v1", record.ServiceID, record.ServiceName, string(record.Kind), record.Owner, record.ZoneID, record.InterfaceHash, record.EndpointRoot, record.DescriptorHash, record.MetadataHash, fmt.Sprint(record.CreatedHeight), fmt.Sprint(record.UpdatedHeight), fmt.Sprint(record.ExpiryHeight), fmt.Sprint(record.Discoverable))
+	return servicesHashParts("aetra-services-distributed-record-v1", record.ServiceID, record.ServiceName, string(record.Kind), record.Owner, record.ZoneID, record.InterfaceHash, record.EndpointRoot, record.DescriptorHash, record.MetadataHash, fmt.Sprint(record.CreatedHeight), fmt.Sprint(record.UpdatedHeight), fmt.Sprint(record.ExpiryHeight), fmt.Sprint(record.Discoverable))
 }
 
 func ComputeDistributedServiceEndpointHash(endpoint DistributedServiceEndpoint) string {
-	return servicesHashParts("aetheris-services-distributed-endpoint-v1", endpoint.ServiceID, endpoint.EndpointID, string(endpoint.Kind), endpoint.ZoneID, endpoint.Target, endpoint.InterfaceHash, fmt.Sprint(endpoint.Priority), fmt.Sprint(endpoint.Weight), endpoint.MetadataHash)
+	return servicesHashParts("aetra-services-distributed-endpoint-v1", endpoint.ServiceID, endpoint.EndpointID, string(endpoint.Kind), endpoint.ZoneID, endpoint.Target, endpoint.InterfaceHash, fmt.Sprint(endpoint.Priority), fmt.Sprint(endpoint.Weight), endpoint.MetadataHash)
 }
 
 func ComputeDistributedInterfaceDescriptorHash(descriptor DistributedInterfaceDescriptor) string {
-	return servicesHashParts("aetheris-services-distributed-interface-v1", descriptor.InterfaceHash, descriptor.InterfaceName, fmt.Sprint(descriptor.Version), descriptor.SchemaHash, descriptor.MethodRoot, descriptor.EventRoot, descriptor.ErrorRoot)
+	return servicesHashParts("aetra-services-distributed-interface-v1", descriptor.InterfaceHash, descriptor.InterfaceName, fmt.Sprint(descriptor.Version), descriptor.SchemaHash, descriptor.MethodRoot, descriptor.EventRoot, descriptor.ErrorRoot)
 }
 
 func ComputeDistributedExecutionCommitmentHash(commitment DistributedExecutionCommitment) string {
-	return servicesHashParts("aetheris-services-distributed-execution-commitment-v1", commitment.ServiceID, commitment.EndpointID, string(commitment.Kind), commitment.MessageID, commitment.ProofHash, commitment.ResultHash, fmt.Sprint(commitment.CommittedHeight))
+	return servicesHashParts("aetra-services-distributed-execution-commitment-v1", commitment.ServiceID, commitment.EndpointID, string(commitment.Kind), commitment.MessageID, commitment.ProofHash, commitment.ResultHash, fmt.Sprint(commitment.CommittedHeight))
 }
 
 func ComputeDistributedEndpointRoot(endpoints []DistributedServiceEndpoint) string {
 	ordered := normalizeDistributedServiceEndpoints(endpoints)
-	parts := []string{"aetheris-services-distributed-endpoint-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-services-distributed-endpoint-root-v1", fmt.Sprint(len(ordered))}
 	for _, endpoint := range ordered {
 		parts = append(parts, endpoint.CommitmentHash)
 	}
@@ -526,7 +526,7 @@ func ComputeDistributedEndpointRoot(endpoints []DistributedServiceEndpoint) stri
 
 func ComputeDistributedRecordRoot(records []DistributedServiceRecord) string {
 	ordered := normalizeDistributedServiceRecords(records)
-	parts := []string{"aetheris-services-distributed-record-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-services-distributed-record-root-v1", fmt.Sprint(len(ordered))}
 	for _, record := range ordered {
 		parts = append(parts, record.RecordHash)
 	}
@@ -535,7 +535,7 @@ func ComputeDistributedRecordRoot(records []DistributedServiceRecord) string {
 
 func ComputeDistributedInterfaceRoot(interfaces []DistributedInterfaceDescriptor) string {
 	ordered := normalizeDistributedInterfaces(interfaces)
-	parts := []string{"aetheris-services-distributed-interface-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-services-distributed-interface-root-v1", fmt.Sprint(len(ordered))}
 	for _, descriptor := range ordered {
 		parts = append(parts, descriptor.DescriptorHash)
 	}
@@ -544,7 +544,7 @@ func ComputeDistributedInterfaceRoot(interfaces []DistributedInterfaceDescriptor
 
 func ComputeDistributedCommitmentRoot(commitments []DistributedExecutionCommitment) string {
 	ordered := normalizeDistributedExecutionCommitments(commitments)
-	parts := []string{"aetheris-services-distributed-commitment-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-services-distributed-commitment-root-v1", fmt.Sprint(len(ordered))}
 	for _, commitment := range ordered {
 		parts = append(parts, commitment.CommitmentHash)
 	}
@@ -558,7 +558,7 @@ func ComputeDistributedServiceDiscoveryRoots(state DistributedServiceDiscoverySt
 		InterfaceRoot:  ComputeDistributedInterfaceRoot(state.Interfaces),
 		CommitmentRoot: ComputeDistributedCommitmentRoot(state.Commitments),
 	}
-	roots.StateRoot = servicesHashParts("aetheris-services-distributed-state-root-v1", roots.RecordRoot, roots.EndpointRoot, roots.InterfaceRoot, roots.CommitmentRoot, fmt.Sprint(state.Height))
+	roots.StateRoot = servicesHashParts("aetra-services-distributed-state-root-v1", roots.RecordRoot, roots.EndpointRoot, roots.InterfaceRoot, roots.CommitmentRoot, fmt.Sprint(state.Height))
 	return roots
 }
 

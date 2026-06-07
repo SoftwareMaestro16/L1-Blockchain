@@ -3,7 +3,7 @@
 
 This document defines when the Aetra L1 prototype is considered working.
 
-The contract is intentionally narrower than a mainnet readiness checklist. It proves a local or CI operator can build `aetherisd`, create a reproducible localnet, produce blocks, run core signed transactions, query state through CLI/gRPC/REST, stop the network cleanly, and collect enough evidence to debug failures.
+The contract is intentionally narrower than a mainnet readiness checklist. It proves a local or CI operator can build `aetrad`, create a reproducible localnet, produce blocks, run core signed transactions, query state through CLI/gRPC/REST, stop the network cleanly, and collect enough evidence to debug failures.
 
 ## Scope
 
@@ -29,17 +29,17 @@ Do not commit or package localnet homes, keyrings, validator keys, mnemonics, di
 Default reusable variables:
 
 ```powershell
-$CHAIN_ID = "aetheris-local-1"
+$CHAIN_ID = "aetra-local-1"
 $NODE = "tcp://127.0.0.1:26657"
 $GRPC = "127.0.0.1:9090"
 $REST = "http://127.0.0.1:1317"
-$HOME = ".localnet\node0\aetherisd"
+$HOME = ".localnet\node0\aetrad"
 $FROM = "node0"
 $KEYRING = "test"
 $FEES = "1000000naet"
-$NODE0 = build\aetherisd.exe keys show $FROM -a --home $HOME --keyring-backend $KEYRING
-$NODE1_HOME = ".localnet\node1\aetherisd"
-$NODE1 = build\aetherisd.exe keys show node1 -a --home $NODE1_HOME --keyring-backend $KEYRING
+$NODE0 = build\aetrad.exe keys show $FROM -a --home $HOME --keyring-backend $KEYRING
+$NODE1_HOME = ".localnet\node1\aetrad"
+$NODE1 = build\aetrad.exe keys show node1 -a --home $NODE1_HOME --keyring-backend $KEYRING
 ```
 
 For `.localnet-5`, set `$HOME` and `$NODE1_HOME` under `.localnet-5`. Keep `$NODE` on node0 unless testing another endpoint.
@@ -48,12 +48,12 @@ For `.localnet-5`, set `$HOME` and `$NODE1_HOME` under `.localnet-5`. Keep `$NOD
 
 | Flow | Commands | Expected Result | Evidence |
 | --- | --- | --- | --- |
-| Build binary | `go build -o build\aetherisd.exe ./cmd/l1d`; `build\aetherisd.exe version --long --output json` | Binary exists, starts, and reports app name, commit/version metadata, SDK, CometBFT, build date, and dirty state. | `tests/e2e/prototype_acceptance.ps1`, `tests/scripts/prototype_release_package_test.ps1`, `.github/workflows/prototype-release.yml` |
-| Init localnet | `.\scripts\localnet\init.ps1`; `.\scripts\localnet\validate-genesis.ps1` | `.localnet\node*` exists, all nodes share the same genesis hash, chain-id is `aetheris-local-1`, staking/mint/fees denom is `naet`, custom modules validate. | `docs/bootstrap-profile.md`, `app/determinism_test.go`, `x/*/types/genesis_test.go`, `tests/e2e/prototype_acceptance.ps1` |
+| Build binary | `go build -o build\aetrad.exe ./cmd/l1d`; `build\aetrad.exe version --long --output json` | Binary exists, starts, and reports app name, commit/version metadata, SDK, CometBFT, build date, and dirty state. | `tests/e2e/prototype_acceptance.ps1`, `tests/scripts/prototype_release_package_test.ps1`, `.github/workflows/prototype-release.yml` |
+| Init localnet | `.\scripts\localnet\init.ps1`; `.\scripts\localnet\validate-genesis.ps1` | `.localnet\node*` exists, all nodes share the same genesis hash, chain-id is `aetra-local-1`, staking/mint/fees denom is `naet`, custom modules validate. | `docs/bootstrap-profile.md`, `app/determinism_test.go`, `x/*/types/genesis_test.go`, `tests/e2e/prototype_acceptance.ps1` |
 | Start validators | `.\scripts\localnet\start.ps1 -NoInit -Wait` | Validators listen on configured RPC/gRPC/REST ports, peers connect, and blocks are produced. | `scripts/localnet/health.ps1`, `tests/e2e/localnet_smoke.ps1`, `tests/e2e/prototype_acceptance.ps1` |
-| Wait height and health | `.\scripts\localnet\health.ps1 -ValidatorCount 3`; `Invoke-RestMethod http://127.0.0.1:26657/status` | Height is increasing, node status network is `aetheris-local-1`, validator set size matches profile, REST and gRPC are reachable. | `docs/observability.md`, `tests/e2e/query_surface_smoke.ps1` |
-| Query block | `build\aetherisd.exe query block --node $NODE --output json` | Output contains a latest block height/header. | `tests/e2e/prototype_acceptance.ps1`, `tests/e2e/query_surface_smoke.ps1` |
-| Bank send | `build\aetherisd.exe tx bank send $FROM $NODE1 1000naet --from $FROM --home $HOME --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json`; then `query bank balance $NODE1 naet` | Tx commits with `code = 0`; node1 `naet` balance increases by `1000`. | `tests/e2e/prototype_acceptance.ps1`, `tests/e2e/native_token_smoke.ps1`, `tests/e2e/localnet_smoke.ps1` |
+| Wait height and health | `.\scripts\localnet\health.ps1 -ValidatorCount 3`; `Invoke-RestMethod http://127.0.0.1:26657/status` | Height is increasing, node status network is `aetra-local-1`, validator set size matches profile, REST and gRPC are reachable. | `docs/observability.md`, `tests/e2e/query_surface_smoke.ps1` |
+| Query block | `build\aetrad.exe query block --node $NODE --output json` | Output contains a latest block height/header. | `tests/e2e/prototype_acceptance.ps1`, `tests/e2e/query_surface_smoke.ps1` |
+| Bank send | `build\aetrad.exe tx bank send $FROM $NODE1 1000naet --from $FROM --home $HOME --chain-id $CHAIN_ID --keyring-backend $KEYRING --fees $FEES --yes --broadcast-mode sync --node $NODE --output json`; then `query bank balance $NODE1 naet` | Tx commits with `code = 0`; node1 `naet` balance increases by `1000`. | `tests/e2e/prototype_acceptance.ps1`, `tests/e2e/native_token_smoke.ps1`, `tests/e2e/localnet_smoke.ps1` |
 | Tokenfactory create/mint/query | `tx tokenfactory create-denom gold`; `$GOLD = "factory/$NODE0/gold"`; `query tokenfactory denom $GOLD`; `tx tokenfactory mint "1000000$GOLD" $NODE0`; `query bank balance $NODE0 $GOLD` | Factory denom admin is node0, mint succeeds, bank balance and supply reflect minted amount. | `tests/e2e/prototype_acceptance.ps1`, `tests/e2e/tokenfactory_smoke.ps1`, `tests/e2e/query_surface_smoke.ps1`, `x/tokenfactory/keeper/msg_server_test.go` |
 | Tokenfactory burn/change-admin | `tx tokenfactory burn "1000$GOLD" $NODE0`; `tx tokenfactory change-admin $GOLD $NODE1`; `query tokenfactory denom $GOLD` | Burn by current admin from own address succeeds; admin changes to node1; old admin mint/burn is rejected and new admin mint succeeds. | `docs/tokenfactory-lifecycle.md`, `tests/e2e/tokenfactory_smoke.ps1`, `x/tokenfactory/keeper/msg_server_test.go` |
 | Fees wrong-denom rejection | `tx bank send $FROM $NODE1 1naet ... --fees 1000testtoken --output json` | Tx is rejected with `fee denom testtoken not accepted; use naet`; no state change. | `docs/fees-ante-policy.md`, `x/fees/keeper/ante_test.go`, `tests/e2e/fees_ante_smoke.ps1`, `tests/e2e/prototype_acceptance.ps1` |
@@ -125,7 +125,7 @@ Critical or High audit findings block the prototype unless fixed, regression-tes
 
 MUST FIX before declaring the prototype working:
 
-- `aetherisd` does not build or cannot report version metadata.
+- `aetrad` does not build or cannot report version metadata.
 - Genesis validation fails or nodes in one localnet have different genesis hashes.
 - 3-validator localnet cannot produce blocks, form peers, or expose RPC/gRPC/REST health.
 - Bank, fees, tokenfactory create/mint/query, DEX create/swap/query, or PoS delegation flow fails in the 3-validator acceptance suite.
@@ -172,7 +172,7 @@ Required local checks:
 go test ./...
 go vet ./...
 buf lint
-go build -o build\aetherisd.exe ./cmd/l1d
+go build -o build\aetrad.exe ./cmd/l1d
 .\tests\e2e\prototype_acceptance.ps1
 .\scripts\security\prototype-audit.ps1 -Profile Fast
 ```

@@ -9,7 +9,7 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/cosmos/cosmos-sdk/x/tx/signing"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 func NewTxConfig(appCodec codec.Codec, bankKeeper bankkeeper.BaseKeeper) client.TxConfig {
@@ -19,8 +19,8 @@ func NewTxConfig(appCodec codec.Codec, bankKeeper bankkeeper.BaseKeeper) client.
 		authtx.ConfigOptions{
 			EnabledSignModes: enabledSignModes,
 			SigningOptions: &signing.Options{
-				AddressCodec:          aetherisaddress.Codec{},
-				ValidatorAddressCodec: aetherisaddress.Codec{},
+				AddressCodec:          aetraaddress.Codec{},
+				ValidatorAddressCodec: aetraaddress.Codec{},
 			},
 			TextualCoinMetadataQueryFn: txmodule.NewBankKeeperCoinMetadataQueryFn(bankKeeper),
 		},

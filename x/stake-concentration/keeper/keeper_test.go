@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	stakeconcentrationkeeper "github.com/sovereign-l1/l1/x/stake-concentration/keeper"
 	"github.com/sovereign-l1/l1/x/stake-concentration/types"
 )
@@ -140,7 +140,7 @@ func TestOverflowVotingPowerRejected(t *testing.T) {
 }
 
 func operator(fill byte) string {
-	return aetherisaddress.FormatAccAddress(sdk.AccAddress(bytes20(fill)))
+	return aetraaddress.FormatAccAddress(sdk.AccAddress(bytes20(fill)))
 }
 
 func bytes20(fill byte) []byte {

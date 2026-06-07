@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	ComponentLayerCore      ComponentLayer = "aether_core"
+	ComponentLayerCore      ComponentLayer = "aetra_core"
 	ComponentLayerRouter    ComponentLayer = "avm_execution_router"
 	ComponentLayerEngine    ComponentLayer = "execution_engines"
 	ComponentLayerBackend   ComponentLayer = "contract_backends"
 	ComponentLayerZoneState ComponentLayer = "zone_state"
 
-	ComponentAetherCore     ComponentID = "aether_core"
+	ComponentAetraCore      ComponentID = "aetra_core"
 	ComponentAVMRouter      ComponentID = "avm_execution_router"
 	ComponentSyncEngine     ComponentID = "sync_engine"
 	ComponentAsyncEngine    ComponentID = "async_engine"
@@ -74,7 +74,7 @@ type AVMComponentMap struct {
 func DefaultAVMComponentMap() AVMComponentMap {
 	components := []AVMComponent{
 		{
-			ID:    ComponentAetherCore,
+			ID:    ComponentAetraCore,
 			Layer: ComponentLayerCore,
 			Capabilities: []string{
 				ComponentCapabilityBlockLifecycle,
@@ -148,7 +148,7 @@ func DefaultAVMComponentMap() AVMComponentMap {
 		},
 	}
 	edges := []AVMComponentEdge{
-		{From: ComponentAetherCore, To: ComponentAVMRouter},
+		{From: ComponentAetraCore, To: ComponentAVMRouter},
 		{From: ComponentAVMRouter, To: ComponentSyncEngine},
 		{From: ComponentAVMRouter, To: ComponentAsyncEngine},
 		{From: ComponentAVMRouter, To: ComponentActorRuntime},
@@ -300,7 +300,7 @@ func IsAVMComponentLayer(layer ComponentLayer) bool {
 func ComputeAVMComponentMapRoot(componentMap AVMComponentMap) string {
 	componentMap = CanonicalAVMComponentMap(componentMap)
 	h := sha256.New()
-	writeComponentPart(h, "aetheris-avm-component-map-v1")
+	writeComponentPart(h, "aetra-avm-component-map-v1")
 	writeComponentUint64(h, uint64(len(componentMap.Components)))
 	for _, component := range componentMap.Components {
 		writeComponentPart(h, string(component.ID))
@@ -320,7 +320,7 @@ func ComputeAVMComponentMapRoot(componentMap AVMComponentMap) string {
 
 func validateRequiredComponents(components map[ComponentID]AVMComponent) error {
 	required := map[ComponentID][]string{
-		ComponentAetherCore:     {ComponentCapabilityConsensus, ComponentCapabilityBlockLifecycle, ComponentCapabilityGlobalRoots, ComponentCapabilityZoneRegistry},
+		ComponentAetraCore:      {ComponentCapabilityConsensus, ComponentCapabilityBlockLifecycle, ComponentCapabilityGlobalRoots, ComponentCapabilityZoneRegistry},
 		ComponentAVMRouter:      {ComponentCapabilityRouteMessages, ComponentCapabilityClassifyZone, ComponentCapabilityValidateBudget, ComponentCapabilityDispatch},
 		ComponentSyncEngine:     {ComponentCapabilityMsgServer, ComponentCapabilityKeeperCalls},
 		ComponentAsyncEngine:    {ComponentCapabilityQueues, ComponentCapabilityScheduling},
@@ -346,7 +346,7 @@ func validateRequiredComponents(components map[ComponentID]AVMComponent) error {
 
 func validateRequiredEdges(edges map[string]struct{}) error {
 	required := []AVMComponentEdge{
-		{From: ComponentAetherCore, To: ComponentAVMRouter},
+		{From: ComponentAetraCore, To: ComponentAVMRouter},
 		{From: ComponentAVMRouter, To: ComponentSyncEngine},
 		{From: ComponentAVMRouter, To: ComponentAsyncEngine},
 		{From: ComponentAVMRouter, To: ComponentActorRuntime},

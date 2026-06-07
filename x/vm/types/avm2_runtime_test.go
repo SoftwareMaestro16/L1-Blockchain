@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	zonestypes "github.com/sovereign-l1/l1/x/zones/types"
 )
 
@@ -158,7 +158,7 @@ func mustAVM2RuntimeInput(t *testing.T, instructions []AVM2Instruction, entries 
 	state := mustAVM2StoreAdapter(t, "contract-a", entries)
 	msg := mustAVM2RuntimeMessage(t, "contract-a")
 	ctx := AVM2ExecutionContext{
-		ChainID:         "aetheris-local",
+		ChainID:         "aetra-local",
 		Height:          12,
 		ZoneID:          zonestypes.ZoneID("CONTRACT_ZONE"),
 		ShardID:         1,
@@ -180,7 +180,7 @@ func mustAVM2RuntimeInput(t *testing.T, instructions []AVM2Instruction, entries 
 func mustAVM2RuntimeMessage(t *testing.T, destination string) AVMAsyncMessage {
 	t.Helper()
 	msg, err := NewAVMAsyncMessage(AVMAsyncMessage{
-		ChainID:         "aetheris-local",
+		ChainID:         "aetra-local",
 		Source:          "caller-a",
 		Destination:     destination,
 		Payload:         []byte("execute"),

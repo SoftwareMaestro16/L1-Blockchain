@@ -29,7 +29,7 @@ Full/manual profile:
 Use an already-built binary:
 
 ```powershell
-.\tests\e2e\prototype_acceptance.ps1 -SkipBuild -Binary build\aetherisd.exe
+.\tests\e2e\prototype_acceptance.ps1 -SkipBuild -Binary build\aetrad.exe
 ```
 
 Shift ports or choose a specific node endpoint:
@@ -45,7 +45,7 @@ Shift ports or choose a specific node endpoint:
 - `-MinHeight`: first required block height before tx flows start.
 - `-TimeoutSeconds`: shared wait timeout for startup, tx inclusion, and health checks.
 - `-OutputDir`: ignored localnet directory, default `.localnet`.
-- `-Binary`: binary path, default `build\aetherisd.exe`.
+- `-Binary`: binary path, default `build\aetrad.exe`.
 - `-SkipBuild`: reuse an existing binary instead of running `go build`.
 - `-Node`: CLI RPC endpoint; defaults to node0 from the port profile.
 - `-KeepLogsOnFailure`: preserve the localnet output directory after a failure. A diagnostic bundle is collected either way.
@@ -54,7 +54,7 @@ Shift ports or choose a specific node endpoint:
 
 `Smoke` runs these steps on one fresh localnet:
 
-1. Build `aetherisd` unless `-SkipBuild` is set.
+1. Build `aetrad` unless `-SkipBuild` is set.
 2. Stop any previous matching localnet processes.
 3. Reset/init localnet through `scripts\localnet\init.ps1`.
 4. Validate genesis through `scripts\localnet\validate-genesis.ps1`.

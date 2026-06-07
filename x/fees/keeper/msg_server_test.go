@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	l1testutil "github.com/sovereign-l1/l1/tests/testutil"
 	feeskeeper "github.com/sovereign-l1/l1/x/fees/keeper"
 	"github.com/sovereign-l1/l1/x/fees/types"
@@ -60,7 +60,7 @@ func TestUpdateParamsRejectsZeroAuthority(t *testing.T) {
 	msgServer := feeskeeper.NewMsgServerImpl(app.FeesKeeper)
 
 	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
-		Authority: aetherisaddress.ZeroRawAddress,
+		Authority: aetraaddress.ZeroRawAddress,
 		Params:    types.DefaultParams(),
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorized)

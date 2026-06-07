@@ -157,9 +157,9 @@ The next production-hardening test additions are:
 The localnet acceptance path is:
 
 ```powershell
-.\scripts\build-aetherisd.ps1
-.\tests\e2e\pos_smoke.ps1 -Binary .\build\aetherisd.exe
-.\tests\e2e\pos_smoke.ps1 -Binary .\build\aetherisd.exe -OutputDir .localnet-5 -ValidatorCount 5
+.\scripts\build-aetrad.ps1
+.\tests\e2e\pos_smoke.ps1 -Binary .\build\aetrad.exe
+.\tests\e2e\pos_smoke.ps1 -Binary .\build\aetrad.exe -OutputDir .localnet-5 -ValidatorCount 5
 ```
 
 `tests/e2e/pos_smoke.ps1` validates a 3-validator local network by default and

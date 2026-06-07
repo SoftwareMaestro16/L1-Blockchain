@@ -5,11 +5,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestSDKServiceCallBuilderProducesEnvelopeRoutingAndSchema(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 50}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 50}
 	descriptor := testInterfaceSystemDescriptor()
 
 	result, err := BuildSDKServiceCall(SDKServiceCallBuildRequest{
@@ -34,7 +34,7 @@ func TestSDKServiceCallBuilderProducesEnvelopeRoutingAndSchema(t *testing.T) {
 }
 
 func TestServiceCallAnteValidationRejectsReplayAndUnknownRetry(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 50}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 50}
 	descriptor := testInterfaceSystemDescriptor()
 	index, err := NewServiceCallReplayIndex(20)
 	require.NoError(t, err)
@@ -61,7 +61,7 @@ func TestServiceCallAnteValidationRejectsReplayAndUnknownRetry(t *testing.T) {
 }
 
 func TestReceiptAnchoringAndCallProofQuery(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 60}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 60}
 	descriptor := testInterfaceSystemDescriptor()
 	index, err := NewServiceCallReplayIndex(30)
 	require.NoError(t, err)

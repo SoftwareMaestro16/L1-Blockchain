@@ -8,7 +8,7 @@ The package is a prerelease/testnet artifact. It is not a mainnet-ready release 
 
 Each package produced by `scripts\release\prototype-package.ps1` contains:
 
-- `bin/aetherisd` or `bin/aetherisd.exe`
+- `bin/aetrad` or `bin/aetrad.exe`
 - `release-manifest.json`
 - `QUICKSTART.md`
 - `RELEASE-NOTES.md`
@@ -51,7 +51,7 @@ buf lint
 Reuse an existing binary:
 
 ```powershell
-.\scripts\release\prototype-package.ps1 -Version prototype-local -SkipBuild -Binary build\aetherisd.exe -AllowDirty
+.\scripts\release\prototype-package.ps1 -Version prototype-local -SkipBuild -Binary build\aetrad.exe -AllowDirty
 ```
 
 Attach sanitized evidence:

@@ -160,7 +160,7 @@ func (metric ServiceObservabilityMetric) ValidateFormat() error {
 
 func ComputeServiceObservabilityMetricHash(metric ServiceObservabilityMetric) string {
 	return servicesHashParts(
-		"aetheris-services-observability-metric-v1",
+		"aetra-services-observability-metric-v1",
 		string(metric.MetricID),
 		string(metric.Category),
 		string(metric.Unit),
@@ -172,7 +172,7 @@ func ComputeServiceObservabilityMetricHash(metric ServiceObservabilityMetric) st
 func ComputeServiceObservabilityMetricsManifestHash(manifest ServiceObservabilityMetricsManifest) string {
 	manifest.Metrics = canonicalServiceObservabilityMetrics(manifest.Metrics)
 	parts := []string{
-		"aetheris-services-observability-manifest-v1",
+		"aetra-services-observability-manifest-v1",
 		fmt.Sprint(len(manifest.Metrics)),
 	}
 	for _, metric := range manifest.Metrics {

@@ -77,7 +77,7 @@ func (h *VoteExtensionHandler) VerifyVoteExtension() sdk.VerifyVoteExtensionHand
 
 func deterministicVoteExtensionData(height int64, hash []byte) []byte {
 	data := make([]byte, 0, len(hash)+32)
-	data = append(data, []byte(fmt.Sprintf("aetheris-test-vote-extension:%d:", height))...)
+	data = append(data, []byte(fmt.Sprintf("aetra-test-vote-extension:%d:", height))...)
 	data = append(data, hash...)
 	return data
 }

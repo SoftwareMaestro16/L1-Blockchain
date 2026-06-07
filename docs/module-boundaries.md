@@ -245,7 +245,7 @@ Security invariants:
 - Source and destination reject zero address.
 - Value and forwarding fees are native `naet`.
 - Bounce, expiry, and refund/no-double-spend behavior must match
-  `x/aetherisvm/async`.
+  `x/aetravm/async`.
 - Outgoing messages are bounded by async message body, gas, and queue limits.
 
 ## `x/queue`
@@ -571,7 +571,7 @@ Security invariants:
 - Reputation must not bypass signer checks, sequence replay protection,
   zero-address rejection, `naet` fee validation, or module authorization.
 
-## `x/aetherisvm/standards`
+## `x/aetravm/standards`
 
 Purpose: define Aetra-native contract standards before the VM runtime is
 wired into the app. Standards are VM-independent executable specifications with
@@ -604,7 +604,7 @@ Security invariants:
 - Wallet `seqno`, `wallet_id`, `valid_until`, signature, extension auth, and
   native-only fee rules must fail before state mutation.
 
-## `x/aetherisvm/async`
+## `x/aetravm/async`
 
 Purpose: define deterministic asynchronous contract message semantics before
 keeper and VM runtime wiring.
@@ -640,7 +640,7 @@ Security invariants:
   metrics exactly, including `next_sequence`, `next_tx_index`, logical time,
   and ordering metadata.
 
-## `x/aetherisvm/avm`
+## `x/aetravm/avm`
 
 Purpose: define the native Aetra Virtual Machine before keeper and runtime
 wiring.

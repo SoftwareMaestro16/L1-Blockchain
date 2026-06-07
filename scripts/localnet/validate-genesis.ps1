@@ -1,7 +1,7 @@
 param(
   [string]$OutputDir = "",
   [string]$Binary = "",
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [int]$ValidatorCount = 3,
   [int]$BaseP2PPort = 26656,
   [int]$BaseRPCPort = 26657,
@@ -22,7 +22,7 @@ $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "common.ps1")
 
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "localnet output directory"
 if ($ValidatorCount -lt 1) { throw "ValidatorCount must be at least 1" }
 Assert-LocalnetProfile -Profile $Profile
@@ -59,7 +59,7 @@ $expectedNativeAmount = "500000000"
 $expectedSelfDelegation = "100000000"
 
 foreach ($node in $nodes) {
-  $nodeHome = Join-Path $node.FullName "aetherisd"
+  $nodeHome = Join-Path $node.FullName "aetrad"
   $genesisPath = Join-Path $nodeHome "config\genesis.json"
   $configToml = Join-Path $nodeHome "config\config.toml"
   $appToml = Join-Path $nodeHome "config\app.toml"

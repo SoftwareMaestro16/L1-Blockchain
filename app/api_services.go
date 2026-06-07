@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 func (app *L1App) AutoCliOpts() autocli.AppOptions {
@@ -30,9 +30,9 @@ func (app *L1App) AutoCliOpts() autocli.AppOptions {
 	return autocli.AppOptions{
 		Modules:               modules,
 		ModuleOptions:         runtimeservices.ExtractAutoCLIOptions(app.ModuleManager.Modules),
-		AddressCodec:          aetherisaddress.Codec{},
-		ValidatorAddressCodec: aetherisaddress.Codec{},
-		ConsensusAddressCodec: aetherisaddress.Codec{},
+		AddressCodec:          aetraaddress.Codec{},
+		ValidatorAddressCodec: aetraaddress.Codec{},
+		ConsensusAddressCodec: aetraaddress.Codec{},
 	}
 }
 

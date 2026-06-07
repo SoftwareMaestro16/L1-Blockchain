@@ -604,7 +604,7 @@ func IsAVMContractProofKind(kind AVMContractProofKind) bool {
 func ComputeAVMContractBackendInterfaceHash(i AVMContractBackendInterface) string {
 	i = canonicalAVMContractBackendInterface(i)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-backend-interface-v1")
+	writeEnginePart(h, "aetra-avm-contract-backend-interface-v1")
 	writeEnginePart(h, i.Name)
 	writeEnginePart(h, string(i.BackendKind))
 	writeEnginePart(h, string(i.RouterBackend))
@@ -619,7 +619,7 @@ func ComputeAVMContractBackendInterfaceHash(i AVMContractBackendInterface) strin
 func ComputeAVMNativeModuleAdapterHash(a AVMNativeModuleAdapter) string {
 	a = canonicalAVMNativeModuleAdapter(a)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-native-module-adapter-v1")
+	writeEnginePart(h, "aetra-avm-native-module-adapter-v1")
 	writeEnginePart(h, a.Interface.BackendInterfaceHash)
 	writeEnginePart(h, a.Descriptor.DescriptorHash)
 	return hex.EncodeToString(h.Sum(nil))
@@ -628,7 +628,7 @@ func ComputeAVMNativeModuleAdapterHash(a AVMNativeModuleAdapter) string {
 func ComputeAVMWASMAdapterBoundaryHash(b AVMWASMAdapterBoundary) string {
 	b = canonicalAVMWASMAdapterBoundary(b)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-wasm-adapter-boundary-v1")
+	writeEnginePart(h, "aetra-avm-wasm-adapter-boundary-v1")
 	writeEnginePart(h, b.Interface.BackendInterfaceHash)
 	writeEnginePart(h, b.SandboxPolicy.SandboxPolicyHash)
 	return hex.EncodeToString(h.Sum(nil))
@@ -637,7 +637,7 @@ func ComputeAVMWASMAdapterBoundaryHash(b AVMWASMAdapterBoundary) string {
 func ComputeAVMActorContractStateHash(s AVMActorContractState) string {
 	s = canonicalAVMActorContractState(s)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-actor-contract-state-v1")
+	writeEnginePart(h, "aetra-avm-actor-contract-state-v1")
 	writeEnginePart(h, s.ActorID)
 	writeEngineUint64(h, s.CodeID)
 	writeEnginePart(h, s.Owner)
@@ -652,7 +652,7 @@ func ComputeAVMActorContractStateHash(s AVMActorContractState) string {
 func ComputeAVMActorContractExecutionHash(e AVMActorContractExecution) string {
 	e = canonicalAVMActorContractExecution(e)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-actor-contract-execution-v1")
+	writeEnginePart(h, "aetra-avm-actor-contract-execution-v1")
 	writeEnginePart(h, e.Actor.StateHash)
 	writeEnginePart(h, e.Message.ID)
 	writeEngineUint64(h, uint64(e.ActiveMessageCount))
@@ -682,7 +682,7 @@ func ComputeAVMActorContractExecutionHash(e AVMActorContractExecution) string {
 func ComputeAVMContractCodeRecordHash(r AVMContractCodeRegistryRecord) string {
 	r = canonicalAVMContractCodeRegistryRecord(r)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-code-record-v1")
+	writeEnginePart(h, "aetra-avm-contract-code-record-v1")
 	writeEngineUint64(h, r.CodeID)
 	writeEnginePart(h, string(r.BackendKind))
 	writeEnginePart(h, r.CodeHash)
@@ -696,7 +696,7 @@ func ComputeAVMContractCodeRecordHash(r AVMContractCodeRegistryRecord) string {
 func ComputeAVMContractCodeRegistryRoot(r AVMContractCodeRegistry) string {
 	r = canonicalAVMContractCodeRegistry(r)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-code-registry-v1")
+	writeEnginePart(h, "aetra-avm-contract-code-registry-v1")
 	writeEngineUint64(h, uint64(len(r.Codes)))
 	for _, code := range r.Codes {
 		writeEnginePart(h, code.RecordHash)
@@ -707,7 +707,7 @@ func ComputeAVMContractCodeRegistryRoot(r AVMContractCodeRegistry) string {
 func ComputeAVMContractInstanceRecordHash(r AVMContractInstanceRegistryRecord) string {
 	r = canonicalAVMContractInstanceRegistryRecord(r)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-instance-record-v1")
+	writeEnginePart(h, "aetra-avm-contract-instance-record-v1")
 	writeEnginePart(h, r.ContractAddress)
 	writeEngineUint64(h, r.CodeID)
 	writeEnginePart(h, string(r.BackendKind))
@@ -724,7 +724,7 @@ func ComputeAVMContractInstanceRecordHash(r AVMContractInstanceRegistryRecord) s
 func ComputeAVMContractInstanceRegistryRoot(r AVMContractInstanceRegistry) string {
 	r = canonicalAVMContractInstanceRegistry(r)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-instance-registry-v1")
+	writeEnginePart(h, "aetra-avm-contract-instance-registry-v1")
 	writeEngineUint64(h, uint64(len(r.Instances)))
 	for _, instance := range r.Instances {
 		writeEnginePart(h, instance.RecordHash)
@@ -735,7 +735,7 @@ func ComputeAVMContractInstanceRegistryRoot(r AVMContractInstanceRegistry) strin
 func ComputeAVMContractStoragePrefixHash(p AVMContractStoragePrefixDescriptor) string {
 	p = canonicalAVMContractStoragePrefixDescriptor(p)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-storage-prefix-v1")
+	writeEnginePart(h, "aetra-avm-contract-storage-prefix-v1")
 	writeEnginePart(h, p.ContractAddress)
 	writeEnginePart(h, p.Prefix)
 	writeEnginePart(h, p.StorageRoot)
@@ -749,7 +749,7 @@ func ComputeAVMContractReceiptRoot(receipts []AVMExecutionReceipt) string {
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].ReceiptID < out[j].ReceiptID })
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-receipts-v1")
+	writeEnginePart(h, "aetra-avm-contract-receipts-v1")
 	writeEngineUint64(h, uint64(len(out)))
 	for _, receipt := range out {
 		writeEnginePart(h, receipt.ReceiptHash)
@@ -760,7 +760,7 @@ func ComputeAVMContractReceiptRoot(receipts []AVMExecutionReceipt) string {
 func ComputeAVMContractProofHash(p AVMContractProof) string {
 	p = canonicalAVMContractProof(p)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-proof-v1")
+	writeEnginePart(h, "aetra-avm-contract-proof-v1")
 	writeEnginePart(h, string(p.Kind))
 	writeEnginePart(h, p.QueryKey)
 	writeEnginePart(h, p.Root)

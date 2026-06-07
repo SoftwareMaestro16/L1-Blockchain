@@ -293,15 +293,15 @@ func (b AetherBounceEnvelope) Validate() error {
 
 func ComputeAetherRetryStateHash(state AetherRetryState) string {
 	state = normalizeAetherRetryState(state)
-	return hashParts("aetheris-aether-retry-state-v1", state.MsgID, fmt.Sprint(state.RetryCount), state.ForwardingFeeEscrow.String(), fmt.Sprint(state.LastAttemptHeight))
+	return hashParts("aetra-aether-retry-state-v1", state.MsgID, fmt.Sprint(state.RetryCount), state.ForwardingFeeEscrow.String(), fmt.Sprint(state.LastAttemptHeight))
 }
 
 func ComputeAetherRetryDecisionHash(decision AetherRetryDecision) string {
-	return hashParts("aetheris-aether-retry-decision-v1", string(decision.Kind), decision.MsgID, string(decision.FailureKind), fmt.Sprint(decision.NextEligibleHeight), fmt.Sprint(decision.RetryCount), decision.FeeCharged.String(), decision.RemainingFeeEscrow.String())
+	return hashParts("aetra-aether-retry-decision-v1", string(decision.Kind), decision.MsgID, string(decision.FailureKind), fmt.Sprint(decision.NextEligibleHeight), fmt.Sprint(decision.RetryCount), decision.FeeCharged.String(), decision.RemainingFeeEscrow.String())
 }
 
 func ComputeAetherBounceHash(bounce AetherBounceEnvelope) string {
-	return hashParts("aetheris-aether-bounce-v1", bounce.OriginalMsgID, bounce.BounceMsg.MsgID, bounce.RemainingValueNAET.String(), bounce.RemainingFee.String())
+	return hashParts("aetra-aether-bounce-v1", bounce.OriginalMsgID, bounce.BounceMsg.MsgID, bounce.RemainingValueNAET.String(), bounce.RemainingFee.String())
 }
 
 func IsAetherFailureKind(kind AetherFailureKind) bool {

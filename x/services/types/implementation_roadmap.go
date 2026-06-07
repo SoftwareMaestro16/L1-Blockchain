@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ServiceRoadmapPhaseID string
@@ -76,7 +76,7 @@ const (
 	ServiceRoadmapTaskImplementServiceReceiptsModule  ServiceRoadmapTaskID = "implement_x_servicereceipts"
 	ServiceRoadmapTaskImplementServicesModule         ServiceRoadmapTaskID = "implement_x_services"
 	ServiceRoadmapTaskIntegrateBankFinancialZone      ServiceRoadmapTaskID = "integrate_with_bank_or_financial_zone"
-	ServiceRoadmapTaskMapExistingModules              ServiceRoadmapTaskID = "map_existing_aetheris_modules_to_on_chain_services"
+	ServiceRoadmapTaskMapExistingModules              ServiceRoadmapTaskID = "map_existing_aetra_modules_to_on_chain_services"
 
 	ServiceRoadmapExitClientsFetchVerifyInterfaces ServiceRoadmapExitCriterionID = "clients_can_fetch_and_verify_formal_service_interfaces"
 	ServiceRoadmapExitCallsRequireSettlePayments   ServiceRoadmapExitCriterionID = "calls_can_require_and_settle_service_payments"
@@ -656,7 +656,7 @@ func (mapping AetraModuleServiceMapping) Validate() error {
 func ComputeServiceImplementationRoadmapHash(roadmap ServiceImplementationRoadmap) string {
 	phases := cloneServiceRoadmapPhases(roadmap.Phases)
 	sortServiceRoadmapPhases(phases)
-	parts := []string{"aetheris-services-implementation-roadmap-v1", fmt.Sprint(len(phases))}
+	parts := []string{"aetra-services-implementation-roadmap-v1", fmt.Sprint(len(phases))}
 	for _, phase := range phases {
 		parts = append(parts, phase.PhaseHash)
 	}
@@ -665,7 +665,7 @@ func ComputeServiceImplementationRoadmapHash(roadmap ServiceImplementationRoadma
 
 func ComputeServiceRoadmapPhaseHash(phase ServiceRoadmapPhase) string {
 	phase = canonicalServiceRoadmapPhase(phase)
-	parts := []string{"aetheris-services-roadmap-phase-v1", string(phase.PhaseID), phase.Title}
+	parts := []string{"aetra-services-roadmap-phase-v1", string(phase.PhaseID), phase.Title}
 	for _, task := range phase.Tasks {
 		parts = append(parts, "task", task.TaskHash)
 	}
@@ -688,23 +688,23 @@ func ComputeServiceRoadmapPhaseHash(phase ServiceRoadmapPhase) string {
 }
 
 func ComputeServiceRoadmapTaskHash(task ServiceRoadmapTask) string {
-	return servicesHashParts("aetheris-services-roadmap-task-v1", string(task.TaskID), task.Module, task.Artifact)
+	return servicesHashParts("aetra-services-roadmap-task-v1", string(task.TaskID), task.Module, task.Artifact)
 }
 
 func ComputeServiceRoadmapExitCriterionHash(criterion ServiceRoadmapExitCriterion) string {
-	return servicesHashParts("aetheris-services-roadmap-exit-v1", string(criterion.CriterionID), criterion.Evidence, fmt.Sprint(criterion.Met))
+	return servicesHashParts("aetra-services-roadmap-exit-v1", string(criterion.CriterionID), criterion.Evidence, fmt.Sprint(criterion.Met))
 }
 
 func ComputeServiceCoreObjectDefinitionHash(definition ServiceCoreObjectDefinition) string {
-	return servicesHashParts("aetheris-services-roadmap-core-object-v1", definition.ObjectName, definition.ProtobufType, definition.CanonicalHash)
+	return servicesHashParts("aetra-services-roadmap-core-object-v1", definition.ObjectName, definition.ProtobufType, definition.CanonicalHash)
 }
 
 func ComputeServiceSignableObjectVectorHash(vector ServiceSignableObjectVector) string {
-	return servicesHashParts("aetheris-services-roadmap-signable-vector-v1", vector.ObjectName, vector.CanonicalEncoding, vector.TestVectorHash)
+	return servicesHashParts("aetra-services-roadmap-signable-vector-v1", vector.ObjectName, vector.CanonicalEncoding, vector.TestVectorHash)
 }
 
 func ComputeAetraModuleServiceMappingHash(mapping AetraModuleServiceMapping) string {
-	return servicesHashParts("aetheris-services-roadmap-module-mapping-v1", mapping.ModuleName, mapping.ModulePath, mapping.ServiceID, mapping.InterfaceHash, mapping.DescriptorHash, fmt.Sprint(mapping.OnChain))
+	return servicesHashParts("aetra-services-roadmap-module-mapping-v1", mapping.ModuleName, mapping.ModulePath, mapping.ServiceID, mapping.InterfaceHash, mapping.DescriptorHash, fmt.Sprint(mapping.OnChain))
 }
 
 func IsServiceRoadmapPhaseID(phaseID ServiceRoadmapPhaseID) bool {
@@ -789,8 +789,8 @@ func newAetraModuleServiceMapping(moduleName, modulePath, serviceID string, onCh
 		ModuleName:     moduleName,
 		ModulePath:     modulePath,
 		ServiceID:      serviceID,
-		InterfaceHash:  servicesHashParts("aetheris-services-roadmap-interface-v1", moduleName, modulePath),
-		DescriptorHash: servicesHashParts("aetheris-services-roadmap-descriptor-v1", moduleName, serviceID),
+		InterfaceHash:  servicesHashParts("aetra-services-roadmap-interface-v1", moduleName, modulePath),
+		DescriptorHash: servicesHashParts("aetra-services-roadmap-descriptor-v1", moduleName, serviceID),
 		OnChain:        onChain,
 	}
 	mapping.MappingHash = ComputeAetraModuleServiceMappingHash(mapping)
@@ -799,11 +799,11 @@ func newAetraModuleServiceMapping(moduleName, modulePath, serviceID string, onCh
 
 func defaultServiceCoreObjectDefinitions() []ServiceCoreObjectDefinition {
 	return []ServiceCoreObjectDefinition{
-		newServiceCoreObjectDefinition("PaymentEnvelope", "aetheris.services.v1.PaymentEnvelope", servicesHashParts("roadmap/core/payment-envelope")),
-		newServiceCoreObjectDefinition("ServiceCallEnvelope", "aetheris.services.v1.ServiceCallEnvelope", servicesHashParts("roadmap/core/service-call-envelope")),
-		newServiceCoreObjectDefinition("ServiceDescriptor", "aetheris.services.v1.ServiceDescriptor", servicesHashParts("roadmap/core/service-descriptor")),
-		newServiceCoreObjectDefinition("ServiceInterface", "aetheris.services.v1.ServiceInterface", servicesHashParts("roadmap/core/service-interface")),
-		newServiceCoreObjectDefinition("ServiceReceipt", "aetheris.services.v1.ServiceReceipt", servicesHashParts("roadmap/core/service-receipt")),
+		newServiceCoreObjectDefinition("PaymentEnvelope", "aetra.services.v1.PaymentEnvelope", servicesHashParts("roadmap/core/payment-envelope")),
+		newServiceCoreObjectDefinition("ServiceCallEnvelope", "aetra.services.v1.ServiceCallEnvelope", servicesHashParts("roadmap/core/service-call-envelope")),
+		newServiceCoreObjectDefinition("ServiceDescriptor", "aetra.services.v1.ServiceDescriptor", servicesHashParts("roadmap/core/service-descriptor")),
+		newServiceCoreObjectDefinition("ServiceInterface", "aetra.services.v1.ServiceInterface", servicesHashParts("roadmap/core/service-interface")),
+		newServiceCoreObjectDefinition("ServiceReceipt", "aetra.services.v1.ServiceReceipt", servicesHashParts("roadmap/core/service-receipt")),
 	}
 }
 
@@ -819,7 +819,7 @@ func defaultServiceSignableObjectVectors() []ServiceSignableObjectVector {
 
 func defaultAetraModuleServiceMappings() []AetraModuleServiceMapping {
 	return []AetraModuleServiceMapping{
-		newAetraModuleServiceMapping("aethercore", "x/aethercore", "aethercore-service", true),
+		newAetraModuleServiceMapping("aetracore", "x/aetracore", "aetracore-service", true),
 		newAetraModuleServiceMapping("avm-dex-contract", "avm-dex-contract", "avm-dex-contract-service", true),
 		newAetraModuleServiceMapping("fees", "x/fees", "fees-service", true),
 		newAetraModuleServiceMapping("identity", "x/identity", "identity-service", true),

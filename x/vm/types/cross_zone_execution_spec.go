@@ -91,7 +91,7 @@ type AVMCrossZoneZoneRoots struct {
 	CrossZoneRootHash    string
 }
 
-type AVMAetherCoreZoneCommitmentSet struct {
+type AVMAetraCoreZoneCommitmentSet struct {
 	Height    uint64
 	ZoneRoots []AVMZoneStateRoot
 	CoreRoot  string
@@ -202,9 +202,9 @@ func NewAVMCrossZoneZoneRoots(roots AVMCrossZoneZoneRoots) (AVMCrossZoneZoneRoot
 	return roots, roots.Validate()
 }
 
-func NewAVMAetherCoreZoneCommitmentSet(set AVMAetherCoreZoneCommitmentSet) (AVMAetherCoreZoneCommitmentSet, error) {
-	set = canonicalAVMAetherCoreZoneCommitmentSet(set)
-	set.CoreRoot = ComputeAVMAetherCoreZoneCommitmentRoot(set)
+func NewAVMAetraCoreZoneCommitmentSet(set AVMAetraCoreZoneCommitmentSet) (AVMAetraCoreZoneCommitmentSet, error) {
+	set = canonicalAVMAetraCoreZoneCommitmentSet(set)
+	set.CoreRoot = ComputeAVMAetraCoreZoneCommitmentRoot(set)
 	return set, set.Validate()
 }
 
@@ -549,8 +549,8 @@ func (r AVMCrossZoneZoneRoots) Validate() error {
 	return nil
 }
 
-func (s AVMAetherCoreZoneCommitmentSet) Validate() error {
-	s = canonicalAVMAetherCoreZoneCommitmentSet(s)
+func (s AVMAetraCoreZoneCommitmentSet) Validate() error {
+	s = canonicalAVMAetraCoreZoneCommitmentSet(s)
 	if s.Height == 0 {
 		return errors.New("Aether core zone commitment height must be positive")
 	}
@@ -579,7 +579,7 @@ func (s AVMAetherCoreZoneCommitmentSet) Validate() error {
 	if err := zonestypes.ValidateHash("Aether core zone commitment root", s.CoreRoot); err != nil {
 		return err
 	}
-	if s.CoreRoot != ComputeAVMAetherCoreZoneCommitmentRoot(s) {
+	if s.CoreRoot != ComputeAVMAetraCoreZoneCommitmentRoot(s) {
 		return errors.New("Aether core zone commitment root mismatch")
 	}
 	return nil
@@ -851,7 +851,7 @@ func ComputeAVMZoneOutputMessageRoot(zoneID zonestypes.ZoneID, messages []AVMAsy
 	out := cloneCrossZoneMessages(messages)
 	sort.SliceStable(out, func(i, j int) bool { return out[i].ID < out[j].ID })
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cross-zone-output-messages-v1")
+	writeEnginePart(h, "aetra-avm-cross-zone-output-messages-v1")
 	writeEnginePart(h, string(zoneID))
 	writeEngineUint64(h, uint64(len(out)))
 	for _, msg := range out {
@@ -871,7 +871,7 @@ func ComputeAVMDestinationInboxRoot(zoneID zonestypes.ZoneID, entries []AVMZoneQ
 	}
 	sort.SliceStable(out, func(i, j int) bool { return compareAVMQueueEntries(out[i], out[j]) < 0 })
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cross-zone-destination-inbox-v1")
+	writeEnginePart(h, "aetra-avm-cross-zone-destination-inbox-v1")
 	writeEnginePart(h, string(zoneID))
 	writeEngineUint64(h, uint64(len(out)))
 	for _, entry := range out {
@@ -890,7 +890,7 @@ func ComputeAVMCrossZoneReceiptRoot(zoneID zonestypes.ZoneID, receipts []AVMExec
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].ReceiptID < out[j].ReceiptID })
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cross-zone-receipts-v1")
+	writeEnginePart(h, "aetra-avm-cross-zone-receipts-v1")
 	writeEnginePart(h, string(zoneID))
 	writeEngineUint64(h, uint64(len(out)))
 	for _, receipt := range out {
@@ -909,7 +909,7 @@ func ComputeAVMCrossZoneEscrowRoot(zoneID zonestypes.ZoneID, records []AVMCrossZ
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].MessageID < out[j].MessageID })
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cross-zone-escrow-root-v1")
+	writeEnginePart(h, "aetra-avm-cross-zone-escrow-root-v1")
 	writeEnginePart(h, string(zoneID))
 	writeEngineUint64(h, uint64(len(out)))
 	for _, record := range out {
@@ -926,7 +926,7 @@ func ComputeAVMCrossZoneEscrowRoot(zoneID zonestypes.ZoneID, records []AVMCrossZ
 func ComputeAVMZoneRouterRouteHash(route AVMZoneRouterRoute) string {
 	route = canonicalAVMZoneRouterRoute(route)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-zone-router-route-v1")
+	writeEnginePart(h, "aetra-avm-zone-router-route-v1")
 	writeEnginePart(h, route.RouteKey)
 	writeEnginePart(h, string(route.SourceZone))
 	writeEnginePart(h, string(route.DestinationZone))
@@ -944,7 +944,7 @@ func ComputeAVMZoneRouterRouteHash(route AVMZoneRouterRoute) string {
 func ComputeAVMZoneRouterTableRoot(table AVMZoneRouterTable) string {
 	table = canonicalAVMZoneRouterTable(table)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-zone-router-table-v1")
+	writeEnginePart(h, "aetra-avm-zone-router-table-v1")
 	writeEngineUint64(h, table.Height)
 	writeEngineUint64(h, uint64(len(table.Routes)))
 	for _, route := range table.Routes {
@@ -956,7 +956,7 @@ func ComputeAVMZoneRouterTableRoot(table AVMZoneRouterTable) string {
 func ComputeAVMCrossZoneZoneRootHash(roots AVMCrossZoneZoneRoots) string {
 	roots = canonicalAVMCrossZoneZoneRoots(roots)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cross-zone-roots-v1")
+	writeEnginePart(h, "aetra-avm-cross-zone-roots-v1")
 	writeEnginePart(h, string(roots.ZoneID))
 	writeEngineUint64(h, roots.Height)
 	writeEnginePart(h, roots.OutputMessageRoot)
@@ -966,10 +966,10 @@ func ComputeAVMCrossZoneZoneRootHash(roots AVMCrossZoneZoneRoots) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVMAetherCoreZoneCommitmentRoot(set AVMAetherCoreZoneCommitmentSet) string {
-	set = canonicalAVMAetherCoreZoneCommitmentSet(set)
+func ComputeAVMAetraCoreZoneCommitmentRoot(set AVMAetraCoreZoneCommitmentSet) string {
+	set = canonicalAVMAetraCoreZoneCommitmentSet(set)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-core-zone-commitments-v1")
+	writeEnginePart(h, "aetra-core-zone-commitments-v1")
 	writeEngineUint64(h, set.Height)
 	writeEngineUint64(h, uint64(len(set.ZoneRoots)))
 	for _, root := range set.ZoneRoots {
@@ -982,7 +982,7 @@ func ComputeAVMAetherCoreZoneCommitmentRoot(set AVMAetherCoreZoneCommitmentSet) 
 func ComputeAVMCrossZoneValueEscrowHash(record AVMCrossZoneValueEscrowRecord) string {
 	record = canonicalAVMCrossZoneValueEscrowRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cross-zone-value-escrow-v1")
+	writeEnginePart(h, "aetra-avm-cross-zone-value-escrow-v1")
 	writeEnginePart(h, record.MessageID)
 	writeEnginePart(h, string(record.SourceZone))
 	writeEnginePart(h, string(record.DestinationZone))
@@ -997,7 +997,7 @@ func ComputeAVMCrossZoneValueEscrowHash(record AVMCrossZoneValueEscrowRecord) st
 func ComputeAVMCrossZoneProofHash(proof AVMCrossZoneProof) string {
 	proof = canonicalAVMCrossZoneProof(proof)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cross-zone-proof-v1")
+	writeEnginePart(h, "aetra-avm-cross-zone-proof-v1")
 	writeEnginePart(h, string(proof.Kind))
 	writeEnginePart(h, string(proof.ZoneID))
 	writeEnginePart(h, proof.MessageID)
@@ -1016,7 +1016,7 @@ func ComputeAVMCrossZoneProofHash(proof AVMCrossZoneProof) string {
 func ComputeAVMCrossZoneRoutePolicyHash(policy AVMCrossZoneRoutePolicy) string {
 	policy = canonicalAVMCrossZoneRoutePolicy(policy)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cross-zone-route-policy-v1")
+	writeEnginePart(h, "aetra-avm-cross-zone-route-policy-v1")
 	writeEnginePart(h, string(policy.SourceZone))
 	writeEnginePart(h, string(policy.DestinationZone))
 	writeEnginePart(h, policy.GasPolicy.Denom)
@@ -1043,7 +1043,7 @@ func ComputeAVMCrossZoneRoutePolicyHash(policy AVMCrossZoneRoutePolicy) string {
 func ComputeAVMCrossZoneExecutionHash(execution AVMCrossZoneExecution) string {
 	execution = canonicalAVMCrossZoneExecution(execution)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-cross-zone-execution-v1")
+	writeEnginePart(h, "aetra-avm-cross-zone-execution-v1")
 	writeEnginePart(h, execution.Message.ID)
 	writeEnginePart(h, execution.RoutePolicy.PolicyHash)
 	writeEnginePart(h, execution.DestinationQueueEntry.SortKey)
@@ -1109,7 +1109,7 @@ func canonicalAVMCrossZoneZoneRoots(roots AVMCrossZoneZoneRoots) AVMCrossZoneZon
 	return roots
 }
 
-func canonicalAVMAetherCoreZoneCommitmentSet(set AVMAetherCoreZoneCommitmentSet) AVMAetherCoreZoneCommitmentSet {
+func canonicalAVMAetraCoreZoneCommitmentSet(set AVMAetraCoreZoneCommitmentSet) AVMAetraCoreZoneCommitmentSet {
 	set.CoreRoot = strings.TrimSpace(set.CoreRoot)
 	set.ZoneRoots = append([]AVMZoneStateRoot(nil), set.ZoneRoots...)
 	for i := range set.ZoneRoots {

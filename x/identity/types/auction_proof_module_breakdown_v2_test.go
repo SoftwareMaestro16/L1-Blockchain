@@ -27,7 +27,7 @@ func TestAuctionModuleV2DeterministicFinalizeRefundsAndFailures(t *testing.T) {
 	state := EmptyIdentityState(DefaultIdentityParams())
 	state, auction, err := StartSealedAuction(state, "market.aet", 20)
 	require.NoError(t, err)
-	params := DefaultIdentityAuctionFairnessParamsV2("aetheris-local-1")
+	params := DefaultIdentityAuctionFairnessParamsV2("aetra-local-1")
 	machine, err := DescribeIdentityAuctionStateMachineV2(auction, params)
 	require.NoError(t, err)
 	require.Equal(t, auction.RevealStartHeight, machine.CommitEndHeight)
@@ -109,7 +109,7 @@ func TestProofVerificationModuleV2AssemblyCacheHeightAndLightClientFailures(t *t
 	rootProof, err := BuildIdentityProof(state, mustIdentityDomainStoreKeyV2("alice.aet"))
 	require.NoError(t, err)
 	appHash := rootProof.RootHash
-	proof, err := BuildProofModuleResolutionProofV2(state, "aetheris-local-1", appHash, "alice.aet", 14, 30)
+	proof, err := BuildProofModuleResolutionProofV2(state, "aetra-local-1", appHash, "alice.aet", 14, 30)
 	require.NoError(t, err)
 	require.NoError(t, ValidateProofModuleResolutionProofV2(proof))
 
@@ -119,9 +119,9 @@ func TestProofVerificationModuleV2AssemblyCacheHeightAndLightClientFailures(t *t
 	require.ErrorContains(t, ValidateProofModuleResolutionProofV2(badVersion), string(ProofModuleFailureInconsistentRecordVersions))
 
 	target, err := VerifyIdentityResolutionProofLightClientV2(IdentityLightClientVerificationRequestV2{
-		ExpectedChainID:      "aetheris-local-1",
+		ExpectedChainID:      "aetra-local-1",
 		RequestedName:        "alice.aet",
-		TrustedHeader:        IdentityTrustedHeaderV2{ChainID: "aetheris-local-1", Height: 14, AppHash: appHash, Trusted: true},
+		TrustedHeader:        IdentityTrustedHeaderV2{ChainID: "aetra-local-1", Height: 14, AppHash: appHash, Trusted: true},
 		Proof:                proof,
 		TargetType:           IdentityResolutionTargetPrimary,
 		CurrentHeight:        14,
@@ -131,9 +131,9 @@ func TestProofVerificationModuleV2AssemblyCacheHeightAndLightClientFailures(t *t
 	require.NoError(t, err)
 	require.Equal(t, addr(2), target.Address)
 
-	_, err = BuildProofModuleNonExistenceProofV2(state, "aetheris-local-1", appHash, "Bad..Name", 14, 30)
+	_, err = BuildProofModuleNonExistenceProofV2(state, "aetra-local-1", appHash, "Bad..Name", 14, 30)
 	require.ErrorContains(t, err, string(ProofModuleFailureMalformedNameNonExistence))
-	absence, err := BuildProofModuleNonExistenceProofV2(state, "aetheris-local-1", appHash, "missing.aet", 14, 30)
+	absence, err := BuildProofModuleNonExistenceProofV2(state, "aetra-local-1", appHash, "missing.aet", 14, 30)
 	require.NoError(t, err)
 	require.NotNil(t, absence.NonExistenceProofOptional)
 
@@ -160,7 +160,7 @@ func TestProofVerificationModuleV2AssemblyCacheHeightAndLightClientFailures(t *t
 	require.NoError(t, ValidateProofModuleHeightAvailableV2(14, 10, 20))
 	require.ErrorContains(t, ValidateProofModuleHeightAvailableV2(9, 10, 20), string(ProofModuleFailureProofHeightPruned))
 
-	recursive, err := BuildRecursiveResolutionProofV2(state, "aetheris-local-1", "alice.aet", "alice.aet", 14, 30, nil)
+	recursive, err := BuildRecursiveResolutionProofV2(state, "aetra-local-1", "alice.aet", "alice.aet", 14, 30, nil)
 	require.NoError(t, err)
 	require.NoError(t, ValidateProofModuleRecursiveProofV2(recursive))
 	brokenRecursive := recursive
@@ -191,7 +191,7 @@ func TestProofModuleReverseResolutionProofV2(t *testing.T) {
 	require.NoError(t, err)
 	state = state.Export()
 	require.NoError(t, state.Validate())
-	proof, err := BuildProofModuleReverseResolutionProofV2(state, "aetheris-local-1", identityHash("app"), "alice.aet", 15, 30, addr(2))
+	proof, err := BuildProofModuleReverseResolutionProofV2(state, "aetra-local-1", identityHash("app"), "alice.aet", 15, 30, addr(2))
 	require.NoError(t, err)
 	require.NotNil(t, proof.ReverseRecordOptional)
 	require.Equal(t, IdentityProofQueryResolveReverse, proof.QueryType)

@@ -1,7 +1,7 @@
 # Aetra Roadmap V4: Modular L1 Execution OS Implementation
 
 This roadmap turns the target design in
-`docs/architecture/aetheris-modular-execution-os.md` and the safety gates in
+`docs/architecture/aetra-modular-execution-os.md` and the safety gates in
 `docs/architecture/sharding-rd.md` into implementation tasks.
 
 V4 is an implementation backlog, not a production claim. Aetra must not
@@ -12,7 +12,7 @@ proof are complete.
 
 ## Source Documents
 
-- `docs/architecture/aetheris-modular-execution-os.md`
+- `docs/architecture/aetra-modular-execution-os.md`
 - `docs/architecture/sharding-rd.md`
 - `docs/architecture/execution-os.md`
 - `docs/architecture/async-smart-contract-execution.md`
@@ -52,7 +52,7 @@ Implementation tasks:
   - simulator;
   - docs/test/tooling only.
 - Add or update docs explaining that `x/sharding/sim`, `x/execution/types`,
-  `x/vm/types`, `x/aetherisvm/*`, `x/identity/types`, `x/messaging/types`,
+  `x/vm/types`, `x/aetravm/*`, `x/identity/types`, `x/messaging/types`,
   `x/queue/types`, and related packages are not wired consensus modules unless
   explicitly mounted later.
 - Confirm current dirty files before each implementation branch.
@@ -520,8 +520,8 @@ mutation prematurely.
 Recommended packages:
 
 - `x/vm/types`
-- `x/aetherisvm/avm`
-- `x/aetherisvm/async`
+- `x/aetravm/avm`
+- `x/aetravm/async`
 - `app/wasmconfig`
 
 Implementation tasks:

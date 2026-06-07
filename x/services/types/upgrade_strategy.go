@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ServiceDescriptorObjectKind string
@@ -590,7 +590,7 @@ func IsServiceProviderReregistrationMode(mode ServiceProviderReregistrationMode)
 func ComputeServiceDescriptorVersionRecordHash(record ServiceDescriptorVersionRecord) string {
 	record = canonicalServiceDescriptorVersionRecord(record)
 	return servicesHashParts(
-		"aetheris-services-descriptor-version-record-v1",
+		"aetra-services-descriptor-version-record-v1",
 		string(record.ObjectKind),
 		record.ObjectID,
 		fmt.Sprint(record.Version),
@@ -603,7 +603,7 @@ func ComputeServiceDescriptorVersionRecordHash(record ServiceDescriptorVersionRe
 func ComputeServiceSchemaCompatibilityHash(metadata ServiceSchemaCompatibilityMetadata) string {
 	metadata = canonicalServiceSchemaCompatibilityMetadata(metadata)
 	parts := []string{
-		"aetheris-services-schema-compatibility-v1",
+		"aetra-services-schema-compatibility-v1",
 		metadata.SchemaID,
 		metadata.PreviousHash,
 		metadata.NextHash,
@@ -624,7 +624,7 @@ func ComputeServiceSchemaCompatibilityHash(metadata ServiceSchemaCompatibilityMe
 func ComputeServiceRegistryMigrationHandlerHash(handler ServiceRegistryMigrationHandler) string {
 	handler = canonicalServiceRegistryMigrationHandler(handler)
 	return servicesHashParts(
-		"aetheris-services-registry-migration-handler-v1",
+		"aetra-services-registry-migration-handler-v1",
 		fmt.Sprint(handler.FromRegistryVersion),
 		fmt.Sprint(handler.ToRegistryVersion),
 		handler.HandlerName,
@@ -638,7 +638,7 @@ func ComputeServiceRegistryMigrationHandlerHash(handler ServiceRegistryMigration
 func ComputeServiceInterfaceDeprecationMarkerHash(marker ServiceInterfaceDeprecationMarker) string {
 	marker = canonicalServiceInterfaceDeprecationMarker(marker)
 	return servicesHashParts(
-		"aetheris-services-interface-deprecation-marker-v1",
+		"aetra-services-interface-deprecation-marker-v1",
 		marker.InterfaceHash,
 		fmt.Sprint(marker.Version),
 		fmt.Sprint(marker.DeprecatedHeight),
@@ -651,7 +651,7 @@ func ComputeServiceInterfaceDeprecationMarkerHash(marker ServiceInterfaceDepreca
 func ComputeServiceProviderReregistrationRuleHash(rule ServiceProviderReregistrationRule) string {
 	rule = canonicalServiceProviderReregistrationRule(rule)
 	return servicesHashParts(
-		"aetheris-services-provider-reregistration-rule-v1",
+		"aetra-services-provider-reregistration-rule-v1",
 		rule.ProviderID,
 		rule.ServiceID,
 		rule.PreviousInterfaceHash,
@@ -667,7 +667,7 @@ func ComputeServiceProviderReregistrationRuleHash(rule ServiceProviderReregistra
 func ComputeServiceRegistryUpgradePlanHash(plan ServiceRegistryUpgradePlan) string {
 	plan = canonicalServiceRegistryUpgradePlan(plan)
 	parts := []string{
-		"aetheris-services-registry-upgrade-plan-v1",
+		"aetra-services-registry-upgrade-plan-v1",
 		fmt.Sprint(plan.FromRegistryVersion),
 		fmt.Sprint(plan.ToRegistryVersion),
 		plan.GovernanceProposalID,
@@ -698,7 +698,7 @@ func ComputeServiceRegistryUpgradePlanHash(plan ServiceRegistryUpgradePlan) stri
 
 func ComputeServiceRegistryUpgradeSimulationHash(result ServiceRegistryUpgradeSimulationResult) string {
 	return servicesHashParts(
-		"aetheris-services-registry-upgrade-simulation-v1",
+		"aetra-services-registry-upgrade-simulation-v1",
 		result.PlanHash,
 		fmt.Sprint(result.FromRegistryVersion),
 		fmt.Sprint(result.ToRegistryVersion),

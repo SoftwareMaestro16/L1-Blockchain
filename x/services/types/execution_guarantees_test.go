@@ -5,11 +5,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestExecutionGuaranteesForOnChainService(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 40}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 40}
 	descriptor := testUnifiedOnChainDescriptor()
 	input := testExecutionGuaranteeInput(t, ctx, descriptor, 1, "guarantee/onchain", true, false)
 
@@ -26,7 +26,7 @@ func TestExecutionGuaranteesForOnChainService(t *testing.T) {
 }
 
 func TestExecutionGuaranteesForOffChainSignedReplayProtectedCall(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 40}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 40}
 	descriptor := testUnifiedOffChainDescriptor()
 	input := testExecutionGuaranteeInput(t, ctx, descriptor, 1, "guarantee/offchain", true, false)
 	input.ResultProofVerified = true
@@ -59,7 +59,7 @@ func TestExecutionGuaranteesForOffChainSignedReplayProtectedCall(t *testing.T) {
 }
 
 func TestExecutionGuaranteesRejectOffChainCorrectnessBeforeProofOrChallengeSettlement(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 40}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 40}
 	descriptor := testUnifiedOffChainDescriptor()
 	input := testExecutionGuaranteeInput(t, ctx, descriptor, 1, "guarantee/offchain-unverified", true, false)
 
@@ -73,7 +73,7 @@ func TestExecutionGuaranteesRejectOffChainCorrectnessBeforeProofOrChallengeSettl
 }
 
 func TestExecutionGuaranteesForMixedChallengeableServiceWithPenaltyRoute(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 40}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 40}
 	descriptor := testInterfaceSystemDescriptor()
 	input := testExecutionGuaranteeInput(t, ctx, descriptor, 1, "guarantee/mixed", true, true)
 	input.ChallengePeriodElapsed = true
@@ -86,7 +86,7 @@ func TestExecutionGuaranteesForMixedChallengeableServiceWithPenaltyRoute(t *test
 }
 
 func TestExecutionGuaranteesRejectUnknownPaymentRulesAndInterfaceMismatch(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 40}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 40}
 	descriptor := testUnifiedOnChainDescriptor()
 	input := testExecutionGuaranteeInput(t, ctx, descriptor, 1, "guarantee/payment", true, false)
 	input.PaymentModel.KnownBeforeSigning = false
@@ -103,7 +103,7 @@ func TestExecutionGuaranteesRejectUnknownPaymentRulesAndInterfaceMismatch(t *tes
 }
 
 func TestExecutionNonGuaranteesKeepAdvisoryCacheAndAvailabilityExplicit(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 40}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 40}
 	descriptor := testUnifiedOffChainDescriptor()
 	input := testExecutionGuaranteeInput(t, ctx, descriptor, 1, "guarantee/cache-advisory", true, false)
 	input.ResultProofVerified = true

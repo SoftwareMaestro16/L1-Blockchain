@@ -17,7 +17,7 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	"github.com/cosmos/cosmos-sdk/x/tx/signing"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 )
 
 // NewL1App returns a reference to an initialized L1App.
@@ -31,8 +31,8 @@ func NewL1App(
 	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
 		ProtoFiles: proto.HybridResolver,
 		SigningOptions: signing.Options{
-			AddressCodec:          aetherisaddress.Codec{},
-			ValidatorAddressCodec: aetherisaddress.Codec{},
+			AddressCodec:          aetraaddress.Codec{},
+			ValidatorAddressCodec: aetraaddress.Codec{},
 		},
 	})
 	appCodec := codec.NewProtoCodec(interfaceRegistry)
@@ -97,7 +97,7 @@ func NewL1App(
 
 	txConfig = app.initKeepers(appCodec, legacyAmino, logger, appOpts, keys)
 	app.initModules(appCodec, legacyAmino, interfaceRegistry, txConfig)
-	if err := app.ValidateAetherCoreWiringGate(); err != nil {
+	if err := app.ValidateAetraCoreWiringGate(); err != nil {
 		panic(err)
 	}
 	if err := ValidateReservedSystemModuleAccountWiring(BlockedAddresses()); err != nil {

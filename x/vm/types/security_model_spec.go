@@ -440,7 +440,7 @@ func AVMExpiredNonceTombstoneSortKey(tombstone AVMExpiredNonceTombstone) string 
 func ComputeAVMSecurityModelHash(model AVMSecurityModel) string {
 	model = canonicalAVMSecurityModel(model)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-security-model-v1")
+	writeEnginePart(h, "aetra-avm-security-model-v1")
 	writeEnginePart(h, model.StoreRootCommitment)
 	writeEngineUint64(h, uint64(len(model.Assumptions)))
 	for _, assumption := range model.Assumptions {
@@ -452,7 +452,7 @@ func ComputeAVMSecurityModelHash(model AVMSecurityModel) string {
 func ComputeAVMReplayProtectionRecordHash(record AVMReplayProtectionRecord) string {
 	record = canonicalAVMReplayProtectionRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-replay-record-v1")
+	writeEnginePart(h, "aetra-avm-replay-record-v1")
 	writeEnginePart(h, record.ChainID)
 	writeEnginePart(h, string(record.SourceZone))
 	writeEnginePart(h, record.Sender)
@@ -469,7 +469,7 @@ func ComputeAVMReplayProtectionRecordHash(record AVMReplayProtectionRecord) stri
 func ComputeAVMExpiredNonceTombstoneHash(tombstone AVMExpiredNonceTombstone) string {
 	tombstone = canonicalAVMExpiredNonceTombstone(tombstone)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-expired-nonce-tombstone-v1")
+	writeEnginePart(h, "aetra-avm-expired-nonce-tombstone-v1")
 	writeEnginePart(h, tombstone.ChainID)
 	writeEnginePart(h, string(tombstone.SourceZone))
 	writeEnginePart(h, tombstone.Sender)
@@ -482,7 +482,7 @@ func ComputeAVMExpiredNonceTombstoneHash(tombstone AVMExpiredNonceTombstone) str
 func ComputeAVMReplayNonceStateHash(state AVMReplayNonceState) string {
 	state = canonicalAVMReplayNonceState(state)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-replay-nonce-state-v1")
+	writeEnginePart(h, "aetra-avm-replay-nonce-state-v1")
 	writeEnginePart(h, state.ChainID)
 	writeEnginePart(h, string(state.SourceZone))
 	writeEnginePart(h, state.Sender)

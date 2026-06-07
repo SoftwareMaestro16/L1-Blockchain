@@ -69,14 +69,14 @@ foreach ($term in @(
     'failed executions',
     'queue lag',
     'contract state size',
-    'x/aetherisvm/async',
+    'x/aetravm/async',
     'export/import state shape that preserves queue state exactly'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "async execution doc missing: $term"
 }
 
 foreach ($term in @(
-    'x/aetherisvm/async',
+    'x/aetravm/async',
     'deterministic asynchronous contract message semantics',
     'Cosmos SDK delivered transactions remain synchronous',
     'Production partitioning or sharding is a later R&D track',

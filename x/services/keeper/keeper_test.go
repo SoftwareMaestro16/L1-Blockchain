@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	servicestypes "github.com/sovereign-l1/l1/x/services/types"
 )
 
@@ -237,7 +237,7 @@ func testServicesDescriptor(serviceID string, serviceType coretypes.ServiceType,
 		Execution: coretypes.ServiceExecutionDescriptor{
 			Location:        location,
 			Target:          serviceID + ".target",
-			Endpoint:        "https://" + serviceID + ".aetheris.local/v1",
+			Endpoint:        "https://" + serviceID + ".aetra.local/v1",
 			ProviderPoolID:  serviceID + "-pool",
 			Mode:            coretypes.ExecutionModeAsync,
 			FailureBehavior: coretypes.ServiceFailureRetry,

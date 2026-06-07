@@ -761,34 +761,34 @@ func ValidateFinalSettlementWritesFinancialZoneState(before, after FinancialZone
 
 func ComputeMsgCreatePaymentIntentHash(msg MsgCreatePaymentIntent) string {
 	msg = msg.Normalize()
-	return HashParts("aetheris-msg-create-payment-intent-v1", msg.PaymentID, msg.Payer, msg.Payee, msg.TargetIdentity, msg.Amount, msg.Denom, msg.MaxFee, fmt.Sprintf("%020d", msg.ExpiryHeight), msg.IdempotencyKey)
+	return HashParts("aetra-msg-create-payment-intent-v1", msg.PaymentID, msg.Payer, msg.Payee, msg.TargetIdentity, msg.Amount, msg.Denom, msg.MaxFee, fmt.Sprintf("%020d", msg.ExpiryHeight), msg.IdempotencyKey)
 }
 
 func ComputeMsgOpenPaymentChannelHash(msg MsgOpenPaymentChannel) string {
 	msg = msg.Normalize()
-	parts := []string{"aetheris-msg-open-payment-channel-v1", msg.Channel.ChannelRoot, msg.CollateralAvailable, msg.IdempotencyKey}
+	parts := []string{"aetra-msg-open-payment-channel-v1", msg.Channel.ChannelRoot, msg.CollateralAvailable, msg.IdempotencyKey}
 	parts = append(parts, msg.ParticipantSignatures...)
 	return HashParts(parts...)
 }
 
 func ComputeMsgUpdatePaymentChannelHash(msg MsgUpdatePaymentChannel) string {
 	msg = msg.Normalize()
-	return HashParts("aetheris-msg-update-payment-channel-v1", msg.ChannelID, msg.Submitter, fmt.Sprintf("%020d", msg.PreviousNonce), fmt.Sprintf("%020d", msg.NewNonce), msg.SignedStateHash, msg.BalanceRoot, msg.ConditionRoot)
+	return HashParts("aetra-msg-update-payment-channel-v1", msg.ChannelID, msg.Submitter, fmt.Sprintf("%020d", msg.PreviousNonce), fmt.Sprintf("%020d", msg.NewNonce), msg.SignedStateHash, msg.BalanceRoot, msg.ConditionRoot)
 }
 
 func ComputeMsgClosePaymentChannelHash(msg MsgClosePaymentChannel) string {
 	msg = msg.Normalize()
-	return HashParts("aetheris-msg-close-payment-channel-v1", msg.PaymentID, msg.ChannelID, msg.LatestStateHash, fmt.Sprintf("%020d", msg.ChallengeStart), fmt.Sprintf("%020d", msg.ChallengeEnd), string(msg.SettlementStatus), msg.CollateralRoot)
+	return HashParts("aetra-msg-close-payment-channel-v1", msg.PaymentID, msg.ChannelID, msg.LatestStateHash, fmt.Sprintf("%020d", msg.ChallengeStart), fmt.Sprintf("%020d", msg.ChallengeEnd), string(msg.SettlementStatus), msg.CollateralRoot)
 }
 
 func ComputeMsgDisputePaymentChannelHash(msg MsgDisputePaymentChannel) string {
 	msg = msg.Normalize()
-	return HashParts("aetheris-msg-dispute-payment-channel-v1", msg.Dispute.DisputeRoot, fmt.Sprintf("%020d", msg.StaleNonce), fmt.Sprintf("%020d", msg.NewerNonce), fmt.Sprintf("%020d", msg.CurrentHeight))
+	return HashParts("aetra-msg-dispute-payment-channel-v1", msg.Dispute.DisputeRoot, fmt.Sprintf("%020d", msg.StaleNonce), fmt.Sprintf("%020d", msg.NewerNonce), fmt.Sprintf("%020d", msg.CurrentHeight))
 }
 
 func ComputeMsgCreateConditionalPaymentHash(msg MsgCreateConditionalPayment) string {
 	msg = msg.Normalize()
-	parts := []string{"aetheris-msg-create-conditional-payment-v1", msg.Condition.ConditionRoot, msg.Payer, msg.ReservedLiquidity}
+	parts := []string{"aetra-msg-create-conditional-payment-v1", msg.Condition.ConditionRoot, msg.Payer, msg.ReservedLiquidity}
 	for _, condition := range msg.LinkedConditions {
 		parts = append(parts, condition.ConditionRoot)
 	}
@@ -797,7 +797,7 @@ func ComputeMsgCreateConditionalPaymentHash(msg MsgCreateConditionalPayment) str
 
 func ComputeMsgResolveConditionalPaymentHash(msg MsgResolveConditionalPayment) string {
 	msg = msg.Normalize()
-	parts := []string{"aetheris-msg-resolve-conditional-payment-v1", msg.Preimage, msg.ProofRoot, msg.PromiseResultHash, msg.PaymentStateRoot, fmt.Sprintf("%020d", msg.CurrentHeight)}
+	parts := []string{"aetra-msg-resolve-conditional-payment-v1", msg.Preimage, msg.ProofRoot, msg.PromiseResultHash, msg.PaymentStateRoot, fmt.Sprintf("%020d", msg.CurrentHeight)}
 	for _, condition := range msg.Conditions {
 		parts = append(parts, condition.ConditionRoot)
 	}
@@ -806,12 +806,12 @@ func ComputeMsgResolveConditionalPaymentHash(msg MsgResolveConditionalPayment) s
 
 func ComputeMsgExpireConditionalPaymentHash(msg MsgExpireConditionalPayment) string {
 	msg = msg.Normalize()
-	return HashParts("aetheris-msg-expire-conditional-payment-v1", msg.Condition.ConditionRoot, msg.Resolver, msg.RefundRouteRoot, msg.PaymentStateRoot, fmt.Sprintf("%020d", msg.CurrentHeight))
+	return HashParts("aetra-msg-expire-conditional-payment-v1", msg.Condition.ConditionRoot, msg.Resolver, msg.RefundRouteRoot, msg.PaymentStateRoot, fmt.Sprintf("%020d", msg.CurrentHeight))
 }
 
 func ComputeMsgSettlePaymentHash(msg MsgSettlePayment) string {
 	msg = msg.Normalize()
-	return HashParts("aetheris-msg-settle-payment-v1", msg.Settlement.SettlementHash, msg.RouteCommitment.RouteID, msg.RouteCommitment.CommitmentHash, fmt.Sprintf("%t", msg.RouteCommitment.Signed), fmt.Sprintf("%t", msg.RouteCommitment.Reserved), msg.ReceiptRoot, msg.PaymentStateRoot, msg.FinancialStateRoot)
+	return HashParts("aetra-msg-settle-payment-v1", msg.Settlement.SettlementHash, msg.RouteCommitment.RouteID, msg.RouteCommitment.CommitmentHash, fmt.Sprintf("%t", msg.RouteCommitment.Signed), fmt.Sprintf("%t", msg.RouteCommitment.Reserved), msg.ReceiptRoot, msg.PaymentStateRoot, msg.FinancialStateRoot)
 }
 
 func paymentMessageDescriptor(message PaymentMessageType, purpose string, validations ...string) PaymentMessageDescriptor {

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type ExecutionGuaranteeReport struct {
@@ -205,7 +205,7 @@ func (report ExecutionGuaranteeReport) Validate() error {
 
 func ComputeExecutionGuaranteeReportHash(report ExecutionGuaranteeReport) string {
 	return servicesHashParts(
-		"aetheris-services-execution-guarantees-v1",
+		"aetra-services-execution-guarantees-v1",
 		report.ServiceID,
 		string(report.ServiceType),
 		report.CallID,

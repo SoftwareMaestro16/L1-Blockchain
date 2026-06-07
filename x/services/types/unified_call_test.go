@@ -5,11 +5,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 func TestUnifiedServiceCallBuildsEnvelopeAndMixedRouting(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 20}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 20}
 	descriptor := testInterfaceSystemDescriptor()
 
 	call, err := NewUnifiedServiceCall(
@@ -58,7 +58,7 @@ func TestUnifiedServiceCallBuildsEnvelopeAndMixedRouting(t *testing.T) {
 }
 
 func TestUnifiedServiceCallRoutesOnChainAndOffChainServices(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 20}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 20}
 	onChain := testUnifiedOnChainDescriptor()
 
 	onChainCall, err := NewUnifiedServiceCall(
@@ -108,7 +108,7 @@ func TestUnifiedServiceCallRoutesOnChainAndOffChainServices(t *testing.T) {
 }
 
 func TestUnifiedServiceCallRejectsRoutingRuleViolations(t *testing.T) {
-	ctx := coretypes.ServiceConsensusContext{ChainID: "aetheris-test-1", Height: 20}
+	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 20}
 	descriptor := testInterfaceSystemDescriptor()
 	call, err := NewUnifiedServiceCall(
 		ctx,
@@ -219,7 +219,7 @@ func testUnifiedOffChainDescriptor() coretypes.ServiceDescriptor {
 	descriptor.Execution = coretypes.ServiceExecutionDescriptor{
 		Location:        coretypes.ServiceLocationExternal,
 		Target:          "indexer.unified",
-		Endpoint:        "https://indexer-unified.aetheris.local/v1",
+		Endpoint:        "https://indexer-unified.aetra.local/v1",
 		Mode:            coretypes.ExecutionModeAsync,
 		FailureBehavior: coretypes.ServiceFailureRetry,
 		ResultExpiry:    20,

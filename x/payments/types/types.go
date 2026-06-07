@@ -16,7 +16,7 @@ const (
 	CanonicalEncodingVersion      = byte(1)
 	CurrentAppVersion             = uint32(1)
 	CurrentStateVersion           = uint32(1)
-	SignatureSchemeEd25519        = "ed25519-aetheris-v1"
+	SignatureSchemeEd25519        = "ed25519-aetra-v1"
 	SignatureObjectState          = "channel_state"
 	SignatureObjectClaim          = "unidirectional_claim"
 	SignatureObjectDelta          = "async_delta"

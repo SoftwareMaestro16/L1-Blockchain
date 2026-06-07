@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	identitytypes "github.com/sovereign-l1/l1/x/identity/types"
 )
 
@@ -388,7 +388,7 @@ func (verification AETServiceBindingVerification) Validate() error {
 func ComputeServiceDiscoveryDescriptorV1Hash(descriptor ServiceDiscoveryDescriptorV1) string {
 	descriptor = canonicalServiceDiscoveryDescriptorV1(descriptor)
 	return servicesHashParts(
-		"aetheris-services-discovery-descriptor-v1",
+		"aetra-services-discovery-descriptor-v1",
 		descriptor.ServiceID,
 		descriptor.ServiceName,
 		descriptor.Owner,
@@ -408,7 +408,7 @@ func ComputeServiceDiscoveryDescriptorV1Hash(descriptor ServiceDiscoveryDescript
 func ComputeAETServiceBindingHash(binding AETServiceBinding) string {
 	binding = canonicalAETServiceBinding(binding)
 	return servicesHashParts(
-		"aetheris-services-aet-binding-v1",
+		"aetra-services-aet-binding-v1",
 		binding.IdentityName,
 		binding.ServiceID,
 		binding.InterfaceHash,
@@ -419,7 +419,7 @@ func ComputeAETServiceBindingHash(binding AETServiceBinding) string {
 func ComputeAETServiceBindingProofHash(proof AETServiceBindingProof) string {
 	proof = canonicalAETServiceBindingProof(proof)
 	return servicesHashParts(
-		"aetheris-services-aet-binding-proof-v1",
+		"aetra-services-aet-binding-proof-v1",
 		proof.Binding.BindingHash,
 		proof.Descriptor.DescriptorHash,
 		coretypes.ComputeServiceDescriptorHash(proof.RegistryDescriptor),
@@ -434,7 +434,7 @@ func ComputeAETServiceBindingProofHash(proof AETServiceBindingProof) string {
 
 func ComputeAETServiceBindingVerificationHash(verification AETServiceBindingVerification) string {
 	return servicesHashParts(
-		"aetheris-services-aet-binding-verification-v1",
+		"aetra-services-aet-binding-verification-v1",
 		verification.IdentityName,
 		verification.ServiceID,
 		verification.InterfaceHash,

@@ -51,7 +51,7 @@ Minimum faucet rules:
 Initial operator command:
 
 ```powershell
-build\aetherisd.exe tx bank send <faucet-key> <recipient-aetheris-address> 1000000naet --chain-id <testnet-chain-id> --fees 1000000naet --node <rpc-url> --keyring-backend <secure-backend> -y
+build\aetrad.exe tx bank send <faucet-key> <recipient-aetra-address> 1000000naet --chain-id <testnet-chain-id> --fees 1000000naet --node <rpc-url> --keyring-backend <secure-backend> -y
 ```
 
 ## Explorer And Indexer Plan
@@ -93,7 +93,7 @@ Do not run public validators with localnet `--keyring-backend test` keys.
 Snapshot creation on a trusted node:
 
 ```powershell
-.\scripts\localnet\snapshot.ps1 -OutputDir .localnet -NodeIndex 0 -Height <height> -ArchivePath .work\snapshots\aetheris-testnet-<height>.tar
+.\scripts\localnet\snapshot.ps1 -OutputDir .localnet -NodeIndex 0 -Height <height> -ArchivePath .work\snapshots\aetra-testnet-<height>.tar
 ```
 
 State sync configuration on a joining node:
@@ -124,7 +124,7 @@ execution smoke and the AFT-44/ANFT-66/ASBT-67 standard tests before opening the
 network:
 
 ```powershell
-.\.work\tools\go1.25.11\go\bin\go.exe test ./x/aetherisvm/async ./x/aetherisvm/standards/...
+.\.work\tools\go1.25.11\go\bin\go.exe test ./x/aetravm/async ./x/aetravm/standards/...
 ```
 
 ## Rollback And Restart Procedure

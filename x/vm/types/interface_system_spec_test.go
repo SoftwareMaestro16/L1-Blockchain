@@ -142,7 +142,7 @@ func TestAVMInterfaceSchemaBindingsQueriesAndSDKCodegen(t *testing.T) {
 	codegen, err := NewAVMSDKCodeGenerationFormat(AVMSDKCodeGenerationFormat{
 		InterfaceHash:     contractDescriptor.InterfaceHash,
 		Format:            AVMInterfaceSDKTypeScript,
-		PackageName:       "aetheris_actor",
+		PackageName:       "aetra_actor",
 		MethodBindings:    []string{"execute", "schedule"},
 		GetMethodBindings: []string{"balance"},
 	})

@@ -109,7 +109,7 @@ func TestNativePaymentStaleCloseFraudProofSupersedesLowerNonce(t *testing.T) {
 	require.ErrorContains(t, err, "newer")
 }
 
-func TestNativePaymentFinalityCommitmentBindsFinancialAndAetherCoreRoots(t *testing.T) {
+func TestNativePaymentFinalityCommitmentBindsFinancialAndAetraCoreRoots(t *testing.T) {
 	alice := testAddress(0x98)
 	bob := testAddress(0x99)
 	channel := signedChannel(t, "native-settlement-finality", "1000", alice, bob)

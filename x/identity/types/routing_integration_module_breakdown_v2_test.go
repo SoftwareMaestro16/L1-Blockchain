@@ -114,7 +114,7 @@ func TestRoutingIntegrationModuleMappingsAndResolvedTargetsV2(t *testing.T) {
 		ExpectedSchemaHash: inlineHash,
 		WalletPolicy:       DefaultIdentityInterfaceWalletPolicyV2(),
 		CurrentHeight:      15,
-		ExpectedChainID:    "aetheris-local-1",
+		ExpectedChainID:    "aetra-local-1",
 		TrustedHeader:      trustedHeaderForProofV2(proof),
 		Proof:              &proof,
 	})

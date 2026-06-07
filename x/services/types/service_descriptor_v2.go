@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sort"
 
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type CanonicalServiceEndpointType string
@@ -163,7 +163,7 @@ func (descriptor CanonicalServiceDescriptor) Validate() error {
 func ComputeCanonicalServiceDescriptorHash(descriptor CanonicalServiceDescriptor) string {
 	descriptor = CanonicalizeServiceDescriptor(descriptor)
 	parts := []string{
-		"aetheris-services-canonical-descriptor-v1",
+		"aetra-services-canonical-descriptor-v1",
 		descriptor.ServiceID,
 		string(descriptor.EndpointType),
 		descriptor.InterfaceHash,

@@ -210,7 +210,7 @@ func classForZone(zone routingtypes.ZoneID) routingtypes.TxClass {
 		return routingtypes.TxClassContract
 	case routingtypes.ZoneApplication:
 		return routingtypes.TxClassApplication
-	case routingtypes.ZoneAetherCore:
+	case routingtypes.ZoneAetraCore:
 		return routingtypes.TxClassCriticalSystem
 	default:
 		return ""

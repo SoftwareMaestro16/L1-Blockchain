@@ -71,7 +71,7 @@ func TestResolverModuleValidationV2RecordTTLReverseBatchAndProof(t *testing.T) {
 	require.Equal(t, uint32(1), response.Successes)
 	require.NoError(t, next.Validate())
 
-	_, proofErr := BuildResolverModuleProofQueryV2(next, "aetheris-test", identityHash("app"), "alice.aet", IdentityProofQueryResolveRecord, 17, 30, nil)
+	_, proofErr := BuildResolverModuleProofQueryV2(next, "aetra-test", identityHash("app"), "alice.aet", IdentityProofQueryResolveRecord, 17, 30, nil)
 	require.NoError(t, proofErr)
 }
 
@@ -199,7 +199,7 @@ func resolverModuleState(t *testing.T) IdentityState {
 
 func resolverModuleAuth(signer []byte, scope IdentitySignerScopeV2, nonce uint64) IdentityTxAuthV2 {
 	return IdentityTxAuthV2{
-		ChainID:                  "aetheris-local-1",
+		ChainID:                  "aetra-local-1",
 		Signer:                   signer,
 		Scope:                    scope,
 		NameNormalizationVersion: NameNormalizationVersionV2,

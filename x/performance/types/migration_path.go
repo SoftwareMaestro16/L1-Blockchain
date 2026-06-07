@@ -72,7 +72,7 @@ type ProofRootMetadataCheck struct {
 }
 
 type MigrationPhase1Input struct {
-	AetherCoreModuleHash    string
+	AetraCoreModuleHash     string
 	ZoneRegistryRoot        string
 	ZoneCount               uint32
 	DefaultZoneID           string
@@ -351,7 +351,7 @@ func BuildMigrationPhase1Readiness(input MigrationPhase1Input) MigrationReadines
 		label string
 		hash  string
 	}{
-		{"aethercore_module", input.AetherCoreModuleHash},
+		{"aetracore_module", input.AetraCoreModuleHash},
 		{"zone_registry_root", input.ZoneRegistryRoot},
 		{"default_zone_state_root", input.DefaultZoneStateRoot},
 		{"message_root", input.MessageRoot},
@@ -722,7 +722,7 @@ func (i MigrationPhase0Input) Normalize() MigrationPhase0Input {
 }
 
 func (i MigrationPhase1Input) Normalize() MigrationPhase1Input {
-	i.AetherCoreModuleHash = normalizeLowerHex(i.AetherCoreModuleHash)
+	i.AetraCoreModuleHash = normalizeLowerHex(i.AetraCoreModuleHash)
 	i.ZoneRegistryRoot = normalizeLowerHex(i.ZoneRegistryRoot)
 	i.DefaultZoneID = strings.TrimSpace(i.DefaultZoneID)
 	i.DefaultZoneStateRoot = normalizeLowerHex(i.DefaultZoneStateRoot)

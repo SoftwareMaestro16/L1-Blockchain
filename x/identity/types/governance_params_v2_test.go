@@ -47,7 +47,7 @@ func TestIdentityGovernanceParamsV2DefaultsCoverSection16(t *testing.T) {
 	require.Equal(t, uint64(MaxInterfaceInlineSchemaBytesV2), params.ResolverParams.MaximumInlineSchemaBytes)
 	require.Equal(t, uint64(1), params.ResolverParams.MinimumResolverTTL)
 	require.Equal(t, IdentityGovernanceMaximumResolverTTLV2, params.ResolverParams.MaximumResolverTTL)
-	require.ElementsMatch(t, []string{"aetheris", "grpcs", "https", "ipfs", "wss"}, params.ResolverParams.AllowedEndpointSchemes)
+	require.ElementsMatch(t, []string{"aetra", "grpcs", "https", "ipfs", "wss"}, params.ResolverParams.AllowedEndpointSchemes)
 
 	require.Equal(t, IdentityGovernanceMaximumDelegationDurationV2, params.DelegationParams.MaximumDelegationDuration)
 	require.Equal(t, IdentityGovernanceMaximumScopedDelegatesPerDomain, params.DelegationParams.MaximumScopedDelegatesPerDomain)
@@ -192,7 +192,7 @@ func TestIdentityGovernanceParamsV2RejectsInvalidResolverDelegationAuction(t *te
 	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badTTL), "maximum ttl")
 
 	badSchemeOrder := params
-	badSchemeOrder.ResolverParams.AllowedEndpointSchemes = []string{"https", "aetheris"}
+	badSchemeOrder.ResolverParams.AllowedEndpointSchemes = []string{"https", "aetra"}
 	badSchemeOrder.ParamsHash = ComputeIdentityGovernanceParamsHashV2(badSchemeOrder)
 	require.ErrorContains(t, ValidateIdentityGovernanceParamsV2(badSchemeOrder), "schemes must be sorted")
 

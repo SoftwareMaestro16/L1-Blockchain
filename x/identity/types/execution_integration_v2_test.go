@@ -18,7 +18,7 @@ func TestIdentitySendByNameV2ProofAwareMemoAndStaleWarning(t *testing.T) {
 		CurrentHeight:      40,
 		FreshnessThreshold: 5,
 		IncludeAuditMemo:   true,
-		ExpectedChainID:    "aetheris-local-1",
+		ExpectedChainID:    "aetra-local-1",
 		TrustedHeader:      trustedHeaderForProofV2(proof),
 		Proof:              &proof,
 	})
@@ -92,7 +92,7 @@ func TestIdentityInvokeByNameV2ProofAwareContractTarget(t *testing.T) {
 		TargetID:        ResolverKeyContract,
 		Method:          "execute_swap",
 		CurrentHeight:   20,
-		ExpectedChainID: "aetheris-local-1",
+		ExpectedChainID: "aetra-local-1",
 		TrustedHeader:   trustedHeaderForProofV2(proof),
 		Proof:           &proof,
 	})

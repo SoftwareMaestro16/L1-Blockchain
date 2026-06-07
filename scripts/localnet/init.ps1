@@ -2,7 +2,7 @@ param(
   [string]$OutputDir = "",
   [string]$Binary = "",
   [int]$ValidatorCount = 3,
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [int]$BaseP2PPort = 26656,
   [int]$BaseRPCPort = 26657,
   [int]$BaseRESTPort = 1317,
@@ -24,7 +24,7 @@ $ErrorActionPreference = "Stop"
 
 $RepoRoot = Get-LocalnetRepoRoot
 $OutputDir = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetherisd.exe"
+$Binary = Resolve-LocalnetPath -Path $Binary -DefaultRelativePath "build\aetrad.exe"
 Assert-LocalnetWorkspacePath -Path $OutputDir -Purpose "localnet output directory"
 if ($ValidatorCount -lt 1) { throw "ValidatorCount must be at least 1" }
 if ($PortStride -lt 1) { throw "PortStride must be at least 1" }
@@ -35,7 +35,7 @@ if ($SkipBuild) {
     throw "Binary not found at $Binary and -SkipBuild was specified"
   }
 } else {
-  & (Join-Path $RepoRoot "scripts\build-aetherisd.ps1") -Binary $Binary
+  & (Join-Path $RepoRoot "scripts\build-aetrad.ps1") -Binary $Binary
 }
 
 Remove-LocalnetDirectory -OutputDir $OutputDir
@@ -44,7 +44,7 @@ Remove-LocalnetDirectory -OutputDir $OutputDir
   --output-dir $OutputDir `
   --chain-id $ChainId `
   --staking-denom naet `
-  --node-daemon-home aetherisd `
+  --node-daemon-home aetrad `
   --node-dir-prefix node `
   --keyring-backend test `
   --single-host `

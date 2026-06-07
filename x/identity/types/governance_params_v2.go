@@ -160,7 +160,7 @@ func DefaultIdentityGovernanceResolverParamsV2() IdentityGovernanceResolverParam
 		MaximumInlineSchemaBytes:    MaxInterfaceInlineSchemaBytesV2,
 		MinimumResolverTTL:          1,
 		MaximumResolverTTL:          IdentityGovernanceMaximumResolverTTLV2,
-		AllowedEndpointSchemes:      []string{"aetheris", "grpcs", "https", "ipfs", "wss"},
+		AllowedEndpointSchemes:      []string{"aetra", "grpcs", "https", "ipfs", "wss"},
 	}
 }
 
@@ -175,7 +175,7 @@ func DefaultIdentityGovernanceDelegationParamsV2() IdentityGovernanceDelegationP
 }
 
 func DefaultIdentityGovernanceAuctionParamsV2() IdentityGovernanceAuctionParamsV2 {
-	fairness := DefaultIdentityAuctionFairnessParamsV2("aetheris-local-1")
+	fairness := DefaultIdentityAuctionFairnessParamsV2("aetra-local-1")
 	return IdentityGovernanceAuctionParamsV2{
 		CommitPhaseDuration:      DefaultAuctionCommitBlocks,
 		RevealPhaseDuration:      DefaultAuctionRevealBlocks,
@@ -470,7 +470,7 @@ func ApplyIdentityGovernanceParamsToRuntimeV2(params IdentityGovernanceParamsV2)
 	spam.PricingParams = pricing
 	spam.SubdomainCreationFee = params.PricingParams.SubdomainCreationFee
 
-	auction := DefaultIdentityAuctionFairnessParamsV2("aetheris-local-1")
+	auction := DefaultIdentityAuctionFairnessParamsV2("aetra-local-1")
 	auction.BidDeposit = params.AuctionParams.BidDepositMinimum
 	auction.UnrevealedForfeitBps = params.AuctionParams.UnrevealedBidPenaltyBps
 	auction.TieBreakRule = params.AuctionParams.TieBreakRule
@@ -600,7 +600,7 @@ func validateGovernanceEndpointSchemesV2(schemes []string) error {
 			return fmt.Errorf("duplicate identity governance endpoint scheme %q", scheme)
 		}
 		switch scheme {
-		case "aetheris", "grpcs", "https", "ipfs", "wss":
+		case "aetra", "grpcs", "https", "ipfs", "wss":
 		default:
 			return fmt.Errorf("unsupported identity governance endpoint scheme %q", scheme)
 		}

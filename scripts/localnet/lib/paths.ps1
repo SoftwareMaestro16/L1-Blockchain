@@ -73,5 +73,5 @@ function Get-NodeHome {
   )
 
   $resolved = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
-  return Join-Path $resolved "node$Index\aetherisd"
+  return Join-Path $resolved "node$Index\aetrad"
 }

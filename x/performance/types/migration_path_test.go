@@ -240,7 +240,7 @@ func validMigrationPhase0Input() MigrationPhase0Input {
 			genesisImport("staking"),
 			genesisImport("slashing"),
 			genesisImport("distribution"),
-			genesisImport("aethercore"),
+			genesisImport("aetracore"),
 		},
 		DynamicFeeBoundsTestHash: hashStrings("dynamic-fee-bounds"),
 		InvariantChecks: []ModuleInvariantCheck{
@@ -260,7 +260,7 @@ func validMigrationPhase0Input() MigrationPhase0Input {
 func validMigrationPhase1Input() MigrationPhase1Input {
 	emptyQueueRoot := hashStrings("empty-message-queues")
 	return MigrationPhase1Input{
-		AetherCoreModuleHash:    hashStrings("x-aethercore"),
+		AetraCoreModuleHash:     hashStrings("x-aetracore"),
 		ZoneRegistryRoot:        hashStrings("default-zone-registry"),
 		ZoneCount:               1,
 		DefaultZoneID:           "default",

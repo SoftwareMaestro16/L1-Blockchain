@@ -11,7 +11,7 @@ $content = Get-Content -LiteralPath $doc -Raw
 
 $required = @(
   "Refactor Audit Report",
-  "x/aetherisvm/async",
+  "x/aetravm/async",
   "types.go",
   "params.go",
   "address.go",

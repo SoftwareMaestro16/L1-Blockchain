@@ -38,7 +38,7 @@ Contract address derivation is deterministic:
 
 ```text
 address = sha256(
-  "aetheris/async-contract/v1",
+  "aetra/async-contract/v1",
   deployer,
   code_hash,
   salt
@@ -170,7 +170,7 @@ Nodes should expose deterministic counters or gauges for:
 
 ## Executable Specification
 
-The pure Go package `x/aetherisvm/async` is the current executable
+The pure Go package `x/aetravm/async` is the current executable
 specification for Phase 10. It does not wire the VM into the app. It defines:
 
 - contract address derivation
@@ -196,7 +196,7 @@ the semantics version.
 ## Required Tests
 
 ```powershell
-go test ./x/aetherisvm/async
+go test ./x/aetravm/async
 go test ./...
 ```
 

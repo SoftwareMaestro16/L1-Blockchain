@@ -2,7 +2,7 @@
 # TO_AUDIT: Aetra Automated Fuzzing And Exploit Campaign
 
 This file defines the audit task list to run before a fuzzing/invariant
-campaign. It is based on `docs/security/aetheris-fuzzing-invariant-pipeline.md`
+campaign. It is based on `docs/security/aetra-fuzzing-invariant-pipeline.md`
 and the Aetra attack catalog.
 
 Runtime reports, generated scenarios, minimized exploits, and state diffs
@@ -28,11 +28,11 @@ coverage.
 
 ## Source Documents And Scope
 
-- [ ] Use `docs/security/aetheris-fuzzing-invariant-pipeline.md` as the primary
+- [ ] Use `docs/security/aetra-fuzzing-invariant-pipeline.md` as the primary
   pipeline task source.
 - [ ] Use existing module-boundary and security docs to map module invariants.
 - [ ] Include current implemented modules: `x/fees`, `x/tokenfactory`, `x/dex`,
-  `x/aetherisvm`, and the Cosmos SDK base modules wired through `app`.
+  `x/aetravm`, and the Cosmos SDK base modules wired through `app`.
 - [ ] Include future architecture surfaces where specs already exist:
   `x/execution`, `x/vm`, `x/messaging`, `x/queue`, `x/events`, `x/actors`,
   `x/scheduler`, `x/storage`, `x/identity`, `x/reputation`, `x/sharding/sim`.

@@ -21,7 +21,7 @@ The health command checks:
 - peer availability for multi-validator localnet
 - REST gateway `/cosmos/base/tendermint/v1beta1/blocks/latest`
 - gRPC TCP readiness
-- tracked `aetherisd` process ids
+- tracked `aetrad` process ids
 - generated telemetry mode from node `app.toml`
 - recent redacted node log tails
 

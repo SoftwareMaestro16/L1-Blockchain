@@ -848,7 +848,7 @@ func ZoneMempoolLane(zoneID ZoneID) string {
 func ComputeZoneRootHash(root ZoneRoot) string {
 	root = canonicalZoneRoot(root)
 	return hashRuntimeParts(
-		"aetheris-zone-root-v1",
+		"aetra-zone-root-v1",
 		string(root.ZoneID),
 		fmt.Sprint(root.Height),
 		root.ZoneStateRoot,
@@ -866,7 +866,7 @@ func ComputeZoneExportManifestHash(manifest ZoneExportManifest) string {
 		manifest.EventRoot = EmptyRootHash()
 	}
 	return hashRuntimeParts(
-		"aetheris-zone-export-manifest-v1",
+		"aetra-zone-export-manifest-v1",
 		string(manifest.ZoneID),
 		fmt.Sprint(manifest.Height),
 		manifest.DescriptorRoot,
@@ -883,7 +883,7 @@ func ComputeZoneExportManifestHash(manifest ZoneExportManifest) string {
 
 func ComputeZoneReceiptHash(receipt ZoneReceipt) string {
 	return hashRuntimeParts(
-		"aetheris-zone-receipt-v1",
+		"aetra-zone-receipt-v1",
 		string(receipt.ZoneID),
 		fmt.Sprint(receipt.Height),
 		receipt.ItemHash,
@@ -897,7 +897,7 @@ func ComputeZoneReceiptHash(receipt ZoneReceipt) string {
 func ComputeZoneReceiptRoot(receipts []ZoneReceipt) string {
 	ordered := cloneZoneReceipts(receipts)
 	h := sha256.New()
-	writeRuntimePart(h, "aetheris-zone-receipt-root-v1")
+	writeRuntimePart(h, "aetra-zone-receipt-root-v1")
 	writeRuntimeUint64(h, uint64(len(ordered)))
 	for _, receipt := range ordered {
 		writeRuntimePart(h, receipt.ReceiptHash)
@@ -908,7 +908,7 @@ func ComputeZoneReceiptRoot(receipts []ZoneReceipt) string {
 func ComputeZoneExecutionResultRoot(receipts []ZoneReceipt) string {
 	ordered := cloneZoneReceipts(receipts)
 	h := sha256.New()
-	writeRuntimePart(h, "aetheris-zone-execution-result-root-v1")
+	writeRuntimePart(h, "aetra-zone-execution-result-root-v1")
 	writeRuntimeUint64(h, uint64(len(ordered)))
 	for _, receipt := range ordered {
 		writeRuntimePart(h, receipt.ItemHash)
@@ -921,7 +921,7 @@ func ComputeZoneExecutionResultRoot(receipts []ZoneReceipt) string {
 
 func ComputeZoneMessageQueuesRoot(inbox []ZoneMessage, outbox []ZoneMessage) string {
 	return hashRuntimeParts(
-		"aetheris-zone-message-queues-v1",
+		"aetra-zone-message-queues-v1",
 		ComputeZoneMessageRoot(inbox),
 		ComputeZoneMessageRoot(outbox),
 	)
@@ -938,7 +938,7 @@ func ComputeZoneProofCollectionRoot(proofs []ZoneProof) string {
 		}
 		return ordered[i].ProofHash < ordered[j].ProofHash
 	})
-	parts := []string{"aetheris-zone-proof-collection-root-v1", fmt.Sprint(len(ordered))}
+	parts := []string{"aetra-zone-proof-collection-root-v1", fmt.Sprint(len(ordered))}
 	for _, proof := range ordered {
 		parts = append(parts, proof.ProofHash)
 	}
@@ -947,7 +947,7 @@ func ComputeZoneProofCollectionRoot(proofs []ZoneProof) string {
 
 func ComputeZoneProofHash(proof ZoneProof) string {
 	h := sha256.New()
-	writeRuntimePart(h, "aetheris-zone-proof-v1")
+	writeRuntimePart(h, "aetra-zone-proof-v1")
 	writeRuntimePart(h, string(proof.ZoneID))
 	writeRuntimeUint64(h, proof.Height)
 	writeRuntimePart(h, string(proof.Kind))

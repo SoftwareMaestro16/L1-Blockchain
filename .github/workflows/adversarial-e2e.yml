@@ -20,7 +20,7 @@ env:
   BUF_VERSION: "1.70.0"
   GOCOSMOS_VERSION: "v1.7.0"
   GRPC_GATEWAY_VERSION: "v1.16.0"
-  AETHERIS_BINARY: build\aetherisd.exe
+  AETRA_BINARY: build\aetrad.exe
 
 jobs:
   unit-adversarial:
@@ -123,7 +123,7 @@ jobs:
           }
 
   build:
-    name: build aetherisd
+    name: build aetrad
     runs-on: windows-latest
     timeout-minutes: 25
     steps:
@@ -140,7 +140,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force build | Out-Null
-          go build -o $env:AETHERIS_BINARY .\cmd\l1d
+          go build -o $env:AETRA_BINARY .\cmd\l1d
 
   e2e-smoke:
     name: adversarial localnet smoke
@@ -166,13 +166,13 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force build | Out-Null
-          go build -o $env:AETHERIS_BINARY .\cmd\l1d
+          go build -o $env:AETRA_BINARY .\cmd\l1d
 
       - name: Run adversarial localnet smoke
         shell: pwsh
         run: |
           $duration = Measure-Command {
-            .\tests\e2e\adversarial_smoke.ps1 -Binary $env:AETHERIS_BINARY -SpamCount 3 -TimeoutSeconds 120 -SkipBuild
+            .\tests\e2e\adversarial_smoke.ps1 -Binary $env:AETRA_BINARY -SpamCount 3 -TimeoutSeconds 120 -SkipBuild
           }
           "### CI Timing Summary" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
           "| Check | Duration seconds |" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
@@ -200,13 +200,13 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force build | Out-Null
-          go build -o $env:AETHERIS_BINARY .\cmd\l1d
+          go build -o $env:AETRA_BINARY .\cmd\l1d
 
       - name: Run scaled localnet smoke
         shell: pwsh
         run: |
           $duration = Measure-Command {
-            .\tests\e2e\localnet_smoke.ps1 -Binary $env:AETHERIS_BINARY -ValidatorCounts 3,5,10 -TimeoutSeconds 180
+            .\tests\e2e\localnet_smoke.ps1 -Binary $env:AETRA_BINARY -ValidatorCounts 3,5,10 -TimeoutSeconds 180
           }
           "### CI Timing Summary" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
           "| Check | Duration seconds |" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append

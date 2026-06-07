@@ -10,7 +10,7 @@ import (
 )
 
 func TestNodeRecordSignatureIdentityAndExpiry(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	record := signedNodeRecord(t, 0x11, salt, 100, NodeRoleFull, NodeRoleRouting)
 
 	require.NoError(t, record.Validate(salt, 99))
@@ -27,7 +27,7 @@ func TestNodeRecordSignatureIdentityAndExpiry(t *testing.T) {
 }
 
 func TestNodeIdentityDerivesFromKeysAndBindsRoles(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	privateKey := deterministicPrivateKey(0x12)
 	leftAddressHash, err := HashNetworkAddresses([]string{"tcp://10.0.0.1:26656"})
 	require.NoError(t, err)
@@ -71,7 +71,7 @@ func TestNodeIdentityDerivesFromKeysAndBindsRoles(t *testing.T) {
 }
 
 func TestSignedIdentityTransitionRotatesNodeIdentity(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	oldPrivateKey := deterministicPrivateKey(0x91)
 	newPrivateKey := deterministicPrivateKey(0x92)
 	oldRecord := signedNodeRecord(t, 0x91, salt, 100, NodeRoleService)
@@ -140,7 +140,7 @@ func TestNetworkAddressHashCanonicalizesOffchainAddresses(t *testing.T) {
 
 	require.Equal(t, left, right)
 
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	record := signedNodeRecord(t, 0x19, salt, 100, NodeRoleFull)
 	record.NetworkAddressesHash = left
 	payload, err := record.SigningPayload()
@@ -151,7 +151,7 @@ func TestNetworkAddressHashCanonicalizesOffchainAddresses(t *testing.T) {
 }
 
 func TestSessionNegotiationCreatesDeterministicStreams(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	local := signedNodeRecord(t, 0x21, salt, 100, NodeRoleFull)
 	remote := signedNodeRecord(t, 0x22, salt, 100, NodeRoleService)
 
@@ -180,7 +180,7 @@ func TestSessionNegotiationCreatesDeterministicStreams(t *testing.T) {
 }
 
 func TestSessionHandshakeStateMachineRejectsReplaysAndExpiredRecords(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	local := signedNodeRecord(t, 0x25, salt, 100, NodeRoleFull)
 	remote := signedNodeRecord(t, 0x26, salt, 100, NodeRoleService)
 	req := testSessionRequest(local, remote, 20, 60, "state-machine-handshake", []ChannelClass{ChannelConsensus, ChannelService})
@@ -206,7 +206,7 @@ func TestSessionHandshakeStateMachineRejectsReplaysAndExpiredRecords(t *testing.
 }
 
 func TestSessionKeyRotationUpdatesKeysWithoutChangingSessionID(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	local := signedNodeRecord(t, 0x28, salt, 100, NodeRoleFull)
 	remote := signedNodeRecord(t, 0x29, salt, 100, NodeRoleService)
 	handshake, err := RunSessionHandshake(local, remote, testSessionRequest(local, remote, 20, 80, "rotate-session-keys", nil), salt, 20, nil)
@@ -242,7 +242,7 @@ func TestSessionKeyRotationUpdatesKeysWithoutChangingSessionID(t *testing.T) {
 }
 
 func TestMultiplexedStreamsEnforceEncryptionCapacityAndResetPolicy(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	local := signedNodeRecord(t, 0x23, salt, 100, NodeRoleFull)
 	remote := signedNodeRecord(t, 0x24, salt, 100, NodeRoleService)
 	session, err := NegotiateVerifiedSession(local, remote, testSessionRequest(local, remote, 10, 50, "multiplexed-streams", nil), salt, 10)
@@ -439,7 +439,7 @@ func TestL0AlertsEscalateConsensusDropsAboveBackpressure(t *testing.T) {
 }
 
 func TestChunkPayloadRoundTripAndCorruptionDetection(t *testing.T) {
-	payload := bytes.Repeat([]byte("aetheris-networking"), 512)
+	payload := bytes.Repeat([]byte("aetra-networking"), 512)
 	chunks, err := ChunkPayload(payload, 257)
 	require.NoError(t, err)
 	require.Greater(t, len(chunks), 1)
@@ -863,7 +863,7 @@ func TestRL2AdaptiveChunkSizingAndOfferValidation(t *testing.T) {
 }
 
 func TestNetworkingStateRegistersNodesAndSessionsCanonically(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	local := signedNodeRecord(t, 0x31, salt, 100, NodeRoleFull)
 	remote := signedNodeRecord(t, 0x32, salt, 100, NodeRoleService)
 
@@ -975,7 +975,7 @@ func TestOverlayDescriptorRejectsInvalidMembershipQoSAndFanout(t *testing.T) {
 }
 
 func TestOverlayMembershipMatchesNodeRolesAndCapabilities(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	multiRole := signedNodeRecord(t, 0x35, salt, 100, NodeRoleFull, NodeRoleZoneExecution, NodeRoleService, NodeRoleStorageProvider, NodeRoleRouting)
 
 	for _, overlayType := range []OverlayType{
@@ -1057,7 +1057,7 @@ func TestOverlayRoutingFanoutClampsToEligiblePeers(t *testing.T) {
 }
 
 func TestOverlayMembershipProofAuthorizesServiceStakeAndSignedRecords(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	service := signedNodeRecord(t, 0x38, salt, 100, NodeRoleService)
 	serviceDesc := defaultOverlayByType(t, OverlayTypeService)
 	serviceProof := testOverlayMembershipProof(t, service, serviceDesc, MembershipProofServiceRegistration, OverlayMembershipModeServiceRegistry, 80)
@@ -1086,7 +1086,7 @@ func TestOverlayMembershipProofAuthorizesServiceStakeAndSignedRecords(t *testing
 }
 
 func TestOverlayRoutingPipelineClassifiesAndSelectsServiceProviders(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	source := signedNodeRecord(t, 0x3b, salt, 100, NodeRoleFull)
 	left := signedNodeRecord(t, 0x3c, salt, 100, NodeRoleService)
 	right := signedNodeRecord(t, 0x3d, salt, 100, NodeRoleService)
@@ -1132,7 +1132,7 @@ func TestOverlayRoutingPipelineClassifiesAndSelectsServiceProviders(t *testing.T
 }
 
 func TestOverlayRoutingConsensusSafetyRequiresCommittedRoutingTable(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	source := signedNodeRecord(t, 0x3e, salt, 100, NodeRoleZoneExecution)
 	slow := signedNodeRecord(t, 0x3f, salt, 100, NodeRoleZoneExecution)
 	fast := signedNodeRecord(t, 0x40, salt, 100, NodeRoleZoneExecution)
@@ -1196,7 +1196,7 @@ func TestOverlayRoutingConsensusSafetyRequiresCommittedRoutingTable(t *testing.T
 }
 
 func TestAdaptiveOverlayGraphBuildsPeerSetsAndPreservesGlobalDiversity(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	local := signedNodeRecord(t, 0x43, salt, 100, NodeRoleService)
 	desc := defaultOverlayByType(t, OverlayTypeService)
 	peers := []AdaptivePeer{
@@ -1308,7 +1308,7 @@ func TestRoutingTableCommitmentGuardsExecutionScheduling(t *testing.T) {
 }
 
 func TestOverlayMembershipManagerRegistersMembersCanonically(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	desc := defaultOverlayByType(t, OverlayTypeService)
 	record := signedNodeRecord(t, 0x49, salt, 100, NodeRoleService)
 	proof := testOverlayMembershipProof(t, record, desc, MembershipProofServiceRegistration, OverlayMembershipModeServiceRegistry, 80)
@@ -1324,7 +1324,7 @@ func TestOverlayMembershipManagerRegistersMembersCanonically(t *testing.T) {
 }
 
 func TestRoutingGraphBuilderProducesDeterministicEdges(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	local := signedNodeRecord(t, 0x4a, salt, 100, NodeRoleService)
 	desc := defaultOverlayByType(t, OverlayTypeService)
 	peers := []AdaptivePeer{
@@ -1349,7 +1349,7 @@ func TestRoutingGraphBuilderProducesDeterministicEdges(t *testing.T) {
 }
 
 func TestOverlayPartitionUsesFallbackRouteForPhysicalDelivery(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	source := signedNodeRecord(t, 0x4e, salt, 100, NodeRoleFull)
 	service := signedNodeRecord(t, 0x4f, salt, 100, NodeRoleService)
 	fallbackA := signedNodeRecord(t, 0x50, salt, 100, NodeRoleFull)
@@ -1410,10 +1410,12 @@ func TestOverlayPartitionUsesFallbackRouteForPhysicalDelivery(t *testing.T) {
 }
 
 func TestAdaptivePeerRotationBoundsChurnAndKeepsStablePeers(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	local := signedNodeRecord(t, 0x55, salt, 100, NodeRoleService)
 	desc := defaultOverlayByType(t, OverlayTypeService)
 	stable := testAdaptivePeer(t, signedNodeRecord(t, 0x56, salt, 100, NodeRoleService), 9_000, 20, 9_900, true)
+	stable.ZonesSupported = nil
+	stable.Services = nil
 	oldA := testAdaptivePeer(t, signedNodeRecord(t, 0x57, salt, 100, NodeRoleService), 8_000, 40, 8_000, false)
 	oldB := testAdaptivePeer(t, signedNodeRecord(t, 0x58, salt, 100, NodeRoleService), 7_500, 60, 7_500, false)
 	oldC := testAdaptivePeer(t, signedNodeRecord(t, 0x59, salt, 100, NodeRoleFull), 7_000, 100, 7_000, false)
@@ -1456,7 +1458,7 @@ func TestAetherMeshMessageTypesMapToChannels(t *testing.T) {
 }
 
 func TestAetherMeshMessageSignsAndRejectsTampering(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	originKey := deterministicPrivateKey(0x5b)
 	origin := signedNodeRecord(t, 0x5b, salt, 100, NodeRoleService)
 	destination := signedNodeRecord(t, 0x5c, salt, 100, NodeRoleService)
@@ -1500,7 +1502,7 @@ func TestAetherMeshMessageSignsAndRejectsTampering(t *testing.T) {
 }
 
 func TestAetherMeshCrossZoneAndConsensusProofRules(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	origin := signedNodeRecord(t, 0x5d, salt, 100, NodeRoleZoneExecution)
 	destination := signedNodeRecord(t, 0x5e, salt, 100, NodeRoleZoneExecution)
 	desc := defaultOverlayByType(t, OverlayTypeExecution)
@@ -1561,7 +1563,7 @@ func TestAetherMeshCrossZoneAndConsensusProofRules(t *testing.T) {
 }
 
 func TestAetherMeshRouteUsesOverlayAndServicePeers(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	source := signedNodeRecord(t, 0x5f, salt, 100, NodeRoleFull)
 	left := signedNodeRecord(t, 0x60, salt, 100, NodeRoleService)
 	right := signedNodeRecord(t, 0x62, salt, 100, NodeRoleService)
@@ -1606,7 +1608,7 @@ func TestAetherMeshRouteUsesOverlayAndServicePeers(t *testing.T) {
 }
 
 func TestExecutionZoneMessageRequiresCommittedScheduleForConsensusOrder(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	origin := signedNodeRecord(t, 0x63, salt, 100, NodeRoleZoneExecution)
 	destination := signedNodeRecord(t, 0x64, salt, 100, NodeRoleZoneExecution)
 	desc := defaultOverlayByType(t, OverlayTypeExecution)
@@ -1679,7 +1681,7 @@ func TestExecutionZoneMessageRequiresCommittedScheduleForConsensusOrder(t *testi
 }
 
 func TestExecutionZoneMessageSupportsAsyncParallelBlockSTMGroups(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	origin := signedNodeRecord(t, 0x65, salt, 100, NodeRoleZoneExecution)
 	destination := signedNodeRecord(t, 0x66, salt, 100, NodeRoleZoneExecution)
 	desc := defaultOverlayByType(t, OverlayTypeExecution)
@@ -1787,7 +1789,7 @@ func TestCrossZoneReceiptIsRollbackSafeAndProofQueryable(t *testing.T) {
 }
 
 func TestOverlayMessageQueueOrdersMessagesAndRejectsReplay(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	origin := signedNodeRecord(t, 0x67, salt, 100, NodeRoleService)
 	destination := signedNodeRecord(t, 0x68, salt, 100, NodeRoleService)
 	desc := defaultOverlayByType(t, OverlayTypeService)
@@ -1908,7 +1910,7 @@ func TestQueryResponseProofAttachmentIsRequiredAndMetriced(t *testing.T) {
 }
 
 func TestL3MetricsAccountQueuesReplayDropsAndExpiry(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	origin := signedNodeRecord(t, 0x69, salt, 100, NodeRoleService)
 	destination := signedNodeRecord(t, 0x6a, salt, 100, NodeRoleService)
 	desc := defaultOverlayByType(t, OverlayTypeService)
@@ -2077,7 +2079,7 @@ func TestLargeNetworkPayloadRequiresChunkedVerifiedCommitment(t *testing.T) {
 }
 
 func TestDiscoveryRecordMustBeSignedExpiringAndProofChecked(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	record := signedNodeRecord(t, 0x51, salt, 100, NodeRoleStateSync)
 	discovery := DiscoveryRecord{
 		Record:      record,
@@ -2096,7 +2098,7 @@ func TestDiscoveryRecordMustBeSignedExpiringAndProofChecked(t *testing.T) {
 }
 
 func TestDistributedRoutingTableIndexesLeaseBasedDiscoveryObjects(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	overlay := defaultOverlayByType(t, OverlayTypeService)
 	serviceLow := signedNodeRecordWithCapabilities(t, 0x52, salt, 100, []NodeRole{NodeRoleService}, nil, []string{"svc.payments"})
 	serviceHigh := signedNodeRecordWithCapabilities(t, 0x53, salt, 100, []NodeRole{NodeRoleService}, nil, []string{"svc.payments"})
@@ -2149,7 +2151,7 @@ func TestDistributedRoutingTableIndexesLeaseBasedDiscoveryObjects(t *testing.T) 
 }
 
 func TestDRTRejectsExpiredTamperedAndRoleMismatchedAdvertisements(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	service := signedNodeRecordWithCapabilities(t, 0x58, salt, 100, []NodeRole{NodeRoleService}, nil, []string{"svc.search"})
 	full := signedNodeRecord(t, 0x59, salt, 100, NodeRoleFull)
 	table := EmptyDistributedRoutingTable()
@@ -2177,7 +2179,7 @@ func TestDRTRejectsExpiredTamperedAndRoleMismatchedAdvertisements(t *testing.T) 
 }
 
 func TestDRTBucketsAndOverlayNativeDiscoveryAreDeterministic(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	overlay := defaultOverlayByType(t, OverlayTypeRouting)
 	local := signedNodeRecord(t, 0x5a, salt, 100, NodeRoleFull)
 	left := signedNodeRecord(t, 0x5b, salt, 100, NodeRoleRouting)
@@ -2207,7 +2209,7 @@ func TestDRTBucketsAndOverlayNativeDiscoveryAreDeterministic(t *testing.T) {
 }
 
 func TestSignedDiscoveryRecordStoreFindRenewAndRevoke(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	owner := signedNodeRecordWithCapabilities(t, 0x5d, salt, 120, []NodeRole{NodeRoleService}, nil, []string{"svc.payments"})
 	targetID := HashParts("discovery-target", "svc.payments")
 	endpointHash := HashParts("endpoint", "svc.payments.primary")
@@ -2250,7 +2252,7 @@ func TestSignedDiscoveryRecordStoreFindRenewAndRevoke(t *testing.T) {
 }
 
 func TestDiscoveryQueryOperationsCoverNodeZoneStorageAndEndpoint(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	node := signedNodeRecord(t, 0x5e, salt, 100, NodeRoleFull)
 	zone := signedNodeRecordWithCapabilities(t, 0x5f, salt, 100, []NodeRole{NodeRoleZoneExecution}, []string{"zone-b"}, nil)
 	storage := signedNodeRecord(t, 0x60, salt, 100, NodeRoleStorageProvider)
@@ -2283,7 +2285,7 @@ func TestDiscoveryQueryOperationsCoverNodeZoneStorageAndEndpoint(t *testing.T) {
 }
 
 func TestDiscoveryResponseSignsResultsAndProofAttachment(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	source := signedNodeRecord(t, 0x62, salt, 120, NodeRoleRouting)
 	service := signedNodeRecordWithCapabilities(t, 0x63, salt, 120, []NodeRole{NodeRoleService}, nil, []string{"svc.search"})
 	record := testSignedDiscoveryObjectRecord(t, service, 0x63, salt, DRTObjectServiceEndpoint, HashParts("target", "svc.search"), HashParts("endpoint", "svc.search"), "", "svc.search", "", 90)
@@ -2328,7 +2330,7 @@ func TestDiscoveryResponseSignsResultsAndProofAttachment(t *testing.T) {
 }
 
 func TestDiscoveryResponseRejectsExpiredForgedAndReplayedRecords(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	source := signedNodeRecord(t, 0x64, salt, 120, NodeRoleRouting)
 	service := signedNodeRecordWithCapabilities(t, 0x65, salt, 120, []NodeRole{NodeRoleService}, nil, []string{"svc.replay"})
 	record := testSignedDiscoveryObjectRecord(t, service, 0x65, salt, DRTObjectServiceEndpoint, HashParts("target", "svc.replay"), HashParts("endpoint", "svc.replay"), "", "svc.replay", "", 40)
@@ -2365,7 +2367,7 @@ func TestDiscoveryResponseRejectsExpiredForgedAndReplayedRecords(t *testing.T) {
 }
 
 func TestBroadcastMessageSignsDeduplicatesAndRejectsForgedOrExpired(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	originKey := deterministicPrivateKey(0x66)
 	origin := signedNodeRecord(t, 0x66, salt, 100, NodeRoleRouting)
 	desc := defaultOverlayByType(t, OverlayTypeRouting)
@@ -2404,7 +2406,7 @@ func TestBroadcastMessageSignsDeduplicatesAndRejectsForgedOrExpired(t *testing.T
 }
 
 func TestBroadcastForwardingUsesTreeThenGossipFallbackAndOverlayFanout(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	originKey := deterministicPrivateKey(0x67)
 	origin := signedNodeRecord(t, 0x67, salt, 100, NodeRoleRouting)
 	local := signedNodeRecord(t, 0x68, salt, 100, NodeRoleRouting)
@@ -2455,7 +2457,7 @@ func TestBroadcastForwardingUsesTreeThenGossipFallbackAndOverlayFanout(t *testin
 }
 
 func TestBroadcastPriorityOrderingAndOverlayMismatch(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	key := deterministicPrivateKey(0x6d)
 	serviceDesc := defaultOverlayByType(t, OverlayTypeService)
 	routingDesc := defaultOverlayByType(t, OverlayTypeRouting)
@@ -2485,7 +2487,7 @@ func TestBroadcastPriorityOrderingAndOverlayMismatch(t *testing.T) {
 }
 
 func TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	key := deterministicPrivateKey(0x6e)
 	peer := signedNodeRecord(t, 0x6f, salt, 100, NodeRoleRouting)
 	desc := defaultOverlayByType(t, OverlayTypeRouting)
@@ -2528,7 +2530,7 @@ func TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes(t *testing.
 }
 
 func TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	proposerKey := deterministicPrivateKey(0x70)
 	validatorKey := deterministicPrivateKey(0x71).Public().(ed25519.PublicKey)
 	addressHash, err := HashNetworkAddresses([]string{"tcp://127.0.0.70:26656"})
@@ -2542,7 +2544,7 @@ func TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs(t *testi
 	}, proposerKey, salt)
 	require.NoError(t, err)
 
-	blockBytes := bytes.Repeat([]byte("aetheris-block-body"), 32)
+	blockBytes := bytes.Repeat([]byte("aetra-block-body"), 32)
 	chunks, err := ChunkPayload(blockBytes, 96)
 	require.NoError(t, err)
 	chunkRoot, err := ComputeRL2ChunkRoot(chunks)
@@ -2594,7 +2596,7 @@ func TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs(t *testi
 }
 
 func TestStreamSessionFromSpecOpensAndAccountsFlowControl(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	local := signedNodeRecord(t, 0x72, salt, 100, NodeRoleFull, NodeRoleStateSync)
 	remote := signedNodeRecord(t, 0x73, salt, 100, NodeRoleService, NodeRoleStorageProvider)
 	session, err := NegotiateVerifiedSession(local, remote, testSessionRequest(local, remote, 10, 80, "stream-session", []ChannelClass{
@@ -2982,7 +2984,7 @@ func TestNetworkSecurityReplayChannelBindingAndQoSIsolation(t *testing.T) {
 	require.True(t, accepted)
 	require.Len(t, cache.Entries, 1)
 
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	local := signedNodeRecord(t, 0x74, salt, 100, NodeRoleFull)
 	remote := signedNodeRecord(t, 0x75, salt, 100, NodeRoleService)
 	session, err := NegotiateVerifiedSession(local, remote, testSessionRequest(local, remote, 10, 80, "security-channel", nil), salt, 10)
@@ -3002,7 +3004,7 @@ func TestNetworkSecurityReplayChannelBindingAndQoSIsolation(t *testing.T) {
 }
 
 func TestNetworkSecurityAuthenticatesDiscoveryOverlayAndChunks(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	owner := signedNodeRecordWithCapabilities(t, 0x76, salt, 100, []NodeRole{NodeRoleService}, nil, []string{"svc.secure"})
 	record := testSignedDiscoveryObjectRecord(t, owner, 0x76, salt, DRTObjectServiceEndpoint, HashParts("target", "svc.secure"), HashParts("endpoint", "svc.secure"), "", "svc.secure", "", 90)
 	require.NoError(t, ValidateSecurityDiscoveryRecord(record, salt, 20))
@@ -3040,7 +3042,7 @@ func TestNetworkSecurityAuthenticatesDiscoveryOverlayAndChunks(t *testing.T) {
 }
 
 func TestNetworkSecurityPeerDiversityAndWithheldBlockChunks(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	peerA := signedNodeRecordWithCapabilities(t, 0x77, salt, 100, []NodeRole{NodeRoleFull}, []string{"zone-a"}, nil)
 	peerB := peerA
 	peerC := signedNodeRecordWithCapabilities(t, 0x78, salt, 100, []NodeRole{NodeRoleFull}, []string{"zone-b"}, nil)
@@ -3198,7 +3200,7 @@ func TestEclipseResistancePlanMaintainsDiversityAndProofBackedRouting(t *testing
 }
 
 func TestSpamResistanceSignedEnvelopeRateLimitsAndResourceBackedAds(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	privateKey := deterministicPrivateKey(0x7b)
 	signer, err := SignNodeRecord(NodeRecord{
 		Roles:                []NodeRole{NodeRoleService},
@@ -3279,7 +3281,7 @@ func TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations(t *testing.
 	badRequest.MissingIndexes = []uint32{1, 2}
 	require.ErrorContains(t, ValidateChunkRequestLimit(badRequest, transfer, tightPolicy), "limit")
 
-	origin := signedNodeRecord(t, 0x7d, []byte("aetheris-test-network"), 100, NodeRoleFull)
+	origin := signedNodeRecord(t, 0x7d, []byte("aetra-test-network"), 100, NodeRoleFull)
 	msg, err := SignBroadcastMessage(BroadcastMessage{
 		OriginNode:  origin.NodeID,
 		OverlayID:   HashParts("spam-overlay"),
@@ -3293,7 +3295,7 @@ func TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations(t *testing.
 			OverlayBound: true,
 		},
 		Height: 20,
-	}, deterministicPrivateKey(0x7d), []byte("aetheris-test-network"))
+	}, deterministicPrivateKey(0x7d), []byte("aetra-test-network"))
 	require.NoError(t, err)
 	cache := NewBroadcastDedupCache(4)
 	cache, accepted, err := SuppressDuplicateBroadcast(cache, msg, origin.NodeID, 20)
@@ -3434,7 +3436,7 @@ func TestPerformanceModelBoundsFanoutLatencyStreamingAndQoS(t *testing.T) {
 }
 
 func TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	storage := signedNodeRecord(t, 0x7e, salt, 100, NodeRoleStorageProvider)
 	service := signedNodeRecord(t, 0x7f, salt, 100, NodeRoleService)
 	full := signedNodeRecord(t, 0x80, salt, 100, NodeRoleFull)
@@ -3830,7 +3832,7 @@ func TestNetworkingAPIIntegrationBuildsDiagnosticsProofsAndRouteHints(t *testing
 	broken.RouteHintEndpoint = false
 	require.ErrorContains(t, broken.Validate(), "route hints")
 
-	salt := []byte("aetheris-api-network")
+	salt := []byte("aetra-api-network")
 	service := signedNodeRecordWithCapabilities(t, 0x83, salt, 100, []NodeRole{NodeRoleService, NodeRoleFull}, []string{"zone-api"}, []string{"svc.api"})
 	stateSync := signedNodeRecordWithCapabilities(t, 0x84, salt, 100, []NodeRole{NodeRoleStateSync}, []string{"zone-api"}, []string{"state-sync"})
 	nodeResponse, err := BuildNodeNetworkingQueryResponse(NodeNetworkingQueryRequest{
@@ -4010,7 +4012,7 @@ func TestNetworkingComponentMapRejectsUnsafeBoundariesAndMissingLinks(t *testing
 }
 
 func TestXNetworkStateKeysMessagesAndQueries(t *testing.T) {
-	salt := []byte("aetheris-x-network-state")
+	salt := []byte("aetra-x-network-state")
 	node := signedNodeRecord(t, 0x85, salt, 100, NodeRoleFull, NodeRoleRouting)
 	service := signedNodeRecordWithCapabilities(t, 0x86, salt, 100, []NodeRole{NodeRoleService}, []string{"zone-net"}, []string{"svc.net"})
 	state := EmptyState()
@@ -4092,7 +4094,7 @@ func TestXNetworkStateKeysMessagesAndQueries(t *testing.T) {
 }
 
 func TestXNetworkStateRejectsInvalidKeysMessagesAndConsensusReputation(t *testing.T) {
-	salt := []byte("aetheris-x-network-invalid")
+	salt := []byte("aetra-x-network-invalid")
 	node := signedNodeRecord(t, 0x87, salt, 100, NodeRoleFull)
 	params := DefaultXNetworkParams(salt)
 	state, err := NewXNetworkState(params, EmptyState(), nil, nil, nil)
@@ -4693,7 +4695,7 @@ func TestNetworkingScopeBoundaryRejectsNonGoalViolations(t *testing.T) {
 }
 
 func TestNetworkRoleConsensusScopeRequiresBondedCommitment(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	record := signedNodeRecord(t, 0x61, salt, 100, NodeRoleService, NodeRoleRouting, NodeRoleStorageProvider)
 
 	scopes, err := RoleScopes(record, nil, 10)
@@ -4739,7 +4741,7 @@ func TestNetworkRoleConsensusScopeRequiresBondedCommitment(t *testing.T) {
 }
 
 func TestANAValidatesSignedPeerRoleAdvertisements(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	record := signedNodeRecord(t, 0x66, salt, 100, NodeRoleService)
 	adapter := DefaultAetherNetworkingAdapter()
 	discovery := DiscoveryRecord{Record: record}
@@ -4756,7 +4758,7 @@ func TestANAValidatesSignedPeerRoleAdvertisements(t *testing.T) {
 }
 
 func TestValidatorRoleIsConsensusCriticalWithoutRoleCommitment(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	privateKey := deterministicPrivateKey(0x71)
 	validatorKey := ed25519.NewKeyFromSeed(bytes.Repeat([]byte{0x72}, ed25519.SeedSize)).Public().(ed25519.PublicKey)
 	addressHash, err := HashNetworkAddresses([]string{"tcp://127.0.0.1:26656"})
@@ -4792,7 +4794,7 @@ func TestValidatorRoleIsConsensusCriticalWithoutRoleCommitment(t *testing.T) {
 }
 
 func TestRoleCommitmentRejectsUnbondedUnadvertisedAndOutlivingRecords(t *testing.T) {
-	salt := []byte("aetheris-test-network")
+	salt := []byte("aetra-test-network")
 	record := signedNodeRecord(t, 0x81, salt, 100, NodeRoleService)
 	state := EmptyState()
 	var err error
@@ -5021,7 +5023,7 @@ func testPerformanceStreamPlan() StreamParallelFetchPlan {
 func testRoadmapEvidence(t *testing.T) NetworkingRoadmapEvidence {
 	t.Helper()
 
-	salt := []byte("aetheris-roadmap")
+	salt := []byte("aetra-roadmap")
 	local := signedNodeRecord(t, 0x88, salt, 100, NodeRoleFull, NodeRoleRouting)
 	remote := signedNodeRecordWithCapabilities(t, 0x89, salt, 100, []NodeRole{NodeRoleService, NodeRoleRouting}, []string{"zone-roadmap"}, []string{"svc.roadmap"})
 	adapter := DefaultAetherNetworkingAdapter()

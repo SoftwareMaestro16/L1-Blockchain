@@ -174,7 +174,7 @@ func ComputeOverlayMembershipProofID(proof OverlayMembershipProof) string {
 		fmt.Sprintf("%t", proof.Committed),
 		fmt.Sprintf("%t", proof.Deterministic),
 		fmt.Sprintf("%d", proof.ExpiresHeight),
-		hashBytes("aetheris-overlay-membership-auth-pub-key-v1", proof.AuthPubKey),
+		hashBytes("aetra-overlay-membership-auth-pub-key-v1", proof.AuthPubKey),
 	)
 }
 

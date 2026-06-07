@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/x/fees/types"
 )
 
@@ -52,7 +52,7 @@ func TestModuleBalancesQueryReturnsFeeCollectorBalance(t *testing.T) {
 			continue
 		}
 		found = true
-		require.Equal(t, aetherisaddress.FormatAccAddress(feeCollector), balance.Address)
+		require.Equal(t, aetraaddress.FormatAccAddress(feeCollector), balance.Address)
 		require.Equal(t, before.Add(sdk.NewInt64Coin(types.BondDenom, 100)), balance.Balance)
 	}
 	require.True(t, found, "fee collector balance must be returned")

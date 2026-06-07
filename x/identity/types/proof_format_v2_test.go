@@ -16,11 +16,11 @@ func TestIdentityResolutionProofFormatV2FieldsEncodingAndCommitment(t *testing.T
 	appHash, err := IdentityStateRoot(state)
 	require.NoError(t, err)
 
-	proof, err := BuildIdentityResolutionProofFormatV2(state, "aetheris-local-1", appHash, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, addr(2))
+	proof, err := BuildIdentityResolutionProofFormatV2(state, "aetra-local-1", appHash, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, addr(2))
 	require.NoError(t, err)
 	require.Equal(t, IdentityProofSchemaVersionV2, proof.ProofVersion)
 	require.Equal(t, IdentityResolutionProofFormatV2FieldOrder[len(IdentityResolutionProofFormatV2FieldOrder)-1], "proof_commitment_hash")
-	require.Equal(t, "aetheris-local-1", proof.ChainID)
+	require.Equal(t, "aetra-local-1", proof.ChainID)
 	require.Equal(t, uint64(14), proof.Height)
 	require.Equal(t, appHash, proof.AppHash)
 	require.Equal(t, "alice.aet", proof.Name)
@@ -56,7 +56,7 @@ func TestIdentityResolutionProofFormatV2NonExistenceProof(t *testing.T) {
 	appHash, err := IdentityStateRoot(state)
 	require.NoError(t, err)
 
-	proof, err := BuildIdentityResolutionProofFormatV2(state, "aetheris-local-1", appHash, "missing.aet", IdentityProofQueryDomainAbsent, 14, 30, nil)
+	proof, err := BuildIdentityResolutionProofFormatV2(state, "aetra-local-1", appHash, "missing.aet", IdentityProofQueryDomainAbsent, 14, 30, nil)
 	require.NoError(t, err)
 	require.Nil(t, proof.DomainRecord)
 	require.NotNil(t, proof.NonExistenceProofOptional)
@@ -80,7 +80,7 @@ func TestRecursiveResolutionProofV2EncodingCommitmentAndCache(t *testing.T) {
 	cache, err := NewResolutionCacheRecordV2("api.alice.aet", pathHash, resolvedHash, 24, ResolverRecordVersionV2(finalRecordToResolverRecord(t, state, "alice.aet")), 1, 1)
 	require.NoError(t, err)
 
-	proof, err := BuildRecursiveResolutionProofV2(state, "aetheris-local-1", "alice.aet", "api.alice.aet", 14, 30, &cache)
+	proof, err := BuildRecursiveResolutionProofV2(state, "aetra-local-1", "alice.aet", "api.alice.aet", 14, 30, &cache)
 	require.NoError(t, err)
 	require.Equal(t, RecursiveResolutionProofV2FieldOrder[0], "proof_version")
 	require.Equal(t, "alice.aet", proof.RootName)
@@ -100,7 +100,7 @@ func TestRecursiveResolutionProofV2EncodingCommitmentAndCache(t *testing.T) {
 	require.True(t, bytes.Equal(encoded1, encoded2))
 	require.Equal(t, ComputeRecursiveResolutionProofCommitmentHashV2(proof), proof.ProofCommitmentHash)
 
-	resolutionProof, err := BuildIdentityResolutionProofFormatV2(state, "aetheris-local-1", proof.FinalRecordProof.RootHash, "api.alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
+	resolutionProof, err := BuildIdentityResolutionProofFormatV2(state, "aetra-local-1", proof.FinalRecordProof.RootHash, "api.alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
 	require.NoError(t, err)
 	require.NotEqual(t, resolutionProof.ProofCommitmentHash, proof.ProofCommitmentHash)
 }

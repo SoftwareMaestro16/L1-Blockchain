@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/sovereign-l1/l1/app/addressing"
-	coretypes "github.com/sovereign-l1/l1/x/aethercore/types"
+	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 )
 
 type XServiceProvidersStateObject string
@@ -650,7 +650,7 @@ func (state ServiceProviderState) Validate() error {
 
 func ComputeXServiceProvidersModuleBreakdownHash(breakdown XServiceProvidersModuleBreakdown) string {
 	breakdown = canonicalXServiceProvidersModuleBreakdown(breakdown)
-	parts := []string{"aetheris-x-serviceproviders-breakdown-v1", breakdown.ModulePath}
+	parts := []string{"aetra-x-serviceproviders-breakdown-v1", breakdown.ModulePath}
 	parts = appendStringParts(parts, "purpose", breakdown.Purpose)
 	for _, state := range breakdown.StateObjects {
 		parts = append(parts, "state", string(state))
@@ -672,7 +672,7 @@ func ComputeXServiceProvidersModuleBreakdownHash(breakdown XServiceProvidersModu
 
 func ComputeProviderCollateralHash(collateral ProviderCollateral) string {
 	return servicesHashParts(
-		"aetheris-x-serviceproviders-collateral-v1",
+		"aetra-x-serviceproviders-collateral-v1",
 		collateral.ServiceID,
 		collateral.ProviderID,
 		collateral.Denom,
@@ -684,7 +684,7 @@ func ComputeProviderCollateralHash(collateral ProviderCollateral) string {
 
 func ComputeAvailabilityCommitmentRecordHash(commitment AvailabilityCommitment) string {
 	return servicesHashParts(
-		"aetheris-x-serviceproviders-availability-record-v1",
+		"aetra-x-serviceproviders-availability-record-v1",
 		commitment.ServiceID,
 		commitment.ProviderID,
 		commitment.InterfaceHash,
@@ -693,11 +693,11 @@ func ComputeAvailabilityCommitmentRecordHash(commitment AvailabilityCommitment) 
 }
 
 func ComputeMsgSubmitAvailabilityCommitmentHash(msg MsgSubmitAvailabilityCommitment) string {
-	return servicesHashParts("aetheris-x-serviceproviders-msg-submit-availability-v1", msg.Authority, msg.Commitment.RecordHash)
+	return servicesHashParts("aetra-x-serviceproviders-msg-submit-availability-v1", msg.Authority, msg.Commitment.RecordHash)
 }
 
 func ComputeMsgSubmitProviderFaultHash(msg MsgSubmitProviderFault) string {
-	return servicesHashParts("aetheris-x-serviceproviders-msg-submit-fault-v1", msg.Authority, msg.Report.ReportHash, msg.Proof.FaultProofHash)
+	return servicesHashParts("aetra-x-serviceproviders-msg-submit-fault-v1", msg.Authority, msg.Report.ReportHash, msg.Proof.FaultProofHash)
 }
 
 func ComputeServiceProviderStateRootHash(state ServiceProviderState) string {
@@ -709,7 +709,7 @@ func ComputeServiceProviderStateRootHash(state ServiceProviderState) string {
 	sortProviderCollaterals(state.Collaterals)
 	sortReputationRecords(state.Reputations)
 	sortAvailabilityCommitments(state.Commitments)
-	parts := []string{"aetheris-x-serviceproviders-state-root-v1", fmt.Sprint(state.UpdatedHeight)}
+	parts := []string{"aetra-x-serviceproviders-state-root-v1", fmt.Sprint(state.UpdatedHeight)}
 	for _, provider := range state.Providers {
 		parts = append(parts, "provider", provider.RecordHash)
 	}

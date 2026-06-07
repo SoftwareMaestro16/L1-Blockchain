@@ -7,7 +7,7 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	aetherisaddress "github.com/sovereign-l1/l1/app/addressing"
+	aetraaddress "github.com/sovereign-l1/l1/app/addressing"
 	"github.com/sovereign-l1/l1/observability"
 	"github.com/sovereign-l1/l1/x/fees/types"
 )
@@ -52,9 +52,9 @@ func validateNoZeroTxAddresses(tx sdk.Tx) error {
 		}
 	}
 	if feeTx, ok := tx.(sdk.FeeTx); ok {
-		if payer := sdk.AccAddress(feeTx.FeePayer()); aetherisaddress.IsZeroAccAddress(payer) {
+		if payer := sdk.AccAddress(feeTx.FeePayer()); aetraaddress.IsZeroAccAddress(payer) {
 			return types.ErrInvalidFee.Wrap("fee payer must not be zero address")
-		} else if reserved, found := aetherisaddress.SystemAddressByBytes(payer); found {
+		} else if reserved, found := aetraaddress.SystemAddressByBytes(payer); found {
 			return types.ErrInvalidFee.Wrapf("fee payer is reserved system address %s", reserved.Name)
 		}
 	}
@@ -64,10 +64,10 @@ func validateNoZeroTxAddresses(tx sdk.Tx) error {
 			return err
 		}
 		for i, signer := range signers {
-			if aetherisaddress.IsZero(signer) {
+			if aetraaddress.IsZero(signer) {
 				return types.ErrInvalidFee.Wrapf("signer %d must not be zero address", i)
 			}
-			if reserved, found := aetherisaddress.SystemAddressByBytes(signer); found {
+			if reserved, found := aetraaddress.SystemAddressByBytes(signer); found {
 				return types.ErrInvalidFee.Wrapf("signer %d is reserved system address %s", i, reserved.Name)
 			}
 		}
@@ -95,13 +95,13 @@ func selectTxSender(tx sdk.Tx, feeTx sdk.FeeTx) sdk.AccAddress {
 func validateNoZeroMsgAddresses(msg sdk.Msg) error {
 	switch msg := msg.(type) {
 	case *banktypes.MsgSend:
-		if err := aetherisaddress.ValidateUserAddress("bank send sender", msg.FromAddress); err != nil {
+		if err := aetraaddress.ValidateUserAddress("bank send sender", msg.FromAddress); err != nil {
 			return types.ErrInvalidFee.Wrap(err.Error())
 		}
 		if err := validateUserFundSender("bank send sender", msg.FromAddress); err != nil {
 			return err
 		}
-		if err := aetherisaddress.ValidateUserAddress("bank send recipient", msg.ToAddress); err != nil {
+		if err := aetraaddress.ValidateUserAddress("bank send recipient", msg.ToAddress); err != nil {
 			return types.ErrInvalidFee.Wrap(err.Error())
 		}
 		if err := validateUserFundRecipient("bank send recipient", msg.ToAddress); err != nil {
@@ -109,7 +109,7 @@ func validateNoZeroMsgAddresses(msg sdk.Msg) error {
 		}
 	case *banktypes.MsgMultiSend:
 		for i, input := range msg.Inputs {
-			if err := aetherisaddress.ValidateUserAddress("bank multisend input", input.Address); err != nil {
+			if err := aetraaddress.ValidateUserAddress("bank multisend input", input.Address); err != nil {
 				return types.ErrInvalidFee.Wrapf("input %d: %s", i, err.Error())
 			}
 			if err := validateUserFundSender("bank multisend input", input.Address); err != nil {
@@ -117,7 +117,7 @@ func validateNoZeroMsgAddresses(msg sdk.Msg) error {
 			}
 		}
 		for i, output := range msg.Outputs {
-			if err := aetherisaddress.ValidateUserAddress("bank multisend output", output.Address); err != nil {
+			if err := aetraaddress.ValidateUserAddress("bank multisend output", output.Address); err != nil {
 				return types.ErrInvalidFee.Wrapf("output %d: %s", i, err.Error())
 			}
 			if err := validateUserFundRecipient("bank multisend output", output.Address); err != nil {
@@ -125,10 +125,10 @@ func validateNoZeroMsgAddresses(msg sdk.Msg) error {
 			}
 		}
 	case *distrtypes.MsgSetWithdrawAddress:
-		if err := aetherisaddress.ValidateUserAddress("distribution withdraw delegator", msg.DelegatorAddress); err != nil {
+		if err := aetraaddress.ValidateUserAddress("distribution withdraw delegator", msg.DelegatorAddress); err != nil {
 			return types.ErrInvalidFee.Wrap(err.Error())
 		}
-		if err := aetherisaddress.ValidateUserAddress("distribution withdraw address", msg.WithdrawAddress); err != nil {
+		if err := aetraaddress.ValidateUserAddress("distribution withdraw address", msg.WithdrawAddress); err != nil {
 			return types.ErrInvalidFee.Wrap(err.Error())
 		}
 		if err := validateUserFundRecipient("distribution withdraw address", msg.WithdrawAddress); err != nil {
@@ -139,14 +139,14 @@ func validateNoZeroMsgAddresses(msg sdk.Msg) error {
 }
 
 func validateUserFundSender(field, text string) error {
-	if reserved, found := aetherisaddress.SystemAddressByText(text); found {
+	if reserved, found := aetraaddress.SystemAddressByText(text); found {
 		return types.ErrInvalidFee.Wrapf("%s is reserved system address %s", field, reserved.Name)
 	}
 	return nil
 }
 
 func validateUserFundRecipient(field, text string) error {
-	if reserved, found := aetherisaddress.SystemAddressByText(text); found && !reserved.CanReceiveUserFunds {
+	if reserved, found := aetraaddress.SystemAddressByText(text); found && !reserved.CanReceiveUserFunds {
 		return types.ErrInvalidFee.Wrapf("%s is reserved system address %s and cannot receive user funds", field, reserved.Name)
 	}
 	return nil

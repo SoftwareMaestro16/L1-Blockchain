@@ -400,7 +400,7 @@ func IsAVMUpgradeComponentKind(kind AVMUpgradeComponentKind) bool {
 func ComputeAVMUpgradeComponentHash(component AVMUpgradeComponent) string {
 	component = canonicalAVMUpgradeComponent(component)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-upgrade-component-v1")
+	writeEnginePart(h, "aetra-avm-upgrade-component-v1")
 	writeEnginePart(h, string(component.Kind))
 	writeEnginePart(h, component.PreviousVersion)
 	writeEnginePart(h, component.NextVersion)
@@ -411,7 +411,7 @@ func ComputeAVMUpgradeComponentHash(component AVMUpgradeComponent) string {
 func ComputeAVMSchedulerRuleVersionHash(rule AVMSchedulerRuleVersion) string {
 	rule = canonicalAVMSchedulerRuleVersion(rule)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-scheduler-rule-version-v1")
+	writeEnginePart(h, "aetra-avm-scheduler-rule-version-v1")
 	writeEnginePart(h, rule.RuleSetID)
 	writeEnginePart(h, rule.Version)
 	writeEngineUint64(h, rule.EffectiveFromHeight)
@@ -422,7 +422,7 @@ func ComputeAVMSchedulerRuleVersionHash(rule AVMSchedulerRuleVersion) string {
 func ComputeAVMGasTableActivationHash(table AVMGasTableActivation) string {
 	table = canonicalAVMGasTableActivation(table)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-gas-table-activation-v1")
+	writeEnginePart(h, "aetra-avm-gas-table-activation-v1")
 	writeEngineUint64(h, table.ActivationHeight)
 	writeEnginePart(h, table.PolicyVersion)
 	writeEnginePart(h, table.Policy.PolicyHash)
@@ -433,7 +433,7 @@ func ComputeAVMGasTableActivationHash(table AVMGasTableActivation) string {
 func ComputeAVMContinuationRuntimeVersionHash(version AVMContinuationRuntimeVersion) string {
 	version = canonicalAVMContinuationRuntimeVersion(version)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-continuation-runtime-version-v1")
+	writeEnginePart(h, "aetra-avm-continuation-runtime-version-v1")
 	writeEnginePart(h, version.ContinuationID)
 	writeEnginePart(h, version.ActorID)
 	writeEnginePart(h, version.RuntimeVersion)
@@ -444,7 +444,7 @@ func ComputeAVMContinuationRuntimeVersionHash(version AVMContinuationRuntimeVers
 func ComputeAVMContractCodeVMVersionHash(version AVMContractCodeVMVersion) string {
 	version = canonicalAVMContractCodeVMVersion(version)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-contract-code-vm-version-v1")
+	writeEnginePart(h, "aetra-avm-contract-code-vm-version-v1")
 	writeEngineUint64(h, version.CodeID)
 	writeEnginePart(h, string(version.BackendKind))
 	writeEnginePart(h, version.CodeHash)
@@ -455,7 +455,7 @@ func ComputeAVMContractCodeVMVersionHash(version AVMContractCodeVMVersion) strin
 func ComputeAVMVersionedMessageExecutionPolicyHash(policy AVMVersionedMessageExecutionPolicy) string {
 	policy = canonicalAVMVersionedMessageExecutionPolicy(policy)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-versioned-message-policy-v1")
+	writeEnginePart(h, "aetra-avm-versioned-message-policy-v1")
 	writeEnginePart(h, policy.MessageID)
 	writeEngineUint64(h, policy.CreatedHeight)
 	writeEngineUint64(h, policy.ExecutionHeight)
@@ -469,7 +469,7 @@ func ComputeAVMVersionedMessageExecutionPolicyHash(policy AVMVersionedMessageExe
 func ComputeAVMUpgradeManifestHash(manifest AVMUpgradeManifest) string {
 	manifest = canonicalAVMUpgradeManifest(manifest)
 	h := sha256.New()
-	writeEnginePart(h, "aetheris-avm-upgrade-manifest-v1")
+	writeEnginePart(h, "aetra-avm-upgrade-manifest-v1")
 	writeEnginePart(h, manifest.UpgradeID)
 	writeEnginePart(h, manifest.GovernanceProposalID)
 	writeEngineUint64(h, manifest.StagedHeight)

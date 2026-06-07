@@ -4,7 +4,7 @@ param(
   [string]$OutputDir = "",
   [ValidateSet("base", "execution-os-sim", "zones-prototype", "mesh-prototype", "identity-prototype")]
   [string]$Profile = "base",
-  [string]$ChainId = "aetheris-local-1",
+  [string]$ChainId = "aetra-local-1",
   [int]$ValidatorCount = 3
 )
 

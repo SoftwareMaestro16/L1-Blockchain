@@ -52,12 +52,12 @@ const (
 	MsgTypeWasmInstantiate = "/cosmwasm.wasm.v1.MsgInstantiateContract"
 	MsgTypeWasmExecute     = "/cosmwasm.wasm.v1.MsgExecuteContract"
 	MsgTypeWasmMigrate     = "/cosmwasm.wasm.v1.MsgMigrateContract"
-	MsgTypeAVMDeploy       = "/aetheris.avm.v1.MsgDeploy"
-	MsgTypeAVMExecute      = "/aetheris.avm.v1.MsgExecute"
+	MsgTypeAVMDeploy       = "/aetra.avm.v1.MsgDeploy"
+	MsgTypeAVMExecute      = "/aetra.avm.v1.MsgExecute"
 
 	MsgTypeAsyncSend    = "/l1.messaging.v1.MsgSendAsync"
 	MsgTypeAsyncEnqueue = "/l1.queue.v1.MsgEnqueue"
-	MsgTypeAsyncDeliver = "/l1.aetherisvm.async.v1.MsgDeliver"
+	MsgTypeAsyncDeliver = "/l1.aetravm.async.v1.MsgDeliver"
 
 	MsgTypeMemoAttach      = "/l1.memo.v1.MsgAttachMemo"
 	MsgTypePermissionsSet  = "/l1.permissions.v1.MsgSetPermission"
@@ -80,7 +80,7 @@ const (
 type ZoneID string
 
 const (
-	ZoneAetherCore  ZoneID = "AETHER_CORE"
+	ZoneAetraCore   ZoneID = "AETHER_CORE"
 	ZoneFinancial   ZoneID = "FINANCIAL_ZONE"
 	ZoneIdentity    ZoneID = "IDENTITY_ZONE"
 	ZoneContract    ZoneID = "CONTRACT_ZONE"
@@ -198,7 +198,7 @@ func Route(input RouteInput) (RouteDecision, error) {
 		PrimaryActor: cloneBytes(primaryActor),
 		PriorityKey:  BuildPriorityKey(txClass, input.FeeClass, input.ReputationClass, input.AdmissionHeight, input.TxHash),
 	}
-	if zone == ZoneAetherCore {
+	if zone == ZoneAetraCore {
 		decision.ActiveShards = 1
 		return decision, nil
 	}
@@ -217,7 +217,7 @@ func Route(input RouteInput) (RouteDecision, error) {
 func ZoneForClass(txClass TxClass) (ZoneID, error) {
 	switch txClass {
 	case TxClassCriticalSystem, TxClassStakingGovSecurity:
-		return ZoneAetherCore, nil
+		return ZoneAetraCore, nil
 	case TxClassFinancial:
 		return ZoneFinancial, nil
 	case TxClassIdentity:
@@ -236,7 +236,7 @@ func AssignShard(zone ZoneID, primaryActor []byte, routingEpoch uint64, activeSh
 		return 0
 	}
 	h := sha256.New()
-	h.Write([]byte("aetheris-routing-v1"))
+	h.Write([]byte("aetra-routing-v1"))
 	h.Write([]byte{0})
 	h.Write([]byte(zone))
 	h.Write([]byte{0})

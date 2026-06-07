@@ -51,7 +51,7 @@ foreach ($heading in @(
 }
 
 foreach ($required in @(
-    '\.\\scripts\\build-aetherisd\.ps1',
+    '\.\\scripts\\build-aetrad\.ps1',
     '\.\\scripts\\localnet\\init\.ps1',
     '\.\\scripts\\localnet\\validate-genesis\.ps1',
     '\.\\scripts\\localnet\\start\.ps1',
@@ -62,23 +62,23 @@ foreach ($required in @(
     '\.\\tests\\e2e\\prototype_smoke\.ps1',
     '\.\\tests\\e2e\\pos_smoke\.ps1',
     '\.\\tests\\e2e\\contract-assets_smoke\.ps1',
-    'build\\aetherisd\.exe version --long --output json',
-    'build\\aetherisd\.exe query block',
-    'build\\aetherisd\.exe query bank balance',
-    'build\\aetherisd\.exe query staking validators',
-    'build\\aetherisd\.exe query fees params',
-    'build\\aetherisd\.exe query contract-assets denom',
-    'build\\aetherisd\.exe query dex pool',
-    'build\\aetherisd\.exe tx bank send',
-    'build\\aetherisd\.exe tx staking delegate',
-    'build\\aetherisd\.exe tx contract-assets create-denom',
-    'build\\aetherisd\.exe tx contract-assets mint',
-    'build\\aetherisd\.exe tx contract-assets burn',
-    'build\\aetherisd\.exe tx contract-assets change-admin',
-    'build\\aetherisd\.exe tx dex create-pool',
-    'build\\aetherisd\.exe tx dex add-liquidity',
-    'build\\aetherisd\.exe tx dex swap-exact-in',
-    'build\\aetherisd\.exe tx dex remove-liquidity'
+    'build\\aetrad\.exe version --long --output json',
+    'build\\aetrad\.exe query block',
+    'build\\aetrad\.exe query bank balance',
+    'build\\aetrad\.exe query staking validators',
+    'build\\aetrad\.exe query fees params',
+    'build\\aetrad\.exe query contract-assets denom',
+    'build\\aetrad\.exe query dex pool',
+    'build\\aetrad\.exe tx bank send',
+    'build\\aetrad\.exe tx staking delegate',
+    'build\\aetrad\.exe tx contract-assets create-denom',
+    'build\\aetrad\.exe tx contract-assets mint',
+    'build\\aetrad\.exe tx contract-assets burn',
+    'build\\aetrad\.exe tx contract-assets change-admin',
+    'build\\aetrad\.exe tx dex create-pool',
+    'build\\aetrad\.exe tx dex add-liquidity',
+    'build\\aetrad\.exe tx dex swap-exact-in',
+    'build\\aetrad\.exe tx dex remove-liquidity'
   )) {
   Assert-Contains -Text $guideText -Pattern $required -Message "operator guide missing command pattern: $required"
 }
