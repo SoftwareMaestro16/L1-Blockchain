@@ -278,6 +278,7 @@ func (k Keeper) recordCollectedFees(ctx context.Context, fees sdk.Coins, feeType
 		types.EventTypeCollectFees,
 		sdk.NewAttribute(types.AttributeKeyFeeType, feeType),
 		sdk.NewAttribute(types.AttributeKeyAmount, fees.String()),
+		sdk.NewAttribute(types.AttributeKeyBurn, split.Burn.String()),
 	))
 	return nil
 }
@@ -348,6 +349,7 @@ func (k Keeper) distributeFees(ctx context.Context, epoch uint64) (types.FeeHist
 	balances.ProtocolFees = sdk.NewCoins()
 	balances.TotalDistributed = balances.TotalDistributed.Add(pending.Treasury...).Add(pending.Protection...).Add(pending.Validators...)
 	balances.TotalBurned = balances.TotalBurned.Add(pending.Burn...)
+	totalBurned := balances.TotalBurned
 	if err := k.SetFeeBalances(ctx, balances); err != nil {
 		return types.FeeHistoryEntry{}, err
 	}
@@ -379,6 +381,8 @@ func (k Keeper) distributeFees(ctx context.Context, epoch uint64) (types.FeeHist
 		types.EventTypeDistributeFees,
 		sdk.NewAttribute(types.AttributeKeyEpoch, fmt.Sprintf("%d", epoch)),
 		sdk.NewAttribute(types.AttributeKeyAmount, collected.String()),
+		sdk.NewAttribute(types.AttributeKeyBurn, pending.Burn.String()),
+		sdk.NewAttribute(types.AttributeKeyTotalBurn, totalBurned.String()),
 	))
 	return history, nil
 }

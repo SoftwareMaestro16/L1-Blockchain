@@ -56,6 +56,26 @@ func TestDistributeFeesRoutesTreasuryProtectionValidatorsAndBurn(t *testing.T) {
 	require.Equal(t, validatorsBefore.Add(coin(350)), app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)))
 	require.Equal(t, supplyBefore.Amount.Sub(sdkmath.NewInt(500)), app.BankKeeper.GetSupply(ctx, types.BaseDenom).Amount)
 	require.NoError(t, collector.AssertModuleAccountingInvariant(ctx))
+	requireFeeCollectorEvent(t, ctx, types.EventTypeDistributeFees, map[string]string{
+		types.AttributeKeyBurn:      sdk.NewCoins(coin(500)).String(),
+		types.AttributeKeyTotalBurn: sdk.NewCoins(coin(500)).String(),
+	})
+}
+
+func TestTotalBurnedIsQueryableAfterDistribution(t *testing.T) {
+	app := l1app.Setup(t, false)
+	ctx := app.NewContext(false)
+	collector := app.FeeCollectorKeeper
+	user := l1app.AddTestAddrsWithCoins(t, app, ctx, 1, sdk.NewCoins(coin(2_000)))[0]
+
+	require.NoError(t, collector.CollectFeesFromAccount(ctx, user, sdk.NewCoins(coin(1_000)), types.FeeTypeProtocol))
+	_, err := collector.DistributeFees(ctx, 8)
+	require.NoError(t, err)
+
+	res, err := collector.FeeBalances(ctx, &types.QueryFeeBalancesRequest{})
+	require.NoError(t, err)
+	require.Equal(t, sdk.NewCoins(coin(500)), res.Balances.TotalBurned)
+	require.True(t, res.Balances.AccountingBalance().Empty())
 }
 
 func TestRoundingRemainderIsDeterministicAndCannotCreateCoins(t *testing.T) {
@@ -210,4 +230,20 @@ func TestProtocolIncomeDistributionRejectsMissingModuleAccount(t *testing.T) {
 
 func coin(amount int64) sdk.Coin {
 	return sdk.NewInt64Coin(types.BaseDenom, amount)
+}
+
+func requireFeeCollectorEvent(t *testing.T, ctx sdk.Context, eventType string, attrs map[string]string) {
+	t.Helper()
+	for _, event := range ctx.EventManager().Events() {
+		if event.Type != eventType {
+			continue
+		}
+		for key, expected := range attrs {
+			attr, found := event.GetAttribute(key)
+			require.Truef(t, found, "event %s missing attribute %s", eventType, key)
+			require.Equal(t, expected, attr.Value)
+		}
+		return
+	}
+	require.Failf(t, "missing event", "event type %s not emitted", eventType)
 }

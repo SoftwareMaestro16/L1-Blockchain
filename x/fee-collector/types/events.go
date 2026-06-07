@@ -9,4 +9,6 @@ const (
 	AttributeKeyEpoch     = "epoch"
 	AttributeKeyFeeType   = "fee_type"
 	AttributeKeyAmount    = "amount"
+	AttributeKeyBurn      = "burn"
+	AttributeKeyTotalBurn = "total_burn"
 )
