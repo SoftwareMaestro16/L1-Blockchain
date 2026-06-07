@@ -2,6 +2,20 @@
 
 This guide is for a clean public testnet validator join. Localnet examples use PowerShell paths; public operators must replace local paths, chain id, peers, and keyring backend with launch values.
 
+## Hardware Target
+
+Aetra validator hardware should be medium, not extreme. The public testnet baseline is:
+
+```text
+CPU: 4-8 modern cores
+RAM: 16-32 GB
+Storage: NVMe SSD
+Network: stable 100 Mbps+, low packet loss
+OS: Linux recommended, Windows local tooling supported for development
+```
+
+Mainnet requirements should be finalized after load testing. Do not treat these testnet numbers as final mainnet requirements until AVM execution, state growth, snapshot, state sync, and 100-300 validator load profiles are measured.
+
 ## Build
 
 ```powershell
@@ -42,6 +56,8 @@ Store mnemonic backup offline. Never commit mnemonics, keyrings, `priv_validator
 
 ## Sync
 
+The network launch profile must provide state sync support, snapshots, pruning profiles, and an archive node profile.
+
 Start from genesis:
 
 ```powershell
@@ -62,6 +78,21 @@ build\aetrad.exe status --node tcp://127.0.0.1:26657 --output json
 ```
 
 The node is caught up when `catching_up` is false.
+
+Recommended pruning profiles:
+
+```toml
+# Normal validator profile.
+pruning = "default"
+
+# Archive node profile. Preserves historical state.
+pruning = "nothing"
+
+# Low-disk development or non-critical nodes only.
+pruning = "everything"
+```
+
+For public testnet, operators must use published snapshot/state-sync endpoints and verify trust height, trust hash, and trust period values from the launch announcement.
 
 ## Create Validator
 
@@ -105,7 +136,27 @@ Monitor:
 - peer count,
 - RPC/indexer lag if serving public endpoints.
 
-Before restart, stop cleanly and preserve `$HOME\data`, `$HOME\config\priv_validator_key.json`, and `$HOME\config\node_key.json`.
+Before restart, stop cleanly and preserve `$HOME\data`, `$HOME\config\priv_validator_key.json`, `$HOME\config\priv_validator_state.json`, and `$HOME\config\node_key.json`. Restart safety is mandatory: losing or rolling back validator state can create double-sign risk.
+
+State management readiness requires export/import reliability and deterministic app hash across restarts. Before public launch, the release process must export genesis, import it into a fresh home, restart the node, and verify deterministic app hash behavior for the same state.
+
+## Sentry Architecture
+
+Public validators should use documented sentry architecture:
+
+```text
+public peers <-> sentry nodes <-> private validator node
+```
+
+Rules:
+
+- never copy `priv_validator_key.json` to sentry nodes;
+- expose P2P and optional public RPC from sentries, not from the private validator node;
+- configure validator persistent peers to trusted sentries only;
+- restrict inbound access to the validator node with firewall rules;
+- serve public RPC/indexer traffic from non-validator infrastructure;
+- diversify sentries across providers or regions when possible;
+- preserve `priv_validator_state.json` during restarts and upgrades.
 
 ## CosmWasm Contract Smoke
 
@@ -120,4 +171,3 @@ If wasm is not enabled, the disabled-by-default check must pass:
 ```powershell
 .\tests\e2e\cosmwasm_smoke.ps1 -Node tcp://127.0.0.1:26657
 ```
-
