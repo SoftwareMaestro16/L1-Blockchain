@@ -103,3 +103,58 @@ func TestAetraValidatorScoreSubjectiveControlRejectsMissingGuards(t *testing.T) 
 	require.Contains(t, report.Failed, AetraValidatorScoreGuardObjectiveInputsDeterministic)
 	require.Error(t, ValidateAetraValidatorScoreSubjectiveControl(evidence))
 }
+
+func TestDefaultAetraValidatorScoreStateSpecCoversSection242(t *testing.T) {
+	evidence := DefaultAetraValidatorScoreStateSpecEvidence()
+
+	report := BuildAetraValidatorScoreStateSpecReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Empty(t, report.Failed)
+	require.Equal(t, AetraValidatorScoreModuleName, report.ModuleName)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 22, report.Required)
+	require.NoError(t, ValidateAetraValidatorScoreStateSpec(evidence))
+}
+
+func TestAetraValidatorScoreStateSpecRejectsMissingFields(t *testing.T) {
+	evidence := DefaultAetraValidatorScoreStateSpecEvidence()
+	evidence.ParamsFields = removeValidatorScoreString(evidence.ParamsFields, AetraValidatorScoreStateParamRewardModifierEnabled)
+	evidence.ValidatorScoreFields = removeValidatorScoreString(evidence.ValidatorScoreFields, AetraValidatorScoreStateScoreLastUpdatedHeight)
+
+	report := BuildAetraValidatorScoreStateSpecReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, AetraValidatorScoreStateParams+"."+AetraValidatorScoreStateParamRewardModifierEnabled+":missing")
+	require.Contains(t, report.Failed, AetraValidatorScoreStateValidatorScore+"."+AetraValidatorScoreStateScoreLastUpdatedHeight+":missing")
+	require.Error(t, ValidateAetraValidatorScoreStateSpec(evidence))
+}
+
+func TestAetraValidatorScoreStateSpecRejectsDuplicateUnexpectedAndWrongModule(t *testing.T) {
+	evidence := DefaultAetraValidatorScoreStateSpecEvidence()
+	evidence.ModuleName = "x/reputation"
+	evidence.ParamsFields = append(evidence.ParamsFields, AetraValidatorScoreStateParamUptimeWindow, "SubjectivePenaltyWeight")
+	evidence.ValidatorScoreFields = append(evidence.ValidatorScoreFields, AetraValidatorScoreStateScoreScore, "LocalLatencyScore")
+
+	report := BuildAetraValidatorScoreStateSpecReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_must_be_"+AetraValidatorScoreModuleName)
+	require.Contains(t, report.Failed, AetraValidatorScoreStateParams+"."+AetraValidatorScoreStateParamUptimeWindow+":duplicate")
+	require.Contains(t, report.Failed, AetraValidatorScoreStateParams+".SubjectivePenaltyWeight:unexpected")
+	require.Contains(t, report.Failed, AetraValidatorScoreStateValidatorScore+"."+AetraValidatorScoreStateScoreScore+":duplicate")
+	require.Contains(t, report.Failed, AetraValidatorScoreStateValidatorScore+".LocalLatencyScore:unexpected")
+	require.Error(t, ValidateAetraValidatorScoreStateSpec(evidence))
+}
+
+func removeValidatorScoreString(values []string, targets ...string) []string {
+	targetSet := map[string]bool{}
+	for _, target := range targets {
+		targetSet[target] = true
+	}
+
+	filtered := make([]string, 0, len(values))
+	for _, value := range values {
+		if !targetSet[value] {
+			filtered = append(filtered, value)
+		}
+	}
+	return filtered
+}

@@ -53,7 +53,39 @@ foreach ($term in @(
     'ObjectiveRewardModifierEnabled',
     'QueryValidatorScore',
     'QueryPublicValidatorMetrics',
-    'QueryAllValidatorScores'
+    'QueryAllValidatorScores',
+    '24.2 State',
+    'Params:',
+    'UptimeWindow',
+    'UptimeWeightBps',
+    'SlashHistoryWeightBps',
+    'GovernanceWeightBps',
+    'SelfBondWeightBps',
+    'ConcentrationWeightBps',
+    'MinScore',
+    'MaxScore',
+    'RewardModifierEnabled',
+    'MaxRewardPenaltyBps',
+    'ValidatorScore:',
+    'OperatorAddress',
+    'Score',
+    'UptimeScore',
+    'SlashScore',
+    'GovernanceScore',
+    'SelfBondScore',
+    'ConcentrationScore',
+    'MissedBlocks',
+    'SignedBlocks',
+    'JailCount',
+    'SlashCount',
+    'LastUpdatedHeight',
+    'BuildAetraValidatorScoreStateSpecReport',
+    'Current Implementation Mapping',
+    'UptimeWindowBlocks',
+    'ScoreWeights',
+    'OverallScoreBps',
+    'JailEvents',
+    'SlashEventCount'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "aetra validator score spec doc missing: $term"
 }
@@ -90,7 +122,36 @@ foreach ($term in @(
     'AetraValidatorScoreGuardInformationalFirst',
     'AetraValidatorScoreGuardObjectiveRewardOnly',
     'AetraValidatorScoreGuardConsensusOverrideDisabled',
-    'AetraValidatorScoreGuardObjectiveInputsDeterministic'
+    'AetraValidatorScoreGuardObjectiveInputsDeterministic',
+    'AetraValidatorScoreStateSpecEvidence',
+    'AetraValidatorScoreStateSpecReport',
+    'DefaultAetraValidatorScoreStateSpecEvidence',
+    'ValidateAetraValidatorScoreStateSpec',
+    'BuildAetraValidatorScoreStateSpecReport',
+    'AetraValidatorScoreStateParams',
+    'AetraValidatorScoreStateValidatorScore',
+    'AetraValidatorScoreStateParamUptimeWindow',
+    'AetraValidatorScoreStateParamUptimeWeightBps',
+    'AetraValidatorScoreStateParamSlashHistoryWeightBps',
+    'AetraValidatorScoreStateParamGovernanceWeightBps',
+    'AetraValidatorScoreStateParamSelfBondWeightBps',
+    'AetraValidatorScoreStateParamConcentrationWeightBps',
+    'AetraValidatorScoreStateParamMinScore',
+    'AetraValidatorScoreStateParamMaxScore',
+    'AetraValidatorScoreStateParamRewardModifierEnabled',
+    'AetraValidatorScoreStateParamMaxRewardPenaltyBps',
+    'AetraValidatorScoreStateScoreOperatorAddress',
+    'AetraValidatorScoreStateScoreScore',
+    'AetraValidatorScoreStateScoreUptimeScore',
+    'AetraValidatorScoreStateScoreSlashScore',
+    'AetraValidatorScoreStateScoreGovernanceScore',
+    'AetraValidatorScoreStateScoreSelfBondScore',
+    'AetraValidatorScoreStateScoreConcentrationScore',
+    'AetraValidatorScoreStateScoreMissedBlocks',
+    'AetraValidatorScoreStateScoreSignedBlocks',
+    'AetraValidatorScoreStateScoreJailCount',
+    'AetraValidatorScoreStateScoreSlashCount',
+    'AetraValidatorScoreStateScoreLastUpdatedHeight'
   )) {
   Assert-Contains -Text $policyText -Pattern ([regex]::Escape($term)) -Message "aetra validator score spec policy missing: $term"
 }
@@ -101,7 +162,10 @@ foreach ($term in @(
     'TestDefaultAetraValidatorScoreResponsibilitiesCoverSection241',
     'TestAetraValidatorScoreResponsibilitiesRejectMissingRequiredItems',
     'TestDefaultAetraValidatorScoreSubjectiveControlGuards',
-    'TestAetraValidatorScoreSubjectiveControlRejectsMissingGuards'
+    'TestAetraValidatorScoreSubjectiveControlRejectsMissingGuards',
+    'TestDefaultAetraValidatorScoreStateSpecCoversSection242',
+    'TestAetraValidatorScoreStateSpecRejectsMissingFields',
+    'TestAetraValidatorScoreStateSpecRejectsDuplicateUnexpectedAndWrongModule'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "aetra validator score spec tests missing: $term"
 }
