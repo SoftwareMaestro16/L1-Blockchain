@@ -14,125 +14,145 @@ Local Aetra validator/full nodes do not require Redis or PostgreSQL for consensu
 
 ## Current Surface
 
-Aetra is not just a base Cosmos SDK skeleton. The current chain surface is split into protocol-native layers and AVM contract layers:
+Aetra is a runnable Cosmos SDK chain with a broader native protocol surface layered around the standard PoS path. The design line is simple:
 
-- native `x/` modules are for chain safety, PoS, accounting, protocol configuration, system entities, scheduling, storage rent, identity root, and AVM runtime coordination;
-- user/application logic such as fungible tokens, NFTs, marketplaces, workflow apps, and exchange-style liquidity should live as AVM contracts;
-- native contract-assets and native DEX runtime modules have been removed from the app graph. AFT/ANFT standards remain under `x/aetravm/standards` as contract standards.
+- native `x/` modules are kept for consensus safety, validator economics, fees, treasury accounting, governance/config, system entities, scheduling, storage rent, and AVM coordination;
+- user application logic belongs in AVM contracts, including fungible tokens, NFTs, wallets, markets, auctions, workflow apps, and custom service logic;
+- native tokenfactory and native exchange runtime modules are not part of the active app graph. AFT/ANFT/wallet standards remain as AVM contract standards under `x/aetravm/standards`.
 
 ```mermaid
 flowchart TD
-  CLIENT["Clients: CLI, REST, gRPC, CometBFT RPC"]
-  CLIENT --> MEMPOOL["CometBFT mempool and proposal"]
-  MEMPOOL --> PREBLOCK["PreBlock: upgrade/auth preparation"]
-  PREBLOCK --> ANTE["Ante: signatures, sequence, fees, reserved-address policy"]
-  ANTE --> ROUTER["SDK message router"]
+  CLIENT["CLI, REST, gRPC, CometBFT RPC"]
+  CLIENT --> MEMPOOL["CometBFT mempool"]
+  MEMPOOL --> PROPOSAL["Block proposal"]
+  PROPOSAL --> PREBLOCK["PreBlock: upgrade/auth preparation"]
+  PREBLOCK --> ANTE["Ante: signatures, sequence, fee payer, reserved-system-address checks"]
+  ANTE --> FEES["x/fees: naet fee admission and spam limits"]
+  FEES --> ROUTER["SDK message router"]
 
-  ROUTER --> POS["PoS core: staking, slashing, evidence, distribution, mint"]
-  ROUTER --> MONEY["Money core: bank, fees, fee collector, treasury, burn, emissions"]
-  ROUTER --> VALIDATORS["Validator systems: registry, election, insurance, protection, reputation, performance"]
-  ROUTER --> SYSTEM["System entities: config, constitution, system registry, scheduler, identity root"]
-  ROUTER --> AVM["AVM infrastructure: actor registry, AVM scheduler, contracts, VM, storage rent"]
-  ROUTER --> FUTURE["Coordination: bridge hub, cross-chain registry, sharding coordinator"]
+  ROUTER --> SDK["SDK base: auth, bank, staking, slashing, evidence, distribution, mint, gov, upgrade"]
+  ROUTER --> ECON["Aetra economy: fee collector, treasury, burn, emissions, mint authority"]
+  ROUTER --> VAL["Validator systems: registry, election, nominator pools, insurance, protection, reputation, performance"]
+  ROUTER --> SYS["System layer: config, config voting, constitution, system registry, scheduler"]
+  ROUTER --> ID["Identity root: .aet root policy, normalization, reserved names, expiry bounds"]
+  ROUTER --> AVM["AVM coordination: actor registry, AVM scheduler, storage rent, contracts/VM packages"]
+  ROUTER --> NET["Coordination surfaces: bridge hub, cross-chain registry, sharding coordinator, routing/mesh/zones"]
 
-  AVM --> CONTRACTS["Contract standards: AFT-44, ANFT-66, wallet, future app contracts"]
-  POS --> COMMIT["Deterministic state commit"]
-  MONEY --> COMMIT
-  VALIDATORS --> COMMIT
-  SYSTEM --> COMMIT
+  SDK --> COMMIT["Deterministic state commit"]
+  ECON --> COMMIT
+  VAL --> COMMIT
+  SYS --> COMMIT
+  ID --> COMMIT
+  AVM --> CONTRACTS["AVM standards: AFT-44, ANFT-66, wallet"]
   CONTRACTS --> COMMIT
-  FUTURE --> COMMIT
-  COMMIT --> EXPORT["Genesis validation, export/import, localnet restart checks"]
+  NET --> COMMIT
+  COMMIT --> EXPORT["Genesis validation, export/import, restart checks"]
 ```
 
-### Runtime Layers
+### Implemented Today
 
-| Layer | Current status | What it does |
+| Area | Status | What is available |
 | --- | --- | --- |
-| Node and consensus | Implemented | Node binary/CLI, CometBFT consensus, mempool admission, block execution, RPC/gRPC/REST query surface, localnet scripts. |
-| Accounts and bank | Implemented | `auth`, `bank`, custom Aetra address codec, zero-address rejection, reserved system address catalog, blocked-address policy. |
-| PoS base | Implemented | `naet` staking, validator creation, delegation, unbonding, redelegation, slashing/evidence, distribution, mint rewards. |
-| Native fee admission | Implemented | `x/fees` enforces `naet` fees, minimum fee, hard cap, dynamic fee bounds, sender/block spam controls. |
-| Protocol economy | Implemented/wired | Fee collector, treasury, burn, emissions, mint authority, validator insurance, delegator protection, reporter rewards, storage-rent reserve surfaces. |
-| Validator systems | Implemented/wired | Validator registry, validator election, nominator pools, insurance, protection, reputation, performance, dynamic commission, stake concentration. |
-| Native system entities | Implemented/wired | Config, config voting, constitution, system registry, scheduler, actor registry, storage rent, identity root, bridge hub, cross-chain registry, sharding coordinator. |
-| AVM infrastructure | Prototype/gated | VM/contract packages, AVM scheduler, actor registry, async execution specs, read/write-set coordination, storage-rent direction. |
-| Contract standards | Executable specs | AFT-44 fungible token standard, ANFT-66 NFT/SBT standard, wallet standard. These are contract surfaces, not native app modules. |
+| Node and CLI | Implemented | `aetrad` binary, CometBFT node, CLI, REST, gRPC, RPC, AutoCLI/reflection, Windows localnet scripts. |
+| Base account model | Implemented | Cosmos SDK `auth`, `vesting`, `bank`, fee grants, authz, custom Aetra address codec, zero-address rejection. |
+| PoS execution | Implemented | Staking denom `naet`, validator creation, delegation, unbonding, redelegation, slashing, evidence, distribution, mint rewards. |
+| Governance base | Implemented | SDK gov/upgrade/consensus params plus native constitution/config/config-voting/system-registry surfaces. |
+| Native fee policy | Implemented | `x/fees` validates fee denom, minimum fee, hard cap, dynamic fee bounds, sender limits, block limits, and malformed fee cases. |
+| Reserved system addresses | Implemented | Stable `4:` and protocol-core `-7:` raw addresses, `AE...` user-friendly forms, signer rejection, blocked bank-send policy, startup wiring checks. |
+| Module accounts | Implemented | Reserved module accounts for mint authority, burn, fee collector, treasury, storage rent, delegator protection, validator insurance, reporter rewards, config, system registry, and validator election. |
+| Protocol economy | Wired | Fee collector, treasury, burn, emissions, mint authority, delegator protection, validator insurance, reporter rewards, storage-rent reserve surfaces. |
+| Validator systems | Wired | Validator registry/election, nominator pools, insurance, delegator protection, reputation, performance, dynamic commission, stake concentration. |
+| Scheduler/system modules | Wired | Native scheduler, AVM scheduler, actor registry, storage rent, identity root, bridge hub, cross-chain registry, sharding coordinator. |
+| Network coordination | Wired/spec surface | `x/aetracore`, `x/load`, `x/routing`, `x/zones`, `x/mesh`, `x/networking`, `x/payments` provide current protocol coordination surfaces. |
+| AVM contract standards | Present | AFT-44 fungible token standard, ANFT-66 NFT/SBT standard, wallet standard, VM/contracts packages. These are not native app-token modules. |
 
 ### Transaction Path
 
-1. A user signs and broadcasts a tx through CLI, REST, gRPC, or CometBFT RPC.
-2. CometBFT admits it to mempool and proposes it in a block.
-3. PreBlock prepares upgrade/auth-related state.
-4. Ante validation checks fee payer, signers, account sequence, signatures, fee policy, and reserved system address rules.
-5. `x/fees` enforces native `naet` fee policy before message execution.
-6. Cosmos SDK auth verifies signer state and sequence.
-7. The SDK router dispatches messages to native keepers.
-8. Native protocol modules mutate only protocol/system state.
-9. AVM/application behavior is expected to execute through contract/runtime surfaces, not native token/NFT/market modules.
-10. BeginBlock/EndBlock ordering stays explicit and deterministic; state can be exported/imported for restart checks.
+1. A client broadcasts a tx through `aetrad`, REST, gRPC, or CometBFT RPC.
+2. CometBFT admits it to the mempool and includes it in a proposal.
+3. PreBlock runs upgrade/auth preparation.
+4. Ante checks signer signatures, sequence, fee payer, account state, and reserved system address rules.
+5. `x/fees` enforces `naet` fee policy before normal message execution.
+6. The SDK router dispatches messages to Cosmos SDK modules or Aetra native keepers.
+7. Native modules mutate only protocol/system state.
+8. User-facing app logic is expected to go through AVM contracts and standards rather than native token/NFT/market modules.
+9. BeginBlock/EndBlock ordering is explicit through `app/wiring/aetracore`, keeping export/import and restart behavior deterministic.
 
-Already enforced safety rules include:
+Important checks already enforced by tests and app startup:
 
-- protocol fees are paid in `naet`;
-- malformed, zero, and unsupported addresses are rejected;
-- reserved system addresses cannot sign user transactions;
-- user sends to non-receivable system addresses are rejected;
-- core `-7:` protocol addresses do not receive user funds;
-- module-account permissions and blocked-address policy are checked at startup.
+- tx fees use `naet`;
+- unsupported fee denoms are rejected;
+- zero addresses are rejected;
+- malformed raw/user-friendly addresses are rejected;
+- reserved system addresses cannot be normal signers or fee payers;
+- user sends to non-receivable system accounts are blocked;
+- core `-7:` system addresses cannot receive user funds;
+- module account permissions match reserved address constants;
+- mint authority is wired to `AETMint`;
+- burn sink is wired to `AETBurn`;
+- duplicate reserved system address bytes are rejected.
 
 ## Native Protocol Modules
 
-Aetra keeps native code for protocol responsibilities:
+The active runtime keeps native code for protocol responsibilities:
 
+- SDK base: `auth`, `bank`, `staking`, `slashing`, `evidence`, `distribution`, `mint`, `gov`, `upgrade`, `consensus`, `epochs`, `authz`, `feegrant`, `protocolpool`;
 - configuration and authority: `x/config`, `x/config-voting`, `x/constitution`, `x/system-registry`;
 - fees and economy: `x/fees`, `x/fee-collector`, `x/treasury`, `x/burn`, `x/emissions`, `x/mint-authority`;
 - validator economics: `x/validator-registry`, `x/validator-election`, `x/nominator-pool`, `x/single-nominator-pool`, `x/validator-insurance`, `x/delegator-protection`, `x/reputation`, `x/performance`, `x/dynamic-commission`, `x/stake-concentration`;
 - execution coordination: `x/scheduler`, `x/avm-scheduler`, `x/actor-registry`, `x/storage-rent`;
-- identity root: `x/identity-root` for `.aet` root policy, reserved names, normalization, expiry bounds, and root registry policy;
-- future coordination: `x/bridge-hub`, `x/cross-chain-registry`, `x/sharding-coordinator`;
-- infrastructure/spec layers: `x/aetracore`, `x/load`, `x/routing`, `x/zones`, `x/mesh`, `x/networking`, `x/payments`, `x/contracts`, `x/vm`, `x/aetravm`.
+- identity root: `x/identity-root` for `.aet` root policy, uniqueness, reserved names, normalization, expiry bounds, and root registry policy;
+- cross-system coordination: `x/bridge-hub`, `x/cross-chain-registry`, `x/sharding-coordinator`;
+- protocol infrastructure/spec layers: `x/aetracore`, `x/load`, `x/routing`, `x/zones`, `x/mesh`, `x/networking`, `x/payments`, `x/contracts`, `x/vm`, `x/aetravm`.
 
 ## AVM Contract Surface
 
-User application logic is moving to AVM contracts:
+Application features are meant to be built as AVM contracts:
 
-- fungible tokens use AFT-44 contracts under `x/aetravm/standards/aft`;
-- NFTs/SBTs use ANFT-66 contracts under `x/aetravm/standards/anft`;
-- wallet behavior uses the wallet standard under `x/aetravm/standards/aw`;
-- old service, market, workflow, permissions, and identity app-specific surfaces are marked as migration targets;
-- exchange-style liquidity and other app logic should be implemented as AVM contracts, not native Cosmos SDK modules.
+- fungible tokens: AFT-44 contracts in `x/aetravm/standards/aft`;
+- NFTs and SBTs: ANFT-66 contracts in `x/aetravm/standards/anft`;
+- wallet/account behavior: wallet standard in `x/aetravm/standards/aw`;
+- app markets, auctions, services, workflow logic, permission models, and custom business rules should be contracts or SDK tooling around contracts.
 
-The old `x/identity` package remains as a legacy/spec migration target. Root-only `.aet` logic belongs in `x/identity-root`.
+The old `x/identity` package remains as a legacy/spec migration target. Root-only `.aet` logic belongs in native `x/identity-root`; domain NFT collections, resolvers, subdomain managers, auctions, and domain governance should migrate to AVM contracts.
 
 ## Economy
 
-The native economy is built around explicit accounting modules instead of one opaque account:
+The native economy is split into clear accounting surfaces:
 
-- `x/fees` controls tx fee admission;
-- `x/fee-collector` is the protocol income hub and bucket accounting surface;
-- `x/treasury` manages controlled treasury allocations;
-- `x/burn` records user and protocol burns;
-- `x/mint-authority` controls base-denom mint authority;
-- `x/emissions` holds emission policy;
-- `x/delegator-protection` and `x/validator-insurance` provide safety reserve surfaces;
+- `x/fees` admits txs only when fee policy is satisfied;
+- `x/fee-collector` is the protocol income hub and bucket-accounting surface;
+- `x/treasury` holds controlled treasury funds;
+- `x/burn` records burn sinks and burn-by-send policy;
+- `x/mint-authority` owns base-denom mint authority;
+- `x/emissions` carries emission policy;
+- `x/delegator-protection` and `x/validator-insurance` are safety reserve surfaces;
 - `x/reporter` supports reporter reward accounting;
 - `x/storage-rent` prepares rent accounting for persistent AVM state.
 
-Protocol income is designed to route through deterministic buckets such as validator rewards, treasury, delegator protection, validator insurance, ecosystem grants, storage rent reserve, burn, and reporter rewards. Bucket weights must sum to 100%, zero-weight buckets must be explicit, rounding must be deterministic, and accounting tests must reconcile module accounting with bank balances.
+Protocol income is designed to route through deterministic buckets: validator rewards, treasury, delegator protection, validator insurance, ecosystem grants, storage rent reserve, burn, and reporter rewards. Weights must sum to 100%, zero-weight buckets must be explicit, rounding must be deterministic, and tests reconcile module accounting against bank balances.
+
+The current console-testable economy surface includes:
+
+- checking `x/fees` params and rejecting wrong fee denoms;
+- sending `naet` with explicit fees;
+- querying bank supply and module account balances;
+- querying distribution rewards and validator commission;
+- testing blocked sends to non-receivable system addresses;
+- testing `AETBurn` receive behavior according to burn policy.
 
 ## PoS And Validators
 
-The live PoS base is Cosmos SDK staking with `naet`:
+The live validator path is Cosmos SDK staking with `naet`:
 
-- validators can be created and bonded;
-- delegators can delegate, unbond, and redelegate;
-- distribution handles validator and delegator rewards;
-- slashing/evidence protect the validator set;
-- minting supports uncapped PoS reward issuance;
-- validator transitions and export/import behavior are tested in app suites.
+- validators can be initialized, created, bonded, queried, and jailed/slashed through SDK paths;
+- delegators can delegate, unbond, redelegate, and withdraw rewards;
+- distribution tracks delegator rewards, validator commission, outstanding rewards, and community-pool style accounting;
+- slashing/evidence protect validator set safety;
+- minting supports uncapped PoS reward issuance in `naet`;
+- app tests cover validator transitions, genesis validation, export/import, and localnet boot behavior.
 
-Aetra adds native validator-system surfaces for registry metadata, election coordination, nominator pools, insurance, delegator protection, reputation, performance, dynamic commission, and stake concentration controls.
+Aetra adds native validator-system modules for registry metadata, election coordination, nominator pools, validator insurance, delegator protection, reputation scoring, performance tracking, dynamic commission, and stake concentration controls. These modules are wired into BeginBlock/EndBlock and genesis/export ordering so they can be hardened toward public testnet without becoming user application modules.
 
 ## Addresses And System Accounts
 
@@ -145,7 +165,27 @@ Aetra uses a custom address codec:
 
 Reserved system addresses are defined in `app/addressing/system_addresses.go`. They give native entities stable addresses for authority, accounting, and events without private keys.
 
-Fund-capable or accounting-relevant reserved accounts include `AETMint`, `AETBurn`, `AETFeeCollector`, `AETTreasury`, `AETStorageRent`, `AETDelegatorProtection`, `AETValidatorInsurance`, and `AETReporterRewards`. Core registry/config/elector addresses are non-spendable by default.
+Core `-7:` addresses are protocol-only and non-receivable by default:
+
+- `AETElector`;
+- `AETConfig`;
+- `AETConstitution`;
+- `AETSystemRegistry`;
+- `AETValidatorRegistry`;
+- `AETConfigVoting`.
+
+Fund-capable or accounting-relevant reserved accounts include:
+
+- `AETMint`: mint authority, not user-fundable;
+- `AETBurn`: burn sink, can receive user funds only when policy permits;
+- `AETFeeCollector`: protocol fee collection account, not directly user-fundable by default;
+- `AETTreasury`: treasury account, not directly user-fundable by default;
+- `AETStorageRent`: storage-rent accounting account;
+- `AETDelegatorProtection`: delegator protection reserve;
+- `AETValidatorInsurance`: validator insurance reserve;
+- `AETReporterRewards`: reporter rewards reserve.
+
+Startup validation checks that reserved module account addresses match constants, module-account permissions are correct, bank blocked-address policy matches `can_receive_user_funds`, `AETMint` is the mint authority, and `AETBurn` is the burn sink.
 
 ## Build
 
@@ -195,6 +235,69 @@ build\aetrad.exe tx bank send node0 $node1 1000naet `
   --fees 1000000naet `
   -y
 ```
+
+## Next Local Testnet Console Pass
+
+Use this checklist when manually exercising the chain:
+
+1. Build and inspect the binary.
+
+```powershell
+.\scripts\build-aetrad.ps1
+build\aetrad.exe version --long --output json
+```
+
+2. Start a clean multi-validator localnet.
+
+```powershell
+.\scripts\localnet\init.ps1 -ChainId aetra-local-1 -ValidatorCount 3
+.\scripts\localnet\start.ps1 -ChainId aetra-local-1
+```
+
+3. Check node health, blocks, supply, and fees.
+
+```powershell
+build\aetrad.exe status --node tcp://127.0.0.1:26657
+build\aetrad.exe query block --node tcp://127.0.0.1:26657
+build\aetrad.exe query bank total-supply-of naet --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query fees params --grpc-addr 127.0.0.1:9090 --grpc-insecure --node tcp://127.0.0.1:26657 --output json
+```
+
+4. Exercise account and bank flow.
+
+```powershell
+$node0 = build\aetrad.exe keys show node0 -a --home .localnet\node0\aetrad --keyring-backend test
+$node1 = build\aetrad.exe keys show node1 -a --home .localnet\node1\aetrad --keyring-backend test
+
+build\aetrad.exe query bank balances $node0 --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query bank balances $node1 --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe tx bank send node0 $node1 1000naet --home .localnet\node0\aetrad --keyring-backend test --chain-id aetra-local-1 --node tcp://127.0.0.1:26657 --fees 1000000naet -y
+```
+
+5. Exercise validator and staking flow.
+
+```powershell
+build\aetrad.exe query staking validators --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query staking delegations $node0 --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query distribution rewards $node0 --node tcp://127.0.0.1:26657 --output json
+```
+
+6. Exercise system-account and fee-distribution visibility.
+
+```powershell
+build\aetrad.exe query auth module-account feecollector --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query auth module-account feecollector_treasury --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query auth module-account burn --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query auth module-account mint-authority --node tcp://127.0.0.1:26657 --output json
+```
+
+7. Negative tests worth running before public testnet:
+
+- send with a non-`naet` fee denom and expect rejection;
+- send from a reserved system address and expect signer rejection;
+- send to `AETMint`, `AETConfig`, or another non-receivable system address and expect rejection;
+- send to `AETBurn` only when burn-by-send policy permits it;
+- export genesis, restart from it, and confirm validators, balances, system accounts, and fee params survive.
 
 ## Token Summary
 
