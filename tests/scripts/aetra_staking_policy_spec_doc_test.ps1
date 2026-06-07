@@ -110,7 +110,28 @@ foreach ($term in @(
     '0 < Top10TargetBps <= Top20TargetBps <= Top33TargetBps <= 10000',
     'The parameter gate is `BuildAetraStakingPolicyParameterReport` in `app/params/aetra_staking_policy_spec.go`',
     '`DefaultAetraStakingPolicyParameterRuleSet` must encode min, max, and recommended ranges for all bounded bps parameters',
-    'negative math inputs must fail validation'
+    'negative math inputs must fail validation',
+    '22.4 Effective Power Calculation',
+    'The implementation must define whether cap affects:',
+    'only reward calculation',
+    'actual CometBFT voting power',
+    'both',
+    'Stage 1:',
+    'cap affects rewards and delegation warnings',
+    'low consensus risk',
+    'Stage 2:',
+    'cap affects effective staking power used for validator updates',
+    'requires deeper integration and heavy tests',
+    'validator updates sent to CometBFT use capped power',
+    'total voting power remains consistent',
+    'no validator can exceed cap',
+    'delegation and unbonding shares remain correct',
+    'slashing can still slash the underlying raw stake',
+    'evidence handling remains correct',
+    'Stage 1 must fail if it touches actual CometBFT voting power',
+    'Stage 2 must require validator updates sent to CometBFT to use capped power',
+    'Stage 2 must require slashing to slash underlying raw stake',
+    'The effective power gate is `BuildAetraStakingPolicyEffectivePowerReport` in `app/params/aetra_staking_policy_spec.go`'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "aetra staking policy spec doc missing: $term"
 }
@@ -193,7 +214,27 @@ foreach ($term in @(
     'AetraStakingPolicyParamTop20TargetBps',
     'AetraStakingPolicyParamTop33TargetBps',
     'AetraStakingPolicyParamMaxValidatorsSoftTarget',
-    'AetraStakingPolicyParamRejectNegativeOrOverflowMath'
+    'AetraStakingPolicyParamRejectNegativeOrOverflowMath',
+    'AetraStakingPolicyEffectivePowerStage1',
+    'AetraStakingPolicyEffectivePowerStage2',
+    'AetraStakingPolicyEffectivePowerEvidence',
+    'AetraStakingPolicyEffectivePowerReport',
+    'DefaultAetraStakingPolicyEffectivePowerStage1Evidence',
+    'DefaultAetraStakingPolicyEffectivePowerStage2Evidence',
+    'ValidateAetraStakingPolicyEffectivePowerEvidence',
+    'BuildAetraStakingPolicyEffectivePowerReport',
+    'AetraStakingPolicyEffectivePowerDefinesCapScope',
+    'AetraStakingPolicyEffectivePowerRewards',
+    'AetraStakingPolicyEffectivePowerDelegationWarnings',
+    'AetraStakingPolicyEffectivePowerCometBFTVotingPower',
+    'AetraStakingPolicyEffectivePowerStage1LowConsensusRisk',
+    'AetraStakingPolicyEffectivePowerStage2DeepIntegrationTests',
+    'AetraStakingPolicyEffectivePowerValidatorUpdatesCapped',
+    'AetraStakingPolicyEffectivePowerTotalVotingConsistent',
+    'AetraStakingPolicyEffectivePowerNoValidatorExceedsCap',
+    'AetraStakingPolicyEffectivePowerSharesCorrect',
+    'AetraStakingPolicyEffectivePowerSlashingRawStake',
+    'AetraStakingPolicyEffectivePowerEvidenceHandlingCorrect'
   )) {
   Assert-Contains -Text $policyText -Pattern ([regex]::Escape($term)) -Message "aetra staking policy spec policy missing: $term"
 }
@@ -213,7 +254,12 @@ foreach ($term in @(
     'TestDefaultAetraStakingPolicyParameterValuesPassValidation',
     'TestAetraStakingPolicyParameterRulesRejectUnsafeGovernanceValues',
     'TestAetraStakingPolicyParameterRulesRejectInvalidTopNAndZeroValidatorTarget',
-    'TestAetraStakingPolicyParameterRulesRejectNegativeMathValues'
+    'TestAetraStakingPolicyParameterRulesRejectNegativeMathValues',
+    'TestDefaultAetraStakingPolicyEffectivePowerStage1IsLowConsensusRisk',
+    'TestAetraStakingPolicyEffectivePowerStage1RejectsCometBFTPowerMutation',
+    'TestDefaultAetraStakingPolicyEffectivePowerStage2RequiresConsensusIntegrationGates',
+    'TestAetraStakingPolicyEffectivePowerStage2RejectsMissingValidatorUpdateAndStakeSafety',
+    'TestAetraStakingPolicyEffectivePowerRejectsMissingScopeStageAndModule'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "aetra staking policy spec tests missing: $term"
 }

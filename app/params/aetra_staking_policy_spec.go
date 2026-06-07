@@ -71,6 +71,22 @@ const (
 	AetraStakingPolicyParamTop33TargetBps               = "Top33TargetBps"
 	AetraStakingPolicyParamMaxValidatorsSoftTarget      = "MaxValidatorsSoftTarget"
 	AetraStakingPolicyParamRejectNegativeOrOverflowMath = "reject_negative_or_overflowing_math_values"
+
+	AetraStakingPolicyEffectivePowerStage1 = "stage_1_rewards_and_delegation_warnings"
+	AetraStakingPolicyEffectivePowerStage2 = "stage_2_capped_validator_updates"
+
+	AetraStakingPolicyEffectivePowerDefinesCapScope            = "define_whether_cap_affects_rewards_voting_power_or_both"
+	AetraStakingPolicyEffectivePowerRewards                    = "cap_affects_reward_calculation"
+	AetraStakingPolicyEffectivePowerDelegationWarnings         = "cap_affects_delegation_warnings"
+	AetraStakingPolicyEffectivePowerCometBFTVotingPower        = "cap_affects_actual_cometbft_voting_power"
+	AetraStakingPolicyEffectivePowerStage1LowConsensusRisk     = "stage_1_low_consensus_risk"
+	AetraStakingPolicyEffectivePowerStage2DeepIntegrationTests = "stage_2_requires_deeper_integration_and_heavy_tests"
+	AetraStakingPolicyEffectivePowerValidatorUpdatesCapped     = "validator_updates_sent_to_cometbft_use_capped_power"
+	AetraStakingPolicyEffectivePowerTotalVotingConsistent      = "total_voting_power_remains_consistent"
+	AetraStakingPolicyEffectivePowerNoValidatorExceedsCap      = "no_validator_can_exceed_cap"
+	AetraStakingPolicyEffectivePowerSharesCorrect              = "delegation_and_unbonding_shares_remain_correct"
+	AetraStakingPolicyEffectivePowerSlashingRawStake           = "slashing_can_still_slash_underlying_raw_stake"
+	AetraStakingPolicyEffectivePowerEvidenceHandlingCorrect    = "evidence_handling_remains_correct"
 )
 
 type AetraStakingPolicySpecEvidence struct {
@@ -154,6 +170,34 @@ type AetraStakingPolicyParameterReport struct {
 	Passed   int
 	Failed   []string
 	Ready    bool
+}
+
+type AetraStakingPolicyEffectivePowerEvidence struct {
+	ModuleName string
+	Stage      string
+
+	DefinesCapScope               bool
+	CapAffectsRewardCalculation   bool
+	CapAffectsDelegationWarnings  bool
+	CapAffectsCometBFTVotingPower bool
+	Stage1LowConsensusRisk        bool
+	Stage2DeepIntegrationTests    bool
+
+	ValidatorUpdatesUseCappedPower   bool
+	TotalVotingPowerConsistent       bool
+	NoValidatorCanExceedCap          bool
+	DelegationUnbondingSharesCorrect bool
+	SlashingUsesUnderlyingRawStake   bool
+	EvidenceHandlingCorrect          bool
+}
+
+type AetraStakingPolicyEffectivePowerReport struct {
+	ModuleName string
+	Stage      string
+	Required   int
+	Passed     int
+	Failed     []string
+	Ready      bool
 }
 
 func DefaultAetraStakingPolicySpecEvidence() AetraStakingPolicySpecEvidence {
@@ -521,4 +565,101 @@ func hasNegativeAetraStakingPolicyParameter(values AetraStakingPolicyParameterVa
 		values.Top20TargetBps < 0 ||
 		values.Top33TargetBps < 0 ||
 		values.MaxValidatorsSoftTarget < 0
+}
+
+func DefaultAetraStakingPolicyEffectivePowerStage1Evidence() AetraStakingPolicyEffectivePowerEvidence {
+	return AetraStakingPolicyEffectivePowerEvidence{
+		ModuleName: AetraStakingPolicyModuleName,
+		Stage:      AetraStakingPolicyEffectivePowerStage1,
+
+		DefinesCapScope:               true,
+		CapAffectsRewardCalculation:   true,
+		CapAffectsDelegationWarnings:  true,
+		CapAffectsCometBFTVotingPower: false,
+		Stage1LowConsensusRisk:        true,
+	}
+}
+
+func DefaultAetraStakingPolicyEffectivePowerStage2Evidence() AetraStakingPolicyEffectivePowerEvidence {
+	return AetraStakingPolicyEffectivePowerEvidence{
+		ModuleName: AetraStakingPolicyModuleName,
+		Stage:      AetraStakingPolicyEffectivePowerStage2,
+
+		DefinesCapScope:               true,
+		CapAffectsRewardCalculation:   true,
+		CapAffectsDelegationWarnings:  true,
+		CapAffectsCometBFTVotingPower: true,
+		Stage2DeepIntegrationTests:    true,
+
+		ValidatorUpdatesUseCappedPower:   true,
+		TotalVotingPowerConsistent:       true,
+		NoValidatorCanExceedCap:          true,
+		DelegationUnbondingSharesCorrect: true,
+		SlashingUsesUnderlyingRawStake:   true,
+		EvidenceHandlingCorrect:          true,
+	}
+}
+
+func ValidateAetraStakingPolicyEffectivePowerEvidence(evidence AetraStakingPolicyEffectivePowerEvidence) error {
+	report := BuildAetraStakingPolicyEffectivePowerReport(evidence)
+	if !report.Ready {
+		return fmt.Errorf("aetra staking policy effective power rules failed: %v", report.Failed)
+	}
+	return nil
+}
+
+func BuildAetraStakingPolicyEffectivePowerReport(evidence AetraStakingPolicyEffectivePowerEvidence) AetraStakingPolicyEffectivePowerReport {
+	failed := make([]string, 0)
+	if evidence.ModuleName == "" {
+		failed = append(failed, "module_name_required")
+	} else if evidence.ModuleName != AetraStakingPolicyModuleName {
+		failed = append(failed, "module_name_must_be_"+AetraStakingPolicyModuleName)
+	}
+	if evidence.Stage != AetraStakingPolicyEffectivePowerStage1 && evidence.Stage != AetraStakingPolicyEffectivePowerStage2 {
+		failed = append(failed, "effective_power_stage_unknown")
+	}
+
+	checks := []requirementCheck{
+		{AetraStakingPolicyEffectivePowerDefinesCapScope, evidence.DefinesCapScope},
+	}
+	switch evidence.Stage {
+	case AetraStakingPolicyEffectivePowerStage1:
+		checks = append(checks,
+			requirementCheck{AetraStakingPolicyEffectivePowerRewards, evidence.CapAffectsRewardCalculation},
+			requirementCheck{AetraStakingPolicyEffectivePowerDelegationWarnings, evidence.CapAffectsDelegationWarnings},
+			requirementCheck{AetraStakingPolicyEffectivePowerStage1LowConsensusRisk, evidence.Stage1LowConsensusRisk},
+		)
+		if evidence.CapAffectsCometBFTVotingPower {
+			failed = append(failed, AetraStakingPolicyEffectivePowerCometBFTVotingPower+":stage_1_must_not_touch_cometbft_power")
+		}
+	case AetraStakingPolicyEffectivePowerStage2:
+		checks = append(checks,
+			requirementCheck{AetraStakingPolicyEffectivePowerCometBFTVotingPower, evidence.CapAffectsCometBFTVotingPower},
+			requirementCheck{AetraStakingPolicyEffectivePowerStage2DeepIntegrationTests, evidence.Stage2DeepIntegrationTests},
+			requirementCheck{AetraStakingPolicyEffectivePowerValidatorUpdatesCapped, evidence.ValidatorUpdatesUseCappedPower},
+			requirementCheck{AetraStakingPolicyEffectivePowerTotalVotingConsistent, evidence.TotalVotingPowerConsistent},
+			requirementCheck{AetraStakingPolicyEffectivePowerNoValidatorExceedsCap, evidence.NoValidatorCanExceedCap},
+			requirementCheck{AetraStakingPolicyEffectivePowerSharesCorrect, evidence.DelegationUnbondingSharesCorrect},
+			requirementCheck{AetraStakingPolicyEffectivePowerSlashingRawStake, evidence.SlashingUsesUnderlyingRawStake},
+			requirementCheck{AetraStakingPolicyEffectivePowerEvidenceHandlingCorrect, evidence.EvidenceHandlingCorrect},
+		)
+	}
+
+	passed := 0
+	for _, check := range checks {
+		if check.Passed {
+			passed++
+		} else {
+			failed = append(failed, check.ID)
+		}
+	}
+	sort.Strings(failed)
+	return AetraStakingPolicyEffectivePowerReport{
+		ModuleName: evidence.ModuleName,
+		Stage:      evidence.Stage,
+		Required:   len(checks),
+		Passed:     passed,
+		Failed:     failed,
+		Ready:      len(failed) == 0,
+	}
 }

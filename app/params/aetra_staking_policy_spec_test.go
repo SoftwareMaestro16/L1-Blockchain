@@ -247,6 +247,81 @@ func TestAetraStakingPolicyParameterRulesRejectNegativeMathValues(t *testing.T) 
 	require.Contains(t, report.Failed, AetraStakingPolicyParamRejectNegativeOrOverflowMath)
 }
 
+func TestDefaultAetraStakingPolicyEffectivePowerStage1IsLowConsensusRisk(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyEffectivePowerStage1Evidence()
+
+	report := BuildAetraStakingPolicyEffectivePowerReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Equal(t, AetraStakingPolicyEffectivePowerStage1, report.Stage)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 4, report.Required)
+	require.True(t, evidence.CapAffectsRewardCalculation)
+	require.True(t, evidence.CapAffectsDelegationWarnings)
+	require.False(t, evidence.CapAffectsCometBFTVotingPower)
+	require.NoError(t, ValidateAetraStakingPolicyEffectivePowerEvidence(evidence))
+}
+
+func TestAetraStakingPolicyEffectivePowerStage1RejectsCometBFTPowerMutation(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyEffectivePowerStage1Evidence()
+	evidence.CapAffectsCometBFTVotingPower = true
+
+	report := BuildAetraStakingPolicyEffectivePowerReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, AetraStakingPolicyEffectivePowerCometBFTVotingPower+":stage_1_must_not_touch_cometbft_power")
+	require.Error(t, ValidateAetraStakingPolicyEffectivePowerEvidence(evidence))
+}
+
+func TestDefaultAetraStakingPolicyEffectivePowerStage2RequiresConsensusIntegrationGates(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyEffectivePowerStage2Evidence()
+
+	report := BuildAetraStakingPolicyEffectivePowerReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Equal(t, AetraStakingPolicyEffectivePowerStage2, report.Stage)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 9, report.Required)
+	require.True(t, evidence.CapAffectsCometBFTVotingPower)
+	require.NoError(t, ValidateAetraStakingPolicyEffectivePowerEvidence(evidence))
+}
+
+func TestAetraStakingPolicyEffectivePowerStage2RejectsMissingValidatorUpdateAndStakeSafety(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyEffectivePowerStage2Evidence()
+	evidence.ValidatorUpdatesUseCappedPower = false
+	evidence.TotalVotingPowerConsistent = false
+	evidence.NoValidatorCanExceedCap = false
+	evidence.DelegationUnbondingSharesCorrect = false
+	evidence.SlashingUsesUnderlyingRawStake = false
+	evidence.EvidenceHandlingCorrect = false
+
+	report := BuildAetraStakingPolicyEffectivePowerReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, AetraStakingPolicyEffectivePowerValidatorUpdatesCapped)
+	require.Contains(t, report.Failed, AetraStakingPolicyEffectivePowerTotalVotingConsistent)
+	require.Contains(t, report.Failed, AetraStakingPolicyEffectivePowerNoValidatorExceedsCap)
+	require.Contains(t, report.Failed, AetraStakingPolicyEffectivePowerSharesCorrect)
+	require.Contains(t, report.Failed, AetraStakingPolicyEffectivePowerSlashingRawStake)
+	require.Contains(t, report.Failed, AetraStakingPolicyEffectivePowerEvidenceHandlingCorrect)
+	require.Error(t, ValidateAetraStakingPolicyEffectivePowerEvidence(evidence))
+}
+
+func TestAetraStakingPolicyEffectivePowerRejectsMissingScopeStageAndModule(t *testing.T) {
+	evidence := DefaultAetraStakingPolicyEffectivePowerStage1Evidence()
+	evidence.ModuleName = ""
+	evidence.Stage = "stage_3_unknown"
+	evidence.DefinesCapScope = false
+
+	report := BuildAetraStakingPolicyEffectivePowerReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_required")
+	require.Contains(t, report.Failed, "effective_power_stage_unknown")
+	require.Contains(t, report.Failed, AetraStakingPolicyEffectivePowerDefinesCapScope)
+
+	evidence = DefaultAetraStakingPolicyEffectivePowerStage1Evidence()
+	evidence.ModuleName = "x/other"
+	report = BuildAetraStakingPolicyEffectivePowerReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_must_be_"+AetraStakingPolicyModuleName)
+}
+
 func removeString(values []string, targets ...string) []string {
 	targetSet := map[string]bool{}
 	for _, target := range targets {

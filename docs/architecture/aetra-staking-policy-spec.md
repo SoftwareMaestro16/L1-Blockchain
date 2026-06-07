@@ -193,3 +193,65 @@ Required catalog properties:
 - invalid top-N target ordering or values above `10000` must fail validation;
 - `MaxValidatorsSoftTarget <= 0` must fail validation;
 - negative math inputs must fail validation.
+
+## 22.4 Effective Power Calculation
+
+The implementation must define whether cap affects:
+
+1. only reward calculation;
+2. actual CometBFT voting power;
+3. both.
+
+Recommended staged approach:
+
+```text
+Stage 1:
+  cap affects rewards and delegation warnings
+  low consensus risk
+
+Stage 2:
+  cap affects effective staking power used for validator updates
+  requires deeper integration and heavy tests
+```
+
+If Stage 2 is implemented, the staking keeper integration must ensure:
+
+- validator updates sent to CometBFT use capped power;
+- total voting power remains consistent;
+- no validator can exceed cap;
+- delegation and unbonding shares remain correct;
+- slashing can still slash the underlying raw stake;
+- evidence handling remains correct.
+
+### Effective Power Requirements
+
+Aetra must never leave effective power semantics ambiguous. The module must expose whether the cap is reward-only, CometBFT-voting-power-only, or applies to both rewards and voting power.
+
+Stage 1 is the default safe rollout. In Stage 1, the cap changes reward multipliers and delegation warnings only. It must not mutate validator updates sent to CometBFT. This keeps consensus behavior close to standard staking while still steering delegators away from overloaded validators.
+
+Stage 2 is a consensus-affecting rollout. In Stage 2, the cap affects the effective staking power used to build validator updates for CometBFT. This requires deeper staking keeper integration, migration planning, localnet/load testing, evidence tests, slashing tests, export/import tests, and invariant tests.
+
+Stage 2 must keep two concepts separate:
+
+- raw stake: the underlying slashable and withdrawable stake used for delegation shares, unbonding, and slashing;
+- effective power: the capped power exposed to CometBFT for validator set updates.
+
+Slashing must apply to raw stake, not merely to capped effective power. Evidence handling must remain compatible with CometBFT and must not lose accountability for validators whose raw stake exceeds their capped voting power.
+
+### Effective Power Implementation Contract
+
+The effective power gate is `BuildAetraStakingPolicyEffectivePowerReport` in `app/params/aetra_staking_policy_spec.go`.
+
+Required catalog properties:
+
+- `DefaultAetraStakingPolicyEffectivePowerStage1Evidence` must define Stage 1 as rewards plus delegation warnings only;
+- Stage 1 must fail if it touches actual CometBFT voting power;
+- `DefaultAetraStakingPolicyEffectivePowerStage2Evidence` must define Stage 2 as capped validator-update power;
+- Stage 2 must require deeper integration and heavy tests;
+- Stage 2 must require validator updates sent to CometBFT to use capped power;
+- Stage 2 must require total voting power consistency;
+- Stage 2 must require no validator to exceed cap;
+- Stage 2 must require delegation and unbonding shares to remain correct;
+- Stage 2 must require slashing to slash underlying raw stake;
+- Stage 2 must require evidence handling to remain correct;
+- missing cap-scope definition, unknown stage, or wrong module identity must fail validation.
