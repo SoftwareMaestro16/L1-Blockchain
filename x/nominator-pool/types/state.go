@@ -607,6 +607,29 @@ type QueryPoolAllocationsResponse struct {
 	Allocations []ValidatorRewardAllocation
 }
 
+type QueryStakeReputationRequest struct {
+	Account string
+}
+
+type QueryStakeReputationResponse struct {
+	Accumulator StakeReputationAccumulator
+	Found       bool
+}
+
+type QueryAccountReputationRequest struct {
+	Account string
+}
+
+type QueryAccountReputationResponse struct {
+	Account                string
+	ReputationScore        uint64
+	StakeWeightedSeconds   uint64
+	LastUpdatedHeight      uint64
+	HasStakeReputation     bool
+	AccumulatorStateKey    string
+	NonTransferableByToken bool
+}
+
 type QueryStakingRewardsRequest struct {
 	Delegator         string
 	Validator         string

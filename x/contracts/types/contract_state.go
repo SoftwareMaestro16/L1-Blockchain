@@ -360,6 +360,10 @@ func (a AssetOwnershipRecord) Validate() error {
 	if strings.TrimSpace(a.AssetID) == "" {
 		return errors.New("asset id is required")
 	}
+	assetID := strings.ToLower(strings.TrimSpace(a.AssetID))
+	if strings.HasPrefix(assetID, "stake_reputation") || strings.HasPrefix(assetID, "reputation/stake") {
+		return errors.New("stake reputation is account-owned and cannot be transferred as token or NFT")
+	}
 	return nil
 }
 

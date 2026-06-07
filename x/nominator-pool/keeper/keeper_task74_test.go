@@ -282,6 +282,9 @@ func TestTask74StakeReputationClaimTouchesOnlyShareAndAccumulator(t *testing.T) 
 	pool := createOfficialLiquidStakingPool(t, &k, "official-reputation")
 	_, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{PoolID: pool.PoolID, WalletAddress: user, Amount: types.DefaultMinPoolDeposit, Height: 2})
 	require.NoError(t, err)
+	gs := k.ExportGenesis()
+	gs.State.LiquidStakingPools[0].TotalActiveStake = types.DefaultMinPoolDeposit
+	require.NoError(t, k.InitGenesis(gs))
 
 	claim, err := k.ClaimStakeReputation(types.MsgClaimStakeReputation{PoolID: pool.PoolID, OwnerAddress: user, Height: 12})
 	require.NoError(t, err)
@@ -290,6 +293,45 @@ func TestTask74StakeReputationClaimTouchesOnlyShareAndAccumulator(t *testing.T) 
 		string(types.PoolShareKey(pool.PoolID, user)),
 		string(types.ReputationAccumulatorKey(user)),
 	}, claim.InternalMetadata.TouchedKeys)
+
+	stake, err := k.StakeReputation(types.QueryStakeReputationRequest{Account: user})
+	require.NoError(t, err)
+	require.True(t, stake.Found)
+	require.Equal(t, claim.ReputationScore, stake.Accumulator.ReputationScore)
+	account, err := k.AccountReputation(types.QueryAccountReputationRequest{Account: user})
+	require.NoError(t, err)
+	require.True(t, account.HasStakeReputation)
+	require.True(t, account.NonTransferableByToken)
+	require.Equal(t, string(types.ReputationAccumulatorKey(user)), account.AccumulatorStateKey)
+
+	exported := k.ExportGenesis()
+	imported := NewKeeperWithAccountStatus(accountStatusFixture{user: accountStatusActive})
+	require.NoError(t, imported.InitGenesis(exported))
+	roundTrip, err := imported.StakeReputation(types.QueryStakeReputationRequest{Account: user})
+	require.NoError(t, err)
+	require.Equal(t, stake, roundTrip)
+}
+
+func TestTask74StakeReputationNoActiveExposureNoIncrease(t *testing.T) {
+	user := aePoolAddress(t, "51")
+	k := NewKeeperWithAccountStatus(accountStatusFixture{user: accountStatusActive})
+	pool := createOfficialLiquidStakingPool(t, &k, "official-no-exposure")
+	_, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{PoolID: pool.PoolID, WalletAddress: user, Amount: types.DefaultMinPoolDeposit, Height: 2})
+	require.NoError(t, err)
+
+	claim, err := k.ClaimStakeReputation(types.MsgClaimStakeReputation{PoolID: pool.PoolID, OwnerAddress: user, Height: 12})
+	require.NoError(t, err)
+	require.Zero(t, claim.ReputationDelta)
+	require.Zero(t, claim.ReputationScore)
+	require.Equal(t, []string{string(types.PoolShareKey(pool.PoolID, user))}, claim.InternalMetadata.TouchedKeys)
+
+	stake, err := k.StakeReputation(types.QueryStakeReputationRequest{Account: user})
+	require.NoError(t, err)
+	require.False(t, stake.Found)
+	account, err := k.AccountReputation(types.QueryAccountReputationRequest{Account: user})
+	require.NoError(t, err)
+	require.False(t, account.HasStakeReputation)
+	require.Zero(t, account.ReputationScore)
 }
 
 func TestTask74UpdateStakingParamsAlias(t *testing.T) {

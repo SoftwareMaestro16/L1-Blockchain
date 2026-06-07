@@ -195,6 +195,30 @@ func TestContractOwnersAdminsAndAssetQueriesUseAEAndRegistryState(t *testing.T) 
 	require.Len(t, exported.State.AssetOwnership, 1)
 }
 
+func TestStakeReputationCannotBeRepresentedAsTokenOrNFTAsset(t *testing.T) {
+	wallet := aeAddress("11")
+	owner := aeAddress("12")
+	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive})
+	codeHash := storeContractCode(t, &k, wallet)
+	created := instantiateContract(t, &k, wallet, codeHash, "reputation-asset", 10, 0, 0)
+
+	err := k.SetAssetOwner(types.AssetOwnershipRecord{
+		AssetType:           types.AssetTypeNFT,
+		ContractAddressUser: created.ContractAddressUser,
+		AssetID:             "stake_reputation/" + owner,
+		Owner:               owner,
+	})
+	require.ErrorContains(t, err, "cannot be transferred as token or NFT")
+
+	err = k.SetAssetOwner(types.AssetOwnershipRecord{
+		AssetType:           types.AssetTypeToken,
+		ContractAddressUser: created.ContractAddressUser,
+		AssetID:             "reputation/stake/" + owner,
+		Owner:               owner,
+	})
+	require.ErrorContains(t, err, "cannot be transferred as token or NFT")
+}
+
 func TestOfficialLiquidStakingContractCapabilityAllowsNativeHookOnlyForAuthorizedContract(t *testing.T) {
 	wallet := aeAddress("11")
 	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive})
