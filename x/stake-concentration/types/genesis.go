@@ -146,6 +146,7 @@ func ComputeNetworkConcentration(params Params, epoch uint64, validatorSet []Val
 	if len(canonical) > 0 && total == 0 {
 		return NetworkConcentration{}, ErrInvalidConcentration.Wrap("total voting power must be positive")
 	}
+	effectiveCap := EffectiveMaxVotingPowerBps(params, len(canonical))
 	out := NetworkConcentration{
 		Epoch:            epoch,
 		TotalVotingPower: total,
@@ -158,15 +159,15 @@ func ComputeNetworkConcentration(params Params, epoch uint64, validatorSet []Val
 		raw := powerBps(validator.VotingPower, total)
 		rawBps = append(rawBps, raw)
 		effective := raw
-		if effective > params.MaxVotingPowerBps {
-			effective = params.MaxVotingPowerBps
+		if effective > effectiveCap {
+			effective = effectiveCap
 		}
 		modifier := rewardModifier(params, raw)
 		warning := ""
 		if raw >= params.WarningThresholdBps {
 			warning = "concentration_warning"
 		}
-		if raw > params.MaxVotingPowerBps {
+		if raw > effectiveCap {
 			warning = "hard_cap_exceeded"
 		}
 		metric := ValidatorConcentration{
@@ -175,8 +176,8 @@ func ComputeNetworkConcentration(params Params, epoch uint64, validatorSet []Val
 			RawVotingPowerBps:       raw,
 			EffectiveVotingPowerBps: effective,
 			AboveSoftCap:            raw > params.SoftVotingPowerBps,
-			AboveHardCap:            raw > params.MaxVotingPowerBps,
-			DelegationAllowed:       !params.DelegationRejectionEnabled || raw < params.MaxVotingPowerBps,
+			AboveHardCap:            raw > effectiveCap,
+			DelegationAllowed:       !params.DelegationRejectionEnabled || raw < effectiveCap,
 			RewardModifierBps:       modifier,
 			Warning:                 warning,
 		}
@@ -193,6 +194,25 @@ func ComputeNetworkConcentration(params Params, epoch uint64, validatorSet []Val
 		return NetworkConcentration{}, ErrInvalidConcentration.Wrap(err.Error())
 	}
 	return out, nil
+}
+
+func EffectiveMaxVotingPowerBps(params Params, activeValidators int) uint32 {
+	params = NormalizeParams(params)
+	scheduled := AetraPhaseOnePowerCapBps
+	switch {
+	case activeValidators <= 0:
+		scheduled = params.MaxVotingPowerBps
+	case activeValidators <= AetraValidatorSetPhaseOneMax:
+		scheduled = AetraPhaseOnePowerCapBps
+	case activeValidators <= AetraValidatorSetPhaseTwoMax:
+		scheduled = AetraPhaseTwoPowerCapBps
+	default:
+		scheduled = AetraMatureSetPowerCapBps
+	}
+	if params.MaxVotingPowerBps < scheduled {
+		return params.MaxVotingPowerBps
+	}
+	return scheduled
 }
 
 func SortValidatorConcentrations(in []ValidatorConcentration) []ValidatorConcentration {
