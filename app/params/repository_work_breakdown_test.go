@@ -117,6 +117,64 @@ func TestAetraRepoXWorkRejectsMissingTasksAndTests(t *testing.T) {
 	require.Error(t, ValidateAetraRepoXWork(evidence))
 }
 
+func TestDefaultAetraRepoAppWorkCoversSection323(t *testing.T) {
+	evidence := DefaultAetraRepoAppWorkEvidence()
+
+	report := BuildAetraRepoAppWorkReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Empty(t, report.Failed)
+	require.Equal(t, AetraRepoAreaApp, report.Area)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 14, report.Required)
+	require.Contains(t, evidence.Tasks, AetraRepoAppTaskWireKeepers)
+	require.Contains(t, evidence.Tasks, AetraRepoAppTaskWireModules)
+	require.Contains(t, evidence.Tasks, AetraRepoAppTaskWireModuleAccountPermissions)
+	require.Contains(t, evidence.Tasks, AetraRepoAppTaskWireBeginEndPreblockOrder)
+	require.Contains(t, evidence.Tasks, AetraRepoAppTaskWireSimulationManager)
+	require.Contains(t, evidence.Tasks, AetraRepoAppTaskWireAPIRoutes)
+	require.Contains(t, evidence.Tasks, AetraRepoAppTaskWireAutoCLI)
+	require.Contains(t, evidence.Tasks, AetraRepoAppTaskValidateStartup)
+	require.Contains(t, evidence.Tests, AetraRepoAppTestStartup)
+	require.Contains(t, evidence.Tests, AetraRepoAppTestModuleAccountPermissions)
+	require.Contains(t, evidence.Tests, AetraRepoAppTestBeginEndOrder)
+	require.Contains(t, evidence.Tests, AetraRepoAppTestExportImport)
+	require.Contains(t, evidence.Tests, AetraRepoAppTestDeterministicRestart)
+	require.Contains(t, evidence.Tests, AetraRepoAppTestAPIServiceRegistration)
+	require.NoError(t, ValidateAetraRepoAppWork(evidence))
+}
+
+func TestAetraRepoAppWorkRejectsMissingTasksAndTests(t *testing.T) {
+	evidence := DefaultAetraRepoAppWorkEvidence()
+	evidence.Area = "cmd/"
+	evidence.Tasks = removeRepoWorkItem(evidence.Tasks,
+		AetraRepoAppTaskWireKeepers,
+		AetraRepoAppTaskWireModuleAccountPermissions,
+		AetraRepoAppTaskValidateStartup,
+	)
+	evidence.Tests = removeRepoWorkItem(evidence.Tests,
+		AetraRepoAppTestStartup,
+		AetraRepoAppTestExportImport,
+		AetraRepoAppTestAPIServiceRegistration,
+	)
+	evidence.Tasks = append(evidence.Tasks, AetraRepoAppTaskWireModules, "manual_app_note")
+	evidence.Tests = append(evidence.Tests, AetraRepoAppTestBeginEndOrder, "manual_startup_only")
+
+	report := BuildAetraRepoAppWorkReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "area_must_be_"+AetraRepoAreaApp)
+	require.Contains(t, report.Failed, "tasks."+AetraRepoAppTaskWireKeepers+":missing")
+	require.Contains(t, report.Failed, "tasks."+AetraRepoAppTaskWireModuleAccountPermissions+":missing")
+	require.Contains(t, report.Failed, "tasks."+AetraRepoAppTaskValidateStartup+":missing")
+	require.Contains(t, report.Failed, "tasks."+AetraRepoAppTaskWireModules+":duplicate")
+	require.Contains(t, report.Failed, "tasks.manual_app_note:unexpected")
+	require.Contains(t, report.Failed, "tests."+AetraRepoAppTestStartup+":missing")
+	require.Contains(t, report.Failed, "tests."+AetraRepoAppTestExportImport+":missing")
+	require.Contains(t, report.Failed, "tests."+AetraRepoAppTestAPIServiceRegistration+":missing")
+	require.Contains(t, report.Failed, "tests."+AetraRepoAppTestBeginEndOrder+":duplicate")
+	require.Contains(t, report.Failed, "tests.manual_startup_only:unexpected")
+	require.Error(t, ValidateAetraRepoAppWork(evidence))
+}
+
 func removeRepoWorkItem(items []string, targets ...string) []string {
 	targetSet := map[string]bool{}
 	for _, target := range targets {

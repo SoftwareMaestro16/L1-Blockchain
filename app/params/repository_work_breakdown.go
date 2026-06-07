@@ -8,6 +8,7 @@ import (
 const (
 	AetraRepoAreaProto = "proto/"
 	AetraRepoAreaX     = "x/"
+	AetraRepoAreaApp   = "app/"
 )
 
 const (
@@ -47,6 +48,26 @@ const (
 	AetraRepoXTestFuzzPropertyMath = "fuzz_property_tests_for_math"
 )
 
+const (
+	AetraRepoAppTaskWireKeepers                  = "wire_keepers"
+	AetraRepoAppTaskWireModules                  = "wire_modules"
+	AetraRepoAppTaskWireModuleAccountPermissions = "wire_module_account_permissions"
+	AetraRepoAppTaskWireBeginEndPreblockOrder    = "wire_begin_end_preblock_order"
+	AetraRepoAppTaskWireSimulationManager        = "wire_simulation_manager_if_used"
+	AetraRepoAppTaskWireAPIRoutes                = "wire_api_routes"
+	AetraRepoAppTaskWireAutoCLI                  = "wire_autocli_if_used"
+	AetraRepoAppTaskValidateStartup              = "validate_startup"
+)
+
+const (
+	AetraRepoAppTestStartup                  = "app_startup"
+	AetraRepoAppTestModuleAccountPermissions = "module_account_permissions"
+	AetraRepoAppTestBeginEndOrder            = "begin_end_order"
+	AetraRepoAppTestExportImport             = "export_import"
+	AetraRepoAppTestDeterministicRestart     = "deterministic_restart"
+	AetraRepoAppTestAPIServiceRegistration   = "api_service_registration"
+)
+
 type AetraRepoWorkAreaEvidence struct {
 	Area  string
 	Tasks []string
@@ -77,6 +98,14 @@ func DefaultAetraRepoXWorkEvidence() AetraRepoWorkAreaEvidence {
 	}
 }
 
+func DefaultAetraRepoAppWorkEvidence() AetraRepoWorkAreaEvidence {
+	return AetraRepoWorkAreaEvidence{
+		Area:  AetraRepoAreaApp,
+		Tasks: RequiredAetraRepoAppTasks(),
+		Tests: RequiredAetraRepoAppTests(),
+	}
+}
+
 func ValidateAetraRepoProtoWork(evidence AetraRepoWorkAreaEvidence) error {
 	report := BuildAetraRepoProtoWorkReport(evidence)
 	if !report.Ready {
@@ -89,6 +118,14 @@ func ValidateAetraRepoXWork(evidence AetraRepoWorkAreaEvidence) error {
 	report := BuildAetraRepoXWorkReport(evidence)
 	if !report.Ready {
 		return fmt.Errorf("aetra repository x work breakdown failed: %v", report.Failed)
+	}
+	return nil
+}
+
+func ValidateAetraRepoAppWork(evidence AetraRepoWorkAreaEvidence) error {
+	report := BuildAetraRepoAppWorkReport(evidence)
+	if !report.Ready {
+		return fmt.Errorf("aetra repository app work breakdown failed: %v", report.Failed)
 	}
 	return nil
 }
@@ -133,6 +170,26 @@ func BuildAetraRepoXWorkReport(evidence AetraRepoWorkAreaEvidence) AetraRepoWork
 	}
 }
 
+func BuildAetraRepoAppWorkReport(evidence AetraRepoWorkAreaEvidence) AetraRepoWorkAreaReport {
+	failed := make([]string, 0)
+	if evidence.Area != AetraRepoAreaApp {
+		failed = append(failed, "area_must_be_"+AetraRepoAreaApp)
+	}
+	passedTasks, failedTasks := validateRepoWorkCatalog("tasks", evidence.Tasks, RequiredAetraRepoAppTasks())
+	passedTests, failedTests := validateRepoWorkCatalog("tests", evidence.Tests, RequiredAetraRepoAppTests())
+	failed = append(failed, failedTasks...)
+	failed = append(failed, failedTests...)
+
+	sort.Strings(failed)
+	return AetraRepoWorkAreaReport{
+		Area:     evidence.Area,
+		Required: len(RequiredAetraRepoAppTasks()) + len(RequiredAetraRepoAppTests()),
+		Passed:   passedTasks + passedTests,
+		Failed:   failed,
+		Ready:    len(failed) == 0,
+	}
+}
+
 func RequiredAetraRepoProtoTasks() []string {
 	return []string{
 		AetraRepoProtoTaskDefineMessages,
@@ -159,6 +216,19 @@ func RequiredAetraRepoXTasks() []string {
 	}
 }
 
+func RequiredAetraRepoAppTasks() []string {
+	return []string{
+		AetraRepoAppTaskWireKeepers,
+		AetraRepoAppTaskWireModules,
+		AetraRepoAppTaskWireModuleAccountPermissions,
+		AetraRepoAppTaskWireBeginEndPreblockOrder,
+		AetraRepoAppTaskWireSimulationManager,
+		AetraRepoAppTaskWireAPIRoutes,
+		AetraRepoAppTaskWireAutoCLI,
+		AetraRepoAppTaskValidateStartup,
+	}
+}
+
 func RequiredAetraRepoProtoTests() []string {
 	return []string{
 		AetraRepoProtoTestGeneratedCodeCompiles,
@@ -175,6 +245,17 @@ func RequiredAetraRepoXTests() []string {
 		AetraRepoXTestGenesis,
 		AetraRepoXTestInvariant,
 		AetraRepoXTestFuzzPropertyMath,
+	}
+}
+
+func RequiredAetraRepoAppTests() []string {
+	return []string{
+		AetraRepoAppTestStartup,
+		AetraRepoAppTestModuleAccountPermissions,
+		AetraRepoAppTestBeginEndOrder,
+		AetraRepoAppTestExportImport,
+		AetraRepoAppTestDeterministicRestart,
+		AetraRepoAppTestAPIServiceRegistration,
 	}
 }
 

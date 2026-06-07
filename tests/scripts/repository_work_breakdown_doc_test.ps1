@@ -61,6 +61,27 @@ foreach ($term in @(
     'Message servers must validate signers',
     'Query servers must return stable response shapes',
     'Fuzz/property tests are required for math-heavy logic',
+    '32.3 `app/`',
+    'wire keepers',
+    'wire modules',
+    'wire module account permissions',
+    'wire begin/end/preblock order',
+    'wire simulation manager if used',
+    'wire API routes',
+    'wire AutoCLI if used',
+    'validate startup',
+    'app startup',
+    'module account permissions',
+    'begin/end order',
+    'export/import',
+    'deterministic restart',
+    'API service registration',
+    'The `app/` tree owns whole-chain assembly',
+    'Keeper wiring must pass the exact keeper dependencies used by modules',
+    'Module account permissions are consensus-sensitive',
+    'Begin/end/preblock order must be explicit',
+    'Startup validation must reject unsafe module account permissions',
+    'DefaultAetraRepoAppWorkEvidence',
     'DefaultAetraRepoXWorkEvidence',
     'DefaultAetraRepoProtoWorkEvidence'
   )) {
@@ -70,6 +91,7 @@ foreach ($term in @(
 foreach ($term in @(
     'AetraRepoAreaProto',
     'AetraRepoAreaX',
+    'AetraRepoAreaApp',
     'AetraRepoProtoTaskDefineMessages',
     'AetraRepoProtoTaskDefineQueryServices',
     'AetraRepoProtoTaskDefineTxServices',
@@ -95,18 +117,37 @@ foreach ($term in @(
     'AetraRepoXTestGenesis',
     'AetraRepoXTestInvariant',
     'AetraRepoXTestFuzzPropertyMath',
+    'AetraRepoAppTaskWireKeepers',
+    'AetraRepoAppTaskWireModules',
+    'AetraRepoAppTaskWireModuleAccountPermissions',
+    'AetraRepoAppTaskWireBeginEndPreblockOrder',
+    'AetraRepoAppTaskWireSimulationManager',
+    'AetraRepoAppTaskWireAPIRoutes',
+    'AetraRepoAppTaskWireAutoCLI',
+    'AetraRepoAppTaskValidateStartup',
+    'AetraRepoAppTestStartup',
+    'AetraRepoAppTestModuleAccountPermissions',
+    'AetraRepoAppTestBeginEndOrder',
+    'AetraRepoAppTestExportImport',
+    'AetraRepoAppTestDeterministicRestart',
+    'AetraRepoAppTestAPIServiceRegistration',
     'AetraRepoWorkAreaEvidence',
     'AetraRepoWorkAreaReport',
     'DefaultAetraRepoProtoWorkEvidence',
     'DefaultAetraRepoXWorkEvidence',
+    'DefaultAetraRepoAppWorkEvidence',
     'ValidateAetraRepoProtoWork',
     'ValidateAetraRepoXWork',
+    'ValidateAetraRepoAppWork',
     'BuildAetraRepoProtoWorkReport',
     'BuildAetraRepoXWorkReport',
+    'BuildAetraRepoAppWorkReport',
     'RequiredAetraRepoProtoTasks',
     'RequiredAetraRepoProtoTests',
     'RequiredAetraRepoXTasks',
-    'RequiredAetraRepoXTests'
+    'RequiredAetraRepoXTests',
+    'RequiredAetraRepoAppTasks',
+    'RequiredAetraRepoAppTests'
   )) {
   Assert-Contains -Text $catalogText -Pattern ([regex]::Escape($term)) -Message "repository work breakdown catalog missing: $term"
 }
@@ -115,7 +156,9 @@ foreach ($term in @(
     'TestDefaultAetraRepoProtoWorkCoversSection321',
     'TestAetraRepoProtoWorkRejectsMissingTasksAndTests',
     'TestDefaultAetraRepoXWorkCoversSection322',
-    'TestAetraRepoXWorkRejectsMissingTasksAndTests'
+    'TestAetraRepoXWorkRejectsMissingTasksAndTests',
+    'TestDefaultAetraRepoAppWorkCoversSection323',
+    'TestAetraRepoAppWorkRejectsMissingTasksAndTests'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "repository work breakdown tests missing: $term"
 }

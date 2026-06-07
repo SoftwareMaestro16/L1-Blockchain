@@ -57,9 +57,37 @@ Genesis code must support default genesis, validation, import, export, and migra
 
 Fuzz/property tests are required for math-heavy logic such as shares, rewards, slashing fractions, fee split, inflation, APR estimates, voting power caps, overflow stake, storage rent, and any rounding-sensitive calculation.
 
+## 32.3 `app/`
+
+Tasks:
+
+- wire keepers;
+- wire modules;
+- wire module account permissions;
+- wire begin/end/preblock order;
+- wire simulation manager if used;
+- wire API routes;
+- wire AutoCLI if used;
+- validate startup.
+
+Tests:
+
+- app startup;
+- module account permissions;
+- begin/end order;
+- export/import;
+- deterministic restart;
+- API service registration.
+
+The `app/` tree owns whole-chain assembly. Keeper wiring must pass the exact keeper dependencies used by modules and must avoid nil keepers, wrong authorities, wrong codecs, or mismatched store keys. Module wiring must register services, invariants, genesis, migrations, hooks, and begin/end/preblock order consistently with the module manager.
+
+Module account permissions are consensus-sensitive and must be tested. Begin/end/preblock order must be explicit because staking, slashing, distribution, fee burn, treasury, validator score, and contract execution can depend on hook order. API routes, gRPC services, REST gateway routes, and AutoCLI wiring must be tested through app-level registration, not only package-level constructors.
+
+Startup validation must reject unsafe module account permissions, missing stores, duplicate blocked addresses, invalid params, missing authority wiring, and invalid genesis. Export/import and deterministic restart tests are mandatory before public testnet because they catch app hash drift and migration mistakes.
+
 ## Acceptance Gate
 
-The implementation gates are `DefaultAetraRepoProtoWorkEvidence` and `DefaultAetraRepoXWorkEvidence` in `app/params/repository_work_breakdown.go`.
+The implementation gates are `DefaultAetraRepoProtoWorkEvidence`, `DefaultAetraRepoXWorkEvidence`, and `DefaultAetraRepoAppWorkEvidence` in `app/params/repository_work_breakdown.go`.
 
 Required behavior:
 
@@ -72,3 +100,5 @@ Required behavior:
 - missing generated-code compile, proto lint, or service-registration tests fail readiness.
 - missing keeper, msg server, query server, genesis, params validation, invariant, hook, event, or module interface work fails readiness;
 - missing keeper, msg server, query server, genesis, invariant, or fuzz/property math tests fails readiness.
+- missing app keeper wiring, module wiring, module account permissions, begin/end/preblock order, simulation manager, API routes, AutoCLI, or startup validation work fails readiness;
+- missing app startup, module account permissions, begin/end order, export/import, deterministic restart, or API service-registration tests fails readiness.
