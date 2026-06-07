@@ -59,7 +59,7 @@ func TestMigrateAccountV1ToV2DeterministicGolden(t *testing.T) {
 	bz, err := json.Marshal(first)
 	require.NoError(t, err)
 	hash := sha256.Sum256(bz)
-	require.Equal(t, "91a81ae51fef0643b6eeae454a1363d45484b0b62ee9bad63b2a39e8a5e09e6c", hex.EncodeToString(hash[:]))
+	require.Equal(t, "e811078d0945c08baf595a4fc7fea61d23fd1b628cd1408c976e8de2ccbde561", hex.EncodeToString(hash[:]))
 }
 
 func TestAddressAndSequenceSemanticsUnchangedAcrossMigration(t *testing.T) {

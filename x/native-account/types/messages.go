@@ -18,10 +18,12 @@ const (
 )
 
 type ExternalMessage struct {
-	AccountUser string
-	Sequence    uint64
-	Signers     []string
-	Operation   string
+	AccountUser   string
+	Sequence      uint64
+	Signers       []string
+	Operation     string
+	Amount        uint64
+	CurrentHeight uint64
 }
 
 type InternalMessage struct {
@@ -63,23 +65,8 @@ func ValidateExternalMessage(account Account, msg ExternalMessage) error {
 }
 
 func ValidateAuthPolicyForExternalMessage(account Account, msg ExternalMessage) error {
-	if err := account.AuthPolicy.Validate(); err != nil {
-		return err
-	}
-	switch account.AuthPolicy.Mode {
-	case AuthModeSingleKey:
-		for _, signer := range msg.Signers {
-			signer = strings.TrimSpace(signer)
-			for _, pubKey := range account.PubKeys {
-				if signer == pubKey {
-					return nil
-				}
-			}
-		}
-		return errors.New("external message missing authorized single-key signer")
-	default:
-		return fmt.Errorf("unsupported external auth policy mode %q", account.AuthPolicy.Mode)
-	}
+	_, err := AuthorizeAuthPolicy(account, msg)
+	return err
 }
 
 func ApplyInternalMessage(account Account, msg InternalMessage, policy InternalMessagePolicy) (Account, error) {
@@ -126,4 +113,216 @@ func accountHasFeature(account Account, feature string) bool {
 		}
 	}
 	return false
+}
+
+type MsgUpdateAuthPolicy struct {
+	AccountUser   string
+	NewAuthPolicy AuthPolicy
+	Signers       []string
+	CurrentHeight uint64
+}
+
+type MsgRotateKey struct {
+	AccountUser   string
+	OldKeyID      string
+	NewKey        AuthKey
+	Signers       []string
+	CurrentHeight uint64
+}
+
+type MsgRecoverAccount struct {
+	AccountUser   string
+	Signers       []string
+	CurrentHeight uint64
+}
+
+type MsgFreezeAccount struct {
+	AccountUser   string
+	Signers       []string
+	CurrentHeight uint64
+}
+
+type MsgUnfreezeAccount struct {
+	AccountUser       string
+	Signers           []string
+	CurrentHeight     uint64
+	StorageDebtPaid   bool
+	OtherFreezeReason bool
+}
+
+type MsgUpdateAccountMetadata struct {
+	AccountUser   string
+	Metadata      AccountMetadata
+	Signers       []string
+	CurrentHeight uint64
+}
+
+type MsgUpdateAccountParams struct {
+	AccountUser   string
+	FeatureFlags  []string
+	Signers       []string
+	CurrentHeight uint64
+}
+
+func ApplyMsgUpdateAuthPolicy(account Account, msg MsgUpdateAuthPolicy) (Account, error) {
+	if msg.AccountUser != account.AddressUser {
+		return Account{}, errors.New("auth policy update account address mismatch")
+	}
+	if msg.CurrentHeight < account.AuthPolicy.Timelock.AuthPolicyUpdateEndHeight {
+		return Account{}, errors.New("auth policy update timelock has not expired")
+	}
+	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
+		AccountUser:   account.AddressUser,
+		Sequence:      account.Sequence,
+		Signers:       msg.Signers,
+		Operation:     AuthOperationAuthPolicyUpdate,
+		CurrentHeight: msg.CurrentHeight,
+	}); err != nil {
+		return Account{}, err
+	}
+	nextPolicy := msg.NewAuthPolicy.Normalize()
+	if err := nextPolicy.Validate(); err != nil {
+		return Account{}, err
+	}
+	next := cloneAccount(account)
+	next.AuthPolicy = nextPolicy
+	return next, ValidateAccountInvariant(next)
+}
+
+func ApplyMsgRotateKey(account Account, msg MsgRotateKey) (Account, error) {
+	if msg.AccountUser != account.AddressUser {
+		return Account{}, errors.New("key rotation account address mismatch")
+	}
+	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
+		AccountUser:   account.AddressUser,
+		Sequence:      account.Sequence,
+		Signers:       msg.Signers,
+		Operation:     AuthOperationAuthPolicyUpdate,
+		CurrentHeight: msg.CurrentHeight,
+	}); err != nil {
+		return Account{}, err
+	}
+	if containsSecretLikeText(msg.NewKey.ID) || containsSecretLikeText(msg.NewKey.PublicKey) {
+		return Account{}, errors.New("native account rotated key must not contain private keys or seed phrases")
+	}
+	next := cloneAccount(account)
+	next.AuthPolicy = next.AuthPolicy.Normalize()
+	replaced := false
+	for idx, key := range next.AuthPolicy.Keys {
+		if key.ID == msg.OldKeyID {
+			next.AuthPolicy.Keys[idx] = msg.NewKey.Normalize()
+			replaced = true
+			break
+		}
+	}
+	if !replaced {
+		for idx, key := range next.PubKeys {
+			if key == msg.OldKeyID {
+				next.PubKeys[idx] = msg.NewKey.PublicKey
+				replaced = true
+				break
+			}
+		}
+	}
+	if !replaced {
+		return Account{}, errors.New("native account key to rotate not found")
+	}
+	next = normalizeAccount(next)
+	next.AuthPolicy = next.AuthPolicy.Normalize()
+	return next, ValidateAccountInvariant(next)
+}
+
+func ApplyMsgRecoverAccount(account Account, msg MsgRecoverAccount) (Account, error) {
+	if msg.AccountUser != account.AddressUser {
+		return Account{}, errors.New("recovery account address mismatch")
+	}
+	if err := AuthorizeRecoveryPolicy(account, msg); err != nil {
+		return Account{}, err
+	}
+	next := cloneAccount(account)
+	next.Status = AccountStatusRecovered
+	return next, ValidateAccountInvariant(next)
+}
+
+func ApplyMsgFreezeAccount(account Account, msg MsgFreezeAccount) (Account, error) {
+	if msg.AccountUser != account.AddressUser {
+		return Account{}, errors.New("freeze account address mismatch")
+	}
+	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
+		AccountUser:   account.AddressUser,
+		Sequence:      account.Sequence,
+		Signers:       msg.Signers,
+		Operation:     AuthOperationFreezeAccount,
+		CurrentHeight: msg.CurrentHeight,
+	}); err != nil {
+		return Account{}, err
+	}
+	next := cloneAccount(account)
+	next.Status = AccountStatusFrozen
+	return next, ValidateAccountInvariant(next)
+}
+
+func ApplyMsgUnfreezeAccount(account Account, msg MsgUnfreezeAccount) (Account, error) {
+	if msg.AccountUser != account.AddressUser {
+		return Account{}, errors.New("unfreeze account address mismatch")
+	}
+	if account.Status != AccountStatusFrozen {
+		return Account{}, errors.New("only frozen accounts can be unfrozen")
+	}
+	if !msg.StorageDebtPaid || msg.OtherFreezeReason {
+		return Account{}, errors.New("account cannot unfreeze until storage debt is paid and freeze reasons are cleared")
+	}
+	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
+		AccountUser:   account.AddressUser,
+		Sequence:      account.Sequence,
+		Signers:       msg.Signers,
+		Operation:     AuthOperationUnfreezeAccount,
+		CurrentHeight: msg.CurrentHeight,
+	}); err != nil {
+		return Account{}, err
+	}
+	next := cloneAccount(account)
+	next.Status = AccountStatusActive
+	next.StorageRentDebt = 0
+	return next, ValidateAccountInvariant(next)
+}
+
+func ApplyMsgUpdateAccountMetadata(account Account, msg MsgUpdateAccountMetadata) (Account, error) {
+	if msg.AccountUser != account.AddressUser {
+		return Account{}, errors.New("metadata update account address mismatch")
+	}
+	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
+		AccountUser:   account.AddressUser,
+		Sequence:      account.Sequence,
+		Signers:       msg.Signers,
+		Operation:     AuthOperationMetadataUpdate,
+		CurrentHeight: msg.CurrentHeight,
+	}); err != nil {
+		return Account{}, err
+	}
+	if err := msg.Metadata.Validate(); err != nil {
+		return Account{}, err
+	}
+	next := cloneAccount(account)
+	next.Metadata = msg.Metadata
+	return next, ValidateAccountInvariant(next)
+}
+
+func ApplyMsgUpdateAccountParams(account Account, msg MsgUpdateAccountParams) (Account, error) {
+	if msg.AccountUser != account.AddressUser {
+		return Account{}, errors.New("account params update address mismatch")
+	}
+	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
+		AccountUser:   account.AddressUser,
+		Sequence:      account.Sequence,
+		Signers:       msg.Signers,
+		Operation:     AuthOperationParamsUpdate,
+		CurrentHeight: msg.CurrentHeight,
+	}); err != nil {
+		return Account{}, err
+	}
+	next := cloneAccount(account)
+	next.FeatureFlags = cloneStrings(msg.FeatureFlags)
+	next = normalizeAccount(next)
+	return next, ValidateAccountInvariant(next)
 }

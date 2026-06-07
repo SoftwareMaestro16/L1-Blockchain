@@ -208,7 +208,7 @@ func validatorRecord(t *testing.T, fill byte) validatorregistrytypes.ValidatorRe
 		CommissionPolicy:   validatorregistrytypes.DefaultCommissionPolicy(),
 		Status:             validatorregistrytypes.StatusActive,
 		Capabilities:       []string{"liquid-staking"},
-		SelfBond:           1_000_000,
+		SelfBond:           validatorregistrytypes.DefaultSoloValidatorMinSelfStake,
 	}
 }
 

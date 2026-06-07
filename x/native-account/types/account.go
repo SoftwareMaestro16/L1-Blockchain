@@ -53,8 +53,14 @@ type Account struct {
 }
 
 type AuthPolicy struct {
-	Version uint64 `json:"version"`
-	Mode    string `json:"mode"`
+	Version        uint64          `json:"version"`
+	Mode           string          `json:"mode"`
+	Keys           []AuthKey       `json:"keys,omitempty"`
+	Threshold      uint64          `json:"threshold,omitempty"`
+	Weights        []AuthWeight    `json:"weights,omitempty"`
+	RecoveryPolicy RecoveryPolicy  `json:"recovery_policy,omitempty"`
+	Timelock       TimelockPolicy  `json:"timelock,omitempty"`
+	SpendingLimits []SpendingLimit `json:"spending_limits,omitempty"`
 }
 
 type AccountMetadata struct {
@@ -160,6 +166,7 @@ func ValidateAccountInvariant(account Account) error {
 }
 
 func (p AuthPolicy) Validate() error {
+	p = p.Normalize()
 	if p.Version == 0 {
 		return errors.New("native account auth policy version must be positive")
 	}
@@ -173,7 +180,43 @@ func (p AuthPolicy) Validate() error {
 	if containsSecretLikeText(mode) {
 		return errors.New("native account auth policy must not contain private keys or seed phrases")
 	}
-	return nil
+	switch mode {
+	case AuthModeSingleKey:
+		return validateAuthKeys(p.Keys, true)
+	case AuthModeMultisig, AuthModeThreshold:
+		if err := validateAuthKeys(p.Keys, false); err != nil {
+			return err
+		}
+		if p.Threshold == 0 || p.Threshold > uint64(len(p.Keys)) {
+			return errors.New("native account auth policy threshold is invalid")
+		}
+	case AuthModeWeighted:
+		if err := validateAuthKeys(p.Keys, false); err != nil {
+			return err
+		}
+		if p.Threshold == 0 {
+			return errors.New("native account weighted auth threshold is required")
+		}
+		if err := validateAuthWeights(p.Keys, p.Weights, p.Threshold); err != nil {
+			return err
+		}
+	case AuthModeTwoDevice:
+		if err := validateAuthKeys(p.Keys, false); err != nil {
+			return err
+		}
+		if !hasAuthKeyRole(p.Keys, AuthKeyRolePrimary) || !hasAuthKeyRole(p.Keys, AuthKeyRoleDevice) {
+			return errors.New("native account two-device auth requires primary and device keys")
+		}
+	default:
+		return fmt.Errorf("unsupported native account auth policy mode %q", mode)
+	}
+	if err := p.RecoveryPolicy.Validate(); err != nil {
+		return err
+	}
+	if err := p.Timelock.Validate(); err != nil {
+		return err
+	}
+	return validateSpendingLimits(p.SpendingLimits)
 }
 
 func (m AccountMetadata) Validate() error {
@@ -240,6 +283,7 @@ func ValidateAddressPair(field, userAddress, rawAddress string) error {
 func normalizeAccount(account Account) Account {
 	account.PubKeys = cloneStrings(account.PubKeys)
 	account.FeatureFlags = cloneStrings(account.FeatureFlags)
+	account.AuthPolicy = account.AuthPolicy.Normalize()
 	sort.Strings(account.PubKeys)
 	sort.Strings(account.FeatureFlags)
 	return account
@@ -248,6 +292,7 @@ func normalizeAccount(account Account) Account {
 func cloneAccount(account Account) Account {
 	account.PubKeys = cloneStrings(account.PubKeys)
 	account.FeatureFlags = cloneStrings(account.FeatureFlags)
+	account.AuthPolicy = account.AuthPolicy.Normalize()
 	return account
 }
 
@@ -318,7 +363,12 @@ func containsSecretLikeText(value string) bool {
 		strings.Contains(lower, "private_key") ||
 		strings.Contains(lower, "seed phrase") ||
 		strings.Contains(lower, "seed_phrase") ||
-		strings.Contains(lower, "mnemonic")
+		strings.Contains(lower, "mnemonic") ||
+		strings.Contains(lower, "sms_secret") ||
+		strings.Contains(lower, "sms secret") ||
+		strings.Contains(lower, "totp_secret") ||
+		strings.Contains(lower, "totp secret") ||
+		strings.Contains(lower, "one_time_password")
 }
 
 func isAccountStatus(status string) bool {
