@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/sovereign-l1/l1/app/addressing"
 	appparams "github.com/sovereign-l1/l1/app/params"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/nominator-pool/types"
@@ -43,6 +44,207 @@ func TestDepositMintsShares(t *testing.T) {
 	require.True(t, found)
 	require.Equal(t, uint64(1_000), stored.TotalShares)
 	require.Equal(t, uint64(1_000), stored.TotalBondedStake)
+}
+
+func TestOfficialLiquidStakingSmallDepositMintsDeterministicShares(t *testing.T) {
+	k := NewKeeper()
+	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
+	user := aePoolAddress(t, "22")
+
+	share, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
+		Authority:   prototype.DefaultAuthority,
+		PoolID:      pool.PoolID,
+		UserAddress: user,
+		Amount:      types.DefaultMinPoolDeposit,
+		Height:      2,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(10), share.Shares)
+
+	secondShare, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
+		Authority:   prototype.DefaultAuthority,
+		PoolID:      pool.PoolID,
+		UserAddress: user,
+		Amount:      90,
+		Height:      3,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(100), secondShare.Shares)
+
+	stored, found := k.NominatorPool(pool.PoolID)
+	require.True(t, found)
+	require.Equal(t, uint64(100), stored.TotalBondedStake)
+	require.Equal(t, uint64(100), stored.TotalShares)
+	require.Equal(t, rawPoolAddress("22"), stored.DelegatorShares[0].Delegator)
+	require.Equal(t, uint64(100), stored.DelegatorShares[0].Shares)
+}
+
+func TestOfficialLiquidStakingDepositRejectsValidatorAddress(t *testing.T) {
+	k := NewKeeper()
+	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
+
+	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
+		Authority:        prototype.DefaultAuthority,
+		PoolID:           pool.PoolID,
+		UserAddress:      aePoolAddress(t, "22"),
+		ValidatorAddress: aePoolAddress(t, "33"),
+		Amount:           100,
+		Height:           2,
+	})
+	require.ErrorContains(t, err, "must not include a validator address")
+}
+
+func TestOfficialLiquidStakingDepositBelowMinimumRejected(t *testing.T) {
+	k := NewKeeper()
+	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
+
+	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
+		Authority:   prototype.DefaultAuthority,
+		PoolID:      pool.PoolID,
+		UserAddress: aePoolAddress(t, "22"),
+		Amount:      types.DefaultMinPoolDeposit - 1,
+		Height:      2,
+	})
+	require.ErrorContains(t, err, "below configured minimum")
+}
+
+func TestOfficialLiquidStakingDepositRequiresAEUserAddress(t *testing.T) {
+	k := NewKeeper()
+	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
+
+	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
+		Authority:   prototype.DefaultAuthority,
+		PoolID:      pool.PoolID,
+		UserAddress: rawPoolAddress("22"),
+		Amount:      100,
+		Height:      2,
+	})
+	require.ErrorContains(t, err, "must use AE user-facing address format")
+}
+
+func TestOfficialLiquidStakingReceiptExportImportRoundTrip(t *testing.T) {
+	source := NewKeeper()
+	pool := createOfficialLiquidStakingPool(t, &source, "official-pool")
+	user := aePoolAddress(t, "22")
+	share, err := source.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
+		Authority:   prototype.DefaultAuthority,
+		PoolID:      pool.PoolID,
+		UserAddress: user,
+		Amount:      100,
+		Height:      2,
+	})
+	require.NoError(t, err)
+
+	exported := source.ExportGenesis()
+	require.NoError(t, exported.Validate())
+	target := NewKeeper()
+	require.NoError(t, target.InitGenesis(exported))
+
+	roundTripShare, found := target.PoolDelegator(pool.PoolID, rawPoolAddress("22"))
+	require.True(t, found)
+	require.Equal(t, share, roundTripShare)
+	require.Equal(t, exported, target.ExportGenesis())
+}
+
+func TestDirectUserDelegationDisabledByDefault(t *testing.T) {
+	k := NewKeeper()
+
+	err := k.DelegateUserToValidator(types.MsgDelegateToValidator{
+		Authority:        prototype.DefaultAuthority,
+		UserAddress:      aePoolAddress(t, "22"),
+		ValidatorAddress: aePoolAddress(t, "33"),
+		Amount:           100,
+		Height:           2,
+	})
+	require.ErrorContains(t, err, "direct user delegation to validators is disabled")
+}
+
+func TestOfficialContractCanInjectPooledStake(t *testing.T) {
+	k := NewKeeper()
+	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
+	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
+		Authority:   prototype.DefaultAuthority,
+		PoolID:      pool.PoolID,
+		UserAddress: aePoolAddress(t, "22"),
+		Amount:      100,
+		Height:      2,
+	})
+	require.NoError(t, err)
+
+	updated, err := k.InjectPooledStake(types.MsgInjectPooledStake{
+		CallerContractUser: pool.ContractAddressUser,
+		PoolID:             pool.PoolID,
+		ValidatorAddress:   aePoolAddress(t, "33"),
+		Amount:             100,
+		Height:             3,
+	})
+	require.NoError(t, err)
+	require.Equal(t, []types.PoolAllocation{{
+		ValidatorAddress: aePoolAddress(t, "33"),
+		Amount:           100,
+		Height:           3,
+	}}, updated.Allocations)
+}
+
+func TestUnauthorizedContractCannotInjectPooledStake(t *testing.T) {
+	k := NewKeeper()
+	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
+	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
+		Authority:   prototype.DefaultAuthority,
+		PoolID:      pool.PoolID,
+		UserAddress: aePoolAddress(t, "22"),
+		Amount:      100,
+		Height:      2,
+	})
+	require.NoError(t, err)
+
+	_, err = k.InjectPooledStake(types.MsgInjectPooledStake{
+		CallerContractUser: aePoolAddress(t, "77"),
+		PoolID:             pool.PoolID,
+		ValidatorAddress:   aePoolAddress(t, "33"),
+		Amount:             100,
+		Height:             3,
+	})
+	require.ErrorContains(t, err, "requires official liquid staking contract")
+}
+
+func TestPooledStakeInjectionCannotExceedPoolAccounting(t *testing.T) {
+	k := NewKeeper()
+	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
+	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
+		Authority:   prototype.DefaultAuthority,
+		PoolID:      pool.PoolID,
+		UserAddress: aePoolAddress(t, "22"),
+		Amount:      100,
+		Height:      2,
+	})
+	require.NoError(t, err)
+
+	_, err = k.InjectPooledStake(types.MsgInjectPooledStake{
+		CallerContractUser: pool.ContractAddressUser,
+		PoolID:             pool.PoolID,
+		ValidatorAddress:   aePoolAddress(t, "33"),
+		Amount:             101,
+		Height:             3,
+	})
+	require.ErrorContains(t, err, "exceeds unallocated pool stake")
+}
+
+func TestFrozenLimitedOfficialPoolRejectsDeposits(t *testing.T) {
+	k := NewKeeper()
+	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
+	gs := k.ExportGenesis()
+	gs.State.Pools[0].Status = types.PoolStatusFrozenLimited
+	require.NoError(t, k.InitGenesis(gs))
+
+	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
+		Authority:   prototype.DefaultAuthority,
+		PoolID:      pool.PoolID,
+		UserAddress: aePoolAddress(t, "22"),
+		Amount:      100,
+		Height:      2,
+	})
+	require.ErrorContains(t, err, "must be active for deposits")
 }
 
 func TestWithdrawalBurnsShares(t *testing.T) {
@@ -217,6 +419,22 @@ func createPool(t *testing.T, k *Keeper, poolID string) types.NominatorPool {
 	return pool
 }
 
+func createOfficialLiquidStakingPool(t *testing.T, k *Keeper, poolID string) types.NominatorPool {
+	t.Helper()
+	contractRaw := rawPoolAddress("66")
+	pool, err := k.CreateOfficialLiquidStakingPool(types.MsgCreateOfficialLiquidStakingPool{
+		Authority:           prototype.DefaultAuthority,
+		PoolID:              poolID,
+		ContractAddressUser: aeFromRaw(t, contractRaw),
+		ContractAddressRaw:  contractRaw,
+		PoolOperator:        rawPoolAddress("11"),
+		PoolCommissionBps:   100,
+		Height:              1,
+	})
+	require.NoError(t, err)
+	return pool
+}
+
 func deposit(t *testing.T, k *Keeper, poolID string, delegator string, amount uint64, height uint64) {
 	t.Helper()
 	_, err := k.DepositToPool(types.MsgDepositToPool{
@@ -231,4 +449,18 @@ func deposit(t *testing.T, k *Keeper, poolID string, delegator string, amount ui
 
 func rawPoolAddress(hexByte string) string {
 	return "4:000000000000000000000000" + fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte)
+}
+
+func aePoolAddress(t *testing.T, hexByte string) string {
+	t.Helper()
+	return aeFromRaw(t, rawPoolAddress(hexByte))
+}
+
+func aeFromRaw(t *testing.T, raw string) string {
+	t.Helper()
+	bz, err := addressing.Parse(raw)
+	require.NoError(t, err)
+	user, err := addressing.FormatUserFriendly(bz)
+	require.NoError(t, err)
+	return user
 }

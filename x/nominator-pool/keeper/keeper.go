@@ -129,6 +129,38 @@ func (k *Keeper) CreateNominatorPool(msg types.MsgCreateNominatorPool) (types.No
 	return pool, nil
 }
 
+func (k *Keeper) CreateOfficialLiquidStakingPool(msg types.MsgCreateOfficialLiquidStakingPool) (types.NominatorPool, error) {
+	if err := k.genesis.Params.Authorize(msg.Authority); err != nil {
+		return types.NominatorPool{}, err
+	}
+	if msg.Height == 0 {
+		return types.NominatorPool{}, errors.New("official liquid staking pool creation height must be positive")
+	}
+	if _, _, found := findPool(k.genesis.State.Pools, msg.PoolID); found {
+		return types.NominatorPool{}, errors.New("official liquid staking pool already exists")
+	}
+	pool := types.NominatorPool{
+		PoolID:                msg.PoolID,
+		ContractAddressUser:   msg.ContractAddressUser,
+		ContractAddressRaw:    msg.ContractAddressRaw,
+		OfficialLiquidStaking: true,
+		PoolOperator:          msg.PoolOperator,
+		PoolCommissionBps:     msg.PoolCommissionBps,
+		Status:                types.PoolStatusActive,
+	}
+	if err := pool.Validate(k.genesis.Params); err != nil {
+		return types.NominatorPool{}, err
+	}
+	next := cloneGenesis(k.genesis)
+	next.State.Pools = append(next.State.Pools, pool)
+	next.State = next.State.Normalize(next.Params)
+	if err := next.Validate(); err != nil {
+		return types.NominatorPool{}, err
+	}
+	k.genesis = next
+	return pool, nil
+}
+
 func (k *Keeper) DepositToPool(msg types.MsgDepositToPool) (types.DelegatorShare, error) {
 	if err := k.genesis.Params.Authorize(msg.Authority); err != nil {
 		return types.DelegatorShare{}, err
@@ -164,6 +196,90 @@ func (k *Keeper) DepositToPool(msg types.MsgDepositToPool) (types.DelegatorShare
 	pool.TotalBondedStake += msg.Amount
 	pool.PendingDeposits = append(pool.PendingDeposits, types.PendingDeposit{Delegator: msg.Delegator, Amount: msg.Amount, Height: msg.Height})
 	return k.savePool(idx, pool, delegator)
+}
+
+func (k *Keeper) DepositToOfficialLiquidStaking(msg types.MsgDepositToOfficialLiquidStaking) (types.DelegatorShare, error) {
+	if err := types.ValidateOfficialLiquidStakingDeposit(msg, k.genesis.Params); err != nil {
+		return types.DelegatorShare{}, err
+	}
+	rawUserAddress, err := types.RawAddressForUserAddress(msg.UserAddress)
+	if err != nil {
+		return types.DelegatorShare{}, err
+	}
+	idx, pool, found := findPool(k.genesis.State.Pools, msg.PoolID)
+	if !found {
+		return types.DelegatorShare{}, errors.New("official liquid staking pool not found")
+	}
+	if !pool.OfficialLiquidStaking {
+		return types.DelegatorShare{}, errors.New("pool is not an official liquid staking pool")
+	}
+	if pool.Status != types.PoolStatusActive {
+		return types.DelegatorShare{}, errors.New("official liquid staking pool must be active for deposits")
+	}
+	shareAmount := types.SharesForDeposit(pool, msg.Amount)
+	delegatorIdx, delegator, found := findDelegator(pool.DelegatorShares, rawUserAddress)
+	if found {
+		delegator.PendingRewards = types.AccruedReward(delegator, pool.RewardIndex)
+		delegator.Shares += shareAmount
+		delegator.RewardIndexCheckpoint = pool.RewardIndex
+		delegator.SlashIndexCheckpoint = pool.SlashIndex
+		pool.DelegatorShares[delegatorIdx] = delegator
+	} else {
+		delegator = types.DelegatorShare{
+			Delegator:             rawUserAddress,
+			Shares:                shareAmount,
+			RewardIndexCheckpoint: pool.RewardIndex,
+			SlashIndexCheckpoint:  pool.SlashIndex,
+		}
+		pool.DelegatorShares = append(pool.DelegatorShares, delegator)
+	}
+	pool.TotalShares += shareAmount
+	pool.TotalBondedStake += msg.Amount
+	pool.PendingDeposits = append(pool.PendingDeposits, types.PendingDeposit{Delegator: rawUserAddress, Amount: msg.Amount, Height: msg.Height})
+	return k.savePool(idx, pool, delegator)
+}
+
+func (k *Keeper) DelegateUserToValidator(msg types.MsgDelegateToValidator) error {
+	return types.ValidateDirectUserDelegation(msg, k.genesis.Params)
+}
+
+func (k *Keeper) InjectPooledStake(msg types.MsgInjectPooledStake) (types.NominatorPool, error) {
+	if err := types.ValidateUserFacingAEAddress("pooled stake caller contract", msg.CallerContractUser); err != nil {
+		return types.NominatorPool{}, err
+	}
+	if err := types.ValidateUserFacingAEAddress("pooled stake validator address", msg.ValidatorAddress); err != nil {
+		return types.NominatorPool{}, err
+	}
+	if msg.Amount == 0 || msg.Height == 0 {
+		return types.NominatorPool{}, errors.New("pooled stake injection amount and height must be positive")
+	}
+	idx, pool, found := findPool(k.genesis.State.Pools, msg.PoolID)
+	if !found {
+		return types.NominatorPool{}, errors.New("official liquid staking pool not found")
+	}
+	if !pool.OfficialLiquidStaking || pool.ContractAddressUser != msg.CallerContractUser {
+		return types.NominatorPool{}, errors.New("pooled stake injection requires official liquid staking contract")
+	}
+	if pool.Status != types.PoolStatusActive {
+		return types.NominatorPool{}, errors.New("official liquid staking pool must be active for stake injection")
+	}
+	currentAllocated := totalAllocated(pool.Allocations)
+	if msg.Amount > pool.TotalBondedStake-currentAllocated {
+		return types.NominatorPool{}, errors.New("pooled stake injection exceeds unallocated pool stake")
+	}
+	allocationIdx, allocation, found := findAllocation(pool.Allocations, msg.ValidatorAddress)
+	if found {
+		allocation.Amount += msg.Amount
+		allocation.Height = msg.Height
+		pool.Allocations[allocationIdx] = allocation
+	} else {
+		pool.Allocations = append(pool.Allocations, types.PoolAllocation{
+			ValidatorAddress: msg.ValidatorAddress,
+			Amount:           msg.Amount,
+			Height:           msg.Height,
+		})
+	}
+	return k.savePoolOnly(idx, pool)
 }
 
 func (k *Keeper) RequestPoolWithdrawal(msg types.MsgRequestPoolWithdrawal) (types.PendingWithdrawal, error) {
@@ -488,4 +604,21 @@ func findWithdrawal(withdrawals []types.PendingWithdrawal, withdrawalID string) 
 		}
 	}
 	return -1, types.PendingWithdrawal{}, false
+}
+
+func findAllocation(allocations []types.PoolAllocation, validatorAddress string) (int, types.PoolAllocation, bool) {
+	for idx, allocation := range allocations {
+		if allocation.ValidatorAddress == validatorAddress {
+			return idx, allocation, true
+		}
+	}
+	return -1, types.PoolAllocation{}, false
+}
+
+func totalAllocated(allocations []types.PoolAllocation) uint64 {
+	total := uint64(0)
+	for _, allocation := range allocations {
+		total += allocation.Amount
+	}
+	return total
 }

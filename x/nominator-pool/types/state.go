@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	PoolStatusActive = "active"
-	PoolStatusPaused = "paused"
-	PoolStatusClosed = "closed"
+	PoolStatusActive        = "active"
+	PoolStatusPaused        = "paused"
+	PoolStatusFrozenLimited = "frozen_limited"
+	PoolStatusClosed        = "closed"
 
 	WithdrawalStatusPending   = "pending"
 	WithdrawalStatusCancelled = "cancelled"
@@ -32,19 +33,22 @@ const (
 	DefaultMaxCommissionBps     = uint32(2_000)
 	DefaultUnbondingBlocks      = appparams.StakingUnbondingDefaultBlocks
 	DefaultValidatorChangeDelay = uint64(100)
+	DefaultMinPoolDeposit       = uint64(10)
 )
 
 type Params struct {
-	Authority             string
-	MaxPools              uint32
-	MaxDelegators         uint32
-	MaxPendingDeposits    uint32
-	MaxPendingWithdrawals uint32
-	MaxUnbondingEntries   uint32
-	MaxPoolIDBytes        uint32
-	MaxCommissionBps      uint32
-	UnbondingBlocks       uint64
-	ValidatorChangeDelay  uint64
+	Authority                   string
+	MaxPools                    uint32
+	MaxDelegators               uint32
+	MaxPendingDeposits          uint32
+	MaxPendingWithdrawals       uint32
+	MaxUnbondingEntries         uint32
+	MaxPoolIDBytes              uint32
+	MaxCommissionBps            uint32
+	UnbondingBlocks             uint64
+	ValidatorChangeDelay        uint64
+	MinPoolDeposit              uint64
+	DirectUserDelegationEnabled bool
 }
 
 type State struct {
@@ -53,12 +57,16 @@ type State struct {
 
 type NominatorPool struct {
 	PoolID                 string
+	ContractAddressUser    string
+	ContractAddressRaw     string
+	OfficialLiquidStaking  bool
 	PoolOperator           string
 	ValidatorTarget        string
 	PendingValidatorTarget string
 	ValidatorChangeHeight  uint64
 	TotalShares            uint64
 	TotalBondedStake       uint64
+	Allocations            []PoolAllocation
 	PendingDeposits        []PendingDeposit
 	PendingWithdrawals     []PendingWithdrawal
 	DelegatorShares        []DelegatorShare
@@ -101,6 +109,12 @@ type UnbondingEntry struct {
 	Status         string
 }
 
+type PoolAllocation struct {
+	ValidatorAddress string
+	Amount           uint64
+	Height           uint64
+}
+
 type MsgCreateNominatorPool struct {
 	Authority         string
 	PoolID            string
@@ -117,6 +131,41 @@ type MsgDepositToPool struct {
 	Delegator string
 	Amount    uint64
 	Height    uint64
+}
+
+type MsgCreateOfficialLiquidStakingPool struct {
+	Authority           string
+	PoolID              string
+	ContractAddressUser string
+	ContractAddressRaw  string
+	PoolOperator        string
+	PoolCommissionBps   uint32
+	Height              uint64
+}
+
+type MsgDepositToOfficialLiquidStaking struct {
+	Authority        string
+	PoolID           string
+	UserAddress      string
+	Amount           uint64
+	Height           uint64
+	ValidatorAddress string
+}
+
+type MsgDelegateToValidator struct {
+	Authority        string
+	UserAddress      string
+	ValidatorAddress string
+	Amount           uint64
+	Height           uint64
+}
+
+type MsgInjectPooledStake struct {
+	CallerContractUser string
+	PoolID             string
+	ValidatorAddress   string
+	Amount             uint64
+	Height             uint64
 }
 
 type MsgRequestPoolWithdrawal struct {
@@ -172,6 +221,7 @@ func DefaultParams() Params {
 		MaxCommissionBps:      DefaultMaxCommissionBps,
 		UnbondingBlocks:       DefaultUnbondingBlocks,
 		ValidatorChangeDelay:  DefaultValidatorChangeDelay,
+		MinPoolDeposit:        DefaultMinPoolDeposit,
 	}
 }
 
@@ -205,6 +255,9 @@ func (p Params) Validate() error {
 	}
 	if p.ValidatorChangeDelay == 0 {
 		return errors.New("nominator pool validator change delay must be positive")
+	}
+	if p.MinPoolDeposit == 0 {
+		return errors.New("nominator pool minimum pool deposit must be positive")
 	}
 	return nil
 }
@@ -246,11 +299,24 @@ func (p NominatorPool) Validate(params Params) error {
 	if err := validateID("nominator pool id", p.PoolID, params.MaxPoolIDBytes); err != nil {
 		return err
 	}
+	if p.OfficialLiquidStaking || strings.TrimSpace(p.ContractAddressUser) != "" || strings.TrimSpace(p.ContractAddressRaw) != "" {
+		if err := ValidateUserFacingAEAddress("official liquid staking contract address", p.ContractAddressUser); err != nil {
+			return err
+		}
+		if err := ValidateRawAddress("official liquid staking contract raw address", p.ContractAddressRaw); err != nil {
+			return err
+		}
+		if err := ValidateAddressPair("official liquid staking contract address pair", p.ContractAddressUser, p.ContractAddressRaw); err != nil {
+			return err
+		}
+	}
 	if err := addressing.ValidateAuthorityAddress("nominator pool operator", p.PoolOperator); err != nil {
 		return err
 	}
-	if err := addressing.ValidateAuthorityAddress("nominator pool validator target", p.ValidatorTarget); err != nil {
-		return err
+	if strings.TrimSpace(p.ValidatorTarget) != "" {
+		if err := addressing.ValidateAuthorityAddress("nominator pool validator target", p.ValidatorTarget); err != nil {
+			return err
+		}
 	}
 	if strings.TrimSpace(p.PendingValidatorTarget) != "" {
 		if err := addressing.ValidateAuthorityAddress("nominator pool pending validator target", p.PendingValidatorTarget); err != nil {
@@ -280,6 +346,9 @@ func (p NominatorPool) Validate(params Params) error {
 	}
 	if p.TotalShares != sumShares(p.DelegatorShares) {
 		return errors.New("nominator pool total shares do not match delegator shares")
+	}
+	if err := ValidateAllocations(p.Allocations, p.TotalBondedStake); err != nil {
+		return err
 	}
 	delegators := map[string]struct{}{}
 	for _, delegator := range p.DelegatorShares {
@@ -315,6 +384,35 @@ func (p NominatorPool) Validate(params Params) error {
 		if err := entry.Validate(); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (a PoolAllocation) Validate() error {
+	if err := ValidateUserFacingAEAddress("pool allocation validator address", a.ValidatorAddress); err != nil {
+		return err
+	}
+	if a.Amount == 0 || a.Height == 0 {
+		return errors.New("pool allocation amount and height must be positive")
+	}
+	return nil
+}
+
+func ValidateAllocations(allocations []PoolAllocation, totalBondedStake uint64) error {
+	previous := ""
+	total := uint64(0)
+	for _, allocation := range allocations {
+		if err := allocation.Validate(); err != nil {
+			return err
+		}
+		if allocation.ValidatorAddress <= previous {
+			return errors.New("pool allocations must be sorted by unique validator address")
+		}
+		previous = allocation.ValidatorAddress
+		if allocation.Amount > totalBondedStake-total {
+			return errors.New("pool allocations exceed bonded stake")
+		}
+		total += allocation.Amount
 	}
 	return nil
 }
@@ -374,12 +472,19 @@ func (e UnbondingEntry) Validate() error {
 func (s State) Normalize(params Params) State {
 	s.Pools = SortPools(s.Pools)
 	for idx := range s.Pools {
+		s.Pools[idx].Allocations = SortAllocations(s.Pools[idx].Allocations)
 		s.Pools[idx].PendingDeposits = SortDeposits(s.Pools[idx].PendingDeposits)
 		s.Pools[idx].PendingWithdrawals = SortWithdrawals(s.Pools[idx].PendingWithdrawals)
 		s.Pools[idx].DelegatorShares = SortDelegators(s.Pools[idx].DelegatorShares)
 		s.Pools[idx].UnbondingQueue = SortUnbonding(s.Pools[idx].UnbondingQueue)
 	}
 	return s
+}
+
+func SortAllocations(values []PoolAllocation) []PoolAllocation {
+	out := append([]PoolAllocation(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].ValidatorAddress < out[j].ValidatorAddress })
+	return out
 }
 
 func SortPools(values []NominatorPool) []NominatorPool {
@@ -440,6 +545,98 @@ func SharesForDeposit(pool NominatorPool, amount uint64) uint64 {
 	return shares
 }
 
+func ValidateOfficialLiquidStakingDeposit(msg MsgDepositToOfficialLiquidStaking, params Params) error {
+	if err := params.Authorize(msg.Authority); err != nil {
+		return err
+	}
+	if err := ValidateUserFacingAEAddress("official liquid staking depositor", msg.UserAddress); err != nil {
+		return err
+	}
+	if strings.TrimSpace(msg.ValidatorAddress) != "" {
+		return errors.New("official liquid staking deposit must not include a validator address")
+	}
+	if msg.Amount < params.MinPoolDeposit {
+		return fmt.Errorf("official liquid staking deposit below configured minimum %d", params.MinPoolDeposit)
+	}
+	if msg.Height == 0 {
+		return errors.New("official liquid staking deposit height must be positive")
+	}
+	return validateID("official liquid staking pool id", msg.PoolID, params.MaxPoolIDBytes)
+}
+
+func ValidateDirectUserDelegation(msg MsgDelegateToValidator, params Params) error {
+	if err := params.Authorize(msg.Authority); err != nil {
+		return err
+	}
+	if !params.DirectUserDelegationEnabled {
+		return errors.New("direct user delegation to validators is disabled; use official liquid staking pool deposit")
+	}
+	if err := ValidateUserFacingAEAddress("direct delegation user address", msg.UserAddress); err != nil {
+		return err
+	}
+	if err := ValidateUserFacingAEAddress("direct delegation validator address", msg.ValidatorAddress); err != nil {
+		return err
+	}
+	if msg.Amount == 0 || msg.Height == 0 {
+		return errors.New("direct delegation amount and height must be positive")
+	}
+	return nil
+}
+
+func ValidateUserFacingAEAddress(field, text string) error {
+	text = strings.TrimSpace(text)
+	if !strings.HasPrefix(text, addressing.UserFriendlyPrefix) {
+		return fmt.Errorf("%s must use AE user-facing address format", field)
+	}
+	return addressing.ValidateUserAddress(field, text)
+}
+
+func ValidateRawAddress(field, text string) error {
+	text = strings.TrimSpace(text)
+	if !strings.HasPrefix(text, addressing.RawPrefix) {
+		return fmt.Errorf("%s must use 4: raw address format", field)
+	}
+	_, err := addressing.Parse(text)
+	if err != nil {
+		return fmt.Errorf("invalid %s: %w", field, err)
+	}
+	return nil
+}
+
+func ValidateAddressPair(field, userAddress, rawAddress string) error {
+	userBytes, err := addressing.Parse(userAddress)
+	if err != nil {
+		return fmt.Errorf("invalid %s user address: %w", field, err)
+	}
+	rawBytes, err := addressing.Parse(rawAddress)
+	if err != nil {
+		return fmt.Errorf("invalid %s raw address: %w", field, err)
+	}
+	userKey, err := addressing.AddressTextBytesKey(userAddress)
+	if err != nil {
+		return err
+	}
+	rawKey, err := addressing.AddressTextBytesKey(rawAddress)
+	if err != nil {
+		return err
+	}
+	if userKey != rawKey || string(userBytes) != string(rawBytes) {
+		return fmt.Errorf("%s AE and raw addresses must represent the same account", field)
+	}
+	return nil
+}
+
+func RawAddressForUserAddress(userAddress string) (string, error) {
+	if err := ValidateUserFacingAEAddress("user address", userAddress); err != nil {
+		return "", err
+	}
+	bz, err := addressing.Parse(userAddress)
+	if err != nil {
+		return "", err
+	}
+	return addressing.Format(bz), nil
+}
+
 func RewardDelta(amount uint64, totalShares uint64) uint64 {
 	if amount == 0 || totalShares == 0 {
 		return 0
@@ -470,7 +667,7 @@ func validateID(field, value string, maxBytes uint32) error {
 }
 
 func isPoolStatus(status string) bool {
-	return status == PoolStatusActive || status == PoolStatusPaused || status == PoolStatusClosed
+	return status == PoolStatusActive || status == PoolStatusPaused || status == PoolStatusFrozenLimited || status == PoolStatusClosed
 }
 
 func isWithdrawalStatus(status string) bool {
