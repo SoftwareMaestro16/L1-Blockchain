@@ -96,15 +96,73 @@ Acceptance:
 - treasury receives correct amount;
 - rewards are deterministic.
 
+## Phase 3 - Validator Score and Accountability
+
+Tasks:
+
+- implement uptime score;
+- implement slash history;
+- implement governance participation score;
+- implement decentralization score;
+- implement public validator metrics queries;
+- integrate score with reward modifier only for objective inputs.
+
+Tests:
+
+- uptime window tests;
+- missed block tests;
+- slash history tests;
+- governance participation tests;
+- score determinism tests;
+- reward modifier tests;
+- export/import tests.
+
+Acceptance:
+
+- score is deterministic;
+- score cannot be manipulated through subjective inputs;
+- score is queryable for explorers and wallets;
+- score does not break consensus safety.
+
+## Phase 4 - Slashing Hardening
+
+Tasks:
+
+- configure double-sign slash fraction and tombstone behavior;
+- configure downtime windows and jail duration;
+- implement progressive downtime if not covered by standard module;
+- add timestamp/proposal violation policy where objective;
+- document evidence lifecycle and unbonding interaction.
+
+Tests:
+
+- double-sign evidence tests where feasible;
+- downtime tests;
+- jail/unjail tests;
+- progressive downtime tests;
+- slashing accounting tests;
+- delegator loss tests;
+- tombstone tests;
+- evidence expiry tests.
+
+Acceptance:
+
+- double-sign leads to severe slash and permanent tombstone;
+- downtime penalties are bounded and progressive;
+- no subjective slashing path exists;
+- slashing cannot underflow stake or corrupt shares.
+
 ## Implementation Contract
 
 The implementation phase gate is `app/params/implementation_phases.go`.
 
 Required catalog properties:
 
-- `DefaultImplementationPhasePlans` must include Phase 0, Phase 1, and Phase 2;
+- `DefaultImplementationPhasePlans` must include Phase 0 through Phase 4;
 - Phase 0 must include baseline audit tasks, deliverables, and current test evidence;
 - Phase 1 must include staking cap tasks, tests, and acceptance checks;
 - Phase 2 must include economics, fee split, burn, treasury, APR, reward smoothing, and supply invariant checks;
+- Phase 3 must include validator score, accountability metrics, objective reward modifier, and consensus-safety checks;
+- Phase 4 must include objective slashing hardening, evidence lifecycle, tombstone, downtime, and stake/share safety checks;
 - phase items require evidence;
 - missing tasks, deliverables, tests, or acceptance checks fail validation.

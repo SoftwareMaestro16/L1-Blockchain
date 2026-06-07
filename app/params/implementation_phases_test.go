@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDefaultImplementationPhasePlansCoverPhase0ThroughPhase2(t *testing.T) {
+func TestDefaultImplementationPhasePlansCoverPhase0ThroughPhase4(t *testing.T) {
 	plans := DefaultImplementationPhasePlans()
-	require.Len(t, plans, 3)
+	require.Len(t, plans, 5)
 
 	for _, plan := range plans {
 		report := BuildImplementationPhaseReport(plan)
@@ -68,6 +68,70 @@ func TestImplementationPhaseEconomicsFeeSplitRequiresAllAcceptanceGates(t *testi
 		PhaseAcceptanceBurnReducesSupply,
 		PhaseAcceptanceTreasuryReceivesAmount,
 		PhaseAcceptanceRewardsDeterministic,
+	} {
+		require.True(t, ids[requiredID], requiredID)
+	}
+}
+
+func TestImplementationPhaseValidatorScoreRequiresAllAcceptanceGates(t *testing.T) {
+	plan := DefaultImplementationPhasePlans()[3]
+	report := BuildImplementationPhaseReport(plan)
+	require.True(t, report.Ready, report.Failed)
+
+	ids := map[string]bool{}
+	for _, item := range plan.Items {
+		ids[item.ID] = true
+	}
+	for _, requiredID := range []string{
+		PhaseTaskImplementUptimeScore,
+		PhaseTaskImplementSlashHistory,
+		PhaseTaskImplementGovernanceScore,
+		PhaseTaskImplementDecentralizationScore,
+		PhaseTaskImplementValidatorMetricQueries,
+		PhaseTaskIntegrateObjectiveRewardModifier,
+		PhaseTestUptimeWindow,
+		PhaseTestMissedBlock,
+		PhaseTestSlashHistory,
+		PhaseTestGovernanceParticipation,
+		PhaseTestScoreDeterminism,
+		PhaseTestRewardModifier,
+		PhaseTestValidatorScoreExportImport,
+		PhaseAcceptanceScoreDeterministic,
+		PhaseAcceptanceScoreObjectiveOnly,
+		PhaseAcceptanceScoreQueryable,
+		PhaseAcceptanceScoreConsensusSafe,
+	} {
+		require.True(t, ids[requiredID], requiredID)
+	}
+}
+
+func TestImplementationPhaseSlashingHardeningRequiresAllAcceptanceGates(t *testing.T) {
+	plan := DefaultImplementationPhasePlans()[4]
+	report := BuildImplementationPhaseReport(plan)
+	require.True(t, report.Ready, report.Failed)
+
+	ids := map[string]bool{}
+	for _, item := range plan.Items {
+		ids[item.ID] = true
+	}
+	for _, requiredID := range []string{
+		PhaseTaskConfigureDoubleSignSlashTombstone,
+		PhaseTaskConfigureDowntimeJail,
+		PhaseTaskImplementProgressiveDowntime,
+		PhaseTaskAddObjectiveTimestampProposalPolicy,
+		PhaseTaskDocumentEvidenceLifecycle,
+		PhaseTestDoubleSignEvidence,
+		PhaseTestDowntime,
+		PhaseTestJailUnjail,
+		PhaseTestProgressiveDowntime,
+		PhaseTestSlashingAccounting,
+		PhaseTestDelegatorLoss,
+		PhaseTestTombstone,
+		PhaseTestEvidenceExpiry,
+		PhaseAcceptanceDoubleSignTombstone,
+		PhaseAcceptanceDowntimeBoundedProgressive,
+		PhaseAcceptanceNoSubjectiveSlashing,
+		PhaseAcceptanceSlashingStakeShareSafe,
 	} {
 		require.True(t, ids[requiredID], requiredID)
 	}
