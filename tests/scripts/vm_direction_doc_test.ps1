@@ -22,16 +22,31 @@ $boundariesText = Get-Content -Raw -LiteralPath $BoundariesPath
 
 foreach ($term in @(
     'VM Direction',
-    'CosmWasm remains the gated near-term VM candidate',
+    'Aetra uses AVM as the genesis smart contract runtime',
+    'AVM is the primary VM',
+    'AVM production enablement requires complete security review',
+    'complete gas model review',
+    'state growth benchmarks',
+    'interaction tests with fee burn',
+    'interaction tests with staking rewards',
+    'export/import tests',
+    'adversarial contract tests',
+    'CosmWasm remains an explicitly gated optional compatibility layer',
     'CosmWasm is disabled by default',
     'enabled only by explicit config or feature gate',
+    'Instantiate, execute, query, and migrate support',
     'Upload permissions are explicit',
     'Instantiate permissions are explicit',
     'Admin and migration policy is explicit',
     'Gas limits are explicit and bounded',
     'Contract size limits are explicit and bounded',
+    'Contract storage rent or storage pricing is explicit',
     'Memory/cache limits are explicit and bounded',
     'Query limits are explicit and bounded',
+    'Events must be compatible with indexers',
+    'Localnet smoke tests are required',
+    'Malicious contract tests are required',
+    'Export/import tests with active contracts are required',
     'Pinned code is disabled by default',
     'Governance authority for enabling/disabling CosmWasm is explicit',
     'cannot bypass `naet` fee policy',
@@ -51,7 +66,7 @@ foreach ($term in @(
     'explicit bounce behavior',
     'explicit fee behavior',
     'explicit deployment behavior',
-    'Contract standards can be tested independent of the VM choice'
+    'Contract standards can be tested independent of optional compatibility layers'
   )) {
   Assert-Contains -Text $directionText -Pattern ([regex]::Escape($term)) -Message "VM direction doc missing: $term"
 }
@@ -81,11 +96,12 @@ foreach ($term in @(
 
 foreach ($term in @(
     'app/wasmconfig',
-    'CosmWasm is the near-term gated VM candidate',
+    'AVM is the primary VM',
+    'CosmWasm is an optional gated compatibility layer',
     'CosmWasm remains disabled by default',
     'Pinned code is disabled by default',
     'CosmWasm cannot bypass `naet` fee policy',
-    'future Aetra VM requires a written binary serialization spec',
+    'future non-AVM runtime requires a written binary serialization spec',
     'Contract standards must remain testable independent'
   )) {
   Assert-Contains -Text $boundariesText -Pattern ([regex]::Escape($term)) -Message "module boundaries missing VM direction boundary: $term"

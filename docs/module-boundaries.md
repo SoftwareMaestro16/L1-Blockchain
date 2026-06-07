@@ -218,8 +218,8 @@ State:
   and query/getter.
 
 Security invariants:
-- AVM action-to-entrypoint mapping is deterministic.
-- CosmWasm remains disabled by default.
+- AVM is the primary VM and AVM action-to-entrypoint mapping is deterministic.
+- CosmWasm remains disabled by default as an optional compatibility layer.
 - Runtime routing validates code size, gas, query response/depth, and feature
   gates before keeper wiring.
 - VM routing cannot bypass base-chain signer, fee, denom, zero-address,
@@ -720,7 +720,8 @@ State:
 - Policy constants and validation helpers only.
 
 Current status:
-- CosmWasm is the near-term gated VM candidate.
+- AVM is the primary VM.
+- CosmWasm is an optional gated compatibility layer.
 - CosmWasm remains disabled by default.
 - Enabling CosmWasm requires explicit config or feature gate.
 - Upload, instantiate, admin/migration, gas, contract size, memory/cache, and
@@ -737,11 +738,11 @@ Security invariants:
 - Upload, instantiate, execute, query, migrate, pinning, code size, gas, and
   query response/depth limits must be enforced before state mutation when the
   real `x/wasm` keeper is wired.
-- A future Aetra VM requires a written binary serialization spec, message
+- Any future non-AVM runtime requires a written binary serialization spec, message
   ABI, storage ABI, gas schedule, deterministic execution proof, fuzz tests,
   upgrade/migration policy, and adversarial audit before implementation.
-- Contract standards must remain testable independent of CosmWasm or a future
-  Aetra VM choice.
+- Contract standards must remain testable independent of optional CosmWasm or
+  future VM compatibility layers.
 
 ## `x/bridge`
 

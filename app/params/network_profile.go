@@ -5,8 +5,8 @@ import "fmt"
 const (
 	AetraConsensusEngine = "CometBFT BFT"
 	AetraStakingModel    = "PoS + delegation + nomination pools"
-	AetraPrimaryVM       = "CosmWasm"
-	AetraOptionalVM      = "EVM later"
+	AetraPrimaryVM       = "AVM"
+	AetraOptionalVM      = "CosmWasm gated; EVM later"
 	AetraHardwareProfile = "medium"
 
 	AetraValidatorPhaseGenesis = "genesis_early_testnet"

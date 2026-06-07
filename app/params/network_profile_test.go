@@ -12,7 +12,9 @@ func TestDefaultNetworkProfileMatchesAetraBaseModel(t *testing.T) {
 	require.NoError(t, profile.Validate())
 	require.Equal(t, AetraConsensusEngine, profile.ConsensusEngine)
 	require.Equal(t, AetraStakingModel, profile.StakingModel)
+	require.Equal(t, "AVM", profile.PrimaryVM)
 	require.Equal(t, AetraPrimaryVM, profile.PrimaryVM)
+	require.Equal(t, "CosmWasm gated; EVM later", profile.OptionalVM)
 	require.Equal(t, AetraOptionalVM, profile.OptionalVM)
 	require.Equal(t, AetraHardwareProfile, profile.HardwareProfile)
 
