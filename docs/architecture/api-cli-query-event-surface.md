@@ -23,6 +23,22 @@ Commands must support:
 - clear errors;
 - examples in docs.
 
+## 30.2 gRPC/REST Requirements
+
+Every query must have:
+
+- protobuf definition;
+- gRPC service;
+- REST gateway mapping if project supports it;
+- response examples;
+- tests where feasible.
+
+The protobuf definition is the canonical contract for machine clients. It must define request messages, response messages, pagination fields where needed, height-safe behavior where applicable, and stable field names. Query response changes must be treated as public API changes once testnet users, explorers, wallets, or dashboards depend on them.
+
+The gRPC service is the primary typed query API. CLI query commands should call the same query service path rather than implementing separate state logic. REST gateway mappings are required where the project supports gRPC gateway exposure; if a route is intentionally not exposed through REST, the module must document why and keep that exception explicit.
+
+Response examples must include realistic JSON for successful responses and at least one clear error shape for invalid request or not found cases. Tests should cover query handler behavior, pagination, invalid requests, stable response fields, REST route registration where feasible, and CLI examples where the command layer exists.
+
 ## Module Surface Contract
 
 Required modules:
@@ -35,8 +51,11 @@ Each required module must expose:
 
 - CLI query commands;
 - CLI tx commands for governance-authorized or signer-authorized messages;
+- protobuf query definitions;
 - gRPC query services;
 - REST gateway routes where applicable;
+- response examples;
+- query tests where feasible;
 - deterministic event names and bounded attributes;
 - examples in validator, wallet, explorer, or operator docs.
 
@@ -48,6 +67,11 @@ CLI tx commands must validate signer, authority, addresses, params, fees, and me
 
 Required query behavior:
 
+- protobuf definition for every query;
+- gRPC service for every query;
+- REST gateway mapping if project supports it;
+- response examples for public queries;
+- tests where feasible;
 - current params query for every module;
 - module-specific state queries for validators, economics epochs, score records, and warnings;
 - pagination for list endpoints;
@@ -75,6 +99,11 @@ The implementation catalog is `DefaultAPISurfaceModuleSpecs` in `observability/a
 Required catalog properties:
 
 - every required module has query and tx CLI categories;
+- every required query surface has protobuf definition;
+- every required query surface has gRPC service;
+- every required query surface has REST gateway mapping where supported;
+- response examples are mandatory;
+- query tests are mandatory where feasible;
 - every required CLI command supports json output;
 - height query support is explicit for query commands;
 - pagination support is explicit where list queries exist;

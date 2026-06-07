@@ -19,9 +19,14 @@ const (
 const (
 	RequiredAPISurfaceCLIQuery        = "cli_query"
 	RequiredAPISurfaceCLITx           = "cli_tx"
+	RequiredAPISurfaceProtobuf        = "protobuf_definition"
+	RequiredAPISurfaceGRPCService     = "grpc_service"
 	RequiredAPISurfaceGRPCQuery       = "grpc_query"
+	RequiredAPISurfaceRESTGateway     = "rest_gateway_mapping_where_supported"
 	RequiredAPISurfaceRESTQuery       = "rest_query_where_applicable"
 	RequiredAPISurfaceEvents          = "events"
+	RequiredAPISurfaceResponseExample = "response_examples"
+	RequiredAPISurfaceQueryTests      = "query_tests_where_feasible"
 	RequiredAPISurfaceExamplesInDocs  = "examples_in_docs"
 	RequiredAPISurfaceJSONOutput      = "json_output"
 	RequiredAPISurfaceClearErrors     = "clear_errors"
@@ -45,15 +50,20 @@ type CLICommandSpec struct {
 }
 
 type APISurfaceModuleSpec struct {
-	Module          string
-	CLICommands     []CLICommandSpec
-	GRPCQuery       bool
-	RESTQuery       bool
-	Events          bool
-	BoundedAttrs    bool
-	StableResponses bool
-	ExamplesInDocs  bool
-	Required        bool
+	Module             string
+	CLICommands        []CLICommandSpec
+	ProtobufDefinition bool
+	GRPCService        bool
+	GRPCQuery          bool
+	RESTGatewayMapping bool
+	RESTQuery          bool
+	Events             bool
+	ResponseExamples   bool
+	QueryTests         bool
+	BoundedAttrs       bool
+	StableResponses    bool
+	ExamplesInDocs     bool
+	Required           bool
 }
 
 type APISurfaceReadinessReport struct {
@@ -135,13 +145,18 @@ func apiSurfaceModule(module string, rest bool) APISurfaceModuleSpec {
 			apiSurfaceCLICommand(module, CommandCategoryQuery),
 			apiSurfaceCLICommand(module, CommandCategoryTx),
 		},
-		GRPCQuery:       true,
-		RESTQuery:       rest,
-		Events:          true,
-		BoundedAttrs:    true,
-		StableResponses: true,
-		ExamplesInDocs:  true,
-		Required:        true,
+		ProtobufDefinition: true,
+		GRPCService:        true,
+		GRPCQuery:          true,
+		RESTGatewayMapping: rest,
+		RESTQuery:          rest,
+		Events:             true,
+		ResponseExamples:   true,
+		QueryTests:         true,
+		BoundedAttrs:       true,
+		StableResponses:    true,
+		ExamplesInDocs:     true,
+		Required:           true,
 	}
 }
 
@@ -164,14 +179,29 @@ func apiSurfaceCLICommand(module, category string) CLICommandSpec {
 func validateAPISurfaceModule(module APISurfaceModuleSpec) []string {
 	failed := make([]string, 0)
 	if module.Required {
+		if !module.ProtobufDefinition {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceProtobuf+":missing")
+		}
+		if !module.GRPCService {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceGRPCService+":missing")
+		}
 		if !module.GRPCQuery {
 			failed = append(failed, module.Module+":"+RequiredAPISurfaceGRPCQuery+":missing")
+		}
+		if !module.RESTGatewayMapping {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceRESTGateway+":missing")
 		}
 		if !module.RESTQuery {
 			failed = append(failed, module.Module+":"+RequiredAPISurfaceRESTQuery+":missing")
 		}
 		if !module.Events {
 			failed = append(failed, module.Module+":"+RequiredAPISurfaceEvents+":missing")
+		}
+		if !module.ResponseExamples {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceResponseExample+":missing")
+		}
+		if !module.QueryTests {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceQueryTests+":missing")
 		}
 		if !module.BoundedAttrs {
 			failed = append(failed, module.Module+":"+RequiredAPISurfaceBoundedAttrs+":missing")
