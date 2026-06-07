@@ -132,6 +132,52 @@ func TestAetraCosmWasmTestsRejectMissingDuplicateUnexpectedAndWrongModule(t *tes
 	require.Error(t, ValidateAetraCosmWasmTests(evidence))
 }
 
+func TestDefaultAetraCosmWasmContractSecurityTestsCoverSection283(t *testing.T) {
+	evidence := DefaultAetraCosmWasmContractSecurityTestEvidence()
+
+	report := BuildAetraCosmWasmContractSecurityTestReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Empty(t, report.Failed)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 9, report.Required)
+	for _, requiredTest := range []string{
+		AetraCosmWasmSecurityTestInfiniteLoopGasLimit,
+		AetraCosmWasmSecurityTestLargeStorageWriteBounded,
+		AetraCosmWasmSecurityTestFailedContractStateSafe,
+		AetraCosmWasmSecurityTestReservedModuleFundsDenied,
+		AetraCosmWasmSecurityTestMigrationAuthorization,
+		AetraCosmWasmSecurityTestReplySubmessageDeterminism,
+		AetraCosmWasmSecurityTestStableEvents,
+		AetraCosmWasmSecurityTestExportImportContracts,
+		AetraCosmWasmSecurityTestQueryNoStateMutation,
+	} {
+		require.Contains(t, evidence.RequiredTests, requiredTest)
+	}
+	require.NoError(t, ValidateAetraCosmWasmContractSecurityTests(evidence))
+}
+
+func TestAetraCosmWasmContractSecurityTestsRejectMissingDuplicateUnexpectedAndWrongModule(t *testing.T) {
+	evidence := DefaultAetraCosmWasmContractSecurityTestEvidence()
+	evidence.ModuleName = "x/wasm"
+	evidence.RequiredTests = removeString(evidence.RequiredTests,
+		AetraCosmWasmSecurityTestReservedModuleFundsDenied,
+		AetraCosmWasmSecurityTestQueryNoStateMutation,
+	)
+	evidence.RequiredTests = append(evidence.RequiredTests,
+		AetraCosmWasmSecurityTestInfiniteLoopGasLimit,
+		"manual_contract_audit_only",
+	)
+
+	report := BuildAetraCosmWasmContractSecurityTestReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "module_name_must_be_"+AetraCosmWasmPolicyModuleName)
+	require.Contains(t, report.Failed, "contract_security_tests."+AetraCosmWasmSecurityTestReservedModuleFundsDenied+":missing")
+	require.Contains(t, report.Failed, "contract_security_tests."+AetraCosmWasmSecurityTestQueryNoStateMutation+":missing")
+	require.Contains(t, report.Failed, "contract_security_tests."+AetraCosmWasmSecurityTestInfiniteLoopGasLimit+":duplicate")
+	require.Contains(t, report.Failed, "contract_security_tests.manual_contract_audit_only:unexpected")
+	require.Error(t, ValidateAetraCosmWasmContractSecurityTests(evidence))
+}
+
 func removeCosmWasmPhase(values []AetraCosmWasmLaunchPhasePolicy, target string) []AetraCosmWasmLaunchPhasePolicy {
 	out := make([]AetraCosmWasmLaunchPhasePolicy, 0, len(values))
 	for _, value := range values {

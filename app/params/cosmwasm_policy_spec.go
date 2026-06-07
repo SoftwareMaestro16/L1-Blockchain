@@ -38,6 +38,16 @@ const (
 	AetraCosmWasmTestMigrationAuthority       = "migration_authority_tests"
 	AetraCosmWasmTestPinnedCodePolicy         = "pinned_code_policy_tests"
 	AetraCosmWasmTestAVMCompatibilityBoundary = "avm_cosmwasm_boundary_tests"
+
+	AetraCosmWasmSecurityTestInfiniteLoopGasLimit       = "infinite_loop_contract_hits_gas_limit"
+	AetraCosmWasmSecurityTestLargeStorageWriteBounded   = "large_storage_write_bounded"
+	AetraCosmWasmSecurityTestFailedContractStateSafe    = "failed_contract_does_not_corrupt_state"
+	AetraCosmWasmSecurityTestReservedModuleFundsDenied  = "contract_cannot_access_reserved_module_funds"
+	AetraCosmWasmSecurityTestMigrationAuthorization     = "migration_authorization_enforced"
+	AetraCosmWasmSecurityTestReplySubmessageDeterminism = "reply_submessage_behavior_deterministic"
+	AetraCosmWasmSecurityTestStableEvents               = "event_emission_stable"
+	AetraCosmWasmSecurityTestExportImportContracts      = "export_import_with_contracts"
+	AetraCosmWasmSecurityTestQueryNoStateMutation       = "contract_query_does_not_mutate_state"
 )
 
 type AetraCosmWasmLaunchPhasePolicy struct {
@@ -87,6 +97,20 @@ type AetraCosmWasmTestEvidence struct {
 }
 
 type AetraCosmWasmTestReport struct {
+	ModuleName string
+	Required   int
+	Passed     int
+	Failed     []string
+	Ready      bool
+}
+
+type AetraCosmWasmContractSecurityTestEvidence struct {
+	ModuleName string
+
+	RequiredTests []string
+}
+
+type AetraCosmWasmContractSecurityTestReport struct {
 	ModuleName string
 	Required   int
 	Passed     int
@@ -223,6 +247,37 @@ func BuildAetraCosmWasmTestReport(evidence AetraCosmWasmTestEvidence) AetraCosmW
 	}
 }
 
+func DefaultAetraCosmWasmContractSecurityTestEvidence() AetraCosmWasmContractSecurityTestEvidence {
+	return AetraCosmWasmContractSecurityTestEvidence{
+		ModuleName:    AetraCosmWasmPolicyModuleName,
+		RequiredTests: requiredAetraCosmWasmContractSecurityTests(),
+	}
+}
+
+func ValidateAetraCosmWasmContractSecurityTests(evidence AetraCosmWasmContractSecurityTestEvidence) error {
+	report := BuildAetraCosmWasmContractSecurityTestReport(evidence)
+	if !report.Ready {
+		return fmt.Errorf("aetra cosmwasm contract security tests failed: %v", report.Failed)
+	}
+	return nil
+}
+
+func BuildAetraCosmWasmContractSecurityTestReport(evidence AetraCosmWasmContractSecurityTestEvidence) AetraCosmWasmContractSecurityTestReport {
+	failed := validateAetraCosmWasmModuleName(evidence.ModuleName)
+	requiredTests := requiredAetraCosmWasmContractSecurityTests()
+	passed, testFailures := validateAetraCosmWasmCatalog("contract_security_tests", evidence.RequiredTests, requiredTests)
+	failed = append(failed, testFailures...)
+
+	sort.Strings(failed)
+	return AetraCosmWasmContractSecurityTestReport{
+		ModuleName: evidence.ModuleName,
+		Required:   len(requiredTests),
+		Passed:     passed,
+		Failed:     failed,
+		Ready:      len(failed) == 0,
+	}
+}
+
 func requiredAetraCosmWasmGasStorageControls() []string {
 	return []string{
 		AetraCosmWasmGasStorageMaxWasmCodeSize,
@@ -245,6 +300,20 @@ func requiredAetraCosmWasmTests() []string {
 		AetraCosmWasmTestMigrationAuthority,
 		AetraCosmWasmTestPinnedCodePolicy,
 		AetraCosmWasmTestAVMCompatibilityBoundary,
+	}
+}
+
+func requiredAetraCosmWasmContractSecurityTests() []string {
+	return []string{
+		AetraCosmWasmSecurityTestInfiniteLoopGasLimit,
+		AetraCosmWasmSecurityTestLargeStorageWriteBounded,
+		AetraCosmWasmSecurityTestFailedContractStateSafe,
+		AetraCosmWasmSecurityTestReservedModuleFundsDenied,
+		AetraCosmWasmSecurityTestMigrationAuthorization,
+		AetraCosmWasmSecurityTestReplySubmessageDeterminism,
+		AetraCosmWasmSecurityTestStableEvents,
+		AetraCosmWasmSecurityTestExportImportContracts,
+		AetraCosmWasmSecurityTestQueryNoStateMutation,
 	}
 }
 

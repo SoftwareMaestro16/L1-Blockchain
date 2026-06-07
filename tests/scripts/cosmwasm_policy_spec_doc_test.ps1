@@ -57,6 +57,22 @@ foreach ($term in @(
     'deterministic integer accounting',
     'native `naet` fee policy',
     'BuildAetraCosmWasmGasStorageReport',
+    '28.3 Contract Security Tests',
+    'infinite loop contract hits gas limit',
+    'large storage write bounded',
+    'failed contract does not corrupt state',
+    'contract cannot access reserved module funds',
+    'migration authorization enforced',
+    'reply/submessage behavior deterministic',
+    'event emission stable',
+    'export/import with contracts',
+    'contract query does not mutate state',
+    'Infinite loop and gas exhaustion tests must prove deterministic failure without chain halt',
+    'Large storage writes must be bounded by gas, storage pricing, and max storage/write policy',
+    'Failed execute/migrate paths must roll back contract state',
+    'Contract bank access must be mediated by normal SDK permissions',
+    'Smart query execution must not mutate state',
+    'BuildAetraCosmWasmContractSecurityTestReport',
     'Required Tests',
     'launch policy tests',
     'gas/storage limit tests',
@@ -65,6 +81,7 @@ foreach ($term in @(
     'migration authority tests',
     'pinned code policy tests',
     'AVM/CosmWasm boundary tests',
+    'contract security tests',
     'BuildAetraCosmWasmTestReport',
     'enable CosmWasm by default',
     'make CosmWasm the primary Aetra runtime'
@@ -93,6 +110,15 @@ foreach ($term in @(
     'AetraCosmWasmGasStorageGovernanceConfigurable',
     'AetraCosmWasmGasStorageDeterministicAccounting',
     'AetraCosmWasmGasStorageSecurityAndBenchmarkGates',
+    'AetraCosmWasmSecurityTestInfiniteLoopGasLimit',
+    'AetraCosmWasmSecurityTestLargeStorageWriteBounded',
+    'AetraCosmWasmSecurityTestFailedContractStateSafe',
+    'AetraCosmWasmSecurityTestReservedModuleFundsDenied',
+    'AetraCosmWasmSecurityTestMigrationAuthorization',
+    'AetraCosmWasmSecurityTestReplySubmessageDeterminism',
+    'AetraCosmWasmSecurityTestStableEvents',
+    'AetraCosmWasmSecurityTestExportImportContracts',
+    'AetraCosmWasmSecurityTestQueryNoStateMutation',
     'DefaultAetraCosmWasmLaunchPolicyEvidence',
     'ValidateAetraCosmWasmLaunchPolicy',
     'BuildAetraCosmWasmLaunchPolicyReport',
@@ -101,7 +127,10 @@ foreach ($term in @(
     'BuildAetraCosmWasmGasStorageReport',
     'DefaultAetraCosmWasmTestEvidence',
     'ValidateAetraCosmWasmTests',
-    'BuildAetraCosmWasmTestReport'
+    'BuildAetraCosmWasmTestReport',
+    'DefaultAetraCosmWasmContractSecurityTestEvidence',
+    'ValidateAetraCosmWasmContractSecurityTests',
+    'BuildAetraCosmWasmContractSecurityTestReport'
   )) {
   Assert-Contains -Text $policyText -Pattern ([regex]::Escape($term)) -Message "cosmwasm policy spec gate missing: $term"
 }
@@ -113,7 +142,9 @@ foreach ($term in @(
     'TestDefaultAetraCosmWasmGasStorageCoversSection282',
     'TestAetraCosmWasmGasStorageRejectsMissingControlsAndSafetyGates',
     'TestDefaultAetraCosmWasmTestsCoverImplementationGate',
-    'TestAetraCosmWasmTestsRejectMissingDuplicateUnexpectedAndWrongModule'
+    'TestAetraCosmWasmTestsRejectMissingDuplicateUnexpectedAndWrongModule',
+    'TestDefaultAetraCosmWasmContractSecurityTestsCoverSection283',
+    'TestAetraCosmWasmContractSecurityTestsRejectMissingDuplicateUnexpectedAndWrongModule'
   )) {
   Assert-Contains -Text $testText -Pattern ([regex]::Escape($term)) -Message "cosmwasm policy spec tests missing: $term"
 }

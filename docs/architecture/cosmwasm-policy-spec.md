@@ -69,6 +69,39 @@ Acceptance gate:
 - Removing governance bounds, deterministic accounting, or security/benchmark gates must fail validation.
 - `app/wasmconfig` tests must cover instantiate gas, execute gas per tx, upload fee, storage pricing, migration authority, and pinned code policy.
 
+## 28.3 Contract Security Tests
+
+Required contract security tests:
+
+- infinite loop contract hits gas limit;
+- large storage write bounded;
+- failed contract does not corrupt state;
+- contract cannot access reserved module funds;
+- migration authorization enforced;
+- reply/submessage behavior deterministic;
+- event emission stable;
+- export/import with contracts;
+- contract query does not mutate state.
+
+Security requirements:
+
+- Infinite loop and gas exhaustion tests must prove deterministic failure without chain halt.
+- Large storage writes must be bounded by gas, storage pricing, and max storage/write policy.
+- Failed execute/migrate paths must roll back contract state and must not corrupt module state.
+- Contract bank access must be mediated by normal SDK permissions and must not reach reserved module accounts.
+- Migration must be admin or governance authorized according to policy.
+- Reply/submessage handling must be deterministic across validators and replay.
+- Contract events must use stable names and attributes compatible with indexers.
+- Export/import tests must include active code, contract instances, balances, storage, events where applicable, and pending migration metadata.
+- Smart query execution must not mutate state, emit consensus state changes, or bypass query gas limits.
+
+Acceptance gate:
+
+- `BuildAetraCosmWasmContractSecurityTestReport` must pass.
+- Removing any required contract security test must fail validation.
+- Duplicate or unexpected security test catalog entries must fail validation.
+- Manual audit notes are not a substitute for executable tests.
+
 ## Required Tests
 
 Every implementation task must include tests. For section 28, required coverage is:
@@ -79,11 +112,13 @@ Every implementation task must include tests. For section 28, required coverage 
 - storage pricing tests;
 - migration authority tests;
 - pinned code policy tests;
-- AVM/CosmWasm boundary tests.
+- AVM/CosmWasm boundary tests;
+- contract security tests.
 
 Acceptance gate:
 
 - `BuildAetraCosmWasmTestReport` must pass.
+- `BuildAetraCosmWasmContractSecurityTestReport` must pass.
 - Missing, duplicate, or unexpected test catalog entries must fail validation.
 
 ## Non-Goals
