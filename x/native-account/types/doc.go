@@ -6,4 +6,10 @@
 // the domain and resolver registry. Future implementation files in this module
 // should keep state, keys, keeper, messages, queries, genesis, migrations,
 // ante/auth policy, events, and tests split by responsibility.
+//
+// Account state keys are prefix based and deterministic:
+// account/by_user/{AE...}, account/by_raw/{4:...}, account/number/{zero-padded
+// account_number}, account/reputation/{reputation_id}, and
+// account/storage/{AE...}. User-facing query inputs accept AE addresses only;
+// raw 4: addresses are accepted only on raw/internal query boundaries.
 package types
