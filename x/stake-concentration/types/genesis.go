@@ -8,6 +8,24 @@ import (
 	"github.com/sovereign-l1/l1/app/addressing"
 )
 
+const (
+	ConcentrationSignalLowerRewardMultiplier = "lower_reward_multiplier"
+	ConcentrationSignalDelegationWarning     = "delegation_warning"
+	ConcentrationSignalProtocolMetric        = "protocol_metric"
+	ConcentrationSignalGovernanceAlert       = "governance_alert"
+	ConcentrationSignalParameterProposal     = "optional_parameter_adjustment_proposal"
+)
+
+type ConcentrationTargetAssessment struct {
+	Top10VotingPowerBps uint32
+	Top20VotingPowerBps uint32
+	Top33VotingPowerBps uint32
+	Top10Exceeded       bool
+	Top20Exceeded       bool
+	Top33Exceeded       bool
+	Signals             []string
+}
+
 func DefaultParams() Params {
 	return Params{
 		MaxVotingPowerBps:          AetraPhaseOnePowerCapBps,
@@ -239,6 +257,31 @@ func (v ValidatorConcentration) OverflowVotingPower(totalVotingPower uint64) uin
 		return 0
 	}
 	return v.VotingPower - rewardable
+}
+
+func (n NetworkConcentration) AssessConcentrationTargets() ConcentrationTargetAssessment {
+	rawBps := make([]uint32, 0, len(n.Validators))
+	for _, validator := range n.Validators {
+		rawBps = append(rawBps, validator.RawVotingPowerBps)
+	}
+	assessment := ConcentrationTargetAssessment{
+		Top10VotingPowerBps: topNBps(rawBps, 10),
+		Top20VotingPowerBps: topNBps(rawBps, 20),
+		Top33VotingPowerBps: topNBps(rawBps, 33),
+	}
+	assessment.Top10Exceeded = assessment.Top10VotingPowerBps >= AetraTop10VotingPowerTargetBps
+	assessment.Top20Exceeded = assessment.Top20VotingPowerBps >= AetraTop20VotingPowerTargetBps
+	assessment.Top33Exceeded = assessment.Top33VotingPowerBps >= AetraTop33VotingPowerTargetBps
+	if assessment.Top10Exceeded || assessment.Top20Exceeded || assessment.Top33Exceeded {
+		assessment.Signals = []string{
+			ConcentrationSignalLowerRewardMultiplier,
+			ConcentrationSignalDelegationWarning,
+			ConcentrationSignalProtocolMetric,
+			ConcentrationSignalGovernanceAlert,
+			ConcentrationSignalParameterProposal,
+		}
+	}
+	return assessment
 }
 
 func SortValidatorConcentrations(in []ValidatorConcentration) []ValidatorConcentration {

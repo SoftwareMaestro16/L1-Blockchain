@@ -152,6 +152,49 @@ func TestNetworkConcentrationUsesScheduledPowerCap(t *testing.T) {
 	require.False(t, heavy.DelegationAllowed)
 }
 
+func TestConcentrationTargetsEmitEconomicSignalsWithoutHalting(t *testing.T) {
+	params := types.DefaultParams()
+	validatorSet := makeValidatorSet(40)
+	for i := 0; i < 10; i++ {
+		validatorSet[i].VotingPower = 3
+	}
+
+	network, err := types.ComputeNetworkConcentration(params, 1, validatorSet, 10)
+	require.NoError(t, err)
+
+	assessment := network.AssessConcentrationTargets()
+	require.Equal(t, uint32(5_000), assessment.Top10VotingPowerBps)
+	require.Equal(t, uint32(6_660), assessment.Top20VotingPowerBps)
+	require.Equal(t, uint32(8_818), assessment.Top33VotingPowerBps)
+	require.True(t, assessment.Top10Exceeded)
+	require.True(t, assessment.Top20Exceeded)
+	require.True(t, assessment.Top33Exceeded)
+	require.ElementsMatch(t, []string{
+		types.ConcentrationSignalLowerRewardMultiplier,
+		types.ConcentrationSignalDelegationWarning,
+		types.ConcentrationSignalProtocolMetric,
+		types.ConcentrationSignalGovernanceAlert,
+		types.ConcentrationSignalParameterProposal,
+	}, assessment.Signals)
+}
+
+func TestConcentrationTargetsStayQuietWhenBelowThresholds(t *testing.T) {
+	params := types.DefaultParams()
+	validatorSet := makeValidatorSet(100)
+
+	network, err := types.ComputeNetworkConcentration(params, 1, validatorSet, 10)
+	require.NoError(t, err)
+
+	assessment := network.AssessConcentrationTargets()
+	require.Equal(t, uint32(1_000), assessment.Top10VotingPowerBps)
+	require.Equal(t, uint32(2_000), assessment.Top20VotingPowerBps)
+	require.Equal(t, uint32(3_300), assessment.Top33VotingPowerBps)
+	require.False(t, assessment.Top10Exceeded)
+	require.False(t, assessment.Top20Exceeded)
+	require.False(t, assessment.Top33Exceeded)
+	require.Empty(t, assessment.Signals)
+}
+
 func TestInvalidParamsRejected(t *testing.T) {
 	app := l1app.Setup(t, false)
 	ctx := app.NewContext(false)

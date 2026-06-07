@@ -13,6 +13,10 @@ const (
 	AetraPhaseOnePowerCapBps  uint32 = 300
 	AetraPhaseTwoPowerCapBps  uint32 = 250
 	AetraMatureSetPowerCapBps uint32 = 200
+
+	AetraTop10VotingPowerTargetBps uint32 = 2_500
+	AetraTop20VotingPowerTargetBps uint32 = 4_000
+	AetraTop33VotingPowerTargetBps uint32 = 5_000
 )
 
 var (

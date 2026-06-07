@@ -14,9 +14,9 @@ func TestDefaultStakingDelegationPolicyMatchesAetraModel(t *testing.T) {
 	require.Equal(t, int64(10_000*BaseUnitsPerDisplay), policy.MinSelfBondNaet)
 	require.Equal(t, int64(50_000*BaseUnitsPerDisplay), policy.MinValidatorBondNaet)
 	require.Greater(t, policy.MinValidatorBondNaet, policy.MinSelfBondNaet)
-	require.Equal(t, MinCommissionBps, policy.MinCommissionBps)
-	require.Equal(t, MaxCommissionBps, policy.MaxCommissionBps)
-	require.Equal(t, MaxDailyCommissionChangeBps, policy.MaxDailyCommissionBps)
+	require.Equal(t, StakingCommissionFloorBps, policy.MinCommissionBps)
+	require.Equal(t, StakingCommissionCeilingBps, policy.MaxCommissionBps)
+	require.Equal(t, StakingMaxDailyCommissionBps, policy.MaxDailyCommissionBps)
 	require.True(t, policy.DelegationEnabled)
 	require.True(t, policy.RedelegationEnabled)
 	require.True(t, policy.NominationPoolsEnabled)
@@ -65,4 +65,38 @@ func TestStakingPolicyRejectsUnsafeConfiguration(t *testing.T) {
 	policy = DefaultStakingDelegationPolicy()
 	policy.RequireValidatorMetadata = false
 	require.ErrorContains(t, policy.Validate(), "metadata")
+}
+
+func TestDefaultAntiCartelPolicyMatchesAetraControls(t *testing.T) {
+	policy := DefaultAntiCartelPolicy()
+
+	require.NoError(t, policy.Validate())
+	require.Equal(t, int64(300), policy.CommissionFloorBps)
+	require.Equal(t, int64(2_000), policy.CommissionCeilingBps)
+	require.Equal(t, int64(100), policy.MaxDailyCommissionChangeBps)
+	require.True(t, policy.ValidatorIdentityRegistry)
+	require.False(t, policy.MandatoryKYC)
+	require.True(t, policy.ValidatorMetadataTransparency)
+	require.True(t, policy.PublicConcentrationMetrics)
+	require.True(t, policy.SelfBondRatioVisibility)
+	require.True(t, policy.ObjectiveCorrelationWarnings)
+	require.True(t, policy.EconomicSignalsInsteadOfHalting)
+}
+
+func TestAntiCartelPolicyRejectsCentralizedAdmissionAndOpaqueMetrics(t *testing.T) {
+	policy := DefaultAntiCartelPolicy()
+	policy.MandatoryKYC = true
+	require.ErrorContains(t, policy.Validate(), "mandatory KYC")
+
+	policy = DefaultAntiCartelPolicy()
+	policy.PublicConcentrationMetrics = false
+	require.ErrorContains(t, policy.Validate(), "transparency metrics")
+
+	policy = DefaultAntiCartelPolicy()
+	policy.ObjectiveCorrelationWarnings = false
+	require.ErrorContains(t, policy.Validate(), "objective evidence")
+
+	policy = DefaultAntiCartelPolicy()
+	policy.EconomicSignalsInsteadOfHalting = false
+	require.ErrorContains(t, policy.Validate(), "economic signals")
 }

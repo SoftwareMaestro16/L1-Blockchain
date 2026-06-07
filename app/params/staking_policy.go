@@ -14,10 +14,13 @@ const (
 	StakingUnbondingMaxBlocks     = StakingUnbondingMaxDays * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds
 	StakingUnbondingDefaultBlocks = StakingUnbondingDefaultDays * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds
 
-	StakingMinSelfBondAET       = int64(10_000)
-	StakingMinValidatorBondAET  = int64(50_000)
-	StakingMinSelfBondNaet      = StakingMinSelfBondAET * BaseUnitsPerDisplay
-	StakingMinValidatorBondNaet = StakingMinValidatorBondAET * BaseUnitsPerDisplay
+	StakingMinSelfBondAET        = int64(10_000)
+	StakingMinValidatorBondAET   = int64(50_000)
+	StakingMinSelfBondNaet       = StakingMinSelfBondAET * BaseUnitsPerDisplay
+	StakingMinValidatorBondNaet  = StakingMinValidatorBondAET * BaseUnitsPerDisplay
+	StakingCommissionFloorBps    = int64(300)
+	StakingCommissionCeilingBps  = MaxCommissionBps
+	StakingMaxDailyCommissionBps = MaxDailyCommissionChangeBps
 )
 
 type StakingDelegationPolicy struct {
@@ -37,14 +40,27 @@ type StakingDelegationPolicy struct {
 	RequireValidatorMetadata bool
 }
 
+type AntiCartelPolicy struct {
+	CommissionFloorBps              int64
+	CommissionCeilingBps            int64
+	MaxDailyCommissionChangeBps     int64
+	ValidatorIdentityRegistry       bool
+	MandatoryKYC                    bool
+	ValidatorMetadataTransparency   bool
+	PublicConcentrationMetrics      bool
+	SelfBondRatioVisibility         bool
+	ObjectiveCorrelationWarnings    bool
+	EconomicSignalsInsteadOfHalting bool
+}
+
 func DefaultStakingDelegationPolicy() StakingDelegationPolicy {
 	return StakingDelegationPolicy{
 		Denom:                    StakingPolicyDenom,
 		MinSelfBondNaet:          StakingMinSelfBondNaet,
 		MinValidatorBondNaet:     StakingMinValidatorBondNaet,
-		MinCommissionBps:         MinCommissionBps,
-		MaxCommissionBps:         MaxCommissionBps,
-		MaxDailyCommissionBps:    MaxDailyCommissionChangeBps,
+		MinCommissionBps:         StakingCommissionFloorBps,
+		MaxCommissionBps:         StakingCommissionCeilingBps,
+		MaxDailyCommissionBps:    StakingMaxDailyCommissionBps,
 		UnbondingMinBlocks:       StakingUnbondingMinBlocks,
 		UnbondingMaxBlocks:       StakingUnbondingMaxBlocks,
 		UnbondingDefaultBlocks:   StakingUnbondingDefaultBlocks,
@@ -53,6 +69,21 @@ func DefaultStakingDelegationPolicy() StakingDelegationPolicy {
 		NominationPoolsEnabled:   true,
 		SlashingInherited:        true,
 		RequireValidatorMetadata: true,
+	}
+}
+
+func DefaultAntiCartelPolicy() AntiCartelPolicy {
+	return AntiCartelPolicy{
+		CommissionFloorBps:              StakingCommissionFloorBps,
+		CommissionCeilingBps:            StakingCommissionCeilingBps,
+		MaxDailyCommissionChangeBps:     StakingMaxDailyCommissionBps,
+		ValidatorIdentityRegistry:       true,
+		MandatoryKYC:                    false,
+		ValidatorMetadataTransparency:   true,
+		PublicConcentrationMetrics:      true,
+		SelfBondRatioVisibility:         true,
+		ObjectiveCorrelationWarnings:    true,
+		EconomicSignalsInsteadOfHalting: true,
 	}
 }
 
@@ -66,10 +97,10 @@ func (p StakingDelegationPolicy) Validate() error {
 	if p.MinValidatorBondNaet <= p.MinSelfBondNaet {
 		return fmt.Errorf("minimum validator bond must be higher than minimum self-bond")
 	}
-	if err := validateBpsRange("validator_commission", p.MinCommissionBps, p.MaxCommissionBps, MinCommissionBps, MaxCommissionBps); err != nil {
+	if err := validateBpsRange("validator_commission", p.MinCommissionBps, p.MaxCommissionBps, StakingCommissionFloorBps, StakingCommissionCeilingBps); err != nil {
 		return err
 	}
-	if p.MaxDailyCommissionBps <= 0 || p.MaxDailyCommissionBps > MaxDailyCommissionChangeBps {
+	if p.MaxDailyCommissionBps <= 0 || p.MaxDailyCommissionBps > StakingMaxDailyCommissionBps {
 		return fmt.Errorf("daily commission change must stay within configured commission bounds")
 	}
 	if err := ValidateStakingUnbondingBlocks(p.UnbondingDefaultBlocks); err != nil {
@@ -86,6 +117,31 @@ func (p StakingDelegationPolicy) Validate() error {
 	}
 	if !p.RequireValidatorMetadata {
 		return fmt.Errorf("validator metadata must be required")
+	}
+	return nil
+}
+
+func (p AntiCartelPolicy) Validate() error {
+	if err := validateBpsRange("anti_cartel_commission", p.CommissionFloorBps, p.CommissionCeilingBps, 300, 2_000); err != nil {
+		return err
+	}
+	if p.MaxDailyCommissionChangeBps < 50 || p.MaxDailyCommissionChangeBps > StakingMaxDailyCommissionBps {
+		return fmt.Errorf("anti-cartel max daily commission change must stay within 0.5-1 percent")
+	}
+	if !p.ValidatorIdentityRegistry {
+		return fmt.Errorf("anti-cartel policy requires optional validator identity registry")
+	}
+	if p.MandatoryKYC {
+		return fmt.Errorf("anti-cartel policy must not require mandatory KYC")
+	}
+	if !p.ValidatorMetadataTransparency || !p.PublicConcentrationMetrics || !p.SelfBondRatioVisibility {
+		return fmt.Errorf("anti-cartel policy requires public validator transparency metrics")
+	}
+	if !p.ObjectiveCorrelationWarnings {
+		return fmt.Errorf("operator correlation warnings must be based on public objective evidence")
+	}
+	if !p.EconomicSignalsInsteadOfHalting {
+		return fmt.Errorf("anti-cartel policy must use economic signals instead of halting staking")
 	}
 	return nil
 }

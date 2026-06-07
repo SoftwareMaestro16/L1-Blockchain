@@ -9,17 +9,17 @@ import (
 
 const (
 	DefaultBaseCommissionBps        = uint32(1_000)
-	DefaultCommissionFloorBps       = uint32(100)
+	DefaultCommissionFloorBps       = uint32(300)
 	DefaultCommissionCeilingBps     = uint32(2_000)
-	DefaultMaxRateChangeBps         = uint32(500)
+	DefaultMaxRateChangeBps         = uint32(100)
 	DefaultHighPerformanceThreshold = uint32(9_000)
 	DefaultLowPerformanceThreshold  = uint32(5_000)
 	DefaultHighReputationThreshold  = uint32(8_500)
 	DefaultLowReputationThreshold   = uint32(4_000)
-	DefaultPerformanceBonusBps      = uint32(200)
-	DefaultPerformancePenaltyBps    = uint32(300)
-	DefaultReputationBonusBps       = uint32(100)
-	DefaultReputationPenaltyBps     = uint32(200)
+	DefaultPerformanceBonusBps      = uint32(100)
+	DefaultPerformancePenaltyBps    = uint32(100)
+	DefaultReputationBonusBps       = uint32(0)
+	DefaultReputationPenaltyBps     = uint32(0)
 )
 
 func DefaultParams() Params {

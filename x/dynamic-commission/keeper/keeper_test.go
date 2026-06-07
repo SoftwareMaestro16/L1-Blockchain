@@ -32,9 +32,18 @@ func TestHighPerformanceBonus(t *testing.T) {
 		Height:              2,
 	})
 	require.NoError(t, err)
-	require.Equal(t, uint32(1_200), res.Commission.EffectiveCommissionBps)
-	require.Equal(t, int32(200), res.Commission.PerformanceModifierBps)
+	require.Equal(t, uint32(1_100), res.Commission.EffectiveCommissionBps)
+	require.Equal(t, int32(100), res.Commission.PerformanceModifierBps)
 	require.Equal(t, int32(0), res.Commission.ReputationModifierBps)
+}
+
+func TestDefaultCommissionParamsMatchAetraAntiCartelPolicy(t *testing.T) {
+	params := types.DefaultParams()
+
+	require.Equal(t, uint32(300), params.CommissionFloorBps)
+	require.Equal(t, uint32(2_000), params.CommissionCeilingBps)
+	require.Equal(t, uint32(100), params.MaxRateChangeBps)
+	require.NoError(t, params.Validate())
 }
 
 func TestLowPerformancePenalty(t *testing.T) {
@@ -57,8 +66,8 @@ func TestLowPerformancePenalty(t *testing.T) {
 		Height:              2,
 	})
 	require.NoError(t, err)
-	require.Equal(t, uint32(700), res.Commission.EffectiveCommissionBps)
-	require.Equal(t, int32(-300), res.Commission.PerformanceModifierBps)
+	require.Equal(t, uint32(900), res.Commission.EffectiveCommissionBps)
+	require.Equal(t, int32(-100), res.Commission.PerformanceModifierBps)
 }
 
 func TestFloorCeilingAndJailedBonusRules(t *testing.T) {
@@ -92,9 +101,16 @@ func TestFloorCeilingAndJailedBonusRules(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, uint32(1_100), ceiling.Commission.EffectiveCommissionBps)
 
+	floorValidator := validatorAddressN(2)
+	_, err = msgServer.SetBaseCommission(ctx, &types.MsgSetBaseCommission{
+		ValidatorAddress:  floorValidator,
+		BaseCommissionBps: 1_000,
+		Height:            1,
+	})
+	require.NoError(t, err)
 	floor, err := msgServer.RecomputeEffectiveCommission(ctx, &types.MsgRecomputeEffectiveCommission{
 		Authority:           app.DynamicCommissionKeeper.Authority(),
-		ValidatorAddress:    validator,
+		ValidatorAddress:    floorValidator,
 		PerformanceScoreBps: 1_000,
 		ReputationScoreBps:  1_000,
 		Height:              3,
@@ -104,7 +120,7 @@ func TestFloorCeilingAndJailedBonusRules(t *testing.T) {
 
 	jailed, err := msgServer.RecomputeEffectiveCommission(ctx, &types.MsgRecomputeEffectiveCommission{
 		Authority:           app.DynamicCommissionKeeper.Authority(),
-		ValidatorAddress:    validator,
+		ValidatorAddress:    floorValidator,
 		PerformanceScoreBps: 9_500,
 		ReputationScoreBps:  6_000,
 		Jailed:              true,
@@ -172,7 +188,7 @@ func TestExportImportPreservesEffectiveCommission(t *testing.T) {
 	imported, found, err := target.DynamicCommissionKeeper.GetValidatorCommission(targetCtx, validator)
 	require.NoError(t, err)
 	require.True(t, found)
-	require.Equal(t, uint32(1_300), imported.EffectiveCommissionBps)
+	require.Equal(t, uint32(1_100), imported.EffectiveCommissionBps)
 	history, err := target.DynamicCommissionKeeper.GetCommissionHistory(targetCtx, validator)
 	require.NoError(t, err)
 	require.Len(t, history, 2)
@@ -180,4 +196,8 @@ func TestExportImportPreservesEffectiveCommission(t *testing.T) {
 
 func validatorAddress() string {
 	return aetraaddress.FormatAccAddress(simtestutil.CreateIncrementalAccounts(1)[0])
+}
+
+func validatorAddressN(n int) string {
+	return aetraaddress.FormatAccAddress(simtestutil.CreateIncrementalAccounts(n)[n-1])
 }
