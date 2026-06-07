@@ -1,0 +1,256 @@
+package observability
+
+import (
+	"fmt"
+	"sort"
+)
+
+const (
+	RequiredAPIModuleStakingPolicy  = "aetra-staking-policy"
+	RequiredAPIModuleEconomics      = "aetra-economics"
+	RequiredAPIModuleValidatorScore = "aetra-validator-score"
+)
+
+const (
+	CommandCategoryQuery = "query"
+	CommandCategoryTx    = "tx"
+)
+
+const (
+	RequiredAPISurfaceCLIQuery        = "cli_query"
+	RequiredAPISurfaceCLITx           = "cli_tx"
+	RequiredAPISurfaceGRPCQuery       = "grpc_query"
+	RequiredAPISurfaceRESTQuery       = "rest_query_where_applicable"
+	RequiredAPISurfaceEvents          = "events"
+	RequiredAPISurfaceExamplesInDocs  = "examples_in_docs"
+	RequiredAPISurfaceJSONOutput      = "json_output"
+	RequiredAPISurfaceClearErrors     = "clear_errors"
+	RequiredAPISurfaceHeightQuery     = "height_query_where_applicable"
+	RequiredAPISurfacePagination      = "pagination_where_applicable"
+	RequiredAPISurfaceBoundedAttrs    = "bounded_event_attributes"
+	RequiredAPISurfaceStableResponses = "stable_query_responses"
+)
+
+type CLICommandSpec struct {
+	Module              string
+	Category            string
+	Command             string
+	JSONOutput          bool
+	HeightQuery         bool
+	Pagination          bool
+	ClearErrors         bool
+	ExamplesInDocs      bool
+	SignerValidation    bool
+	AuthorityValidation bool
+}
+
+type APISurfaceModuleSpec struct {
+	Module          string
+	CLICommands     []CLICommandSpec
+	GRPCQuery       bool
+	RESTQuery       bool
+	Events          bool
+	BoundedAttrs    bool
+	StableResponses bool
+	ExamplesInDocs  bool
+	Required        bool
+}
+
+type APISurfaceReadinessReport struct {
+	Modules       []APISurfaceModuleSpec
+	RequiredCount int
+	ReadyCount    int
+	Failed        []string
+	Ready         bool
+}
+
+func DefaultAPISurfaceModuleSpecs() []APISurfaceModuleSpec {
+	return []APISurfaceModuleSpec{
+		apiSurfaceModule(RequiredAPIModuleStakingPolicy, true),
+		apiSurfaceModule(RequiredAPIModuleEconomics, true),
+		apiSurfaceModule(RequiredAPIModuleValidatorScore, true),
+	}
+}
+
+func ValidateAPISurfaceReadiness(modules []APISurfaceModuleSpec) error {
+	report := BuildAPISurfaceReadinessReport(modules)
+	if !report.Ready {
+		return fmt.Errorf("api surface readiness failed: %v", report.Failed)
+	}
+	return nil
+}
+
+func BuildAPISurfaceReadinessReport(modules []APISurfaceModuleSpec) APISurfaceReadinessReport {
+	if modules == nil {
+		modules = DefaultAPISurfaceModuleSpecs()
+	}
+	modules = normalizeAPISurfaceModules(modules)
+	required := requiredAPIModules()
+	seen := map[string]APISurfaceModuleSpec{}
+	failed := make([]string, 0)
+	requiredCount := 0
+	readyCount := 0
+
+	for _, module := range modules {
+		if module.Module == "" {
+			failed = append(failed, "module_required")
+			continue
+		}
+		if _, duplicate := seen[module.Module]; duplicate {
+			failed = append(failed, module.Module+":duplicate_module")
+		}
+		seen[module.Module] = module
+		if !required[module.Module] {
+			failed = append(failed, module.Module+":unknown_module")
+		}
+		if module.Required {
+			requiredCount++
+		}
+		moduleFailures := validateAPISurfaceModule(module)
+		failed = append(failed, moduleFailures...)
+		if module.Required && len(moduleFailures) == 0 {
+			readyCount++
+		}
+	}
+	for id := range required {
+		if _, ok := seen[id]; !ok {
+			failed = append(failed, id+":missing_module")
+		}
+	}
+
+	sort.Strings(failed)
+	return APISurfaceReadinessReport{
+		Modules:       modules,
+		RequiredCount: requiredCount,
+		ReadyCount:    readyCount,
+		Failed:        failed,
+		Ready:         len(failed) == 0,
+	}
+}
+
+func apiSurfaceModule(module string, rest bool) APISurfaceModuleSpec {
+	return APISurfaceModuleSpec{
+		Module: module,
+		CLICommands: []CLICommandSpec{
+			apiSurfaceCLICommand(module, CommandCategoryQuery),
+			apiSurfaceCLICommand(module, CommandCategoryTx),
+		},
+		GRPCQuery:       true,
+		RESTQuery:       rest,
+		Events:          true,
+		BoundedAttrs:    true,
+		StableResponses: true,
+		ExamplesInDocs:  true,
+		Required:        true,
+	}
+}
+
+func apiSurfaceCLICommand(module, category string) CLICommandSpec {
+	command := "aetrad " + category + " " + module + " ..."
+	return CLICommandSpec{
+		Module:              module,
+		Category:            category,
+		Command:             command,
+		JSONOutput:          true,
+		HeightQuery:         category == CommandCategoryQuery,
+		Pagination:          category == CommandCategoryQuery,
+		ClearErrors:         true,
+		ExamplesInDocs:      true,
+		SignerValidation:    category == CommandCategoryTx,
+		AuthorityValidation: category == CommandCategoryTx,
+	}
+}
+
+func validateAPISurfaceModule(module APISurfaceModuleSpec) []string {
+	failed := make([]string, 0)
+	if module.Required {
+		if !module.GRPCQuery {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceGRPCQuery+":missing")
+		}
+		if !module.RESTQuery {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceRESTQuery+":missing")
+		}
+		if !module.Events {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceEvents+":missing")
+		}
+		if !module.BoundedAttrs {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceBoundedAttrs+":missing")
+		}
+		if !module.StableResponses {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceStableResponses+":missing")
+		}
+		if !module.ExamplesInDocs {
+			failed = append(failed, module.Module+":"+RequiredAPISurfaceExamplesInDocs+":missing")
+		}
+	}
+
+	commandsByCategory := map[string]CLICommandSpec{}
+	for _, command := range module.CLICommands {
+		if command.Module != module.Module {
+			failed = append(failed, module.Module+":cli_command_module_mismatch")
+		}
+		if command.Category != CommandCategoryQuery && command.Category != CommandCategoryTx {
+			failed = append(failed, module.Module+":"+command.Category+":unknown_cli_category")
+		}
+		if _, duplicate := commandsByCategory[command.Category]; duplicate {
+			failed = append(failed, module.Module+":"+command.Category+":duplicate_cli_command")
+		}
+		commandsByCategory[command.Category] = command
+		failed = append(failed, validateCLICommand(command)...)
+	}
+	for _, category := range []string{CommandCategoryQuery, CommandCategoryTx} {
+		if _, ok := commandsByCategory[category]; !ok {
+			failed = append(failed, module.Module+":cli_"+category+":missing")
+		}
+	}
+	return failed
+}
+
+func validateCLICommand(command CLICommandSpec) []string {
+	failed := make([]string, 0)
+	prefix := command.Module + ":" + command.Category
+	expected := "aetrad " + command.Category + " " + command.Module + " ..."
+	if command.Command != expected {
+		failed = append(failed, prefix+":unexpected_command")
+	}
+	if !command.JSONOutput {
+		failed = append(failed, prefix+":"+RequiredAPISurfaceJSONOutput+":missing")
+	}
+	if !command.ClearErrors {
+		failed = append(failed, prefix+":"+RequiredAPISurfaceClearErrors+":missing")
+	}
+	if !command.ExamplesInDocs {
+		failed = append(failed, prefix+":"+RequiredAPISurfaceExamplesInDocs+":missing")
+	}
+	if command.Category == CommandCategoryQuery {
+		if !command.HeightQuery {
+			failed = append(failed, prefix+":"+RequiredAPISurfaceHeightQuery+":missing")
+		}
+		if !command.Pagination {
+			failed = append(failed, prefix+":"+RequiredAPISurfacePagination+":missing")
+		}
+	}
+	if command.Category == CommandCategoryTx {
+		if !command.SignerValidation {
+			failed = append(failed, prefix+":signer_validation:missing")
+		}
+		if !command.AuthorityValidation {
+			failed = append(failed, prefix+":authority_validation:missing")
+		}
+	}
+	return failed
+}
+
+func normalizeAPISurfaceModules(modules []APISurfaceModuleSpec) []APISurfaceModuleSpec {
+	out := append([]APISurfaceModuleSpec{}, modules...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].Module < out[j].Module })
+	return out
+}
+
+func requiredAPIModules() map[string]bool {
+	return map[string]bool{
+		RequiredAPIModuleStakingPolicy:  true,
+		RequiredAPIModuleEconomics:      true,
+		RequiredAPIModuleValidatorScore: true,
+	}
+}
