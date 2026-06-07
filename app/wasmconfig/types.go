@@ -10,6 +10,8 @@ const (
 
 	DefaultMaxContractSizeBytes         uint64 = 800 * 1024
 	DefaultMaxProposalContractSizeBytes uint64 = 3 * 1024 * 1024
+	DefaultMaxInstantiateGas            uint64 = 20_000_000
+	DefaultMaxExecuteGasPerTx           uint64 = 20_000_000
 	DefaultSmartQueryGasLimit           uint64 = 3_000_000
 	DefaultSimulationGasLimit           uint64 = 20_000_000
 	DefaultGasMultiplier                uint64 = 140_000
@@ -17,13 +19,19 @@ const (
 	DefaultMaxQueryResponseBytes        uint64 = 256 * 1024
 	DefaultMaxQueryDepth                uint32 = 8
 	DefaultMaxPinnedCodes               uint32 = 0
+	DefaultContractUploadFeeNaet        uint64 = 1_000
+	DefaultStoragePricePerByteEpochNaet uint64 = 1
 
-	maxSmartQueryGasLimit uint64 = 10_000_000
-	maxSimulationGasLimit uint64 = 100_000_000
-	maxMemoryCacheSizeMiB uint32 = 256
-	maxQueryResponseBytes uint64 = 1024 * 1024
-	maxQueryDepth         uint32 = 16
-	maxPinnedCodes        uint32 = 128
+	maxInstantiateGas               uint64 = 50_000_000
+	maxExecuteGasPerTx              uint64 = 100_000_000
+	maxSmartQueryGasLimit           uint64 = 10_000_000
+	maxSimulationGasLimit           uint64 = 100_000_000
+	maxMemoryCacheSizeMiB           uint32 = 256
+	maxQueryResponseBytes           uint64 = 1024 * 1024
+	maxQueryDepth                   uint32 = 16
+	maxPinnedCodes                  uint32 = 128
+	maxContractUploadFeeNaet        uint64 = 1_000
+	maxStoragePricePerByteEpochNaet uint64 = 1_000_000
 )
 
 type UploadPermission string
@@ -64,6 +72,8 @@ type Policy struct {
 	UploadAllowlist              []string
 	MaxContractSizeBytes         uint64
 	MaxProposalContractSizeBytes uint64
+	MaxInstantiateGas            uint64
+	MaxExecuteGasPerTx           uint64
 	SmartQueryGasLimit           uint64
 	SimulationGasLimit           uint64
 	GasMultiplier                uint64
@@ -71,6 +81,8 @@ type Policy struct {
 	MaxQueryResponseBytes        uint64
 	MaxQueryDepth                uint32
 	MaxPinnedCodes               uint32
+	ContractUploadFeeNaet        uint64
+	StoragePricePerByteEpochNaet uint64
 }
 
 func DefaultPolicy() Policy {
@@ -83,6 +95,8 @@ func DefaultPolicy() Policy {
 		PinnedCodePolicy:             PinnedCodePolicyDisabled,
 		MaxContractSizeBytes:         DefaultMaxContractSizeBytes,
 		MaxProposalContractSizeBytes: DefaultMaxProposalContractSizeBytes,
+		MaxInstantiateGas:            DefaultMaxInstantiateGas,
+		MaxExecuteGasPerTx:           DefaultMaxExecuteGasPerTx,
 		SmartQueryGasLimit:           DefaultSmartQueryGasLimit,
 		SimulationGasLimit:           DefaultSimulationGasLimit,
 		GasMultiplier:                DefaultGasMultiplier,
@@ -90,6 +104,8 @@ func DefaultPolicy() Policy {
 		MaxQueryResponseBytes:        DefaultMaxQueryResponseBytes,
 		MaxQueryDepth:                DefaultMaxQueryDepth,
 		MaxPinnedCodes:               DefaultMaxPinnedCodes,
+		ContractUploadFeeNaet:        DefaultContractUploadFeeNaet,
+		StoragePricePerByteEpochNaet: DefaultStoragePricePerByteEpochNaet,
 	}
 }
 

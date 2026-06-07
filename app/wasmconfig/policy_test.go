@@ -40,6 +40,8 @@ func TestPolicyDefinesPhase11ReadinessSurface(t *testing.T) {
 	require.True(t, policy.MigrationsEnabled)
 	require.Equal(t, uint64(800*1024), policy.MaxContractSizeBytes)
 	require.Equal(t, uint64(3*1024*1024), policy.MaxProposalContractSizeBytes)
+	require.Equal(t, uint64(20_000_000), policy.MaxInstantiateGas)
+	require.Equal(t, uint64(20_000_000), policy.MaxExecuteGasPerTx)
 	require.Equal(t, uint64(3_000_000), policy.SmartQueryGasLimit)
 	require.Equal(t, uint64(20_000_000), policy.SimulationGasLimit)
 	require.Equal(t, uint64(140_000), policy.GasMultiplier)
@@ -48,6 +50,8 @@ func TestPolicyDefinesPhase11ReadinessSurface(t *testing.T) {
 	require.Equal(t, uint32(8), policy.MaxQueryDepth)
 	require.Equal(t, PinnedCodePolicyDisabled, policy.PinnedCodePolicy)
 	require.Equal(t, uint32(0), policy.MaxPinnedCodes)
+	require.Equal(t, uint64(1_000), policy.ContractUploadFeeNaet)
+	require.Equal(t, uint64(1), policy.StoragePricePerByteEpochNaet)
 	require.NoError(t, policy.Validate())
 }
 
@@ -57,6 +61,14 @@ func TestPolicyRejectsUnsafeLimits(t *testing.T) {
 	tooLargeCode := policy
 	tooLargeCode.MaxContractSizeBytes = DefaultMaxContractSizeBytes + 1
 	require.ErrorContains(t, tooLargeCode.Validate(), "max contract size")
+
+	tooLargeInstantiateGas := policy
+	tooLargeInstantiateGas.MaxInstantiateGas = maxInstantiateGas + 1
+	require.ErrorContains(t, tooLargeInstantiateGas.Validate(), "instantiate gas")
+
+	tooLargeExecuteGas := policy
+	tooLargeExecuteGas.MaxExecuteGasPerTx = maxExecuteGasPerTx + 1
+	require.ErrorContains(t, tooLargeExecuteGas.Validate(), "execute gas")
 
 	tooLargeQueryGas := policy
 	tooLargeQueryGas.SmartQueryGasLimit = maxSmartQueryGasLimit + 1
@@ -82,6 +94,14 @@ func TestPolicyRejectsUnsafeLimits(t *testing.T) {
 	badPinned.PinnedCodePolicy = PinnedCodePolicyGovernanceOnly
 	badPinned.MaxPinnedCodes = 0
 	require.ErrorContains(t, badPinned.Validate(), "pinning is enabled")
+
+	badUploadFee := policy
+	badUploadFee.ContractUploadFeeNaet = 0
+	require.ErrorContains(t, badUploadFee.Validate(), "upload fee")
+
+	badStoragePrice := policy
+	badStoragePrice.StoragePricePerByteEpochNaet = 0
+	require.ErrorContains(t, badStoragePrice.Validate(), "storage price")
 }
 
 func TestAllowlistRejectsMalformedEmptyAndZeroAddress(t *testing.T) {
@@ -160,8 +180,10 @@ func TestGasCodeQueryAndPinnedCodePolicies(t *testing.T) {
 	require.NoError(t, ValidateContractCodeSize(DefaultMaxProposalContractSizeBytes, true, policy))
 	require.ErrorContains(t, ValidateContractCodeSize(0, false, policy), "must not be empty")
 
+	require.NoError(t, EnforceInstantiateGasLimit(policy.MaxInstantiateGas, policy))
+	require.ErrorContains(t, EnforceInstantiateGasLimit(policy.MaxInstantiateGas+1, policy), "instantiate gas")
 	require.NoError(t, EnforceExecuteGasLimit(policy.SimulationGasLimit, policy))
-	require.ErrorContains(t, EnforceExecuteGasLimit(policy.SimulationGasLimit+1, policy), "execute gas")
+	require.ErrorContains(t, EnforceExecuteGasLimit(policy.MaxExecuteGasPerTx+1, policy), "execute gas")
 	require.NoError(t, EnforceQueryLimit(policy.SmartQueryGasLimit, policy.MaxQueryResponseBytes, policy.MaxQueryDepth, policy))
 	require.ErrorContains(t, EnforceQueryLimit(policy.SmartQueryGasLimit+1, 1, 1, policy), "query gas")
 	require.ErrorContains(t, EnforceQueryLimit(1, policy.MaxQueryResponseBytes+1, 1, policy), "query response")
@@ -174,6 +196,22 @@ func TestGasCodeQueryAndPinnedCodePolicies(t *testing.T) {
 	require.NoError(t, CanPinCode(governanceAddr, 1, policy))
 	require.ErrorContains(t, CanPinCode(attackerAddr, 1, policy), "requires governance authority")
 	require.ErrorContains(t, CanPinCode(governanceAddr, 2, policy), "pinned code count")
+}
+
+func TestUploadFeeAndStoragePricingPolicy(t *testing.T) {
+	policy := enabledPolicy()
+
+	require.NoError(t, EnforceContractUploadFee(sdkCoins("naet", int64(policy.ContractUploadFeeNaet)), policy))
+	require.ErrorContains(t, EnforceContractUploadFee(sdkCoins("naet", int64(policy.ContractUploadFeeNaet-1)), policy), "upload fee")
+	require.Error(t, EnforceContractUploadFee(sdkCoins("testtoken", int64(policy.ContractUploadFeeNaet)), policy))
+
+	price, err := CalculateStoragePrice(10, 3, policy)
+	require.NoError(t, err)
+	require.Equal(t, sdk.NewInt64Coin("naet", 30), price)
+	_, err = CalculateStoragePrice(0, 3, policy)
+	require.ErrorContains(t, err, "positive bytes")
+	_, err = CalculateStoragePrice(10, 0, policy)
+	require.ErrorContains(t, err, "positive bytes")
 }
 
 func TestCosmWasmCannotBypassNativeFeeOrZeroAddressPolicy(t *testing.T) {
