@@ -14,6 +14,7 @@ const (
 	AccountVersionV2      = uint64(2)
 	CurrentAccountVersion = AccountVersionV2
 
+	AccountStatusInactive  = "inactive"
 	AccountStatusActive    = "active"
 	AccountStatusFrozen    = "frozen"
 	AccountStatusRecovered = "recovered"
@@ -28,36 +29,39 @@ const (
 	MaxDisplayNameHashBytes = 128
 	MaxDomainAliasBytes     = 253
 	MaxPubKeyTextBytes      = 256
+	MaxAuthPolicyModeBytes  = 64
+	MaxFeatureFlagBytes     = 64
+	MaxReputationIDBytes    = 128
 )
 
 type Account struct {
-	Version                 uint64
-	AddressUser             string
-	AddressRaw              string
-	PubKeys                 []string
-	AccountNumber           uint64
-	Sequence                uint64
-	Status                  string
-	AuthPolicy              AuthPolicy
-	FeatureFlags            []string
-	Metadata                AccountMetadata
-	ReputationID            string
-	CreatedHeight           uint64
-	LastActiveHeight        uint64
-	LastStorageChargeHeight uint64
-	StorageRentDebt         uint64
+	Version                 uint64          `json:"version"`
+	AddressUser             string          `json:"address_user"`
+	AddressRaw              string          `json:"address_raw"`
+	PubKeys                 []string        `json:"pubkeys,omitempty"`
+	AccountNumber           uint64          `json:"account_number"`
+	Sequence                uint64          `json:"sequence"`
+	Status                  string          `json:"status"`
+	AuthPolicy              AuthPolicy      `json:"auth_policy"`
+	FeatureFlags            []string        `json:"features,omitempty"`
+	Metadata                AccountMetadata `json:"metadata,omitempty"`
+	ReputationID            string          `json:"reputation_id,omitempty"`
+	CreatedHeight           uint64          `json:"created_height"`
+	LastActiveHeight        uint64          `json:"last_active_height,omitempty"`
+	LastStorageChargeHeight uint64          `json:"last_storage_charge_height,omitempty"`
+	StorageRentDebt         uint64          `json:"storage_rent_debt,omitempty"`
 }
 
 type AuthPolicy struct {
-	Version uint64
-	Mode    string
+	Version uint64 `json:"version"`
+	Mode    string `json:"mode"`
 }
 
 type AccountMetadata struct {
-	MetadataHash    string
-	DisplayNameHash string
-	DomainAlias     string
-	CreatedHeight   uint64
+	MetadataHash    string `json:"metadata_hash,omitempty"`
+	DisplayNameHash string `json:"display_name_hash,omitempty"`
+	DomainAlias     string `json:"domain_alias,omitempty"`
+	CreatedHeight   uint64 `json:"created_height,omitempty"`
 }
 
 func DefaultFeatureFlags(version uint64) ([]string, error) {
@@ -122,6 +126,9 @@ func ValidateAccountInvariant(account Account) error {
 	if err := ValidateAddressPair("native account address pair", account.AddressUser, account.AddressRaw); err != nil {
 		return err
 	}
+	if account.Status == AccountStatusInactive {
+		return errors.New("inactive native account is virtual only and must not be persisted")
+	}
 	if !isAccountStatus(account.Status) {
 		return fmt.Errorf("unsupported native account status %q", account.Status)
 	}
@@ -137,11 +144,34 @@ func ValidateAccountInvariant(account Account) error {
 	if err := validatePubKeys(account.PubKeys); err != nil {
 		return err
 	}
+	if err := account.AuthPolicy.Validate(); err != nil {
+		return err
+	}
 	if err := account.Metadata.Validate(); err != nil {
 		return err
 	}
 	if err := validateFeatureFlags(account.Version, account.FeatureFlags); err != nil {
 		return err
+	}
+	if err := validateReputationID(account.ReputationID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p AuthPolicy) Validate() error {
+	if p.Version == 0 {
+		return errors.New("native account auth policy version must be positive")
+	}
+	mode := strings.TrimSpace(p.Mode)
+	if mode == "" {
+		return errors.New("native account auth policy mode is required")
+	}
+	if len(mode) > MaxAuthPolicyModeBytes {
+		return fmt.Errorf("native account auth policy mode exceeds %d bytes", MaxAuthPolicyModeBytes)
+	}
+	if containsSecretLikeText(mode) {
+		return errors.New("native account auth policy must not contain private keys or seed phrases")
 	}
 	return nil
 }
@@ -237,10 +267,26 @@ func validateFeatureFlags(version uint64, flags []string) error {
 		if strings.TrimSpace(flag) == "" {
 			return errors.New("native account feature flag is required")
 		}
+		if len(flag) > MaxFeatureFlagBytes {
+			return fmt.Errorf("native account feature flag exceeds %d bytes", MaxFeatureFlagBytes)
+		}
+		if containsSecretLikeText(flag) {
+			return errors.New("native account feature flags must not contain private keys or seed phrases")
+		}
 		if flag <= previous {
 			return errors.New("native account feature flags must be sorted and unique")
 		}
 		previous = flag
+	}
+	return nil
+}
+
+func validateReputationID(reputationID string) error {
+	if len(reputationID) > MaxReputationIDBytes {
+		return fmt.Errorf("native account reputation id exceeds %d bytes", MaxReputationIDBytes)
+	}
+	if containsSecretLikeText(reputationID) {
+		return errors.New("native account reputation id must not contain private keys or seed phrases")
 	}
 	return nil
 }
