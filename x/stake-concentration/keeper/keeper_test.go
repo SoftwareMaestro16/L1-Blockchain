@@ -31,12 +31,38 @@ func TestValidatorAboveCapRejectsNewDelegation(t *testing.T) {
 	require.Equal(t, operator(0x11), res.Network.Validators[0].OperatorAddress)
 	require.Equal(t, uint32(5_000), res.Network.Validators[0].RawVotingPowerBps)
 	require.Equal(t, uint32(300), res.Network.Validators[0].EffectiveVotingPowerBps)
+	require.Equal(t, uint32(4_700), res.Network.Validators[0].OverflowVotingPowerBps())
+	require.Equal(t, uint64(3), res.Network.Validators[0].RewardableVotingPower(res.Network.TotalVotingPower))
+	require.Equal(t, uint64(47), res.Network.Validators[0].OverflowVotingPower(res.Network.TotalVotingPower))
 	require.True(t, res.Network.Validators[0].AboveHardCap)
 	require.False(t, res.Network.Validators[0].DelegationAllowed)
 
 	allowed, err := app.StakeConcentrationKeeper.CanAcceptDelegation(ctx, operator(0x11))
 	require.NoError(t, err)
 	require.False(t, allowed)
+}
+
+func TestAetraPowerCapExampleTracksExcessStake(t *testing.T) {
+	params := types.DefaultParams()
+	validatorSet := []types.ValidatorPower{
+		{OperatorAddress: operator(0x11), VotingPower: 50},
+		{OperatorAddress: operator(0x22), VotingPower: 950},
+	}
+
+	network, err := types.ComputeNetworkConcentration(params, 1, validatorSet, 10)
+	require.NoError(t, err)
+
+	validator, found := findConcentration(network.Validators, operator(0x11))
+	require.True(t, found)
+	require.Equal(t, uint64(1_000), network.TotalVotingPower)
+	require.Equal(t, uint32(500), validator.RawVotingPowerBps)
+	require.Equal(t, uint32(300), validator.EffectiveVotingPowerBps)
+	require.Equal(t, uint32(200), validator.OverflowVotingPowerBps())
+	require.Equal(t, uint64(30), validator.RewardableVotingPower(network.TotalVotingPower))
+	require.Equal(t, uint64(20), validator.OverflowVotingPower(network.TotalVotingPower))
+	require.True(t, validator.AboveHardCap)
+	require.False(t, validator.DelegationAllowed)
+	require.Equal(t, "hard_cap_exceeded", validator.Warning)
 }
 
 func TestRewardModifierApplies(t *testing.T) {

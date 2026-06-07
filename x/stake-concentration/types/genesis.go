@@ -215,6 +215,32 @@ func EffectiveMaxVotingPowerBps(params Params, activeValidators int) uint32 {
 	return scheduled
 }
 
+func (v ValidatorConcentration) OverflowVotingPowerBps() uint32 {
+	if v.RawVotingPowerBps <= v.EffectiveVotingPowerBps {
+		return 0
+	}
+	return v.RawVotingPowerBps - v.EffectiveVotingPowerBps
+}
+
+func (v ValidatorConcentration) RewardableVotingPower(totalVotingPower uint64) uint64 {
+	if !v.AboveHardCap || v.OverflowVotingPowerBps() == 0 {
+		return v.VotingPower
+	}
+	rewardable := bpsToPower(totalVotingPower, v.EffectiveVotingPowerBps)
+	if rewardable > v.VotingPower {
+		return v.VotingPower
+	}
+	return rewardable
+}
+
+func (v ValidatorConcentration) OverflowVotingPower(totalVotingPower uint64) uint64 {
+	rewardable := v.RewardableVotingPower(totalVotingPower)
+	if rewardable >= v.VotingPower {
+		return 0
+	}
+	return v.VotingPower - rewardable
+}
+
 func SortValidatorConcentrations(in []ValidatorConcentration) []ValidatorConcentration {
 	out := append([]ValidatorConcentration(nil), in...)
 	sort.Slice(out, func(i, j int) bool { return out[i].OperatorAddress < out[j].OperatorAddress })
@@ -228,6 +254,15 @@ func powerBps(power, total uint64) uint32 {
 	hi, lo := bits.Mul64(power, uint64(BasisPoints))
 	q, _ := bits.Div64(hi, lo, total)
 	return uint32(q)
+}
+
+func bpsToPower(total uint64, bps uint32) uint64 {
+	if total == 0 || bps == 0 {
+		return 0
+	}
+	hi, lo := bits.Mul64(total, uint64(bps))
+	q, _ := bits.Div64(hi, lo, uint64(BasisPoints))
+	return q
 }
 
 func rewardModifier(params Params, rawBps uint32) uint32 {
