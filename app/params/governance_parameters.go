@@ -6,29 +6,42 @@ import (
 )
 
 const (
-	GovernanceParamValidatorSetSize     = "validator_set_size"
-	GovernanceParamValidatorPowerCap    = "validator_power_cap_bps"
-	GovernanceParamCommissionFloor      = "commission_floor_bps"
-	GovernanceParamCommissionMax        = "commission_max_bps"
-	GovernanceParamCommissionMaxChange  = "commission_max_change_bps"
-	GovernanceParamInflationMin         = "inflation_min_bps"
-	GovernanceParamInflationMax         = "inflation_max_bps"
-	GovernanceParamTargetBondedRatio    = "target_bonded_ratio_bps"
-	GovernanceParamFeeBurnShare         = "fee_burn_share_bps"
-	GovernanceParamFeeRewardShare       = "fee_reward_share_bps"
-	GovernanceParamFeeTreasuryShare     = "fee_treasury_share_bps"
-	GovernanceParamDoubleSignSlash      = "double_sign_slash_bps"
-	GovernanceParamDowntimeSlash        = "downtime_slash_bps"
-	GovernanceParamDowntimeWindow       = "downtime_window_blocks"
-	GovernanceParamCosmWasmUploadPolicy = "cosmwasm_upload_policy"
-	GovernanceParamTreasurySpendPolicy  = "treasury_spend_policy"
-	GovernanceParamValidatorScorePolicy = "validator_score_policy"
-	GovernanceParamValidatorSetGrowth   = "validator_set_growth_schedule"
-	GovernanceParamBlockGasLimit        = "block_gas_limit"
-	GovernanceParamBlockMaxBytes        = "block_max_bytes"
+	GovernanceParamValidatorSetSize      = "validator_set_size"
+	GovernanceParamValidatorEntryStake   = "validator_entry_stake_naet"
+	GovernanceParamPoolBackedSelfStake   = "pool_backed_validator_self_stake_naet"
+	GovernanceParamPoolBackedPoolStake   = "pool_backed_validator_pool_stake_naet"
+	GovernanceParamPoolMinDeposit        = "liquid_staking_pool_min_deposit_naet"
+	GovernanceParamValidatorPowerCap     = "validator_power_cap_bps"
+	GovernanceParamCommissionFloor       = "commission_floor_bps"
+	GovernanceParamCommissionMax         = "commission_max_bps"
+	GovernanceParamCommissionMaxChange   = "commission_max_change_bps"
+	GovernanceParamDirectUserDelegation  = "direct_user_validator_delegation"
+	GovernanceParamUnbondingBlocks       = "staking_unbonding_blocks"
+	GovernanceParamMinTxFee              = "min_tx_fee_naet"
+	GovernanceParamInflationMin          = "inflation_min_bps"
+	GovernanceParamInflationMax          = "inflation_max_bps"
+	GovernanceParamTargetBondedRatio     = "target_bonded_ratio_bps"
+	GovernanceParamFeeBurnShare          = "fee_burn_share_bps"
+	GovernanceParamFeeRewardShare        = "fee_reward_share_bps"
+	GovernanceParamFeeTreasuryShare      = "fee_treasury_share_bps"
+	GovernanceParamStorageRentRate       = "storage_rent_rate_per_byte_second_naet"
+	GovernanceParamSystemReserveMin      = "system_storage_reserve_min_runway_days"
+	GovernanceParamSystemReserveWarning  = "system_storage_reserve_warning_runway_days"
+	GovernanceParamSystemReserveCritical = "system_storage_reserve_critical_runway_days"
+	GovernanceParamDoubleSignSlash       = "double_sign_slash_bps"
+	GovernanceParamDowntimeSlash         = "downtime_slash_bps"
+	GovernanceParamDowntimeWindow        = "downtime_window_blocks"
+	GovernanceParamCosmWasmUploadPolicy  = "cosmwasm_upload_policy"
+	GovernanceParamTreasurySpendPolicy   = "treasury_spend_policy"
+	GovernanceParamValidatorScorePolicy  = "validator_score_policy"
+	GovernanceParamValidatorSetGrowth    = "validator_set_growth_schedule"
+	GovernanceParamBlockGasLimit         = "block_gas_limit"
+	GovernanceParamBlockMaxBytes         = "block_max_bytes"
 
 	GovernanceValueTypeInteger = "integer"
 	GovernanceValueTypeEnum    = "enum"
+
+	DirectUserDelegationDisabled = "disabled"
 
 	CosmWasmUploadDisabled       = "disabled"
 	CosmWasmUploadGovernanceOnly = "governance_only"
@@ -45,17 +58,27 @@ const (
 	ValidatorSetGrowthGradual = "gradual"
 	ValidatorSetGrowthMature  = "mature_cap"
 
-	GovernanceDefaultVotingPeriodBlocks  = uint64(10_000)
-	GovernanceCriticalVotingPeriodBlocks = uint64(20_000)
-	GovernanceDefaultQuorumBps           = int64(4_000)
-	GovernanceCriticalQuorumBps          = int64(5_000)
-	GovernanceValidatorPowerCapMinBps    = int64(200)
-	GovernanceValidatorPowerCapMaxBps    = int64(300)
-	GovernanceAuthorityGovModule         = "gov"
-	GovernanceDefaultBlockGasLimit       = int64(20_000_000)
-	GovernanceMaxBlockGasLimit           = int64(80_000_000)
-	GovernanceDefaultBlockMaxBytes       = int64(1_048_576)
-	GovernanceMaxBlockMaxBytes           = int64(4_194_304)
+	GovernanceDefaultVotingPeriodBlocks    = uint64(10_000)
+	GovernanceCriticalVotingPeriodBlocks   = uint64(20_000)
+	GovernanceDefaultQuorumBps             = int64(4_000)
+	GovernanceCriticalQuorumBps            = int64(5_000)
+	GovernanceValidatorPowerCapMinBps      = int64(200)
+	GovernanceValidatorPowerCapMaxBps      = int64(300)
+	GovernanceAuthorityGovModule           = "gov"
+	GovernanceDefaultBlockGasLimit         = int64(20_000_000)
+	GovernanceMaxBlockGasLimit             = int64(80_000_000)
+	GovernanceDefaultBlockMaxBytes         = int64(1_048_576)
+	GovernanceMaxBlockMaxBytes             = int64(4_194_304)
+	GovernanceDefaultValidatorEntryStake   = int64(1_000_000) * BaseUnitsPerDisplay
+	GovernanceDefaultPoolBackedSelfStake   = int64(400_000) * BaseUnitsPerDisplay
+	GovernanceDefaultPoolBackedPoolStake   = int64(600_000) * BaseUnitsPerDisplay
+	GovernanceDefaultPoolMinDeposit        = int64(10) * BaseUnitsPerDisplay
+	GovernanceDefaultUnbondingBlocks       = int64(18 * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds)
+	GovernanceDefaultMinTxFeeNaet          = int64(3_000_000)
+	GovernanceDefaultStorageRentRate       = int64(1)
+	GovernanceDefaultReserveMinRunway      = int64(365)
+	GovernanceDefaultReserveWarningRunway  = int64(180)
+	GovernanceDefaultReserveCriticalRunway = int64(90)
 
 	GovernanceTestValidParamProposalExecutes = "valid_param_proposal_executes"
 	GovernanceTestInvalidParamRejected       = "invalid_param_proposal_rejected"
@@ -133,16 +156,27 @@ type GovernanceTestingReport struct {
 func DefaultGovernanceParameterSpecs() []GovernanceParameterSpec {
 	return []GovernanceParameterSpec{
 		governanceIntegerSpec(GovernanceParamValidatorSetSize, "staking_policy", AetraValidatorSetGenesisMin, AetraValidatorSetMin, AetraValidatorSetMax, true),
+		governanceIntegerSpec(GovernanceParamValidatorEntryStake, "staking_policy", GovernanceDefaultValidatorEntryStake, GovernanceDefaultValidatorEntryStake, GovernanceDefaultValidatorEntryStake, true),
+		governanceIntegerSpec(GovernanceParamPoolBackedSelfStake, "staking_policy", GovernanceDefaultPoolBackedSelfStake, GovernanceDefaultPoolBackedSelfStake, GovernanceDefaultPoolBackedSelfStake, true),
+		governanceIntegerSpec(GovernanceParamPoolBackedPoolStake, "staking_policy", GovernanceDefaultPoolBackedPoolStake, GovernanceDefaultPoolBackedPoolStake, GovernanceDefaultPoolBackedPoolStake, true),
+		governanceIntegerSpec(GovernanceParamPoolMinDeposit, "staking_policy", GovernanceDefaultPoolMinDeposit, 1, GovernanceDefaultValidatorEntryStake, false),
 		governanceIntegerSpec(GovernanceParamValidatorPowerCap, "staking_policy", GovernanceValidatorPowerCapMaxBps, GovernanceValidatorPowerCapMinBps, GovernanceValidatorPowerCapMaxBps, true),
 		governanceIntegerSpec(GovernanceParamCommissionFloor, "staking_policy", StakingCommissionFloorBps, StakingCommissionFloorBps, 500, false),
 		governanceIntegerSpec(GovernanceParamCommissionMax, "staking_policy", StakingCommissionCeilingBps, 1_500, 2_000, false),
 		governanceIntegerSpec(GovernanceParamCommissionMaxChange, "staking_policy", StakingMaxDailyCommissionBps, 50, StakingMaxDailyCommissionBps, false),
+		governanceEnumSpec(GovernanceParamDirectUserDelegation, "staking_policy", DirectUserDelegationDisabled, true, DirectUserDelegationDisabled),
+		governanceIntegerSpec(GovernanceParamUnbondingBlocks, "staking_policy", GovernanceDefaultUnbondingBlocks, GovernanceDefaultUnbondingBlocks, GovernanceDefaultUnbondingBlocks, true),
+		governanceIntegerSpec(GovernanceParamMinTxFee, "fees", GovernanceDefaultMinTxFeeNaet, GovernanceDefaultMinTxFeeNaet, GovernanceDefaultMinTxFeeNaet, true),
 		governanceIntegerSpec(GovernanceParamInflationMin, "economics", MinInflationBps, 150, 200, true),
 		governanceIntegerSpec(GovernanceParamInflationMax, "economics", MaxInflationBps, 500, 600, true),
 		governanceIntegerSpec(GovernanceParamTargetBondedRatio, "economics", AetraTargetBondedRatioDefaultBps, AetraTargetBondedRatioMinBps, AetraTargetBondedRatioMaxBps, true),
-		governanceIntegerSpec(GovernanceParamFeeBurnShare, "economics", AetraFeeBurnShareMinBps, AetraFeeBurnShareMinBps, AetraFeeBurnShareMaxBps, true),
-		governanceIntegerSpec(GovernanceParamFeeRewardShare, "economics", AetraFeeRewardShareMinBps, AetraFeeRewardShareMinBps, AetraFeeRewardShareMaxBps, true),
-		governanceIntegerSpec(GovernanceParamFeeTreasuryShare, "economics", AetraFeeTreasuryShareMinBps, AetraFeeTreasuryShareMinBps, AetraFeeTreasuryShareMaxBps, true),
+		governanceIntegerSpec(GovernanceParamFeeBurnShare, "economics", 5_000, AetraFeeBurnShareMinBps, AetraFeeBurnShareMaxBps, true),
+		governanceIntegerSpec(GovernanceParamFeeRewardShare, "economics", 3_500, AetraFeeRewardShareMinBps, AetraFeeRewardShareMaxBps, true),
+		governanceIntegerSpec(GovernanceParamFeeTreasuryShare, "economics", 1_500, AetraFeeTreasuryShareMinBps, AetraFeeTreasuryShareMaxBps, true),
+		governanceIntegerSpec(GovernanceParamStorageRentRate, "storage_rent", GovernanceDefaultStorageRentRate, GovernanceDefaultStorageRentRate, GovernanceDefaultStorageRentRate, true),
+		governanceIntegerSpec(GovernanceParamSystemReserveMin, "storage_rent", GovernanceDefaultReserveMinRunway, GovernanceDefaultReserveMinRunway, GovernanceDefaultReserveMinRunway, true),
+		governanceIntegerSpec(GovernanceParamSystemReserveWarning, "storage_rent", GovernanceDefaultReserveWarningRunway, GovernanceDefaultReserveWarningRunway, GovernanceDefaultReserveWarningRunway, true),
+		governanceIntegerSpec(GovernanceParamSystemReserveCritical, "storage_rent", GovernanceDefaultReserveCriticalRunway, GovernanceDefaultReserveCriticalRunway, GovernanceDefaultReserveCriticalRunway, true),
 		governanceEnumSpec(GovernanceParamValidatorScorePolicy, "validator_score", ValidatorScorePolicyInformationalOnly, true, ValidatorScorePolicyInformationalOnly, ValidatorScorePolicyObjectiveRewards),
 		governanceIntegerSpec(GovernanceParamDoubleSignSlash, "slashing", DoubleSignSlashDefaultBps, DoubleSignSlashMinBps, DoubleSignSlashMaxBps, true),
 		governanceIntegerSpec(GovernanceParamDowntimeSlash, "slashing", DowntimeFirstSlashDefaultBps, DowntimeFirstSlashMinBps, DowntimeChronicSlashMaxBps, true),
@@ -158,16 +192,27 @@ func DefaultGovernanceParameterSpecs() []GovernanceParameterSpec {
 func DefaultGovernanceGenesisParams() []GovernanceParamValue {
 	return []GovernanceParamValue{
 		{Key: GovernanceParamValidatorSetSize, IntValue: AetraValidatorSetGenesisMin},
+		{Key: GovernanceParamValidatorEntryStake, IntValue: GovernanceDefaultValidatorEntryStake},
+		{Key: GovernanceParamPoolBackedSelfStake, IntValue: GovernanceDefaultPoolBackedSelfStake},
+		{Key: GovernanceParamPoolBackedPoolStake, IntValue: GovernanceDefaultPoolBackedPoolStake},
+		{Key: GovernanceParamPoolMinDeposit, IntValue: GovernanceDefaultPoolMinDeposit},
 		{Key: GovernanceParamValidatorPowerCap, IntValue: GovernanceValidatorPowerCapMaxBps},
 		{Key: GovernanceParamCommissionFloor, IntValue: StakingCommissionFloorBps},
 		{Key: GovernanceParamCommissionMax, IntValue: StakingCommissionCeilingBps},
 		{Key: GovernanceParamCommissionMaxChange, IntValue: StakingMaxDailyCommissionBps},
+		{Key: GovernanceParamDirectUserDelegation, StringValue: DirectUserDelegationDisabled},
+		{Key: GovernanceParamUnbondingBlocks, IntValue: GovernanceDefaultUnbondingBlocks},
+		{Key: GovernanceParamMinTxFee, IntValue: GovernanceDefaultMinTxFeeNaet},
 		{Key: GovernanceParamInflationMin, IntValue: MinInflationBps},
 		{Key: GovernanceParamInflationMax, IntValue: MaxInflationBps},
 		{Key: GovernanceParamTargetBondedRatio, IntValue: AetraTargetBondedRatioDefaultBps},
-		{Key: GovernanceParamFeeBurnShare, IntValue: AetraFeeBurnShareMinBps},
-		{Key: GovernanceParamFeeRewardShare, IntValue: AetraFeeRewardShareMinBps},
-		{Key: GovernanceParamFeeTreasuryShare, IntValue: AetraFeeTreasuryShareMinBps},
+		{Key: GovernanceParamFeeBurnShare, IntValue: 5_000},
+		{Key: GovernanceParamFeeRewardShare, IntValue: 3_500},
+		{Key: GovernanceParamFeeTreasuryShare, IntValue: 1_500},
+		{Key: GovernanceParamStorageRentRate, IntValue: GovernanceDefaultStorageRentRate},
+		{Key: GovernanceParamSystemReserveMin, IntValue: GovernanceDefaultReserveMinRunway},
+		{Key: GovernanceParamSystemReserveWarning, IntValue: GovernanceDefaultReserveWarningRunway},
+		{Key: GovernanceParamSystemReserveCritical, IntValue: GovernanceDefaultReserveCriticalRunway},
 		{Key: GovernanceParamValidatorScorePolicy, StringValue: ValidatorScorePolicyInformationalOnly},
 		{Key: GovernanceParamDoubleSignSlash, IntValue: DoubleSignSlashDefaultBps},
 		{Key: GovernanceParamDowntimeSlash, IntValue: DowntimeFirstSlashDefaultBps},
@@ -377,7 +422,7 @@ func ValidateGovernanceGenesisParams(specs []GovernanceParameterSpec, values []G
 			return err
 		}
 	}
-	return nil
+	return validateGovernanceGenesisParamRelationships(seen)
 }
 
 func (s GovernanceParameterSpec) ValidateValueSpec() error {
@@ -408,6 +453,38 @@ func (s GovernanceParameterSpec) ValidateValueSpec() error {
 		}
 	default:
 		return fmt.Errorf("value type is invalid")
+	}
+	return nil
+}
+
+func validateGovernanceGenesisParamRelationships(values map[string]GovernanceParamValue) error {
+	entry := values[GovernanceParamValidatorEntryStake].IntValue
+	self := values[GovernanceParamPoolBackedSelfStake].IntValue
+	pool := values[GovernanceParamPoolBackedPoolStake].IntValue
+	if entry != GovernanceDefaultValidatorEntryStake {
+		return fmt.Errorf("%s must equal %d", GovernanceParamValidatorEntryStake, GovernanceDefaultValidatorEntryStake)
+	}
+	if self != GovernanceDefaultPoolBackedSelfStake || pool != GovernanceDefaultPoolBackedPoolStake || self+pool != entry {
+		return fmt.Errorf("pool-backed validator split must be 400000/600000 AET and sum to validator entry stake")
+	}
+	if values[GovernanceParamDirectUserDelegation].StringValue != DirectUserDelegationDisabled {
+		return fmt.Errorf("%s must remain disabled", GovernanceParamDirectUserDelegation)
+	}
+	if values[GovernanceParamUnbondingBlocks].IntValue != GovernanceDefaultUnbondingBlocks {
+		return fmt.Errorf("%s must equal 18 days", GovernanceParamUnbondingBlocks)
+	}
+	if values[GovernanceParamMinTxFee].IntValue != GovernanceDefaultMinTxFeeNaet {
+		return fmt.Errorf("%s must equal 0.003 AET", GovernanceParamMinTxFee)
+	}
+	feeSplit := values[GovernanceParamFeeBurnShare].IntValue + values[GovernanceParamFeeRewardShare].IntValue + values[GovernanceParamFeeTreasuryShare].IntValue
+	if feeSplit != BasisPoints {
+		return fmt.Errorf("fee split must sum to %d bps", BasisPoints)
+	}
+	minRunway := values[GovernanceParamSystemReserveMin].IntValue
+	warningRunway := values[GovernanceParamSystemReserveWarning].IntValue
+	criticalRunway := values[GovernanceParamSystemReserveCritical].IntValue
+	if minRunway < warningRunway || warningRunway < criticalRunway || criticalRunway <= 0 {
+		return fmt.Errorf("system storage reserve runway thresholds are invalid")
 	}
 	return nil
 }
@@ -497,25 +574,36 @@ func normalizeGovernanceSpecs(specs []GovernanceParameterSpec) []GovernanceParam
 
 func requiredGovernanceParameterKeys() map[string]bool {
 	return map[string]bool{
-		GovernanceParamValidatorSetSize:     true,
-		GovernanceParamValidatorPowerCap:    true,
-		GovernanceParamCommissionFloor:      true,
-		GovernanceParamCommissionMax:        true,
-		GovernanceParamCommissionMaxChange:  true,
-		GovernanceParamInflationMin:         true,
-		GovernanceParamInflationMax:         true,
-		GovernanceParamTargetBondedRatio:    true,
-		GovernanceParamFeeBurnShare:         true,
-		GovernanceParamFeeRewardShare:       true,
-		GovernanceParamFeeTreasuryShare:     true,
-		GovernanceParamValidatorScorePolicy: true,
-		GovernanceParamDoubleSignSlash:      true,
-		GovernanceParamDowntimeSlash:        true,
-		GovernanceParamDowntimeWindow:       true,
-		GovernanceParamCosmWasmUploadPolicy: true,
-		GovernanceParamTreasurySpendPolicy:  true,
-		GovernanceParamValidatorSetGrowth:   true,
-		GovernanceParamBlockGasLimit:        true,
-		GovernanceParamBlockMaxBytes:        true,
+		GovernanceParamValidatorSetSize:      true,
+		GovernanceParamValidatorEntryStake:   true,
+		GovernanceParamPoolBackedSelfStake:   true,
+		GovernanceParamPoolBackedPoolStake:   true,
+		GovernanceParamPoolMinDeposit:        true,
+		GovernanceParamValidatorPowerCap:     true,
+		GovernanceParamCommissionFloor:       true,
+		GovernanceParamCommissionMax:         true,
+		GovernanceParamCommissionMaxChange:   true,
+		GovernanceParamDirectUserDelegation:  true,
+		GovernanceParamUnbondingBlocks:       true,
+		GovernanceParamMinTxFee:              true,
+		GovernanceParamInflationMin:          true,
+		GovernanceParamInflationMax:          true,
+		GovernanceParamTargetBondedRatio:     true,
+		GovernanceParamFeeBurnShare:          true,
+		GovernanceParamFeeRewardShare:        true,
+		GovernanceParamFeeTreasuryShare:      true,
+		GovernanceParamStorageRentRate:       true,
+		GovernanceParamSystemReserveMin:      true,
+		GovernanceParamSystemReserveWarning:  true,
+		GovernanceParamSystemReserveCritical: true,
+		GovernanceParamValidatorScorePolicy:  true,
+		GovernanceParamDoubleSignSlash:       true,
+		GovernanceParamDowntimeSlash:         true,
+		GovernanceParamDowntimeWindow:        true,
+		GovernanceParamCosmWasmUploadPolicy:  true,
+		GovernanceParamTreasurySpendPolicy:   true,
+		GovernanceParamValidatorSetGrowth:    true,
+		GovernanceParamBlockGasLimit:         true,
+		GovernanceParamBlockMaxBytes:         true,
 	}
 }

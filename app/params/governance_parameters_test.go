@@ -1,6 +1,7 @@
 package params
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -230,4 +231,93 @@ func TestGovernanceTestingEvidenceRejectsMissingRequiredTests(t *testing.T) {
 	require.Contains(t, report.Failed, GovernanceTestQueryReflectsNewParams)
 	require.Contains(t, report.Failed, GovernanceTestExportImportAfterChange)
 	require.Error(t, ValidateGovernanceTestingEvidence(evidence))
+}
+
+func TestGovernanceParamsSchema185DefaultGenesisExactMatch(t *testing.T) {
+	values := governanceValuesByKey(DefaultGovernanceGenesisParams())
+
+	require.Equal(t, int64(AetraValidatorSetGenesisMin), values[GovernanceParamValidatorSetSize].IntValue)
+	require.Equal(t, GovernanceDefaultValidatorEntryStake, values[GovernanceParamValidatorEntryStake].IntValue)
+	require.Equal(t, GovernanceDefaultPoolBackedSelfStake, values[GovernanceParamPoolBackedSelfStake].IntValue)
+	require.Equal(t, GovernanceDefaultPoolBackedPoolStake, values[GovernanceParamPoolBackedPoolStake].IntValue)
+	require.Equal(t, GovernanceDefaultPoolMinDeposit, values[GovernanceParamPoolMinDeposit].IntValue)
+	require.Equal(t, DirectUserDelegationDisabled, values[GovernanceParamDirectUserDelegation].StringValue)
+	require.Equal(t, GovernanceDefaultUnbondingBlocks, values[GovernanceParamUnbondingBlocks].IntValue)
+	require.Equal(t, GovernanceDefaultMinTxFeeNaet, values[GovernanceParamMinTxFee].IntValue)
+	require.Equal(t, int64(5_000), values[GovernanceParamFeeBurnShare].IntValue)
+	require.Equal(t, int64(3_500), values[GovernanceParamFeeRewardShare].IntValue)
+	require.Equal(t, int64(1_500), values[GovernanceParamFeeTreasuryShare].IntValue)
+	require.Equal(t, GovernanceDefaultStorageRentRate, values[GovernanceParamStorageRentRate].IntValue)
+	require.Equal(t, GovernanceDefaultReserveMinRunway, values[GovernanceParamSystemReserveMin].IntValue)
+	require.Equal(t, GovernanceDefaultReserveWarningRunway, values[GovernanceParamSystemReserveWarning].IntValue)
+	require.Equal(t, GovernanceDefaultReserveCriticalRunway, values[GovernanceParamSystemReserveCritical].IntValue)
+	require.NoError(t, ValidateGovernanceGenesisParams(nil, DefaultGovernanceGenesisParams()))
+}
+
+func TestGovernanceParamsSchema185RejectsInvalidValidatorCount(t *testing.T) {
+	values := DefaultGovernanceGenesisParams()
+	setGovernanceIntValue(values, GovernanceParamValidatorSetSize, 99)
+	require.ErrorContains(t, ValidateGovernanceGenesisParams(nil, values), GovernanceParamValidatorSetSize)
+
+	values = DefaultGovernanceGenesisParams()
+	setGovernanceIntValue(values, GovernanceParamValidatorSetSize, 301)
+	require.ErrorContains(t, ValidateGovernanceGenesisParams(nil, values), GovernanceParamValidatorSetSize)
+}
+
+func TestGovernanceParamsSchema185RejectsInvalidPoolBackedSplit(t *testing.T) {
+	values := DefaultGovernanceGenesisParams()
+	setGovernanceIntValue(values, GovernanceParamPoolBackedSelfStake, GovernanceDefaultPoolBackedSelfStake-BaseUnitsPerDisplay)
+	require.ErrorContains(t, ValidateGovernanceGenesisParams(nil, values), GovernanceParamPoolBackedSelfStake)
+
+	specs := DefaultGovernanceParameterSpecs()
+	relaxGovernanceIntBounds(specs, GovernanceParamPoolBackedSelfStake, 1, GovernanceDefaultValidatorEntryStake)
+	relaxGovernanceIntBounds(specs, GovernanceParamPoolBackedPoolStake, 1, GovernanceDefaultValidatorEntryStake)
+	values = DefaultGovernanceGenesisParams()
+	setGovernanceIntValue(values, GovernanceParamPoolBackedSelfStake, int64(500_000)*BaseUnitsPerDisplay)
+	setGovernanceIntValue(values, GovernanceParamPoolBackedPoolStake, int64(500_000)*BaseUnitsPerDisplay)
+	require.ErrorContains(t, ValidateGovernanceGenesisParams(specs, values), "pool-backed validator split")
+}
+
+func TestGovernanceParamsSchema185RejectsInvalidFeeSplit(t *testing.T) {
+	values := DefaultGovernanceGenesisParams()
+	setGovernanceIntValue(values, GovernanceParamFeeRewardShare, 3_000)
+	require.ErrorContains(t, ValidateGovernanceGenesisParams(nil, values), "fee split")
+}
+
+func TestGovernanceParamsSchema185ExportImportStable(t *testing.T) {
+	values := DefaultGovernanceGenesisParams()
+	bz, err := json.Marshal(values)
+	require.NoError(t, err)
+
+	var imported []GovernanceParamValue
+	require.NoError(t, json.Unmarshal(bz, &imported))
+	require.Equal(t, values, imported)
+	require.NoError(t, ValidateGovernanceGenesisParams(nil, imported))
+}
+
+func governanceValuesByKey(values []GovernanceParamValue) map[string]GovernanceParamValue {
+	byKey := make(map[string]GovernanceParamValue, len(values))
+	for _, value := range values {
+		byKey[value.Key] = value
+	}
+	return byKey
+}
+
+func setGovernanceIntValue(values []GovernanceParamValue, key string, next int64) {
+	for i := range values {
+		if values[i].Key == key {
+			values[i].IntValue = next
+			return
+		}
+	}
+}
+
+func relaxGovernanceIntBounds(specs []GovernanceParameterSpec, key string, minValue int64, maxValue int64) {
+	for i := range specs {
+		if specs[i].Key == key {
+			specs[i].MinInt = minValue
+			specs[i].MaxInt = maxValue
+			return
+		}
+	}
 }
