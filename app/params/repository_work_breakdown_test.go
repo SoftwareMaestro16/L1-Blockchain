@@ -175,6 +175,57 @@ func TestAetraRepoAppWorkRejectsMissingTasksAndTests(t *testing.T) {
 	require.Error(t, ValidateAetraRepoAppWork(evidence))
 }
 
+func TestDefaultAetraRepoTestsWorkCoversSection324(t *testing.T) {
+	evidence := DefaultAetraRepoTestsWorkEvidence()
+
+	report := BuildAetraRepoTestsWorkReport(evidence)
+	require.True(t, report.Ready, report.Failed)
+	require.Empty(t, report.Failed)
+	require.Equal(t, AetraRepoAreaTests, report.Area)
+	require.Equal(t, report.Required, report.Passed)
+	require.Equal(t, 9, report.Required)
+	require.Contains(t, evidence.Tasks, AetraRepoTestsTaskIntegrationSuites)
+	require.Contains(t, evidence.Tasks, AetraRepoTestsTaskE2ELocalnetSmoke)
+	require.Contains(t, evidence.Tasks, AetraRepoTestsTaskAdversarial)
+	require.Contains(t, evidence.Tasks, AetraRepoTestsTaskLoadProfiles)
+	require.Contains(t, evidence.Tasks, AetraRepoTestsTaskDocumentationPath)
+	require.Contains(t, evidence.Tasks, AetraRepoTestsTaskCIScripts)
+	require.Contains(t, evidence.Tests, AetraRepoTestsRequirementDocumentedCommands)
+	require.Contains(t, evidence.Tests, AetraRepoTestsRequirementWindowsPowerShell)
+	require.Contains(t, evidence.Tests, AetraRepoTestsRequirementLinuxCIPrimary)
+	require.NoError(t, ValidateAetraRepoTestsWork(evidence))
+}
+
+func TestAetraRepoTestsWorkRejectsMissingTasksAndRequirements(t *testing.T) {
+	evidence := DefaultAetraRepoTestsWorkEvidence()
+	evidence.Area = "qa/"
+	evidence.Tasks = removeRepoWorkItem(evidence.Tasks,
+		AetraRepoTestsTaskIntegrationSuites,
+		AetraRepoTestsTaskAdversarial,
+		AetraRepoTestsTaskCIScripts,
+	)
+	evidence.Tests = removeRepoWorkItem(evidence.Tests,
+		AetraRepoTestsRequirementDocumentedCommands,
+		AetraRepoTestsRequirementLinuxCIPrimary,
+	)
+	evidence.Tasks = append(evidence.Tasks, AetraRepoTestsTaskDocumentationPath, "manual_test_plan")
+	evidence.Tests = append(evidence.Tests, AetraRepoTestsRequirementWindowsPowerShell, "undocumented_local_script")
+
+	report := BuildAetraRepoTestsWorkReport(evidence)
+	require.False(t, report.Ready)
+	require.Contains(t, report.Failed, "area_must_be_"+AetraRepoAreaTests)
+	require.Contains(t, report.Failed, "tasks."+AetraRepoTestsTaskIntegrationSuites+":missing")
+	require.Contains(t, report.Failed, "tasks."+AetraRepoTestsTaskAdversarial+":missing")
+	require.Contains(t, report.Failed, "tasks."+AetraRepoTestsTaskCIScripts+":missing")
+	require.Contains(t, report.Failed, "tasks."+AetraRepoTestsTaskDocumentationPath+":duplicate")
+	require.Contains(t, report.Failed, "tasks.manual_test_plan:unexpected")
+	require.Contains(t, report.Failed, "requirements."+AetraRepoTestsRequirementDocumentedCommands+":missing")
+	require.Contains(t, report.Failed, "requirements."+AetraRepoTestsRequirementLinuxCIPrimary+":missing")
+	require.Contains(t, report.Failed, "requirements."+AetraRepoTestsRequirementWindowsPowerShell+":duplicate")
+	require.Contains(t, report.Failed, "requirements.undocumented_local_script:unexpected")
+	require.Error(t, ValidateAetraRepoTestsWork(evidence))
+}
+
 func removeRepoWorkItem(items []string, targets ...string) []string {
 	targetSet := map[string]bool{}
 	for _, target := range targets {

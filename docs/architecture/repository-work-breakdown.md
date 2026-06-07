@@ -85,9 +85,32 @@ Module account permissions are consensus-sensitive and must be tested. Begin/end
 
 Startup validation must reject unsafe module account permissions, missing stores, duplicate blocked addresses, invalid params, missing authority wiring, and invalid genesis. Export/import and deterministic restart tests are mandatory before public testnet because they catch app hash drift and migration mistakes.
 
+## 32.4 `tests/`
+
+Tasks:
+
+- integration test suites;
+- e2e localnet smoke tests;
+- adversarial tests;
+- load profile tests;
+- documentation path tests;
+- CI scripts.
+
+Required:
+
+- tests must be runnable from documented commands;
+- Windows PowerShell local scripts should remain usable if current project supports them;
+- Linux CI path should remain primary for production confidence.
+
+The `tests/` tree owns cross-module confidence. Integration suites must prove keeper, app, module, governance, staking, economics, slashing, contract, and migration behavior across boundaries. E2E localnet smoke tests must prove that a node can start, produce blocks, submit transactions, query state, restart, and preserve state across export/import where feasible.
+
+Adversarial tests must cover malformed txs, invalid params, module account abuse attempts, concentration and overflow edge cases, slashing/evidence edge cases, contract gas/storage abuse, and migration failure paths. Load profile tests must measure block time, finality, mempool pressure, contract execution load, and state growth where feasible.
+
+Documentation path tests must keep architecture docs, runbooks, command examples, and production gates synchronized with code. CI scripts must keep Linux as the production-confidence path while preserving Windows PowerShell local scripts when the project supports them.
+
 ## Acceptance Gate
 
-The implementation gates are `DefaultAetraRepoProtoWorkEvidence`, `DefaultAetraRepoXWorkEvidence`, and `DefaultAetraRepoAppWorkEvidence` in `app/params/repository_work_breakdown.go`.
+The implementation gates are `DefaultAetraRepoProtoWorkEvidence`, `DefaultAetraRepoXWorkEvidence`, `DefaultAetraRepoAppWorkEvidence`, and `DefaultAetraRepoTestsWorkEvidence` in `app/params/repository_work_breakdown.go`.
 
 Required behavior:
 
@@ -102,3 +125,5 @@ Required behavior:
 - missing keeper, msg server, query server, genesis, invariant, or fuzz/property math tests fails readiness.
 - missing app keeper wiring, module wiring, module account permissions, begin/end/preblock order, simulation manager, API routes, AutoCLI, or startup validation work fails readiness;
 - missing app startup, module account permissions, begin/end order, export/import, deterministic restart, or API service-registration tests fails readiness.
+- missing integration, e2e localnet, adversarial, load profile, documentation path, or CI script work fails readiness;
+- missing documented commands, Windows PowerShell local-script usability where supported, or Linux CI production-confidence path fails readiness.

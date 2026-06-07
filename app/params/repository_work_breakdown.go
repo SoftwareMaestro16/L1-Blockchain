@@ -9,6 +9,7 @@ const (
 	AetraRepoAreaProto = "proto/"
 	AetraRepoAreaX     = "x/"
 	AetraRepoAreaApp   = "app/"
+	AetraRepoAreaTests = "tests/"
 )
 
 const (
@@ -68,6 +69,21 @@ const (
 	AetraRepoAppTestAPIServiceRegistration   = "api_service_registration"
 )
 
+const (
+	AetraRepoTestsTaskIntegrationSuites = "integration_test_suites"
+	AetraRepoTestsTaskE2ELocalnetSmoke  = "e2e_localnet_smoke_tests"
+	AetraRepoTestsTaskAdversarial       = "adversarial_tests"
+	AetraRepoTestsTaskLoadProfiles      = "load_profile_tests"
+	AetraRepoTestsTaskDocumentationPath = "documentation_path_tests"
+	AetraRepoTestsTaskCIScripts         = "ci_scripts"
+)
+
+const (
+	AetraRepoTestsRequirementDocumentedCommands = "tests_runnable_from_documented_commands"
+	AetraRepoTestsRequirementWindowsPowerShell  = "windows_powershell_local_scripts_remain_usable_if_supported"
+	AetraRepoTestsRequirementLinuxCIPrimary     = "linux_ci_path_primary_for_production_confidence"
+)
+
 type AetraRepoWorkAreaEvidence struct {
 	Area  string
 	Tasks []string
@@ -106,6 +122,14 @@ func DefaultAetraRepoAppWorkEvidence() AetraRepoWorkAreaEvidence {
 	}
 }
 
+func DefaultAetraRepoTestsWorkEvidence() AetraRepoWorkAreaEvidence {
+	return AetraRepoWorkAreaEvidence{
+		Area:  AetraRepoAreaTests,
+		Tasks: RequiredAetraRepoTestsTasks(),
+		Tests: RequiredAetraRepoTestsRequirements(),
+	}
+}
+
 func ValidateAetraRepoProtoWork(evidence AetraRepoWorkAreaEvidence) error {
 	report := BuildAetraRepoProtoWorkReport(evidence)
 	if !report.Ready {
@@ -126,6 +150,14 @@ func ValidateAetraRepoAppWork(evidence AetraRepoWorkAreaEvidence) error {
 	report := BuildAetraRepoAppWorkReport(evidence)
 	if !report.Ready {
 		return fmt.Errorf("aetra repository app work breakdown failed: %v", report.Failed)
+	}
+	return nil
+}
+
+func ValidateAetraRepoTestsWork(evidence AetraRepoWorkAreaEvidence) error {
+	report := BuildAetraRepoTestsWorkReport(evidence)
+	if !report.Ready {
+		return fmt.Errorf("aetra repository tests work breakdown failed: %v", report.Failed)
 	}
 	return nil
 }
@@ -190,6 +222,26 @@ func BuildAetraRepoAppWorkReport(evidence AetraRepoWorkAreaEvidence) AetraRepoWo
 	}
 }
 
+func BuildAetraRepoTestsWorkReport(evidence AetraRepoWorkAreaEvidence) AetraRepoWorkAreaReport {
+	failed := make([]string, 0)
+	if evidence.Area != AetraRepoAreaTests {
+		failed = append(failed, "area_must_be_"+AetraRepoAreaTests)
+	}
+	passedTasks, failedTasks := validateRepoWorkCatalog("tasks", evidence.Tasks, RequiredAetraRepoTestsTasks())
+	passedTests, failedTests := validateRepoWorkCatalog("requirements", evidence.Tests, RequiredAetraRepoTestsRequirements())
+	failed = append(failed, failedTasks...)
+	failed = append(failed, failedTests...)
+
+	sort.Strings(failed)
+	return AetraRepoWorkAreaReport{
+		Area:     evidence.Area,
+		Required: len(RequiredAetraRepoTestsTasks()) + len(RequiredAetraRepoTestsRequirements()),
+		Passed:   passedTasks + passedTests,
+		Failed:   failed,
+		Ready:    len(failed) == 0,
+	}
+}
+
 func RequiredAetraRepoProtoTasks() []string {
 	return []string{
 		AetraRepoProtoTaskDefineMessages,
@@ -229,6 +281,17 @@ func RequiredAetraRepoAppTasks() []string {
 	}
 }
 
+func RequiredAetraRepoTestsTasks() []string {
+	return []string{
+		AetraRepoTestsTaskIntegrationSuites,
+		AetraRepoTestsTaskE2ELocalnetSmoke,
+		AetraRepoTestsTaskAdversarial,
+		AetraRepoTestsTaskLoadProfiles,
+		AetraRepoTestsTaskDocumentationPath,
+		AetraRepoTestsTaskCIScripts,
+	}
+}
+
 func RequiredAetraRepoProtoTests() []string {
 	return []string{
 		AetraRepoProtoTestGeneratedCodeCompiles,
@@ -256,6 +319,14 @@ func RequiredAetraRepoAppTests() []string {
 		AetraRepoAppTestExportImport,
 		AetraRepoAppTestDeterministicRestart,
 		AetraRepoAppTestAPIServiceRegistration,
+	}
+}
+
+func RequiredAetraRepoTestsRequirements() []string {
+	return []string{
+		AetraRepoTestsRequirementDocumentedCommands,
+		AetraRepoTestsRequirementWindowsPowerShell,
+		AetraRepoTestsRequirementLinuxCIPrimary,
 	}
 }
 
