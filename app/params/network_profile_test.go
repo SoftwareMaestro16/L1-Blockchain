@@ -111,3 +111,103 @@ func TestNetworkProfileRejectsUnsafeEconomicTargets(t *testing.T) {
 	profile.FeeBurnShareMinBps = 2_000
 	require.ErrorContains(t, profile.Validate(), "fee_burn_share")
 }
+
+func TestValidatorSetPhasePoliciesMatchAetraGrowthPlan(t *testing.T) {
+	phases := DefaultValidatorSetPhasePolicies()
+	require.Len(t, phases, 3)
+
+	require.Equal(t, ValidatorSetPhasePolicy{
+		Name:                     AetraValidatorPhaseGenesis,
+		MinActiveValidators:      100,
+		MaxActiveValidators:      128,
+		TargetBlockTimeSeconds:   6,
+		NormalFinalityMinSeconds: 5,
+		NormalFinalityMaxSeconds: 10,
+	}, phases[0])
+
+	require.Equal(t, ValidatorSetPhasePolicy{
+		Name:                     AetraValidatorPhaseGrowth,
+		MinActiveValidators:      150,
+		MaxActiveValidators:      200,
+		TargetBlockTimeSeconds:   6,
+		NormalFinalityMinSeconds: 6,
+		NormalFinalityMaxSeconds: 12,
+	}, phases[1])
+
+	require.Equal(t, ValidatorSetPhasePolicy{
+		Name:                      AetraValidatorPhaseMature,
+		MinActiveValidators:       250,
+		MaxActiveValidators:       300,
+		TargetBlockTimeSeconds:    8,
+		NormalFinalityMinSeconds:  8,
+		NormalFinalityMaxSeconds:  15,
+		RequiresOperatorReadiness: true,
+	}, phases[2])
+}
+
+func TestNetworkProfileSelectsValidatorSetPhase(t *testing.T) {
+	profile := DefaultNetworkProfile()
+
+	phase, err := profile.ValidatorSetPhase(100)
+	require.NoError(t, err)
+	require.Equal(t, AetraValidatorPhaseGenesis, phase.Name)
+
+	phase, err = profile.ValidatorSetPhase(128)
+	require.NoError(t, err)
+	require.Equal(t, AetraValidatorPhaseGenesis, phase.Name)
+
+	phase, err = profile.ValidatorSetPhase(150)
+	require.NoError(t, err)
+	require.Equal(t, AetraValidatorPhaseGrowth, phase.Name)
+
+	phase, err = profile.ValidatorSetPhase(200)
+	require.NoError(t, err)
+	require.Equal(t, AetraValidatorPhaseGrowth, phase.Name)
+
+	phase, err = profile.ValidatorSetPhase(250)
+	require.NoError(t, err)
+	require.Equal(t, AetraValidatorPhaseMature, phase.Name)
+
+	phase, err = profile.ValidatorSetPhase(300)
+	require.NoError(t, err)
+	require.Equal(t, AetraValidatorPhaseMature, phase.Name)
+}
+
+func TestNetworkProfileRejectsValidatorCountsOutsideGrowthPhases(t *testing.T) {
+	profile := DefaultNetworkProfile()
+
+	_, err := profile.ValidatorSetPhase(80)
+	require.ErrorContains(t, err, "100-300")
+
+	_, err = profile.ValidatorSetPhase(129)
+	require.ErrorContains(t, err, "outside configured growth phases")
+
+	_, err = profile.ValidatorSetPhase(201)
+	require.ErrorContains(t, err, "outside configured growth phases")
+
+	_, err = profile.ValidatorSetPhase(301)
+	require.ErrorContains(t, err, "100-300")
+}
+
+func TestMatureValidatorSetRequiresOperatorReadiness(t *testing.T) {
+	profile := DefaultNetworkProfile()
+
+	require.NoError(t, profile.ValidateMatureLaunch(128, false))
+	require.NoError(t, profile.ValidateMatureLaunch(200, false))
+	require.ErrorContains(t, profile.ValidateMatureLaunch(300, false), "operator readiness")
+	require.NoError(t, profile.ValidateMatureLaunch(300, true))
+}
+
+func TestNetworkProfileRejectsUnsafePhasePolicy(t *testing.T) {
+	profile := DefaultNetworkProfile()
+	profile.ValidatorSetPhases[0].MaxActiveValidators = 80
+	require.ErrorContains(t, profile.Validate(), "invalid validator range")
+
+	profile = DefaultNetworkProfile()
+	profile.ValidatorSetPhases[1].TargetBlockTimeSeconds = 2
+	require.ErrorContains(t, profile.Validate(), "invalid target block time")
+
+	profile = DefaultNetworkProfile()
+	profile.ValidatorSetPhases[2].NormalFinalityMaxSeconds = 30
+	require.ErrorContains(t, profile.Validate(), "invalid finality range")
+}

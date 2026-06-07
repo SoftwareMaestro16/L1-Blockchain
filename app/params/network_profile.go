@@ -9,6 +9,10 @@ const (
 	AetraOptionalVM      = "EVM later"
 	AetraHardwareProfile = "medium"
 
+	AetraValidatorPhaseGenesis = "genesis_early_testnet"
+	AetraValidatorPhaseGrowth  = "stable_public_testnet"
+	AetraValidatorPhaseMature  = "mature_network"
+
 	AetraValidatorSetMin            = 100
 	AetraValidatorSetGenesisMin     = 100
 	AetraValidatorSetGenesisMax     = 128
@@ -35,6 +39,16 @@ const (
 	AetraFeeTreasuryShareMinBps     = int64(1_000)
 	AetraFeeTreasuryShareMaxBps     = int64(2_000)
 )
+
+type ValidatorSetPhasePolicy struct {
+	Name                      string
+	MinActiveValidators       int
+	MaxActiveValidators       int
+	TargetBlockTimeSeconds    int
+	NormalFinalityMinSeconds  int
+	NormalFinalityMaxSeconds  int
+	RequiresOperatorReadiness bool
+}
 
 type NetworkProfile struct {
 	ConsensusEngine            string
@@ -67,6 +81,7 @@ type NetworkProfile struct {
 	FeeRewardShareMaxBps       int64
 	FeeTreasuryShareMinBps     int64
 	FeeTreasuryShareMaxBps     int64
+	ValidatorSetPhases         []ValidatorSetPhasePolicy
 }
 
 func DefaultNetworkProfile() NetworkProfile {
@@ -101,6 +116,37 @@ func DefaultNetworkProfile() NetworkProfile {
 		FeeRewardShareMaxBps:       AetraFeeRewardShareMaxBps,
 		FeeTreasuryShareMinBps:     AetraFeeTreasuryShareMinBps,
 		FeeTreasuryShareMaxBps:     AetraFeeTreasuryShareMaxBps,
+		ValidatorSetPhases:         DefaultValidatorSetPhasePolicies(),
+	}
+}
+
+func DefaultValidatorSetPhasePolicies() []ValidatorSetPhasePolicy {
+	return []ValidatorSetPhasePolicy{
+		{
+			Name:                     AetraValidatorPhaseGenesis,
+			MinActiveValidators:      AetraValidatorSetGenesisMin,
+			MaxActiveValidators:      AetraValidatorSetGenesisMax,
+			TargetBlockTimeSeconds:   6,
+			NormalFinalityMinSeconds: 5,
+			NormalFinalityMaxSeconds: 10,
+		},
+		{
+			Name:                     AetraValidatorPhaseGrowth,
+			MinActiveValidators:      AetraValidatorSetGrowthMin,
+			MaxActiveValidators:      AetraValidatorSetGrowthMax,
+			TargetBlockTimeSeconds:   6,
+			NormalFinalityMinSeconds: 6,
+			NormalFinalityMaxSeconds: 12,
+		},
+		{
+			Name:                      AetraValidatorPhaseMature,
+			MinActiveValidators:       AetraValidatorSetMatureMin,
+			MaxActiveValidators:       AetraValidatorSetMatureMax,
+			TargetBlockTimeSeconds:    8,
+			NormalFinalityMinSeconds:  8,
+			NormalFinalityMaxSeconds:  15,
+			RequiresOperatorReadiness: true,
+		},
 	}
 }
 
@@ -155,6 +201,54 @@ func (p NetworkProfile) Validate() error {
 	}
 	if DefaultTargetInflationBps < p.NormalInflationMinBps || DefaultTargetInflationBps > p.NormalInflationMaxBps {
 		return fmt.Errorf("default target inflation must remain inside normal inflation range")
+	}
+	if err := p.validateValidatorSetPhases(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p NetworkProfile) ValidatorSetPhase(activeValidators int) (ValidatorSetPhasePolicy, error) {
+	if activeValidators < p.ValidatorSetMin || activeValidators > p.ValidatorSetMax {
+		return ValidatorSetPhasePolicy{}, fmt.Errorf("active validator count must stay within %d-%d", p.ValidatorSetMin, p.ValidatorSetMax)
+	}
+	for _, phase := range p.ValidatorSetPhases {
+		if activeValidators >= phase.MinActiveValidators && activeValidators <= phase.MaxActiveValidators {
+			return phase, nil
+		}
+	}
+	return ValidatorSetPhasePolicy{}, fmt.Errorf("active validator count %d is outside configured growth phases", activeValidators)
+}
+
+func (p NetworkProfile) ValidateMatureLaunch(activeValidators int, operatorReadinessConfirmed bool) error {
+	phase, err := p.ValidatorSetPhase(activeValidators)
+	if err != nil {
+		return err
+	}
+	if phase.Name == AetraValidatorPhaseMature && phase.RequiresOperatorReadiness && !operatorReadinessConfirmed {
+		return fmt.Errorf("mature validator set requires confirmed operator readiness")
+	}
+	return nil
+}
+
+func (p NetworkProfile) validateValidatorSetPhases() error {
+	if len(p.ValidatorSetPhases) != 3 {
+		return fmt.Errorf("validator set policy must define exactly three growth phases")
+	}
+	expectedNames := []string{AetraValidatorPhaseGenesis, AetraValidatorPhaseGrowth, AetraValidatorPhaseMature}
+	for i, phase := range p.ValidatorSetPhases {
+		if phase.Name != expectedNames[i] {
+			return fmt.Errorf("validator phase %d must be %q", i, expectedNames[i])
+		}
+		if phase.MinActiveValidators < p.ValidatorSetMin || phase.MaxActiveValidators > p.ValidatorSetMax || phase.MinActiveValidators > phase.MaxActiveValidators {
+			return fmt.Errorf("validator phase %q has invalid validator range", phase.Name)
+		}
+		if phase.TargetBlockTimeSeconds < p.BlockTimeMinSeconds || phase.TargetBlockTimeSeconds > p.BlockTimeMaxSeconds {
+			return fmt.Errorf("validator phase %q has invalid target block time", phase.Name)
+		}
+		if phase.NormalFinalityMinSeconds < p.NormalFinalityMinSeconds || phase.NormalFinalityMaxSeconds > p.NormalFinalityMaxSeconds || phase.NormalFinalityMinSeconds > phase.NormalFinalityMaxSeconds {
+			return fmt.Errorf("validator phase %q has invalid finality range", phase.Name)
+		}
 	}
 	return nil
 }
