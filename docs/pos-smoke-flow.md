@@ -85,7 +85,7 @@ Query validators and select any bonded `operator_address`:
 build\aetrad.exe query staking validators --node tcp://127.0.0.1:26657 --output json
 ```
 
-Expected output includes `BOND_STATUS_BONDED` validators with `aevaloper...` operator addresses. Do not assume only one validator or a fixed order.
+Expected output includes `BOND_STATUS_BONDED` validators with `AE...` operator addresses. Do not assume only one validator or a fixed order.
 
 Show the funded delegator account:
 
@@ -96,7 +96,7 @@ build\aetrad.exe keys show node0 -a --home .localnet\node0\aetrad --keyring-back
 Delegate from `node0` to a bonded validator:
 
 ```powershell
-build\aetrad.exe tx staking delegate <aevaloper...> 5000000naet --from node0 --home .localnet\node0\aetrad --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe tx staking delegate <AE...validator> 5000000naet --from node0 --home .localnet\node0\aetrad --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
 ```
 
 Expected output includes a `txhash`. Query the transaction until it returns `code = 0`:
@@ -108,7 +108,7 @@ build\aetrad.exe query tx <txhash> --node tcp://127.0.0.1:26657 --output json
 Verify the delegation:
 
 ```powershell
-build\aetrad.exe query staking delegation <AE...delegator> <aevaloper...> --node tcp://127.0.0.1:26657 --output json
+build\aetrad.exe query staking delegation <AE...delegator> <AE...validator> --node tcp://127.0.0.1:26657 --output json
 ```
 
 Expected output includes:

@@ -10,7 +10,7 @@ The profile is structurally reproducible: the same commands create the same chai
 - Chain ID: `aetra-local-1`
 - Base denom: `naet`
 - Display denom: `AET`
-- Address prefixes: account `ae`, validator `aevaloper`, consensus `aevalcons`
+- User-facing address prefix: `AE` for account, validator, and consensus addresses
 - Default validator count: `3`
 - Supported scale smoke profiles: `1`, `3`, and `5` validators
 - Node directories: `.localnet\node<N>\aetrad`

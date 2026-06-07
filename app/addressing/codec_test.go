@@ -164,6 +164,5 @@ func requireUserFriendlyAddress(t *testing.T, text string) {
 	require.Len(t, text, addressing.UserFriendlyLength)
 	require.True(t, strings.HasPrefix(text, addressing.UserFriendlyPrefix))
 	require.Regexp(t, `^[A-Za-z0-9_-]{48}$`, text)
-	require.False(t, strings.HasPrefix(text, "aevaloper"))
-	require.False(t, strings.HasPrefix(text, "aevalcons"))
+	require.NotRegexp(t, `^[a-z]+1`, text)
 }

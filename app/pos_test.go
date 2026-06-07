@@ -365,6 +365,6 @@ func formatValidatorAddress(t *testing.T, app *L1App, addr sdk.ValAddress) strin
 	text, err := app.StakingKeeper.ValidatorAddressCodec().BytesToString(addr)
 	require.NoError(t, err)
 	require.True(t, strings.HasPrefix(text, ValidatorAddressPrefix), text)
-	require.False(t, strings.HasPrefix(text, "aevaloper"), text)
+	require.NotRegexp(t, `^[a-z]+1`, text)
 	return text
 }

@@ -168,7 +168,7 @@ func assertPrototypeGenesisProfile(
 		require.Equal(t, expectedSelfDelegation, createValMsg.Value)
 		require.True(t, createValMsg.MinSelfDelegation.IsPositive())
 		require.True(t, strings.HasPrefix(createValMsg.ValidatorAddress, l1app.ValidatorAddressPrefix), createValMsg.ValidatorAddress)
-		require.False(t, strings.HasPrefix(createValMsg.ValidatorAddress, "aevaloper"), createValMsg.ValidatorAddress)
+		require.NotRegexp(t, `^[a-z]+1`, createValMsg.ValidatorAddress)
 	}
 }
 
