@@ -164,6 +164,7 @@ function Assert-NativeCommandFails {
   if ($ExpectedText -and ($text -notmatch $ExpectedText)) {
     throw "command failed, but output did not match '$ExpectedText': $text"
   }
+  $global:LASTEXITCODE = 0
 }
 
 Push-Location $RepoRoot
