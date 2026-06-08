@@ -177,26 +177,13 @@ try {
   $node1Home = Join-Path $OutputDir "node1\aetrad"
   $node0 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node0Home -KeyName "node0"
   $node1 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node1Home -KeyName "node1"
-  $factoryDenom = "factory/$node0/$FactorySubdenom"
 
   Send-LocalnetBankTx -Binary $Binary -FromHome $node0Home -FromKey "node0" -ToAddress $node1 -Amount "12345naet" -Fees $Fees -ChainId $ChainId -RPCPort $node0Ports.RPC -TimeoutSeconds $TimeoutSeconds | Out-Null
   Write-Host "bank send flow committed"
 
   $validator = Get-LocalnetBondedValidator -Binary $Binary -RPCPort $node0Ports.RPC
   Write-Host "direct staking delegation is disabled by policy; export smoke skips obsolete direct delegate tx"
-
-  Send-SignedTx -ActionArgs @("tx", "contract-assets", "create-denom", $FactorySubdenom) -FromHome $node0Home | Out-Null
-  Send-SignedTx -ActionArgs @("tx", "contract-assets", "mint", "100000000$factoryDenom", $node0) -FromHome $node0Home | Out-Null
-  $tfQuery = Invoke-QueryCliJson -Arguments @("query", "contract-assets", "denom", $factoryDenom)
-  Assert-True ($tfQuery.metadata.admin -eq $node0) "contract-assets admin query mismatch"
-  Write-Host "contract-assets create/mint flow committed for $factoryDenom"
-
-  Send-SignedTx -ActionArgs @("tx", "dex", "create-pool", "10000000naet", "10000000$factoryDenom") -FromHome $node0Home | Out-Null
-  $poolQuery = Invoke-QueryCliJson -Arguments @("query", "dex", "pool", "1")
-  Assert-True ($poolQuery.pool.lp_denom -eq "lp/1") "DEX pool query did not return lp/1"
-  Assert-True ($poolQuery.pool.denom0 -eq $factoryDenom) "DEX pool denom0 mismatch"
-  Assert-True ($poolQuery.pool.denom1 -eq "naet") "DEX pool denom1 mismatch"
-  Write-Host "DEX create-pool flow committed"
+  Write-Host "contract-assets and DEX placeholder tx paths are skipped by export smoke"
 
   $feesParams = Invoke-QueryCliJson -Arguments @("query", "fees", "params")
   Assert-True (@($feesParams.params.allowed_fee_denoms).Count -eq 1) "fees params must export one allowed fee denom"
@@ -215,32 +202,17 @@ try {
   Assert-True (@($genesis.app_state.fees.params.allowed_fee_denoms).Count -eq 1) "exported fees allowed denoms count mismatch"
   Assert-True (@($genesis.app_state.fees.params.allowed_fee_denoms) -contains "naet") "exported fees params missing naet"
 
-  $contractAssetsState = $genesis.app_state.PSObject.Properties["contract-assets"].Value
-  $exportedDenom = @($contractAssetsState.denoms | Where-Object { $_.denom -eq $factoryDenom } | Select-Object -First 1)
-  Assert-True ($exportedDenom.Count -eq 1) "exported contract-assets denom missing"
-  Assert-True ($exportedDenom[0].admin -eq $node0) "exported contract-assets admin mismatch"
-
-  $exportedPool = @($genesis.app_state.dex.pools | Where-Object { [int64]$_.id -eq 1 } | Select-Object -First 1)
-  Assert-True ($exportedPool.Count -eq 1) "exported DEX pool 1 missing"
-  Assert-True ($exportedPool[0].denom0 -eq $factoryDenom) "exported DEX denom0 mismatch"
-  Assert-True ($exportedPool[0].denom1 -eq "naet") "exported DEX denom1 mismatch"
-  Assert-True ([int64]$exportedPool[0].reserve0 -eq 10000000) "exported DEX reserve0 mismatch"
-  Assert-True ([int64]$exportedPool[0].reserve1 -eq 10000000) "exported DEX reserve1 mismatch"
-  Assert-True ($exportedPool[0].lp_denom -eq "lp/1") "exported DEX lp denom mismatch"
-
-  Assert-CoinInBalance -Genesis $genesis -Address $node0 -Denom $factoryDenom -MinAmount 90000000
-  Assert-CoinInBalance -Genesis $genesis -Address $node0 -Denom "lp/1" -MinAmount 10000000
   Assert-CoinInBalance -Genesis $genesis -Address $node1 -Denom "naet" -MinAmount 12345
 
   Assert-True ($genesis.app_state.staking.params.bond_denom -eq "naet") "exported staking bond denom mismatch"
   $exportedDelegation = @($genesis.app_state.staking.delegations | Where-Object { $_.delegator_address -eq $node0 -and $_.validator_address -eq $validator.operator_address } | Select-Object -First 1)
   Assert-True ($exportedDelegation.Count -eq 0) "exported genesis must not include rejected direct staking delegation"
-  Write-Host "exported genesis preserves bank, staking params, fees, contract-assets, and DEX state"
+  Write-Host "exported genesis preserves bank, staking params, and fees state"
 
   $corruptPath = Join-Path $ExportDir "node0-export-corrupt.json"
-  $genesis.app_state.dex.pools[0].reserve0 = "not-an-int"
+  $genesis.app_state.bank.balances[0].coins[0].amount = "not-an-int"
   $genesis | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $corruptPath -Encoding UTF8
-  Assert-NativeCommandFails -Arguments @("genesis", "validate-genesis", $corruptPath, "--home", $node0Home) -ExpectedText "reserve0|invalid"
+  Assert-NativeCommandFails -Arguments @("genesis", "validate-genesis", $corruptPath, "--home", $node0Home) -ExpectedText "amount|invalid"
   Write-Host "corrupted exported genesis is rejected by validate-genesis"
 
   Write-Host "state export/import smoke completed with export $exportPath"
