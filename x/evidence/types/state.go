@@ -18,6 +18,8 @@ const (
 	StatusExpired  = "expired"
 
 	EvidenceTypeConsensus   = "consensus"
+	EvidenceTypeDoubleSign  = "double-sign"
+	EvidenceTypeDowntime    = "downtime"
 	EvidenceTypeMissedBlock = "missed-block"
 	EvidenceTypePerformance = "performance"
 	EvidenceTypeFraud       = "fraud"
@@ -25,8 +27,12 @@ const (
 	VoteSupportAccept = "accept"
 	VoteSupportReject = "reject"
 
+	RegistryStatusCandidate  = validatorregistrytypes.StatusCandidate
 	RegistryStatusJailed     = validatorregistrytypes.StatusJailed
 	RegistryStatusTombstoned = validatorregistrytypes.StatusTombstoned
+
+	SlashingReasonDoubleSign = "double_sign"
+	SlashingReasonDowntime   = "downtime"
 
 	MaxEvidenceV1          = uint32(100_000)
 	MaxPendingEvidenceV1   = uint32(10_000)
@@ -36,12 +42,18 @@ const (
 	MaxSideEffectHistoryV1 = uint32(100_000)
 	MaxBasisPoints         = uint32(10_000)
 
-	DefaultEvidenceTTLBlocks        = uint64(10_000)
-	DefaultReviewQuorumBps          = uint32(6_700)
-	DefaultMinSlashFractionBps      = uint32(1)
-	DefaultMaxSlashFractionBps      = uint32(2_000)
-	DefaultCriticalSlashFractionBps = uint32(500)
-	DefaultReporterRewardNaet       = uint64(1_000_000)
+	DefaultEvidenceTTLBlocks         = uint64(10_000)
+	DefaultReviewQuorumBps           = uint32(6_700)
+	DefaultMinSlashFractionBps       = uint32(1)
+	DefaultMaxSlashFractionBps       = uint32(2_000)
+	DefaultCriticalSlashFractionBps  = uint32(500)
+	DefaultReporterRewardNaet        = uint64(1_000_000)
+	DefaultDoubleSignJailBlocks      = uint64(0)
+	DefaultDowntimeFirstJailBlocks   = uint64(3 * 60 * 60 / 6)
+	DefaultDowntimeRepeatJailBlocks  = uint64(24 * 60 * 60 / 6)
+	DefaultFrozenStakeBlocks         = uint64(18 * 24 * 60 * 60 / 6)
+	DefaultDowntimeRepeatMultiplier  = uint32(5)
+	DefaultDowntimeChronicMultiplier = uint32(20)
 )
 
 type State struct {
@@ -50,6 +62,10 @@ type State struct {
 	ReporterRewards      []ReporterReward
 	RegistryUpdates      []RegistryUpdate
 	TombstonedValidators []string
+	JailRecords          []JailRecord
+	FrozenStakes         []FrozenStake
+	OffenseCounters      []OffenseCounter
+	IntegrationEvents    []IntegrationEvent
 }
 
 type EvidenceRecord struct {
@@ -96,6 +112,10 @@ type SlashEvent struct {
 	FractionBps      uint32
 	Tombstone        bool
 	Height           uint64
+	Reason           string
+	OffenseCount     uint64
+	FrozenStake      uint64
+	JailUntilHeight  uint64
 }
 
 type ReporterReward struct {
@@ -110,6 +130,40 @@ type RegistryUpdate struct {
 	EvidenceID       string
 	ValidatorAddress string
 	Status           string
+	Height           uint64
+}
+
+type JailRecord struct {
+	EvidenceID        string
+	ValidatorAddress  string
+	Reason            string
+	JailedAtHeight    uint64
+	JailedUntilHeight uint64
+	Tombstone         bool
+	Active            bool
+}
+
+type FrozenStake struct {
+	EvidenceID       string
+	ValidatorAddress string
+	Amount           uint64
+	FrozenAtHeight   uint64
+	ReleaseHeight    uint64
+	Reason           string
+}
+
+type OffenseCounter struct {
+	ValidatorAddress string
+	EvidenceType     string
+	Count            uint64
+	LastHeight       uint64
+}
+
+type IntegrationEvent struct {
+	EvidenceID       string
+	ValidatorAddress string
+	Target           string
+	Action           string
 	Height           uint64
 }
 
@@ -148,6 +202,36 @@ type MsgCancelExpiredEvidence struct {
 	Height     uint64
 }
 
+type MsgSubmitDoubleSignEvidence struct {
+	Authority        string
+	EvidenceID       string
+	AccusedValidator string
+	Reporter         string
+	VoteAHash        string
+	VoteBHash        string
+	InfractionHeight uint64
+	Height           uint64
+	ValidatorStake   uint64
+}
+
+type MsgSubmitDowntimeEvidence struct {
+	Authority        string
+	EvidenceID       string
+	AccusedValidator string
+	Reporter         string
+	MissedBlocks     uint64
+	WindowBlocks     uint64
+	InfractionHeight uint64
+	Height           uint64
+	ValidatorStake   uint64
+}
+
+type MsgUnjailValidator struct {
+	Authority        string
+	ValidatorAddress string
+	Height           uint64
+}
+
 func (p Params) Authorize(authority string) error {
 	if err := p.Validate(); err != nil {
 		return err
@@ -170,7 +254,11 @@ func (s State) Validate(params Params) error {
 	}
 	if uint32(len(s.SlashEvents)) > params.MaxSideEffectHistory ||
 		uint32(len(s.ReporterRewards)) > params.MaxSideEffectHistory ||
-		uint32(len(s.RegistryUpdates)) > params.MaxSideEffectHistory {
+		uint32(len(s.RegistryUpdates)) > params.MaxSideEffectHistory ||
+		uint32(len(s.JailRecords)) > params.MaxSideEffectHistory ||
+		uint32(len(s.FrozenStakes)) > params.MaxSideEffectHistory ||
+		uint32(len(s.OffenseCounters)) > params.MaxSideEffectHistory ||
+		uint32(len(s.IntegrationEvents)) > params.MaxSideEffectHistory {
 		return errors.New("native evidence side effect history limit exceeded")
 	}
 	ids := map[string]struct{}{}
@@ -226,6 +314,9 @@ func (s State) Validate(params Params) error {
 		if err := addressing.ValidateAuthorityAddress("native evidence slash validator", event.ValidatorAddress); err != nil {
 			return err
 		}
+		if event.OffenseCount != 0 && strings.TrimSpace(event.Reason) == "" {
+			return errors.New("native evidence slash offense count requires reason")
+		}
 	}
 	for _, reward := range s.ReporterRewards {
 		if reward.AmountNaet > params.MaxReporterRewardNaet {
@@ -239,8 +330,32 @@ func (s State) Validate(params Params) error {
 		if err := addressing.ValidateAuthorityAddress("native evidence registry validator", update.ValidatorAddress); err != nil {
 			return err
 		}
-		if update.Status != RegistryStatusJailed && update.Status != RegistryStatusTombstoned {
+		if update.Status != RegistryStatusCandidate && update.Status != RegistryStatusJailed && update.Status != RegistryStatusTombstoned {
 			return fmt.Errorf("native evidence unsupported registry update status %q", update.Status)
+		}
+	}
+	if err := validateSingleSideEffectPerEvidence(s.JailRecords, func(j JailRecord) string { return j.EvidenceID }); err != nil {
+		return err
+	}
+	if err := validateSingleSideEffectPerEvidence(s.FrozenStakes, func(f FrozenStake) string { return f.EvidenceID }); err != nil {
+		return err
+	}
+	if err := validateOffenseCounters(s.OffenseCounters); err != nil {
+		return err
+	}
+	for _, jail := range s.JailRecords {
+		if err := jail.Validate(); err != nil {
+			return err
+		}
+	}
+	for _, frozen := range s.FrozenStakes {
+		if err := frozen.Validate(); err != nil {
+			return err
+		}
+	}
+	for _, event := range s.IntegrationEvents {
+		if err := event.Validate(); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -341,12 +456,86 @@ func (d RewardDecision) Validate(params Params, reporter string) error {
 	return nil
 }
 
+func (j JailRecord) Validate() error {
+	if strings.TrimSpace(j.EvidenceID) == "" {
+		return errors.New("native evidence jail evidence id is required")
+	}
+	if err := addressing.ValidateAuthorityAddress("native evidence jailed validator", j.ValidatorAddress); err != nil {
+		return err
+	}
+	if strings.TrimSpace(j.Reason) == "" {
+		return errors.New("native evidence jail reason is required")
+	}
+	if j.JailedAtHeight == 0 {
+		return errors.New("native evidence jail height must be positive")
+	}
+	if !j.Tombstone && j.JailedUntilHeight <= j.JailedAtHeight {
+		return errors.New("native evidence temporary jail must have future release height")
+	}
+	return nil
+}
+
+func (f FrozenStake) Validate() error {
+	if strings.TrimSpace(f.EvidenceID) == "" {
+		return errors.New("native evidence frozen stake evidence id is required")
+	}
+	if err := addressing.ValidateAuthorityAddress("native evidence frozen stake validator", f.ValidatorAddress); err != nil {
+		return err
+	}
+	if f.Amount == 0 {
+		return errors.New("native evidence frozen stake amount must be positive")
+	}
+	if f.FrozenAtHeight == 0 {
+		return errors.New("native evidence frozen stake height must be positive")
+	}
+	if f.ReleaseHeight != 0 && f.ReleaseHeight <= f.FrozenAtHeight {
+		return errors.New("native evidence frozen stake release must be future height")
+	}
+	if strings.TrimSpace(f.Reason) == "" {
+		return errors.New("native evidence frozen stake reason is required")
+	}
+	return nil
+}
+
+func (c OffenseCounter) Validate() error {
+	if err := addressing.ValidateAuthorityAddress("native evidence offense validator", c.ValidatorAddress); err != nil {
+		return err
+	}
+	if !isEvidenceType(c.EvidenceType) {
+		return fmt.Errorf("native evidence offense type %q is invalid", c.EvidenceType)
+	}
+	if c.Count == 0 || c.LastHeight == 0 {
+		return errors.New("native evidence offense counter count and height must be positive")
+	}
+	return nil
+}
+
+func (e IntegrationEvent) Validate() error {
+	if strings.TrimSpace(e.EvidenceID) == "" {
+		return errors.New("native evidence integration evidence id is required")
+	}
+	if err := addressing.ValidateAuthorityAddress("native evidence integration validator", e.ValidatorAddress); err != nil {
+		return err
+	}
+	if strings.TrimSpace(e.Target) == "" || strings.TrimSpace(e.Action) == "" {
+		return errors.New("native evidence integration target/action are required")
+	}
+	if e.Height == 0 {
+		return errors.New("native evidence integration height must be positive")
+	}
+	return nil
+}
+
 func (s State) Normalize(params Params) State {
 	s.Evidence = SortEvidence(s.Evidence)
 	s.SlashEvents = SortSlashEvents(s.SlashEvents)
 	s.ReporterRewards = SortReporterRewards(s.ReporterRewards)
 	s.RegistryUpdates = SortRegistryUpdates(s.RegistryUpdates)
 	s.TombstonedValidators = sortedUnique(s.TombstonedValidators)
+	s.JailRecords = SortJailRecords(s.JailRecords)
+	s.FrozenStakes = SortFrozenStakes(s.FrozenStakes)
+	s.OffenseCounters = SortOffenseCounters(s.OffenseCounters)
+	s.IntegrationEvents = SortIntegrationEvents(s.IntegrationEvents)
 	for idx := range s.Evidence {
 		s.Evidence[idx].Votes = SortVotes(s.Evidence[idx].Votes)
 	}
@@ -388,12 +577,65 @@ func SortRegistryUpdates(values []RegistryUpdate) []RegistryUpdate {
 	return out
 }
 
+func SortJailRecords(values []JailRecord) []JailRecord {
+	out := append([]JailRecord(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].ValidatorAddress != out[j].ValidatorAddress {
+			return out[i].ValidatorAddress < out[j].ValidatorAddress
+		}
+		if out[i].JailedAtHeight != out[j].JailedAtHeight {
+			return out[i].JailedAtHeight < out[j].JailedAtHeight
+		}
+		return out[i].EvidenceID < out[j].EvidenceID
+	})
+	return out
+}
+
+func SortFrozenStakes(values []FrozenStake) []FrozenStake {
+	out := append([]FrozenStake(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].ValidatorAddress != out[j].ValidatorAddress {
+			return out[i].ValidatorAddress < out[j].ValidatorAddress
+		}
+		if out[i].FrozenAtHeight != out[j].FrozenAtHeight {
+			return out[i].FrozenAtHeight < out[j].FrozenAtHeight
+		}
+		return out[i].EvidenceID < out[j].EvidenceID
+	})
+	return out
+}
+
+func SortOffenseCounters(values []OffenseCounter) []OffenseCounter {
+	out := append([]OffenseCounter(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].ValidatorAddress != out[j].ValidatorAddress {
+			return out[i].ValidatorAddress < out[j].ValidatorAddress
+		}
+		return out[i].EvidenceType < out[j].EvidenceType
+	})
+	return out
+}
+
+func SortIntegrationEvents(values []IntegrationEvent) []IntegrationEvent {
+	out := append([]IntegrationEvent(nil), values...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].EvidenceID != out[j].EvidenceID {
+			return out[i].EvidenceID < out[j].EvidenceID
+		}
+		if out[i].Target != out[j].Target {
+			return out[i].Target < out[j].Target
+		}
+		return out[i].Action < out[j].Action
+	})
+	return out
+}
+
 func CanonicalSlashFraction(params Params, evidenceType string, requested uint32) uint32 {
 	if requested != 0 {
 		return requested
 	}
 	switch evidenceType {
-	case EvidenceTypeConsensus, EvidenceTypeFraud:
+	case EvidenceTypeConsensus, EvidenceTypeDoubleSign, EvidenceTypeFraud:
 		return params.CriticalFaultSlashFractionBps
 	default:
 		return params.MinSlashFractionBps
@@ -401,7 +643,48 @@ func CanonicalSlashFraction(params Params, evidenceType string, requested uint32
 }
 
 func IsCriticalEvidenceType(evidenceType string) bool {
-	return evidenceType == EvidenceTypeConsensus || evidenceType == EvidenceTypeFraud
+	return evidenceType == EvidenceTypeConsensus || evidenceType == EvidenceTypeDoubleSign || evidenceType == EvidenceTypeFraud
+}
+
+func DowntimeSlashFraction(params Params, offenseCount uint64) uint32 {
+	fraction := uint64(params.MinSlashFractionBps)
+	switch {
+	case offenseCount >= 3:
+		fraction *= uint64(params.DowntimeChronicMultiplier)
+	case offenseCount >= 2:
+		fraction *= uint64(params.DowntimeRepeatMultiplier)
+	}
+	if fraction > uint64(params.MaxSlashFractionBps) {
+		return params.MaxSlashFractionBps
+	}
+	return uint32(fraction)
+}
+
+func DowntimeJailBlocks(params Params, offenseCount uint64) uint64 {
+	if offenseCount >= 2 {
+		return params.DowntimeRepeatJailBlocks
+	}
+	return params.DowntimeFirstJailBlocks
+}
+
+func ValidateNoJailedValidatorInActiveSet(state State, activeValidators []string) error {
+	state = state.Normalize(DefaultParams())
+	jailed := map[string]struct{}{}
+	for _, jail := range state.JailRecords {
+		if jail.Active {
+			jailed[jail.ValidatorAddress] = struct{}{}
+		}
+	}
+	for _, validator := range state.TombstonedValidators {
+		jailed[validator] = struct{}{}
+	}
+	for _, validator := range activeValidators {
+		validator = strings.TrimSpace(validator)
+		if _, found := jailed[validator]; found {
+			return fmt.Errorf("jailed validator %s cannot be in active set", validator)
+		}
+	}
+	return nil
 }
 
 func AcceptedVotingPowerBps(votes []EvidenceVote) uint32 {
@@ -444,11 +727,26 @@ func isStatus(status string) bool {
 
 func isEvidenceType(evidenceType string) bool {
 	switch evidenceType {
-	case EvidenceTypeConsensus, EvidenceTypeMissedBlock, EvidenceTypePerformance, EvidenceTypeFraud:
+	case EvidenceTypeConsensus, EvidenceTypeDoubleSign, EvidenceTypeDowntime, EvidenceTypeMissedBlock, EvidenceTypePerformance, EvidenceTypeFraud:
 		return true
 	default:
 		return false
 	}
+}
+
+func validateOffenseCounters(values []OffenseCounter) error {
+	seen := map[string]struct{}{}
+	for _, value := range values {
+		if err := value.Validate(); err != nil {
+			return err
+		}
+		key := value.ValidatorAddress + "\x00" + value.EvidenceType
+		if _, found := seen[key]; found {
+			return fmt.Errorf("native evidence duplicate offense counter for %s %s", value.ValidatorAddress, value.EvidenceType)
+		}
+		seen[key] = struct{}{}
+	}
+	return nil
 }
 
 func validateSingleSideEffectPerEvidence[T any](values []T, id func(T) string) error {

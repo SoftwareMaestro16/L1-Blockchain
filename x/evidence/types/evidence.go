@@ -50,6 +50,12 @@ type Params struct {
 	MaxSlashFractionBps           uint32
 	CriticalFaultSlashFractionBps uint32
 	MaxReporterRewardNaet         uint64
+	DoubleSignJailBlocks          uint64
+	DowntimeFirstJailBlocks       uint64
+	DowntimeRepeatJailBlocks      uint64
+	FrozenStakeBlocks             uint64
+	DowntimeRepeatMultiplier      uint32
+	DowntimeChronicMultiplier     uint32
 }
 
 type EvidenceSubmission struct {
@@ -114,6 +120,12 @@ func DefaultParams() Params {
 		MaxSlashFractionBps:           DefaultMaxSlashFractionBps,
 		CriticalFaultSlashFractionBps: DefaultCriticalSlashFractionBps,
 		MaxReporterRewardNaet:         DefaultReporterRewardNaet,
+		DoubleSignJailBlocks:          DefaultDoubleSignJailBlocks,
+		DowntimeFirstJailBlocks:       DefaultDowntimeFirstJailBlocks,
+		DowntimeRepeatJailBlocks:      DefaultDowntimeRepeatJailBlocks,
+		FrozenStakeBlocks:             DefaultFrozenStakeBlocks,
+		DowntimeRepeatMultiplier:      DefaultDowntimeRepeatMultiplier,
+		DowntimeChronicMultiplier:     DefaultDowntimeChronicMultiplier,
 	}
 }
 
@@ -163,6 +175,15 @@ func (p Params) Validate() error {
 	}
 	if p.CriticalFaultSlashFractionBps < p.MinSlashFractionBps || p.CriticalFaultSlashFractionBps > p.MaxSlashFractionBps {
 		return errors.New("native evidence critical slash fraction must be inside slash bounds")
+	}
+	if p.DowntimeFirstJailBlocks == 0 || p.DowntimeRepeatJailBlocks <= p.DowntimeFirstJailBlocks {
+		return errors.New("native evidence downtime jail durations are invalid")
+	}
+	if p.FrozenStakeBlocks == 0 {
+		return errors.New("native evidence frozen stake duration must be positive")
+	}
+	if p.DowntimeRepeatMultiplier == 0 || p.DowntimeChronicMultiplier < p.DowntimeRepeatMultiplier {
+		return errors.New("native evidence downtime repeat multipliers are invalid")
 	}
 	return nil
 }

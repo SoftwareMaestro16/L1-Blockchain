@@ -198,6 +198,137 @@ func TestEvidenceProcessingCannotPanicOnInvalidPayload(t *testing.T) {
 	})
 }
 
+func TestDoubleSignEvidencePipelineJailsTombstonesFreezesStakeAndCallsHooks(t *testing.T) {
+	k := NewKeeper()
+	hooks := &recordingSlashingHooks{}
+	k.SetSlashingIntegrationHooks(hooks)
+	validator := rawAddress("33")
+
+	record, err := k.ProcessDoubleSignEvidence(types.MsgSubmitDoubleSignEvidence{
+		Authority:        prototype.DefaultAuthority,
+		EvidenceID:       "double-sign-1",
+		AccusedValidator: validator,
+		Reporter:         rawAddress("22"),
+		VoteAHash:        proofHash("vote-a"),
+		VoteBHash:        proofHash("vote-b"),
+		InfractionHeight: 9,
+		Height:           10,
+		ValidatorStake:   1_000_000,
+	})
+	require.NoError(t, err)
+	require.Equal(t, types.StatusAccepted, record.Status)
+	require.Equal(t, types.EvidenceTypeDoubleSign, record.EvidenceType)
+	require.True(t, record.SlashDecision.Tombstone)
+
+	events := k.SlashEvents()
+	require.Len(t, events, 1)
+	require.Equal(t, types.SlashingReasonDoubleSign, events[0].Reason)
+	require.True(t, events[0].Tombstone)
+	require.Equal(t, uint64(1), events[0].OffenseCount)
+	require.Equal(t, uint64(50_000), events[0].FrozenStake)
+	require.Contains(t, k.TombstonedValidators(), validator)
+	require.Len(t, k.JailRecords(), 1)
+	require.True(t, k.JailRecords()[0].Active)
+	require.True(t, k.JailRecords()[0].Tombstone)
+	require.Len(t, k.FrozenStakes(), 1)
+	require.Equal(t, uint64(50_000), k.FrozenStakes()[0].Amount)
+	require.Zero(t, k.FrozenStakes()[0].ReleaseHeight)
+	require.ErrorContains(t, k.ValidateActiveSetInvariant([]string{validator}), "jailed validator")
+
+	require.Equal(t, []string{
+		"slash:double-sign-1",
+		"jail:double-sign-1:true:0",
+		"freeze:double-sign-1:50000:0",
+		"reputation:double-sign-1:double-sign",
+		"insurance:double-sign-1:50000",
+	}, hooks.calls)
+	require.Len(t, k.IntegrationEvents(), 3)
+}
+
+func TestDowntimeEvidencePipelineSupportsRepeatedOffenseAndUnjail(t *testing.T) {
+	k := NewKeeper()
+	validator := rawAddress("44")
+
+	first, err := k.ProcessDowntimeEvidence(types.MsgSubmitDowntimeEvidence{
+		Authority:        prototype.DefaultAuthority,
+		EvidenceID:       "downtime-1",
+		AccusedValidator: validator,
+		Reporter:         rawAddress("22"),
+		MissedBlocks:     51,
+		WindowBlocks:     100,
+		InfractionHeight: 5,
+		Height:           6,
+		ValidatorStake:   1_000_000,
+	})
+	require.NoError(t, err)
+	require.Equal(t, types.EvidenceTypeDowntime, first.EvidenceType)
+	require.False(t, first.SlashDecision.Tombstone)
+	require.Equal(t, types.DefaultMinSlashFractionBps, first.SlashDecision.FractionBps)
+	require.Equal(t, uint64(1), k.OffenseCounters()[0].Count)
+	firstJailUntil := uint64(6 + types.DefaultDowntimeFirstJailBlocks)
+	require.Equal(t, firstJailUntil, k.JailRecords()[0].JailedUntilHeight)
+	require.ErrorContains(t, k.UnjailValidator(types.MsgUnjailValidator{
+		Authority:        prototype.DefaultAuthority,
+		ValidatorAddress: validator,
+		Height:           firstJailUntil - 1,
+	}), "before jail period")
+	require.NoError(t, k.UnjailValidator(types.MsgUnjailValidator{
+		Authority:        prototype.DefaultAuthority,
+		ValidatorAddress: validator,
+		Height:           firstJailUntil,
+	}))
+	require.NoError(t, k.ValidateActiveSetInvariant([]string{validator}))
+
+	second, err := k.ProcessDowntimeEvidence(types.MsgSubmitDowntimeEvidence{
+		Authority:        prototype.DefaultAuthority,
+		EvidenceID:       "downtime-2",
+		AccusedValidator: validator,
+		Reporter:         rawAddress("22"),
+		MissedBlocks:     60,
+		WindowBlocks:     100,
+		InfractionHeight: firstJailUntil + 1,
+		Height:           firstJailUntil + 2,
+		ValidatorStake:   1_000_000,
+	})
+	require.NoError(t, err)
+	require.Equal(t, types.DefaultMinSlashFractionBps*types.DefaultDowntimeRepeatMultiplier, second.SlashDecision.FractionBps)
+	require.Equal(t, uint64(2), k.OffenseCounters()[0].Count)
+	require.Equal(t, uint64(firstJailUntil+2+types.DefaultDowntimeRepeatJailBlocks), k.JailRecords()[1].JailedUntilHeight)
+	require.ErrorContains(t, k.ValidateActiveSetInvariant([]string{validator}), "jailed validator")
+}
+
+func TestInvalidObjectiveEvidenceRejectedSafely(t *testing.T) {
+	k := NewKeeper()
+	hash := proofHash("same")
+	_, err := k.ProcessDoubleSignEvidence(types.MsgSubmitDoubleSignEvidence{
+		Authority:        prototype.DefaultAuthority,
+		EvidenceID:       "bad-double-sign",
+		AccusedValidator: rawAddress("33"),
+		Reporter:         rawAddress("22"),
+		VoteAHash:        hash,
+		VoteBHash:        hash,
+		InfractionHeight: 9,
+		Height:           10,
+		ValidatorStake:   1_000_000,
+	})
+	require.ErrorContains(t, err, "distinct")
+	require.Empty(t, k.SlashEvents())
+
+	_, err = k.ProcessDowntimeEvidence(types.MsgSubmitDowntimeEvidence{
+		Authority:        prototype.DefaultAuthority,
+		EvidenceID:       "bad-downtime",
+		AccusedValidator: rawAddress("33"),
+		Reporter:         rawAddress("22"),
+		MissedBlocks:     101,
+		WindowBlocks:     100,
+		InfractionHeight: 9,
+		Height:           10,
+		ValidatorStake:   1_000_000,
+	})
+	require.ErrorContains(t, err, "missed/window")
+	require.Empty(t, k.SlashEvents())
+}
+
 func submitEvidence(t *testing.T, k *Keeper, id string, evidenceType string, review bool, height uint64) types.EvidenceRecord {
 	t.Helper()
 	record, err := k.SubmitEvidence(validSubmit(id, evidenceType, proofHash(id), height, withReview(review)))
@@ -235,4 +366,38 @@ func proofHash(value string) string {
 
 func rawAddress(hexByte string) string {
 	return "4:000000000000000000000000" + fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte, hexByte)
+}
+
+type recordingSlashingHooks struct {
+	calls []string
+}
+
+func (h *recordingSlashingHooks) RecordSlashingEvent(event types.SlashEvent) error {
+	h.calls = append(h.calls, "slash:"+event.EvidenceID)
+	return nil
+}
+
+func (h *recordingSlashingHooks) JailValidator(_ string, tombstone bool, jailUntilHeight uint64, evidenceID string) error {
+	h.calls = append(h.calls, fmt.Sprintf("jail:%s:%t:%d", evidenceID, tombstone, jailUntilHeight))
+	return nil
+}
+
+func (h *recordingSlashingHooks) UnjailValidator(_ string, height uint64) error {
+	h.calls = append(h.calls, fmt.Sprintf("unjail:%d", height))
+	return nil
+}
+
+func (h *recordingSlashingHooks) FreezeStake(_ string, evidenceID string, amount uint64, releaseHeight uint64) error {
+	h.calls = append(h.calls, fmt.Sprintf("freeze:%s:%d:%d", evidenceID, amount, releaseHeight))
+	return nil
+}
+
+func (h *recordingSlashingHooks) ApplyReputationPenalty(_ string, evidenceID string, evidenceType string, _ uint64) error {
+	h.calls = append(h.calls, "reputation:"+evidenceID+":"+evidenceType)
+	return nil
+}
+
+func (h *recordingSlashingHooks) ApplyInsuranceSlash(_ string, evidenceID string, amount uint64, _ uint64) error {
+	h.calls = append(h.calls, fmt.Sprintf("insurance:%s:%d", evidenceID, amount))
+	return nil
 }
