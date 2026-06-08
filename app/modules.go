@@ -55,6 +55,7 @@ func (app *L1App) initModules(
 		ZonesKeeper:               &app.ZonesKeeper,
 		MeshKeeper:                &app.MeshKeeper,
 		NetworkingKeeper:          &app.NetworkingKeeper,
+		NativeAccountKeeper:       &app.NativeAccountKeeper,
 		PaymentsKeeper:            &app.PaymentsKeeper,
 		SchedulerKeeper:           &app.SchedulerKeeper,
 		AVMSchedulerKeeper:        &app.AVMSchedulerKeeper,

@@ -201,6 +201,7 @@ func (app *L1App) initKeepers(
 	app.ZonesKeeper = persistentKeepers.ZonesKeeper
 	app.MeshKeeper = persistentKeepers.MeshKeeper
 	app.NetworkingKeeper = persistentKeepers.NetworkingKeeper
+	app.NativeAccountKeeper = persistentKeepers.NativeAccountKeeper
 	app.PaymentsKeeper = persistentKeepers.PaymentsKeeper
 	app.SchedulerKeeper = persistentKeepers.SchedulerKeeper
 	app.AVMSchedulerKeeper = persistentKeepers.AVMSchedulerKeeper

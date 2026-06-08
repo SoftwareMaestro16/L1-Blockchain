@@ -30,6 +30,8 @@ import (
 	meshtypes "github.com/sovereign-l1/l1/x/mesh/types"
 	networkingkeeper "github.com/sovereign-l1/l1/x/networking/keeper"
 	networkingtypes "github.com/sovereign-l1/l1/x/networking/types"
+	nativeaccountkeeper "github.com/sovereign-l1/l1/x/native-account/keeper"
+	nativeaccounttypes "github.com/sovereign-l1/l1/x/native-account/types"
 	nominatorpoolkeeper "github.com/sovereign-l1/l1/x/nominator-pool/keeper"
 	nominatorpooltypes "github.com/sovereign-l1/l1/x/nominator-pool/types"
 	paymentskeeper "github.com/sovereign-l1/l1/x/payments/keeper"
@@ -76,6 +78,7 @@ type PersistentKeepers struct {
 	ZonesKeeper               zoneskeeper.Keeper
 	MeshKeeper                meshkeeper.Keeper
 	NetworkingKeeper          networkingkeeper.Keeper
+	NativeAccountKeeper       nativeaccountkeeper.Keeper
 	PaymentsKeeper            paymentskeeper.Keeper
 	SchedulerKeeper           schedulerkeeper.Keeper
 	AVMSchedulerKeeper        avmschedulerkeeper.Keeper
@@ -106,6 +109,7 @@ func NewPersistentKeepers(keys map[string]*storetypes.KVStoreKey) PersistentKeep
 		ZonesKeeper:               zoneskeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[zonestypes.StoreKey])),
 		MeshKeeper:                meshkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[meshtypes.StoreKey])),
 		NetworkingKeeper:          networkingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[networkingtypes.StoreKey])),
+		NativeAccountKeeper:       nativeaccountkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[nativeaccounttypes.StoreKey])),
 		PaymentsKeeper:            paymentskeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[paymentstypes.StoreKey])),
 		SchedulerKeeper:           schedulerkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[schedulertypes.StoreKey])),
 		AVMSchedulerKeeper:        avmschedulerkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[avmschedulertypes.StoreKey])),

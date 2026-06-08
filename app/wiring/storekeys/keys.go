@@ -36,6 +36,7 @@ import (
 	loadtypes "github.com/sovereign-l1/l1/x/load/types"
 	meshtypes "github.com/sovereign-l1/l1/x/mesh/types"
 	mintauthoritytypes "github.com/sovereign-l1/l1/x/mint-authority/types"
+	nativeaccounttypes "github.com/sovereign-l1/l1/x/native-account/types"
 	networkingtypes "github.com/sovereign-l1/l1/x/networking/types"
 	nominatorpooltypes "github.com/sovereign-l1/l1/x/nominator-pool/types"
 	paymentstypes "github.com/sovereign-l1/l1/x/payments/types"
@@ -100,6 +101,7 @@ func NewKVStoreKeys() map[string]*storetypes.KVStoreKey {
 		zonestypes.StoreKey,
 		meshtypes.StoreKey,
 		networkingtypes.StoreKey,
+		nativeaccounttypes.StoreKey,
 		paymentstypes.StoreKey,
 		schedulertypes.StoreKey,
 		avmschedulertypes.StoreKey,

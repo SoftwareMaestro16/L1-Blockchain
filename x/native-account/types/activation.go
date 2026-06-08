@@ -4,24 +4,32 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"strings"
 
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 
 	"github.com/sovereign-l1/l1/app/addressing"
 )
 
 type MsgActivateAccount struct {
-	AddressUser string
-	AddressRaw  string
-	PublicKey   cryptotypes.PubKey
-	FeePaid     uint64
+	AddressUser   string             `protobuf:"bytes,1,opt,name=address_user,json=addressUser,proto3" json:"address_user,omitempty"`
+	AddressRaw    string             `protobuf:"bytes,2,opt,name=address_raw,json=addressRaw,proto3" json:"address_raw,omitempty"`
+	PublicKeyType string             `protobuf:"bytes,3,opt,name=public_key_type,json=publicKeyType,proto3" json:"public_key_type,omitempty"`
+	PublicKeyHex  string             `protobuf:"bytes,4,opt,name=public_key_hex,json=publicKeyHex,proto3" json:"public_key_hex,omitempty"`
+	FeePaid       uint64             `protobuf:"varint,5,opt,name=fee_paid,json=feePaid,proto3" json:"fee_paid,omitempty"`
+	PublicKey     cryptotypes.PubKey `json:"-"`
 }
 
 func (m MsgActivateAccount) ValidateBasic() error {
 	if err := addressing.ValidateUserAddress("activation address", m.AddressUser); err != nil {
 		return err
 	}
-	pair, err := addressing.DeriveAccountAddress(m.PublicKey)
+	pubKey, err := m.EffectivePublicKey()
+	if err != nil {
+		return err
+	}
+	pair, err := addressing.DeriveAccountAddress(pubKey)
 	if err != nil {
 		return err
 	}
@@ -37,6 +45,27 @@ func (m MsgActivateAccount) ValidateBasic() error {
 		}
 	}
 	return nil
+}
+
+func (m MsgActivateAccount) EffectivePublicKey() (cryptotypes.PubKey, error) {
+	if m.PublicKey != nil {
+		return m.PublicKey, nil
+	}
+	publicKeyType := strings.TrimSpace(m.PublicKeyType)
+	publicKeyHex := strings.TrimSpace(m.PublicKeyHex)
+	if publicKeyType == "" || publicKeyHex == "" {
+		return nil, fmt.Errorf("activation public key is required")
+	}
+	raw, err := hex.DecodeString(publicKeyHex)
+	if err != nil {
+		return nil, fmt.Errorf("activation public key hex is invalid: %w", err)
+	}
+	switch publicKeyType {
+	case "secp256k1", "secp256k1.PubKey", "cosmos.crypto.secp256k1.PubKey", "/cosmos.crypto.secp256k1.PubKey":
+		return &secp256k1.PubKey{Key: raw}, nil
+	default:
+		return nil, fmt.Errorf("unsupported activation public key type %q", publicKeyType)
+	}
 }
 
 func ActivationAddressPair(pubKey cryptotypes.PubKey) (addressing.AddressPair, error) {
@@ -103,7 +132,11 @@ func (s AccountActivationService) ActivateAccount(msg MsgActivateAccount, create
 	if err := s.feePolicy.ValidateActivationFee(msg.FeePaid); err != nil {
 		return AccountActivationResult{}, err
 	}
-	pair, err := ActivationAddressPair(msg.PublicKey)
+	pubKey, err := msg.EffectivePublicKey()
+	if err != nil {
+		return AccountActivationResult{}, err
+	}
+	pair, err := ActivationAddressPair(pubKey)
 	if err != nil {
 		return AccountActivationResult{}, err
 	}
@@ -120,7 +153,7 @@ func (s AccountActivationService) ActivateAccount(msg MsgActivateAccount, create
 		Version:                 CurrentAccountVersion,
 		AddressUser:             pair.User,
 		AddressRaw:              pair.Raw,
-		PubKeys:                 []string{PublicKeyText(msg.PublicKey)},
+		PubKeys:                 []string{PublicKeyText(pubKey)},
 		AccountNumber:           s.store.NextAccountNumber(),
 		Sequence:                ActivationInitialSequence,
 		Status:                  AccountStatusActive,
@@ -144,7 +177,7 @@ func (s AccountActivationService) ActivateAccount(msg MsgActivateAccount, create
 			AddressRaw:    account.AddressRaw,
 			AccountNumber: account.AccountNumber,
 			Sequence:      account.Sequence,
-			PubKeyHash:    PublicKeyHash(msg.PublicKey),
+			PubKeyHash:    PublicKeyHash(pubKey),
 			Height:        createdHeight,
 			FeePaid:       msg.FeePaid,
 		},

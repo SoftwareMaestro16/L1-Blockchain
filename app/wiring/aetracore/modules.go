@@ -15,6 +15,7 @@ import (
 	identityroottypes "github.com/sovereign-l1/l1/x/identity-root/types"
 	loadtypes "github.com/sovereign-l1/l1/x/load/types"
 	meshtypes "github.com/sovereign-l1/l1/x/mesh/types"
+	nativeaccounttypes "github.com/sovereign-l1/l1/x/native-account/types"
 	networkingtypes "github.com/sovereign-l1/l1/x/networking/types"
 	nominatorpooltypes "github.com/sovereign-l1/l1/x/nominator-pool/types"
 	paymentstypes "github.com/sovereign-l1/l1/x/payments/types"
@@ -69,6 +70,7 @@ var systemModules = []string{
 	validatorinsurancetypes.ModuleName,
 	validatorregistrytypes.ModuleName,
 	configtypes.ModuleName,
+	nativeaccounttypes.ModuleName,
 }
 
 func RoutingExecution() RoutingExecutionPoint {
@@ -116,5 +118,6 @@ func SystemStoreKeys() []string {
 		validatorinsurancetypes.StoreKey,
 		validatorregistrytypes.StoreKey,
 		configtypes.StoreKey,
+		nativeaccounttypes.StoreKey,
 	}
 }

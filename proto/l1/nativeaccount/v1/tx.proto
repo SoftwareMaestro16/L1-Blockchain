@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package l1.nativeaccount.v1;
+
+import "cosmos/msg/v1/msg.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/native-account/types";
+
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  rpc ActivateAccount(MsgActivateAccount) returns (MsgActivateAccountResponse);
+}
+
+message MsgActivateAccount {
+  option (cosmos.msg.v1.signer) = "address_user";
+
+  string address_user = 1;
+  string address_raw = 2;
+  string public_key_type = 3;
+  string public_key_hex = 4;
+  uint64 fee_paid = 5;
+}
+
+message MsgActivateAccountResponse {
+  string address_user = 1;
+  string address_raw = 2;
+  uint64 account_number = 3;
+  uint64 sequence = 4;
+}

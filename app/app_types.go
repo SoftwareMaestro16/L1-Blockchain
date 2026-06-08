@@ -43,6 +43,7 @@ import (
 	loadkeeper "github.com/sovereign-l1/l1/x/load/keeper"
 	meshkeeper "github.com/sovereign-l1/l1/x/mesh/keeper"
 	mintauthoritykeeper "github.com/sovereign-l1/l1/x/mint-authority/keeper"
+	nativeaccountkeeper "github.com/sovereign-l1/l1/x/native-account/keeper"
 	networkingkeeper "github.com/sovereign-l1/l1/x/networking/keeper"
 	nominatorpoolkeeper "github.com/sovereign-l1/l1/x/nominator-pool/keeper"
 	paymentskeeper "github.com/sovereign-l1/l1/x/payments/keeper"
@@ -118,6 +119,7 @@ type L1App struct {
 	ZonesKeeper               zoneskeeper.Keeper
 	MeshKeeper                meshkeeper.Keeper
 	NetworkingKeeper          networkingkeeper.Keeper
+	NativeAccountKeeper       nativeaccountkeeper.Keeper
 	PaymentsKeeper            paymentskeeper.Keeper
 	SchedulerKeeper           schedulerkeeper.Keeper
 	AVMSchedulerKeeper        avmschedulerkeeper.Keeper

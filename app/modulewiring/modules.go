@@ -86,6 +86,8 @@ import (
 	meshkeeper "github.com/sovereign-l1/l1/x/mesh/keeper"
 	mintauthoritymodule "github.com/sovereign-l1/l1/x/mint-authority"
 	mintauthoritykeeper "github.com/sovereign-l1/l1/x/mint-authority/keeper"
+	nativeaccountmodule "github.com/sovereign-l1/l1/x/native-account"
+	nativeaccountkeeper "github.com/sovereign-l1/l1/x/native-account/keeper"
 	networkingmodule "github.com/sovereign-l1/l1/x/networking"
 	networkingkeeper "github.com/sovereign-l1/l1/x/networking/keeper"
 	nominatorpoolmodule "github.com/sovereign-l1/l1/x/nominator-pool"
@@ -165,6 +167,7 @@ type ModuleDeps struct {
 	ZonesKeeper               *zoneskeeper.Keeper
 	MeshKeeper                *meshkeeper.Keeper
 	NetworkingKeeper          *networkingkeeper.Keeper
+	NativeAccountKeeper       *nativeaccountkeeper.Keeper
 	PaymentsKeeper            *paymentskeeper.Keeper
 	SchedulerKeeper           *schedulerkeeper.Keeper
 	AVMSchedulerKeeper        *avmschedulerkeeper.Keeper
@@ -219,6 +222,7 @@ func NewModuleManager(deps ModuleDeps) *module.Manager {
 		zonesmodule.NewAppModule(deps.ZonesKeeper),
 		meshmodule.NewAppModule(deps.MeshKeeper),
 		networkingmodule.NewAppModule(deps.NetworkingKeeper),
+		nativeaccountmodule.NewAppModule(*deps.NativeAccountKeeper),
 		paymentsmodule.NewAppModule(deps.PaymentsKeeper),
 		schedulermodule.NewAppModule(deps.SchedulerKeeper),
 		avmschedulermodule.NewAppModule(deps.AVMSchedulerKeeper),
