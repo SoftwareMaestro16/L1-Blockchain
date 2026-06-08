@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package l1.nativeaccount.v1;
+
+option go_package = "github.com/sovereign-l1/l1/x/native-account/types";
+
+service Query {
+  rpc Account(QueryAccountRequest) returns (QueryAccountResponse);
+  rpc AccountByRaw(QueryAccountByRawRequest) returns (QueryAccountResponse);
+  rpc VirtualAccount(QueryVirtualAccountRequest) returns (QueryVirtualAccountResponse);
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse);
+  rpc AccountStatus(QueryAccountStatusRequest) returns (QueryAccountStatusResponse);
+}
+
+message QueryAccountRequest {
+  string address = 1;
+}
+
+message QueryAccountResponse {
+  bool found = 1;
+  bool virtual = 2;
+  string address_user = 3;
+  string address_raw = 4;
+  string status = 5;
+  string account_json = 6;
+}
+
+message QueryAccountByRawRequest {
+  string address_raw = 1;
+}
+
+message QueryVirtualAccountRequest {
+  string address_user = 1;
+}
+
+message QueryVirtualAccountResponse {
+  string address_user = 1;
+  string address_raw = 2;
+  string status = 3;
+  bool persistent = 4;
+  bool storage_rent_active = 5;
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  uint64 default_query_limit = 1;
+  uint64 max_query_limit = 2;
+}
+
+message QueryAccountStatusRequest {
+  string address = 1;
+}
+
+message QueryAccountStatusResponse {
+  string address_user = 1;
+  string address_raw = 2;
+  string status = 3;
+  bool persistent = 4;
+  bool storage_rent_active = 5;
+  uint64 storage_rent_debt = 6;
+}

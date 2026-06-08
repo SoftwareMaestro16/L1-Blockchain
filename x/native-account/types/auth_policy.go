@@ -29,30 +29,30 @@ const (
 )
 
 type AuthKey struct {
-	ID        string `json:"id"`
-	PublicKey string `json:"public_key"`
-	Role      string `json:"role,omitempty"`
+	ID        string `protobuf:"bytes,1,opt,name=id,proto3" json:"id"`
+	PublicKey string `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key"`
+	Role      string `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`
 }
 
 type AuthWeight struct {
-	KeyID  string `json:"key_id"`
-	Weight uint64 `json:"weight"`
+	KeyID  string `protobuf:"bytes,1,opt,name=key_id,json=keyID,proto3" json:"key_id"`
+	Weight uint64 `protobuf:"varint,2,opt,name=weight,proto3" json:"weight"`
 }
 
 type RecoveryPolicy struct {
-	Keys              []string `json:"keys,omitempty"`
-	Threshold         uint64   `json:"threshold,omitempty"`
-	TimelockEndHeight uint64   `json:"timelock_end_height,omitempty"`
+	Keys              []string `protobuf:"bytes,1,rep,name=keys,proto3" json:"keys,omitempty"`
+	Threshold         uint64   `protobuf:"varint,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	TimelockEndHeight uint64   `protobuf:"varint,3,opt,name=timelock_end_height,json=timelockEndHeight,proto3" json:"timelock_end_height,omitempty"`
 }
 
 type TimelockPolicy struct {
-	AuthPolicyUpdateEndHeight uint64 `json:"auth_policy_update_end_height,omitempty"`
-	RecoveryEndHeight         uint64 `json:"recovery_end_height,omitempty"`
+	AuthPolicyUpdateEndHeight uint64 `protobuf:"varint,1,opt,name=auth_policy_update_end_height,json=authPolicyUpdateEndHeight,proto3" json:"auth_policy_update_end_height,omitempty"`
+	RecoveryEndHeight         uint64 `protobuf:"varint,2,opt,name=recovery_end_height,json=recoveryEndHeight,proto3" json:"recovery_end_height,omitempty"`
 }
 
 type SpendingLimit struct {
-	Operation string `json:"operation"`
-	MaxAmount uint64 `json:"max_amount"`
+	Operation string `protobuf:"bytes,1,opt,name=operation,proto3" json:"operation"`
+	MaxAmount uint64 `protobuf:"varint,2,opt,name=max_amount,json=maxAmount,proto3" json:"max_amount"`
 }
 
 type AuthzResult struct {

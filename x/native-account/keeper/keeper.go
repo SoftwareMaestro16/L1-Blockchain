@@ -47,6 +47,48 @@ func (k Keeper) ActivateAccount(ctx context.Context, msg nativeaccount.MsgActiva
 	return result, nil
 }
 
+func (k Keeper) UpdateAuthPolicy(ctx context.Context, msg nativeaccount.MsgUpdateAuthPolicy) (nativeaccount.Account, error) {
+	return k.applyAccountMutation(ctx, msg.AccountUser, frozenMutationBlocked, func(account nativeaccount.Account) (nativeaccount.Account, error) {
+		return nativeaccount.ApplyMsgUpdateAuthPolicy(account, msg)
+	})
+}
+
+func (k Keeper) RotateKey(ctx context.Context, msg nativeaccount.MsgRotateKey) (nativeaccount.Account, error) {
+	return k.applyAccountMutation(ctx, msg.AccountUser, frozenMutationBlocked, func(account nativeaccount.Account) (nativeaccount.Account, error) {
+		return nativeaccount.ApplyMsgRotateKey(account, msg)
+	})
+}
+
+func (k Keeper) RecoverAccount(ctx context.Context, msg nativeaccount.MsgRecoverAccount) (nativeaccount.Account, error) {
+	return k.applyAccountMutation(ctx, msg.AccountUser, frozenMutationAllowed, func(account nativeaccount.Account) (nativeaccount.Account, error) {
+		return nativeaccount.ApplyMsgRecoverAccount(account, msg)
+	})
+}
+
+func (k Keeper) FreezeAccount(ctx context.Context, msg nativeaccount.MsgFreezeAccount) (nativeaccount.Account, error) {
+	return k.applyAccountMutation(ctx, msg.AccountUser, frozenMutationBlocked, func(account nativeaccount.Account) (nativeaccount.Account, error) {
+		return nativeaccount.ApplyMsgFreezeAccount(account, msg)
+	})
+}
+
+func (k Keeper) PayStorageDebt(ctx context.Context, msg nativeaccount.MsgPayStorageDebt) (nativeaccount.Account, error) {
+	return k.applyAccountMutation(ctx, msg.AccountUser, frozenMutationAllowed, func(account nativeaccount.Account) (nativeaccount.Account, error) {
+		return nativeaccount.ApplyMsgPayStorageDebt(account, msg)
+	})
+}
+
+func (k Keeper) UnfreezeAccount(ctx context.Context, msg nativeaccount.MsgUnfreezeAccount) (nativeaccount.Account, error) {
+	return k.applyAccountMutation(ctx, msg.AccountUser, frozenMutationAllowed, func(account nativeaccount.Account) (nativeaccount.Account, error) {
+		return nativeaccount.ApplyMsgUnfreezeAccount(account, msg)
+	})
+}
+
+func (k Keeper) UpdateAccountMetadata(ctx context.Context, msg nativeaccount.MsgUpdateAccountMetadata) (nativeaccount.Account, error) {
+	return k.applyAccountMutation(ctx, msg.AccountUser, frozenMutationBlocked, func(account nativeaccount.Account) (nativeaccount.Account, error) {
+		return nativeaccount.ApplyMsgUpdateAccountMetadata(account, msg)
+	})
+}
+
 func (k Keeper) AccountByUser(ctx context.Context, userAddress string) (nativeaccount.Account, bool, error) {
 	key, err := nativeaccount.AccountByUserKey(userAddress)
 	if err != nil {
@@ -167,6 +209,53 @@ func (k Keeper) SetAccount(ctx context.Context, account nativeaccount.Account) e
 		return setNextAccountNumber(store, account.AccountNumber+1)
 	}
 	return nil
+}
+
+type frozenMutationPolicy bool
+
+const (
+	frozenMutationBlocked frozenMutationPolicy = false
+	frozenMutationAllowed frozenMutationPolicy = true
+)
+
+func (k Keeper) applyAccountMutation(ctx context.Context, userAddress string, frozenPolicy frozenMutationPolicy, apply func(nativeaccount.Account) (nativeaccount.Account, error)) (nativeaccount.Account, error) {
+	if apply == nil {
+		return nativeaccount.Account{}, fmt.Errorf("native account mutation handler is required")
+	}
+	account, found, err := k.AccountByUser(ctx, userAddress)
+	if err != nil {
+		return nativeaccount.Account{}, err
+	}
+	if !found {
+		return nativeaccount.Account{}, fmt.Errorf("inactive account cannot send normal messages")
+	}
+	if err := validatePersistentMutationStatus(account, frozenPolicy); err != nil {
+		return nativeaccount.Account{}, err
+	}
+	next, err := apply(account)
+	if err != nil {
+		return nativeaccount.Account{}, err
+	}
+	if err := k.SetAccount(ctx, next); err != nil {
+		return nativeaccount.Account{}, err
+	}
+	return next, nil
+}
+
+func validatePersistentMutationStatus(account nativeaccount.Account, frozenPolicy frozenMutationPolicy) error {
+	switch account.Status {
+	case nativeaccount.AccountStatusActive, nativeaccount.AccountStatusRecovered:
+		return nil
+	case nativeaccount.AccountStatusFrozen:
+		if frozenPolicy == frozenMutationAllowed {
+			return nil
+		}
+		return fmt.Errorf("frozen account allows only recovery, storage debt payment, and unfreeze")
+	case nativeaccount.AccountStatusArchived, nativeaccount.AccountStatusClosed:
+		return fmt.Errorf("%s account cannot send normal messages", account.Status)
+	default:
+		return fmt.Errorf("%s account cannot send normal messages", account.Status)
+	}
 }
 
 func (k Keeper) NextAccountNumber(ctx context.Context) (uint64, error) {

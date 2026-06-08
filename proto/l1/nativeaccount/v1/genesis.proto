@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package l1.nativeaccount.v1;
+
+import "l1/nativeaccount/v1/tx.proto";
+
+option go_package = "github.com/sovereign-l1/l1/x/native-account/types";
+
+message GenesisState {
+  uint64 version = 1;
+  repeated Account accounts = 2;
+}
+
+message Account {
+  uint64 version = 1;
+  string address_user = 2;
+  string address_raw = 3;
+  repeated string pubkeys = 4;
+  uint64 account_number = 5;
+  uint64 sequence = 6;
+  string status = 7;
+  AuthPolicy auth_policy = 8;
+  repeated string features = 9;
+  AccountMetadata metadata = 10;
+  string reputation_id = 11;
+  uint64 created_height = 12;
+  uint64 last_active_height = 13;
+  uint64 last_storage_charge_height = 14;
+  uint64 storage_rent_debt = 15;
+}

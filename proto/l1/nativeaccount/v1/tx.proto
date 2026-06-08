@@ -10,6 +10,13 @@ service Msg {
   option (cosmos.msg.v1.service) = true;
 
   rpc ActivateAccount(MsgActivateAccount) returns (MsgActivateAccountResponse);
+  rpc UpdateAuthPolicy(MsgUpdateAuthPolicy) returns (MsgUpdateAuthPolicyResponse);
+  rpc RotateKey(MsgRotateKey) returns (MsgRotateKeyResponse);
+  rpc RecoverAccount(MsgRecoverAccount) returns (MsgRecoverAccountResponse);
+  rpc FreezeAccount(MsgFreezeAccount) returns (MsgFreezeAccountResponse);
+  rpc PayStorageDebt(MsgPayStorageDebt) returns (MsgPayStorageDebtResponse);
+  rpc UnfreezeAccount(MsgUnfreezeAccount) returns (MsgUnfreezeAccountResponse);
+  rpc UpdateAccountMetadata(MsgUpdateAccountMetadata) returns (MsgUpdateAccountMetadataResponse);
 }
 
 message MsgActivateAccount {
@@ -27,4 +34,154 @@ message MsgActivateAccountResponse {
   string address_raw = 2;
   uint64 account_number = 3;
   uint64 sequence = 4;
+}
+
+message MsgUpdateAuthPolicy {
+  option (cosmos.msg.v1.signer) = "account_user";
+
+  string account_user = 1;
+  AuthPolicy new_auth_policy = 2;
+  repeated string signers = 3;
+  uint64 current_height = 4;
+}
+
+message MsgUpdateAuthPolicyResponse {
+  string address_user = 1;
+  uint64 sequence = 2;
+  string status = 3;
+}
+
+message MsgRotateKey {
+  option (cosmos.msg.v1.signer) = "account_user";
+
+  string account_user = 1;
+  string old_key_id = 2;
+  AuthKey new_key = 3;
+  repeated string signers = 4;
+  uint64 current_height = 5;
+}
+
+message MsgRotateKeyResponse {
+  string address_user = 1;
+  uint64 sequence = 2;
+  string status = 3;
+}
+
+message MsgRecoverAccount {
+  option (cosmos.msg.v1.signer) = "account_user";
+
+  string account_user = 1;
+  repeated string signers = 2;
+  uint64 current_height = 3;
+}
+
+message MsgRecoverAccountResponse {
+  string address_user = 1;
+  uint64 sequence = 2;
+  string status = 3;
+}
+
+message MsgFreezeAccount {
+  option (cosmos.msg.v1.signer) = "account_user";
+
+  string account_user = 1;
+  repeated string signers = 2;
+  uint64 current_height = 3;
+}
+
+message MsgFreezeAccountResponse {
+  string address_user = 1;
+  uint64 sequence = 2;
+  string status = 3;
+}
+
+message MsgPayStorageDebt {
+  option (cosmos.msg.v1.signer) = "account_user";
+
+  string account_user = 1;
+  uint64 amount = 2;
+  repeated string signers = 3;
+  uint64 current_height = 4;
+}
+
+message MsgPayStorageDebtResponse {
+  string address_user = 1;
+  uint64 storage_rent_debt = 2;
+  string status = 3;
+}
+
+message MsgUnfreezeAccount {
+  option (cosmos.msg.v1.signer) = "account_user";
+
+  string account_user = 1;
+  repeated string signers = 2;
+  uint64 current_height = 3;
+  bool storage_debt_paid = 4;
+  bool other_freeze_reason = 5;
+}
+
+message MsgUnfreezeAccountResponse {
+  string address_user = 1;
+  uint64 storage_rent_debt = 2;
+  string status = 3;
+}
+
+message MsgUpdateAccountMetadata {
+  option (cosmos.msg.v1.signer) = "account_user";
+
+  string account_user = 1;
+  AccountMetadata metadata = 2;
+  repeated string signers = 3;
+  uint64 current_height = 4;
+}
+
+message MsgUpdateAccountMetadataResponse {
+  string address_user = 1;
+  uint64 sequence = 2;
+  string status = 3;
+}
+
+message AuthKey {
+  string id = 1;
+  string public_key = 2;
+  string role = 3;
+}
+
+message AuthWeight {
+  string key_id = 1;
+  uint64 weight = 2;
+}
+
+message RecoveryPolicy {
+  repeated string keys = 1;
+  uint64 threshold = 2;
+  uint64 timelock_end_height = 3;
+}
+
+message TimelockPolicy {
+  uint64 auth_policy_update_end_height = 1;
+  uint64 recovery_end_height = 2;
+}
+
+message SpendingLimit {
+  string operation = 1;
+  uint64 max_amount = 2;
+}
+
+message AuthPolicy {
+  uint64 version = 1;
+  string mode = 2;
+  repeated AuthKey keys = 3;
+  uint64 threshold = 4;
+  repeated AuthWeight weights = 5;
+  RecoveryPolicy recovery_policy = 6;
+  TimelockPolicy timelock = 7;
+  repeated SpendingLimit spending_limits = 8;
+}
+
+message AccountMetadata {
+  string metadata_hash = 1;
+  string display_name_hash = 2;
+  string domain_alias = 3;
+  uint64 created_height = 4;
 }

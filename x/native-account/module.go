@@ -48,6 +48,7 @@ func (AppModule) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {}
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServerImpl(am.keeper))
 	if err := cfg.RegisterMigration(types.ModuleName, 1, func(ctx sdk.Context) error {
 		return am.keeper.Migrate1to2State(ctx)
 	}); err != nil {
