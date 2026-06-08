@@ -223,7 +223,7 @@ Delegator impact:
 - delegators are slashed pro rata because their stake contributes to validator
   power;
 - rewards and unbonding claims are recalculated after slash;
-- delegators are incentivized to choose reliable validators and diversify;
+- pool users are exposed through the official liquid staking pool/index, while allocation policy and governance controls are incentivized to diversify across reliable validators;
 - delegators must be able to see validator uptime, commission, slashing
   history, concentration, and tombstone status.
 

@@ -107,7 +107,9 @@ Send `naet` and pay fees in `naet`:
 build\aetrad.exe tx bank send node0 $node1 1000naet --home .localnet\node0\aetrad --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
 ```
 
-Delegate `naet` to a bonded validator:
+Attempt direct `naet` delegation to a bonded validator as a negative check.
+Normal user staking must use the official liquid staking pool/index, so this
+command must be rejected and the follow-up delegation query must remain empty:
 
 ```powershell
 $validator = (build\aetrad.exe query staking validators --node tcp://127.0.0.1:26657 --output json | ConvertFrom-Json).validators[0].operator_address

@@ -15,10 +15,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	l1app "github.com/sovereign-l1/l1/app"
+	"github.com/sovereign-l1/l1/app/stakingpolicy"
 	testutil "github.com/sovereign-l1/l1/tests/testutil"
 )
 
-func TestStakingTxReturnsValidatorSetUpdates(t *testing.T) {
+func TestDirectUserDelegationTxRejectedBeforeValidatorSetUpdates(t *testing.T) {
 	app := testutil.NewInitializedApp(t, "aetra-integration-pos-updates")
 	ctx := testutil.NewContext(app, 1)
 	delegatorPriv, delegator := testutil.AddFundedSigner(t, app, ctx, sdkmath.NewInt(20_000_000))
@@ -42,8 +43,9 @@ func TestStakingTxReturnsValidatorSetUpdates(t *testing.T) {
 
 	res := testutil.FinalizeBlock(t, app, 1, txBytes)
 	require.Len(t, res.TxResults, 1)
-	require.Zero(t, res.TxResults[0].Code, res.TxResults[0].Log)
-	require.NotEmpty(t, res.ValidatorUpdates, "staking power changes must reach CometBFT through FinalizeBlock")
+	require.NotZero(t, res.TxResults[0].Code)
+	require.Contains(t, res.TxResults[0].Log, stakingpolicy.DirectUserDelegationDisabledMessage)
+	require.Empty(t, res.ValidatorUpdates)
 	testutil.Commit(t, app)
 
 	afterCtx := testutil.NewContext(app, 2)
@@ -51,19 +53,12 @@ func TestStakingTxReturnsValidatorSetUpdates(t *testing.T) {
 	require.NoError(t, err)
 	updatedValidator, err := app.StakingKeeper.GetValidator(afterCtx, valAddr)
 	require.NoError(t, err)
-	require.Equal(t, beforePower+5, updatedValidator.GetConsensusPower(sdk.DefaultPowerReduction))
-
-	var found bool
-	for _, update := range res.ValidatorUpdates {
-		if update.Power == updatedValidator.GetConsensusPower(sdk.DefaultPowerReduction) {
-			found = true
-			break
-		}
-	}
-	require.True(t, found, "FinalizeBlock must return the updated voting power")
+	require.Equal(t, beforePower, updatedValidator.GetConsensusPower(sdk.DefaultPowerReduction))
+	_, err = app.StakingKeeper.GetDelegation(afterCtx, delegator, valAddr)
+	require.Error(t, err)
 }
 
-func TestStakingStateSurvivesExportImportRestart(t *testing.T) {
+func TestRejectedDirectUserDelegationDoesNotExportDelegationState(t *testing.T) {
 	app := testutil.NewInitializedApp(t, "aetra-integration-pos-restart")
 	ctx := testutil.NewContext(app, 1)
 	delegatorPriv, delegator := testutil.AddFundedSigner(t, app, ctx, sdkmath.NewInt(20_000_000))
@@ -88,7 +83,8 @@ func TestStakingStateSurvivesExportImportRestart(t *testing.T) {
 
 	res := testutil.FinalizeBlock(t, app, 1, txBytes)
 	require.Len(t, res.TxResults, 1)
-	require.Zero(t, res.TxResults[0].Code, res.TxResults[0].Log)
+	require.NotZero(t, res.TxResults[0].Code)
+	require.Contains(t, res.TxResults[0].Log, stakingpolicy.DirectUserDelegationDisabledMessage)
 	testutil.Commit(t, app)
 
 	exported, err := app.ExportAppStateAndValidators(false, nil, nil)
@@ -110,14 +106,12 @@ func TestStakingStateSurvivesExportImportRestart(t *testing.T) {
 	require.NoError(t, err)
 
 	restartedCtx := testutil.NewContext(restarted, 1)
-	restartedDelegation, err := restarted.StakingKeeper.GetDelegation(restartedCtx, delegator, valAddr)
-	require.NoError(t, err)
+	_, err = restarted.StakingKeeper.GetDelegation(restartedCtx, delegator, valAddr)
+	require.Error(t, err)
 
 	restartedValidator, err := restarted.StakingKeeper.GetValidator(restartedCtx, valAddr)
 	require.NoError(t, err)
-	restartedDelegationTokens := restartedValidator.TokensFromSharesTruncated(restartedDelegation.Shares).TruncateInt()
-	require.Equal(t, delegation, restartedDelegationTokens)
-	require.True(t, restartedValidator.Tokens.GTE(validator.Tokens.Add(delegation)))
+	require.Equal(t, validator.Tokens, restartedValidator.Tokens)
 }
 
 func bondedValidator(t *testing.T, app *l1app.L1App, ctx sdk.Context) stakingtypes.Validator {

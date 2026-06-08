@@ -93,34 +93,34 @@ Show the funded delegator account:
 build\aetrad.exe keys show node0 -a --home .localnet\node0\aetrad --keyring-backend test
 ```
 
-Delegate from `node0` to a bonded validator:
+Attempt direct delegation from `node0` to a bonded validator. This is a negative
+check: normal user staking must use the official liquid staking pool/index, so
+the direct validator choice is rejected.
 
 ```powershell
 build\aetrad.exe tx staking delegate <AE...validator> 5000000naet --from node0 --home .localnet\node0\aetrad --chain-id aetra-local-1 --keyring-backend test --fees 1000000naet --yes --broadcast-mode sync --node tcp://127.0.0.1:26657 --output json
 ```
 
-Expected output includes a `txhash`. Query the transaction until it returns `code = 0`:
+Expected output includes a `txhash`. Query the transaction until it returns a
+non-zero `code` and the pool-only policy error:
 
 ```powershell
 build\aetrad.exe query tx <txhash> --node tcp://127.0.0.1:26657 --output json
 ```
 
-Verify the delegation:
+Verify no direct delegation was created:
 
 ```powershell
 build\aetrad.exe query staking delegation <AE...delegator> <AE...validator> --node tcp://127.0.0.1:26657 --output json
 ```
 
-Expected output includes:
+Expected output is not found or empty; it must not include a delegated `naet`
+balance:
 
 ```json
 {
-  "delegation_response": {
-    "balance": {
-      "denom": "naet",
-      "amount": "5000000"
-    }
-  }
+  "code": 5,
+  "message": "not found"
 }
 ```
 

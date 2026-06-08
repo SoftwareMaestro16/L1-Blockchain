@@ -17,6 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	appparams "github.com/sovereign-l1/l1/app/params"
+	"github.com/sovereign-l1/l1/app/stakingpolicy"
 )
 
 func TestPoSCreateValidatorWithNaet(t *testing.T) {
@@ -36,7 +37,7 @@ func TestPoSCreateValidatorWithNaet(t *testing.T) {
 	require.Equal(t, validator.DelegatorShares, delegation.Shares)
 }
 
-func TestPoSDelegationUpdatesValidatorPower(t *testing.T) {
+func TestPoSDirectUserDelegationMsgRouteRejected(t *testing.T) {
 	app := Setup(t, false)
 	ctx := app.NewContext(false)
 
@@ -54,35 +55,24 @@ func TestPoSDelegationUpdatesValidatorPower(t *testing.T) {
 	beforeTokens := validator.Tokens
 	beforePower := validator.GetConsensusPower(sdk.DefaultPowerReduction)
 
-	msgServer := stakingkeeper.NewMsgServerImpl(app.StakingKeeper)
-	_, err = msgServer.Delegate(ctx, stakingtypes.NewMsgDelegate(
+	msg := stakingtypes.NewMsgDelegate(
 		delegator.String(),
 		validator.OperatorAddress,
 		sdk.NewCoin(BondDenom, delegation),
-	))
-	require.NoError(t, err)
+	)
+	handler := app.MsgServiceRouter().Handler(msg)
+	require.NotNil(t, handler)
+	_, err = handler(ctx, msg)
+	require.ErrorContains(t, err, stakingpolicy.DirectUserDelegationDisabledMessage)
 
 	valAddr := parseValidatorAddress(t, app, validator.OperatorAddress)
 	updatedValidator, err := app.StakingKeeper.GetValidator(ctx, valAddr)
 	require.NoError(t, err)
-	require.Equal(t, beforeTokens.Add(delegation), updatedValidator.Tokens)
-	require.Equal(t, beforePower+5, updatedValidator.GetConsensusPower(sdk.DefaultPowerReduction))
-
-	updates, err := app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
-	require.NoError(t, err)
-	require.NotEmpty(t, updates)
-
-	var found bool
-	for _, update := range updates {
-		if update.Power == updatedValidator.GetConsensusPower(sdk.DefaultPowerReduction) {
-			found = true
-			break
-		}
-	}
-	require.True(t, found, "expected validator-set update with new voting power")
+	require.Equal(t, beforeTokens, updatedValidator.Tokens)
+	require.Equal(t, beforePower, updatedValidator.GetConsensusPower(sdk.DefaultPowerReduction))
 }
 
-func TestPoSUnbondingFlow(t *testing.T) {
+func TestPoSDirectUserUnbondingMsgRouteRejected(t *testing.T) {
 	app := Setup(t, false)
 	ctx := app.NewContext(false).WithBlockTime(time.Now().UTC())
 
@@ -91,36 +81,30 @@ func TestPoSUnbondingFlow(t *testing.T) {
 	unbond := sdk.TokensFromConsensusPower(2, sdk.DefaultPowerReduction)
 	delegator := AddTestAddrsIncremental(app, ctx, 1, delegation.MulRaw(2))[0]
 
-	msgServer := stakingkeeper.NewMsgServerImpl(app.StakingKeeper)
-	_, err := msgServer.Delegate(ctx, stakingtypes.NewMsgDelegate(
-		delegator.String(),
-		validator.OperatorAddress,
-		sdk.NewCoin(BondDenom, delegation),
-	))
-	require.NoError(t, err)
+	delegateStakeFixture(t, app, ctx, delegator, validator, delegation)
 	balanceBeforeUnbond := app.BankKeeper.GetBalance(ctx, delegator, BondDenom)
 
-	undelegateRes, err := msgServer.Undelegate(ctx, stakingtypes.NewMsgUndelegate(
+	msg := stakingtypes.NewMsgUndelegate(
 		delegator.String(),
 		validator.OperatorAddress,
 		sdk.NewCoin(BondDenom, unbond),
-	))
-	require.NoError(t, err)
-	require.True(t, undelegateRes.CompletionTime.After(ctx.BlockTime()))
+	)
+	handler := app.MsgServiceRouter().Handler(msg)
+	require.NotNil(t, handler)
+	_, err := handler(ctx, msg)
+	require.ErrorContains(t, err, stakingpolicy.DirectUserDelegationDisabledMessage)
 
 	valAddr := parseValidatorAddress(t, app, validator.OperatorAddress)
 	remaining, err := app.StakingKeeper.GetDelegation(ctx, delegator, valAddr)
 	require.NoError(t, err)
 	require.True(t, remaining.Shares.IsPositive())
 
-	unbonding, err := app.StakingKeeper.GetUnbondingDelegation(ctx, delegator, valAddr)
-	require.NoError(t, err)
-	require.Len(t, unbonding.Entries, 1)
-	require.Equal(t, unbond, unbonding.Entries[0].Balance)
-	require.Equal(t, balanceBeforeUnbond, app.BankKeeper.GetBalance(ctx, delegator, BondDenom), "unbonded stake must not return before completion time")
+	_, err = app.StakingKeeper.GetUnbondingDelegation(ctx, delegator, valAddr)
+	require.Error(t, err)
+	require.Equal(t, balanceBeforeUnbond, app.BankKeeper.GetBalance(ctx, delegator, BondDenom))
 }
 
-func TestPoSRedelegationFlow(t *testing.T) {
+func TestPoSDirectUserRedelegationMsgRouteRejected(t *testing.T) {
 	app := Setup(t, false)
 	ctx := app.NewContext(false).WithBlockTime(time.Now().UTC())
 
@@ -132,93 +116,46 @@ func TestPoSRedelegationFlow(t *testing.T) {
 	redelegate := sdk.TokensFromConsensusPower(2, sdk.DefaultPowerReduction)
 	delegator := AddTestAddrsIncremental(app, ctx, 1, delegation.MulRaw(2))[0]
 
-	msgServer := stakingkeeper.NewMsgServerImpl(app.StakingKeeper)
-	_, err := msgServer.Delegate(ctx, stakingtypes.NewMsgDelegate(
-		delegator.String(),
-		source.OperatorAddress,
-		sdk.NewCoin(BondDenom, delegation),
-	))
-	require.NoError(t, err)
+	delegateStakeFixture(t, app, ctx, delegator, source, delegation)
 
-	redelegateRes, err := msgServer.BeginRedelegate(ctx, stakingtypes.NewMsgBeginRedelegate(
+	msg := stakingtypes.NewMsgBeginRedelegate(
 		delegator.String(),
 		source.OperatorAddress,
 		destination.OperatorAddress,
 		sdk.NewCoin(BondDenom, redelegate),
-	))
-	require.NoError(t, err)
-	require.True(t, redelegateRes.CompletionTime.After(ctx.BlockTime()))
+	)
+	handler := app.MsgServiceRouter().Handler(msg)
+	require.NotNil(t, handler)
+	_, err := handler(ctx, msg)
+	require.ErrorContains(t, err, stakingpolicy.DirectUserDelegationDisabledMessage)
 
 	srcValAddr := parseValidatorAddress(t, app, source.OperatorAddress)
 	sourceDelegation, err := app.StakingKeeper.GetDelegation(ctx, delegator, srcValAddr)
 	require.NoError(t, err)
 	require.True(t, sourceDelegation.Shares.IsPositive())
 
-	destinationDelegation, err := app.StakingKeeper.GetDelegation(ctx, delegator, dstValAddr)
-	require.NoError(t, err)
-	require.True(t, destinationDelegation.Shares.IsPositive())
+	_, err = app.StakingKeeper.GetDelegation(ctx, delegator, dstValAddr)
+	require.Error(t, err)
 
-	storedRedelegation, err := app.StakingKeeper.GetRedelegation(ctx, delegator, srcValAddr, dstValAddr)
-	require.NoError(t, err)
-	require.Len(t, storedRedelegation.Entries, 1)
-	require.Equal(t, redelegate, storedRedelegation.Entries[0].InitialBalance)
+	_, err = app.StakingKeeper.GetRedelegation(ctx, delegator, srcValAddr, dstValAddr)
+	require.Error(t, err)
 }
 
-func TestPoSRejectsInvalidDelegations(t *testing.T) {
-	tests := []struct {
-		name             string
-		fundedCoins      sdk.Coins
-		delegatorAddress string
-		delegationAmount sdk.Coin
-		validatorAddress string
-	}{
-		{
-			name:             "wrong denom",
-			fundedCoins:      sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 10_000_000), sdk.NewInt64Coin("uatom", 10_000_000)),
-			delegationAmount: sdk.NewInt64Coin("uatom", 5_000_000),
-		},
-		{
-			name:             "insufficient funds",
-			fundedCoins:      sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 1)),
-			delegationAmount: sdk.NewInt64Coin(BondDenom, 5_000_000),
-		},
-		{
-			name:             "invalid validator address",
-			fundedCoins:      sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 10_000_000)),
-			delegationAmount: sdk.NewInt64Coin(BondDenom, 5_000_000),
-			validatorAddress: "not-a-validator-address",
-		},
-		{
-			name:             "invalid delegator address",
-			delegatorAddress: "not-a-delegator-address",
-			delegationAmount: sdk.NewInt64Coin(BondDenom, 5_000_000),
-		},
-	}
+func TestPoSDirectUserDelegationRejectsBeforeSDKValidation(t *testing.T) {
+	app := Setup(t, false)
+	ctx := app.NewContext(false)
+	validator := GetBondedTestValidator(t, app, ctx)
+	delegator := AddTestAddrsWithCoins(t, app, ctx, 1, sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 10_000_000), sdk.NewInt64Coin("uatom", 10_000_000)))[0]
+	msg := stakingtypes.NewMsgDelegate(
+		delegator.String(),
+		validator.OperatorAddress,
+		sdk.NewInt64Coin("uatom", 5_000_000),
+	)
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			app := Setup(t, false)
-			ctx := app.NewContext(false)
-			validator := GetBondedTestValidator(t, app, ctx)
-			validatorAddress := validator.OperatorAddress
-			if tc.validatorAddress != "" {
-				validatorAddress = tc.validatorAddress
-			}
-
-			delegatorAddress := tc.delegatorAddress
-			if delegatorAddress == "" {
-				delegator := AddTestAddrsWithCoins(t, app, ctx, 1, tc.fundedCoins)[0]
-				delegatorAddress = delegator.String()
-			}
-			msgServer := stakingkeeper.NewMsgServerImpl(app.StakingKeeper)
-			_, err := msgServer.Delegate(ctx, stakingtypes.NewMsgDelegate(
-				delegatorAddress,
-				validatorAddress,
-				tc.delegationAmount,
-			))
-			require.Error(t, err)
-		})
-	}
+	handler := app.MsgServiceRouter().Handler(msg)
+	require.NotNil(t, handler)
+	_, err := handler(ctx, msg)
+	require.ErrorContains(t, err, stakingpolicy.DirectUserDelegationDisabledMessage)
 }
 
 func TestSlashingParamsAndSigningInfoRoundTrip(t *testing.T) {
@@ -269,13 +206,7 @@ func TestStakingRewardsDistributionCanBeWithdrawn(t *testing.T) {
 	delegation := sdk.TokensFromConsensusPower(5, sdk.DefaultPowerReduction)
 	delegator := AddTestAddrsIncremental(app, ctx, 1, delegation.MulRaw(2))[0]
 
-	msgServer := stakingkeeper.NewMsgServerImpl(app.StakingKeeper)
-	_, err := msgServer.Delegate(ctx, stakingtypes.NewMsgDelegate(
-		delegator.String(),
-		validator.OperatorAddress,
-		sdk.NewCoin(BondDenom, delegation),
-	))
-	require.NoError(t, err)
+	delegateStakeFixture(t, app, ctx, delegator, validator, delegation)
 
 	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1).WithBlockTime(ctx.BlockTime().Add(time.Second))
 	updatedValidator, err := app.StakingKeeper.GetValidator(ctx, valAddr)
@@ -355,6 +286,13 @@ func createFundedValidator(t *testing.T, app *L1App, ctx sdk.Context, moniker st
 	validator, err := app.StakingKeeper.GetValidator(ctx, valAddr)
 	require.NoError(t, err)
 	return valAddr, validator
+}
+
+func delegateStakeFixture(t *testing.T, app *L1App, ctx sdk.Context, delegator sdk.AccAddress, validator stakingtypes.Validator, amount sdkmath.Int) {
+	t.Helper()
+
+	_, err := app.StakingKeeper.Delegate(ctx, delegator, amount, stakingtypes.Unbonded, validator, true)
+	require.NoError(t, err)
 }
 
 func parseValidatorAddress(t *testing.T, app *L1App, text string) sdk.ValAddress {

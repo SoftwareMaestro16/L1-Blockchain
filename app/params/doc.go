@@ -10,10 +10,13 @@ file with the weights defined for each of the transaction operations:
 
 	{
 		"op_weight_msg_send": 60,
-		"op_weight_msg_delegate": 100,
+		"op_weight_msg_create_validator": 100,
 	}
 
 In the example above, the `MsgSend` has 60% chance to be simulated, while the
-`MsgDelegate` will always be simulated.
+validator creation operation will always be simulated. Direct user
+`MsgDelegate`, `MsgUndelegate`, and `MsgBeginRedelegate` simulations are
+disabled because normal user staking must go through the official liquid staking
+pool/index path.
 */
 package params

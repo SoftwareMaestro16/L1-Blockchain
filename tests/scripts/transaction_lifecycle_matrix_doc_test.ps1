@@ -22,7 +22,8 @@ $text = Get-Content -Raw -LiteralPath $MatrixPath
 
 foreach ($row in @(
     'Bank send',
-    'Staking delegate',
+    'Official liquid staking deposit',
+    'Direct staking delegate rejected',
     'Contract assets create denom',
     'Contract assets mint',
     'Contract assets burn',

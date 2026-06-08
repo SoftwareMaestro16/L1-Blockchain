@@ -132,7 +132,10 @@ build\aetrad.exe query slashing signing-infos --node $NODE --output json
 
 ## Staking Tx
 
-Delegate to any bonded validator returned by the validators query:
+Normal user staking goes through the official liquid staking pool/index, not a
+direct validator choice. Keep this direct `x/staking` command as a negative
+operator check: it must be rejected with the pool-only policy error and must not
+create a delegation.
 
 ```powershell
 $VALIDATOR = (build\aetrad.exe query staking validators --node $NODE --output json | ConvertFrom-Json).validators[0].operator_address

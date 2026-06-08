@@ -15,7 +15,7 @@ Behavior:
 - the receipt represents a claim on pool assets and rewards, not ownership of any validator;
 - the pool aggregates user deposits and sends validator-sized allocations through official pool accounting rules;
 - validator rewards and slashing exposure return to the pool and are applied by pool share;
-- direct user delegation to validators is disabled by default and exists only as an explicit governance-enabled operator path.
+- direct user delegation to validators is disabled in user-facing transaction paths; validator/operator and pool funding use governance-approved pool allocation and capability hooks, not normal user `MsgDelegate`.
 
 Example:
 

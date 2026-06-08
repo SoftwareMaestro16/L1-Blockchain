@@ -43,11 +43,11 @@ import (
 	protocolpoolkeeper "github.com/cosmos/cosmos-sdk/x/protocolpool/keeper"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
-	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 
+	"github.com/sovereign-l1/l1/app/stakingpolicy"
 	actorregistrymodule "github.com/sovereign-l1/l1/x/actor-registry"
 	actorregistrykeeper "github.com/sovereign-l1/l1/x/actor-registry/keeper"
 	aetracoremodule "github.com/sovereign-l1/l1/x/aetracore"
@@ -198,7 +198,7 @@ func NewModuleManager(deps ModuleDeps) *module.Manager {
 		mint.NewAppModule(deps.AppCodec, deps.MintKeeper, deps.AccountKeeper, nil, nil),
 		slashing.NewAppModule(deps.AppCodec, deps.SlashingKeeper, deps.AccountKeeper, deps.BankKeeper, deps.StakingKeeper, nil, deps.InterfaceRegistry),
 		distr.NewAppModule(deps.AppCodec, deps.DistrKeeper, deps.AccountKeeper, deps.BankKeeper, deps.StakingKeeper, nil),
-		staking.NewAppModule(deps.AppCodec, deps.StakingKeeper, deps.AccountKeeper, deps.BankKeeper, nil),
+		stakingpolicy.NewAppModule(deps.AppCodec, deps.StakingKeeper, deps.AccountKeeper, deps.BankKeeper, nil),
 		upgrade.NewAppModule(deps.UpgradeKeeper, deps.AccountKeeper.AddressCodec()),
 		evidence.NewAppModule(deps.EvidenceKeeper),
 		authzmodule.NewAppModule(deps.AppCodec, deps.AuthzKeeper, deps.AccountKeeper, deps.BankKeeper, deps.InterfaceRegistry),
