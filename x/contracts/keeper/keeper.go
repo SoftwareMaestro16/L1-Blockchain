@@ -3,6 +3,7 @@ package keeper
 import (
 	"errors"
 	"fmt"
+	"math"
 
 	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	"github.com/sovereign-l1/l1/x/contracts/types"
@@ -137,7 +138,15 @@ func (k *Keeper) InstantiateContract(msg types.MsgInstantiateContract) (types.In
 	if _, found := findContract(k.genesis.State.Contracts, user); found {
 		return types.InstantiateContractResponse{}, errors.New(types.ErrContractNotFound + ": contract address already exists")
 	}
-	if msg.StorageBytes > k.genesis.Params.MaxContractStorageBytes {
+	data := append([]byte(nil), msg.InitMsg...)
+	storageBytes, err := contractStorageBytesForCode(code, data)
+	if err != nil {
+		return types.InstantiateContractResponse{}, err
+	}
+	if msg.StorageBytes != 0 && msg.StorageBytes != storageBytes {
+		return types.InstantiateContractResponse{}, errors.New(types.ErrStorageRent + ": contract storage must equal code bytes plus data bytes")
+	}
+	if storageBytes > k.genesis.Params.MaxContractStorageBytes {
 		return types.InstantiateContractResponse{}, errors.New(types.ErrStorageRent + ": contract storage exceeds configured limit")
 	}
 	contract := types.Contract{
@@ -147,11 +156,11 @@ func (k *Keeper) InstantiateContract(msg types.MsgInstantiateContract) (types.In
 		Creator:                 msg.Creator,
 		Owner:                   msg.Creator,
 		Admin:                   admin,
-		InitMsg:                 append([]byte(nil), msg.InitMsg...),
-		Data:                    append([]byte(nil), msg.InitMsg...),
+		InitMsg:                 append([]byte(nil), data...),
+		Data:                    append([]byte(nil), data...),
 		Balance:                 msg.Funds,
 		Status:                  types.ContractStatusActive,
-		StorageBytes:            msg.StorageBytes,
+		StorageBytes:            storageBytes,
 		LastStorageChargeHeight: msg.Height,
 		CreatedHeight:           msg.Height,
 		UpdatedHeight:           msg.Height,
@@ -199,17 +208,24 @@ func (k *Keeper) ExecuteContract(msg types.MsgExecuteContract) (types.ExecuteCon
 	if contract.Status == types.ContractStatusFrozen {
 		return types.ExecuteContractResponse{}, errors.New(types.ErrAccountFrozen + ": frozen contract cannot execute normal calls")
 	}
-	contract = k.chargeRent(contract, msg.Height)
-	if contract.StorageRentDebt > 0 {
-		contract.Status = types.ContractStatusFrozen
-		next := k.genesis
-		next.State.Contracts[idx] = contract
-		next = types.RefreshStateRoot(next)
-		k.genesis = next
+	contract, err := k.chargeContractRentAt(idx, contract, msg.Height)
+	if err != nil {
 		return types.ExecuteContractResponse{}, errors.New(types.ErrStorageRent + ": contract has storage rent debt")
 	}
-	contract.Balance += msg.Funds
+	balance, err := checkedAdd(contract.Balance, msg.Funds, "contract balance overflow")
+	if err != nil {
+		return types.ExecuteContractResponse{}, err
+	}
+	contract.Balance = balance
 	contract.Data = append([]byte(nil), msg.Msg...)
+	storageBytes, err := k.contractStorageBytes(contract)
+	if err != nil {
+		return types.ExecuteContractResponse{}, err
+	}
+	if storageBytes > k.genesis.Params.MaxContractStorageBytes {
+		return types.ExecuteContractResponse{}, errors.New(types.ErrStorageRent + ": contract storage exceeds configured limit")
+	}
+	contract.StorageBytes = storageBytes
 	contract.UpdatedHeight = msg.Height
 	next := k.genesis
 	next.State.Contracts[idx] = contract
@@ -243,7 +259,11 @@ func (k *Keeper) TopUpContract(msg types.MsgTopUpContract) (types.Contract, erro
 	if !found {
 		return types.Contract{}, errors.New(types.ErrContractNotFound + ": contract not found")
 	}
-	contract.Balance += msg.Amount
+	balance, err := checkedAdd(contract.Balance, msg.Amount, "contract top-up balance overflow")
+	if err != nil {
+		return types.Contract{}, err
+	}
+	contract.Balance = balance
 	contract.UpdatedHeight = msg.Height
 	next := k.genesis
 	next.State.Contracts[idx] = contract
@@ -349,12 +369,16 @@ func (k *Keeper) InjectNativeStaking(msg types.MsgInjectNativeStaking) (types.Na
 	if err := types.ValidateAddressPair("native staking caller contract", msg.CallerContractUser, msg.CallerContractRaw); err != nil {
 		return types.NativeStakingInjectionRecord{}, err
 	}
-	contract, found := findContract(k.genesis.State.Contracts, msg.CallerContractUser)
+	idx, contract, found := findContractWithIndex(k.genesis.State.Contracts, msg.CallerContractUser)
 	if !found {
 		return types.NativeStakingInjectionRecord{}, errors.New(types.ErrContractNotFound + ": contract not found")
 	}
 	if contract.Status != types.ContractStatusActive {
 		return types.NativeStakingInjectionRecord{}, errors.New(types.ErrAccountFrozen + ": frozen contract cannot inject native staking")
+	}
+	contract, err := k.chargeContractRentAt(idx, contract, msg.Height)
+	if err != nil {
+		return types.NativeStakingInjectionRecord{}, errors.New(types.ErrStorageRent + ": contract has storage rent debt")
 	}
 	if !hasCapability(k.genesis.State.StakingCapabilities, msg.CallerContractUser, msg.PoolID) {
 		return types.NativeStakingInjectionRecord{}, errors.New(types.ErrUnauthorized + ": contract lacks native staking capability")
@@ -387,12 +411,15 @@ func (k *Keeper) ReceiveInternalMessage(msg types.MsgReceiveInternalMessage) (ty
 	if err := record.Validate(); err != nil {
 		return types.InternalMessage{}, err
 	}
-	contract, found := findContract(k.genesis.State.Contracts, msg.SourceContractUser)
+	idx, contract, found := findContractWithIndex(k.genesis.State.Contracts, msg.SourceContractUser)
 	if !found {
 		return types.InternalMessage{}, errors.New(types.ErrContractNotFound + ": source contract not found")
 	}
 	if contract.Status != types.ContractStatusActive {
 		return types.InternalMessage{}, errors.New(types.ErrAccountFrozen + ": frozen contract cannot send internal messages")
+	}
+	if _, err := k.chargeContractRentAt(idx, contract, msg.Height); err != nil {
+		return types.InternalMessage{}, errors.New(types.ErrStorageRent + ": contract has storage rent debt")
 	}
 	next := k.genesis
 	next.State.InternalMessages = append(next.State.InternalMessages, record)
@@ -453,20 +480,96 @@ func (k *Keeper) ensureActiveWallet(address string, operation string) error {
 	return nil
 }
 
-func (k Keeper) chargeRent(contract types.Contract, height uint64) types.Contract {
+func (k *Keeper) chargeContractRentAt(idx int, contract types.Contract, height uint64) (types.Contract, error) {
+	contract, changed, err := k.chargeRent(contract, height)
+	if err != nil {
+		return types.Contract{}, err
+	}
+	if contract.StorageRentDebt > 0 {
+		contract.Status = types.ContractStatusFrozen
+		if err := k.persistContractAt(idx, contract); err != nil {
+			return types.Contract{}, err
+		}
+		return contract, errors.New(types.ErrStorageRent + ": contract has storage rent debt")
+	}
+	if changed {
+		if err := k.persistContractAt(idx, contract); err != nil {
+			return types.Contract{}, err
+		}
+	}
+	return contract, nil
+}
+
+func (k *Keeper) persistContractAt(idx int, contract types.Contract) error {
+	if idx < 0 || idx >= len(k.genesis.State.Contracts) {
+		return errors.New(types.ErrContractNotFound + ": contract index out of bounds")
+	}
+	next := k.genesis
+	next.State.Contracts[idx] = contract
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return err
+	}
+	k.genesis = next
+	return nil
+}
+
+func (k Keeper) chargeRent(contract types.Contract, height uint64) (types.Contract, bool, error) {
+	if height < contract.LastStorageChargeHeight {
+		return types.Contract{}, false, errors.New(types.ErrStorageRent + ": contract storage rent height must be monotonic")
+	}
 	if height <= contract.LastStorageChargeHeight || contract.StorageBytes == 0 || k.genesis.Params.StorageRentPerByteBlock == 0 {
-		return contract
+		return contract, false, nil
 	}
 	blocks := height - contract.LastStorageChargeHeight
-	charge := blocks * contract.StorageBytes * k.genesis.Params.StorageRentPerByteBlock
+	charge, err := checkedMul(blocks, contract.StorageBytes, "contract storage rent overflow")
+	if err != nil {
+		return types.Contract{}, false, err
+	}
+	charge, err = checkedMul(charge, k.genesis.Params.StorageRentPerByteBlock, "contract storage rent overflow")
+	if err != nil {
+		return types.Contract{}, false, err
+	}
 	if contract.Balance >= charge {
 		contract.Balance -= charge
 	} else {
-		contract.StorageRentDebt += charge - contract.Balance
+		unpaid := charge - contract.Balance
+		debt, err := checkedAdd(contract.StorageRentDebt, unpaid, "contract storage rent debt overflow")
+		if err != nil {
+			return types.Contract{}, false, err
+		}
+		contract.StorageRentDebt = debt
 		contract.Balance = 0
 	}
 	contract.LastStorageChargeHeight = height
-	return contract
+	return contract, true, nil
+}
+
+func (k Keeper) contractStorageBytes(contract types.Contract) (uint64, error) {
+	code, found := findCode(k.genesis.State.Codes, contract.CodeID)
+	if !found {
+		return 0, errors.New(types.ErrContractNotFound + ": contract code not found")
+	}
+	return contractStorageBytesForCode(code, contract.Data)
+}
+
+func contractStorageBytesForCode(code types.CodeRecord, data []byte) (uint64, error) {
+	dataBytes := uint64(len(data))
+	return checkedAdd(code.CodeBytes, dataBytes, "contract storage size overflow")
+}
+
+func checkedAdd(left, right uint64, message string) (uint64, error) {
+	if left > math.MaxUint64-right {
+		return 0, errors.New(message)
+	}
+	return left + right, nil
+}
+
+func checkedMul(left, right uint64, message string) (uint64, error) {
+	if left != 0 && right > math.MaxUint64/left {
+		return 0, errors.New(message)
+	}
+	return left * right, nil
 }
 
 func upsertCode(codes []types.CodeRecord, code types.CodeRecord) []types.CodeRecord {

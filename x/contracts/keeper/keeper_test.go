@@ -62,40 +62,48 @@ func TestWalletInstantiatesExecutesAndPassesFunds(t *testing.T) {
 	wallet := aeAddress("11")
 	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive})
 	codeHash := storeContractCode(t, &k, wallet)
+	initMsg := []byte(`{"owner":"wallet"}`)
+	initialFunds := uint64(500)
 
 	created, err := k.InstantiateContract(types.MsgInstantiateContract{
-		Creator:      wallet,
-		CodeID:       codeHash,
-		InitMsg:      []byte(`{"owner":"wallet"}`),
-		Funds:        100,
-		Admin:        wallet,
-		Salt:         "contract-a",
-		StorageBytes: 4,
-		Height:       10,
+		Creator: wallet,
+		CodeID:  codeHash,
+		InitMsg: initMsg,
+		Funds:   initialFunds,
+		Admin:   wallet,
+		Salt:    "contract-a",
+		Height:  10,
 	})
 	require.NoError(t, err)
 	require.Equal(t, wallet, created.Owner)
 	require.Equal(t, wallet, created.Admin)
-	require.Equal(t, uint64(100), created.Balance)
+	require.Equal(t, initialFunds, created.Balance)
 	require.True(t, stringsHasPrefix(created.ContractAddressUser, "AE"))
 	require.True(t, stringsHasPrefix(created.ContractAddressRaw, "4:"))
 	require.Equal(t, types.EventTypeContractInstantiated, created.Events[0].Type)
 	require.Equal(t, created.ContractAddressUser, created.Events[0].Contract)
 	require.Equal(t, created.ContractAddressRaw, created.Events[0].InternalRaw)
+	query, err := k.Contract(types.QueryContractRequest{ContractAddress: created.ContractAddressUser})
+	require.NoError(t, err)
+	require.Equal(t, contractStorageBytes(128, initMsg), query.Contract.StorageBytes)
 
+	execMsg := []byte(`{"transfer":1}`)
 	executed, err := k.ExecuteContract(types.MsgExecuteContract{
 		Sender:          wallet,
 		ContractAddress: created.ContractAddressUser,
-		Msg:             []byte(`{"transfer":1}`),
+		Msg:             execMsg,
 		Funds:           25,
 		Height:          11,
 	})
 	require.NoError(t, err)
 	require.Equal(t, created.ContractAddressUser, executed.ContractAddressUser)
-	require.Equal(t, uint64(121), executed.Balance)
+	require.Equal(t, initialFunds-contractStorageBytes(128, initMsg)+25, executed.Balance)
 	require.Equal(t, types.EventTypeContractExecuted, executed.Events[0].Type)
 	require.Equal(t, created.ContractAddressUser, executed.Events[0].Contract)
 	require.Equal(t, created.ContractAddressRaw, executed.Events[0].InternalRaw)
+	query, err = k.Contract(types.QueryContractRequest{ContractAddress: created.ContractAddressUser})
+	require.NoError(t, err)
+	require.Equal(t, contractStorageBytes(128, execMsg), query.Contract.StorageBytes)
 }
 
 func TestFrozenWalletCannotInstantiateOrExecuteUntilUnfrozen(t *testing.T) {
@@ -103,7 +111,7 @@ func TestFrozenWalletCannotInstantiateOrExecuteUntilUnfrozen(t *testing.T) {
 	status := testAccountStatus{wallet: accountStatusActive}
 	k := NewKeeperWithAccountStatus(status)
 	codeHash := storeContractCode(t, &k, wallet)
-	created := instantiateContract(t, &k, wallet, codeHash, "contract-a", 10, 10, 2)
+	created := instantiateContract(t, &k, wallet, codeHash, "contract-a", 10, 300, 2)
 
 	status[wallet] = accountStatusFrozen
 	k.accountStatusReader = status
@@ -223,8 +231,8 @@ func TestOfficialLiquidStakingContractCapabilityAllowsNativeHookOnlyForAuthorize
 	wallet := aeAddress("11")
 	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive})
 	codeHash := storeContractCode(t, &k, wallet)
-	official := instantiateContract(t, &k, wallet, codeHash, "official-lst", 10, 100, 0)
-	unauthorized := instantiateContract(t, &k, wallet, codeHash, "other-contract", 11, 100, 0)
+	official := instantiateContract(t, &k, wallet, codeHash, "official-lst", 10, 1000, 0)
+	unauthorized := instantiateContract(t, &k, wallet, codeHash, "other-contract", 11, 1000, 0)
 
 	capability, err := k.GrantNativeStakingCapability(types.MsgGrantNativeStakingCapability{
 		Authority:           types.DefaultParams().Authority,
@@ -301,12 +309,45 @@ func TestNativeStakingCapabilityRejectsBadAuthorityAndFrozenContract(t *testing.
 	require.Equal(t, types.ContractStatusFrozen, query.Contract.Status)
 }
 
+func TestNativeStakingHookChargesStorageRentBeforeInjection(t *testing.T) {
+	wallet := aeAddress("11")
+	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive})
+	codeHash := storeContractCode(t, &k, wallet)
+	official := instantiateContract(t, &k, wallet, codeHash, "official-rent", 10, 1, 0)
+
+	_, err := k.GrantNativeStakingCapability(types.MsgGrantNativeStakingCapability{
+		Authority:           types.DefaultParams().Authority,
+		ContractAddressUser: official.ContractAddressUser,
+		ContractAddressRaw:  official.ContractAddressRaw,
+		PoolID:              "official-pool",
+		Height:              11,
+	})
+	require.NoError(t, err)
+
+	_, err = k.InjectNativeStaking(types.MsgInjectNativeStaking{
+		CallerContractUser: official.ContractAddressUser,
+		CallerContractRaw:  official.ContractAddressRaw,
+		PoolID:             "official-pool",
+		Amount:             500,
+		Height:             12,
+	})
+	require.ErrorContains(t, err, types.ErrStorageRent)
+
+	query, err := k.Contract(types.QueryContractRequest{ContractAddress: official.ContractAddressUser})
+	require.NoError(t, err)
+	require.Equal(t, types.ContractStatusFrozen, query.Contract.Status)
+	require.Zero(t, query.Contract.Balance)
+	require.Equal(t, []byte("init"), query.Contract.Data)
+	require.NotZero(t, query.Contract.StorageRentDebt)
+	require.Empty(t, k.ExportGenesis().State.NativeStakingInjects)
+}
+
 func TestInternalMessagesAndExportImportAreDeterministic(t *testing.T) {
 	wallet := aeAddress("11")
 	destination := aeAddress("22")
 	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive})
 	codeHash := storeContractCode(t, &k, wallet)
-	contract := instantiateContract(t, &k, wallet, codeHash, "internal", 10, 100, 0)
+	contract := instantiateContract(t, &k, wallet, codeHash, "internal", 10, 1000, 0)
 
 	message, err := k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{
 		SourceContractUser: contract.ContractAddressUser,
@@ -324,6 +365,28 @@ func TestInternalMessagesAndExportImportAreDeterministic(t *testing.T) {
 	roundTrip := NewKeeper()
 	require.NoError(t, roundTrip.InitGenesis(exported))
 	require.Equal(t, exported, roundTrip.ExportGenesis())
+}
+
+func TestInternalMessageChargesStorageRentBeforeSend(t *testing.T) {
+	wallet := aeAddress("11")
+	destination := aeAddress("22")
+	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive})
+	codeHash := storeContractCode(t, &k, wallet)
+	contract := instantiateContract(t, &k, wallet, codeHash, "internal-rent", 10, 1, 0)
+
+	_, err := k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{
+		SourceContractUser: contract.ContractAddressUser,
+		DestinationAccount: destination,
+		Funds:              7,
+		Body:               []byte("hello"),
+		Height:             12,
+	})
+	require.ErrorContains(t, err, types.ErrStorageRent)
+
+	query, err := k.Contract(types.QueryContractRequest{ContractAddress: contract.ContractAddressUser})
+	require.NoError(t, err)
+	require.Equal(t, types.ContractStatusFrozen, query.Contract.Status)
+	require.Empty(t, k.ExportGenesis().State.InternalMessages)
 }
 
 type testAccountStatus map[string]string
@@ -350,11 +413,15 @@ func instantiateContract(t *testing.T, k *Keeper, owner string, codeHash string,
 		Funds:        funds,
 		Admin:        owner,
 		Salt:         salt,
-		StorageBytes: storageBytes,
+		StorageBytes: 0,
 		Height:       height,
 	})
 	require.NoError(t, err)
 	return created
+}
+
+func contractStorageBytes(codeBytes uint64, data []byte) uint64 {
+	return codeBytes + uint64(len(data))
 }
 
 func aeAddress(hexByte string) string {

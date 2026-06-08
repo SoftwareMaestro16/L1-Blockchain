@@ -98,9 +98,10 @@ func TestWalletInsufficientBalanceAccumulatesDebtFreezesAndPreservesState(t *tes
 	})
 
 	require.NoError(t, err)
-	require.Equal(t, uint64(30), result.StorageRentDelta)
-	require.Equal(t, uint64(32), result.EffectiveFee)
-	require.Equal(t, uint64(30), result.Account.StorageRentDebt)
+	require.Equal(t, uint64(10), result.StorageBytes)
+	require.Equal(t, uint64(20), result.StorageRentDelta)
+	require.Equal(t, uint64(22), result.EffectiveFee)
+	require.Equal(t, uint64(20), result.Account.StorageRentDebt)
 	require.Equal(t, AccountStatusFrozen, result.Account.Status)
 	require.True(t, result.Frozen)
 	require.Equal(t, uint64(0), result.Balance)

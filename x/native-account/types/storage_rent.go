@@ -62,11 +62,7 @@ func WalletPersistentStorageSize(usage WalletStorageUsage) (uint64, error) {
 	if total > math.MaxUint64-usage.DataBytes {
 		return 0, errors.New("native wallet storage size overflow")
 	}
-	total += usage.DataBytes
-	if total > math.MaxUint64-usage.IndexBytes {
-		return 0, errors.New("native wallet storage size overflow")
-	}
-	return total + usage.IndexBytes, nil
+	return total + usage.DataBytes, nil
 }
 
 func CollectWalletStorageRent(input WalletRentInput) (WalletRentResult, error) {
