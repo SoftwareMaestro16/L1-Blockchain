@@ -167,6 +167,28 @@ function Assert-NativeCommandFails {
   $global:LASTEXITCODE = 0
 }
 
+function Invoke-NativeCommand {
+  param(
+    [string[]]$Arguments,
+    [string]$FailureMessage
+  )
+
+  $previousErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    $output = & $Binary @Arguments 2>&1
+    $exitCode = $LASTEXITCODE
+  } finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
+  if ($exitCode -ne 0) {
+    $text = $output -join "`n"
+    throw "$FailureMessage`: $text"
+  }
+  $global:LASTEXITCODE = 0
+  return $output
+}
+
 Push-Location $RepoRoot
 try {
   $goCache = Join-Path $RepoRoot ".work\gocache"
@@ -194,10 +216,7 @@ try {
   $node1Raw = [string](Invoke-LocalnetCliJson -Binary $Binary -Arguments @("address", "convert", $node1)).raw
   $node1SDK = Get-LocalnetKeySDKAddress -NodeHome $node1Home -KeyName "node1"
   $exportUserKey = "export-user"
-  $keyOutput = & $Binary keys add $exportUserKey --home $node0Home --keyring-backend test --no-backup 2>&1
-  if ($LASTEXITCODE -ne 0) {
-    throw "failed to create non-validator export user key"
-  }
+  Invoke-NativeCommand -Arguments @("keys", "add", $exportUserKey, "--home", $node0Home, "--keyring-backend", "test", "--no-backup") -FailureMessage "failed to create non-validator export user key" | Out-Null
   $exportUser = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node0Home -KeyName $exportUserKey
   $exportUserRaw = [string](Invoke-LocalnetCliJson -Binary $Binary -Arguments @("address", "convert", $exportUser)).raw
   $exportUserSDK = Get-LocalnetKeySDKAddress -NodeHome $node0Home -KeyName $exportUserKey

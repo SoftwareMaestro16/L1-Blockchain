@@ -12,7 +12,7 @@ permissions:
 
 env:
   GOFLAGS: "-p=1"
-  AETRA_BINARY: build\aetrad.exe
+  AETRA_BINARY: build/aetrad.exe
 
 jobs:
   go-test-all:
@@ -62,8 +62,8 @@ jobs:
           # ValidateAetraTestnetChainID
           go test ./app/params ./cmd/l1d/cmd -run "ChainID|TestnetInitRejectsMalformedChainID" -count=1
 
-  version-command:
-    name: node binary version command
+  build-aetrad:
+    name: build aetrad
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -75,23 +75,49 @@ jobs:
       - name: Build node binary
         shell: pwsh
         run: ./scripts/build-aetrad.ps1 -Binary $env:AETRA_BINARY -SkipModVerify
+      - name: Upload aetrad binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: aetrad-windows-amd64
+          path: ${{ env.AETRA_BINARY }}
+          if-no-files-found: error
+          retention-days: 1
+
+  version-command:
+    name: node binary version command
+    runs-on: windows-latest
+    timeout-minutes: 10
+    needs:
+      - build-aetrad
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download aetrad binary
+        uses: actions/download-artifact@v4
+        with:
+          name: aetrad-windows-amd64
+          path: build
       - name: aetrad version --long --output json
         shell: pwsh
-        run: ./build/aetrad.exe version --long --output json
+        run: |
+          if (!(Test-Path $env:AETRA_BINARY)) { throw "missing $env:AETRA_BINARY" }
+          ./build/aetrad.exe version --long --output json
 
   genesis-validate:
     name: genesis validate
     runs-on: windows-latest
-    timeout-minutes: 35
+    timeout-minutes: 20
+    needs:
+      - build-aetrad
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Download aetrad binary
+        uses: actions/download-artifact@v4
         with:
-          go-version-file: go.mod
-          cache: true
-      - name: Build node binary
+          name: aetrad-windows-amd64
+          path: build
+      - name: Verify downloaded binary
         shell: pwsh
-        run: ./scripts/build-aetrad.ps1 -Binary $env:AETRA_BINARY -SkipModVerify
+        run: if (!(Test-Path $env:AETRA_BINARY)) { throw "missing $env:AETRA_BINARY" }
       - name: scripts/localnet/validate-genesis.ps1
         shell: pwsh
         run: ./scripts/localnet/validate-genesis.ps1 -Binary $env:AETRA_BINARY -ChainId aetra-local-1 -ValidatorCount 3
@@ -116,19 +142,19 @@ jobs:
     timeout-minutes: 45
     needs:
       - genesis-validate
-      - version-command
+      - build-aetrad
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Download aetrad binary
+        uses: actions/download-artifact@v4
         with:
-          go-version-file: go.mod
-          cache: true
-      - name: Build node binary
-        shell: pwsh
-        run: ./scripts/build-aetrad.ps1 -Binary $env:AETRA_BINARY -SkipModVerify
+          name: aetrad-windows-amd64
+          path: build
       - name: tests/e2e/localnet_smoke.ps1
         shell: pwsh
-        run: ./tests/e2e/localnet_smoke.ps1 -Binary $env:AETRA_BINARY -ChainId aetra-local-1 -ValidatorCount 3 -SkipBuild
+        run: |
+          if (!(Test-Path $env:AETRA_BINARY)) { throw "missing $env:AETRA_BINARY" }
+          ./tests/e2e/localnet_smoke.ps1 -Binary $env:AETRA_BINARY -ChainId aetra-local-1 -ValidatorCount 3 -SkipBuild
 
   export-import-roundtrip:
     name: export/import roundtrip
@@ -136,19 +162,19 @@ jobs:
     timeout-minutes: 55
     needs:
       - genesis-validate
-      - version-command
+      - build-aetrad
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Download aetrad binary
+        uses: actions/download-artifact@v4
         with:
-          go-version-file: go.mod
-          cache: true
-      - name: Build node binary
-        shell: pwsh
-        run: ./scripts/build-aetrad.ps1 -Binary $env:AETRA_BINARY -SkipModVerify
+          name: aetrad-windows-amd64
+          path: build
       - name: tests/e2e/export_import_smoke.ps1
         shell: pwsh
-        run: ./tests/e2e/export_import_smoke.ps1 -Binary $env:AETRA_BINARY -ChainId aetra-local-1 -ValidatorCount 3
+        run: |
+          if (!(Test-Path $env:AETRA_BINARY)) { throw "missing $env:AETRA_BINARY" }
+          ./tests/e2e/export_import_smoke.ps1 -Binary $env:AETRA_BINARY -ChainId aetra-local-1 -ValidatorCount 3
 
   validator-docs:
     name: validator documentation minimum
