@@ -8,6 +8,17 @@ The full public testnet and production gate ledger is
 
 ## Profiles
 
+Run the objective readiness report before starting localnet profiles. It checks
+that AVM/contracts, native-account, official pool staking, storage rent,
+governance/config safety, app invariants, export/import evidence, and
+contract-only token/NFT/DEX boundaries are implemented in runtime paths rather
+than only prototype/spec packages:
+
+```powershell
+.\scripts\testnet\public-testnet-readiness-report.ps1
+.\scripts\testnet\public-testnet-readiness-report.ps1 -OutputFormat Json
+```
+
 Run all local profiles before publishing testnet genesis:
 
 ```powershell
@@ -22,7 +33,12 @@ Individual profiles:
 .\scripts\testnet\public-testnet-preflight.ps1 -ValidatorProfile 10 -SkipBuild
 ```
 
-The preflight runs full prototype acceptance, validates the requested validator count, exercises bank, fees, staking, tokenfactory, DEX, query surfaces, restart persistence, and asserts CosmWasm remains disabled unless explicitly gated. The 10-validator profile is the stress profile for public testnet readiness; it is expected to be slower and should run before advertising modular execution features.
+The preflight runs full prototype acceptance, validates the requested validator count, exercises bank, fees, official liquid staking pool flows, direct delegation rejection, storage rent recovery behavior, query surfaces, restart persistence, and asserts CosmWasm remains disabled unless explicitly gated. Token, NFT, and DEX-style behavior must be exercised through AVM contracts and standards, not through native app modules. The 10-validator profile is the stress profile for public testnet readiness; it is expected to be slower and should run before advertising modular execution features.
+
+The focused E2E smoke command list is maintained in
+[Public Testnet E2E Smoke Commands](public-testnet-e2e-smoke-commands.md).
+Long-running network evidence is tracked in
+[Public Testnet Long-Running Evidence](public-testnet-long-running-evidence.md).
 
 ## Localnet Hardening
 

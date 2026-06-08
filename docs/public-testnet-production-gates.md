@@ -13,6 +13,9 @@ triaged with owner, severity, mitigation, and target milestone.
 
 Required checks:
 
+- Objective readiness report passes:
+  - `scripts\testnet\public-testnet-readiness-report.ps1`
+  - `scripts\testnet\public-testnet-readiness-report.ps1 -OutputFormat Json`
 - `go test ./...` passes.
 - `go vet ./...` passes.
 - `buf lint` passes.
@@ -42,11 +45,19 @@ Required checks:
   - `go test ./x/aetravm/avm ./x/aetravm/async`
 - Contract standard smoke passes if async contracts are enabled:
   - `go test ./x/aetravm/standards/...`
+- E2E smoke command list is current:
+  - `docs\public-testnet-e2e-smoke-commands.md`
+- Long-running evidence checklist exists and has owners before launch:
+  - `docs\public-testnet-long-running-evidence.md`
 
 Blocking rule:
 
 - Any untriaged `Critical` or `High` fund-safety, consensus-safety, or
   secret-leak finding blocks public testnet.
+- Any required runtime module that is only prototype/spec state blocks public
+  testnet. The readiness report must explicitly fail if AVM/contracts,
+  native-account, official pool staking, storage rent enforcement, governance
+  safety, app invariants, or export/import are not wired into runtime paths.
 
 ## Phase 12 Modular Execution Public Testnet Gate
 
