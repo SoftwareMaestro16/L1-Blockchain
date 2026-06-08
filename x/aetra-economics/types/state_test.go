@@ -65,6 +65,43 @@ func TestFeeSplitAccounting(t *testing.T) {
 	require.Equal(t, split.FeesCollected, split.BurnAmount+split.TreasuryAmount+split.ValidatorDelegatorRewards)
 }
 
+func TestEconomicsAuthorityPathIsSinglePolicySource(t *testing.T) {
+	path := types.DefaultEconomicsAuthorityPath()
+	require.NoError(t, types.ValidateEconomicsAuthorityPath(path))
+
+	authoritative := make([]string, 0)
+	execution := map[string]bool{}
+	for _, role := range path {
+		if role.AuthoritativePolicy {
+			authoritative = append(authoritative, role.Module)
+		}
+		if role.ExecutionAccounting {
+			execution[role.Module] = true
+		}
+	}
+	require.Equal(t, []string{types.EconomicsAuthoritativePolicyModule}, authoritative)
+	require.True(t, execution[types.EconomicsFeesModule])
+	require.True(t, execution[types.EconomicsFeeCollectorModule])
+	require.True(t, execution[types.EconomicsBurnModule])
+	require.True(t, execution[types.EconomicsTreasuryModule])
+	require.True(t, execution[types.EconomicsEmissionsModule])
+	require.True(t, execution[types.EconomicsMintAuthorityModule])
+}
+
+func TestEconomicsAuthorityPathRejectsSplitPolicySources(t *testing.T) {
+	path := types.DefaultEconomicsAuthorityPath()
+	path[1].AuthoritativePolicy = true
+	require.ErrorContains(t, types.ValidateEconomicsAuthorityPath(path), "exactly one authoritative")
+
+	path = types.DefaultEconomicsAuthorityPath()
+	path = path[1:]
+	require.ErrorContains(t, types.ValidateEconomicsAuthorityPath(path), "authoritative policy module")
+
+	path = types.DefaultEconomicsAuthorityPath()
+	path[len(path)-1].ExecutionAccounting = false
+	require.ErrorContains(t, types.ValidateEconomicsAuthorityPath(path), types.EconomicsMintAuthorityModule)
+}
+
 func TestFeeSplitParamsRejectUnsafeRules(t *testing.T) {
 	params := types.DefaultParams(authority)
 	params.TreasuryBps = 1_400

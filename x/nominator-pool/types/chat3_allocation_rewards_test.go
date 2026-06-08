@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -98,6 +99,34 @@ func TestCHAT3AllocationPlanAppliesDeterministicBoundedStateTransition(t *testin
 	receipt.Allocations[0].TargetWeightBps = params.MaxPoolValidatorAllocationBps + 1
 	_, _, err = ApplyPoolAllocationPlan(params, existing, receipt)
 	require.ErrorContains(t, err, "exceeds configured cap")
+}
+
+func TestCHAT3ValidatorPowerCapIsStage1RewardsOnlyUntilCometBFTEvidence(t *testing.T) {
+	scope := ActiveValidatorPowerCapScope()
+	require.NoError(t, scope.Validate())
+	require.Equal(t, ValidatorPowerCapStageRewardsOnly, scope.Stage)
+	require.True(t, scope.CapsPoolAllocationWeight)
+	require.True(t, scope.CapsRewardEffectivePower)
+	require.False(t, scope.CapsCometBFTVotingPower)
+	require.Equal(t, "x/pos+x/staking+CometBFT", scope.ConsensusVotingPowerOwner)
+
+	allocationType := reflect.TypeOf(PoolValidatorAllocation{})
+	_, hasCometBFTPower := allocationType.FieldByName("CometBFTVotingPower")
+	_, hasConsensusPower := allocationType.FieldByName("ConsensusVotingPower")
+	require.False(t, hasCometBFTPower)
+	require.False(t, hasConsensusPower)
+
+	invalidStage1 := scope
+	invalidStage1.CapsCometBFTVotingPower = true
+	require.ErrorContains(t, invalidStage1.Validate(), "must not claim CometBFT")
+
+	stage2 := ValidatorPowerCapScope{
+		Stage:                    ValidatorPowerCapStageCometBFT,
+		CapsPoolAllocationWeight: true,
+		CapsRewardEffectivePower: true,
+		CapsCometBFTVotingPower:  true,
+	}
+	require.NoError(t, stage2.Validate())
 }
 
 func TestCHAT3PoolRewardsDeductCommissionThenPoolFeeAndCapRewards(t *testing.T) {
