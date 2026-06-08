@@ -22,7 +22,12 @@ The goal of V2 is not to add more native modules. The goal is:
 - Token, NFT, DEX, wallet standards, and domains must be AVM contracts or
   registries unless explicitly listed as system state.
 - Normal user staking goes through the official liquid staking/nominator pool
-  path. Direct user validator selection is not the normal UX.
+  path only. A wallet user deposits at least `10 AET` into the official pool and
+  never chooses a validator address.
+- Direct wallet-to-validator delegation is disabled for the public testnet
+  product model. If an operator-only escape hatch exists, it must be disabled
+  by default, governance-gated, excluded from normal CLI/API/docs, and covered
+  by rejection tests.
 - `AE...` remains the only user-facing address format.
 - `4:...` remains raw/internal/proof format.
 - Private keys, seed phrases, validator private keys, keyrings, and localnet
@@ -51,6 +56,9 @@ Observed status:
 
 - Testnet readiness CI exists, but it must become the canonical release gate,
   not only an auxiliary workflow.
+- `x/nominator-pool/types/state.go` already defines `DefaultMinPoolDeposit` as
+  `10 AET` in base units and has direct-delegation params. V2 must make this the
+  user-facing rule everywhere: wallet -> pool deposit, no validator selection.
 - Exit codes already exist under `x/contracts/types/exit_codes.go` and are small
   stable values. Keep them small; do not introduce huge opaque error numbers.
 - AVM has a stack VM, gas table, host registry, storage ABI, async messages, and
@@ -60,11 +68,180 @@ Observed status:
 - AVM storage currently looks more like bounded key/value storage. The target
   testnet AVM model should move persistent contract data toward immutable
   content-addressed Chunks and ChunkMap indexes.
+- `app/invariants.go` exists and registers many important app invariants, but
+  some checks still use exported-genesis/model-level shortcuts or placeholder
+  inputs. V2 must bind launch invariants to live keeper state and CI.
+- `app/keeperwiring/native.go` still wires some policy/economics/score keepers
+  without store services, while other modules are KV-backed. Any runtime keeper
+  used for testnet consensus must persist mutations through KV and survive
+  restart/export/import.
+- The repo contains many prototype modules under `x/`. Testnet launch should not
+  attempt to productionize every module. Freeze, remove from app wiring, or mark
+  future-only anything outside the minimal kernel.
 - Docs still contain historical tokenfactory/DEX language in places. For V2,
   keep those as future AVM standards or remove from testnet launch docs.
 - Docker image, seed/peer publication, Cosmovisor guide, and top-level
   `docs/VALIDATOR.md` / `docs/TESTNET.md` / `docs/COSMOVISOR.md` are not yet the
   single canonical operator path.
+
+## V2.1 Launch Blockers From Code Audit
+
+These are explicit blockers for public testnet readiness.
+
+### Blocker 1 - Pool-Only User Staking Must Be Enforced Everywhere
+
+Requirement:
+
+- Wallet, CLI, API, docs, examples, and smoke tests must expose one default
+  staking action:
+
+```text
+AE wallet -> official liquid staking/nominator pool -> pool allocations -> validators
+```
+
+- Minimum user deposit: `10 AET`.
+- User deposit message must not contain:
+  - validator operator address;
+  - consensus address;
+  - `aevaloper`;
+  - `aevalcons`;
+  - raw `4:...` validator target.
+- Validator choice belongs to deterministic pool allocation/accounting, not to
+  the user.
+- Direct wallet-to-validator delegation must fail before any staking mutation.
+- Native staking hooks may be callable only by the official pool/contract
+  capability path.
+
+Acceptance:
+
+- CLI help for normal staking has no validator argument.
+- Normal tx/API protobuf for pool deposit has no validator field.
+- E2E smoke includes `delegate-direct-disabled`.
+- A 9.999999 AET deposit is rejected.
+- A 10 AET deposit from an active wallet succeeds.
+- Pool share minting for 10 AET is deterministic across two runs.
+- Export/import after 10 AET deposit returns the same pool share and pool totals.
+
+### Blocker 2 - Consensus Validator Set Must Match The Aetra PoS Model
+
+Current risk:
+
+- Validator registry/election/score modules can exist while CometBFT still uses
+  the standard SDK staking validator set as the actual consensus source.
+
+Requirement:
+
+- Either:
+  - Aetra validator election writes the effective validator set used by
+    CometBFT; or
+  - app invariants enforce that SDK staking state exactly mirrors the Aetra
+    registry/election output at every boundary.
+- No validator can be active in consensus unless it satisfies:
+  - registry active status;
+  - min stake/funding mode;
+  - pool-backed self/nominator split;
+  - commission bounds;
+  - slashing/insurance requirements;
+  - score/reputation eligibility.
+
+Acceptance:
+
+- Active CometBFT validator set query equals Aetra elected set.
+- Attempted validator activation below entry rules is rejected before consensus
+  power changes.
+- Export/import preserves validator power and election snapshots.
+- Upgrade test preserves the exact validator set unless migration explicitly
+  changes it with a deterministic migration record.
+
+### Blocker 3 - Storage Rent Must Be Runtime-Enforced
+
+Current risk:
+
+- Storage rent models and frozen states exist, but launch must prove rent is
+  charged in ante/account lifecycle/contract execution, not only in helpers.
+
+Requirement:
+
+- Every active stateful account and contract accrues rent from:
+  - code bytes;
+  - data bytes;
+  - unpaid debt;
+  - elapsed consensus time/height.
+- Rent is collected during transactions/actions from configured payer:
+  - owner account;
+  - contract balance;
+  - pool reserve;
+  - module balance;
+  - protocol payer.
+- Frozen wallet/contract keeps code, data, sequence, ownership, balance, and
+  proof access.
+- Frozen state recovers through top-up -> pay storage debt -> unfreeze.
+- Protocol-critical state cannot freeze/archive/delete because of rent.
+
+Acceptance:
+
+- Contract execute accrues rent before compute.
+- Account tx path accrues rent before normal action.
+- Frozen contract rejects normal execute but accepts top-up/pay-debt/unfreeze and
+  read/proof queries.
+- Protocol-critical module action still executes under system rent stress.
+
+### Blocker 4 - Prototype Keepers Must Not Rely On Runtime Memory
+
+Requirement:
+
+- Any keeper used in testnet consensus must:
+  - write prefix records in `InitGenesis`;
+  - read/write KV in every mutating method;
+  - export deterministic sorted genesis from KV;
+  - paginate over bounded prefixes;
+  - migrate old single-genesis blobs to prefix layout in migration `1 -> 2`.
+- In-memory state is allowed only for tests or explicit fixtures with no
+  store service.
+
+Acceptance:
+
+- mutate -> export -> new app import -> query returns same state for:
+  - nominator pool;
+  - validator registry;
+  - validator election;
+  - validator insurance;
+  - config/config-voting;
+  - system registry;
+  - storage rent;
+  - actor registry;
+  - AVM scheduler.
+
+### Blocker 5 - AVM Must Be A Real VM, Not A Demo Interpreter
+
+Requirement:
+
+- AVM v1 must have:
+  - canonical bytecode/module format;
+  - verifier;
+  - instruction set spec;
+  - gas schedule;
+  - typed values;
+  - deterministic stack execution;
+  - Chunk/ChunkMap persistent state;
+  - deploy/execute/get methods;
+  - receipts/events/proofs;
+  - host function allowlist;
+  - no forbidden nondeterminism;
+  - examples that compile/run in CI.
+
+Acceptance:
+
+- Same code/state/message always gives same:
+  - exit code;
+  - gas used;
+  - receipt hash;
+  - state root;
+  - outgoing messages.
+- Out-of-gas and failed migration roll back state.
+- Get methods cannot mutate state or emit consensus messages.
+- Minimal examples cover counter, domain registry, token-like ledger, internal
+  message, bounce/refund, and get methods.
 
 ## Parallel Workstream Ownership
 
@@ -203,6 +380,40 @@ Tests:
 Done:
 
 - Testnet scope is small and not confused by prototype-era docs.
+
+### Task 0.3 - Launch Module Inventory
+
+Implementation:
+
+- Create a machine-readable launch inventory that classifies every `x/*` module:
+  - `launch_core`;
+  - `launch_support`;
+  - `future_avm_standard`;
+  - `prototype_only`;
+  - `disabled`.
+- For every module in app wiring, record:
+  - why it is needed for public testnet;
+  - whether it owns consensus state;
+  - whether it has KV-backed runtime mutations;
+  - export/import status;
+  - invariant status;
+  - block lifecycle scanning risk.
+- Public testnet profile must fail if a `prototype_only` or `disabled` module is
+  wired into launch state.
+- Future token/NFT/DEX/market modules must be either AVM standards/contracts or
+  disabled from launch profile.
+
+Tests:
+
+- inventory covers every `x/*` directory;
+- app wiring modules are all listed in inventory;
+- launch profile rejects native DEX/token/NFT app asset modules;
+- launch profile rejects memory-only consensus keepers;
+- docs generated from inventory match module-boundary docs.
+
+Done:
+
+- The launch scope is enforceable by CI instead of tribal knowledge.
 
 ## Phase 1 - Runnable Testnet Core
 
@@ -345,6 +556,13 @@ Create:
 - `docs/HEALTH.md`;
 - `docs/AVM.md`.
 
+Current audit:
+
+- Top-level `docs/VALIDATOR.md`, `docs/TESTNET.md`, and
+  `docs/COSMOVISOR.md` are missing and must be created as canonical docs, even
+  if older partial docs such as `validator-onboarding.md` or
+  `public-testnet-preparation.md` exist.
+
 `docs/VALIDATOR.md` must cover:
 
 - hardware;
@@ -389,6 +607,8 @@ Create:
 Tests:
 
 - Static doc coverage test for all required sections.
+- Static docs test rejects normal user direct-delegation examples.
+- Static docs test requires the `10 AET` pool minimum in user staking docs.
 - Release package includes all docs.
 
 Done:
@@ -406,6 +626,11 @@ Implementation:
 - Add build args for version/commit.
 - Add docker-compose localnet sample only if it does not replace existing
   PowerShell localnet scripts.
+
+Current audit:
+
+- Top-level `Dockerfile` is missing. Public testnet release is incomplete until
+  a reproducible image can be built and version-checked.
 
 Tests:
 
@@ -482,26 +707,49 @@ Implementation:
 
 - Normal user staking path:
   - User `AE...`;
+  - deposit amount `>= 10 AET`;
   - official liquid staking contract/pool;
   - pool shares/receipt;
   - allocation to validators.
-- Normal CLI/API must not ask user for a validator address.
+- Normal CLI/API must not ask user for a validator address and must not accept a
+  hidden validator override in the default staking command.
+- User-facing deposit message shape:
+
+```text
+MsgDepositToStakingPool {
+  depositor AE...
+  pool_id or official_contract AE...
+  amount >= 10 AET
+}
+```
+
+- The normal deposit message must not contain `validator`, `operator_address`,
+  `consensus_address`, `aevaloper`, `aevalcons`, or raw target address fields.
 - Direct SDK `MsgDelegate` must be:
-  - disabled for normal user path; or
-  - explicitly guarded as operator-only/advanced governance-enabled path.
-- Pool deposits must support small users above anti-spam minimum.
+  - disabled for normal user path;
+  - rejected by app-level invariant if enabled in testnet profile; and
+  - explicitly guarded as operator-only/advanced governance-enabled path if it
+    exists outside public testnet.
+- Pool deposits must support small users at `10 AET` and above.
+- The pool, not the user, selects validators through deterministic allocation
+  weights.
 
 Tests:
 
 - User deposits into pool without validator address.
-- Deposit below minimum rejected.
+- 10 AET deposit succeeds from active `AE...` wallet.
+- Deposit below 10 AET rejected.
+- Deposit message containing a validator address is rejected by validation.
 - Direct user delegation rejected before staking mutation.
 - Pool shares deterministic.
 - Export/import preserves shares and pool totals.
+- CLI help snapshot does not mention validator selection for normal staking.
+- Docs static test rejects user-facing validator-choice examples.
 
 Done:
 
-- User staking UX is pool/index-based.
+- User staking UX is pool/index-based and a wallet user can start staking from
+  10 AET without choosing a validator.
 
 ### Task 3.2 - Nominator Pool Accounting
 
@@ -940,6 +1188,327 @@ Done:
 
 - A developer can write and run a minimal contract.
 
+### Task 4.9 - Canonical AVM Module And Bytecode Verifier
+
+Implementation:
+
+- Define one canonical AVM module format:
+  - magic/version;
+  - ABI version;
+  - code version selector;
+  - import table;
+  - export table;
+  - metadata hash;
+  - instruction stream;
+  - optional schema/type descriptors;
+  - dependency hashes.
+- Verifier must reject:
+  - unknown version;
+  - missing required entrypoints;
+  - forbidden imports;
+  - unreachable invalid jump targets;
+  - stack underflow/overflow;
+  - instruction count over params;
+  - bytecode over params;
+  - nondeterministic opcodes;
+  - malformed dependency hashes.
+- Verification result must be deterministic and stored with code metadata.
+
+Tests:
+
+- bytecode golden vectors;
+- malformed module rejected;
+- forbidden host import rejected;
+- same module hash across export/import;
+- verifier cannot panic on random bytes/fuzz fixtures.
+
+Done:
+
+- A node can safely accept/reject AVM code before deployment.
+
+### Task 4.10 - Production Instruction Set V1
+
+Implementation:
+
+- Freeze a small v1 instruction set:
+  - stack: push/pop/dup/swap/drop;
+  - arithmetic: checked add/sub/mul/div/mod for supported ints;
+  - comparison: eq/neq/lt/lte/gt/gte;
+  - boolean: and/or/not;
+  - control: jump/jump_if/call/return/abort;
+  - typed load/decode/encode through Reader/Writer/Codec;
+  - chunk ops: new/read/ref/hash/type_hash;
+  - ChunkMap ops: get/put/delete/proof;
+  - message ops: read caller/source/value/op/query_id/body;
+  - event/internal-message emit through host calls only.
+- Every instruction has:
+  - mnemonic;
+  - opcode;
+  - stack input/output contract;
+  - gas rule;
+  - overflow behavior;
+  - exit code on failure.
+
+Tests:
+
+- opcode table golden test;
+- stack contract tests for each opcode;
+- integer overflow exits deterministically;
+- invalid jump rejected by verifier;
+- same program always same trace hash.
+
+Done:
+
+- AVM is specified as a real machine with stable execution semantics.
+
+### Task 4.11 - AVM Value Model For Short Contracts
+
+Implementation:
+
+- Runtime value tags:
+  - null;
+  - bool;
+  - signed/unsigned int widths;
+  - coins;
+  - timestamp;
+  - address;
+  - hash;
+  - bytes;
+  - string;
+  - tuple;
+  - chunk ref;
+  - reader cursor;
+  - writer handle;
+  - execution frame.
+- Developer/compiler layer may expose:
+  - structs;
+  - generics;
+  - `T?`/Option;
+  - `Map<K,V>`;
+  - methods and traits.
+- VM must not implement runtime reflection or unbounded generics.
+- Value encoding must be canonical, size-bounded, and gas-metered.
+
+Tests:
+
+- value tag golden vectors;
+- tuple nested encoding;
+- string/domain name encoding;
+- Option null/value;
+- invalid type cast exits with small code;
+- same value bytes produce same chunk hash.
+
+Done:
+
+- Contracts can be concise without making the VM nondeterministic or huge.
+
+### Task 4.12 - StateInit And Counterfactual Deploy
+
+Implementation:
+
+- `StateInit` must include:
+  - ABI version;
+  - code hash/code id;
+  - init data bytes;
+  - salt bytes/string;
+  - owner `AE...`;
+  - optional library/dependency hashes;
+  - initial storage root;
+  - initial balance in `naet`;
+  - flags/capabilities.
+- Add:
+  - canonical encoding;
+  - `HashStateInit`;
+  - max init data size;
+  - max salt size;
+  - max dependency count;
+  - deterministic normalization.
+- Contract address derivation:
+
+```text
+DeriveContractAddress(chain_id, namespace, deployer, code_hash, init_data_hash, salt)
+```
+
+- Output both:
+  - raw/internal `4:...`;
+  - user-facing `AE...`.
+- Reject zero deployer and malformed code hash.
+
+Tests:
+
+- same StateInit -> same address;
+- init data change -> address changes;
+- salt change -> address changes;
+- oversized init data rejected;
+- duplicate address deploy rejected;
+- counterfactual address query returns virtual/not_deployed before deploy;
+- export/import preserves derived address.
+
+Done:
+
+- Contract deployment is deterministic and supports counterfactual workflows.
+
+### Task 4.13 - Get Methods As First-Class Contract ABI
+
+Implementation:
+
+- Each contract can expose named get methods in ABI metadata.
+- Get method call includes:
+  - method name or selector;
+  - typed args;
+  - query gas limit;
+  - optional proof request.
+- Get method execution context:
+  - read-only state root;
+  - no writes;
+  - no outgoing messages;
+  - no consensus events;
+  - no balance movement;
+  - deterministic return bytes/chunk.
+- CLI must print typed JSON when ABI is known and raw hex/chunk hash when ABI
+  is unknown.
+
+Tests:
+
+- query by method name;
+- query by selector;
+- ABI decode success;
+- unknown method rejected;
+- write/send/event forbidden in get context;
+- response hash stable across repeated query and export/import.
+
+Done:
+
+- Users can inspect contract state without custom off-chain parsers.
+
+### Task 4.14 - Receipts, Events, Bounce, And Refund Accounting
+
+Implementation:
+
+- Every deploy/execute/get/migrate/internal message produces a receipt or query
+  response record with:
+  - small exit code;
+  - gas used;
+  - gas refunded if policy ever allows it;
+  - storage fee/rent charged;
+  - value in/out;
+  - state root before/after;
+  - outgoing messages;
+  - events;
+  - bounced/refunded flags;
+  - proof hash.
+- Bounce rules:
+  - failed internal message with `bounce=true` creates one bounce;
+  - bounced message sets `bounced=true` and `bounce=false`;
+  - failed bounce cannot create another bounce loop;
+  - double refund is impossible by state flag.
+
+Tests:
+
+- failed internal message creates bounce;
+- non-bounceable message does not create bounce;
+- failed bounce ends without loop;
+- value accounting conserved;
+- double refund rejected;
+- export/import preserves bounced/refunded status.
+
+Done:
+
+- Operators can explain every value movement and contract failure.
+
+### Task 4.15 - Contract Upgrade And Migration Model
+
+Implementation:
+
+- Contracts immutable by default.
+- Upgradeable only if deployed with upgrade flag.
+- Admin-controlled upgrade only by current admin.
+- System/governance upgrade only for explicitly system-owned contracts.
+- Code hash change requires migration handler unless state root is empty.
+- Contract state stores schema version.
+- Migration transforms state deterministically and emits migration receipt.
+- Failed migration rolls back.
+
+Messages:
+
+- `MsgUpgradeContractCode`;
+- `MsgMigrateContractState`;
+- `MsgSetContractAdmin`;
+- `MsgDisableContractUpgrades`.
+
+Tests:
+
+- immutable contract cannot upgrade;
+- admin upgrade works only if allowed;
+- non-admin rejected;
+- migration changes schema version;
+- failed migration rolls back;
+- system upgrade requires governance/system authority.
+
+Done:
+
+- Upgradeability is explicit and safe enough for testnet system contracts.
+
+### Task 4.16 - AVM Developer Surface And CI Examples
+
+Implementation:
+
+- Add minimal contract authoring format for v1:
+  - either tiny assembly format;
+  - or JSON/module builder;
+  - or first compiler stub if available.
+- Add examples under one canonical path:
+  - counter;
+  - domain registry with bounded string names;
+  - token-like ledger using ChunkMap;
+  - internal message sender/receiver;
+  - bounce/refund example;
+  - get-method example.
+- Add CI command that builds/encodes examples, deploys them in localnet or app
+  simulator, executes happy/reject paths, and checks receipts.
+
+Tests:
+
+- examples build in CI;
+- examples deploy;
+- examples execute external/internal;
+- examples query get methods;
+- examples export/import and continue executing.
+
+Done:
+
+- AVM is usable by a developer, not only by Go unit tests.
+
+### Task 4.17 - AVM Security And Determinism Gate
+
+Implementation:
+
+- Add a dedicated AVM determinism test suite:
+  - repeated execution;
+  - shuffled map input normalization;
+  - export/import/re-execute;
+  - randomized bytecode verifier fuzz;
+  - forbidden host call attempts;
+  - gas overflow attempts;
+  - storage limit attempts.
+- Add static checks that forbid:
+  - wall-clock/process time in runtime;
+  - process randomness in runtime;
+  - filesystem/network in host functions;
+  - goroutines/threads inside execution;
+  - floating point arithmetic in consensus execution.
+
+Tests:
+
+- `go test ./x/aetravm/...`;
+- static determinism scanner;
+- fuzz corpus does not panic verifier;
+- gas overflow returns deterministic error.
+
+Done:
+
+- AVM can be defended as consensus-safe for public testnet.
+
 ## Phase 5 - Contract Standards Instead Of Native App Assets
 
 ### Task 5.1 - Move Token/NFT/DEX To AVM Standards
@@ -1015,6 +1584,15 @@ Implementation:
   - direct delegation rejection;
   - AVM receipt/queue/state root;
   - no native app asset modules.
+- Invariants must read live keeper state, not only model fixtures or placeholder
+  input values.
+- Existing placeholder-style inputs such as max integer budgets, empty activation
+  attempts, or hardcoded "export/import stable = true" must be replaced by
+  state-derived evidence or removed from launch gates.
+- Each invariant must be runnable:
+  - in Go tests;
+  - from CI;
+  - against a localnet/exported app state where feasible.
 - Add CLI/test command or CI target that runs them against app state.
 
 Tests:
@@ -1023,6 +1601,10 @@ Tests:
 - each invariant has a failing fixture;
 - default app state passes;
 - post-core-flow app state passes.
+- invariant failures include deterministic IDs and messages.
+- direct delegation invariant fails if either direct delegation param is true.
+- validator-set invariant fails if CometBFT/SDK staking set diverges from Aetra
+  registry/election output.
 
 Done:
 
@@ -1101,18 +1683,21 @@ Done:
 
 ## Recommended Execution Order
 
-1. CHAT A: stabilize binary/version/genesis/localnet/export-import CI.
-2. CHAT D: create canonical `docs/VALIDATOR.md`, `docs/TESTNET.md`,
+1. CHAT E: create launch module inventory and quarantine prototype-only modules.
+2. CHAT A: stabilize binary/version/genesis/localnet/export-import CI.
+3. CHAT D: create canonical `docs/VALIDATOR.md`, `docs/TESTNET.md`,
    `docs/COSMOVISOR.md`, Dockerfile, health docs.
-3. CHAT B: finish pool-based staking, direct delegation rejection, reward policy,
-   slashing, validator score v1.
-4. CHAT C: finish AVM exit-code mapping, Chunk core, typed Codec, ChunkMap, get
-   methods, examples.
-5. CHAT E: remove stale native DEX/token/NFT launch docs and enforce future AVM
+4. CHAT B: finish 10 AET pool-based staking, direct delegation rejection, real
+   consensus validator-set alignment, reward policy, slashing, validator score
+   v1.
+5. CHAT C: finish AVM module format/verifier, exit-code mapping, instruction
+   set, Chunk core, typed Codec, ChunkMap, StateInit, get methods,
+   receipts/bounce/refund, upgrades, examples, determinism gate.
+6. CHAT E: remove stale native DEX/token/NFT launch docs and enforce future AVM
    standards boundary.
-6. CHAT A: final app wiring, 4/5-node localnet, upgrade rehearsal, release
+7. CHAT A: final app wiring, live invariants, 4/5-node localnet, upgrade rehearsal, release
    workflow.
-7. All chats: run full testnet release candidate checklist.
+8. All chats: run full testnet release candidate checklist.
 
 ## Definition Of Done For V2
 
@@ -1123,14 +1708,22 @@ Aetra is V2 testnet-ready only when:
 - 4-5 node localnet reaches height and has stable validators;
 - export/import restart works;
 - upgrade rehearsal works;
-- normal staking uses the pool path;
-- direct user validator delegation is not the default user path;
+- normal staking uses the pool path with a `10 AET` minimum deposit;
+- normal staking messages, CLI, API, and docs do not accept validator selection;
+- direct user validator delegation is disabled in public testnet profile and
+  rejected before staking mutation;
+- the actual CometBFT/SDK validator set is controlled by or proven identical to
+  the Aetra registry/election output;
 - reward/slashing/reputation v1 are understandable and tested;
 - AVM can deploy, execute external/internal messages, charge gas, store state,
   emit receipts/events, return small exit codes, and run get methods;
-- AVM persistent data uses Chunk/ChunkMap design or has a clearly documented
-  migration path to it before public contract developer use;
+- AVM has canonical module encoding, verifier, instruction set, StateInit,
+  typed value/Codec model, Chunk/ChunkMap storage, get methods, receipts,
+  bounce/refund, upgrade/migration policy, and CI contract examples;
+- AVM persistent data uses Chunk/ChunkMap design before public contract
+  developer use;
 - token/NFT/DEX are AVM standards/contracts, not native app asset modules;
 - validator docs, testnet docs, Cosmovisor docs, Docker image, health checks,
   seed/peer templates, and release artifacts exist;
+- app invariants are live keeper checks, not placeholder/model-only checks;
 - CI gates enforce the above.
