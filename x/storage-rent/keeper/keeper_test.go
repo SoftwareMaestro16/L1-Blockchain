@@ -1,10 +1,12 @@
 package keeper
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/sovereign-l1/l1/x/internal/kvtest"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/storage-rent/types"
 )
@@ -135,4 +137,33 @@ func TestExportImportPreservesFreezeAndDeletionQueues(t *testing.T) {
 	require.Len(t, frozen, 1)
 	require.Len(t, deletionQueue, 1)
 	require.Equal(t, frozen[0].DeletionEligibilityHeight, deletionQueue[0].DeletionEligibilityHeight)
+}
+
+func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	source := NewPersistentKeeper(service)
+	gs := DefaultGenesis()
+	gs.Params = prototype.TestnetParams()
+	gs.RentParams.FreeStorageAllowance = 0
+	require.NoError(t, source.InitGenesisState(ctx, gs))
+
+	_, err := source.TrackContractStorageUsage(authority, contract, actor, 10, 10, 1)
+	require.NoError(t, err)
+	_, distribution, err := source.PayStorageRent(types.MsgPayStorageRent{Payer: "payer", ContractAddress: contract, Amount: 100, Height: 1})
+	require.NoError(t, err)
+	require.Equal(t, uint64(100), distribution.Amount)
+
+	restarted := NewPersistentKeeper(service)
+	exported, err := restarted.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	require.Len(t, exported.State.Contracts, 1)
+	require.Len(t, exported.State.Distributions, 1)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	require.NoError(t, imported.InitGenesisState(ctx, exported))
+	record, found, err := imported.ContractRent(contract)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, uint64(100), record.PrepaidRentBalance)
 }

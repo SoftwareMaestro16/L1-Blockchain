@@ -1,12 +1,14 @@
 package keeper
 
 import (
+	"context"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/sovereign-l1/l1/app/addressing"
+	"github.com/sovereign-l1/l1/x/internal/kvtest"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/system-registry/types"
 )
@@ -202,6 +204,40 @@ func TestExportImportPreservesRegistryOrdering(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, graph)
 	require.LessOrEqual(t, graph[0].ModuleName, graph[len(graph)-1].ModuleName)
+}
+
+func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	source := NewPersistentKeeper(service)
+	require.NoError(t, source.InitGenesisState(ctx, DefaultGenesis()))
+
+	_, _, err := source.RegisterSystemEntity(types.MsgRegisterSystemEntity{
+		Authority: prototype.DefaultAuthority,
+		Entity: types.SystemEntity{
+			ModuleName:           "runtime-metering",
+			ModuleAccountAddress: testAddress(0x72),
+			AuthorityAddress:     prototype.DefaultAuthority,
+			Status:               types.StatusActive,
+			Version:              1,
+		},
+	})
+	require.NoError(t, err)
+	_, _, err = source.PauseSystemEntity(types.MsgPauseSystemEntity{Authority: prototype.DefaultAuthority, ModuleName: "runtime-metering", Height: 2})
+	require.NoError(t, err)
+
+	restarted := NewPersistentKeeper(service)
+	exported, err := restarted.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	entity, found := exported.State.Entity("runtime-metering")
+	require.True(t, found)
+	require.Equal(t, types.StatusPaused, entity.Status)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	require.NoError(t, imported.InitGenesisState(ctx, exported))
+	allowed, err := imported.CanReceivePrivilegedCall("runtime-metering")
+	require.NoError(t, err)
+	require.False(t, allowed)
 }
 
 func TestMaliciousAuthorityCannotUpdateRegistry(t *testing.T) {

@@ -2,12 +2,11 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"reflect"
 
 	corestore "cosmossdk.io/core/store"
 
+	"github.com/sovereign-l1/l1/x/internal/prefixgenesis"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/nominator-pool/types"
 )
@@ -114,18 +113,8 @@ func (k Keeper) ExportGenesisState(ctx context.Context) (GenesisState, error) {
 	if k.storeService == nil {
 		return k.ExportGenesis(), nil
 	}
-	if !reflect.DeepEqual(k.genesis, DefaultGenesis()) {
-		return k.ExportGenesis(), nil
-	}
-	bz, err := k.storeService.OpenKVStore(ctx).Get(genesisKey)
+	gs, _, err := prefixgenesis.Load(ctx, k.storeService, genesisKey, DefaultGenesis())
 	if err != nil {
-		return GenesisState{}, err
-	}
-	if len(bz) == 0 {
-		return DefaultGenesis(), nil
-	}
-	var gs GenesisState
-	if err := json.Unmarshal(bz, &gs); err != nil {
 		return GenesisState{}, err
 	}
 	if err := gs.Validate(); err != nil {
@@ -151,11 +140,7 @@ func (k Keeper) writeGenesisState(ctx context.Context, gs GenesisState) error {
 	if k.storeService == nil {
 		return nil
 	}
-	bz, err := json.Marshal(cloneGenesis(gs))
-	if err != nil {
-		return err
-	}
-	return k.storeService.OpenKVStore(ctx).Set(genesisKey, bz)
+	return prefixgenesis.Save(ctx, k.storeService, genesisKey, cloneGenesis(gs))
 }
 
 func (k Keeper) OperationCounters() OperationCounters {

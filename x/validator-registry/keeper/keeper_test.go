@@ -1,12 +1,14 @@
 package keeper
 
 import (
+	"context"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/sovereign-l1/l1/app/addressing"
+	"github.com/sovereign-l1/l1/x/internal/kvtest"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/validator-registry/types"
 )
@@ -157,6 +159,36 @@ func TestExportImportPreservesHistory(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, found)
 	require.Equal(t, history, importedHistory)
+}
+
+func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	source := NewPersistentKeeper(service)
+	require.NoError(t, source.InitGenesisState(ctx, DefaultGenesis()))
+
+	validator := registerValidator(t, &source, 0x51, "ed25519:persistent-history")
+	_, err := source.UpdateValidatorMetadata(types.MsgUpdateValidatorMetadata{
+		Authority:       prototype.DefaultAuthority,
+		OperatorAddress: validator.OperatorAddress,
+		Metadata:        `{"moniker":"persistent"}`,
+		Height:          2,
+	})
+	require.NoError(t, err)
+
+	restarted := NewPersistentKeeper(service)
+	exported, err := restarted.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	restored, found := exported.State.Validator(validator.OperatorAddress)
+	require.True(t, found)
+	require.Equal(t, `{"moniker":"persistent"}`, restored.Metadata)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	require.NoError(t, imported.InitGenesisState(ctx, exported))
+	history, found, err := imported.ValidatorHistory(validator.OperatorAddress)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Len(t, history, 2)
 }
 
 func TestValidatorSecurityQueries(t *testing.T) {

@@ -2,15 +2,14 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"math"
-	"reflect"
 	"strings"
 
 	corestore "cosmossdk.io/core/store"
 
 	"github.com/sovereign-l1/l1/app/addressing"
+	"github.com/sovereign-l1/l1/x/internal/prefixgenesis"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/validator-insurance/types"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
@@ -27,6 +26,7 @@ type GenesisState struct {
 type Keeper struct {
 	genesis      GenesisState
 	storeService corestore.KVStoreService
+	runtimeCtx   context.Context
 }
 
 func NewKeeper() Keeper { return Keeper{genesis: DefaultGenesis()} }
@@ -60,14 +60,11 @@ func (k *Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
 		return err
 	}
 	k.genesis = cloneGenesis(gs)
+	k.runtimeCtx = ctx
 	if k.storeService == nil {
 		return nil
 	}
-	bz, err := json.Marshal(cloneGenesis(gs))
-	if err != nil {
-		return err
-	}
-	return k.storeService.OpenKVStore(ctx).Set(genesisKey, bz)
+	return prefixgenesis.Save(ctx, k.storeService, genesisKey, k.genesis)
 }
 
 func (k Keeper) ExportGenesis() GenesisState { return cloneGenesis(k.genesis) }
@@ -76,18 +73,8 @@ func (k Keeper) ExportGenesisState(ctx context.Context) (GenesisState, error) {
 	if k.storeService == nil {
 		return k.ExportGenesis(), nil
 	}
-	if !reflect.DeepEqual(k.genesis, DefaultGenesis()) {
-		return k.ExportGenesis(), nil
-	}
-	bz, err := k.storeService.OpenKVStore(ctx).Get(genesisKey)
+	gs, _, err := prefixgenesis.Load(ctx, k.storeService, genesisKey, DefaultGenesis())
 	if err != nil {
-		return GenesisState{}, err
-	}
-	if len(bz) == 0 {
-		return DefaultGenesis(), nil
-	}
-	var gs GenesisState
-	if err := json.Unmarshal(bz, &gs); err != nil {
 		return GenesisState{}, err
 	}
 	if err := gs.Validate(); err != nil {
@@ -362,7 +349,10 @@ func (k *Keeper) saveGenesis(next GenesisState) error {
 		return err
 	}
 	k.genesis = next
-	return nil
+	if k.storeService == nil || k.runtimeCtx == nil {
+		return nil
+	}
+	return prefixgenesis.Save(k.runtimeCtx, k.storeService, genesisKey, next)
 }
 
 func cloneGenesis(gs GenesisState) GenesisState {

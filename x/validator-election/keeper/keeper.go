@@ -2,13 +2,12 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"reflect"
 	"sort"
 
 	corestore "cosmossdk.io/core/store"
 
+	"github.com/sovereign-l1/l1/x/internal/prefixgenesis"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/validator-election/types"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
@@ -25,6 +24,7 @@ type GenesisState struct {
 type Keeper struct {
 	genesis      GenesisState
 	storeService corestore.KVStoreService
+	runtimeCtx   context.Context
 }
 
 func NewKeeper() Keeper {
@@ -64,14 +64,11 @@ func (k *Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
 		return err
 	}
 	k.genesis = cloneGenesis(gs)
+	k.runtimeCtx = ctx
 	if k.storeService == nil {
 		return nil
 	}
-	bz, err := json.Marshal(cloneGenesis(gs))
-	if err != nil {
-		return err
-	}
-	return k.storeService.OpenKVStore(ctx).Set(genesisKey, bz)
+	return prefixgenesis.Save(ctx, k.storeService, genesisKey, k.genesis)
 }
 
 func (k Keeper) ExportGenesis() GenesisState {
@@ -82,24 +79,26 @@ func (k Keeper) ExportGenesisState(ctx context.Context) (GenesisState, error) {
 	if k.storeService == nil {
 		return k.ExportGenesis(), nil
 	}
-	if !reflect.DeepEqual(k.genesis, DefaultGenesis()) {
-		return k.ExportGenesis(), nil
-	}
-	bz, err := k.storeService.OpenKVStore(ctx).Get(genesisKey)
+	gs, _, err := prefixgenesis.Load(ctx, k.storeService, genesisKey, DefaultGenesis())
 	if err != nil {
-		return GenesisState{}, err
-	}
-	if len(bz) == 0 {
-		return DefaultGenesis(), nil
-	}
-	var gs GenesisState
-	if err := json.Unmarshal(bz, &gs); err != nil {
 		return GenesisState{}, err
 	}
 	if err := gs.Validate(); err != nil {
 		return GenesisState{}, err
 	}
 	return cloneGenesis(gs), nil
+}
+
+func (k *Keeper) saveGenesis(next GenesisState) error {
+	next = cloneGenesis(next)
+	if err := next.Validate(); err != nil {
+		return err
+	}
+	k.genesis = next
+	if k.storeService == nil || k.runtimeCtx == nil {
+		return nil
+	}
+	return prefixgenesis.Save(k.runtimeCtx, k.storeService, genesisKey, next)
 }
 
 func (k *Keeper) ApplyForValidatorSet(msg types.MsgApplyForValidatorSet) (types.CandidateApplication, error) {
@@ -133,7 +132,9 @@ func (k *Keeper) ApplyForValidatorSet(msg types.MsgApplyForValidatorSet) (types.
 	if err := next.Validate(); err != nil {
 		return types.CandidateApplication{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.CandidateApplication{}, err
+	}
 	return app, nil
 }
 
@@ -176,7 +177,9 @@ func (k *Keeper) CommitElection(msg types.MsgCommitElection) (types.ElectionResu
 	if err := next.Validate(); err != nil {
 		return types.ElectionResult{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ElectionResult{}, err
+	}
 	return result, nil
 }
 
@@ -221,7 +224,9 @@ func (k *Keeper) FinalizeElection(msg types.MsgFinalizeElection) (types.Validato
 	if err := next.Validate(); err != nil {
 		return types.ValidatorSetTransition{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ValidatorSetTransition{}, err
+	}
 	return transition, nil
 }
 
@@ -243,7 +248,9 @@ func (k *Keeper) RequestValidatorExit(msg types.MsgRequestValidatorExit) (types.
 	if err := next.Validate(); err != nil {
 		return types.PendingExit{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.PendingExit{}, err
+	}
 	return exit, nil
 }
 
@@ -265,7 +272,9 @@ func (k *Keeper) CancelValidatorExit(msg types.MsgCancelValidatorExit) (types.Pe
 	if err := next.Validate(); err != nil {
 		return types.PendingExit{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.PendingExit{}, err
+	}
 	return exit, nil
 }
 
@@ -284,7 +293,9 @@ func (k *Keeper) ReleaseFrozenStake(operator string, height uint64) (types.Froze
 		if err := next.Validate(); err != nil {
 			return types.FrozenStake{}, err
 		}
-		k.genesis = next
+		if err := k.saveGenesis(next); err != nil {
+			return types.FrozenStake{}, err
+		}
 		return stake, nil
 	}
 	return types.FrozenStake{}, errors.New("validator election frozen stake not found")
@@ -394,7 +405,9 @@ func (k *Keeper) transitionApplication(operator string, mutate func(types.Candid
 	if err := next.Validate(); err != nil {
 		return types.CandidateApplication{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.CandidateApplication{}, err
+	}
 	return updated.Normalize(), nil
 }
 

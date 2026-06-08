@@ -1,12 +1,14 @@
 package keeper
 
 import (
+	"context"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/sovereign-l1/l1/x/config/types"
+	"github.com/sovereign-l1/l1/x/internal/kvtest"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 )
 
@@ -128,6 +130,29 @@ func TestExportImportDeterministicAndMigration(t *testing.T) {
 	require.NoError(t, NewMigrator(&target).Migrate1to2())
 }
 
+func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	source := NewPersistentKeeper(service)
+	require.NoError(t, source.InitGenesisState(ctx, DefaultGenesis()))
+
+	_, err := source.UpsertEntry(prototype.DefaultAuthority, "runtime/persistent", "enabled", 1)
+	require.NoError(t, err)
+
+	restarted := NewPersistentKeeper(service)
+	exported, err := restarted.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	require.Len(t, exported.State.Entries, 1)
+	require.Equal(t, "runtime/persistent", exported.State.Entries[0].Key)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	require.NoError(t, imported.InitGenesisState(ctx, exported))
+	value, found, err := imported.ConfigValue("runtime/persistent")
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, "enabled", value)
+}
+
 func TestConfigChangeLifecycleRequiresAuthority(t *testing.T) {
 	keeper := NewKeeper()
 	_, err := keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
@@ -150,7 +175,10 @@ func TestConfigChangeLifecycleRequiresAuthority(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, types.ChangeStatusApproved, approved.Status)
 
-	entry, executed, err := keeper.ExecuteConfigChange(types.MsgExecuteConfigChange{Authority: prototype.DefaultAuthority, ChangeID: "change-1"}, 3)
+	_, _, err = keeper.ExecuteConfigChange(types.MsgExecuteConfigChange{Authority: prototype.DefaultAuthority, ChangeID: "change-1"}, approved.ActivationHeight-1)
+	require.ErrorContains(t, err, "activation height")
+
+	entry, executed, err := keeper.ExecuteConfigChange(types.MsgExecuteConfigChange{Authority: prototype.DefaultAuthority, ChangeID: "change-1"}, approved.ActivationHeight)
 	require.NoError(t, err)
 	require.Equal(t, types.ChangeStatusExecuted, executed.Status)
 	require.Equal(t, "runtime/max_validators", entry.Key)
@@ -160,6 +188,26 @@ func TestConfigChangeLifecycleRequiresAuthority(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, found)
 	require.Equal(t, "100", value)
+}
+
+func TestCriticalConfigChangeActivatesOnDeterministicEpoch(t *testing.T) {
+	keeper := NewKeeper()
+	submitted, err := keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
+		Authority: prototype.DefaultAuthority,
+		Change:    change("critical-gas", types.KeyConsensusMaxBlockGas, "1000000"),
+	}, 7)
+	require.NoError(t, err)
+	require.True(t, submitted.Critical)
+	require.Equal(t, int64(150), submitted.ActivationHeight)
+	require.Equal(t, uint64(3), submitted.ActivationEpoch)
+
+	approved, err := keeper.ApproveConfigChange(types.MsgApproveConfigChange{Authority: prototype.DefaultAuthority, ChangeID: "critical-gas"}, 8)
+	require.NoError(t, err)
+	_, _, err = keeper.ExecuteConfigChange(types.MsgExecuteConfigChange{Authority: prototype.DefaultAuthority, ChangeID: "critical-gas"}, approved.ActivationHeight-1)
+	require.ErrorContains(t, err, "activation height")
+	_, executed, err := keeper.ExecuteConfigChange(types.MsgExecuteConfigChange{Authority: prototype.DefaultAuthority, ChangeID: "critical-gas"}, approved.ActivationHeight)
+	require.NoError(t, err)
+	require.Equal(t, types.ChangeStatusExecuted, executed.Status)
 }
 
 func TestInvalidConfigChangeRejectedBeforeExecution(t *testing.T) {

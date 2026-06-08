@@ -2,13 +2,12 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"reflect"
 
 	corestore "cosmossdk.io/core/store"
 
 	"github.com/sovereign-l1/l1/x/avm-scheduler/types"
+	"github.com/sovereign-l1/l1/x/internal/prefixgenesis"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 )
 
@@ -24,6 +23,7 @@ type GenesisState struct {
 type Keeper struct {
 	genesis      GenesisState
 	storeService corestore.KVStoreService
+	runtimeCtx   context.Context
 }
 
 func NewKeeper() Keeper {
@@ -66,14 +66,11 @@ func (k *Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
 		return err
 	}
 	k.genesis = cloneGenesis(gs)
+	k.runtimeCtx = ctx
 	if k.storeService == nil {
 		return nil
 	}
-	bz, err := json.Marshal(cloneGenesis(gs))
-	if err != nil {
-		return err
-	}
-	return k.storeService.OpenKVStore(ctx).Set(genesisKey, bz)
+	return prefixgenesis.Save(ctx, k.storeService, genesisKey, k.genesis)
 }
 
 func (k Keeper) ExportGenesis() GenesisState {
@@ -84,18 +81,8 @@ func (k Keeper) ExportGenesisState(ctx context.Context) (GenesisState, error) {
 	if k.storeService == nil {
 		return k.ExportGenesis(), nil
 	}
-	if !reflect.DeepEqual(k.genesis, DefaultGenesis()) {
-		return k.ExportGenesis(), nil
-	}
-	bz, err := k.storeService.OpenKVStore(ctx).Get(genesisKey)
+	gs, _, err := prefixgenesis.Load(ctx, k.storeService, genesisKey, DefaultGenesis())
 	if err != nil {
-		return GenesisState{}, err
-	}
-	if len(bz) == 0 {
-		return DefaultGenesis(), nil
-	}
-	var gs GenesisState
-	if err := json.Unmarshal(bz, &gs); err != nil {
 		return GenesisState{}, err
 	}
 	if err := gs.Validate(); err != nil {
@@ -114,8 +101,9 @@ func (k *Keeper) UpdateAVMSchedulerParams(msg types.MsgUpdateAVMSchedulerParams)
 	if err := k.genesis.State.Validate(msg.SchedulerParams); err != nil {
 		return err
 	}
-	k.genesis.SchedulerParams = msg.SchedulerParams
-	return nil
+	next := cloneGenesis(k.genesis)
+	next.SchedulerParams = msg.SchedulerParams
+	return k.saveGenesis(next)
 }
 
 func (k *Keeper) SubmitAVMExecutionBatch(msg types.MsgSubmitAVMExecutionBatch) error {
@@ -146,8 +134,7 @@ func (k *Keeper) SubmitAVMExecutionBatch(msg types.MsgSubmitAVMExecutionBatch) e
 	if err := next.Validate(); err != nil {
 		return err
 	}
-	k.genesis = next
-	return nil
+	return k.saveGenesis(next)
 }
 
 func (k *Keeper) FinalizeAVMExecutionBatch(msg types.MsgFinalizeAVMExecutionBatch) ([]types.AVMExecutionReceipt, error) {
@@ -192,8 +179,22 @@ func (k *Keeper) FinalizeAVMExecutionBatch(msg types.MsgFinalizeAVMExecutionBatc
 	if err := next.Validate(); err != nil {
 		return nil, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return nil, err
+	}
 	return receipts, nil
+}
+
+func (k *Keeper) saveGenesis(next GenesisState) error {
+	next = cloneGenesis(next)
+	if err := next.Validate(); err != nil {
+		return err
+	}
+	k.genesis = next
+	if k.storeService == nil || k.runtimeCtx == nil {
+		return nil
+	}
+	return prefixgenesis.Save(k.runtimeCtx, k.storeService, genesisKey, next)
 }
 
 func (k Keeper) AVMExecutionQueue(req *prototype.PageRequest) ([]types.AVMExecutionBatch, prototype.PageResponse, error) {

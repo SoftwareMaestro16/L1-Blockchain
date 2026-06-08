@@ -1,12 +1,14 @@
 package keeper
 
 import (
+	"context"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/sovereign-l1/l1/app/addressing"
+	"github.com/sovereign-l1/l1/x/internal/kvtest"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/validator-election/types"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
@@ -53,6 +55,28 @@ func TestExportImportDuringActiveElection(t *testing.T) {
 	require.NoError(t, NewMigrator(&target).Migrate1to2())
 	require.Len(t, target.NextValidatorSet(), 2)
 	require.Len(t, target.ElectionCandidates(), 2)
+}
+
+func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	source := NewPersistentKeeper(service)
+	require.NoError(t, source.InitGenesisState(ctx, DefaultGenesis()))
+
+	applyCandidate(t, &source, 0x61, 100, 100, 2)
+	result, err := source.CommitElection(types.MsgCommitElection{Authority: prototype.DefaultAuthority, Height: 90})
+	require.NoError(t, err)
+	require.Len(t, result.NextSet, 1)
+
+	restarted := NewPersistentKeeper(service)
+	exported, err := restarted.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	require.Len(t, exported.State.NextValidatorSet, 1)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	require.NoError(t, imported.InitGenesisState(ctx, exported))
+	require.Len(t, imported.NextValidatorSet(), 1)
+	require.Len(t, imported.ElectionCandidates(), 1)
 }
 
 func TestCandidateWithdrawalBeforeDeadline(t *testing.T) {

@@ -1,10 +1,12 @@
 package keeper
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/sovereign-l1/l1/x/internal/kvtest"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/nominator-pool/types"
 )
@@ -55,6 +57,38 @@ func TestTask74UserFacingDepositMintsReceiptAndKeepsRawInternal(t *testing.T) {
 		Height:           3,
 	})
 	require.ErrorContains(t, err, "must not include a validator address")
+}
+
+func TestTask74PersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
+	ctx := context.Background()
+	user := aePoolAddress(t, "52")
+	service := kvtest.NewStoreService()
+	source := NewPersistentKeeper(service)
+	source.accountStatusReader = accountStatusFixture{user: accountStatusActive}
+	require.NoError(t, source.InitGenesisState(ctx, DefaultGenesis()))
+	pool := createOfficialLiquidStakingPool(t, &source, "official-persistent")
+
+	receipt, err := source.DepositToStakingPool(types.MsgDepositToStakingPool{
+		PoolID:        pool.PoolID,
+		WalletAddress: user,
+		Amount:        types.DefaultMinPoolDeposit,
+		Height:        2,
+	})
+	require.NoError(t, err)
+
+	restarted := NewPersistentKeeper(service)
+	exported, err := restarted.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	require.Len(t, exported.State.Pools, 1)
+	require.Len(t, exported.State.PoolShares, 1)
+	require.Equal(t, receipt.Shares, exported.State.PoolShares[0].Shares)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	imported.accountStatusReader = accountStatusFixture{user: accountStatusActive}
+	require.NoError(t, imported.InitGenesisState(ctx, exported))
+	share, found := imported.PoolShare(types.QueryPoolShareRequest{PoolID: pool.PoolID, Delegator: rawPoolAddress("52")})
+	require.True(t, found)
+	require.Equal(t, receipt.Shares, share.Share.Shares)
 }
 
 func TestTask74DepositRejectsInactiveFrozenLowAndFrozenLimitedPool(t *testing.T) {

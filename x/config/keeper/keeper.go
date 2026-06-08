@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
@@ -10,6 +9,7 @@ import (
 	corestore "cosmossdk.io/core/store"
 
 	"github.com/sovereign-l1/l1/x/config/types"
+	"github.com/sovereign-l1/l1/x/internal/prefixgenesis"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 )
 
@@ -24,6 +24,7 @@ type GenesisState struct {
 type Keeper struct {
 	genesis      GenesisState
 	storeService corestore.KVStoreService
+	runtimeCtx   context.Context
 }
 
 func NewKeeper() Keeper {
@@ -57,18 +58,16 @@ func (k *Keeper) InitGenesis(gs GenesisState) error {
 	return nil
 }
 
-func (k Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
+func (k *Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
 	if err := gs.Validate(); err != nil {
 		return err
 	}
+	k.genesis = cloneGenesis(gs)
+	k.runtimeCtx = ctx
 	if k.storeService == nil {
 		return errors.New("config persistent store is not configured")
 	}
-	bz, err := json.Marshal(cloneGenesis(gs))
-	if err != nil {
-		return err
-	}
-	return k.storeService.OpenKVStore(ctx).Set(genesisKey, bz)
+	return prefixgenesis.Save(ctx, k.storeService, genesisKey, k.genesis)
 }
 
 func (k Keeper) saveGenesisState(ctx context.Context, gs GenesisState) error {
@@ -78,11 +77,19 @@ func (k Keeper) saveGenesisState(ctx context.Context, gs GenesisState) error {
 	if k.storeService == nil {
 		return errors.New("config persistent store is not configured")
 	}
-	bz, err := json.Marshal(cloneGenesis(gs))
-	if err != nil {
+	return prefixgenesis.Save(ctx, k.storeService, genesisKey, cloneGenesis(gs))
+}
+
+func (k *Keeper) saveGenesis(next GenesisState) error {
+	next = cloneGenesis(next)
+	if err := next.Validate(); err != nil {
 		return err
 	}
-	return k.storeService.OpenKVStore(ctx).Set(genesisKey, bz)
+	k.genesis = next
+	if k.storeService == nil || k.runtimeCtx == nil {
+		return nil
+	}
+	return prefixgenesis.Save(k.runtimeCtx, k.storeService, genesisKey, next)
 }
 
 func (k Keeper) ExportGenesis() GenesisState {
@@ -93,15 +100,8 @@ func (k Keeper) ExportGenesisState(ctx context.Context) (GenesisState, error) {
 	if k.storeService == nil {
 		return k.ExportGenesis(), nil
 	}
-	bz, err := k.storeService.OpenKVStore(ctx).Get(genesisKey)
+	gs, _, err := prefixgenesis.Load(ctx, k.storeService, genesisKey, DefaultGenesis())
 	if err != nil {
-		return GenesisState{}, err
-	}
-	if len(bz) == 0 {
-		return DefaultGenesis(), nil
-	}
-	var gs GenesisState
-	if err := json.Unmarshal(bz, &gs); err != nil {
 		return GenesisState{}, err
 	}
 	if err := gs.Validate(); err != nil {
@@ -121,8 +121,7 @@ func (k *Keeper) UpdateParams(authority string, params types.Params) error {
 	if err := next.Validate(); err != nil {
 		return err
 	}
-	k.genesis = next
-	return nil
+	return k.saveGenesis(next)
 }
 
 func (k Keeper) UpdateParamsState(ctx context.Context, authority string, params types.Params) error {
@@ -176,7 +175,9 @@ func (k *Keeper) UpsertEntry(authority string, key string, value string, height 
 	if err := next.Validate(); err != nil {
 		return types.ConfigEntry{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ConfigEntry{}, err
+	}
 	return entry, nil
 }
 
@@ -204,7 +205,7 @@ func (k *Keeper) SubmitConfigChange(msg types.MsgSubmitConfigChange, height int6
 	if uint32(len(k.genesis.State.PendingChanges)+1) > k.genesis.Params.MaxPendingChanges {
 		return types.ConfigChange{}, errors.New("config pending changes limit reached")
 	}
-	change := normalizeSubmittedChange(msg.Change, msg.Authority, height)
+	change := normalizeSubmittedChange(k.genesis.Params, msg.Change, msg.Authority, height)
 	if _, _, found := types.FindChange(k.genesis.State.PendingChanges, change.ID); found {
 		return types.ConfigChange{}, errors.New("config change already exists")
 	}
@@ -216,7 +217,9 @@ func (k *Keeper) SubmitConfigChange(msg types.MsgSubmitConfigChange, height int6
 	if err := next.Validate(); err != nil {
 		return types.ConfigChange{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ConfigChange{}, err
+	}
 	return change, nil
 }
 
@@ -281,6 +284,9 @@ func (k *Keeper) ExecuteConfigChange(msg types.MsgExecuteConfigChange, height in
 	if change.Status != types.ChangeStatusApproved {
 		return types.ConfigEntry{}, types.ConfigChange{}, errors.New("config change must be approved before execution")
 	}
+	if change.ActivationHeight != 0 && height < change.ActivationHeight {
+		return types.ConfigEntry{}, types.ConfigChange{}, errors.New("config change activation height has not elapsed")
+	}
 	if err := types.ValidateChangeAgainstState(k.genesis.Params, k.genesis.State, change); err != nil {
 		return types.ConfigEntry{}, types.ConfigChange{}, err
 	}
@@ -297,7 +303,9 @@ func (k *Keeper) ExecuteConfigChange(msg types.MsgExecuteConfigChange, height in
 	if err := next.Validate(); err != nil {
 		return types.ConfigEntry{}, types.ConfigChange{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ConfigEntry{}, types.ConfigChange{}, err
+	}
 	return entry, change, nil
 }
 
@@ -345,6 +353,28 @@ func (k Keeper) PendingConfigChanges() ([]types.ConfigChange, error) {
 	return out, nil
 }
 
+func (k Keeper) EffectiveEntries(height int64) ([]types.ConfigEntry, error) {
+	state := types.CloneState(k.genesis.State)
+	if err := state.Validate(k.genesis.Params); err != nil {
+		return nil, err
+	}
+	for _, change := range types.SortedChanges(state.PendingChanges) {
+		if change.Status != types.ChangeStatusApproved {
+			continue
+		}
+		if change.ActivationHeight != 0 && height < change.ActivationHeight {
+			continue
+		}
+		if err := types.ValidateChangeAgainstState(k.genesis.Params, state, change); err != nil {
+			return nil, err
+		}
+		if _, err := applyConfigChange(k.genesis.Params, &state, change, change.ApprovedBy, height); err != nil {
+			return nil, err
+		}
+	}
+	return types.SortedEntries(state.Entries), nil
+}
+
 func (k Keeper) ConfigChange(id string) (types.ConfigChange, bool, error) {
 	state := k.genesis.State
 	if err := state.Validate(k.genesis.Params); err != nil {
@@ -383,7 +413,7 @@ func cloneGenesis(gs GenesisState) GenesisState {
 	return gs
 }
 
-func normalizeSubmittedChange(change types.ConfigChange, authority string, height int64) types.ConfigChange {
+func normalizeSubmittedChange(params types.Params, change types.ConfigChange, authority string, height int64) types.ConfigChange {
 	change.ID = stringsTrim(change.ID)
 	change.Key = stringsTrim(change.Key)
 	change.Operation = stringsTrim(change.Operation)
@@ -398,6 +428,8 @@ func normalizeSubmittedChange(change types.ConfigChange, authority string, heigh
 	change.ExecutedBy = ""
 	change.CreatedHeight = height
 	change.UpdatedHeight = height
+	change.Critical = types.IsCriticalConfigKey(change.Key)
+	change.ActivationHeight, change.ActivationEpoch = types.ActivationHeight(params, change.Key, height)
 	return change
 }
 
@@ -423,7 +455,9 @@ func (k *Keeper) transitionChange(id string, height int64, mutate func(types.Con
 	if err := next.Validate(); err != nil {
 		return types.ConfigChange{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ConfigChange{}, err
+	}
 	return updated, nil
 }
 

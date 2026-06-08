@@ -2,14 +2,13 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"reflect"
 
 	corestore "cosmossdk.io/core/store"
 
 	"github.com/sovereign-l1/l1/x/config-voting/types"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
+	"github.com/sovereign-l1/l1/x/internal/prefixgenesis"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 )
 
@@ -25,6 +24,7 @@ type GenesisState struct {
 type Keeper struct {
 	genesis      GenesisState
 	storeService corestore.KVStoreService
+	runtimeCtx   context.Context
 }
 
 func NewKeeper() Keeper {
@@ -67,14 +67,11 @@ func (k *Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
 		return err
 	}
 	k.genesis = cloneGenesis(gs)
+	k.runtimeCtx = ctx
 	if k.storeService == nil {
 		return nil
 	}
-	bz, err := json.Marshal(cloneGenesis(gs))
-	if err != nil {
-		return err
-	}
-	return k.storeService.OpenKVStore(ctx).Set(genesisKey, bz)
+	return prefixgenesis.Save(ctx, k.storeService, genesisKey, k.genesis)
 }
 
 func (k Keeper) ExportGenesis() GenesisState {
@@ -85,18 +82,8 @@ func (k Keeper) ExportGenesisState(ctx context.Context) (GenesisState, error) {
 	if k.storeService == nil {
 		return k.ExportGenesis(), nil
 	}
-	if !reflect.DeepEqual(k.genesis, DefaultGenesis()) {
-		return k.ExportGenesis(), nil
-	}
-	bz, err := k.storeService.OpenKVStore(ctx).Get(genesisKey)
+	gs, _, err := prefixgenesis.Load(ctx, k.storeService, genesisKey, DefaultGenesis())
 	if err != nil {
-		return GenesisState{}, err
-	}
-	if len(bz) == 0 {
-		return DefaultGenesis(), nil
-	}
-	var gs GenesisState
-	if err := json.Unmarshal(bz, &gs); err != nil {
 		return GenesisState{}, err
 	}
 	if err := gs.Validate(); err != nil {
@@ -123,7 +110,9 @@ func (k *Keeper) SubmitConfigProposal(msg types.MsgSubmitConfigProposal) (types.
 	if err := next.Validate(); err != nil {
 		return types.ConfigProposal{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ConfigProposal{}, err
+	}
 	return proposal, nil
 }
 
@@ -166,7 +155,9 @@ func (k *Keeper) VoteConfigProposal(msg types.MsgVoteConfigProposal) (types.Conf
 	if err := next.Validate(); err != nil {
 		return types.ConfigVote{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ConfigVote{}, err
+	}
 	return vote, nil
 }
 
@@ -202,7 +193,9 @@ func (k *Keeper) ExecuteConfigProposal(msg types.MsgExecuteConfigProposal) (type
 		if err := next.Validate(); err != nil {
 			return types.ConfigProposal{}, err
 		}
-		k.genesis = next
+		if err := k.saveGenesis(next); err != nil {
+			return types.ConfigProposal{}, err
+		}
 		return proposal, nil
 	}
 	if msg.Height < proposal.EarliestExecutionHeight {
@@ -220,7 +213,9 @@ func (k *Keeper) ExecuteConfigProposal(msg types.MsgExecuteConfigProposal) (type
 	if err := next.Validate(); err != nil {
 		return types.ConfigProposal{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ConfigProposal{}, err
+	}
 	return proposal, nil
 }
 
@@ -245,8 +240,22 @@ func (k *Keeper) VetoConfigProposal(msg types.MsgVetoConfigProposal) (types.Conf
 	if err := next.Validate(); err != nil {
 		return types.ConfigProposal{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ConfigProposal{}, err
+	}
 	return proposal, nil
+}
+
+func (k *Keeper) saveGenesis(next GenesisState) error {
+	next = cloneGenesis(next)
+	if err := next.Validate(); err != nil {
+		return err
+	}
+	k.genesis = next
+	if k.storeService == nil || k.runtimeCtx == nil {
+		return nil
+	}
+	return prefixgenesis.Save(k.runtimeCtx, k.storeService, genesisKey, next)
 }
 
 func (k Keeper) ConfigProposal(proposalID string) (types.ConfigProposal, bool, error) {

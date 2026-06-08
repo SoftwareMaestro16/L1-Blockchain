@@ -1,11 +1,13 @@
 package keeper
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/sovereign-l1/l1/x/avm-scheduler/types"
+	"github.com/sovereign-l1/l1/x/internal/kvtest"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 )
 
@@ -110,6 +112,35 @@ func TestExportImportPreservesQueueAndReceipts(t *testing.T) {
 	require.NoError(t, target.InitGenesis(exported))
 	require.Equal(t, exported, target.ExportGenesis())
 	require.NoError(t, NewMigrator(&target).Migrate1to2())
+}
+
+func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	source := NewPersistentKeeper(service)
+	gs := DefaultGenesis()
+	gs.Params = prototype.TestnetParams()
+	require.NoError(t, source.InitGenesisState(ctx, gs))
+
+	batch := testBatch("persistent-done", task("d", "contract-d", "mailbox-d", nil, []string{"state/d"}))
+	require.NoError(t, source.SubmitAVMExecutionBatch(submit(batch)))
+	receipts, err := source.FinalizeAVMExecutionBatch(finalize("persistent-done", 20))
+	require.NoError(t, err)
+	require.Len(t, receipts, 1)
+
+	restarted := NewPersistentKeeper(service)
+	exported, err := restarted.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	require.Empty(t, exported.State.ExecutionQueue)
+	require.Len(t, exported.State.ExecutionReceipts, 1)
+	require.Equal(t, receipts[0].ReceiptID, exported.State.ExecutionReceipts[0].ReceiptID)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	require.NoError(t, imported.InitGenesisState(ctx, exported))
+	restored, found, err := imported.AVMExecutionReceipt("persistent-done", "d")
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, receipts[0], restored)
 }
 
 func enabledKeeper(t *testing.T) Keeper {

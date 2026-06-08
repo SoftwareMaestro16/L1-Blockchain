@@ -1,12 +1,14 @@
 package keeper
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	configvotingtypes "github.com/sovereign-l1/l1/x/config-voting/types"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
+	"github.com/sovereign-l1/l1/x/internal/kvtest"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 )
 
@@ -157,5 +159,32 @@ func TestVotingPowerSnapshotPreservedAcrossValidatorSetChange(t *testing.T) {
 
 	votes, err := k.ConfigVotes("p1")
 	require.NoError(t, err)
+	require.Equal(t, uint64(60), votes[0].Power)
+}
+
+func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	source := NewPersistentKeeper(service)
+	gs := DefaultGenesis()
+	gs.Params = prototype.TestnetParams()
+	require.NoError(t, source.InitGenesisState(ctx, gs))
+
+	p := submit(t, &source, "persistent-p1", defaultSnapshot())
+	_, err := source.VoteConfigProposal(configvotingtypes.MsgVoteConfigProposal{Voter: "val1", ProposalID: p.ProposalID, Option: configvotingtypes.VoteOptionYes, Height: 3})
+	require.NoError(t, err)
+
+	restarted := NewPersistentKeeper(service)
+	exported, err := restarted.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	require.Len(t, exported.State.Proposals, 1)
+	require.Len(t, exported.State.Votes, 1)
+	require.Equal(t, p.ProposalID, exported.State.Votes[0].ProposalID)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	require.NoError(t, imported.InitGenesisState(ctx, exported))
+	votes, err := imported.ConfigVotes(p.ProposalID)
+	require.NoError(t, err)
+	require.Len(t, votes, 1)
 	require.Equal(t, uint64(60), votes[0].Power)
 }

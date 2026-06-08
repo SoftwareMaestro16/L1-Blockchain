@@ -1,11 +1,13 @@
 package keeper
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/sovereign-l1/l1/x/actor-registry/types"
+	"github.com/sovereign-l1/l1/x/internal/kvtest"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 )
 
@@ -127,6 +129,35 @@ func TestExportImportPreservesLogicalTime(t *testing.T) {
 	require.Equal(t, updated.LogicalTime, restored.LogicalTime)
 	require.Equal(t, exported, target.ExportGenesis())
 	require.NoError(t, NewMigrator(&target).Migrate1to2())
+}
+
+func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	source := NewPersistentKeeper(service)
+	gs := DefaultGenesis()
+	gs.Params = prototype.TestnetParams()
+	gs.State.CodeStore = append(gs.State.CodeStore, types.CodeRecord{CodeHash: codeHash("code-a"), RegisteredBy: prototype.DefaultAuthority, RegisteredAt: 1})
+	require.NoError(t, source.InitGenesisState(ctx, gs))
+
+	actor, err := source.RegisterActor(registerMsg("owner-a", codeHash("code-a"), "salt-a", 10))
+	require.NoError(t, err)
+	frozen, err := source.FreezeActor(types.MsgFreezeActor{Authority: prototype.DefaultAuthority, ActorID: actor.ActorID, Height: 11})
+	require.NoError(t, err)
+	require.Equal(t, types.ActorStatusFrozen, frozen.Status)
+
+	restarted := NewPersistentKeeper(service)
+	exported, err := restarted.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	require.Len(t, exported.State.Actors, 1)
+	require.Equal(t, types.ActorStatusFrozen, exported.State.Actors[0].Status)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	require.NoError(t, imported.InitGenesisState(ctx, exported))
+	restored, found, err := imported.Actor(actor.ActorID)
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, frozen, restored)
 }
 
 func enabledKeeper(t *testing.T, codeHashes ...string) Keeper {

@@ -1,12 +1,14 @@
 package keeper
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/sovereign-l1/l1/x/internal/kvtest"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/validator-insurance/types"
 	validatorregistrytypes "github.com/sovereign-l1/l1/x/validator-registry/types"
@@ -165,6 +167,37 @@ func TestExportImportPreservesPendingClaims(t *testing.T) {
 	require.Equal(t, exported, target.ExportGenesis())
 	require.NoError(t, NewMigrator(&target).Migrate1to2())
 	claims := target.InsuranceClaims(validator)
+	require.Len(t, claims, 1)
+	require.Equal(t, claim, claims[0])
+}
+
+func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	source := NewPersistentKeeper(service)
+	require.NoError(t, source.InitGenesisState(ctx, DefaultGenesis()))
+
+	validator := rawInsuranceAddress("33")
+	fundInsurance(t, &source, validator, 1_500)
+	claim, err := source.SubmitInsuranceClaim(types.MsgSubmitInsuranceClaim{
+		Authority:        prototype.DefaultAuthority,
+		ClaimID:          "persistent-claim",
+		ValidatorAddress: validator,
+		Claimant:         rawInsuranceAddress("44"),
+		Amount:           700,
+		Reason:           "restart proof",
+		Height:           2,
+	})
+	require.NoError(t, err)
+
+	restarted := NewPersistentKeeper(service)
+	exported, err := restarted.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	require.Len(t, exported.State.Claims, 1)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	require.NoError(t, imported.InitGenesisState(ctx, exported))
+	claims := imported.InsuranceClaims(validator)
 	require.Len(t, claims, 1)
 	require.Equal(t, claim, claims[0])
 }

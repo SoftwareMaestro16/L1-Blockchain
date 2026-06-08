@@ -2,13 +2,12 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"math"
-	"reflect"
 
 	corestore "cosmossdk.io/core/store"
 
+	"github.com/sovereign-l1/l1/x/internal/prefixgenesis"
 	"github.com/sovereign-l1/l1/x/internal/prototype"
 	"github.com/sovereign-l1/l1/x/storage-rent/types"
 )
@@ -25,6 +24,7 @@ type GenesisState struct {
 type Keeper struct {
 	genesis      GenesisState
 	storeService corestore.KVStoreService
+	runtimeCtx   context.Context
 }
 
 func NewKeeper() Keeper {
@@ -67,14 +67,11 @@ func (k *Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
 		return err
 	}
 	k.genesis = cloneGenesis(gs)
+	k.runtimeCtx = ctx
 	if k.storeService == nil {
 		return nil
 	}
-	bz, err := json.Marshal(cloneGenesis(gs))
-	if err != nil {
-		return err
-	}
-	return k.storeService.OpenKVStore(ctx).Set(genesisKey, bz)
+	return prefixgenesis.Save(ctx, k.storeService, genesisKey, k.genesis)
 }
 
 func (k Keeper) ExportGenesis() GenesisState {
@@ -85,24 +82,45 @@ func (k Keeper) ExportGenesisState(ctx context.Context) (GenesisState, error) {
 	if k.storeService == nil {
 		return k.ExportGenesis(), nil
 	}
-	if !reflect.DeepEqual(k.genesis, DefaultGenesis()) {
-		return k.ExportGenesis(), nil
-	}
-	bz, err := k.storeService.OpenKVStore(ctx).Get(genesisKey)
+	gs, _, err := prefixgenesis.Load(ctx, k.storeService, genesisKey, DefaultGenesis())
 	if err != nil {
-		return GenesisState{}, err
-	}
-	if len(bz) == 0 {
-		return DefaultGenesis(), nil
-	}
-	var gs GenesisState
-	if err := json.Unmarshal(bz, &gs); err != nil {
 		return GenesisState{}, err
 	}
 	if err := gs.Validate(); err != nil {
 		return GenesisState{}, err
 	}
 	return cloneGenesis(gs), nil
+}
+
+func (k Keeper) SystemRentStatus() (types.SystemRentResult, error) {
+	if err := k.genesis.State.SystemReserve.Validate(); err != nil {
+		return types.SystemRentResult{}, err
+	}
+	return k.genesis.State.SystemReserve.Evaluate(), nil
+}
+
+func (k *Keeper) UpdateSystemRentReserve(authority string, reserve types.SystemRentReserve, height uint64) (types.SystemRentResult, error) {
+	if err := k.requireAuthority(authority); err != nil {
+		return types.SystemRentResult{}, err
+	}
+	if height == 0 {
+		return types.SystemRentResult{}, errors.New("storage rent system reserve height must be positive")
+	}
+	if err := reserve.Validate(); err != nil {
+		return types.SystemRentResult{}, err
+	}
+	result := reserve.Evaluate()
+	reserve = reserve.WithResult(height, result)
+	next := cloneGenesis(k.genesis)
+	next.State.SystemReserve = reserve
+	next.State = next.State.Export()
+	if err := next.Validate(); err != nil {
+		return types.SystemRentResult{}, err
+	}
+	if err := k.saveGenesis(next); err != nil {
+		return types.SystemRentResult{}, err
+	}
+	return result, nil
 }
 
 func (k *Keeper) TrackContractStorageUsage(authority, contractAddress, actorID string, storageBytes, observedStorageBytes, height uint64) (types.ContractRentRecord, error) {
@@ -142,7 +160,9 @@ func (k *Keeper) TrackContractStorageUsage(authority, contractAddress, actorID s
 	if err := next.Validate(); err != nil {
 		return types.ContractRentRecord{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ContractRentRecord{}, err
+	}
 	_, contract, _ := contractIndex(k.genesis.State.Contracts, contractAddress)
 	return contract, nil
 }
@@ -185,7 +205,9 @@ func (k *Keeper) WithdrawExcessRent(msg types.MsgWithdrawExcessRent) (types.Cont
 	if err := next.Validate(); err != nil {
 		return types.ContractRentRecord{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ContractRentRecord{}, err
+	}
 	return contract.Normalize(), nil
 }
 
@@ -222,7 +244,9 @@ func (k *Keeper) FreezeExpiredContract(msg types.MsgFreezeExpiredContract) (type
 	if err := next.Validate(); err != nil {
 		return types.ContractRentRecord{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ContractRentRecord{}, err
+	}
 	return contract.Normalize(), nil
 }
 
@@ -266,7 +290,9 @@ func (k *Keeper) UnfreezeContract(msg types.MsgUnfreezeContract) (types.Contract
 	if err := next.Validate(); err != nil {
 		return types.ContractRentRecord{}, types.RentDistributionRecord{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ContractRentRecord{}, types.RentDistributionRecord{}, err
+	}
 	return contract.Normalize(), distribution, nil
 }
 
@@ -297,7 +323,9 @@ func (k *Keeper) DeleteExpiredContract(msg types.MsgDeleteExpiredContract) (type
 	if err := next.Validate(); err != nil {
 		return types.ContractRentRecord{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ContractRentRecord{}, err
+	}
 	return contract.Normalize(), nil
 }
 
@@ -310,8 +338,7 @@ func (k *Keeper) UpdateStorageRentParams(msg types.MsgUpdateStorageRentParams) e
 	if err := next.Validate(); err != nil {
 		return err
 	}
-	k.genesis = next
-	return nil
+	return k.saveGenesis(next)
 }
 
 func (k Keeper) ContractRent(contractAddress string) (types.ContractRentRecord, bool, error) {
@@ -412,8 +439,22 @@ func (k *Keeper) pay(contractAddress string, amount, height uint64, requireFroze
 	if err := next.Validate(); err != nil {
 		return types.ContractRentRecord{}, types.RentDistributionRecord{}, err
 	}
-	k.genesis = next
+	if err := k.saveGenesis(next); err != nil {
+		return types.ContractRentRecord{}, types.RentDistributionRecord{}, err
+	}
 	return contract.Normalize(), distribution, nil
+}
+
+func (k *Keeper) saveGenesis(next GenesisState) error {
+	next = cloneGenesis(next)
+	if err := next.Validate(); err != nil {
+		return err
+	}
+	k.genesis = next
+	if k.storeService == nil || k.runtimeCtx == nil {
+		return nil
+	}
+	return prefixgenesis.Save(k.runtimeCtx, k.storeService, genesisKey, next)
 }
 
 func (k Keeper) requireAuthority(authority string) error {
