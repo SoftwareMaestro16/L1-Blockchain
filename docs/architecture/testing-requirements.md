@@ -31,9 +31,9 @@ Required:
 - fee collector + burn + treasury;
 - nomination pool + delegation + unbonding;
 - governance param updates;
-- CosmWasm tx flow.
+- AVM tx flow.
 
-Integration tests must prove cross-module behavior before localnet scripts are treated as acceptance evidence. CosmWasm tests remain gated when wasm is disabled, but the flow must be represented by explicit enabled/disabled checks.
+Integration tests must prove cross-module behavior before localnet scripts are treated as acceptance evidence. AVM contract tests are required for genesis; any non-AVM compatibility tests remain post-genesis and explicitly gated.
 
 ### E2E/Localnet Tests
 
@@ -47,7 +47,7 @@ Required:
 - downtime scenario;
 - double-sign evidence scenario where feasible;
 - fee burn scenario;
-- CosmWasm instantiate/execute/query;
+- AVM instantiate/execute/query;
 - export/import;
 - restart;
 - state sync/snapshot where feasible.
@@ -79,7 +79,7 @@ Required:
 - block time under load;
 - finality latency measurement;
 - mempool pressure;
-- CosmWasm execution load;
+- AVM execution load;
 - state growth profile.
 
 Performance tests may be nightly/manual when expensive, but public testnet readiness must include evidence for the relevant validator-set phase, finality target, load profile, and state growth behavior.

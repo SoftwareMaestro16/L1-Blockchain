@@ -148,8 +148,8 @@ func TestGovernanceGenesisValidationRejectsInvalidParams(t *testing.T) {
 func TestGovernanceEnumParamsAreBounded(t *testing.T) {
 	change := GovernanceParamChange{
 		Value: GovernanceParamValue{
-			Key:         GovernanceParamCosmWasmUploadPolicy,
-			StringValue: CosmWasmUploadGovernanceOnly,
+			Key:         GovernanceParamAVMContractUploadPolicy,
+			StringValue: AVMContractUploadGovernanceOnly,
 		},
 		VotingPeriodBlocks: GovernanceCriticalVotingPeriodBlocks,
 		QuorumBps:          GovernanceCriticalQuorumBps,

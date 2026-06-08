@@ -10,7 +10,7 @@ Required criteria:
 - dynamic inflation implemented and tested;
 - fee burn/treasury/reward split implemented and tested;
 - slashing configured and tested;
-- CosmWasm integrated and tested;
+- AVM integrated and tested;
 - export/import stable;
 - state sync/snapshots stable;
 - public testnet has run long enough to observe validator behavior;
@@ -25,7 +25,7 @@ Mainnet readiness is all-or-nothing. Missing evidence for any item means Aetra i
 
 The readiness gate must be backed by:
 
-- passing module tests for staking policy, economics, slashing, CosmWasm, export/import, state sync, and snapshots;
+- passing module tests for staking policy, economics, slashing, AVM, export/import, state sync, and snapshots;
 - load reports showing normal and stressed finality targets;
 - public testnet reports covering real validator behavior;
 - completed security audit report;

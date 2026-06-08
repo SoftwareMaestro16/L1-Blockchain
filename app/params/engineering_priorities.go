@@ -30,7 +30,7 @@ const (
 )
 
 const (
-	AetraEngineeringP2CosmWasmHardening = "cosmwasm_production_hardening"
+	AetraEngineeringP2AVMHardening      = "avm_production_hardening"
 	AetraEngineeringP2Observability     = "observability"
 	AetraEngineeringP2Dashboards        = "dashboards"
 	AetraEngineeringP2LoadTests         = "load_tests"
@@ -39,7 +39,7 @@ const (
 
 const (
 	AetraEngineeringP3AntiCartelAnalytics           = "advanced_anti_cartel_analytics"
-	AetraEngineeringP3EVMResearch                   = "evm_research"
+	AetraEngineeringP3AVMLanguageResearch           = "avm_language_research"
 	AetraEngineeringP3MEVPolicy                     = "mev_policy"
 	AetraEngineeringP3EncryptedMempoolResearch      = "encrypted_mempool_research"
 	AetraEngineeringP3HigherValidatorCapExperiments = "higher_validator_cap_experiments"
@@ -164,7 +164,7 @@ func RequiredAetraEngineeringP1Items() []string {
 
 func RequiredAetraEngineeringP2Items() []string {
 	return []string{
-		AetraEngineeringP2CosmWasmHardening,
+		AetraEngineeringP2AVMHardening,
 		AetraEngineeringP2Observability,
 		AetraEngineeringP2Dashboards,
 		AetraEngineeringP2LoadTests,
@@ -175,7 +175,7 @@ func RequiredAetraEngineeringP2Items() []string {
 func RequiredAetraEngineeringP3Items() []string {
 	return []string{
 		AetraEngineeringP3AntiCartelAnalytics,
-		AetraEngineeringP3EVMResearch,
+		AetraEngineeringP3AVMLanguageResearch,
 		AetraEngineeringP3MEVPolicy,
 		AetraEngineeringP3EncryptedMempoolResearch,
 		AetraEngineeringP3HigherValidatorCapExperiments,

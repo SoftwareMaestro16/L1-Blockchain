@@ -4,7 +4,7 @@
 Aetra =
   CometBFT BFT PoS
   + Cosmos SDK
-  + CosmWasm
+  + AVM-only genesis smart contracts
   + 100-300 active validators over time
   + 5-8 second block time
   + <= 120 second worst acceptable finality target
@@ -27,7 +27,7 @@ Required properties:
 
 - consensus target is CometBFT BFT PoS;
 - application base is Cosmos SDK;
-- smart contract VM target is CosmWasm;
+- smart contract VM target is AVM-only at genesis;
 - active validator range is 100-300 over time;
 - block time target is 5-8 seconds;
 - worst acceptable finality target is less than or equal to 120 seconds;

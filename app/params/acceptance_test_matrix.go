@@ -11,7 +11,7 @@ const (
 	AetraAcceptanceCategoryAntiCentralization = "anti_centralization"
 	AetraAcceptanceCategorySlashing           = "slashing"
 	AetraAcceptanceCategoryEconomics          = "economics"
-	AetraAcceptanceCategoryCosmWasm           = "cosmwasm"
+	AetraAcceptanceCategoryAVM                = "avm"
 	AetraAcceptanceCategoryGovernance         = "governance"
 	AetraAcceptanceCategoryObservability      = "observability"
 )
@@ -59,12 +59,12 @@ const (
 )
 
 const (
-	AetraAcceptanceCosmWasmUploadCode             = "upload_code"
-	AetraAcceptanceCosmWasmInstantiate            = "instantiate"
-	AetraAcceptanceCosmWasmExecute                = "execute"
-	AetraAcceptanceCosmWasmQuery                  = "query"
-	AetraAcceptanceCosmWasmMigrateIfEnabled       = "migrate_if_enabled"
-	AetraAcceptanceCosmWasmGasExhaustionContained = "gas_exhaustion_contained"
+	AetraAcceptanceAVMUploadCode             = "upload_code"
+	AetraAcceptanceAVMInstantiate            = "instantiate"
+	AetraAcceptanceAVMExecute                = "execute"
+	AetraAcceptanceAVMQuery                  = "query"
+	AetraAcceptanceAVMMigrateIfEnabled       = "migrate_if_enabled"
+	AetraAcceptanceAVMGasExhaustionContained = "gas_exhaustion_contained"
 )
 
 const (
@@ -101,7 +101,7 @@ func DefaultAetraAcceptanceMatrixEvidence() []AetraAcceptanceCategoryEvidence {
 		{Category: AetraAcceptanceCategoryAntiCentralization, Scenarios: RequiredAetraAcceptanceAntiCentralizationScenarios()},
 		{Category: AetraAcceptanceCategorySlashing, Scenarios: RequiredAetraAcceptanceSlashingScenarios()},
 		{Category: AetraAcceptanceCategoryEconomics, Scenarios: RequiredAetraAcceptanceEconomicsScenarios()},
-		{Category: AetraAcceptanceCategoryCosmWasm, Scenarios: RequiredAetraAcceptanceCosmWasmScenarios()},
+		{Category: AetraAcceptanceCategoryAVM, Scenarios: RequiredAetraAcceptanceAVMScenarios()},
 		{Category: AetraAcceptanceCategoryGovernance, Scenarios: RequiredAetraAcceptanceGovernanceScenarios()},
 		{Category: AetraAcceptanceCategoryObservability, Scenarios: RequiredAetraAcceptanceObservabilityScenarios()},
 	}
@@ -214,14 +214,14 @@ func RequiredAetraAcceptanceEconomicsScenarios() []string {
 	}
 }
 
-func RequiredAetraAcceptanceCosmWasmScenarios() []string {
+func RequiredAetraAcceptanceAVMScenarios() []string {
 	return []string{
-		AetraAcceptanceCosmWasmUploadCode,
-		AetraAcceptanceCosmWasmInstantiate,
-		AetraAcceptanceCosmWasmExecute,
-		AetraAcceptanceCosmWasmQuery,
-		AetraAcceptanceCosmWasmMigrateIfEnabled,
-		AetraAcceptanceCosmWasmGasExhaustionContained,
+		AetraAcceptanceAVMUploadCode,
+		AetraAcceptanceAVMInstantiate,
+		AetraAcceptanceAVMExecute,
+		AetraAcceptanceAVMQuery,
+		AetraAcceptanceAVMMigrateIfEnabled,
+		AetraAcceptanceAVMGasExhaustionContained,
 	}
 }
 
@@ -250,7 +250,7 @@ func requiredAcceptanceCategories() map[string][]string {
 		AetraAcceptanceCategoryAntiCentralization: RequiredAetraAcceptanceAntiCentralizationScenarios(),
 		AetraAcceptanceCategorySlashing:           RequiredAetraAcceptanceSlashingScenarios(),
 		AetraAcceptanceCategoryEconomics:          RequiredAetraAcceptanceEconomicsScenarios(),
-		AetraAcceptanceCategoryCosmWasm:           RequiredAetraAcceptanceCosmWasmScenarios(),
+		AetraAcceptanceCategoryAVM:                RequiredAetraAcceptanceAVMScenarios(),
 		AetraAcceptanceCategoryGovernance:         RequiredAetraAcceptanceGovernanceScenarios(),
 		AetraAcceptanceCategoryObservability:      RequiredAetraAcceptanceObservabilityScenarios(),
 	}

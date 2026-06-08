@@ -43,7 +43,7 @@ foreach ($term in @(
     'fee collector + burn + treasury',
     'nomination pool + delegation + unbonding',
     'governance param updates',
-    'CosmWasm tx flow',
+    'AVM tx flow',
     'E2E/Localnet Tests',
     'node startup',
     'validator creation',
@@ -53,7 +53,7 @@ foreach ($term in @(
     'downtime scenario',
     'double-sign evidence scenario where feasible',
     'fee burn scenario',
-    'CosmWasm instantiate/execute/query',
+    'AVM instantiate/execute/query',
     'export/import',
     'restart',
     'state sync/snapshot where feasible',
@@ -73,7 +73,7 @@ foreach ($term in @(
     'block time under load',
     'finality latency measurement',
     'mempool pressure',
-    'CosmWasm execution load',
+    'AVM execution load',
     'state growth profile'
   )) {
   Assert-Contains -Text $docText -Pattern ([regex]::Escape($term)) -Message "testing requirements doc missing: $term"
@@ -131,7 +131,7 @@ foreach ($term in @(
     'TestRequirementFeeCollectorBurnTreasury',
     'TestRequirementNominationDelegation',
     'TestRequirementGovernanceParamUpdates',
-    'TestRequirementCosmWasmTxFlow',
+    'TestRequirementAVMTxFlow',
     'TestRequirementDoubleSignEvidence',
     'TestRequirementStateSyncSnapshot',
     'TestRequirementConcentrationAttack',
@@ -148,7 +148,7 @@ foreach ($term in @(
     'TestRequirementBlockTimeUnderLoad',
     'TestRequirementFinalityLatencyMeasurement',
     'TestRequirementMempoolPressure',
-    'TestRequirementCosmWasmExecutionLoad',
+    'TestRequirementAVMExecutionLoad',
     'TestRequirementStateGrowthProfile'
   )) {
   Assert-Contains -Text $policyText -Pattern ([regex]::Escape($term)) -Message "testing requirements policy missing: $term"

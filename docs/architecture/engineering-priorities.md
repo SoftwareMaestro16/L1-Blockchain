@@ -19,7 +19,7 @@ P1:
   governance bounds
 
 P2:
-  CosmWasm production hardening
+  AVM production hardening
   observability
   dashboards
   load tests
@@ -27,7 +27,7 @@ P2:
 
 P3:
   advanced anti-cartel analytics
-  EVM research
+  AVM language research
   MEV policy
   encrypted mempool research
   higher validator cap experiments
@@ -41,9 +41,9 @@ P0 is the foundation. Consensus safety, deterministic state, staking correctness
 
 P1 is the core Aetra differentiation layer. Validator power cap, fee burn/economics, validator score, nomination pool safety, and governance bounds must stabilize before the network can claim the balanced BFT PoS model described by the architecture.
 
-P2 prepares the public testnet surface. CosmWasm production hardening, observability, dashboards, load tests, and public testnet docs should progress after P0/P1 are controlled enough that operators can test real flows without hiding consensus or economic instability.
+P2 prepares the public testnet surface. AVM production hardening, observability, dashboards, load tests, and public testnet docs should progress after P0/P1 are controlled enough that operators can test real flows without hiding consensus or economic instability.
 
-P3 is research and advanced policy. Advanced anti-cartel analytics, EVM research, MEV policy, encrypted mempool research, and higher validator cap experiments must not distract from P0/P1. P3 work may be documented as research, but implementation should not enter the production path until P0 and P1 are stable.
+P3 is research and advanced policy. Advanced anti-cartel analytics, AVM language research, MEV policy, encrypted mempool research, and higher validator cap experiments must not distract from P0/P1. P3 work may be documented as research, but implementation should not enter the production path until P0 and P1 are stable.
 
 ## Acceptance Gate
 

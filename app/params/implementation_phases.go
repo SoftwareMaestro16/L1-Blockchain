@@ -11,7 +11,7 @@ const (
 	ImplementationPhaseEconomicsFeeSplit   = "phase_2_economics_fee_split"
 	ImplementationPhaseValidatorScore      = "phase_3_validator_score_accountability"
 	ImplementationPhaseSlashingHardening   = "phase_4_slashing_hardening"
-	ImplementationPhaseCosmWasmIntegration = "phase_5_cosmwasm_integration"
+	ImplementationPhaseAVMIntegration      = "phase_5_avm_integration"
 	ImplementationPhaseFinalityPerformance = "phase_6_finality_performance_profile"
 	ImplementationPhasePublicTestnetReady  = "phase_7_public_testnet_readiness"
 
@@ -47,7 +47,7 @@ const (
 	PhaseTaskImplementProgressiveDowntime         = "implement_progressive_downtime_if_not_covered_by_standard_module"
 	PhaseTaskAddObjectiveTimestampProposalPolicy  = "add_timestamp_proposal_violation_policy_where_objective"
 	PhaseTaskDocumentEvidenceLifecycle            = "document_evidence_lifecycle_and_unbonding_interaction"
-	PhaseTaskFinalizeCosmWasmWiring               = "finalize_cosmwasm_module_wiring"
+	PhaseTaskFinalizeAVMWiring                    = "finalize_avm_module_wiring"
 	PhaseTaskDefineCodeUploadPolicy               = "define_code_upload_policy"
 	PhaseTaskDefineContractGasLimits              = "define_contract_gas_limits"
 	PhaseTaskDefineContractSizeLimits             = "define_contract_size_limits"
@@ -68,7 +68,7 @@ const (
 	PhaseTaskPublishEconomicModelExplanation      = "publish_economic_model_explanation"
 	PhaseTaskPublishSlashingRiskExplanation       = "publish_slashing_risk_explanation"
 	PhaseTaskPublishDelegationPoolGuide           = "publish_delegation_and_nomination_pool_guide"
-	PhaseTaskPublishCosmWasmDeveloperGuide        = "publish_cosmwasm_developer_guide"
+	PhaseTaskPublishAVMDeveloperGuide             = "publish_avm_developer_guide"
 	PhaseTaskPreparePublicDashboards              = "prepare_public_dashboards"
 	PhaseTaskPrepareIncidentResponseProcess       = "prepare_incident_response_process"
 
@@ -117,7 +117,7 @@ const (
 	PhaseTestContractStorageLimitRent   = "storage_limit_rent_tests"
 	PhaseTestMaliciousContract          = "malicious_contract_tests"
 	PhaseTestContractExportImport       = "export_import_tests_with_contracts"
-	PhaseTestLocalnetCosmWasmSmoke      = "localnet_cosmwasm_smoke_test"
+	PhaseTestLocalnetAVMSmoke           = "localnet_avm_smoke_test"
 	PhaseTestLocalnetLoadProfile        = "localnet_load_profile"
 	PhaseTestMempoolPressure            = "mempool_pressure_test"
 	PhaseTestBlockTimeMeasurement       = "block_time_measurement"
@@ -300,9 +300,9 @@ func DefaultImplementationPhasePlans() []ImplementationPhasePlan {
 			},
 		},
 		{
-			PhaseID: ImplementationPhaseCosmWasmIntegration,
+			PhaseID: ImplementationPhaseAVMIntegration,
 			Items: []ImplementationPhaseItem{
-				phaseItem("task", PhaseTaskFinalizeCosmWasmWiring),
+				phaseItem("task", PhaseTaskFinalizeAVMWiring),
 				phaseItem("task", PhaseTaskDefineCodeUploadPolicy),
 				phaseItem("task", PhaseTaskDefineContractGasLimits),
 				phaseItem("task", PhaseTaskDefineContractSizeLimits),
@@ -315,7 +315,7 @@ func DefaultImplementationPhasePlans() []ImplementationPhasePlan {
 				phaseItem("test", PhaseTestContractStorageLimitRent),
 				phaseItem("test", PhaseTestMaliciousContract),
 				phaseItem("test", PhaseTestContractExportImport),
-				phaseItem("test", PhaseTestLocalnetCosmWasmSmoke),
+				phaseItem("test", PhaseTestLocalnetAVMSmoke),
 				phaseItem("acceptance", PhaseAcceptanceContractsDeterministic),
 				phaseItem("acceptance", PhaseAcceptanceContractGasBounded),
 				phaseItem("acceptance", PhaseAcceptanceMaliciousContractsSafe),
@@ -355,7 +355,7 @@ func DefaultImplementationPhasePlans() []ImplementationPhasePlan {
 				phaseItem("task", PhaseTaskPublishEconomicModelExplanation),
 				phaseItem("task", PhaseTaskPublishSlashingRiskExplanation),
 				phaseItem("task", PhaseTaskPublishDelegationPoolGuide),
-				phaseItem("task", PhaseTaskPublishCosmWasmDeveloperGuide),
+				phaseItem("task", PhaseTaskPublishAVMDeveloperGuide),
 				phaseItem("task", PhaseTaskPreparePublicDashboards),
 				phaseItem("task", PhaseTaskPrepareIncidentResponseProcess),
 				phaseItem("test", PhaseTestCleanNodeBootstrapDocs),
@@ -574,9 +574,9 @@ func defaultImplementationPhaseItemIDs() []phaseItemIDs {
 			},
 		},
 		{
-			phaseID: ImplementationPhaseCosmWasmIntegration,
+			phaseID: ImplementationPhaseAVMIntegration,
 			ids: []string{
-				PhaseTaskFinalizeCosmWasmWiring,
+				PhaseTaskFinalizeAVMWiring,
 				PhaseTaskDefineCodeUploadPolicy,
 				PhaseTaskDefineContractGasLimits,
 				PhaseTaskDefineContractSizeLimits,
@@ -589,7 +589,7 @@ func defaultImplementationPhaseItemIDs() []phaseItemIDs {
 				PhaseTestContractStorageLimitRent,
 				PhaseTestMaliciousContract,
 				PhaseTestContractExportImport,
-				PhaseTestLocalnetCosmWasmSmoke,
+				PhaseTestLocalnetAVMSmoke,
 				PhaseAcceptanceContractsDeterministic,
 				PhaseAcceptanceContractGasBounded,
 				PhaseAcceptanceMaliciousContractsSafe,
@@ -629,7 +629,7 @@ func defaultImplementationPhaseItemIDs() []phaseItemIDs {
 				PhaseTaskPublishEconomicModelExplanation,
 				PhaseTaskPublishSlashingRiskExplanation,
 				PhaseTaskPublishDelegationPoolGuide,
-				PhaseTaskPublishCosmWasmDeveloperGuide,
+				PhaseTaskPublishAVMDeveloperGuide,
 				PhaseTaskPreparePublicDashboards,
 				PhaseTaskPrepareIncidentResponseProcess,
 				PhaseTestCleanNodeBootstrapDocs,

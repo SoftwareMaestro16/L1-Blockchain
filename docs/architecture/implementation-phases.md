@@ -152,11 +152,11 @@ Acceptance:
 - no subjective slashing path exists;
 - slashing cannot underflow stake or corrupt shares.
 
-## Phase 5 - CosmWasm Integration
+## Phase 5 - AVM Integration
 
 Tasks:
 
-- finalize CosmWasm module wiring;
+- finalize AVM module wiring;
 - define code upload policy;
 - define contract gas limits;
 - define contract size limits;
@@ -172,7 +172,7 @@ Tests:
 - storage limit/rent tests;
 - malicious contract tests;
 - export/import tests with contracts;
-- localnet CosmWasm smoke test.
+- localnet AVM smoke test.
 
 Acceptance:
 
@@ -221,7 +221,7 @@ Tasks:
 - publish economic model explanation;
 - publish slashing risk explanation;
 - publish delegation and nomination pool guide;
-- publish CosmWasm developer guide;
+- publish AVM developer guide;
 - prepare public dashboards;
 - prepare incident response process.
 
@@ -254,7 +254,7 @@ Required catalog properties:
 - Phase 2 must include economics, fee split, burn, treasury, APR, reward smoothing, and supply invariant checks;
 - Phase 3 must include validator score, accountability metrics, objective reward modifier, and consensus-safety checks;
 - Phase 4 must include objective slashing hardening, evidence lifecycle, tombstone, downtime, and stake/share safety checks;
-- Phase 5 must include CosmWasm module wiring, upload policy, gas/size limits, storage pricing, indexer events, developer flow, malicious contract safety, and export/import checks;
+- Phase 5 must include AVM module wiring, upload policy, gas/size limits, storage pricing, indexer events, developer flow, malicious contract safety, and export/import checks;
 - Phase 6 must include finality, block timing, load profile, validator-failure profile, restart, and state sync/snapshot checks;
 - Phase 7 must include public testnet docs, dashboards, endpoint smoke tests, incident response, and end-to-end economic/staking flow checks;
 - phase items require evidence;

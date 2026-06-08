@@ -8,7 +8,7 @@ import (
 const (
 	FinalTargetConsensusCometBFTBFTPoS     = "cometbft_bft_pos"
 	FinalTargetCosmosSDK                   = "cosmos_sdk"
-	FinalTargetCosmWasm                    = "cosmwasm"
+	FinalTargetAVMOnlyGenesis              = "avm_only_genesis"
 	FinalTargetValidatorSetRange           = "100_300_active_validators_over_time"
 	FinalTargetBlockTimeRange              = "5_8_second_block_time"
 	FinalTargetWorstFinality               = "120_second_worst_acceptable_finality"
@@ -31,7 +31,7 @@ const (
 type AetraFinalTargetFormula struct {
 	CometBFTBFTPoS                 bool
 	CosmosSDK                      bool
-	CosmWasm                       bool
+	AVMOnlyGenesis                 bool
 	MinActiveValidators            int
 	MaxActiveValidators            int
 	MinBlockTimeSeconds            int
@@ -58,7 +58,7 @@ func DefaultAetraFinalTargetFormula() AetraFinalTargetFormula {
 	return AetraFinalTargetFormula{
 		CometBFTBFTPoS:                 true,
 		CosmosSDK:                      true,
-		CosmWasm:                       true,
+		AVMOnlyGenesis:                 true,
 		MinActiveValidators:            FinalTargetMinActiveValidators,
 		MaxActiveValidators:            FinalTargetMaxActiveValidators,
 		MinBlockTimeSeconds:            FinalTargetMinBlockTimeSeconds,
@@ -87,7 +87,7 @@ func BuildFinalTargetFormulaReport(formula AetraFinalTargetFormula) FinalTargetF
 	checks := []requirementCheck{
 		{FinalTargetConsensusCometBFTBFTPoS, formula.CometBFTBFTPoS},
 		{FinalTargetCosmosSDK, formula.CosmosSDK},
-		{FinalTargetCosmWasm, formula.CosmWasm},
+		{FinalTargetAVMOnlyGenesis, formula.AVMOnlyGenesis},
 		{FinalTargetValidatorSetRange, formula.MinActiveValidators == FinalTargetMinActiveValidators && formula.MaxActiveValidators == FinalTargetMaxActiveValidators},
 		{FinalTargetBlockTimeRange, formula.MinBlockTimeSeconds == FinalTargetMinBlockTimeSeconds && formula.MaxBlockTimeSeconds == FinalTargetMaxBlockTimeSeconds},
 		{FinalTargetWorstFinality, formula.WorstAcceptableFinalitySeconds <= FinalTargetWorstFinalitySeconds && formula.WorstAcceptableFinalitySeconds > 0},

@@ -56,7 +56,7 @@ func completeMainnetReadinessEvidence() MainnetReadinessEvidence {
 		DynamicInflationImplementedAndTested:           true,
 		FeeBurnTreasuryRewardSplitImplementedAndTested: true,
 		SlashingConfiguredAndTested:                    true,
-		CosmWasmIntegratedAndTested:                    true,
+		AVMIntegratedAndTested:                         true,
 		ExportImportStable:                             true,
 		StateSyncSnapshotsStable:                       true,
 		PublicTestnetObservedValidatorBehavior:         true,

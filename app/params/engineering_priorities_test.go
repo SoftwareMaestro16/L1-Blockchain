@@ -24,7 +24,7 @@ func TestDefaultAetraEngineeringPrioritiesCoverSection35(t *testing.T) {
 	require.Contains(t, byPriority[AetraEngineeringPriorityP0], AetraEngineeringP0ExportImport)
 	require.Contains(t, byPriority[AetraEngineeringPriorityP1], AetraEngineeringP1ValidatorPowerCap)
 	require.Contains(t, byPriority[AetraEngineeringPriorityP1], AetraEngineeringP1GovernanceBounds)
-	require.Contains(t, byPriority[AetraEngineeringPriorityP2], AetraEngineeringP2CosmWasmHardening)
+	require.Contains(t, byPriority[AetraEngineeringPriorityP2], AetraEngineeringP2AVMHardening)
 	require.Contains(t, byPriority[AetraEngineeringPriorityP2], AetraEngineeringP2PublicTestnetDocs)
 	require.Contains(t, byPriority[AetraEngineeringPriorityP3], AetraEngineeringP3EncryptedMempoolResearch)
 	require.Contains(t, byPriority[AetraEngineeringPriorityP3], AetraEngineeringP3HigherValidatorCapExperiments)

@@ -17,7 +17,7 @@ const (
 	AetraNearTermTaskValidatorScoreStateQueries  = "add_validator_score_state_and_query_tests"
 	AetraNearTermTaskProgressiveDowntimeDecision = "add_progressive_downtime_design_or_document_standard_slashing_v1"
 	AetraNearTermTaskNominationPoolAccounting    = "add_nomination_pool_accounting_tests"
-	AetraNearTermTaskCosmWasmSmokeMalicious      = "add_cosmwasm_smoke_and_malicious_contract_tests"
+	AetraNearTermTaskAVMSmokeMalicious           = "add_avm_smoke_and_malicious_contract_tests"
 	AetraNearTermTaskFinalityMeasurementScript   = "add_public_testnet_finality_measurement_script"
 	AetraNearTermTaskValidatorDelegatorDocs      = "add_documentation_for_validators_and_delegators"
 	AetraNearTermTaskCriticalCIGate              = "add_ci_gate_for_critical_unit_integration_tests"
@@ -84,7 +84,7 @@ func RequiredAetraNearTermTasks() []string {
 		AetraNearTermTaskValidatorScoreStateQueries,
 		AetraNearTermTaskProgressiveDowntimeDecision,
 		AetraNearTermTaskNominationPoolAccounting,
-		AetraNearTermTaskCosmWasmSmokeMalicious,
+		AetraNearTermTaskAVMSmokeMalicious,
 		AetraNearTermTaskFinalityMeasurementScript,
 		AetraNearTermTaskValidatorDelegatorDocs,
 		AetraNearTermTaskCriticalCIGate,

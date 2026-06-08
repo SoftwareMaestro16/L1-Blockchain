@@ -27,13 +27,13 @@ func TestAetraFinalTargetFormulaRejectsMissingCoreStack(t *testing.T) {
 	formula := DefaultAetraFinalTargetFormula()
 	formula.CometBFTBFTPoS = false
 	formula.CosmosSDK = false
-	formula.CosmWasm = false
+	formula.AVMOnlyGenesis = false
 
 	report := BuildFinalTargetFormulaReport(formula)
 	require.False(t, report.Ready)
 	require.Contains(t, report.Failed, FinalTargetConsensusCometBFTBFTPoS)
 	require.Contains(t, report.Failed, FinalTargetCosmosSDK)
-	require.Contains(t, report.Failed, FinalTargetCosmWasm)
+	require.Contains(t, report.Failed, FinalTargetAVMOnlyGenesis)
 	require.Error(t, ValidateAetraFinalTargetFormula(formula))
 }
 

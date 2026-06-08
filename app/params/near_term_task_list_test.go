@@ -25,7 +25,7 @@ func TestDefaultAetraNearTermTaskListCoversSection36(t *testing.T) {
 	require.Contains(t, evidence.Tasks, AetraNearTermTaskValidatorScoreStateQueries)
 	require.Contains(t, evidence.Tasks, AetraNearTermTaskProgressiveDowntimeDecision)
 	require.Contains(t, evidence.Tasks, AetraNearTermTaskNominationPoolAccounting)
-	require.Contains(t, evidence.Tasks, AetraNearTermTaskCosmWasmSmokeMalicious)
+	require.Contains(t, evidence.Tasks, AetraNearTermTaskAVMSmokeMalicious)
 	require.Contains(t, evidence.Tasks, AetraNearTermTaskFinalityMeasurementScript)
 	require.Contains(t, evidence.Tasks, AetraNearTermTaskValidatorDelegatorDocs)
 	require.Contains(t, evidence.Tasks, AetraNearTermTaskCriticalCIGate)

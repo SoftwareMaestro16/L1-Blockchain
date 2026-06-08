@@ -137,7 +137,7 @@ func TestImplementationPhaseSlashingHardeningRequiresAllAcceptanceGates(t *testi
 	}
 }
 
-func TestImplementationPhaseCosmWasmIntegrationRequiresAllAcceptanceGates(t *testing.T) {
+func TestImplementationPhaseAVMIntegrationRequiresAllAcceptanceGates(t *testing.T) {
 	plan := DefaultImplementationPhasePlans()[5]
 	report := BuildImplementationPhaseReport(plan)
 	require.True(t, report.Ready, report.Failed)
@@ -147,7 +147,7 @@ func TestImplementationPhaseCosmWasmIntegrationRequiresAllAcceptanceGates(t *tes
 		ids[item.ID] = true
 	}
 	for _, requiredID := range []string{
-		PhaseTaskFinalizeCosmWasmWiring,
+		PhaseTaskFinalizeAVMWiring,
 		PhaseTaskDefineCodeUploadPolicy,
 		PhaseTaskDefineContractGasLimits,
 		PhaseTaskDefineContractSizeLimits,
@@ -160,7 +160,7 @@ func TestImplementationPhaseCosmWasmIntegrationRequiresAllAcceptanceGates(t *tes
 		PhaseTestContractStorageLimitRent,
 		PhaseTestMaliciousContract,
 		PhaseTestContractExportImport,
-		PhaseTestLocalnetCosmWasmSmoke,
+		PhaseTestLocalnetAVMSmoke,
 		PhaseAcceptanceContractsDeterministic,
 		PhaseAcceptanceContractGasBounded,
 		PhaseAcceptanceMaliciousContractsSafe,
@@ -220,7 +220,7 @@ func TestImplementationPhasePublicTestnetReadinessRequiresAllAcceptanceGates(t *
 		PhaseTaskPublishEconomicModelExplanation,
 		PhaseTaskPublishSlashingRiskExplanation,
 		PhaseTaskPublishDelegationPoolGuide,
-		PhaseTaskPublishCosmWasmDeveloperGuide,
+		PhaseTaskPublishAVMDeveloperGuide,
 		PhaseTaskPreparePublicDashboards,
 		PhaseTaskPrepareIncidentResponseProcess,
 		PhaseTestCleanNodeBootstrapDocs,

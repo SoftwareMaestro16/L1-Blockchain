@@ -12,7 +12,7 @@ const (
 	MainnetReadinessDynamicInflation         = "dynamic_inflation_implemented_and_tested"
 	MainnetReadinessFeeBurnTreasuryRewards   = "fee_burn_treasury_reward_split_implemented_and_tested"
 	MainnetReadinessSlashing                 = "slashing_configured_and_tested"
-	MainnetReadinessCosmWasm                 = "cosmwasm_integrated_and_tested"
+	MainnetReadinessAVM                      = "avm_integrated_and_tested"
 	MainnetReadinessExportImport             = "export_import_stable"
 	MainnetReadinessStateSyncSnapshots       = "state_sync_snapshots_stable"
 	MainnetReadinessPublicTestnetDuration    = "public_testnet_observed_validator_behavior"
@@ -29,7 +29,7 @@ type MainnetReadinessEvidence struct {
 	DynamicInflationImplementedAndTested           bool
 	FeeBurnTreasuryRewardSplitImplementedAndTested bool
 	SlashingConfiguredAndTested                    bool
-	CosmWasmIntegratedAndTested                    bool
+	AVMIntegratedAndTested                         bool
 	ExportImportStable                             bool
 	StateSyncSnapshotsStable                       bool
 	PublicTestnetObservedValidatorBehavior         bool
@@ -62,7 +62,7 @@ func BuildMainnetReadinessReport(evidence MainnetReadinessEvidence) MainnetReadi
 		{MainnetReadinessDynamicInflation, evidence.DynamicInflationImplementedAndTested},
 		{MainnetReadinessFeeBurnTreasuryRewards, evidence.FeeBurnTreasuryRewardSplitImplementedAndTested},
 		{MainnetReadinessSlashing, evidence.SlashingConfiguredAndTested},
-		{MainnetReadinessCosmWasm, evidence.CosmWasmIntegratedAndTested},
+		{MainnetReadinessAVM, evidence.AVMIntegratedAndTested},
 		{MainnetReadinessExportImport, evidence.ExportImportStable},
 		{MainnetReadinessStateSyncSnapshots, evidence.StateSyncSnapshotsStable},
 		{MainnetReadinessPublicTestnetDuration, evidence.PublicTestnetObservedValidatorBehavior},

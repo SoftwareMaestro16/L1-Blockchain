@@ -27,20 +27,20 @@ const (
 	TestRequirementFeeCollectorBurnTreasury = "fee_collector_plus_burn_plus_treasury"
 	TestRequirementNominationDelegation     = "nomination_pool_plus_delegation_plus_unbonding"
 	TestRequirementGovernanceParamUpdates   = "governance_param_updates"
-	TestRequirementCosmWasmTxFlow           = "cosmwasm_tx_flow"
+	TestRequirementAVMTxFlow                = "avm_tx_flow"
 
-	TestRequirementNodeStartup              = "node_startup"
-	TestRequirementValidatorCreation        = "validator_creation"
-	TestRequirementDelegation               = "delegation"
-	TestRequirementRedelegation             = "redelegation"
-	TestRequirementUnbonding                = "unbonding"
-	TestRequirementDowntimeScenario         = "downtime_scenario"
-	TestRequirementDoubleSignEvidence       = "double_sign_evidence_scenario_where_feasible"
-	TestRequirementFeeBurnScenario          = "fee_burn_scenario"
-	TestRequirementCosmWasmInstantiateQuery = "cosmwasm_instantiate_execute_query"
-	TestRequirementExportImport             = "export_import"
-	TestRequirementRestart                  = "restart"
-	TestRequirementStateSyncSnapshot        = "state_sync_snapshot_where_feasible"
+	TestRequirementNodeStartup         = "node_startup"
+	TestRequirementValidatorCreation   = "validator_creation"
+	TestRequirementDelegation          = "delegation"
+	TestRequirementRedelegation        = "redelegation"
+	TestRequirementUnbonding           = "unbonding"
+	TestRequirementDowntimeScenario    = "downtime_scenario"
+	TestRequirementDoubleSignEvidence  = "double_sign_evidence_scenario_where_feasible"
+	TestRequirementFeeBurnScenario     = "fee_burn_scenario"
+	TestRequirementAVMInstantiateQuery = "avm_instantiate_execute_query"
+	TestRequirementExportImport        = "export_import"
+	TestRequirementRestart             = "restart"
+	TestRequirementStateSyncSnapshot   = "state_sync_snapshot_where_feasible"
 
 	TestRequirementConcentrationAttack    = "concentration_attack_simulation"
 	TestRequirementOverflowStake          = "validator_overflow_stake_simulation"
@@ -57,7 +57,7 @@ const (
 	TestRequirementBlockTimeUnderLoad         = "block_time_under_load"
 	TestRequirementFinalityLatencyMeasurement = "finality_latency_measurement"
 	TestRequirementMempoolPressure            = "mempool_pressure"
-	TestRequirementCosmWasmExecutionLoad      = "cosmwasm_execution_load"
+	TestRequirementAVMExecutionLoad           = "avm_execution_load"
 	TestRequirementStateGrowthProfile         = "state_growth_profile"
 
 	ProductionAcceptanceUnitTestsPass         = "unit_tests_pass"
@@ -137,7 +137,7 @@ func DefaultTestingRequirements() []TestingLayerRequirement {
 		TestRequirementFeeCollectorBurnTreasury,
 		TestRequirementNominationDelegation,
 		TestRequirementGovernanceParamUpdates,
-		TestRequirementCosmWasmTxFlow,
+		TestRequirementAVMTxFlow,
 	} {
 		requirements = append(requirements, testingRequirement(TestLayerIntegration, scenario, true))
 	}
@@ -149,7 +149,7 @@ func DefaultTestingRequirements() []TestingLayerRequirement {
 		TestRequirementUnbonding,
 		TestRequirementDowntimeScenario,
 		TestRequirementFeeBurnScenario,
-		TestRequirementCosmWasmInstantiateQuery,
+		TestRequirementAVMInstantiateQuery,
 		TestRequirementExportImport,
 		TestRequirementRestart,
 	} {
@@ -177,7 +177,7 @@ func DefaultTestingRequirements() []TestingLayerRequirement {
 		TestRequirementBlockTimeUnderLoad,
 		TestRequirementFinalityLatencyMeasurement,
 		TestRequirementMempoolPressure,
-		TestRequirementCosmWasmExecutionLoad,
+		TestRequirementAVMExecutionLoad,
 		TestRequirementStateGrowthProfile,
 	} {
 		requirements = append(requirements, testingRequirement(TestLayerPerformance, scenario, true))
@@ -389,7 +389,7 @@ func requiredTestingScenariosByLayer() map[string][]string {
 			TestRequirementFeeCollectorBurnTreasury,
 			TestRequirementNominationDelegation,
 			TestRequirementGovernanceParamUpdates,
-			TestRequirementCosmWasmTxFlow,
+			TestRequirementAVMTxFlow,
 		},
 		TestLayerE2ELocalnet: {
 			TestRequirementNodeStartup,
@@ -400,7 +400,7 @@ func requiredTestingScenariosByLayer() map[string][]string {
 			TestRequirementDowntimeScenario,
 			TestRequirementDoubleSignEvidence,
 			TestRequirementFeeBurnScenario,
-			TestRequirementCosmWasmInstantiateQuery,
+			TestRequirementAVMInstantiateQuery,
 			TestRequirementExportImport,
 			TestRequirementRestart,
 			TestRequirementStateSyncSnapshot,
@@ -422,7 +422,7 @@ func requiredTestingScenariosByLayer() map[string][]string {
 			TestRequirementBlockTimeUnderLoad,
 			TestRequirementFinalityLatencyMeasurement,
 			TestRequirementMempoolPressure,
-			TestRequirementCosmWasmExecutionLoad,
+			TestRequirementAVMExecutionLoad,
 			TestRequirementStateGrowthProfile,
 		},
 	}

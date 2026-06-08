@@ -24,7 +24,7 @@ func TestDefaultAetraAcceptanceMatrixCoversSection34(t *testing.T) {
 	require.Contains(t, byCategory[AetraAcceptanceCategoryAntiCentralization], AetraAcceptanceAntiCentralizationCommissionFloor)
 	require.Contains(t, byCategory[AetraAcceptanceCategorySlashing], AetraAcceptanceSlashingDelegatorAccounting)
 	require.Contains(t, byCategory[AetraAcceptanceCategoryEconomics], AetraAcceptanceEconomicsSupplyInvariant)
-	require.Contains(t, byCategory[AetraAcceptanceCategoryCosmWasm], AetraAcceptanceCosmWasmGasExhaustionContained)
+	require.Contains(t, byCategory[AetraAcceptanceCategoryAVM], AetraAcceptanceAVMGasExhaustionContained)
 	require.Contains(t, byCategory[AetraAcceptanceCategoryGovernance], AetraAcceptanceGovernanceDelayedCriticalActivation)
 	require.Contains(t, byCategory[AetraAcceptanceCategoryObservability], AetraAcceptanceObservabilityEventsIndexable)
 }

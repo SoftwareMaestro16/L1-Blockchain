@@ -40,7 +40,7 @@ Economics:
   APR query
   supply invariant
 
-CosmWasm:
+AVM:
   upload code
   instantiate
   execute
@@ -69,7 +69,7 @@ This matrix is the minimum public testnet acceptance scope, not the full product
 
 Base node coverage proves chain boot, validator networking, restart safety, export/import, and state sync or snapshot restore. Staking and anti-centralization coverage proves validator lifecycle, delegation lifecycle, commission control, power cap behavior, overflow penalty, and concentration query behavior. Slashing and economics coverage proves safety-critical accountability and supply/reward accounting.
 
-CosmWasm coverage proves contract upload, instantiate, execute, query, migration if enabled, and malicious gas exhaustion containment. Governance coverage proves valid and invalid param changes, treasury flow, and delayed activation for critical params. Observability coverage proves that Prometheus, CLI, gRPC, and indexable events expose enough public evidence for operators and explorers.
+AVM coverage proves contract upload, instantiate, execute, query, migration if enabled, and malicious gas exhaustion containment. Governance coverage proves valid and invalid param changes, treasury flow, and delayed activation for critical params. Observability coverage proves that Prometheus, CLI, gRPC, and indexable events expose enough public evidence for operators and explorers.
 
 ## Acceptance Gate
 
@@ -80,7 +80,7 @@ Required behavior:
 - missing anti-centralization scenarios fail readiness;
 - missing slashing scenarios fail readiness;
 - missing economics scenarios fail readiness;
-- missing CosmWasm scenarios fail readiness;
+- missing AVM scenarios fail readiness;
 - missing governance scenarios fail readiness;
 - missing observability scenarios fail readiness;
 - duplicate or unexpected scenarios fail readiness.

@@ -6,46 +6,46 @@ import (
 )
 
 const (
-	GovernanceParamValidatorSetSize      = "validator_set_size"
-	GovernanceParamValidatorEntryStake   = "validator_entry_stake_naet"
-	GovernanceParamPoolBackedSelfStake   = "pool_backed_validator_self_stake_naet"
-	GovernanceParamPoolBackedPoolStake   = "pool_backed_validator_pool_stake_naet"
-	GovernanceParamPoolMinDeposit        = "liquid_staking_pool_min_deposit_naet"
-	GovernanceParamValidatorPowerCap     = "validator_power_cap_bps"
-	GovernanceParamCommissionFloor       = "commission_floor_bps"
-	GovernanceParamCommissionMax         = "commission_max_bps"
-	GovernanceParamCommissionMaxChange   = "commission_max_change_bps"
-	GovernanceParamDirectUserDelegation  = "direct_user_validator_delegation"
-	GovernanceParamUnbondingBlocks       = "staking_unbonding_blocks"
-	GovernanceParamMinTxFee              = "min_tx_fee_naet"
-	GovernanceParamInflationMin          = "inflation_min_bps"
-	GovernanceParamInflationMax          = "inflation_max_bps"
-	GovernanceParamTargetBondedRatio     = "target_bonded_ratio_bps"
-	GovernanceParamFeeBurnShare          = "fee_burn_share_bps"
-	GovernanceParamFeeRewardShare        = "fee_reward_share_bps"
-	GovernanceParamFeeTreasuryShare      = "fee_treasury_share_bps"
-	GovernanceParamStorageRentRate       = "storage_rent_rate_per_byte_second_naet"
-	GovernanceParamSystemReserveMin      = "system_storage_reserve_min_runway_days"
-	GovernanceParamSystemReserveWarning  = "system_storage_reserve_warning_runway_days"
-	GovernanceParamSystemReserveCritical = "system_storage_reserve_critical_runway_days"
-	GovernanceParamDoubleSignSlash       = "double_sign_slash_bps"
-	GovernanceParamDowntimeSlash         = "downtime_slash_bps"
-	GovernanceParamDowntimeWindow        = "downtime_window_blocks"
-	GovernanceParamCosmWasmUploadPolicy  = "cosmwasm_upload_policy"
-	GovernanceParamTreasurySpendPolicy   = "treasury_spend_policy"
-	GovernanceParamValidatorScorePolicy  = "validator_score_policy"
-	GovernanceParamValidatorSetGrowth    = "validator_set_growth_schedule"
-	GovernanceParamBlockGasLimit         = "block_gas_limit"
-	GovernanceParamBlockMaxBytes         = "block_max_bytes"
+	GovernanceParamValidatorSetSize        = "validator_set_size"
+	GovernanceParamValidatorEntryStake     = "validator_entry_stake_naet"
+	GovernanceParamPoolBackedSelfStake     = "pool_backed_validator_self_stake_naet"
+	GovernanceParamPoolBackedPoolStake     = "pool_backed_validator_pool_stake_naet"
+	GovernanceParamPoolMinDeposit          = "liquid_staking_pool_min_deposit_naet"
+	GovernanceParamValidatorPowerCap       = "validator_power_cap_bps"
+	GovernanceParamCommissionFloor         = "commission_floor_bps"
+	GovernanceParamCommissionMax           = "commission_max_bps"
+	GovernanceParamCommissionMaxChange     = "commission_max_change_bps"
+	GovernanceParamDirectUserDelegation    = "direct_user_validator_delegation"
+	GovernanceParamUnbondingBlocks         = "staking_unbonding_blocks"
+	GovernanceParamMinTxFee                = "min_tx_fee_naet"
+	GovernanceParamInflationMin            = "inflation_min_bps"
+	GovernanceParamInflationMax            = "inflation_max_bps"
+	GovernanceParamTargetBondedRatio       = "target_bonded_ratio_bps"
+	GovernanceParamFeeBurnShare            = "fee_burn_share_bps"
+	GovernanceParamFeeRewardShare          = "fee_reward_share_bps"
+	GovernanceParamFeeTreasuryShare        = "fee_treasury_share_bps"
+	GovernanceParamStorageRentRate         = "storage_rent_rate_per_byte_second_naet"
+	GovernanceParamSystemReserveMin        = "system_storage_reserve_min_runway_days"
+	GovernanceParamSystemReserveWarning    = "system_storage_reserve_warning_runway_days"
+	GovernanceParamSystemReserveCritical   = "system_storage_reserve_critical_runway_days"
+	GovernanceParamDoubleSignSlash         = "double_sign_slash_bps"
+	GovernanceParamDowntimeSlash           = "downtime_slash_bps"
+	GovernanceParamDowntimeWindow          = "downtime_window_blocks"
+	GovernanceParamAVMContractUploadPolicy = "avm_contract_upload_policy"
+	GovernanceParamTreasurySpendPolicy     = "treasury_spend_policy"
+	GovernanceParamValidatorScorePolicy    = "validator_score_policy"
+	GovernanceParamValidatorSetGrowth      = "validator_set_growth_schedule"
+	GovernanceParamBlockGasLimit           = "block_gas_limit"
+	GovernanceParamBlockMaxBytes           = "block_max_bytes"
 
 	GovernanceValueTypeInteger = "integer"
 	GovernanceValueTypeEnum    = "enum"
 
 	DirectUserDelegationDisabled = "disabled"
 
-	CosmWasmUploadDisabled       = "disabled"
-	CosmWasmUploadGovernanceOnly = "governance_only"
-	CosmWasmUploadPermissioned   = "permissioned"
+	AVMContractUploadDisabled       = "disabled"
+	AVMContractUploadGovernanceOnly = "governance_only"
+	AVMContractUploadPermissioned   = "permissioned"
 
 	TreasurySpendDisabled       = "disabled"
 	TreasurySpendGovernanceOnly = "governance_only"
@@ -181,7 +181,7 @@ func DefaultGovernanceParameterSpecs() []GovernanceParameterSpec {
 		governanceIntegerSpec(GovernanceParamDoubleSignSlash, "slashing", DoubleSignSlashDefaultBps, DoubleSignSlashMinBps, DoubleSignSlashMaxBps, true),
 		governanceIntegerSpec(GovernanceParamDowntimeSlash, "slashing", DowntimeFirstSlashDefaultBps, DowntimeFirstSlashMinBps, DowntimeChronicSlashMaxBps, true),
 		governanceIntegerSpec(GovernanceParamDowntimeWindow, "slashing", int64(HeightUnbondingEvidenceWindowBlocks), 1_000, 100_000, true),
-		governanceEnumSpec(GovernanceParamCosmWasmUploadPolicy, "vm", CosmWasmUploadGovernanceOnly, true, CosmWasmUploadDisabled, CosmWasmUploadGovernanceOnly, CosmWasmUploadPermissioned),
+		governanceEnumSpec(GovernanceParamAVMContractUploadPolicy, "vm", AVMContractUploadGovernanceOnly, true, AVMContractUploadDisabled, AVMContractUploadGovernanceOnly, AVMContractUploadPermissioned),
 		governanceEnumSpec(GovernanceParamTreasurySpendPolicy, "treasury", TreasurySpendGovernanceOnly, true, TreasurySpendDisabled, TreasurySpendGovernanceOnly, TreasurySpendBudgetCapped),
 		governanceEnumSpec(GovernanceParamValidatorSetGrowth, "validator_set_growth", ValidatorSetGrowthGradual, true, ValidatorSetGrowthPaused, ValidatorSetGrowthGradual, ValidatorSetGrowthMature),
 		governanceIntegerSpec(GovernanceParamBlockGasLimit, "consensus", GovernanceDefaultBlockGasLimit, 1_000_000, GovernanceMaxBlockGasLimit, true),
@@ -217,7 +217,7 @@ func DefaultGovernanceGenesisParams() []GovernanceParamValue {
 		{Key: GovernanceParamDoubleSignSlash, IntValue: DoubleSignSlashDefaultBps},
 		{Key: GovernanceParamDowntimeSlash, IntValue: DowntimeFirstSlashDefaultBps},
 		{Key: GovernanceParamDowntimeWindow, IntValue: int64(HeightUnbondingEvidenceWindowBlocks)},
-		{Key: GovernanceParamCosmWasmUploadPolicy, StringValue: CosmWasmUploadGovernanceOnly},
+		{Key: GovernanceParamAVMContractUploadPolicy, StringValue: AVMContractUploadGovernanceOnly},
 		{Key: GovernanceParamTreasurySpendPolicy, StringValue: TreasurySpendGovernanceOnly},
 		{Key: GovernanceParamValidatorSetGrowth, StringValue: ValidatorSetGrowthGradual},
 		{Key: GovernanceParamBlockGasLimit, IntValue: GovernanceDefaultBlockGasLimit},
@@ -574,36 +574,36 @@ func normalizeGovernanceSpecs(specs []GovernanceParameterSpec) []GovernanceParam
 
 func requiredGovernanceParameterKeys() map[string]bool {
 	return map[string]bool{
-		GovernanceParamValidatorSetSize:      true,
-		GovernanceParamValidatorEntryStake:   true,
-		GovernanceParamPoolBackedSelfStake:   true,
-		GovernanceParamPoolBackedPoolStake:   true,
-		GovernanceParamPoolMinDeposit:        true,
-		GovernanceParamValidatorPowerCap:     true,
-		GovernanceParamCommissionFloor:       true,
-		GovernanceParamCommissionMax:         true,
-		GovernanceParamCommissionMaxChange:   true,
-		GovernanceParamDirectUserDelegation:  true,
-		GovernanceParamUnbondingBlocks:       true,
-		GovernanceParamMinTxFee:              true,
-		GovernanceParamInflationMin:          true,
-		GovernanceParamInflationMax:          true,
-		GovernanceParamTargetBondedRatio:     true,
-		GovernanceParamFeeBurnShare:          true,
-		GovernanceParamFeeRewardShare:        true,
-		GovernanceParamFeeTreasuryShare:      true,
-		GovernanceParamStorageRentRate:       true,
-		GovernanceParamSystemReserveMin:      true,
-		GovernanceParamSystemReserveWarning:  true,
-		GovernanceParamSystemReserveCritical: true,
-		GovernanceParamValidatorScorePolicy:  true,
-		GovernanceParamDoubleSignSlash:       true,
-		GovernanceParamDowntimeSlash:         true,
-		GovernanceParamDowntimeWindow:        true,
-		GovernanceParamCosmWasmUploadPolicy:  true,
-		GovernanceParamTreasurySpendPolicy:   true,
-		GovernanceParamValidatorSetGrowth:    true,
-		GovernanceParamBlockGasLimit:         true,
-		GovernanceParamBlockMaxBytes:         true,
+		GovernanceParamValidatorSetSize:        true,
+		GovernanceParamValidatorEntryStake:     true,
+		GovernanceParamPoolBackedSelfStake:     true,
+		GovernanceParamPoolBackedPoolStake:     true,
+		GovernanceParamPoolMinDeposit:          true,
+		GovernanceParamValidatorPowerCap:       true,
+		GovernanceParamCommissionFloor:         true,
+		GovernanceParamCommissionMax:           true,
+		GovernanceParamCommissionMaxChange:     true,
+		GovernanceParamDirectUserDelegation:    true,
+		GovernanceParamUnbondingBlocks:         true,
+		GovernanceParamMinTxFee:                true,
+		GovernanceParamInflationMin:            true,
+		GovernanceParamInflationMax:            true,
+		GovernanceParamTargetBondedRatio:       true,
+		GovernanceParamFeeBurnShare:            true,
+		GovernanceParamFeeRewardShare:          true,
+		GovernanceParamFeeTreasuryShare:        true,
+		GovernanceParamStorageRentRate:         true,
+		GovernanceParamSystemReserveMin:        true,
+		GovernanceParamSystemReserveWarning:    true,
+		GovernanceParamSystemReserveCritical:   true,
+		GovernanceParamValidatorScorePolicy:    true,
+		GovernanceParamDoubleSignSlash:         true,
+		GovernanceParamDowntimeSlash:           true,
+		GovernanceParamDowntimeWindow:          true,
+		GovernanceParamAVMContractUploadPolicy: true,
+		GovernanceParamTreasurySpendPolicy:     true,
+		GovernanceParamValidatorSetGrowth:      true,
+		GovernanceParamBlockGasLimit:           true,
+		GovernanceParamBlockMaxBytes:           true,
 	}
 }

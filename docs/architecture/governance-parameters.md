@@ -15,7 +15,7 @@ Governance may control:
 - economics params;
 - validator score params;
 - slashing params within bounds;
-- CosmWasm upload policy;
+- AVM contract upload policy;
 - treasury spend;
 - validator set growth schedule;
 - block gas/size within safe bounds.
@@ -27,7 +27,7 @@ The implementation catalog maps those modules to parameter categories:
 - `economics`: inflation min/max, target bonded ratio, fee split;
 - `validator_score`: validator score policy;
 - `slashing`: double-sign slash, downtime slash, downtime window;
-- `vm`: CosmWasm upload policy;
+- `vm`: AVM contract upload policy;
 - `treasury`: treasury spend policy;
 - `validator_set_growth`: validator set growth schedule;
 - `consensus`: block gas limit and block max bytes.
@@ -58,7 +58,7 @@ Safety requirements:
 - parameter changes must emit events;
 - critical changes should use longer voting period or higher quorum.
 
-Critical changes include validator set size, validator power cap, inflation min/max, target bonded ratio, fee split, slashing fractions, downtime windows, CosmWasm upload policy, and treasury spend policy. These changes can affect consensus safety, validator economics, slashing risk, VM attack surface, or treasury custody, so they require the critical governance path.
+Critical changes include validator set size, validator power cap, inflation min/max, target bonded ratio, fee split, slashing fractions, downtime windows, AVM contract upload policy, and treasury spend policy. These changes can affect consensus safety, validator economics, slashing risk, VM attack surface, or treasury custody, so they require the critical governance path.
 
 Recommended baseline:
 
@@ -94,7 +94,7 @@ Genesis validation must:
 - reject enum values outside allowed policy values;
 - validate cross-parameter relationships before launch.
 
-The goal is to prevent a network from booting with an unsafe validator set size, unsafe fee split, unsafe slashing fraction, open CosmWasm upload mode, or treasury spend policy that bypasses governance.
+The goal is to prevent a network from booting with an unsafe validator set size, unsafe fee split, unsafe slashing fraction, open AVM upload mode, or treasury spend policy that bypasses governance.
 
 ## Event Requirements
 

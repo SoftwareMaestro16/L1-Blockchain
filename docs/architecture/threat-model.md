@@ -141,7 +141,7 @@ Tests:
 
 Security requirements:
 
-- Economics, slashing, validator power cap, validator set growth, block gas/bytes, and VM/CosmWasm/AVM params must define explicit min/max bounds.
+- Economics, slashing, validator power cap, validator set growth, block gas/bytes, and AVM params must define explicit min/max bounds.
 - Critical params must activate after a deterministic delay or epoch boundary so validators, dashboards, and delegators can observe the change before it becomes active.
 - Emergency review window for critical params must be documented and observable; it must not depend on subjective off-chain consensus in the state transition.
 - Governance and params messages must verify explicit authority and reject spoofed signers.
@@ -159,7 +159,7 @@ Acceptance gate:
 
 Threat:
 
-- malicious CosmWasm contract consumes gas/storage, exploits permissions, or causes state bloat.
+- malicious AVM contract consumes gas/storage, exploits permissions, or causes state bloat.
 
 Controls:
 
