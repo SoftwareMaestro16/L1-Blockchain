@@ -102,6 +102,44 @@ func Test_TestnetCmd(t *testing.T) {
 	}
 }
 
+func TestTestnetInitRejectsMalformedChainIDBeforeGenesisWrite(t *testing.T) {
+	home := t.TempDir()
+	testApp := l1app.NewL1App(log.NewNopLogger(), dbm.NewMemDB(), true, simtestutil.NewAppOptionsWithFlagHome(home))
+	moduleBasic := testApp.BasicModuleManager
+	cdc := testApp.AppCodec()
+	txConfig := testApp.TxConfig()
+	logger := log.NewNopLogger()
+	cfg, err := genutiltest.CreateDefaultCometConfig(home)
+	require.NoError(t, err)
+
+	err = genutiltest.ExecInitCmd(moduleBasic, home, cdc)
+	require.NoError(t, err)
+
+	serverCtx := server.NewContext(viper.New(), cfg, logger)
+	clientCtx := client.Context{}.
+		WithCodec(cdc).
+		WithHomeDir(home).
+		WithTxConfig(txConfig)
+
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, server.ServerContextKey, serverCtx)
+	ctx = context.WithValue(ctx, client.ClientContextKey, &clientCtx)
+	cmd := testnetInitFilesCmd(moduleBasic, banktypes.GenesisBalancesIterator{})
+	outputDir := filepath.Join(home, "bad-localnet")
+	cmd.SetArgs([]string{
+		fmt.Sprintf("--%s=test", flags.FlagKeyringBackend),
+		fmt.Sprintf("--%s=%s", flags.FlagChainID, "cosmoshub-4"),
+		fmt.Sprintf("--%s=1", flagNumValidators),
+		fmt.Sprintf("--%s=%s", flagOutputDir, outputDir),
+		fmt.Sprintf("--%s=%s", flagStakingDenom, appparams.BaseDenom),
+		fmt.Sprintf("--%s=0%s", server.FlagMinGasPrices, appparams.BaseDenom),
+	})
+
+	require.ErrorContains(t, cmd.ExecuteContext(ctx), "chain-id must start with aetra-")
+	_, statErr := os.Stat(outputDir)
+	require.True(t, os.IsNotExist(statErr), "malformed chain-id must fail before writing localnet files")
+}
+
 func assertPrototypeGenesisProfile(
 	t *testing.T,
 	cdc codec.Codec,

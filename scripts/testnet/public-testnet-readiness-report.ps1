@@ -157,6 +157,33 @@ Add-Check $checks "export_import_roundtrip" "export/import roundtrip evidence ex
   Assert-Contains "UPDATE.md" "Export/import preserves storage rent debt" "UPDATE export/import rent debt requirement"
 }
 
+Add-Check $checks "formal_ci_readiness" "formal public testnet CI readiness workflow exists" {
+  Assert-FileExists ".github\workflows\testnet-readiness.yml"
+  foreach ($term in @(
+      "go-test-all",
+      "go test ./...",
+      "genesis-validate",
+      "scripts/localnet/validate-genesis.ps1",
+      "localnet-smoke",
+      "tests/e2e/localnet_smoke.ps1",
+      "export-import-roundtrip",
+      "tests/e2e/export_import_smoke.ps1",
+      "invariants",
+      "go test ./app -run Invariant",
+      "linter",
+      "go vet ./...",
+      "buf lint",
+      "release-artifact-build",
+      "scripts/release/prototype-package.ps1",
+      "version-command",
+      "version --long --output json",
+      "chain-id-validation",
+      "validator-docs"
+    )) {
+    Assert-Contains ".github\workflows\testnet-readiness.yml" ([regex]::Escape($term)) "CI readiness term $term"
+  }
+}
+
 Add-Check $checks "no_native_asset_modules" "token/NFT/DEX remain contracts, not native app modules" {
   Assert-NotContains "app\modulewiring\modules.go" "tokenfactory|dexmodule|nftmodule|marketmodule|assetfactory" "native token/NFT/DEX app module"
   Assert-Contains "docs\public-testnet-preparation.md" "token, NFT, market, and exchange-style application logic now targets AVM contracts" "docs contract-only asset model"

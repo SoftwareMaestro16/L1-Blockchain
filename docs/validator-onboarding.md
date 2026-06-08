@@ -140,6 +140,25 @@ Before restart, stop cleanly and preserve `$HOME\data`, `$HOME\config\priv_valid
 
 State management readiness requires export/import reliability and deterministic app hash across restarts. Before public launch, the release process must export genesis, import it into a fresh home, restart the node, and verify deterministic app hash behavior for the same state.
 
+## Upgrade Readiness
+
+Before joining a public testnet, verify the published release artifact and upgrade notes:
+
+```powershell
+build\aetrad.exe version --long --output json
+Get-Content .\docs\upgrade-playbook.md
+Get-Content .\docs\public-testnet-production-gates.md
+```
+
+Operators must confirm:
+
+- the binary version, commit, and dirty flag match the launch announcement;
+- the chain-id is the published `aetra-...` testnet chain-id;
+- genesis validation passes locally before first start;
+- snapshot or state-sync restore instructions are published;
+- export/import and invariant CI gates passed for the release artifact;
+- planned upgrade height, handler name, rollback policy, and communication channel are documented before any coordinated upgrade.
+
 ## Sentry Architecture
 
 Public validators should use documented sentry architecture:

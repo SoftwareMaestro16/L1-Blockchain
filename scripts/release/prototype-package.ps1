@@ -176,6 +176,11 @@ try {
       "README.md",
       "docs\operator-commands.md",
       "docs\operator-troubleshooting.md",
+      "docs\validator-onboarding.md",
+      "docs\public-testnet-production-gates.md",
+      "docs\public-testnet-e2e-smoke-commands.md",
+      "docs\state-export-import.md",
+      "docs\upgrade-playbook.md",
       "docs\prototype-acceptance-suite.md",
       "docs\security\prototype-audit-gate.md",
       "docs\query-surface.md",
@@ -214,6 +219,10 @@ Use the repository operator guide for full localnet setup and command examples:
 - `README.md`
 - `docs/operator-commands.md`
 - `docs/operator-troubleshooting.md`
+- `docs/validator-onboarding.md`
+- `docs/public-testnet-production-gates.md`
+- `docs/state-export-import.md`
+- `docs/upgrade-playbook.md`
 - `docs/observability.md`
 - `docs/security/prototype-audit-gate.md`
 - `docs/release/prototype-limitations.md`
