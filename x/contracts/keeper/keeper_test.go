@@ -676,6 +676,105 @@ func TestInternalMessageChargesStorageRentBeforeSend(t *testing.T) {
 	require.Empty(t, k.ExportGenesis().State.InternalMessages)
 }
 
+func TestAVMContractLifecycleStateMachineEnforced(t *testing.T) {
+	wallet := aeAddress("11")
+	other := aeAddress("22")
+	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive, other: accountStatusActive})
+	codeHash := storeContractCode(t, &k, wallet)
+	codeV2 := sha256Hex("lifecycle-code-v2")
+	_, err := k.StoreCode(types.MsgStoreCode{Authority: wallet, CodeHash: codeV2, CodeBytes: 256})
+	require.NoError(t, err)
+
+	active := instantiateContract(t, &k, wallet, codeHash, "lifecycle-active", 10, 500, 0)
+	executed, err := k.ExecuteContract(types.MsgExecuteContract{
+		Sender:          wallet,
+		ContractAddress: active.ContractAddressUser,
+		Msg:             []byte("active-call"),
+		Height:          11,
+	})
+	require.NoError(t, err)
+	require.Equal(t, active.ContractAddressUser, executed.ContractAddressUser)
+
+	frozen := instantiateContract(t, &k, wallet, codeHash, "lifecycle-frozen", 20, 500, 0)
+	setContractLifecycle(t, &k, frozen.ContractAddressUser, types.ContractStatusFrozen, func(contract *types.Contract) {
+		contract.StorageRentDebt = 25
+	})
+	frozenQuery, err := k.Contract(types.QueryContractRequest{ContractAddress: frozen.ContractAddressUser})
+	require.NoError(t, err)
+	beforeFrozen := frozenQuery.Contract
+
+	_, err = k.ExecuteContract(types.MsgExecuteContract{Sender: wallet, ContractAddress: frozen.ContractAddressUser, Msg: []byte("blocked"), Height: 21})
+	require.ErrorContains(t, err, types.ErrAccountFrozen)
+	_, err = k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{SourceContractUser: active.ContractAddressUser, DestinationAccount: frozen.ContractAddressUser, Height: 22})
+	require.ErrorContains(t, err, types.ErrAccountFrozen)
+
+	topped, err := k.TopUpContract(types.MsgTopUpContract{Sender: wallet, ContractAddress: frozen.ContractAddressUser, Amount: 25, Height: 23})
+	require.NoError(t, err)
+	require.Equal(t, beforeFrozen.CodeID, topped.CodeID)
+	require.Equal(t, beforeFrozen.Data, topped.Data)
+	require.Equal(t, beforeFrozen.StateRoot, topped.StateRoot)
+	paid, err := k.PayContractStorageDebt(types.MsgPayContractStorageDebt{Sender: wallet, ContractAddress: frozen.ContractAddressUser, Amount: 25, Height: 24})
+	require.NoError(t, err)
+	require.Zero(t, paid.StorageRentDebt)
+	unfrozen, err := k.UnfreezeContract(types.MsgUnfreezeContract{Sender: wallet, ContractAddress: frozen.ContractAddressUser, Height: 25})
+	require.NoError(t, err)
+	require.Equal(t, types.ContractStatusActive, unfrozen.Status)
+	require.Equal(t, paid.CodeID, unfrozen.CodeID)
+	require.Equal(t, paid.Data, unfrozen.Data)
+	require.Equal(t, paid.Balance, unfrozen.Balance)
+	require.Equal(t, paid.StateRoot, unfrozen.StateRoot)
+
+	frozenLimited := instantiateContract(t, &k, wallet, codeHash, "lifecycle-frozen-limited", 30, 500, 0)
+	setContractLifecycle(t, &k, frozenLimited.ContractAddressUser, types.ContractStatusFrozenLimited, func(contract *types.Contract) {
+		contract.Upgradeable = true
+		contract.StorageRentDebt = 10
+	})
+	_, err = k.ExecuteContract(types.MsgExecuteContract{Sender: wallet, ContractAddress: frozenLimited.ContractAddressUser, Msg: []byte("blocked"), Height: 31})
+	require.ErrorContains(t, err, types.ErrAccountFrozen)
+	_, err = k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{SourceContractUser: frozenLimited.ContractAddressUser, DestinationAccount: other, Height: 32})
+	require.ErrorContains(t, err, types.ErrAccountFrozen)
+	_, err = k.UpgradeContractCode(types.MsgUpgradeContractCode{
+		Actor: wallet, ContractAddress: frozenLimited.ContractAddressUser, NewCodeID: codeV2, MigrationHandler: "schema_only", Height: 33,
+	})
+	require.ErrorContains(t, err, types.ErrAccountFrozen)
+	_, err = k.TopUpContract(types.MsgTopUpContract{Sender: wallet, ContractAddress: frozenLimited.ContractAddressUser, Amount: 10, Height: 34})
+	require.NoError(t, err)
+	_, err = k.PayContractStorageDebt(types.MsgPayContractStorageDebt{Sender: wallet, ContractAddress: frozenLimited.ContractAddressUser, Amount: 10, Height: 35})
+	require.NoError(t, err)
+	_, err = k.UnfreezeContract(types.MsgUnfreezeContract{Sender: wallet, ContractAddress: frozenLimited.ContractAddressUser, Height: 36})
+	require.NoError(t, err)
+
+	archived := instantiateContract(t, &k, wallet, codeHash, "lifecycle-archived", 40, 500, 0)
+	setContractLifecycle(t, &k, archived.ContractAddressUser, types.ContractStatusArchived, func(contract *types.Contract) {
+		contract.Upgradeable = true
+	})
+	_, err = k.ExecuteContract(types.MsgExecuteContract{Sender: wallet, ContractAddress: archived.ContractAddressUser, Msg: []byte("blocked"), Height: 41})
+	require.ErrorContains(t, err, types.ErrContractLifecycle)
+	_, err = k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{SourceContractUser: archived.ContractAddressUser, DestinationAccount: other, Height: 42})
+	require.ErrorContains(t, err, types.ErrContractLifecycle)
+	_, err = k.MigrateContractState(types.MsgMigrateContractState{
+		Actor: wallet, ContractAddress: archived.ContractAddressUser, FromSchemaVersion: 1, ToSchemaVersion: 2, MigrationHandler: "schema_only", Height: 43,
+	})
+	require.ErrorContains(t, err, types.ErrContractLifecycle)
+	archivedRoot, err := k.ContractStateRoot(types.QueryContractStateRootRequest{ContractAddress: archived.ContractAddressUser})
+	require.NoError(t, err)
+	require.NotEmpty(t, archivedRoot)
+
+	deleted := instantiateContract(t, &k, wallet, codeHash, "lifecycle-deleted", 50, 500, 0)
+	setContractLifecycle(t, &k, deleted.ContractAddressUser, types.ContractStatusDeleted, func(contract *types.Contract) {
+		contract.Balance = 0
+		contract.StorageRentDebt = 0
+	})
+	_, err = k.ExecuteContract(types.MsgExecuteContract{Sender: wallet, ContractAddress: deleted.ContractAddressUser, Msg: []byte("blocked"), Height: 51})
+	require.ErrorContains(t, err, types.ErrContractLifecycle)
+	_, err = k.TopUpContract(types.MsgTopUpContract{Sender: wallet, ContractAddress: deleted.ContractAddressUser, Amount: 1, Height: 52})
+	require.ErrorContains(t, err, types.ErrContractLifecycle)
+	deletedQuery, err := k.Contract(types.QueryContractRequest{ContractAddress: deleted.ContractAddressUser})
+	require.NoError(t, err)
+	require.True(t, deletedQuery.Found)
+	require.Equal(t, types.ContractStatusDeleted, deletedQuery.Contract.Status)
+}
+
 type testAccountStatus map[string]string
 
 func (s testAccountStatus) AccountStatus(_ context.Context, address string) (string, bool, error) {
@@ -705,6 +804,23 @@ func instantiateContract(t *testing.T, k *Keeper, owner string, codeHash string,
 	})
 	require.NoError(t, err)
 	return created
+}
+
+func setContractLifecycle(t *testing.T, k *Keeper, contractAddress string, status string, mutate func(*types.Contract)) {
+	t.Helper()
+	gs := k.ExportGenesis()
+	for i := range gs.State.Contracts {
+		if gs.State.Contracts[i].AddressUser != contractAddress {
+			continue
+		}
+		gs.State.Contracts[i].Status = status
+		if mutate != nil {
+			mutate(&gs.State.Contracts[i])
+		}
+		require.NoError(t, k.InitGenesis(gs))
+		return
+	}
+	t.Fatalf("contract %s not found", contractAddress)
 }
 
 func contractStorageBytes(codeBytes uint64, data []byte) uint64 {

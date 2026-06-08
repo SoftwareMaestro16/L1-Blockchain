@@ -357,6 +357,11 @@ func (k Keeper) Contract(req types.QueryContractRequest) (types.QueryContractRes
 		}
 		return types.QueryContractResponse{ContractAddress: req.ContractAddress, StateRoot: k.genesis.StateRoot, Found: false, Virtual: true}, nil
 	}
+	if found {
+		if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionQuery); err != nil {
+			return types.QueryContractResponse{}, err
+		}
+	}
 	return types.QueryContractResponse{ContractAddress: req.ContractAddress, StateRoot: k.genesis.StateRoot, Found: found, Contract: contract}, nil
 }
 
@@ -381,6 +386,9 @@ func (k Keeper) ContractStorage(req types.QueryContractStorageRequest) ([]types.
 	contract, found := findContract(k.genesis.State.Contracts, req.ContractAddress)
 	if !found {
 		return nil, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionProofQuery); err != nil {
+		return nil, err
 	}
 	entries := []types.ContractStorageEntry{{
 		ContractAddress: contract.AddressUser,
@@ -409,6 +417,13 @@ func (k Keeper) ContractReceipts(req types.QueryContractReceiptsRequest) ([]type
 	}
 	receipts := k.genesis.State.Normalize().Receipts
 	out := make([]types.ContractReceipt, 0)
+	contract, found := findContract(k.genesis.State.Contracts, req.ContractAddress)
+	if !found {
+		return nil, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionQuery); err != nil {
+		return nil, err
+	}
 	for _, receipt := range receipts {
 		if receipt.ContractAddress != req.ContractAddress {
 			continue
@@ -429,6 +444,13 @@ func (k Keeper) ContractQueue(req types.QueryContractQueueRequest) ([]types.Inte
 		return nil, err
 	}
 	queue := make([]types.InternalMessage, 0)
+	contract, found := findContract(k.genesis.State.Contracts, req.ContractAddress)
+	if !found {
+		return nil, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionQuery); err != nil {
+		return nil, err
+	}
 	for _, msg := range k.genesis.State.Normalize().InternalMessages {
 		if msg.SourceContractUser == req.ContractAddress || msg.DestinationAccount == req.ContractAddress {
 			queue = append(queue, msg)
@@ -454,6 +476,9 @@ func (k Keeper) ContractStateRoot(req types.QueryContractStateRootRequest) (stri
 	contract, found := findContract(k.genesis.State.Contracts, req.ContractAddress)
 	if !found {
 		return "", errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionProofQuery); err != nil {
+		return "", err
 	}
 	return contract.StateRoot, nil
 }
@@ -582,6 +607,9 @@ func (k *Keeper) UpgradeContractCode(msg types.MsgUpgradeContractCode) (types.Co
 	if !found {
 		return types.ContractReceipt{}, errors.New(types.ErrContractNotFound + ": contract not found")
 	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionUpgradeMigrate); err != nil {
+		return types.ContractReceipt{}, err
+	}
 	if err := k.authorizeContractUpgradeActor(contract, msg.Actor); err != nil {
 		return types.ContractReceipt{}, err
 	}
@@ -628,6 +656,9 @@ func (k *Keeper) MigrateContractState(msg types.MsgMigrateContractState) (types.
 	idx, contract, found := findContractWithIndex(k.genesis.State.Contracts, msg.ContractAddress)
 	if !found {
 		return types.ContractReceipt{}, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionUpgradeMigrate); err != nil {
+		return types.ContractReceipt{}, err
 	}
 	if err := k.authorizeContractUpgradeActor(contract, msg.Actor); err != nil {
 		return types.ContractReceipt{}, err
@@ -676,6 +707,9 @@ func (k *Keeper) SetContractAdmin(msg types.MsgSetContractAdmin) (types.Contract
 	if !found {
 		return types.ContractReceipt{}, errors.New(types.ErrContractNotFound + ": contract not found")
 	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionUpgradeMigrate); err != nil {
+		return types.ContractReceipt{}, err
+	}
 	if err := k.authorizeContractUpgradeActor(contract, msg.Actor); err != nil {
 		return types.ContractReceipt{}, err
 	}
@@ -702,6 +736,9 @@ func (k *Keeper) DisableContractUpgrades(msg types.MsgDisableContractUpgrades) (
 	idx, contract, found := findContractWithIndex(k.genesis.State.Contracts, msg.ContractAddress)
 	if !found {
 		return types.ContractReceipt{}, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionUpgradeMigrate); err != nil {
+		return types.ContractReceipt{}, err
 	}
 	if err := k.authorizeContractUpgradeActor(contract, msg.Actor); err != nil {
 		return types.ContractReceipt{}, err
@@ -774,8 +811,8 @@ func (k *Keeper) executeContract(ctx context.Context, msg types.MsgExecuteContra
 	if !found {
 		return types.ExecuteContractResponse{}, errors.New(types.ErrContractNotFound + ": contract not found")
 	}
-	if contract.Status != types.ContractStatusActive {
-		return types.ExecuteContractResponse{}, errors.New(types.ErrAccountFrozen + ": frozen contract cannot execute normal calls")
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionExecuteExternal); err != nil {
+		return types.ExecuteContractResponse{}, err
 	}
 	contract, err := k.chargeContractRentAt(idx, contract, msg.Height)
 	if err != nil {
@@ -839,6 +876,9 @@ func (k *Keeper) TopUpContract(msg types.MsgTopUpContract) (types.Contract, erro
 	if !found {
 		return types.Contract{}, errors.New(types.ErrContractNotFound + ": contract not found")
 	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionReceiveTopUp); err != nil {
+		return types.Contract{}, err
+	}
 	balance, err := checkedAdd(contract.Balance, msg.Amount, "contract top-up balance overflow")
 	if err != nil {
 		return types.Contract{}, err
@@ -873,6 +913,9 @@ func (k *Keeper) PayContractStorageDebt(msg types.MsgPayContractStorageDebt) (ty
 	idx, contract, found := findContractWithIndex(k.genesis.State.Contracts, msg.ContractAddress)
 	if !found {
 		return types.Contract{}, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionPayRentDebt); err != nil {
+		return types.Contract{}, err
 	}
 	if msg.Amount >= contract.StorageRentDebt {
 		contract.StorageRentDebt = 0
@@ -923,6 +966,9 @@ func (k *Keeper) unfreezeContract(ctx context.Context, msg types.MsgUnfreezeCont
 	idx, contract, found := findContractWithIndex(k.genesis.State.Contracts, msg.ContractAddress)
 	if !found {
 		return types.Contract{}, errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionUnfreeze); err != nil {
+		return types.Contract{}, err
 	}
 	if contract.StorageRentDebt > 0 {
 		return types.Contract{}, errors.New(types.ErrStorageRent + ": contract storage rent debt must be paid before unfreeze")
@@ -981,8 +1027,8 @@ func (k *Keeper) InjectNativeStaking(msg types.MsgInjectNativeStaking) (types.Na
 	if !found {
 		return types.NativeStakingInjectionRecord{}, errors.New(types.ErrContractNotFound + ": contract not found")
 	}
-	if contract.Status != types.ContractStatusActive {
-		return types.NativeStakingInjectionRecord{}, errors.New(types.ErrAccountFrozen + ": frozen contract cannot inject native staking")
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionExecuteExternal); err != nil {
+		return types.NativeStakingInjectionRecord{}, err
 	}
 	contract, err := k.chargeContractRentAt(idx, contract, msg.Height)
 	if err != nil {
@@ -1036,8 +1082,13 @@ func (k *Keeper) ReceiveInternalMessage(msg types.MsgReceiveInternalMessage) (ty
 	if !found {
 		return types.InternalMessage{}, errors.New(types.ErrContractNotFound + ": source contract not found")
 	}
-	if contract.Status != types.ContractStatusActive {
-		return types.InternalMessage{}, errors.New(types.ErrAccountFrozen + ": frozen contract cannot send internal messages")
+	if err := types.EnsureContractLifecycleAction(contract, types.ContractLifecycleActionEmitInternalMessage); err != nil {
+		return types.InternalMessage{}, err
+	}
+	if _, destination, found := findContractWithIndex(k.genesis.State.Contracts, msg.DestinationAccount); found {
+		if err := types.EnsureContractLifecycleAction(destination, types.ContractLifecycleActionReceiveInternal); err != nil {
+			return types.InternalMessage{}, err
+		}
 	}
 	if _, err := k.chargeContractRentAt(idx, contract, msg.Height); err != nil {
 		return types.InternalMessage{}, errors.New(types.ErrStorageRent + ": contract has storage rent debt")

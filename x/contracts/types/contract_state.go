@@ -480,6 +480,9 @@ func (c Contract) Validate(params Params) error {
 	if c.Status != ContractStatusActive && c.Status != ContractStatusFrozen && c.Status != ContractStatusFrozenLimited && c.Status != ContractStatusArchived && c.Status != ContractStatusDeleted {
 		return fmt.Errorf("unsupported contract status %q", c.Status)
 	}
+	if err := ValidateDeletedContractTombstone(c); err != nil {
+		return err
+	}
 	if c.UpgradesDisabled && c.Upgradeable {
 		return errors.New("contract upgrades disabled cannot remain upgradeable")
 	}
