@@ -107,10 +107,13 @@ func initRootCmd(
 	cfg := sdk.GetConfig()
 	cfg.Seal()
 
+	debugCmd := debug.Cmd()
+	debugCmd.AddCommand(NewAVMDebugCmd())
+
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(basicManager, l1app.DefaultNodeHome),
 		NewTestnetCmd(basicManager, banktypes.GenesisBalancesIterator{}),
-		debug.Cmd(),
+		debugCmd,
 		confixcmd.ConfigCommand(),
 		pruning.Cmd(newApp, l1app.DefaultNodeHome),
 		snapshot.Cmd(newApp),
@@ -161,6 +164,7 @@ func queryCommand() *cobra.Command {
 		server.QueryBlocksCmd(),
 		authcmd.QueryTxCmd(),
 		server.QueryBlockResultsCmd(),
+		NewAVMQueryCmd(),
 	)
 
 	return cmd
@@ -185,6 +189,7 @@ func txCommand() *cobra.Command {
 		authcmd.GetEncodeCommand(),
 		authcmd.GetDecodeCommand(),
 		authcmd.GetSimulateCmd(),
+		NewAVMTxCmd(),
 	)
 
 	return cmd
