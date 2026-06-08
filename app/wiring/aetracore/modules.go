@@ -4,12 +4,16 @@ import (
 	"slices"
 
 	actorregistrytypes "github.com/sovereign-l1/l1/x/actor-registry/types"
+	aetraeconomicstypes "github.com/sovereign-l1/l1/x/aetra-economics/types"
+	aetrastakingpolicytypes "github.com/sovereign-l1/l1/x/aetra-staking-policy/types"
+	aetravalidatorscoretypes "github.com/sovereign-l1/l1/x/aetra-validator-score/types"
 	aetracoretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	bridgehubtypes "github.com/sovereign-l1/l1/x/bridge-hub/types"
 	configvotingtypes "github.com/sovereign-l1/l1/x/config-voting/types"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
 	constitutiontypes "github.com/sovereign-l1/l1/x/constitution/types"
+	contractstypes "github.com/sovereign-l1/l1/x/contracts/types"
 	crosschainregistrytypes "github.com/sovereign-l1/l1/x/cross-chain-registry/types"
 	nativeevidencetypes "github.com/sovereign-l1/l1/x/evidence/types"
 	identityroottypes "github.com/sovereign-l1/l1/x/identity-root/types"
@@ -52,6 +56,7 @@ var prototypeModules = []string{
 	schedulertypes.ModuleName,
 	avmschedulertypes.ModuleName,
 	actorregistrytypes.ModuleName,
+	contractstypes.ModuleName,
 	storagerenttypes.ModuleName,
 	identityroottypes.ModuleName,
 	bridgehubtypes.ModuleName,
@@ -69,6 +74,9 @@ var systemModules = []string{
 	validatorelectiontypes.ModuleName,
 	validatorinsurancetypes.ModuleName,
 	validatorregistrytypes.ModuleName,
+	aetrastakingpolicytypes.ModuleName,
+	aetraeconomicstypes.ModuleName,
+	aetravalidatorscoretypes.ModuleName,
 	configtypes.ModuleName,
 	nativeaccounttypes.ModuleName,
 }
@@ -94,6 +102,7 @@ func PrototypeStoreKeys() []string {
 		schedulertypes.StoreKey,
 		avmschedulertypes.StoreKey,
 		actorregistrytypes.StoreKey,
+		contractstypes.StoreKey,
 		storagerenttypes.StoreKey,
 		identityroottypes.StoreKey,
 		bridgehubtypes.StoreKey,
@@ -117,6 +126,9 @@ func SystemStoreKeys() []string {
 		validatorelectiontypes.StoreKey,
 		validatorinsurancetypes.StoreKey,
 		validatorregistrytypes.StoreKey,
+		aetrastakingpolicytypes.StoreKey,
+		aetraeconomicstypes.StoreKey,
+		aetravalidatorscoretypes.StoreKey,
 		configtypes.StoreKey,
 		nativeaccounttypes.StoreKey,
 	}

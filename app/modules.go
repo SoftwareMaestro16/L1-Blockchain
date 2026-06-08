@@ -60,6 +60,7 @@ func (app *L1App) initModules(
 		SchedulerKeeper:           &app.SchedulerKeeper,
 		AVMSchedulerKeeper:        &app.AVMSchedulerKeeper,
 		ActorRegistryKeeper:       &app.ActorRegistryKeeper,
+		ContractsKeeper:           &app.ContractsKeeper,
 		StorageRentKeeper:         &app.StorageRentKeeper,
 		IdentityRootKeeper:        &app.IdentityRootKeeper,
 		BridgeHubKeeper:           &app.BridgeHubKeeper,
@@ -73,6 +74,9 @@ func (app *L1App) initModules(
 		ValidatorElectionKeeper:   &app.ValidatorElectionKeeper,
 		ValidatorInsuranceKeeper:  &app.ValidatorInsuranceKeeper,
 		ValidatorRegistryKeeper:   &app.ValidatorRegistryKeeper,
+		AetraStakingPolicyKeeper:  &app.AetraStakingPolicyKeeper,
+		AetraEconomicsKeeper:      &app.AetraEconomicsKeeper,
+		AetraValidatorScoreKeeper: &app.AetraValidatorScoreKeeper,
 	})
 	app.BasicModuleManager = modulewiring.NewBasicManager(app.ModuleManager, legacyAmino, interfaceRegistry)
 	app.ModuleManager.SetOrderPreBlockers(aetherCorePreBlockerOrder()...)

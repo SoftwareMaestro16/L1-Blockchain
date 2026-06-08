@@ -12,8 +12,11 @@ import (
 )
 
 const (
-	ContractStatusActive = "active"
-	ContractStatusFrozen = "frozen"
+	ContractStatusActive        = "active"
+	ContractStatusFrozen        = "frozen"
+	ContractStatusFrozenLimited = "frozen_limited"
+	ContractStatusArchived      = "archived"
+	ContractStatusDeleted       = "deleted"
 
 	AssetTypeToken = "token"
 	AssetTypeNFT   = "nft"
@@ -40,6 +43,7 @@ type CodeRecord struct {
 	CodeID    string
 	CodeHash  string
 	CodeBytes uint64
+	Bytecode  []byte
 	Owner     string
 }
 
@@ -47,16 +51,19 @@ type Contract struct {
 	AddressUser             string
 	AddressRaw              string
 	CodeID                  string
+	CodeHash                string
 	Creator                 string
 	Owner                   string
 	Admin                   string
 	InitMsg                 []byte
 	Data                    []byte
 	Balance                 uint64
+	StateRoot               string
 	Status                  string
 	StorageBytes            uint64
 	LastStorageChargeHeight uint64
 	StorageRentDebt         uint64
+	LogicalTime             uint64
 	CreatedHeight           uint64
 	UpdatedHeight           uint64
 }
@@ -73,7 +80,15 @@ type InternalMessage struct {
 	SourceContractUser string
 	DestinationAccount string
 	Funds              uint64
+	Opcode             uint32
+	QueryID            uint64
 	Body               []byte
+	Bounce             bool
+	Deadline           uint64
+	GasLimit           uint64
+	LogicalTime        uint64
+	MessageID          string
+	Refunded           bool
 	Height             uint64
 }
 
@@ -167,7 +182,14 @@ type MsgReceiveInternalMessage struct {
 	SourceContractUser string
 	DestinationAccount string
 	Funds              uint64
+	Opcode             uint32
+	QueryID            uint64
 	Body               []byte
+	Bounce             bool
+	Deadline           uint64
+	GasLimit           uint64
+	LogicalTime        uint64
+	MessageID          string
 	Height             uint64
 }
 
@@ -197,6 +219,12 @@ func (s State) Normalize() State {
 	sort.SliceStable(out.InternalMessages, func(i, j int) bool {
 		if out.InternalMessages[i].Height != out.InternalMessages[j].Height {
 			return out.InternalMessages[i].Height < out.InternalMessages[j].Height
+		}
+		if out.InternalMessages[i].LogicalTime != out.InternalMessages[j].LogicalTime {
+			return out.InternalMessages[i].LogicalTime < out.InternalMessages[j].LogicalTime
+		}
+		if out.InternalMessages[i].MessageID != out.InternalMessages[j].MessageID {
+			return out.InternalMessages[i].MessageID < out.InternalMessages[j].MessageID
 		}
 		if out.InternalMessages[i].SourceContractUser != out.InternalMessages[j].SourceContractUser {
 			return out.InternalMessages[i].SourceContractUser < out.InternalMessages[j].SourceContractUser
@@ -297,6 +325,17 @@ func (c CodeRecord) Validate(params Params) error {
 	if c.CodeBytes == 0 || c.CodeBytes > params.MaxCodeBytes {
 		return errors.New(ErrInvalidBytecode + ": code size out of bounds")
 	}
+	if len(c.Bytecode) > 0 {
+		if err := ValidateAVMBytecode(params, c.Bytecode); err != nil {
+			return err
+		}
+		if c.CodeBytes != uint64(len(c.Bytecode)) {
+			return errors.New(ErrInvalidBytecode + ": code bytes must match bytecode length")
+		}
+		if c.CodeHash != CanonicalCodeHash(c.Bytecode) {
+			return errors.New(ErrInvalidBytecode + ": code hash must match canonical bytecode hash")
+		}
+	}
 	return nil
 }
 
@@ -322,7 +361,17 @@ func (c Contract) Validate(params Params) error {
 	if strings.TrimSpace(c.CodeID) == "" {
 		return errors.New("contract code id is required")
 	}
-	if c.Status != ContractStatusActive && c.Status != ContractStatusFrozen {
+	if c.CodeHash != "" {
+		if err := validateHashText("contract code hash", c.CodeHash); err != nil {
+			return err
+		}
+	}
+	if c.StateRoot != "" {
+		if err := validateHashText("contract state root", c.StateRoot); err != nil {
+			return err
+		}
+	}
+	if c.Status != ContractStatusActive && c.Status != ContractStatusFrozen && c.Status != ContractStatusFrozenLimited && c.Status != ContractStatusArchived && c.Status != ContractStatusDeleted {
 		return fmt.Errorf("unsupported contract status %q", c.Status)
 	}
 	if c.StorageBytes > params.MaxContractStorageBytes {
@@ -330,6 +379,9 @@ func (c Contract) Validate(params Params) error {
 	}
 	if c.CreatedHeight == 0 || c.UpdatedHeight < c.CreatedHeight {
 		return errors.New("contract heights are invalid")
+	}
+	if c.LogicalTime == 0 && c.Status != ContractStatusDeleted {
+		return errors.New("contract logical time must be positive")
 	}
 	return nil
 }
@@ -343,6 +395,17 @@ func (m InternalMessage) Validate() error {
 	}
 	if m.Height == 0 {
 		return errors.New("internal message height must be positive")
+	}
+	if len(m.Body) > MaxContractPayloadBytes {
+		return errors.New("internal message body exceeds maximum size")
+	}
+	if m.Deadline != 0 && m.Deadline < m.Height {
+		return errors.New("internal message is expired")
+	}
+	if m.MessageID != "" {
+		if err := validateHashText("internal message id", m.MessageID); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -473,6 +536,35 @@ func DeriveContractAddress(creator string, codeID string, salt string) (string, 
 	return user, addressing.Format(sum[:]), nil
 }
 
+func ComputeContractStateRoot(contract Contract) string {
+	sum := sha256.Sum256([]byte(fmt.Sprintf(
+		"aetra-contract-state-v1/%s/%s/%s/%020d/%x",
+		contract.AddressUser,
+		contract.CodeID,
+		contract.CodeHash,
+		contract.LogicalTime,
+		contract.Data,
+	)))
+	return hex.EncodeToString(sum[:])
+}
+
+func ComputeInternalMessageID(msg InternalMessage) string {
+	sum := sha256.Sum256([]byte(fmt.Sprintf(
+		"aetra-internal-message-v1/%s/%s/%020d/%010d/%020d/%020d/%t/%020d/%020d/%x",
+		msg.SourceContractUser,
+		msg.DestinationAccount,
+		msg.Funds,
+		msg.Opcode,
+		msg.QueryID,
+		msg.Height,
+		msg.Bounce,
+		msg.Deadline,
+		msg.LogicalTime,
+		msg.Body,
+	)))
+	return hex.EncodeToString(sum[:])
+}
+
 func RefreshStateRoot(gs GenesisState) GenesisState {
 	gs.State = gs.State.Normalize()
 	gs.StateRoot = ComputeContractsStateRoot(gs)
@@ -481,13 +573,21 @@ func RefreshStateRoot(gs GenesisState) GenesisState {
 
 func cloneState(s State) State {
 	return State{
-		Codes:                append([]CodeRecord(nil), s.Codes...),
+		Codes:                cloneCodes(s.Codes),
 		Contracts:            cloneContracts(s.Contracts),
 		InternalMessages:     cloneInternalMessages(s.InternalMessages),
 		AssetOwnership:       append([]AssetOwnershipRecord(nil), s.AssetOwnership...),
 		StakingCapabilities:  append([]ContractCapability(nil), s.StakingCapabilities...),
 		NativeStakingInjects: append([]NativeStakingInjectionRecord(nil), s.NativeStakingInjects...),
 	}
+}
+
+func cloneCodes(values []CodeRecord) []CodeRecord {
+	out := append([]CodeRecord(nil), values...)
+	for i := range out {
+		out[i].Bytecode = append([]byte(nil), out[i].Bytecode...)
+	}
+	return out
 }
 
 func cloneContracts(values []Contract) []Contract {

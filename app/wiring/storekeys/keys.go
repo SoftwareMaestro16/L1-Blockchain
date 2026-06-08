@@ -18,6 +18,9 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	actorregistrytypes "github.com/sovereign-l1/l1/x/actor-registry/types"
+	aetraeconomicstypes "github.com/sovereign-l1/l1/x/aetra-economics/types"
+	aetrastakingpolicytypes "github.com/sovereign-l1/l1/x/aetra-staking-policy/types"
+	aetravalidatorscoretypes "github.com/sovereign-l1/l1/x/aetra-validator-score/types"
 	aetracoretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	bridgehubtypes "github.com/sovereign-l1/l1/x/bridge-hub/types"
@@ -25,6 +28,7 @@ import (
 	configvotingtypes "github.com/sovereign-l1/l1/x/config-voting/types"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
 	constitutiontypes "github.com/sovereign-l1/l1/x/constitution/types"
+	contractstypes "github.com/sovereign-l1/l1/x/contracts/types"
 	crosschainregistrytypes "github.com/sovereign-l1/l1/x/cross-chain-registry/types"
 	delegatorprotectiontypes "github.com/sovereign-l1/l1/x/delegator-protection/types"
 	dynamiccommissiontypes "github.com/sovereign-l1/l1/x/dynamic-commission/types"
@@ -84,6 +88,9 @@ func NewKVStoreKeys() map[string]*storetypes.KVStoreKey {
 		validatorelectiontypes.StoreKey,
 		validatorinsurancetypes.StoreKey,
 		validatorregistrytypes.StoreKey,
+		aetrastakingpolicytypes.StoreKey,
+		aetraeconomicstypes.StoreKey,
+		aetravalidatorscoretypes.StoreKey,
 		burntypes.StoreKey,
 		treasurytypes.StoreKey,
 		emissionstypes.StoreKey,
@@ -106,6 +113,7 @@ func NewKVStoreKeys() map[string]*storetypes.KVStoreKey {
 		schedulertypes.StoreKey,
 		avmschedulertypes.StoreKey,
 		actorregistrytypes.StoreKey,
+		contractstypes.StoreKey,
 		storagerenttypes.StoreKey,
 		identityroottypes.StoreKey,
 		bridgehubtypes.StoreKey,

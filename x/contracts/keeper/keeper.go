@@ -1,16 +1,21 @@
 package keeper
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
+	"reflect"
 
+	corestore "cosmossdk.io/core/store"
 	coretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	"github.com/sovereign-l1/l1/x/contracts/types"
 )
 
 type Keeper struct {
 	genesis             types.GenesisState
+	storeService        corestore.KVStoreService
 	accountStatusReader AccountStatusReader
 }
 
@@ -20,6 +25,8 @@ const (
 	accountStatusFrozen   = "frozen"
 )
 
+var genesisKey = []byte{0x01}
+
 // AccountStatusReader is a temporary integration boundary for CHAT 1 native-account wiring.
 // It keeps contract auth/freeze checks local until the account keeper interface is finalized.
 type AccountStatusReader interface {
@@ -28,6 +35,10 @@ type AccountStatusReader interface {
 
 func NewKeeper() Keeper {
 	return Keeper{genesis: types.DefaultGenesis()}
+}
+
+func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
+	return Keeper{genesis: types.DefaultGenesis(), storeService: storeService}
 }
 
 func NewKeeperWithAccountStatus(reader AccountStatusReader) Keeper {
@@ -49,12 +60,63 @@ func (k *Keeper) InitGenesis(gs types.GenesisState) error {
 	return nil
 }
 
+func (k *Keeper) InitGenesisState(ctx context.Context, gs types.GenesisState) error {
+	if err := k.InitGenesis(gs); err != nil {
+		return err
+	}
+	return k.writeGenesis(ctx)
+}
+
 func (k Keeper) ExportGenesis() types.GenesisState {
 	return types.RefreshStateRoot(k.genesis)
 }
 
+func (k Keeper) ExportGenesisState(ctx context.Context) (types.GenesisState, error) {
+	if k.storeService == nil {
+		return k.ExportGenesis(), nil
+	}
+	if !reflect.DeepEqual(k.genesis, types.DefaultGenesis()) {
+		return k.ExportGenesis(), nil
+	}
+	bz, err := k.storeService.OpenKVStore(ctx).Get(genesisKey)
+	if err != nil {
+		return types.GenesisState{}, err
+	}
+	if len(bz) == 0 {
+		return types.DefaultGenesis(), nil
+	}
+	var gs types.GenesisState
+	if err := json.Unmarshal(bz, &gs); err != nil {
+		return types.GenesisState{}, err
+	}
+	gs = types.RefreshStateRoot(gs)
+	if err := gs.Validate(); err != nil {
+		return types.GenesisState{}, err
+	}
+	return gs, nil
+}
+
 func (k Keeper) Params() types.Params {
 	return k.genesis.Params
+}
+
+func (k Keeper) Code(req types.QueryCodeRequest) (types.CodeRecord, bool, error) {
+	if req.CodeID == "" {
+		return types.CodeRecord{}, false, errors.New("contract code id is required")
+	}
+	code, found := findCode(k.genesis.State.Codes, req.CodeID)
+	return code, found, nil
+}
+
+func (k Keeper) Codes(req types.QueryCodesRequest) ([]types.CodeRecord, error) {
+	if err := types.ValidateQueryPagination(req.Pagination); err != nil {
+		return nil, err
+	}
+	codes := k.genesis.State.Normalize().Codes
+	if uint32(len(codes)) > req.Pagination.Limit {
+		codes = codes[:req.Pagination.Limit]
+	}
+	return append([]types.CodeRecord(nil), codes...), nil
 }
 
 func (k Keeper) ValidateInvariants() error {
@@ -63,6 +125,11 @@ func (k Keeper) ValidateInvariants() error {
 
 func (k Keeper) RootContribution() (coretypes.RootContribution, error) {
 	return types.RootContribution(k.genesis)
+}
+
+func (k Keeper) Migrate1to2State(ctx context.Context) error {
+	_, err := k.ExportGenesisState(ctx)
+	return err
 }
 
 func (k *Keeper) StoreCode(msg types.MsgStoreCode) (types.StoreCodeResponse, error) {
@@ -75,6 +142,17 @@ func (k *Keeper) StoreCode(msg types.MsgStoreCode) (types.StoreCodeResponse, err
 	if err := k.ensureActiveWallet(msg.Authority, "contract code store"); err != nil {
 		return types.StoreCodeResponse{}, err
 	}
+	if len(msg.Bytecode) > 0 {
+		if err := types.ValidateAVMBytecode(k.genesis.Params, msg.Bytecode); err != nil {
+			return types.StoreCodeResponse{}, err
+		}
+		codeHash := types.CanonicalCodeHash(msg.Bytecode)
+		if msg.CodeHash != "" && msg.CodeHash != codeHash {
+			return types.StoreCodeResponse{}, errors.New(types.ErrInvalidBytecode + ": code hash must match canonical bytecode hash")
+		}
+		msg.CodeHash = codeHash
+		msg.CodeBytes = uint64(len(msg.Bytecode))
+	}
 	if msg.CodeBytes == 0 || msg.CodeBytes > k.genesis.Params.MaxCodeBytes {
 		return types.StoreCodeResponse{}, errors.New(types.ErrInvalidBytecode + ": code size out of bounds")
 	}
@@ -86,6 +164,7 @@ func (k *Keeper) StoreCode(msg types.MsgStoreCode) (types.StoreCodeResponse, err
 		CodeID:    msg.CodeHash,
 		CodeHash:  msg.CodeHash,
 		CodeBytes: msg.CodeBytes,
+		Bytecode:  append([]byte(nil), msg.Bytecode...),
 		Owner:     msg.Authority,
 	})
 	next = types.RefreshStateRoot(next)
@@ -96,12 +175,168 @@ func (k *Keeper) StoreCode(msg types.MsgStoreCode) (types.StoreCodeResponse, err
 	return types.StoreCodeResponse{CodeID: msg.CodeHash, StateRoot: k.genesis.StateRoot}, nil
 }
 
+func (k *Keeper) StoreCodeState(ctx context.Context, msg types.MsgStoreCode) (types.StoreCodeResponse, error) {
+	res, err := k.StoreCode(msg)
+	if err != nil {
+		return types.StoreCodeResponse{}, err
+	}
+	return res, k.writeGenesis(ctx)
+}
+
+func (k *Keeper) DeployContract(msg types.MsgDeployContract) (types.InstantiateContractResponse, error) {
+	if err := msg.ValidateBasic(k.genesis.Params); err != nil {
+		return types.InstantiateContractResponse{}, err
+	}
+	admin := msg.Admin
+	if admin == "" {
+		admin = msg.Creator
+	}
+	return k.InstantiateContract(types.MsgInstantiateContract{
+		Creator: msg.Creator,
+		CodeID:  msg.CodeID,
+		InitMsg: append([]byte(nil), msg.InitPayload...),
+		Funds:   msg.InitialBalance,
+		Admin:   admin,
+		Salt:    msg.Salt,
+		Height:  msg.Height,
+	})
+}
+
+func (k *Keeper) ExecuteExternal(msg types.MsgExecuteExternal) (types.ExecuteContractResponse, error) {
+	if err := msg.ValidateBasic(k.genesis.Params); err != nil {
+		return types.ExecuteContractResponse{}, err
+	}
+	return k.ExecuteContract(types.MsgExecuteContract{
+		Sender:          msg.Sender,
+		ContractAddress: msg.ContractAddress,
+		Msg:             append([]byte(nil), msg.Payload...),
+		Funds:           msg.Funds,
+		Height:          msg.Height,
+	})
+}
+
+func (k *Keeper) ExecuteInternal(msg types.MsgExecuteInternal) (types.InternalMessage, error) {
+	if err := msg.ValidateBasic(k.genesis.Params); err != nil {
+		return types.InternalMessage{}, err
+	}
+	return k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{
+		SourceContractUser: msg.Message.SourceContractUser,
+		DestinationAccount: msg.Message.DestinationAccount,
+		Funds:              msg.Message.Funds,
+		Opcode:             msg.Message.Opcode,
+		QueryID:            msg.Message.QueryID,
+		Body:               append([]byte(nil), msg.Message.Body...),
+		Bounce:             msg.Message.Bounce,
+		Deadline:           msg.Message.Deadline,
+		GasLimit:           msg.Message.GasLimit,
+		LogicalTime:        msg.Message.LogicalTime,
+		MessageID:          msg.Message.MessageID,
+		Height:             msg.Height,
+	})
+}
+
+func (k *Keeper) SendInternalMessage(msg types.MsgSendInternalMessage) (types.InternalMessage, error) {
+	if err := msg.ValidateBasic(k.genesis.Params); err != nil {
+		return types.InternalMessage{}, err
+	}
+	return k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{
+		SourceContractUser: msg.Message.SourceContractUser,
+		DestinationAccount: msg.Message.DestinationAccount,
+		Funds:              msg.Message.Funds,
+		Opcode:             msg.Message.Opcode,
+		QueryID:            msg.Message.QueryID,
+		Body:               append([]byte(nil), msg.Message.Body...),
+		Bounce:             msg.Message.Bounce,
+		Deadline:           msg.Message.Deadline,
+		GasLimit:           msg.Message.GasLimit,
+		LogicalTime:        msg.Message.LogicalTime,
+		MessageID:          msg.Message.MessageID,
+		Height:             msg.Height,
+	})
+}
+
+func (k *Keeper) UpdateContractParams(msg types.MsgUpdateContractParams) error {
+	if err := msg.ValidateBasic(); err != nil {
+		return err
+	}
+	next := k.genesis
+	next.Params = msg.Params
+	next = types.RefreshStateRoot(next)
+	if err := next.Validate(); err != nil {
+		return err
+	}
+	k.genesis = next
+	return nil
+}
+
 func (k Keeper) Contract(req types.QueryContractRequest) (types.QueryContractResponse, error) {
 	if err := types.ValidateContractAddress(req.ContractAddress); err != nil {
 		return types.QueryContractResponse{}, err
 	}
 	contract, found := findContract(k.genesis.State.Contracts, req.ContractAddress)
 	return types.QueryContractResponse{ContractAddress: req.ContractAddress, StateRoot: k.genesis.StateRoot, Found: found, Contract: contract}, nil
+}
+
+func (k Keeper) Contracts(req types.QueryContractsRequest) ([]types.Contract, error) {
+	if err := types.ValidateQueryPagination(req.Pagination); err != nil {
+		return nil, err
+	}
+	contracts := k.genesis.State.Normalize().Contracts
+	if uint32(len(contracts)) > req.Pagination.Limit {
+		contracts = contracts[:req.Pagination.Limit]
+	}
+	return append([]types.Contract(nil), contracts...), nil
+}
+
+func (k Keeper) ContractStorage(req types.QueryContractStorageRequest) error {
+	if err := types.ValidateContractAddress(req.ContractAddress); err != nil {
+		return err
+	}
+	return types.ValidateQueryPagination(req.Pagination)
+}
+
+func (k Keeper) ContractReceipts(req types.QueryContractReceiptsRequest) error {
+	if err := types.ValidateContractAddress(req.ContractAddress); err != nil {
+		return err
+	}
+	return types.ValidateQueryPagination(req.Pagination)
+}
+
+func (k Keeper) ContractQueue(req types.QueryContractQueueRequest) ([]types.InternalMessage, error) {
+	if err := types.ValidateContractAddress(req.ContractAddress); err != nil {
+		return nil, err
+	}
+	if err := types.ValidateQueryPagination(req.Pagination); err != nil {
+		return nil, err
+	}
+	queue := make([]types.InternalMessage, 0)
+	for _, msg := range k.genesis.State.Normalize().InternalMessages {
+		if msg.SourceContractUser == req.ContractAddress || msg.DestinationAccount == req.ContractAddress {
+			queue = append(queue, msg)
+			if uint32(len(queue)) == req.Pagination.Limit {
+				break
+			}
+		}
+	}
+	return queue, nil
+}
+
+func (k Keeper) ContractEvents(req types.QueryContractEventsRequest) error {
+	if err := types.ValidateContractAddress(req.ContractAddress); err != nil {
+		return err
+	}
+	return types.ValidateQueryPagination(req.Pagination)
+}
+
+func (k Keeper) ContractStateRoot(req types.QueryContractStateRootRequest) (string, error) {
+	if err := types.ValidateContractAddress(req.ContractAddress); err != nil {
+		return "", err
+	}
+	contract, found := findContract(k.genesis.State.Contracts, req.ContractAddress)
+	if !found {
+		return "", errors.New(types.ErrContractNotFound + ": contract not found")
+	}
+	return contract.StateRoot, nil
 }
 
 func (k *Keeper) InstantiateContract(msg types.MsgInstantiateContract) (types.InstantiateContractResponse, error) {
@@ -153,6 +388,7 @@ func (k *Keeper) InstantiateContract(msg types.MsgInstantiateContract) (types.In
 		AddressUser:             user,
 		AddressRaw:              raw,
 		CodeID:                  msg.CodeID,
+		CodeHash:                code.CodeHash,
 		Creator:                 msg.Creator,
 		Owner:                   msg.Creator,
 		Admin:                   admin,
@@ -162,9 +398,11 @@ func (k *Keeper) InstantiateContract(msg types.MsgInstantiateContract) (types.In
 		Status:                  types.ContractStatusActive,
 		StorageBytes:            storageBytes,
 		LastStorageChargeHeight: msg.Height,
+		LogicalTime:             1,
 		CreatedHeight:           msg.Height,
 		UpdatedHeight:           msg.Height,
 	}
+	contract.StateRoot = types.ComputeContractStateRoot(contract)
 	next := k.genesis
 	next.State.Contracts = append(next.State.Contracts, contract)
 	next = types.RefreshStateRoot(next)
@@ -186,6 +424,14 @@ func (k *Keeper) InstantiateContract(msg types.MsgInstantiateContract) (types.In
 			InternalRaw: raw,
 		}},
 	}, nil
+}
+
+func (k *Keeper) InstantiateContractState(ctx context.Context, msg types.MsgInstantiateContract) (types.InstantiateContractResponse, error) {
+	res, err := k.InstantiateContract(msg)
+	if err != nil {
+		return types.InstantiateContractResponse{}, err
+	}
+	return res, k.writeGenesis(ctx)
 }
 
 func (k *Keeper) ExecuteContract(msg types.MsgExecuteContract) (types.ExecuteContractResponse, error) {
@@ -218,6 +464,7 @@ func (k *Keeper) ExecuteContract(msg types.MsgExecuteContract) (types.ExecuteCon
 	}
 	contract.Balance = balance
 	contract.Data = append([]byte(nil), msg.Msg...)
+	contract.LogicalTime++
 	storageBytes, err := k.contractStorageBytes(contract)
 	if err != nil {
 		return types.ExecuteContractResponse{}, err
@@ -227,6 +474,7 @@ func (k *Keeper) ExecuteContract(msg types.MsgExecuteContract) (types.ExecuteCon
 	}
 	contract.StorageBytes = storageBytes
 	contract.UpdatedHeight = msg.Height
+	contract.StateRoot = types.ComputeContractStateRoot(contract)
 	next := k.genesis
 	next.State.Contracts[idx] = contract
 	next = types.RefreshStateRoot(next)
@@ -246,6 +494,14 @@ func (k *Keeper) ExecuteContract(msg types.MsgExecuteContract) (types.ExecuteCon
 			InternalRaw: contract.AddressRaw,
 		}},
 	}, nil
+}
+
+func (k *Keeper) ExecuteContractState(ctx context.Context, msg types.MsgExecuteContract) (types.ExecuteContractResponse, error) {
+	res, err := k.ExecuteContract(msg)
+	if err != nil {
+		return types.ExecuteContractResponse{}, err
+	}
+	return res, k.writeGenesis(ctx)
 }
 
 func (k *Keeper) TopUpContract(msg types.MsgTopUpContract) (types.Contract, error) {
@@ -405,8 +661,21 @@ func (k *Keeper) ReceiveInternalMessage(msg types.MsgReceiveInternalMessage) (ty
 		SourceContractUser: msg.SourceContractUser,
 		DestinationAccount: msg.DestinationAccount,
 		Funds:              msg.Funds,
+		Opcode:             msg.Opcode,
+		QueryID:            msg.QueryID,
 		Body:               append([]byte(nil), msg.Body...),
+		Bounce:             msg.Bounce,
+		Deadline:           msg.Deadline,
+		GasLimit:           msg.GasLimit,
+		LogicalTime:        msg.LogicalTime,
+		MessageID:          msg.MessageID,
 		Height:             msg.Height,
+	}
+	if record.LogicalTime == 0 {
+		record.LogicalTime = msg.Height
+	}
+	if record.MessageID == "" {
+		record.MessageID = types.ComputeInternalMessageID(record)
 	}
 	if err := record.Validate(); err != nil {
 		return types.InternalMessage{}, err
@@ -635,4 +904,19 @@ func hasCapability(caps []types.ContractCapability, contract string, poolID stri
 		}
 	}
 	return false
+}
+
+func (k Keeper) writeGenesis(ctx context.Context) error {
+	if k.storeService == nil {
+		return nil
+	}
+	gs := types.RefreshStateRoot(k.genesis)
+	if err := gs.Validate(); err != nil {
+		return err
+	}
+	bz, err := json.Marshal(gs)
+	if err != nil {
+		return err
+	}
+	return k.storeService.OpenKVStore(ctx).Set(genesisKey, bz)
 }

@@ -17,6 +17,8 @@ import (
 
 	aetracorekeeper "github.com/sovereign-l1/l1/x/aetracore/keeper"
 	aetracoretypes "github.com/sovereign-l1/l1/x/aetracore/types"
+	contractskeeper "github.com/sovereign-l1/l1/x/contracts/keeper"
+	contractstypes "github.com/sovereign-l1/l1/x/contracts/types"
 	loadkeeper "github.com/sovereign-l1/l1/x/load/keeper"
 	loadtypes "github.com/sovereign-l1/l1/x/load/types"
 	meshkeeper "github.com/sovereign-l1/l1/x/mesh/keeper"
@@ -100,6 +102,12 @@ func TestAetraCoreWiringGateRegistersPrototypeModulesDisabled(t *testing.T) {
 	require.False(t, schedulerGenesis.Params.Enabled)
 	require.Empty(t, schedulerGenesis.State.Jobs)
 	require.Empty(t, schedulerGenesis.State.History)
+
+	contractsGenesis := decodeJSONGenesis[contractstypes.GenesisState](t, genesis[contractstypes.ModuleName])
+	require.NoError(t, contractsGenesis.Validate())
+	require.True(t, contractsGenesis.Params.Enabled)
+	require.Empty(t, contractsGenesis.State.Codes)
+	require.Equal(t, contractskeeper.DefaultGenesis().StateRoot, contractsGenesis.StateRoot)
 }
 
 func TestFeatureDisabledMainnetProfileHasNoActiveProductionShardingBehavior(t *testing.T) {

@@ -1,0 +1,193 @@
+syntax = "proto3";
+
+package l1.contracts.v1;
+
+option go_package = "github.com/sovereign-l1/l1/x/contracts/types";
+
+service Query {
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse);
+  rpc Code(QueryCodeRequest) returns (QueryCodeResponse);
+  rpc Codes(QueryCodesRequest) returns (QueryCodesResponse);
+  rpc Contract(QueryContractRequest) returns (QueryContractResponse);
+  rpc Contracts(QueryContractsRequest) returns (QueryContractsResponse);
+  rpc ContractStorage(QueryContractStorageRequest) returns (QueryContractStorageResponse);
+  rpc ContractReceipts(QueryContractReceiptsRequest) returns (QueryContractReceiptsResponse);
+  rpc ContractQueue(QueryContractQueueRequest) returns (QueryContractQueueResponse);
+  rpc ContractEvents(QueryContractEventsRequest) returns (QueryContractEventsResponse);
+  rpc ContractStateRoot(QueryContractStateRootRequest) returns (QueryContractStateRootResponse);
+}
+
+message PageRequest {
+  uint32 limit = 1;
+  bytes key = 2;
+}
+
+message PageResponse {
+  bytes next_key = 1;
+}
+
+message QueryParamsRequest {}
+message QueryParamsResponse {
+  ContractParams params = 1;
+}
+
+message QueryCodeRequest {
+  string code_id = 1;
+}
+
+message QueryCodeResponse {
+  CodeRecord code = 1;
+  bool found = 2;
+}
+
+message QueryCodesRequest {
+  PageRequest pagination = 1;
+}
+
+message QueryCodesResponse {
+  repeated CodeRecord codes = 1;
+  PageResponse pagination = 2;
+}
+
+message QueryContractRequest {
+  string contract_address = 1;
+}
+
+message QueryContractResponse {
+  ContractRecord contract = 1;
+  bool found = 2;
+  string state_root = 3;
+}
+
+message QueryContractsRequest {
+  PageRequest pagination = 1;
+}
+
+message QueryContractsResponse {
+  repeated ContractRecord contracts = 1;
+  PageResponse pagination = 2;
+}
+
+message QueryContractStorageRequest {
+  string contract_address = 1;
+  bytes key_prefix = 2;
+  PageRequest pagination = 3;
+}
+
+message QueryContractStorageResponse {
+  repeated StorageEntry entries = 1;
+  PageResponse pagination = 2;
+}
+
+message QueryContractReceiptsRequest {
+  string contract_address = 1;
+  PageRequest pagination = 2;
+}
+
+message QueryContractReceiptsResponse {
+  repeated ContractReceipt receipts = 1;
+  PageResponse pagination = 2;
+}
+
+message QueryContractQueueRequest {
+  string contract_address = 1;
+  PageRequest pagination = 2;
+}
+
+message QueryContractQueueResponse {
+  repeated QueuedInternalMessage messages = 1;
+  PageResponse pagination = 2;
+}
+
+message QueryContractEventsRequest {
+  string contract_address = 1;
+  PageRequest pagination = 2;
+}
+
+message QueryContractEventsResponse {
+  repeated ContractEvent events = 1;
+  PageResponse pagination = 2;
+}
+
+message QueryContractStateRootRequest {
+  string contract_address = 1;
+}
+
+message QueryContractStateRootResponse {
+  string state_root = 1;
+}
+
+message CodeRecord {
+  string code_id = 1;
+  string code_hash = 2;
+  uint64 code_bytes = 3;
+  string owner = 4;
+}
+
+message ContractRecord {
+  string address_user = 1;
+  string address_raw = 2;
+  string code_hash = 3;
+  string code_id = 4;
+  string owner = 5;
+  string admin = 6;
+  uint64 balance = 7;
+  string state_root = 8;
+  uint64 storage_size = 9;
+  uint64 storage_rent_debt = 10;
+  string status = 11;
+  uint64 logical_time = 12;
+  uint64 created_height = 13;
+  uint64 updated_height = 14;
+}
+
+message StorageEntry {
+  bytes key = 1;
+  bytes value = 2;
+}
+
+message ContractReceipt {
+  string receipt_id = 1;
+  string tx_hash = 2;
+  string message_id = 3;
+  string contract_address = 4;
+  string caller = 5;
+  uint64 gas_used = 6;
+  uint64 fee_charged = 7;
+  uint64 value_transferred = 8;
+  uint32 exit_code = 9;
+  string state_root_before = 10;
+  string state_root_after = 11;
+  uint64 height = 12;
+  uint64 logical_time = 13;
+}
+
+message ContractEvent {
+  string type = 1;
+  string actor = 2;
+  string contract = 3;
+  uint64 amount = 4;
+}
+
+message ContractParams {
+  string authority = 1;
+  bool enabled = 2;
+  uint64 max_code_bytes = 3;
+  uint64 max_contract_storage_bytes = 4;
+  uint64 max_gas_per_execution = 5;
+  uint64 storage_rent_per_byte_block = 6;
+}
+
+message QueuedInternalMessage {
+  string source_contract = 1;
+  string destination = 2;
+  uint64 value = 3;
+  uint32 opcode = 4;
+  uint64 query_id = 5;
+  bytes body = 6;
+  bool bounce = 7;
+  uint64 deadline = 8;
+  uint64 gas_limit = 9;
+  uint64 logical_time = 10;
+  string message_id = 11;
+}

@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package l1.contracts.v1;
+
+option go_package = "github.com/sovereign-l1/l1/x/contracts/types";
+
+message GenesisState {
+  GenesisParams params = 1;
+  repeated GenesisCodeRecord codes = 2;
+  repeated GenesisContractRecord contracts = 3;
+  repeated GenesisStorageEntry storage_entries = 4;
+  repeated GenesisQueuedInternalMessage message_queue = 5;
+  repeated GenesisContractReceipt receipts = 6;
+  string state_root = 7;
+  uint64 logical_time_counter = 8;
+}
+
+message GenesisParams {
+  string authority = 1;
+  bool enabled = 2;
+  uint64 max_code_bytes = 3;
+  uint64 max_contract_storage_bytes = 4;
+  uint64 max_gas_per_execution = 5;
+  uint64 storage_rent_per_byte_block = 6;
+}
+
+message GenesisCodeRecord {
+  string code_id = 1;
+  string code_hash = 2;
+  uint64 code_bytes = 3;
+  string owner = 4;
+}
+
+message GenesisContractRecord {
+  string address_user = 1;
+  string address_raw = 2;
+  string code_hash = 3;
+  string code_id = 4;
+  string owner = 5;
+  string admin = 6;
+  uint64 balance = 7;
+  string state_root = 8;
+  uint64 storage_size = 9;
+  uint64 storage_rent_debt = 10;
+  string status = 11;
+  uint64 logical_time = 12;
+  uint64 created_height = 13;
+  uint64 updated_height = 14;
+}
+
+message GenesisStorageEntry {
+  string contract_address = 1;
+  bytes key = 2;
+  bytes value = 3;
+}
+
+message GenesisQueuedInternalMessage {
+  string source_contract = 1;
+  string destination = 2;
+  uint64 value = 3;
+  uint32 opcode = 4;
+  uint64 query_id = 5;
+  bytes body = 6;
+  bool bounce = 7;
+  uint64 deadline = 8;
+  uint64 gas_limit = 9;
+  uint64 logical_time = 10;
+  string message_id = 11;
+}
+
+message GenesisContractReceipt {
+  string receipt_id = 1;
+  string tx_hash = 2;
+  string message_id = 3;
+  string contract_address = 4;
+  string caller = 5;
+  uint64 gas_used = 6;
+  uint64 fee_charged = 7;
+  uint64 value_transferred = 8;
+  uint32 exit_code = 9;
+  string state_root_before = 10;
+  string state_root_after = 11;
+  uint64 height = 12;
+  uint64 logical_time = 13;
+}

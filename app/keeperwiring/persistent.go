@@ -18,6 +18,8 @@ import (
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
 	constitutionkeeper "github.com/sovereign-l1/l1/x/constitution/keeper"
 	constitutiontypes "github.com/sovereign-l1/l1/x/constitution/types"
+	contractskeeper "github.com/sovereign-l1/l1/x/contracts/keeper"
+	contractstypes "github.com/sovereign-l1/l1/x/contracts/types"
 	crosschainregistrykeeper "github.com/sovereign-l1/l1/x/cross-chain-registry/keeper"
 	crosschainregistrytypes "github.com/sovereign-l1/l1/x/cross-chain-registry/types"
 	nativeevidencekeeper "github.com/sovereign-l1/l1/x/evidence/keeper"
@@ -28,10 +30,10 @@ import (
 	loadtypes "github.com/sovereign-l1/l1/x/load/types"
 	meshkeeper "github.com/sovereign-l1/l1/x/mesh/keeper"
 	meshtypes "github.com/sovereign-l1/l1/x/mesh/types"
-	networkingkeeper "github.com/sovereign-l1/l1/x/networking/keeper"
-	networkingtypes "github.com/sovereign-l1/l1/x/networking/types"
 	nativeaccountkeeper "github.com/sovereign-l1/l1/x/native-account/keeper"
 	nativeaccounttypes "github.com/sovereign-l1/l1/x/native-account/types"
+	networkingkeeper "github.com/sovereign-l1/l1/x/networking/keeper"
+	networkingtypes "github.com/sovereign-l1/l1/x/networking/types"
 	nominatorpoolkeeper "github.com/sovereign-l1/l1/x/nominator-pool/keeper"
 	nominatorpooltypes "github.com/sovereign-l1/l1/x/nominator-pool/types"
 	paymentskeeper "github.com/sovereign-l1/l1/x/payments/keeper"
@@ -83,6 +85,7 @@ type PersistentKeepers struct {
 	SchedulerKeeper           schedulerkeeper.Keeper
 	AVMSchedulerKeeper        avmschedulerkeeper.Keeper
 	ActorRegistryKeeper       actorregistrykeeper.Keeper
+	ContractsKeeper           contractskeeper.Keeper
 	StorageRentKeeper         storagerentkeeper.Keeper
 	IdentityRootKeeper        identityrootkeeper.Keeper
 	BridgeHubKeeper           bridgehubkeeper.Keeper
@@ -114,6 +117,7 @@ func NewPersistentKeepers(keys map[string]*storetypes.KVStoreKey) PersistentKeep
 		SchedulerKeeper:           schedulerkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[schedulertypes.StoreKey])),
 		AVMSchedulerKeeper:        avmschedulerkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[avmschedulertypes.StoreKey])),
 		ActorRegistryKeeper:       actorregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[actorregistrytypes.StoreKey])),
+		ContractsKeeper:           contractskeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[contractstypes.StoreKey])),
 		StorageRentKeeper:         storagerentkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[storagerenttypes.StoreKey])),
 		IdentityRootKeeper:        identityrootkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[identityroottypes.StoreKey])),
 		BridgeHubKeeper:           bridgehubkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[bridgehubtypes.StoreKey])),

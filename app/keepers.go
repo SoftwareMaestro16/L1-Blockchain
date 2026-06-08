@@ -206,6 +206,7 @@ func (app *L1App) initKeepers(
 	app.SchedulerKeeper = persistentKeepers.SchedulerKeeper
 	app.AVMSchedulerKeeper = persistentKeepers.AVMSchedulerKeeper
 	app.ActorRegistryKeeper = persistentKeepers.ActorRegistryKeeper
+	app.ContractsKeeper = persistentKeepers.ContractsKeeper
 	app.StorageRentKeeper = persistentKeepers.StorageRentKeeper
 	app.IdentityRootKeeper = persistentKeepers.IdentityRootKeeper
 	app.BridgeHubKeeper = persistentKeepers.BridgeHubKeeper
@@ -231,5 +232,8 @@ func (app *L1App) initKeepers(
 	app.StakeConcentrationKeeper = nativeKeepers.StakeConcentrationKeeper
 	app.FeeCollectorKeeper = nativeKeepers.FeeCollectorKeeper
 	app.FeesKeeper = nativeKeepers.FeesKeeper
+	app.AetraStakingPolicyKeeper = nativeKeepers.AetraStakingPolicyKeeper
+	app.AetraEconomicsKeeper = nativeKeepers.AetraEconomicsKeeper
+	app.AetraValidatorScoreKeeper = nativeKeepers.AetraValidatorScoreKeeper
 	return txConfig
 }

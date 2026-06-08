@@ -41,6 +41,7 @@ type MsgStoreCode struct {
 	Authority string
 	CodeHash  string
 	CodeBytes uint64
+	Bytecode  []byte
 }
 
 type StoreCodeResponse struct {
@@ -61,10 +62,24 @@ type QueryContractResponse struct {
 
 type MsgServer interface {
 	StoreCode(MsgStoreCode) (StoreCodeResponse, error)
+	DeployContract(MsgDeployContract) (InstantiateContractResponse, error)
+	ExecuteExternal(MsgExecuteExternal) (ExecuteContractResponse, error)
+	ExecuteInternal(MsgExecuteInternal) (InternalMessage, error)
+	SendInternalMessage(MsgSendInternalMessage) (InternalMessage, error)
+	UpdateContractParams(MsgUpdateContractParams) error
 }
 
 type QueryServer interface {
+	Params() Params
+	Code(QueryCodeRequest) (CodeRecord, bool, error)
+	Codes(QueryCodesRequest) ([]CodeRecord, error)
 	Contract(QueryContractRequest) (QueryContractResponse, error)
+	Contracts(QueryContractsRequest) ([]Contract, error)
+	ContractStorage(QueryContractStorageRequest) error
+	ContractReceipts(QueryContractReceiptsRequest) error
+	ContractQueue(QueryContractQueueRequest) ([]InternalMessage, error)
+	ContractEvents(QueryContractEventsRequest) error
+	ContractStateRoot(QueryContractStateRootRequest) (string, error)
 	RootContribution() (coretypes.RootContribution, error)
 }
 

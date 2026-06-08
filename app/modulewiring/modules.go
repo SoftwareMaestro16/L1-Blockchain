@@ -50,6 +50,12 @@ import (
 	"github.com/sovereign-l1/l1/app/stakingpolicy"
 	actorregistrymodule "github.com/sovereign-l1/l1/x/actor-registry"
 	actorregistrykeeper "github.com/sovereign-l1/l1/x/actor-registry/keeper"
+	aetraeconomicsmodule "github.com/sovereign-l1/l1/x/aetra-economics"
+	aetraeconomicskeeper "github.com/sovereign-l1/l1/x/aetra-economics/keeper"
+	aetrastakingpolicymodule "github.com/sovereign-l1/l1/x/aetra-staking-policy"
+	aetrastakingpolicykeeper "github.com/sovereign-l1/l1/x/aetra-staking-policy/keeper"
+	aetravalidatorscoremodule "github.com/sovereign-l1/l1/x/aetra-validator-score"
+	aetravalidatorscorekeeper "github.com/sovereign-l1/l1/x/aetra-validator-score/keeper"
 	aetracoremodule "github.com/sovereign-l1/l1/x/aetracore"
 	aetracorekeeper "github.com/sovereign-l1/l1/x/aetracore/keeper"
 	avmschedulermodule "github.com/sovereign-l1/l1/x/avm-scheduler"
@@ -64,6 +70,8 @@ import (
 	configkeeper "github.com/sovereign-l1/l1/x/config/keeper"
 	constitutionmodule "github.com/sovereign-l1/l1/x/constitution"
 	constitutionkeeper "github.com/sovereign-l1/l1/x/constitution/keeper"
+	contractsmodule "github.com/sovereign-l1/l1/x/contracts"
+	contractskeeper "github.com/sovereign-l1/l1/x/contracts/keeper"
 	crosschainregistrymodule "github.com/sovereign-l1/l1/x/cross-chain-registry"
 	crosschainregistrykeeper "github.com/sovereign-l1/l1/x/cross-chain-registry/keeper"
 	delegatorprotectionmodule "github.com/sovereign-l1/l1/x/delegator-protection"
@@ -172,6 +180,7 @@ type ModuleDeps struct {
 	SchedulerKeeper           *schedulerkeeper.Keeper
 	AVMSchedulerKeeper        *avmschedulerkeeper.Keeper
 	ActorRegistryKeeper       *actorregistrykeeper.Keeper
+	ContractsKeeper           *contractskeeper.Keeper
 	StorageRentKeeper         *storagerentkeeper.Keeper
 	IdentityRootKeeper        *identityrootkeeper.Keeper
 	BridgeHubKeeper           *bridgehubkeeper.Keeper
@@ -185,6 +194,9 @@ type ModuleDeps struct {
 	ValidatorElectionKeeper   *validatorelectionkeeper.Keeper
 	ValidatorInsuranceKeeper  *validatorinsurancekeeper.Keeper
 	ValidatorRegistryKeeper   *validatorregistrykeeper.Keeper
+	AetraStakingPolicyKeeper  *aetrastakingpolicykeeper.Keeper
+	AetraEconomicsKeeper      *aetraeconomicskeeper.Keeper
+	AetraValidatorScoreKeeper *aetravalidatorscorekeeper.Keeper
 }
 
 func NewModuleManager(deps ModuleDeps) *module.Manager {
@@ -214,6 +226,9 @@ func NewModuleManager(deps ModuleDeps) *module.Manager {
 		validatorelectionmodule.NewAppModule(deps.ValidatorElectionKeeper),
 		validatorinsurancemodule.NewAppModule(deps.ValidatorInsuranceKeeper),
 		validatorregistrymodule.NewAppModule(deps.ValidatorRegistryKeeper),
+		aetrastakingpolicymodule.NewAppModule(deps.AetraStakingPolicyKeeper),
+		aetraeconomicsmodule.NewAppModule(deps.AetraEconomicsKeeper),
+		aetravalidatorscoremodule.NewAppModule(deps.AetraValidatorScoreKeeper),
 		configmodule.NewAppModule(deps.ConfigKeeper),
 		configvotingmodule.NewAppModule(deps.ConfigVotingKeeper),
 		aetracoremodule.NewAppModule(deps.AetraCoreKeeper),
@@ -227,6 +242,7 @@ func NewModuleManager(deps ModuleDeps) *module.Manager {
 		schedulermodule.NewAppModule(deps.SchedulerKeeper),
 		avmschedulermodule.NewAppModule(deps.AVMSchedulerKeeper),
 		actorregistrymodule.NewAppModule(deps.ActorRegistryKeeper),
+		contractsmodule.NewAppModule(deps.ContractsKeeper),
 		storagerentmodule.NewAppModule(deps.StorageRentKeeper),
 		identityrootmodule.NewAppModule(deps.IdentityRootKeeper),
 		bridgehubmodule.NewAppModule(deps.BridgeHubKeeper),

@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package l1.contracts.v1;
+
+option go_package = "github.com/sovereign-l1/l1/x/contracts/types";
+
+service Msg {
+  rpc StoreCode(MsgStoreCode) returns (MsgStoreCodeResponse);
+  rpc DeployContract(MsgDeployContract) returns (MsgDeployContractResponse);
+  rpc ExecuteExternal(MsgExecuteExternal) returns (MsgExecuteExternalResponse);
+  rpc ExecuteInternal(MsgExecuteInternal) returns (MsgExecuteInternalResponse);
+  rpc SendInternalMessage(MsgSendInternalMessage) returns (MsgSendInternalMessageResponse);
+  rpc UpdateContractParams(MsgUpdateContractParams) returns (MsgUpdateContractParamsResponse);
+}
+
+message MsgStoreCode {
+  string authority = 1;
+  bytes bytecode = 2;
+  string code_hash = 3;
+  uint64 code_bytes = 4;
+}
+
+message MsgStoreCodeResponse {
+  string code_id = 1;
+  string code_hash = 2;
+  string state_root = 3;
+}
+
+message MsgDeployContract {
+  string creator = 1;
+  string code_id = 2;
+  string salt = 3;
+  bytes init_payload = 4;
+  uint64 initial_balance = 5;
+  string admin = 6;
+  bytes metadata = 7;
+}
+
+message MsgDeployContractResponse {
+  string contract_address = 1;
+  string raw_address = 2;
+  string state_root = 3;
+  uint32 exit_code = 4;
+}
+
+message MsgExecuteExternal {
+  string sender = 1;
+  string contract_address = 2;
+  bytes payload = 3;
+  uint64 funds = 4;
+  uint64 gas_limit = 5;
+  bytes metadata = 6;
+}
+
+message MsgExecuteExternalResponse {
+  string receipt_id = 1;
+  string state_root_before = 2;
+  string state_root_after = 3;
+  uint64 gas_used = 4;
+  uint32 exit_code = 5;
+}
+
+message MsgExecuteInternal {
+  InternalMessage message = 1;
+}
+
+message MsgExecuteInternalResponse {
+  string receipt_id = 1;
+  uint32 exit_code = 2;
+}
+
+message MsgSendInternalMessage {
+  InternalMessage message = 1;
+}
+
+message MsgSendInternalMessageResponse {
+  string message_id = 1;
+  uint32 exit_code = 2;
+}
+
+message MsgUpdateContractParams {
+  string authority = 1;
+  Params params = 2;
+}
+
+message MsgUpdateContractParamsResponse {}
+
+message InternalMessage {
+  string source_contract = 1;
+  string destination = 2;
+  uint64 value = 3;
+  uint32 opcode = 4;
+  uint64 query_id = 5;
+  bytes body = 6;
+  bool bounce = 7;
+  uint64 deadline = 8;
+  uint64 gas_limit = 9;
+  uint64 logical_time = 10;
+  string message_id = 11;
+}
+
+message Params {
+  string authority = 1;
+  bool enabled = 2;
+  uint64 max_code_bytes = 3;
+  uint64 max_contract_storage_bytes = 4;
+  uint64 max_gas_per_execution = 5;
+  uint64 storage_rent_per_byte_block = 6;
+}

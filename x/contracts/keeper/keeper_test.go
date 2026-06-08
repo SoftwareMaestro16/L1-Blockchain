@@ -58,6 +58,36 @@ func TestContractsKeeperTypedErrorsAndMsgQuerySurface(t *testing.T) {
 	require.ErrorContains(t, err, types.ErrContractNotFound)
 }
 
+func TestAVMExitCodesAreSmallStableAndNamed(t *testing.T) {
+	require.Equal(t, uint32(0), types.ExitCodeOK)
+	require.Equal(t, "ok", types.ExitCodeName(types.ExitCodeOK))
+	require.Equal(t, "code_rejected", types.ExitCodeName(types.ExitCodeCodeRejected))
+	require.Equal(t, "internal_bounce", types.ExitCodeName(types.ExitCodeInternalBounce))
+	require.Less(t, types.ExitCodeInternalBounce, uint32(100))
+	require.Equal(t, "unknown", types.ExitCodeName(99))
+}
+
+func TestStoreCodeAcceptsCanonicalAVMBytecodeAndRejectsNondeterminism(t *testing.T) {
+	wallet := aeAddress("11")
+	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive})
+	bytecode := []byte("AVM1\nset key value\nemit ok")
+	codeHash := types.CanonicalCodeHash(bytecode)
+
+	response, err := k.StoreCode(types.MsgStoreCode{Authority: wallet, Bytecode: bytecode})
+	require.NoError(t, err)
+	require.Equal(t, codeHash, response.CodeID)
+	exported := k.ExportGenesis()
+	require.Len(t, exported.State.Codes, 1)
+	require.Equal(t, bytecode, exported.State.Codes[0].Bytecode)
+	require.Equal(t, uint64(len(bytecode)), exported.State.Codes[0].CodeBytes)
+	require.Equal(t, codeHash, exported.State.Codes[0].CodeHash)
+
+	_, err = k.StoreCode(types.MsgStoreCode{Authority: wallet, Bytecode: []byte("AVM1 time.now")})
+	require.ErrorContains(t, err, types.ErrInvalidBytecode)
+	_, err = k.StoreCode(types.MsgStoreCode{Authority: wallet, CodeHash: sha256Hex("wrong"), Bytecode: bytecode})
+	require.ErrorContains(t, err, "canonical bytecode hash")
+}
+
 func TestWalletInstantiatesExecutesAndPassesFunds(t *testing.T) {
 	wallet := aeAddress("11")
 	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive})
@@ -86,6 +116,9 @@ func TestWalletInstantiatesExecutesAndPassesFunds(t *testing.T) {
 	query, err := k.Contract(types.QueryContractRequest{ContractAddress: created.ContractAddressUser})
 	require.NoError(t, err)
 	require.Equal(t, contractStorageBytes(128, initMsg), query.Contract.StorageBytes)
+	require.Equal(t, codeHash, query.Contract.CodeHash)
+	require.NotEmpty(t, query.Contract.StateRoot)
+	require.Equal(t, uint64(1), query.Contract.LogicalTime)
 
 	execMsg := []byte(`{"transfer":1}`)
 	executed, err := k.ExecuteContract(types.MsgExecuteContract{
@@ -104,6 +137,8 @@ func TestWalletInstantiatesExecutesAndPassesFunds(t *testing.T) {
 	query, err = k.Contract(types.QueryContractRequest{ContractAddress: created.ContractAddressUser})
 	require.NoError(t, err)
 	require.Equal(t, contractStorageBytes(128, execMsg), query.Contract.StorageBytes)
+	require.Equal(t, uint64(2), query.Contract.LogicalTime)
+	require.Equal(t, types.ComputeContractStateRoot(query.Contract), query.Contract.StateRoot)
 }
 
 func TestFrozenWalletCannotInstantiateOrExecuteUntilUnfrozen(t *testing.T) {
@@ -365,6 +400,75 @@ func TestInternalMessagesAndExportImportAreDeterministic(t *testing.T) {
 	roundTrip := NewKeeper()
 	require.NoError(t, roundTrip.InitGenesis(exported))
 	require.Equal(t, exported, roundTrip.ExportGenesis())
+}
+
+func TestContractsTypedMsgAndQueryServiceSurface(t *testing.T) {
+	wallet := aeAddress("11")
+	destination := aeAddress("22")
+	k := NewKeeperWithAccountStatus(testAccountStatus{wallet: accountStatusActive})
+	bytecode := []byte("AVM1 typed-service")
+	stored, err := k.StoreCode(types.MsgStoreCode{Authority: wallet, Bytecode: bytecode})
+	require.NoError(t, err)
+
+	code, found, err := k.Code(types.QueryCodeRequest{CodeID: stored.CodeID})
+	require.NoError(t, err)
+	require.True(t, found)
+	require.Equal(t, types.CanonicalCodeHash(bytecode), code.CodeHash)
+	codes, err := k.Codes(types.QueryCodesRequest{Pagination: types.PageRequest{Limit: 1}})
+	require.NoError(t, err)
+	require.Len(t, codes, 1)
+
+	deployed, err := k.DeployContract(types.MsgDeployContract{
+		Creator:        wallet,
+		CodeID:         stored.CodeID,
+		Salt:           "typed",
+		InitPayload:    []byte("init"),
+		InitialBalance: 1_000,
+		Admin:          wallet,
+		Height:         20,
+	})
+	require.NoError(t, err)
+	executed, err := k.ExecuteExternal(types.MsgExecuteExternal{
+		Sender:          wallet,
+		ContractAddress: deployed.ContractAddressUser,
+		Payload:         []byte("call"),
+		GasLimit:        k.Params().MaxGasPerExecution,
+		Height:          21,
+	})
+	require.NoError(t, err)
+	require.Equal(t, deployed.ContractAddressUser, executed.ContractAddressUser)
+
+	stateRoot, err := k.ContractStateRoot(types.QueryContractStateRootRequest{ContractAddress: deployed.ContractAddressUser})
+	require.NoError(t, err)
+	require.NotEmpty(t, stateRoot)
+	contracts, err := k.Contracts(types.QueryContractsRequest{Pagination: types.PageRequest{Limit: 1}})
+	require.NoError(t, err)
+	require.Len(t, contracts, 1)
+
+	internal, err := k.SendInternalMessage(types.MsgSendInternalMessage{
+		Message: types.InternalMessage{
+			SourceContractUser: deployed.ContractAddressUser,
+			DestinationAccount: destination,
+			Funds:              5,
+			Opcode:             7,
+			QueryID:            9,
+			Body:               []byte("internal"),
+			Bounce:             true,
+			Deadline:           25,
+			GasLimit:           100,
+			LogicalTime:        3,
+		},
+		Height: 22,
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, internal.MessageID)
+	require.Equal(t, types.ComputeInternalMessageID(internal), internal.MessageID)
+	queue, err := k.ContractQueue(types.QueryContractQueueRequest{ContractAddress: deployed.ContractAddressUser, Pagination: types.PageRequest{Limit: 10}})
+	require.NoError(t, err)
+	require.Equal(t, []types.InternalMessage{internal}, queue)
+	require.NoError(t, k.ContractStorage(types.QueryContractStorageRequest{ContractAddress: deployed.ContractAddressUser, Pagination: types.PageRequest{Limit: 1}}))
+	require.NoError(t, k.ContractReceipts(types.QueryContractReceiptsRequest{ContractAddress: deployed.ContractAddressUser, Pagination: types.PageRequest{Limit: 1}}))
+	require.NoError(t, k.ContractEvents(types.QueryContractEventsRequest{ContractAddress: deployed.ContractAddressUser, Pagination: types.PageRequest{Limit: 1}}))
 }
 
 func TestInternalMessageChargesStorageRentBeforeSend(t *testing.T) {

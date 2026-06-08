@@ -19,6 +19,9 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	actorregistrytypes "github.com/sovereign-l1/l1/x/actor-registry/types"
+	aetraeconomicstypes "github.com/sovereign-l1/l1/x/aetra-economics/types"
+	aetrastakingpolicytypes "github.com/sovereign-l1/l1/x/aetra-staking-policy/types"
+	aetravalidatorscoretypes "github.com/sovereign-l1/l1/x/aetra-validator-score/types"
 	aetracoretypes "github.com/sovereign-l1/l1/x/aetracore/types"
 	avmschedulertypes "github.com/sovereign-l1/l1/x/avm-scheduler/types"
 	bridgehubtypes "github.com/sovereign-l1/l1/x/bridge-hub/types"
@@ -26,6 +29,7 @@ import (
 	configvotingtypes "github.com/sovereign-l1/l1/x/config-voting/types"
 	configtypes "github.com/sovereign-l1/l1/x/config/types"
 	constitutiontypes "github.com/sovereign-l1/l1/x/constitution/types"
+	contractstypes "github.com/sovereign-l1/l1/x/contracts/types"
 	crosschainregistrytypes "github.com/sovereign-l1/l1/x/cross-chain-registry/types"
 	delegatorprotectiontypes "github.com/sovereign-l1/l1/x/delegator-protection/types"
 	dynamiccommissiontypes "github.com/sovereign-l1/l1/x/dynamic-commission/types"
@@ -82,6 +86,9 @@ func BeginBlockerOrder() []string {
 		validatorelectiontypes.ModuleName,
 		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
+		aetrastakingpolicytypes.ModuleName,
+		aetraeconomicstypes.ModuleName,
+		aetravalidatorscoretypes.ModuleName,
 		configtypes.ModuleName,
 		configvotingtypes.ModuleName,
 		aetracoretypes.ModuleName,
@@ -94,6 +101,7 @@ func BeginBlockerOrder() []string {
 		schedulertypes.ModuleName,
 		avmschedulertypes.ModuleName,
 		actorregistrytypes.ModuleName,
+		contractstypes.ModuleName,
 		storagerenttypes.ModuleName,
 		identityroottypes.ModuleName,
 		bridgehubtypes.ModuleName,
@@ -119,6 +127,9 @@ func EndBlockerOrder() []string {
 		validatorelectiontypes.ModuleName,
 		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
+		aetrastakingpolicytypes.ModuleName,
+		aetraeconomicstypes.ModuleName,
+		aetravalidatorscoretypes.ModuleName,
 		configtypes.ModuleName,
 		configvotingtypes.ModuleName,
 		aetracoretypes.ModuleName,
@@ -131,6 +142,7 @@ func EndBlockerOrder() []string {
 		schedulertypes.ModuleName,
 		avmschedulertypes.ModuleName,
 		actorregistrytypes.ModuleName,
+		contractstypes.ModuleName,
 		storagerenttypes.ModuleName,
 		identityroottypes.ModuleName,
 		bridgehubtypes.ModuleName,
@@ -166,6 +178,9 @@ func InitGenesisOrder() []string {
 		validatorelectiontypes.ModuleName,
 		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
+		aetrastakingpolicytypes.ModuleName,
+		aetraeconomicstypes.ModuleName,
+		aetravalidatorscoretypes.ModuleName,
 		configtypes.ModuleName,
 		nativeaccounttypes.ModuleName,
 		configvotingtypes.ModuleName,
@@ -179,6 +194,7 @@ func InitGenesisOrder() []string {
 		schedulertypes.ModuleName,
 		avmschedulertypes.ModuleName,
 		actorregistrytypes.ModuleName,
+		contractstypes.ModuleName,
 		storagerenttypes.ModuleName,
 		identityroottypes.ModuleName,
 		bridgehubtypes.ModuleName,
@@ -225,6 +241,9 @@ func ExportGenesisOrder() []string {
 		validatorelectiontypes.ModuleName,
 		validatorinsurancetypes.ModuleName,
 		validatorregistrytypes.ModuleName,
+		aetrastakingpolicytypes.ModuleName,
+		aetraeconomicstypes.ModuleName,
+		aetravalidatorscoretypes.ModuleName,
 		configtypes.ModuleName,
 		nativeaccounttypes.ModuleName,
 		configvotingtypes.ModuleName,
@@ -238,6 +257,7 @@ func ExportGenesisOrder() []string {
 		schedulertypes.ModuleName,
 		avmschedulertypes.ModuleName,
 		actorregistrytypes.ModuleName,
+		contractstypes.ModuleName,
 		storagerenttypes.ModuleName,
 		identityroottypes.ModuleName,
 		bridgehubtypes.ModuleName,

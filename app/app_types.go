@@ -25,6 +25,9 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 
 	actorregistrykeeper "github.com/sovereign-l1/l1/x/actor-registry/keeper"
+	aetraeconomicskeeper "github.com/sovereign-l1/l1/x/aetra-economics/keeper"
+	aetrastakingpolicykeeper "github.com/sovereign-l1/l1/x/aetra-staking-policy/keeper"
+	aetravalidatorscorekeeper "github.com/sovereign-l1/l1/x/aetra-validator-score/keeper"
 	aetracorekeeper "github.com/sovereign-l1/l1/x/aetracore/keeper"
 	avmschedulerkeeper "github.com/sovereign-l1/l1/x/avm-scheduler/keeper"
 	bridgehubkeeper "github.com/sovereign-l1/l1/x/bridge-hub/keeper"
@@ -32,6 +35,7 @@ import (
 	configvotingkeeper "github.com/sovereign-l1/l1/x/config-voting/keeper"
 	configkeeper "github.com/sovereign-l1/l1/x/config/keeper"
 	constitutionkeeper "github.com/sovereign-l1/l1/x/constitution/keeper"
+	contractskeeper "github.com/sovereign-l1/l1/x/contracts/keeper"
 	crosschainregistrykeeper "github.com/sovereign-l1/l1/x/cross-chain-registry/keeper"
 	delegatorprotectionkeeper "github.com/sovereign-l1/l1/x/delegator-protection/keeper"
 	dynamiccommissionkeeper "github.com/sovereign-l1/l1/x/dynamic-commission/keeper"
@@ -124,6 +128,7 @@ type L1App struct {
 	SchedulerKeeper           schedulerkeeper.Keeper
 	AVMSchedulerKeeper        avmschedulerkeeper.Keeper
 	ActorRegistryKeeper       actorregistrykeeper.Keeper
+	ContractsKeeper           contractskeeper.Keeper
 	StorageRentKeeper         storagerentkeeper.Keeper
 	IdentityRootKeeper        identityrootkeeper.Keeper
 	BridgeHubKeeper           bridgehubkeeper.Keeper
@@ -137,6 +142,9 @@ type L1App struct {
 	ValidatorElectionKeeper   validatorelectionkeeper.Keeper
 	ValidatorInsuranceKeeper  validatorinsurancekeeper.Keeper
 	ValidatorRegistryKeeper   validatorregistrykeeper.Keeper
+	AetraStakingPolicyKeeper  aetrastakingpolicykeeper.Keeper
+	AetraEconomicsKeeper      aetraeconomicskeeper.Keeper
+	AetraValidatorScoreKeeper aetravalidatorscorekeeper.Keeper
 
 	// the module manager
 	ModuleManager      *module.Manager
