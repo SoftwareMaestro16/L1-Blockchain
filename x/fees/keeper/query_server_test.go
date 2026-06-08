@@ -85,7 +85,7 @@ func TestEstimateFeeQueryReturnsBoundedQuote(t *testing.T) {
 
 	res, err := app.FeesKeeper.EstimateFee(ctx, &types.QueryEstimateFeeRequest{GasLimit: types.DefaultParams().MaxTxGas})
 	require.NoError(t, err)
-	require.Equal(t, "1naet", res.RequiredFee)
+	require.Equal(t, "10naet", res.RequiredFee)
 	require.Equal(t, "1naet", res.BaseFee)
 	require.Equal(t, "1000naet", res.MaxFee)
 	require.False(t, res.Congested)

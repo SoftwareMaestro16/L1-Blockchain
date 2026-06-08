@@ -99,35 +99,30 @@ func TestNominatorPoolRuntimeMutationPersistsToKVStore(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	sourceCtx := source.NewUncachedContext(false, cmtproto.Header{Height: 1})
+	sourceCtx := source.NewNextBlockContext(cmtproto.Header{Height: 1})
 	initial, err := source.NominatorPoolKeeper.ExportGenesisState(sourceCtx)
 	require.NoError(t, err)
 	contractUser, contractRaw := nominatorPoolAddressPair(t, "77")
 	userAddress, _ := nominatorPoolAddressPair(t, "44")
 
-	pool, err := source.NominatorPoolKeeper.CreateOfficialLiquidStakingPool(nominatorpooltypes.MsgCreateOfficialLiquidStakingPool{
+	poolID := "runtime-kv-official-pool"
+	nominatorPoolMsg(t, source, sourceCtx, &nominatorpooltypes.MsgCreateOfficialLiquidStakingPool{
 		Authority:           initial.Params.Authority,
-		PoolID:              "runtime-kv-official-pool",
+		PoolID:              poolID,
 		ContractAddressUser: contractUser,
 		ContractAddressRaw:  contractRaw,
 		PoolOperator:        nominatorPoolRawAddress("11"),
 		PoolCommissionBps:   100,
 		Height:              2,
 	})
-	require.NoError(t, err)
-	_, err = source.NominatorPoolKeeper.DepositToStakingPool(nominatorpooltypes.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
+	nominatorPoolMsg(t, source, sourceCtx, &nominatorpooltypes.MsgDepositToStakingPool{
+		PoolID:        poolID,
 		WalletAddress: userAddress,
 		Amount:        nominatorpooltypes.DefaultMinPoolDeposit,
 		Height:        3,
 	})
-	require.NoError(t, err)
 
-	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
-	})
-	require.NoError(t, err)
+	source.SimWriteState()
 	_, err = source.Commit()
 	require.NoError(t, err)
 
@@ -136,7 +131,7 @@ func TestNominatorPoolRuntimeMutationPersistsToKVStore(t *testing.T) {
 	exported, err := restarted.NominatorPoolKeeper.ExportGenesisState(restartedCtx)
 	require.NoError(t, err)
 	require.Len(t, exported.State.Pools, 1)
-	require.Equal(t, pool.PoolID, exported.State.Pools[0].PoolID)
+	require.Equal(t, poolID, exported.State.Pools[0].PoolID)
 	require.Len(t, exported.State.PoolShares, 1)
 	require.Equal(t, userAddress, exported.State.PoolShares[0].Owner)
 	require.Equal(t, nominatorpooltypes.DefaultMinPoolDeposit, exported.State.PoolShares[0].Shares)
@@ -145,37 +140,38 @@ func TestNominatorPoolRuntimeMutationPersistsToKVStore(t *testing.T) {
 func TestFinalAppWiringOfficialStakingPoolFlowExportImportRestart(t *testing.T) {
 	appOptions := sims.AppOptionsMap{flags.FlagHome: DefaultNodeHome}
 	source := NewL1App(log.NewNopLogger(), dbm.NewMemDB(), true, appOptions)
-	sourceCtx := source.NewUncachedContext(false, cmtproto.Header{Height: 1})
+	sourceCtx := source.NewNextBlockContext(cmtproto.Header{Height: 1})
 
 	initial, err := source.NominatorPoolKeeper.ExportGenesisState(sourceCtx)
 	require.NoError(t, err)
 	contractUser, contractRaw := nominatorPoolAddressPair(t, "66")
 	userAddress, userRaw := nominatorPoolAddressPair(t, "33")
 
-	pool, err := source.NominatorPoolKeeper.CreateOfficialLiquidStakingPool(nominatorpooltypes.MsgCreateOfficialLiquidStakingPool{
+	poolID := "final-app-official-pool"
+	nominatorPoolMsg(t, source, sourceCtx, &nominatorpooltypes.MsgCreateOfficialLiquidStakingPool{
 		Authority:           initial.Params.Authority,
-		PoolID:              "final-app-official-pool",
+		PoolID:              poolID,
 		ContractAddressUser: contractUser,
 		ContractAddressRaw:  contractRaw,
 		PoolOperator:        nominatorPoolRawAddress("11"),
 		PoolCommissionBps:   100,
 		Height:              2,
 	})
-	require.NoError(t, err)
-	require.True(t, pool.OfficialLiquidStaking)
 
-	receipt, err := source.NominatorPoolKeeper.DepositToStakingPool(nominatorpooltypes.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
+	nominatorPoolMsg(t, source, sourceCtx, &nominatorpooltypes.MsgDepositToStakingPool{
+		PoolID:        poolID,
 		WalletAddress: userAddress,
 		Amount:        nominatorpooltypes.DefaultMinPoolDeposit,
 		Height:        3,
 	})
-	require.NoError(t, err)
-	require.Equal(t, userAddress, receipt.OwnerAddress)
-	require.Equal(t, contractUser, receipt.PoolContractAddressUser)
-	require.Equal(t, contractRaw, receipt.InternalMetadata.PoolContractAddressRaw)
-	require.Equal(t, userRaw, receipt.InternalMetadata.OwnerRaw)
-	require.Equal(t, nominatorpooltypes.DefaultMinPoolDeposit, receipt.Shares)
+	pool, found := source.NominatorPoolKeeper.NominatorPool(poolID)
+	require.True(t, found)
+	require.True(t, pool.OfficialLiquidStaking)
+	require.Equal(t, contractUser, pool.ContractAddressUser)
+	require.Equal(t, contractRaw, pool.ContractAddressRaw)
+	share, found := source.NominatorPoolKeeper.PoolShare(nominatorpooltypes.QueryPoolShareRequest{PoolID: poolID, Delegator: userRaw})
+	require.True(t, found)
+	require.Equal(t, nominatorpooltypes.DefaultMinPoolDeposit, share.Share.Shares)
 
 	exported, err := source.NominatorPoolKeeper.ExportGenesisState(sourceCtx)
 	require.NoError(t, err)
@@ -203,4 +199,13 @@ func nominatorPoolAddressPair(t *testing.T, hexByte string) (string, string) {
 	require.NoError(t, err)
 	user := addressing.FormatAccAddress(sdk.AccAddress(bz))
 	return user, raw
+}
+
+func nominatorPoolMsg(t *testing.T, app *L1App, ctx sdk.Context, msg sdk.Msg) interface{} {
+	t.Helper()
+	handler := app.MsgServiceRouter().Handler(msg)
+	require.NotNil(t, handler)
+	res, err := handler(ctx, msg)
+	require.NoError(t, err)
+	return res
 }

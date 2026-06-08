@@ -67,6 +67,7 @@ func (m msgServer) DepositToStakingPool(ctx context.Context, msg *types.MsgDepos
 	if msg == nil {
 		return nil, errors.New("empty nominator pool deposit request")
 	}
+	m.bindRuntimeContext(ctx)
 	msg.Height = defaultHeight(ctx, msg.Height)
 	receipt, err := m.keeper.DepositToStakingPool(*msg)
 	if err != nil {
@@ -252,6 +253,7 @@ func (m msgServer) CreateOfficialLiquidStakingPool(ctx context.Context, msg *typ
 	if msg == nil {
 		return nil, errors.New("empty official liquid staking pool creation request")
 	}
+	m.bindRuntimeContext(ctx)
 	msg.Height = defaultHeight(ctx, msg.Height)
 	pool, err := m.keeper.CreateOfficialLiquidStakingPool(*msg)
 	if err != nil {
@@ -297,4 +299,10 @@ func defaultHeight(ctx context.Context, provided uint64) uint64 {
 		return 1
 	}
 	return uint64(height)
+}
+
+func (m msgServer) bindRuntimeContext(ctx context.Context) {
+	if ctx != nil {
+		m.keeper.runtimeCtx = ctx
+	}
 }

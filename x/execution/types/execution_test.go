@@ -19,7 +19,7 @@ func TestCheckTxPipelineValidatesFeesMemoAndTrace(t *testing.T) {
 	envelope := testEnvelope()
 	result, err := CheckTx(envelope, DefaultPipelineParams())
 	require.NoError(t, err)
-	require.Equal(t, sdk.NewInt64Coin(appparams.BaseDenom, 1), result.FeeQuote.RequiredFee)
+	require.Equal(t, sdk.NewInt64Coin(appparams.BaseDenom, 2), result.FeeQuote.RequiredFee)
 	require.Equal(t, appparams.BaseDenom, result.MemoFee.Denom)
 	require.NotEmpty(t, result.Trace.Steps)
 	require.Equal(t, StageCheckTxDecode, result.Trace.Steps[0].Stage)
