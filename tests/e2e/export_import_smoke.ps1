@@ -118,16 +118,16 @@ function Assert-True {
 function Assert-CoinInBalance {
   param(
     [object]$Genesis,
-    [string]$Address,
+    [string[]]$Addresses,
     [string]$Denom,
     [int64]$MinAmount
   )
 
-  $entry = @($Genesis.app_state.bank.balances | Where-Object { $_.address -eq $Address } | Select-Object -First 1)
-  Assert-True ($entry.Count -eq 1) "missing bank balance entry for $Address"
+  $entry = @($Genesis.app_state.bank.balances | Where-Object { $Addresses -contains $_.address } | Select-Object -First 1)
+  Assert-True ($entry.Count -eq 1) "missing bank balance entry for $($Addresses -join ' or ')"
   $coin = @($entry[0].coins | Where-Object { $_.denom -eq $Denom } | Select-Object -First 1)
-  Assert-True ($coin.Count -eq 1) "missing $Denom balance for $Address in exported genesis"
-  Assert-True ([int64]$coin[0].amount -ge $MinAmount) "exported $Denom balance for $Address below $MinAmount"
+  Assert-True ($coin.Count -eq 1) "missing $Denom balance for $($entry[0].address) in exported genesis"
+  Assert-True ([int64]$coin[0].amount -ge $MinAmount) "exported $Denom balance for $($entry[0].address) below $MinAmount"
 }
 
 function Assert-NativeCommandFails {
@@ -177,6 +177,7 @@ try {
   $node1Home = Join-Path $OutputDir "node1\aetrad"
   $node0 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node0Home -KeyName "node0"
   $node1 = Get-LocalnetKeyAddress -Binary $Binary -NodeHome $node1Home -KeyName "node1"
+  $node1Raw = [string](Invoke-LocalnetCliJson -Binary $Binary -Arguments @("address", "convert", $node1)).raw
 
   Send-LocalnetBankTx -Binary $Binary -FromHome $node0Home -FromKey "node0" -ToAddress $node1 -Amount "12345naet" -Fees $Fees -ChainId $ChainId -RPCPort $node0Ports.RPC -TimeoutSeconds $TimeoutSeconds | Out-Null
   Write-Host "bank send flow committed"
@@ -202,7 +203,7 @@ try {
   Assert-True (@($genesis.app_state.fees.params.allowed_fee_denoms).Count -eq 1) "exported fees allowed denoms count mismatch"
   Assert-True (@($genesis.app_state.fees.params.allowed_fee_denoms) -contains "naet") "exported fees params missing naet"
 
-  Assert-CoinInBalance -Genesis $genesis -Address $node1 -Denom "naet" -MinAmount 12345
+  Assert-CoinInBalance -Genesis $genesis -Addresses @($node1, $node1Raw) -Denom "naet" -MinAmount 12345
 
   Assert-True ($genesis.app_state.staking.params.bond_denom -eq "naet") "exported staking bond denom mismatch"
   $exportedDelegation = @($genesis.app_state.staking.delegations | Where-Object { $_.delegator_address -eq $node0 -and $_.validator_address -eq $validator.operator_address } | Select-Object -First 1)
