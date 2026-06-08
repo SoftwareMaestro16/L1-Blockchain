@@ -120,6 +120,70 @@ func NewTestnetCmd(mm module.BasicManager, genBalIterator banktypes.GenesisBalan
 	return testnetCmd
 }
 
+// NewInitLocalnetCmd initializes a runnable single-host localnet using Aetra defaults.
+func NewInitLocalnetCmd(mm module.BasicManager, genBalIterator banktypes.GenesisBalancesIterator) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "init-localnet",
+		Short: "Initialize a single-host Aetra localnet with naet genesis balances and gentxs",
+		Long: fmt.Sprintf(`init-localnet is a convenience wrapper around testnet init-files.
+It writes node directories, genesis accounts, gentxs, and collected genesis files
+for a single-host localnet. Use --validator-count 1 for a one-node devnet or
+--validator-count 4 for a local multi-validator devnet.
+
+Example:
+	%s init-localnet --validator-count 4 --output-dir ./.localnet --chain-id aetra-local-1
+`, version.AppName),
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			serverCtx := server.GetServerContextFromCmd(cmd)
+			config := serverCtx.Config
+
+			args := initArgs{}
+			args.outputDir, _ = cmd.Flags().GetString(flagOutputDir)
+			args.keyringBackend, _ = cmd.Flags().GetString(flags.FlagKeyringBackend)
+			args.chainID, _ = cmd.Flags().GetString(flags.FlagChainID)
+			args.minGasPrices, _ = cmd.Flags().GetString(server.FlagMinGasPrices)
+			args.nodeDirPrefix, _ = cmd.Flags().GetString(flagNodeDirPrefix)
+			args.nodeDaemonHome, _ = cmd.Flags().GetString(flagNodeDaemonHome)
+			args.startingIPAddress, _ = cmd.Flags().GetString(flagStartingIPAddress)
+			args.listenIPAddress, _ = cmd.Flags().GetString(flagListenIPAddress)
+			args.numValidators, _ = cmd.Flags().GetInt(flagNumValidators)
+			args.algo, _ = cmd.Flags().GetString(flags.FlagKeyType)
+			args.bondTokenDenom, _ = cmd.Flags().GetString(flagStakingDenom)
+			args.singleMachine = true
+			config.Consensus.TimeoutCommit, err = cmd.Flags().GetDuration(flagCommitTimeout)
+			if err != nil {
+				return err
+			}
+			if args.chainID != "" {
+				if err := appparams.ValidateAetraTestnetChainID(args.chainID); err != nil {
+					return err
+				}
+			}
+
+			return initTestnetFiles(clientCtx, cmd, config, mm, genBalIterator, args)
+		},
+	}
+
+	addTestnetFlagsToCmd(cmd)
+	cmd.Flags().String(flagNodeDirPrefix, "node", "Prefix for per-validator directories")
+	cmd.Flags().String(flagNodeDaemonHome, "aetrad", "Home directory under each node directory")
+	cmd.Flags().String(flagStartingIPAddress, "127.0.0.1", "Starting IP address for generated peers")
+	cmd.Flags().String(flagListenIPAddress, "0.0.0.0", "RPC listen IP")
+	cmd.Flags().String(flags.FlagKeyringBackend, "test", "Keyring backend for generated localnet keys")
+	cmd.Flags().Duration(flagCommitTimeout, time.Second, "Time to wait after a block commit")
+	cmd.Flags().String(flagStakingDenom, appparams.BaseDenom, "Staking token denominator")
+	cmd.Flags().Lookup(flagNumValidators).DefValue = "1"
+	cmd.Flags().Lookup(server.FlagMinGasPrices).DefValue = "0" + appparams.BaseDenom
+	_ = cmd.Flags().Set(flagNumValidators, "1")
+	_ = cmd.Flags().Set(flagStakingDenom, appparams.BaseDenom)
+	_ = cmd.Flags().Set(server.FlagMinGasPrices, "0"+appparams.BaseDenom)
+	return cmd
+}
+
 // testnetInitFilesCmd returns a cmd to initialize all files for CometBFT testnet and application
 func testnetInitFilesCmd(mm module.BasicManager, genBalIterator banktypes.GenesisBalancesIterator) *cobra.Command {
 	cmd := &cobra.Command{
@@ -161,6 +225,11 @@ Example:
 			config.Consensus.TimeoutCommit, err = cmd.Flags().GetDuration(flagCommitTimeout)
 			if err != nil {
 				return err
+			}
+			if args.chainID != "" {
+				if err := appparams.ValidateAetraTestnetChainID(args.chainID); err != nil {
+					return err
+				}
 			}
 
 			return initTestnetFiles(clientCtx, cmd, config, mm, genBalIterator, args)
@@ -205,6 +274,11 @@ Example:
 			args.grpcAddress, _ = cmd.Flags().GetString(flagGRPCAddress)
 			args.printMnemonic, _ = cmd.Flags().GetBool(flagPrintMnemonic)
 			args.timeoutCommit, _ = cmd.Flags().GetDuration(flagCommitTimeout)
+			if args.chainID != "" {
+				if err := appparams.ValidateAetraTestnetChainID(args.chainID); err != nil {
+					return err
+				}
+			}
 
 			return startTestnet(cmd, args)
 		},

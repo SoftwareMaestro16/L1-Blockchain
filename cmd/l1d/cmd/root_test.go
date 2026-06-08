@@ -116,13 +116,25 @@ func TestPrototypeCommandsAreRegistered(t *testing.T) {
 		{"execution-os", "profiles"},
 		{"execution-os", "smoke"},
 		{"execution-os", "diagnostics"},
+		{"init-localnet"},
+		{"add-genesis-account"},
+		{"gentx"},
+		{"collect-gentxs"},
+		{"faucet", "send"},
+		{"balances"},
+		{"validators"},
+		{"system-addresses"},
 		{"query", "block"},
 		{"query", "bank", "balance"},
 		{"query", "staking", "validators"},
 		{"query", "slashing", "params"},
 		{"query", "fees", "params"},
+		{"query", "system", "config", "params"},
+		{"query", "system", "system-registry", "reserved-addresses"},
 		{"tx", "bank", "send"},
 		{"tx", "staking", "delegate"},
+		{"tx", "system", "config", "submit-change"},
+		{"tx", "system", "validator-registry", "register-validator"},
 		{"testnet", "init-files"},
 		{"testnet", "start"},
 	} {
@@ -209,6 +221,21 @@ func TestTestnetStartDoesNotPrintMnemonicByDefault(t *testing.T) {
 	flag := startCmd.Flags().Lookup("print-mnemonic")
 	require.NotNil(t, flag)
 	require.Equal(t, "false", flag.DefValue)
+}
+
+func TestInitLocalnetUsesNaetDefaults(t *testing.T) {
+	rootCmd := cmd.NewRootCmd()
+	initCmd := requireCommand(t, rootCmd, "init-localnet")
+
+	validatorCount := initCmd.Flags().Lookup("validator-count")
+	require.NotNil(t, validatorCount)
+	require.Equal(t, "1", validatorCount.DefValue)
+	stakingDenom := initCmd.Flags().Lookup("staking-denom")
+	require.NotNil(t, stakingDenom)
+	require.Equal(t, "naet", stakingDenom.DefValue)
+	minGas := initCmd.Flags().Lookup("minimum-gas-prices")
+	require.NotNil(t, minGas)
+	require.Equal(t, "0naet", minGas.DefValue)
 }
 
 func requireCommand(t *testing.T, root *cobra.Command, path ...string) *cobra.Command {

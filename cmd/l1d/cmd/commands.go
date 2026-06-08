@@ -27,7 +27,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 )
 
 // initCometBFTConfig helps to override default CometBFT Config values.
@@ -112,7 +114,12 @@ func initRootCmd(
 
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(basicManager, l1app.DefaultNodeHome),
+		NewInitLocalnetCmd(basicManager, banktypes.GenesisBalancesIterator{}),
 		NewTestnetCmd(basicManager, banktypes.GenesisBalancesIterator{}),
+		NewFaucetCmd(),
+		NewBalancesCmd(),
+		NewValidatorsCmd(),
+		NewSystemAddressesCmd(),
 		debugCmd,
 		confixcmd.ConfigCommand(),
 		pruning.Cmd(newApp, l1app.DefaultNodeHome),
@@ -130,6 +137,9 @@ func initRootCmd(
 	// add keybase, auxiliary RPC, query, genesis, and tx child commands
 	rootCmd.AddCommand(
 		server.StatusCommand(),
+		topLevelGenesisAccountCmd(txConfig),
+		topLevelGenTxCmd(txConfig, basicManager),
+		topLevelCollectGenTxsCmd(txConfig, basicManager),
 		genesisCommand(txConfig, basicManager),
 		queryCommand(),
 		txCommand(),
@@ -165,6 +175,7 @@ func queryCommand() *cobra.Command {
 		authcmd.QueryTxCmd(),
 		server.QueryBlockResultsCmd(),
 		NewAVMQueryCmd(),
+		NewSystemQueryCmd(),
 	)
 
 	return cmd
@@ -190,8 +201,40 @@ func txCommand() *cobra.Command {
 		authcmd.GetDecodeCommand(),
 		authcmd.GetSimulateCmd(),
 		NewAVMTxCmd(),
+		NewSystemTxCmd(),
 	)
 
+	return cmd
+}
+
+func topLevelGenesisAccountCmd(txConfig client.TxConfig) *cobra.Command {
+	cmd := genutilcli.AddGenesisAccountCmd(l1app.DefaultNodeHome, txConfig.SigningContext().AddressCodec())
+	cmd.Use = "add-genesis-account [address_or_key_name] [coin][,[coin]]"
+	cmd.Short = "Add a genesis account using Aetra AE... addresses and naet balances"
+	return cmd
+}
+
+func topLevelGenTxCmd(txConfig client.TxConfig, basicManager module.BasicManager) *cobra.Command {
+	cmd := genutilcli.GenTxCmd(
+		basicManager,
+		txConfig,
+		banktypes.GenesisBalancesIterator{},
+		l1app.DefaultNodeHome,
+		txConfig.SigningContext().ValidatorAddressCodec(),
+	)
+	cmd.Short = "Create a genesis validator transaction using naet self-delegation"
+	return cmd
+}
+
+func topLevelCollectGenTxsCmd(txConfig client.TxConfig, basicManager module.BasicManager) *cobra.Command {
+	gentxModule := basicManager[genutiltypes.ModuleName].(genutil.AppModuleBasic)
+	cmd := genutilcli.CollectGenTxsCmd(
+		banktypes.GenesisBalancesIterator{},
+		l1app.DefaultNodeHome,
+		gentxModule.GenTxValidator,
+		txConfig.SigningContext().ValidatorAddressCodec(),
+	)
+	cmd.Short = "Collect gentxs into genesis for localnet/testnet startup"
 	return cmd
 }
 
