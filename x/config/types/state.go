@@ -13,11 +13,14 @@ import (
 )
 
 const (
-	MaxConfigEntriesV1    = uint32(128)
-	MaxConfigKeyBytesV1   = uint32(96)
-	MaxConfigValueBytesV1 = uint32(4096)
-	MaxPendingChangesV1   = uint32(128)
-	MaxChangeIDBytesV1    = uint32(96)
+	MaxConfigEntriesV1     = uint32(128)
+	MaxConfigKeyBytesV1    = uint32(96)
+	MaxConfigValueBytesV1  = uint32(4096)
+	MaxPendingChangesV1    = uint32(128)
+	MaxChangeIDBytesV1     = uint32(96)
+	DefaultActivationDelay = uint64(10)
+	DefaultCriticalDelay   = uint64(100)
+	DefaultEpochLength     = uint64(50)
 
 	OperationSet    = "set"
 	OperationDelete = "delete"
@@ -45,6 +48,9 @@ type Params struct {
 	MaxKeyBytes               uint32
 	MaxValueBytes             uint32
 	MaxChangeIDBytes          uint32
+	MinActivationDelay        uint64
+	CriticalActivationDelay   uint64
+	ActivationEpochLength     uint64
 	BaseDenom                 string
 	RequiredSystemAccountKeys []string
 }
@@ -70,8 +76,11 @@ type ConfigChange struct {
 	ExecutedBy                          string
 	Reason                              string
 	RequiresConstitutionalException     bool
+	Critical                            bool
 	CreatedHeight                       int64
 	UpdatedHeight                       int64
+	ActivationHeight                    int64
+	ActivationEpoch                     uint64
 	ExpectedPreviousVersion             uint64
 	AllowMissingExpectedPreviousVersion bool
 }
@@ -89,6 +98,9 @@ func DefaultParams() Params {
 		MaxKeyBytes:               MaxConfigKeyBytesV1,
 		MaxValueBytes:             MaxConfigValueBytesV1,
 		MaxChangeIDBytes:          MaxChangeIDBytesV1,
+		MinActivationDelay:        DefaultActivationDelay,
+		CriticalActivationDelay:   DefaultCriticalDelay,
+		ActivationEpochLength:     DefaultEpochLength,
 		BaseDenom:                 appparams.BaseDenom,
 		RequiredSystemAccountKeys: []string{"system/account/fee_collector", "system/account/treasury"},
 	}
@@ -112,6 +124,12 @@ func (p Params) Validate() error {
 	}
 	if p.MaxChangeIDBytes == 0 || p.MaxChangeIDBytes > MaxChangeIDBytesV1 {
 		return fmt.Errorf("config max change id bytes must be between 1 and %d", MaxChangeIDBytesV1)
+	}
+	if p.CriticalActivationDelay < p.MinActivationDelay {
+		return errors.New("config critical activation delay must be >= minimum activation delay")
+	}
+	if p.ActivationEpochLength == 0 {
+		return errors.New("config activation epoch length must be positive")
 	}
 	if strings.TrimSpace(p.BaseDenom) != p.BaseDenom || p.BaseDenom == "" {
 		return errors.New("config base denom must be canonical")
@@ -212,6 +230,15 @@ func (c ConfigChange) Validate(params Params) error {
 	}
 	if c.UpdatedHeight < c.CreatedHeight {
 		return errors.New("config change updated height must not precede created height")
+	}
+	if c.ActivationHeight != 0 {
+		if c.ActivationHeight < c.CreatedHeight {
+			return errors.New("config change activation height must not precede created height")
+		}
+		expectedEpoch := ActivationEpoch(uint64(c.ActivationHeight), params.ActivationEpochLength)
+		if c.ActivationEpoch != expectedEpoch {
+			return fmt.Errorf("config change activation epoch mismatch: expected %d got %d", expectedEpoch, c.ActivationEpoch)
+		}
 	}
 	if c.Operation == OperationDelete && c.Value != "" {
 		return errors.New("config delete change value must be empty")
@@ -465,6 +492,41 @@ func ValidateChangeAgainstState(params Params, state ConfigState, change ConfigC
 		}
 	}
 	return nil
+}
+
+func IsCriticalConfigKey(key string) bool {
+	return key == KeyConsensusMaxBlockGas ||
+		key == KeyStorageRentPerByteEpoch ||
+		key == KeyStorageContractStateActive ||
+		strings.HasPrefix(key, "avm/") ||
+		strings.HasPrefix(key, "consensus/") ||
+		strings.HasPrefix(key, "module/") ||
+		strings.HasPrefix(key, "system/")
+}
+
+func ActivationHeight(params Params, key string, createdHeight int64) (int64, uint64) {
+	if createdHeight < 0 {
+		createdHeight = 0
+	}
+	delay := params.MinActivationDelay
+	if IsCriticalConfigKey(key) {
+		delay = params.CriticalActivationDelay
+	}
+	height := uint64(createdHeight) + delay
+	if params.ActivationEpochLength > 0 {
+		remainder := height % params.ActivationEpochLength
+		if remainder != 0 {
+			height += params.ActivationEpochLength - remainder
+		}
+	}
+	return int64(height), ActivationEpoch(height, params.ActivationEpochLength)
+}
+
+func ActivationEpoch(height uint64, epochLength uint64) uint64 {
+	if epochLength == 0 {
+		return 0
+	}
+	return height / epochLength
 }
 
 func isRequiredSystemAccount(params Params, key string) bool {

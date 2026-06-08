@@ -38,6 +38,24 @@ type StorageRentState struct {
 	Contracts     []ContractRentRecord
 	Distributions []RentDistributionRecord
 	Exemptions    []RentExemption
+	SystemReserve SystemRentReserve
+}
+
+type SystemRentReserve struct {
+	AvailableFunds                   uint64
+	ProjectedRentPerBlock            uint64
+	WarningRunwayBlocks              uint64
+	CriticalRunwayBlocks             uint64
+	FeeCollectorBalance              uint64
+	TreasuryBalance                  uint64
+	GovernanceConfiguredPayerBalance uint64
+	RequiredTopUp                    uint64
+	ProtocolCriticalExecutable       bool
+	LastRunwayBlocks                 uint64
+	LastAlert                        string
+	LastTopUpAmount                  uint64
+	LastRemainingDebt                uint64
+	LastUpdatedHeight                uint64
 }
 
 type ContractRentRecord struct {
@@ -128,6 +146,13 @@ func EmptyStorageRentState() StorageRentState {
 		Contracts:     []ContractRentRecord{},
 		Distributions: []RentDistributionRecord{},
 		Exemptions:    []RentExemption{},
+		SystemReserve: DefaultSystemRentReserve(),
+	}
+}
+
+func DefaultSystemRentReserve() SystemRentReserve {
+	return SystemRentReserve{
+		ProtocolCriticalExecutable: true,
 	}
 }
 
@@ -161,6 +186,7 @@ func (s StorageRentState) Export() StorageRentState {
 		Contracts:     cloneContracts(s.Contracts),
 		Distributions: cloneDistributions(s.Distributions),
 		Exemptions:    cloneExemptions(s.Exemptions),
+		SystemReserve: s.SystemReserve,
 	}
 	SortContracts(out.Contracts)
 	SortDistributions(out.Distributions)
@@ -207,7 +233,49 @@ func (s StorageRentState) Validate(params StorageRentParams) error {
 			return fmt.Errorf("storage rent distribution references unknown contract %q", distribution.ContractAddress)
 		}
 	}
+	if err := s.SystemReserve.Validate(); err != nil {
+		return err
+	}
 	return nil
+}
+
+func (r SystemRentReserve) Validate() error {
+	if r.CriticalRunwayBlocks > r.WarningRunwayBlocks {
+		return errors.New("storage rent system critical runway must not exceed warning runway")
+	}
+	switch r.LastAlert {
+	case "", SystemRentAlertWarning, SystemRentAlertCritical, SystemRentAlertInvariant:
+		return nil
+	default:
+		return fmt.Errorf("unsupported storage rent system alert %q", r.LastAlert)
+	}
+}
+
+func (r SystemRentReserve) Accounting() SystemRentAccounting {
+	return SystemRentAccounting{
+		AvailableFunds:                   r.AvailableFunds,
+		ProjectedRentPerBlock:            r.ProjectedRentPerBlock,
+		WarningRunwayBlocks:              r.WarningRunwayBlocks,
+		CriticalRunwayBlocks:             r.CriticalRunwayBlocks,
+		FeeCollectorBalance:              r.FeeCollectorBalance,
+		TreasuryBalance:                  r.TreasuryBalance,
+		GovernanceConfiguredPayerBalance: r.GovernanceConfiguredPayerBalance,
+		RequiredTopUp:                    r.RequiredTopUp,
+		ProtocolCriticalExecutable:       r.ProtocolCriticalExecutable,
+	}
+}
+
+func (r SystemRentReserve) Evaluate() SystemRentResult {
+	return ComputeSystemRentAccounting(r.Accounting())
+}
+
+func (r SystemRentReserve) WithResult(height uint64, result SystemRentResult) SystemRentReserve {
+	r.LastRunwayBlocks = result.RunwayBlocks
+	r.LastAlert = result.Alert
+	r.LastTopUpAmount = result.TopUpAmount
+	r.LastRemainingDebt = result.RemainingDebt
+	r.LastUpdatedHeight = height
+	return r
 }
 
 func (c ContractRentRecord) Normalize() ContractRentRecord {

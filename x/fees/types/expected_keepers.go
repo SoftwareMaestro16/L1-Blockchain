@@ -12,4 +12,9 @@ type AccountKeeper interface {
 
 type BankKeeper interface {
 	GetAllBalances(ctx context.Context, addr sdk.AccAddress) sdk.Coins
+	SendCoinsFromModuleToModule(ctx context.Context, senderModule, recipientModule string, amt sdk.Coins) error
+}
+
+type FeeCollectorKeeper interface {
+	RecordCollectedFees(ctx context.Context, fees sdk.Coins, feeType string) error
 }

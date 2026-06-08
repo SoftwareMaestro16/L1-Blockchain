@@ -18,6 +18,10 @@ const (
 	DefaultMaxTxGas               = uint64(1_000_000)
 	DefaultMaxBlockGas            = uint64(20_000_000)
 	DefaultMaxBlockTxs            = uint64(5_000)
+	DefaultMaxTxBytes             = uint64(256 * 1024)
+	DefaultMaxMemoBytes           = uint64(1024)
+	DefaultMaxMessagesPerTx       = uint64(16)
+	DefaultMinGasPriceUnitGas     = uint64(100_000)
 	DefaultSenderTxsPerBlock      = uint64(25)
 	DefaultStakeAllowanceStep     = "1000000000"
 	DefaultStakeSenderTxsPerBlock = uint64(250)
@@ -45,6 +49,48 @@ type AdmissionInput struct {
 	SenderStake      sdkmath.Int
 }
 
+type TxEnvelopeLimits struct {
+	MaxTxBytes       uint64
+	MaxMemoBytes     uint64
+	MaxMessagesPerTx uint64
+}
+
+type TxEnvelopeInput struct {
+	TxBytes  uint64
+	Memo     string
+	MsgCount uint64
+}
+
+func DefaultTxEnvelopeLimits() TxEnvelopeLimits {
+	return TxEnvelopeLimits{
+		MaxTxBytes:       DefaultMaxTxBytes,
+		MaxMemoBytes:     DefaultMaxMemoBytes,
+		MaxMessagesPerTx: DefaultMaxMessagesPerTx,
+	}
+}
+
+func ValidateTxEnvelope(limits TxEnvelopeLimits, in TxEnvelopeInput) error {
+	if limits.MaxTxBytes == 0 {
+		limits.MaxTxBytes = DefaultMaxTxBytes
+	}
+	if limits.MaxMemoBytes == 0 {
+		limits.MaxMemoBytes = DefaultMaxMemoBytes
+	}
+	if limits.MaxMessagesPerTx == 0 {
+		limits.MaxMessagesPerTx = DefaultMaxMessagesPerTx
+	}
+	if in.TxBytes > limits.MaxTxBytes {
+		return ErrInvalidFee.Wrapf("tx size %d exceeds max_tx_bytes %d", in.TxBytes, limits.MaxTxBytes)
+	}
+	if uint64(len([]byte(in.Memo))) > limits.MaxMemoBytes {
+		return ErrInvalidFee.Wrapf("memo size %d exceeds max_memo_bytes %d", len([]byte(in.Memo)), limits.MaxMemoBytes)
+	}
+	if in.MsgCount > limits.MaxMessagesPerTx {
+		return ErrInvalidFee.Wrapf("message count %d exceeds max_messages_per_tx %d", in.MsgCount, limits.MaxMessagesPerTx)
+	}
+	return nil
+}
+
 func QuoteFee(params Params, gasLimit, blockGasConsumed uint64) (FeeQuote, error) {
 	params = NormalizeParams(params)
 	if err := params.Validate(); err != nil {
@@ -60,6 +106,13 @@ func QuoteFee(params Params, gasLimit, blockGasConsumed uint64) (FeeQuote, error
 	}
 	utilization := BlockUtilizationBps(blockGasConsumed, gasLimit, params.MaxBlockGas)
 	required := DynamicFeeAmount(baseFee, maxFee, params.TargetBlockUtilizationBps, utilization)
+	minGasFee, err := MinimumGasPriceFee(params, gasLimit)
+	if err != nil {
+		return FeeQuote{}, err
+	}
+	if required.LT(minGasFee) {
+		required = minGasFee
+	}
 	accepted := required
 	if accepted.GT(maxFee) {
 		accepted = maxFee
@@ -82,6 +135,19 @@ func QuoteFee(params Params, gasLimit, blockGasConsumed uint64) (FeeQuote, error
 		AcceptedFeeAmount: accepted,
 		EconomicControl:   economicControl,
 	}, nil
+}
+
+func MinimumGasPriceFee(params Params, gasLimit uint64) (sdkmath.Int, error) {
+	params = NormalizeParams(params)
+	minFee, err := params.MinFeeInt()
+	if err != nil {
+		return sdkmath.Int{}, err
+	}
+	if gasLimit == 0 {
+		return minFee, nil
+	}
+	units := (gasLimit + DefaultMinGasPriceUnitGas - 1) / DefaultMinGasPriceUnitGas
+	return minFee.MulRaw(int64(units)), nil // #nosec G115 -- gas units are bounded by MaxTxGas validation before admission.
 }
 
 func ValidateAdmission(params Params, in AdmissionInput) (FeeQuote, error) {
