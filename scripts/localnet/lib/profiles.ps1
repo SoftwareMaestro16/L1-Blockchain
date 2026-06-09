@@ -1,5 +1,8 @@
 $script:LocalnetProfiles = @(
   "base",
+  "localnet-3",
+  "localnet-4",
+  "localnet-5",
   "execution-os-sim",
   "zones-prototype",
   "mesh-prototype",
@@ -16,6 +19,18 @@ function Assert-LocalnetProfile {
 
 function Get-LocalnetProfiles {
   return $script:LocalnetProfiles
+}
+
+function Get-LocalnetProfileNodeCount {
+  param([string]$Profile)
+
+  switch ($Profile) {
+    "base" { return 3 }
+    "localnet-3" { return 3 }
+    "localnet-4" { return 4 }
+    "localnet-5" { return 5 }
+    default { return 3 }
+  }
 }
 
 function New-LocalnetSha256Hex {
@@ -172,6 +187,9 @@ function Write-LocalnetProfileManifest {
   $resolved = Resolve-LocalnetPath -Path $OutputDir -DefaultRelativePath ".localnet"
   $enabled = switch ($Profile) {
     "base" { @() }
+    "localnet-3" { @() }
+    "localnet-4" { @() }
+    "localnet-5" { @() }
     "execution-os-sim" { @("load", "routing") }
     "zones-prototype" { @("load", "routing", "zones") }
     "mesh-prototype" { @("load", "routing", "zones", "mesh") }

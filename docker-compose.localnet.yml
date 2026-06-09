@@ -1,0 +1,98 @@
+# Aetra Localnet Docker Compose
+# This is a sample configuration for localnet testing
+# It does not replace the PowerShell localnet scripts
+# Run with: docker-compose -f docker-compose.localnet.yml up
+
+version: '3.8'
+
+services:
+  aetra-validator-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aetra-validator-1
+    image: aetra/localnet:latest
+    ports:
+      - "26656:26656"
+      - "26657:26657"
+      - "1317:1317"
+      - "9090:9090"
+      - "6060:6060"
+    environment:
+      - AETRA_CHAIN_ID=aetra-local-1
+      - AETRA_HOME=/home/aetra/.aetrad
+      - AETRA_LOG_LEVEL=info
+      - AETRA_MINIMUM_GAS_PRICES=0naet
+    volumes:
+      - aetra-node1-data:/home/aetra/.aetrad
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:26657/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    command: start --home /home/aetra/.aetrad --log_level info
+
+  aetra-validator-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aetra-validator-2
+    image: aetra/localnet:latest
+    ports:
+      - "26666:26656"
+      - "26667:26657"
+      - "1327:1317"
+      - "9092:9090"
+      - "6070:6060"
+    environment:
+      - AETRA_CHAIN_ID=aetra-local-1
+      - AETRA_HOME=/home/aetra/.aetrad
+      - AETRA_LOG_LEVEL=info
+      - AETRA_MINIMUM_GAS_PRICES=0naet
+    volumes:
+      - aetra-node2-data:/home/aetra/.aetrad
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:26657/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    command: start --home /home/aetra/.aetrad --log_level info
+
+  aetra-validator-3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aetra-validator-3
+    image: aetra/localnet:latest
+    ports:
+      - "26676:26656"
+      - "26677:26657"
+      - "1337:1317"
+      - "9094:9090"
+      - "6080:6060"
+    environment:
+      - AETRA_CHAIN_ID=aetra-local-1
+      - AETRA_HOME=/home/aetra/.aetrad
+      - AETRA_LOG_LEVEL=info
+      - AETRA_MINIMUM_GAS_PRICES=0naet
+    volumes:
+      - aetra-node3-data:/home/aetra/.aetrad
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:26657/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    command: start --home /home/aetra/.aetrad --log_level info
+
+volumes:
+  aetra-node1-data:
+  aetra-node2-data:
+  aetra-node3-data:
+
+# Note: This is a sample configuration for testing only.
+# For production localnet setup, use the PowerShell scripts:
+#   scripts/localnet/init.ps1 -Profile localnet-4 -ValidatorCount 4
+#   scripts/localnet/start.ps1 -Profile localnet-4

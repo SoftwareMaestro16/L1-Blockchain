@@ -71,3 +71,20 @@ vendor/
 Thumbs.db
 .vscode/
 .idea/
+
+# Private research and planning docs
+AUDIT_RESULTS_V2.md
+AVM.md
+BLOCKCHAIN.md
+COMPONENTS.md
+DNS.md
+ECONOMICS.md
+NETWORKING.md
+NEXT_ARCHITECTURE.md
+PAYMENTS.md
+POS.md
+UPDATE.md
+architecture.md
+SYSTEM_ENTETIES.md
+SERVICES.md
+TO_AUDIT_V2.md
