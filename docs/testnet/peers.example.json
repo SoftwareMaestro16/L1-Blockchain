@@ -1,0 +1,36 @@
+{
+  "network": "aetra-testnet-1",
+  "version": "1.0.0",
+  "peers": [
+    {
+      "id": "NODE_ID_1@IP:PORT",
+      "node_id": "NODE_ID_1",
+      "address": "IP:PORT",
+      "persistent": true,
+      "description": "Validator node 1"
+    },
+    {
+      "id": "NODE_ID_2@IP:PORT",
+      "node_id": "NODE_ID_2",
+      "address": "IP:PORT",
+      "persistent": true,
+      "description": "Validator node 2"
+    },
+    {
+      "id": "NODE_ID_3@IP:PORT",
+      "node_id": "NODE_ID_3",
+      "address": "IP:PORT",
+      "persistent": false,
+      "description": "Seed/observer node 3"
+    }
+  ],
+  "seeds": [
+    {
+      "id": "SEED_NODE_ID@SEED_IP:SEED_PORT",
+      "address": "SEED_IP:SEED_PORT",
+      "description": "Primary seed node"
+    }
+  ],
+  "config_format": "cometbft_p2p_peers",
+  "usage": "Add to config.toml: persistent_peers = \"PEER_IDS...\""
+}

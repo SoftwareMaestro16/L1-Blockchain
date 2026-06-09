@@ -1,0 +1,17 @@
+# Aetra Testnet Seed Nodes
+# Format: node_id@host:port
+# Generated: 2026-06-09
+
+# Primary seed nodes
+SEED_NODE_ID_1@seed1.aetra-testnet.example.com:26656
+SEED_NODE_ID_2@seed2.aetra-testnet.example.com:26656
+
+# Backup seed nodes
+SEED_NODE_ID_3@backup-seed.aetra-testnet.example.com:26656
+
+# Usage:
+# Add to ~/.aetrad/config/config.toml:
+#   seeds = "SEED_NODE_ID_1@seed1.aetra-testnet.example.com:26656,SEED_NODE_ID_2@seed2.aetra-testnet.example.com:26656"
+
+# Persistent peers (for validators):
+# persistent_peers = "NODE_ID_1@validator1.example.com:26656,NODE_ID_2@validator2.example.com:26656"
