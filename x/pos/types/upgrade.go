@@ -935,28 +935,6 @@ type PosModuleBoundaryManifest struct {
 	Root       string
 }
 
-type PosMessageSpec struct {
-	ModuleName     string
-	MessageName    string
-	SignerRole     string
-	StateScope     string
-	RequiredPhase  string
-	IdempotencyKey string
-}
-
-type PosQuerySpec struct {
-	ModuleName       string
-	QueryName        string
-	ResponseScope    string
-	ConsistencyModel string
-}
-
-type PosMessageQueryManifest struct {
-	Messages []PosMessageSpec
-	Queries  []PosQuerySpec
-	Root     string
-}
-
 type KeeperInterfaceSpec struct {
 	KeeperName       string
 	ModuleName       string
@@ -999,102 +977,6 @@ type ModuleExportImportSpec struct {
 	DeterministicEncoding bool
 }
 
-type PosMigrationPhaseSpec struct {
-	PhaseID                  uint32
-	Name                     string
-	Scope                    string
-	Modules                  []string
-	Tasks                    []string
-	ExitCriteria             []string
-	PreservesExistingStaking bool
-	ReadOnlyUntilExit        bool
-	DependsOn                []uint32
-}
-
-type PosMigrationStrategyManifest struct {
-	Phases []PosMigrationPhaseSpec
-	Root   string
-}
-
-type PosTestCoverageSpec struct {
-	Name            string
-	TestType        string
-	ModuleName      string
-	CoverageTarget  string
-	Assertions      []string
-	MigrationPhases []uint32
-}
-
-type PosRequiredTestCoverageManifest struct {
-	UnitTests        []PosTestCoverageSpec
-	IntegrationTests []PosTestCoverageSpec
-	InvariantTests   []PosTestCoverageSpec
-	SimulationTests  []PosTestCoverageSpec
-	PerformanceTests []PosTestCoverageSpec
-	Root             string
-}
-
-type PosMetricSpec struct {
-	Name        string
-	ModuleName  string
-	MetricType  string
-	Aggregation string
-	Labels      []string
-}
-
-type PosEventSpec struct {
-	Name       string
-	ModuleName string
-	Attributes []string
-}
-
-type PosAlertSpec struct {
-	Name           string
-	ModuleName     string
-	Severity       string
-	Trigger        string
-	MetricRefs     []string
-	EventRefs      []string
-	MitigationHint string
-}
-
-type PosObservabilityManifest struct {
-	Metrics []PosMetricSpec
-	Events  []PosEventSpec
-	Alerts  []PosAlertSpec
-	Root    string
-}
-
-type PosGovernanceParameterSpec struct {
-	Category        string
-	Name            string
-	ModuleName      string
-	ValueKind       string
-	UpdateAuthority string
-	SafetyLevel     string
-}
-
-type PosGovernanceParameterManifest struct {
-	Parameters []PosGovernanceParameterSpec
-	Root       string
-}
-
-type PosAcceptanceCriterionSpec struct {
-	Name             string
-	Requirement      string
-	ModuleNames      []string
-	EvidenceRefs     []string
-	QueryRefs        []string
-	TestCoverageRefs []string
-	MigrationPhases  []uint32
-	PlanningGate     string
-}
-
-type PosAcceptanceCriteriaManifest struct {
-	Criteria []PosAcceptanceCriterionSpec
-	Root     string
-}
-
 type KeeperIntegrationManifest struct {
 	KeeperInterfaces      []KeeperInterfaceSpec
 	StakingLifecycleHooks []KeeperHookSpec
@@ -1115,59 +997,6 @@ type StateKeySpec struct {
 type StateModelManifest struct {
 	Keys []StateKeySpec
 	Root string
-}
-
-type RootCommitmentSpec struct {
-	Name       string
-	StateModel string
-	Source     string
-}
-
-type RootCommitmentManifest struct {
-	Roots []RootCommitmentSpec
-	Root  string
-}
-
-type StateRootCommitments struct {
-	EpochRoot          string
-	ValidatorScoreRoot string
-	TaskGroupRoot      string
-	EvidenceRoot       string
-	PerformanceRoot    string
-	SlashingRoot       string
-	RiskWindowRoot     string
-}
-
-type PosStateValidatorScoreRecord struct {
-	EpochID          uint64
-	ValidatorAddress string
-	RawStakeNaet     sdkmath.Int
-	EffectiveStake   sdkmath.Int
-	Score            sdkmath.Int
-}
-
-type RiskWindowFaultCheck struct {
-	StakeOwner       string
-	ValidatorAddress string
-	FaultEpoch       uint64
-	EvidenceEpoch    uint64
-}
-
-type StateInvariantInput struct {
-	ActiveEpochID              uint64
-	ActiveValidators           []ScoredValidator
-	ScoreRecords               []PosStateValidatorScoreRecord
-	TaskGroups                 []TaskGroup
-	EvidenceRecords            []EvidenceRecord
-	EvidenceVerificationGroups []EvidenceVerificationGroup
-	SlashingRecords            []SlashingRecord
-	RiskWindows                []RiskWindowRecord
-	RiskWindowFaultChecks      []RiskWindowFaultCheck
-}
-
-type StateInvariantReport struct {
-	Passed           bool
-	FailedInvariants []string
 }
 
 func (p CentralizationControlParams) Validate() error {
@@ -1355,17 +1184,6 @@ func OptionalPoSModuleNames(manifest CosmosSDKCompatibilityManifest) []string {
 	return out
 }
 
-func knownPoSModuleNames(manifest CosmosSDKCompatibilityManifest) map[string]struct{} {
-	known := make(map[string]struct{}, len(manifest.Extensions)+len(manifest.Modules))
-	for _, extension := range manifest.Extensions {
-		known[extension.ModuleName] = struct{}{}
-	}
-	for _, module := range manifest.Modules {
-		known[module.ModuleName] = struct{}{}
-	}
-	return known
-}
-
 func (m CosmosSDKCompatibilityManifest) Validate() error {
 	if len(m.Extensions) == 0 {
 		return errors.New("cosmos sdk compatibility extensions are required")
@@ -1509,7 +1327,7 @@ func (m PosCompatibilityMiddleware) Validate(extensions map[string]struct{}, mod
 }
 
 func ComputeCosmosSDKCompatibilityRoot(manifest CosmosSDKCompatibilityManifest) string {
-	return posHashRoot("aetra-pos-cosmos-sdk-compatibility-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-cosmos-sdk-compatibility-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Extensions)))
 		for _, extension := range manifest.Extensions {
 			posWritePart(w, extension.ModuleName)
@@ -1545,7 +1363,7 @@ func DefaultPoSModuleBoundaryManifest() PosModuleBoundaryManifest {
 				Owns:           []string{"epoch lifecycle", "phase transitions", "epoch seed", "epoch queries"},
 				ReadsModules:   []string{"staking"},
 				WritesModules:  []string{"epoch"},
-				QueryEndpoints: []string{"QueryCurrentEpoch", "QueryEpoch"},
+				QueryEndpoints: []string{"QueryCurrentEpoch", "QueryEpochHistory"},
 			},
 			{
 				ModuleName:     "validator_economy",
@@ -1553,7 +1371,7 @@ func DefaultPoSModuleBoundaryManifest() PosModuleBoundaryManifest {
 				Owns:           []string{"validator score", "effective stake", "stake saturation", "election ranking", "role eligibility"},
 				ReadsModules:   []string{"staking", "slashing", "performance"},
 				WritesModules:  []string{"validator_economy"},
-				QueryEndpoints: []string{"QueryValidatorScore", "QueryValidatorEffectiveStake", "QueryValidatorSaturation", "QueryElectionRanking", "QueryValidatorRoleEligibility"},
+				QueryEndpoints: []string{"QueryValidatorScore", "QueryElectionRanking", "QueryValidatorSaturation", "QueryRoleEligibility"},
 			},
 			{
 				ModuleName:     "taskgroups",
@@ -1561,7 +1379,7 @@ func DefaultPoSModuleBoundaryManifest() PosModuleBoundaryManifest {
 				Owns:           []string{"workload registry", "task group assignment", "proposer rotation", "verification groups"},
 				ReadsModules:   []string{"epoch", "validator_economy", "staking"},
 				WritesModules:  []string{"taskgroups"},
-				QueryEndpoints: []string{"QueryTaskGroup", "QueryTaskGroupsByValidator", "QueryProposerForSlot", "QueryWorkloadRegistry", "QueryVerificationGroup"},
+				QueryEndpoints: []string{"QueryWorkloadRegistry", "QueryTaskGroup", "QueryProposerRotation", "QueryVerificationGroup"},
 			},
 			{
 				ModuleName:     "evidence",
@@ -1569,7 +1387,7 @@ func DefaultPoSModuleBoundaryManifest() PosModuleBoundaryManifest {
 				Owns:           []string{"structured evidence records", "evidence deposits", "verification group decisions", "reporter rewards"},
 				ReadsModules:   []string{"taskgroups", "staking", "slashing"},
 				WritesModules:  []string{"evidence", "slashing", "distribution"},
-				QueryEndpoints: []string{"QueryEvidence", "QueryEvidenceByValidator", "QueryEvidenceDeposit", "QueryEvidenceDecision", "QueryReporterRewards"},
+				QueryEndpoints: []string{"QueryEvidenceRecord", "QueryEvidenceDeposit", "QueryEvidenceDecision", "QueryReporterRewards"},
 			},
 			{
 				ModuleName:     "performance",
@@ -1677,7 +1495,7 @@ func PoSModuleBoundaryByName(manifest PosModuleBoundaryManifest, moduleName stri
 }
 
 func ComputePoSModuleBoundaryRoot(manifest PosModuleBoundaryManifest) string {
-	return posHashRoot("aetra-pos-module-boundaries-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-module-boundaries-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Boundaries)))
 		for _, boundary := range manifest.Boundaries {
 			posWritePart(w, boundary.ModuleName)
@@ -1688,1651 +1506,6 @@ func ComputePoSModuleBoundaryRoot(manifest PosModuleBoundaryManifest) string {
 			posWriteStringSlice(w, boundary.QueryEndpoints)
 		}
 	})
-}
-
-func DefaultPosMessageQueryManifest() PosMessageQueryManifest {
-	manifest := PosMessageQueryManifest{
-		Messages: []PosMessageSpec{
-			{ModuleName: "epoch", MessageName: "MsgStartEpoch", SignerRole: "authority", StateScope: "start epoch lifecycle", RequiredPhase: "any", IdempotencyKey: "epoch_id"},
-			{ModuleName: "epoch", MessageName: "MsgAdvanceEpochPhase", SignerRole: "authority", StateScope: "advance epoch phase", RequiredPhase: "any", IdempotencyKey: "epoch_id_phase"},
-			{ModuleName: "epoch", MessageName: "MsgFinalizeEpochSettlement", SignerRole: "authority", StateScope: "finalize settlement rewards penalties and roots", RequiredPhase: string(EpochPhaseSettlement), IdempotencyKey: "epoch_id"},
-			{ModuleName: "validator_economy", MessageName: "MsgDeclareValidatorCapacity", SignerRole: "validator", StateScope: "declare workload capacity", RequiredPhase: string(EpochPhaseDelegation), IdempotencyKey: "validator_epoch"},
-			{ModuleName: "validator_economy", MessageName: "MsgUpdateValidatorMetadata", SignerRole: "validator", StateScope: "update validator marketplace metadata", RequiredPhase: "any", IdempotencyKey: "validator_height"},
-			{ModuleName: "delegation_market", MessageName: "MsgSetDelegationRiskProfile", SignerRole: "delegator", StateScope: "set delegation risk profile", RequiredPhase: string(EpochPhaseDelegation), IdempotencyKey: "delegator_validator_epoch"},
-			{ModuleName: "delegation_market", MessageName: "MsgUpdateCommissionTolerance", SignerRole: "delegator", StateScope: "update commission tolerance", RequiredPhase: "any", IdempotencyKey: "delegator_validator"},
-			{ModuleName: "taskgroups", MessageName: "MsgRegisterWorkload", SignerRole: "operator", StateScope: "register workload definition", RequiredPhase: "any", IdempotencyKey: "workload_id"},
-			{ModuleName: "taskgroups", MessageName: "MsgAssignTaskGroups", SignerRole: "authority", StateScope: "assign deterministic task groups", RequiredPhase: string(EpochPhaseAssignment), IdempotencyKey: "epoch_id_seed"},
-			{ModuleName: "taskgroups", MessageName: "MsgSubmitVerificationReceipt", SignerRole: "validator", StateScope: "submit verification receipt", RequiredPhase: string(EpochPhaseActive), IdempotencyKey: "epoch_task_validator_object"},
-			{ModuleName: "taskgroups", MessageName: "MsgReportMissedTask", SignerRole: "validator", StateScope: "report missed task", RequiredPhase: string(EpochPhaseActive), IdempotencyKey: "epoch_task_validator"},
-			{ModuleName: "evidence", MessageName: "MsgSubmitEvidence", SignerRole: "reporter", StateScope: "submit structured evidence with deposit", RequiredPhase: "any", IdempotencyKey: "evidence_id"},
-			{ModuleName: "evidence", MessageName: "MsgVoteEvidenceDecision", SignerRole: "validator", StateScope: "vote evidence decision", RequiredPhase: "any", IdempotencyKey: "evidence_id_validator"},
-			{ModuleName: "evidence", MessageName: "MsgFinalizeEvidence", SignerRole: "authority", StateScope: "finalize evidence decision and penalty linkage", RequiredPhase: "any", IdempotencyKey: "evidence_id"},
-			{ModuleName: "evidence", MessageName: "MsgClaimReporterReward", SignerRole: "reporter", StateScope: "claim reporter reward", RequiredPhase: "any", IdempotencyKey: "evidence_id_reporter"},
-			{ModuleName: "performance", MessageName: "MsgSubmitPerformanceReport", SignerRole: "validator", StateScope: "submit committed performance report", RequiredPhase: string(EpochPhaseActive), IdempotencyKey: "epoch_operator_role"},
-			{ModuleName: "performance", MessageName: "MsgFinalizePerformanceEpoch", SignerRole: "authority", StateScope: "finalize performance epoch multipliers", RequiredPhase: string(EpochPhaseSettlement), IdempotencyKey: "epoch_id"},
-			{ModuleName: "collators", MessageName: "MsgRegisterCollator", SignerRole: "collator", StateScope: "register collator operator", RequiredPhase: "any", IdempotencyKey: "collator_id"},
-			{ModuleName: "collators", MessageName: "MsgSubmitCollatorOutput", SignerRole: "collator", StateScope: "submit candidate collator output", RequiredPhase: string(EpochPhaseActive), IdempotencyKey: "collator_workload_object"},
-			{ModuleName: "fishermen", MessageName: "MsgRegisterFisherman", SignerRole: "fisherman", StateScope: "register fisherman operator", RequiredPhase: "any", IdempotencyKey: "fisherman_id"},
-			{ModuleName: "fishermen", MessageName: "MsgSubmitFraudProof", SignerRole: "fisherman", StateScope: "submit fraud proof with deposit", RequiredPhase: "any", IdempotencyKey: "fraud_proof_id"},
-		},
-		Queries: []PosQuerySpec{
-			{ModuleName: "epoch", QueryName: "QueryCurrentEpoch", ResponseScope: "current epoch record", ConsistencyModel: "committed_state"},
-			{ModuleName: "epoch", QueryName: "QueryEpoch", ResponseScope: "epoch record by id", ConsistencyModel: "committed_state"},
-			{ModuleName: "epoch", QueryName: "QueryEpochHistory", ResponseScope: "historical epoch records", ConsistencyModel: "committed_state"},
-			{ModuleName: "validator_economy", QueryName: "QueryValidatorScore", ResponseScope: "validator score record", ConsistencyModel: "committed_state"},
-			{ModuleName: "validator_economy", QueryName: "QueryValidatorEffectiveStake", ResponseScope: "validator effective stake", ConsistencyModel: "committed_state"},
-			{ModuleName: "validator_economy", QueryName: "QueryElectionRanking", ResponseScope: "epoch election ranking", ConsistencyModel: "committed_state"},
-			{ModuleName: "validator_economy", QueryName: "QueryValidatorSaturation", ResponseScope: "stake saturation status", ConsistencyModel: "committed_state"},
-			{ModuleName: "validator_economy", QueryName: "QueryValidatorRoleEligibility", ResponseScope: "validator role eligibility state", ConsistencyModel: "committed_state"},
-			{ModuleName: "validator_economy", QueryName: "QueryRoleEligibility", ResponseScope: "role eligibility state", ConsistencyModel: "committed_state"},
-			{ModuleName: "taskgroups", QueryName: "QueryWorkloadRegistry", ResponseScope: "registered workloads", ConsistencyModel: "committed_state"},
-			{ModuleName: "taskgroups", QueryName: "QueryTaskGroup", ResponseScope: "task group record", ConsistencyModel: "committed_state"},
-			{ModuleName: "taskgroups", QueryName: "QueryTaskGroupsByValidator", ResponseScope: "task groups assigned to validator", ConsistencyModel: "committed_state"},
-			{ModuleName: "taskgroups", QueryName: "QueryProposerForSlot", ResponseScope: "canonical proposer for slot", ConsistencyModel: "committed_state"},
-			{ModuleName: "taskgroups", QueryName: "QueryProposerRotation", ResponseScope: "proposer priority and fallback order", ConsistencyModel: "committed_state"},
-			{ModuleName: "taskgroups", QueryName: "QueryVerificationGroup", ResponseScope: "task or evidence verification group", ConsistencyModel: "committed_state"},
-			{ModuleName: "taskgroups", QueryName: "QueryAssignmentProof", ResponseScope: "deterministic assignment proof", ConsistencyModel: "committed_state"},
-			{ModuleName: "taskgroups", QueryName: "QueryVerificationReceipt", ResponseScope: "verification receipt aggregation", ConsistencyModel: "committed_state"},
-			{ModuleName: "evidence", QueryName: "QueryEvidence", ResponseScope: "structured evidence record", ConsistencyModel: "committed_state"},
-			{ModuleName: "evidence", QueryName: "QueryEvidenceByValidator", ResponseScope: "evidence records by accused validator", ConsistencyModel: "committed_state"},
-			{ModuleName: "evidence", QueryName: "QueryEvidenceRecord", ResponseScope: "structured evidence record", ConsistencyModel: "committed_state"},
-			{ModuleName: "evidence", QueryName: "QueryEvidenceDeposit", ResponseScope: "evidence deposit accounting", ConsistencyModel: "committed_state"},
-			{ModuleName: "evidence", QueryName: "QueryEvidenceDecision", ResponseScope: "evidence decision votes", ConsistencyModel: "committed_state"},
-			{ModuleName: "evidence", QueryName: "QueryReporterRewards", ResponseScope: "reporter reward claims", ConsistencyModel: "committed_state"},
-			{ModuleName: "evidence", QueryName: "QueryEvidenceVerificationGroup", ResponseScope: "evidence verification group assignment", ConsistencyModel: "committed_state"},
-			{ModuleName: "performance", QueryName: "QueryPerformanceRecord", ResponseScope: "performance record", ConsistencyModel: "committed_state"},
-			{ModuleName: "performance", QueryName: "QueryOperatorPerformanceHistory", ResponseScope: "operator performance history", ConsistencyModel: "committed_state"},
-			{ModuleName: "performance", QueryName: "QueryRolePerformance", ResponseScope: "role performance metrics", ConsistencyModel: "committed_state"},
-			{ModuleName: "performance", QueryName: "QueryRewardMultiplier", ResponseScope: "reward multiplier", ConsistencyModel: "committed_state"},
-			{ModuleName: "delegation_market", QueryName: "QueryValidatorRisk", ResponseScope: "validator risk profile", ConsistencyModel: "committed_state"},
-			{ModuleName: "delegation_market", QueryName: "QueryValidatorEffectiveYield", ResponseScope: "effective yield estimate", ConsistencyModel: "committed_state"},
-			{ModuleName: "delegation_market", QueryName: "QueryDelegationRiskExposure", ResponseScope: "delegator slash exposure", ConsistencyModel: "committed_state"},
-			{ModuleName: "delegation_market", QueryName: "QueryDelegationActivationEpoch", ResponseScope: "delegation activation epoch", ConsistencyModel: "committed_state"},
-			{ModuleName: "delegation_market", QueryName: "QueryValidatorCommissionHistory", ResponseScope: "validator commission history", ConsistencyModel: "committed_state"},
-			{ModuleName: "delegation_market", QueryName: "QueryValidatorSlashHistory", ResponseScope: "validator slash history", ConsistencyModel: "committed_state"},
-			{ModuleName: "delegation_market", QueryName: "QueryValidatorPerformanceHistory", ResponseScope: "validator performance history", ConsistencyModel: "committed_state"},
-			{ModuleName: "delegation_market", QueryName: "QuerySlashableWindow", ResponseScope: "delegation slashable window", ConsistencyModel: "committed_state"},
-			{ModuleName: "collators", QueryName: "QueryCollatorRegistry", ResponseScope: "collator registry", ConsistencyModel: "committed_state"},
-			{ModuleName: "collators", QueryName: "QueryCollatorOutput", ResponseScope: "candidate collator output", ConsistencyModel: "committed_state"},
-			{ModuleName: "fishermen", QueryName: "QueryFishermanRegistry", ResponseScope: "fisherman registry", ConsistencyModel: "committed_state"},
-			{ModuleName: "fishermen", QueryName: "QueryFraudProof", ResponseScope: "fraud proof record", ConsistencyModel: "committed_state"},
-			{ModuleName: "security_metrics", QueryName: "QuerySecurityMetrics", ResponseScope: "economic security metrics", ConsistencyModel: "committed_state"},
-			{ModuleName: "security_metrics", QueryName: "QueryCentralizationDashboard", ResponseScope: "centralization dashboard data", ConsistencyModel: "committed_state"},
-			{ModuleName: "security_metrics", QueryName: "QueryConcentrationAlerts", ResponseScope: "concentration invariant alerts", ConsistencyModel: "committed_state"},
-		},
-	}
-	manifest.Root = ComputePosMessageQueryRoot(manifest)
-	return manifest
-}
-
-func RequiredPosMessageNames() []string {
-	return []string{
-		"MsgStartEpoch",
-		"MsgAdvanceEpochPhase",
-		"MsgFinalizeEpochSettlement",
-		"MsgDeclareValidatorCapacity",
-		"MsgUpdateValidatorMetadata",
-		"MsgSetDelegationRiskProfile",
-		"MsgUpdateCommissionTolerance",
-		"MsgRegisterWorkload",
-		"MsgAssignTaskGroups",
-		"MsgSubmitVerificationReceipt",
-		"MsgReportMissedTask",
-		"MsgSubmitEvidence",
-		"MsgVoteEvidenceDecision",
-		"MsgFinalizeEvidence",
-		"MsgClaimReporterReward",
-		"MsgSubmitPerformanceReport",
-		"MsgFinalizePerformanceEpoch",
-		"MsgRegisterCollator",
-		"MsgSubmitCollatorOutput",
-		"MsgRegisterFisherman",
-		"MsgSubmitFraudProof",
-	}
-}
-
-func RequiredPosQueryNames() []string {
-	return []string{
-		"QueryCurrentEpoch",
-		"QueryEpoch",
-		"QueryValidatorScore",
-		"QueryValidatorEffectiveStake",
-		"QueryValidatorSaturation",
-		"QueryElectionRanking",
-		"QueryTaskGroup",
-		"QueryTaskGroupsByValidator",
-		"QueryProposerForSlot",
-		"QueryEvidence",
-		"QueryEvidenceByValidator",
-		"QueryPerformanceRecord",
-		"QueryDelegationRiskExposure",
-		"QuerySlashableWindow",
-		"QuerySecurityMetrics",
-		"QueryValidatorRoleEligibility",
-	}
-}
-
-func requiredPosQueryKey(queryName string) string {
-	switch queryName {
-	case "QueryCurrentEpoch", "QueryEpoch":
-		return "epoch/" + queryName
-	case "QueryValidatorScore", "QueryValidatorEffectiveStake", "QueryValidatorSaturation", "QueryElectionRanking", "QueryValidatorRoleEligibility":
-		return "validator_economy/" + queryName
-	case "QueryTaskGroup", "QueryTaskGroupsByValidator", "QueryProposerForSlot":
-		return "taskgroups/" + queryName
-	case "QueryEvidence", "QueryEvidenceByValidator":
-		return "evidence/" + queryName
-	case "QueryPerformanceRecord":
-		return "performance/" + queryName
-	case "QueryDelegationRiskExposure", "QuerySlashableWindow":
-		return "delegation_market/" + queryName
-	case "QuerySecurityMetrics":
-		return "security_metrics/" + queryName
-	default:
-		return "/" + queryName
-	}
-}
-
-func (m PosMessageQueryManifest) Validate(compatibility CosmosSDKCompatibilityManifest, boundaries PosModuleBoundaryManifest) error {
-	if err := compatibility.Validate(); err != nil {
-		return err
-	}
-	if err := boundaries.Validate(compatibility); err != nil {
-		return err
-	}
-	knownModules := knownPoSModuleNames(compatibility)
-	if len(m.Messages) == 0 {
-		return errors.New("pos messages are required")
-	}
-	seenMessages := make(map[string]struct{}, len(m.Messages))
-	for _, message := range m.Messages {
-		if err := message.Validate(knownModules); err != nil {
-			return err
-		}
-		if _, found := seenMessages[message.MessageName]; found {
-			return fmt.Errorf("duplicate pos message %s", message.MessageName)
-		}
-		seenMessages[message.MessageName] = struct{}{}
-	}
-	for _, required := range RequiredPosMessageNames() {
-		if _, found := seenMessages[required]; !found {
-			return fmt.Errorf("required pos message %s is missing", required)
-		}
-	}
-	if len(m.Queries) == 0 {
-		return errors.New("pos queries are required")
-	}
-	seenQueries := make(map[string]struct{}, len(m.Queries))
-	queriesByModule := make(map[string]map[string]struct{})
-	for _, query := range m.Queries {
-		if err := query.Validate(knownModules); err != nil {
-			return err
-		}
-		key := query.ModuleName + "/" + query.QueryName
-		if _, found := seenQueries[key]; found {
-			return fmt.Errorf("duplicate pos query %s", key)
-		}
-		seenQueries[key] = struct{}{}
-		if queriesByModule[query.ModuleName] == nil {
-			queriesByModule[query.ModuleName] = make(map[string]struct{})
-		}
-		queriesByModule[query.ModuleName][query.QueryName] = struct{}{}
-	}
-	for _, required := range RequiredPosQueryNames() {
-		if _, found := seenQueries[requiredPosQueryKey(required)]; !found {
-			return fmt.Errorf("required pos query %s is missing", required)
-		}
-	}
-	for _, boundary := range boundaries.Boundaries {
-		moduleQueries := queriesByModule[boundary.ModuleName]
-		for _, endpoint := range boundary.QueryEndpoints {
-			if _, found := moduleQueries[endpoint]; !found {
-				return fmt.Errorf("boundary query endpoint %s/%s is missing from pos message query manifest", boundary.ModuleName, endpoint)
-			}
-		}
-	}
-	if err := validatePosHash("pos message query root", m.Root); err != nil {
-		return err
-	}
-	if expected := ComputePosMessageQueryRoot(m); expected != m.Root {
-		return errors.New("pos message query root mismatch")
-	}
-	return nil
-}
-
-func (m PosMessageSpec) Validate(knownModules map[string]struct{}) error {
-	if err := validatePosToken("pos message module", m.ModuleName); err != nil {
-		return err
-	}
-	if _, found := knownModules[m.ModuleName]; !found {
-		return fmt.Errorf("pos message %s references unknown module %s", m.MessageName, m.ModuleName)
-	}
-	if err := validatePosToken("pos message name", m.MessageName); err != nil {
-		return err
-	}
-	if !strings.HasPrefix(m.MessageName, "Msg") {
-		return fmt.Errorf("pos message %s must use Msg prefix", m.MessageName)
-	}
-	if err := validatePosToken("pos message signer role", m.SignerRole); err != nil {
-		return err
-	}
-	if err := validatePosResponsibility("pos message state scope", m.StateScope); err != nil {
-		return err
-	}
-	if err := validatePosPhaseSelector("pos message required phase", m.RequiredPhase); err != nil {
-		return err
-	}
-	return validatePosToken("pos message idempotency key", m.IdempotencyKey)
-}
-
-func (q PosQuerySpec) Validate(knownModules map[string]struct{}) error {
-	if err := validatePosToken("pos query module", q.ModuleName); err != nil {
-		return err
-	}
-	if _, found := knownModules[q.ModuleName]; !found {
-		return fmt.Errorf("pos query %s references unknown module %s", q.QueryName, q.ModuleName)
-	}
-	if err := validatePosToken("pos query name", q.QueryName); err != nil {
-		return err
-	}
-	if !strings.HasPrefix(q.QueryName, "Query") {
-		return fmt.Errorf("pos query %s must use Query prefix", q.QueryName)
-	}
-	if err := validatePosResponsibility("pos query response scope", q.ResponseScope); err != nil {
-		return err
-	}
-	return validatePosToken("pos query consistency model", q.ConsistencyModel)
-}
-
-func ComputePosMessageQueryRoot(manifest PosMessageQueryManifest) string {
-	return posHashRoot("aetra-pos-messages-queries-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(manifest.Messages)))
-		for _, message := range manifest.Messages {
-			posWritePart(w, message.ModuleName)
-			posWritePart(w, message.MessageName)
-			posWritePart(w, message.SignerRole)
-			posWritePart(w, message.StateScope)
-			posWritePart(w, message.RequiredPhase)
-			posWritePart(w, message.IdempotencyKey)
-		}
-		posWriteUint64(w, uint64(len(manifest.Queries)))
-		for _, query := range manifest.Queries {
-			posWritePart(w, query.ModuleName)
-			posWritePart(w, query.QueryName)
-			posWritePart(w, query.ResponseScope)
-			posWritePart(w, query.ConsistencyModel)
-		}
-	})
-}
-
-func PosMessageByName(manifest PosMessageQueryManifest, messageName string) (PosMessageSpec, bool) {
-	for _, message := range manifest.Messages {
-		if message.MessageName == messageName {
-			return message, true
-		}
-	}
-	return PosMessageSpec{}, false
-}
-
-func PosQueryByName(manifest PosMessageQueryManifest, moduleName string, queryName string) (PosQuerySpec, bool) {
-	for _, query := range manifest.Queries {
-		if query.ModuleName == moduleName && query.QueryName == queryName {
-			return query, true
-		}
-	}
-	return PosQuerySpec{}, false
-}
-
-func DefaultPosMigrationStrategyManifest() PosMigrationStrategyManifest {
-	manifest := PosMigrationStrategyManifest{Phases: []PosMigrationPhaseSpec{
-		{
-			PhaseID: 1,
-			Name:    "scoring_epoch_simulation",
-			Scope:   "scoring and epoch simulation",
-			Modules: []string{"staking", "epoch", "validator_economy", "performance"},
-			Tasks: []string{
-				"keep Cosmos staking unchanged",
-				"add x/epoch",
-				"add read-only validator scoring",
-				"add effective stake simulation",
-				"add performance metric collection",
-				"add score and saturation queries",
-			},
-			ExitCriteria: []string{
-				"existing staking behavior is unchanged",
-				"validator scores can be computed and compared",
-				"epoch simulation matches deterministic replay",
-			},
-			PreservesExistingStaking: true,
-			ReadOnlyUntilExit:        true,
-		},
-		{
-			PhaseID: 2,
-			Name:    "task_groups_and_roles",
-			Scope:   "task groups and roles",
-			Modules: []string{"staking", "taskgroups", "validator_economy", "performance"},
-			Tasks: []string{
-				"add x/taskgroups",
-				"add workload registry",
-				"add task group assignment",
-				"add role records",
-				"add proposer priority records",
-				"add verification receipts",
-			},
-			ExitCriteria: []string{
-				"validators can be deterministically assigned to workload groups",
-				"roles and task groups are queryable",
-				"assignment roots are reproducible",
-			},
-			PreservesExistingStaking: true,
-			ReadOnlyUntilExit:        false,
-			DependsOn:                []uint32{1},
-		},
-		{
-			PhaseID: 3,
-			Name:    "performance_based_rewards",
-			Scope:   "performance based rewards",
-			Modules: []string{"distribution", "staking", "validator_economy", "taskgroups", "performance", "delegation_market"},
-			Tasks: []string{
-				"activate reward multipliers",
-				"integrate x/performance with distribution",
-				"add task completion rewards",
-				"add missed task penalties to future score",
-				"add delegation risk queries",
-			},
-			ExitCriteria: []string{
-				"rewards reflect deterministic performance metrics",
-				"reward changes are bounded",
-				"performance impact is visible before delegation",
-			},
-			PreservesExistingStaking: true,
-			ReadOnlyUntilExit:        false,
-			DependsOn:                []uint32{2},
-		},
-		{
-			PhaseID: 4,
-			Name:    "full_economic_consensus_activation",
-			Scope:   "full economic consensus activation",
-			Modules: []string{"staking", "validator_economy", "taskgroups", "evidence", "slashing", "distribution", "collators", "fishermen"},
-			Tasks: []string{
-				"activate stake saturation in validator election",
-				"activate performance-weighted selection",
-				"activate structured evidence verification",
-				"activate severity-based slashing",
-				"activate reporter rewards and penalty routing",
-				"activate collator and fisherman roles where configured",
-			},
-			ExitCriteria: []string{
-				"validator selection uses stake and performance",
-				"evidence and slashing are structured and test-covered",
-				"task-based validator economy is live",
-			},
-			PreservesExistingStaking: true,
-			ReadOnlyUntilExit:        false,
-			DependsOn:                []uint32{3},
-		},
-	}}
-	manifest.Root = ComputePosMigrationStrategyRoot(manifest)
-	return manifest
-}
-
-func RequiredPosMigrationPhaseNames() []string {
-	return []string{"scoring_epoch_simulation", "task_groups_and_roles", "performance_based_rewards", "full_economic_consensus_activation"}
-}
-
-func (m PosMigrationStrategyManifest) Validate(compatibility CosmosSDKCompatibilityManifest) error {
-	if err := compatibility.Validate(); err != nil {
-		return err
-	}
-	if len(m.Phases) == 0 {
-		return errors.New("pos migration phases are required")
-	}
-	knownModules := knownPoSModuleNames(compatibility)
-	seenIDs := make(map[uint32]struct{}, len(m.Phases))
-	seenNames := make(map[string]struct{}, len(m.Phases))
-	for i, phase := range m.Phases {
-		if err := phase.Validate(knownModules, seenIDs); err != nil {
-			return err
-		}
-		if phase.PhaseID != uint32(i+1) {
-			return fmt.Errorf("pos migration phase %s must be ordered at position %d", phase.Name, i+1)
-		}
-		if _, found := seenIDs[phase.PhaseID]; found {
-			return fmt.Errorf("duplicate pos migration phase id %d", phase.PhaseID)
-		}
-		seenIDs[phase.PhaseID] = struct{}{}
-		if _, found := seenNames[phase.Name]; found {
-			return fmt.Errorf("duplicate pos migration phase %s", phase.Name)
-		}
-		seenNames[phase.Name] = struct{}{}
-	}
-	for _, required := range RequiredPosMigrationPhaseNames() {
-		if _, found := seenNames[required]; !found {
-			return fmt.Errorf("required pos migration phase %s is missing", required)
-		}
-	}
-	if err := validatePosHash("pos migration strategy root", m.Root); err != nil {
-		return err
-	}
-	if expected := ComputePosMigrationStrategyRoot(m); expected != m.Root {
-		return errors.New("pos migration strategy root mismatch")
-	}
-	return nil
-}
-
-func (p PosMigrationPhaseSpec) Validate(knownModules map[string]struct{}, priorPhases map[uint32]struct{}) error {
-	if p.PhaseID == 0 {
-		return errors.New("pos migration phase id is required")
-	}
-	if err := validatePosToken("pos migration phase name", p.Name); err != nil {
-		return err
-	}
-	if err := validatePosResponsibility("pos migration phase scope", p.Scope); err != nil {
-		return err
-	}
-	if len(p.Modules) == 0 {
-		return fmt.Errorf("pos migration phase %s must reference modules", p.Name)
-	}
-	for _, moduleName := range p.Modules {
-		if err := validatePosToken("pos migration phase module", moduleName); err != nil {
-			return err
-		}
-		if _, found := knownModules[moduleName]; !found {
-			return fmt.Errorf("pos migration phase %s references unknown module %s", p.Name, moduleName)
-		}
-	}
-	if len(p.Tasks) == 0 {
-		return fmt.Errorf("pos migration phase %s must define tasks", p.Name)
-	}
-	for _, task := range p.Tasks {
-		if err := validatePosResponsibility("pos migration phase task", task); err != nil {
-			return err
-		}
-	}
-	if len(p.ExitCriteria) == 0 {
-		return fmt.Errorf("pos migration phase %s must define exit criteria", p.Name)
-	}
-	for _, criterion := range p.ExitCriteria {
-		if err := validatePosResponsibility("pos migration phase exit criterion", criterion); err != nil {
-			return err
-		}
-	}
-	if !p.PreservesExistingStaking {
-		return fmt.Errorf("pos migration phase %s must preserve existing staking behavior", p.Name)
-	}
-	for _, dependency := range p.DependsOn {
-		if dependency == 0 {
-			return fmt.Errorf("pos migration phase %s dependency id is required", p.Name)
-		}
-		if _, found := priorPhases[dependency]; !found {
-			return fmt.Errorf("pos migration phase %s dependency %d must be an earlier phase", p.Name, dependency)
-		}
-	}
-	return nil
-}
-
-func ComputePosMigrationStrategyRoot(manifest PosMigrationStrategyManifest) string {
-	return posHashRoot("aetra-pos-migration-strategy-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(manifest.Phases)))
-		for _, phase := range manifest.Phases {
-			posWriteUint64(w, uint64(phase.PhaseID))
-			posWritePart(w, phase.Name)
-			posWritePart(w, phase.Scope)
-			posWriteStringSlice(w, phase.Modules)
-			posWriteStringSlice(w, phase.Tasks)
-			posWriteStringSlice(w, phase.ExitCriteria)
-			posWriteUint64(w, boolAsUint64(phase.PreservesExistingStaking))
-			posWriteUint64(w, boolAsUint64(phase.ReadOnlyUntilExit))
-			posWriteUint64(w, uint64(len(phase.DependsOn)))
-			for _, dependency := range phase.DependsOn {
-				posWriteUint64(w, uint64(dependency))
-			}
-		}
-	})
-}
-
-func PosMigrationPhaseByName(manifest PosMigrationStrategyManifest, phaseName string) (PosMigrationPhaseSpec, bool) {
-	for _, phase := range manifest.Phases {
-		if phase.Name == phaseName {
-			return phase, true
-		}
-	}
-	return PosMigrationPhaseSpec{}, false
-}
-
-func DefaultPosRequiredTestCoverageManifest() PosRequiredTestCoverageManifest {
-	manifest := PosRequiredTestCoverageManifest{
-		UnitTests: []PosTestCoverageSpec{
-			{Name: "epoch phase transition", TestType: "unit", ModuleName: "epoch", CoverageTarget: "epoch lifecycle transition rules", Assertions: []string{"valid transition order", "invalid transition rejection"}, MigrationPhases: []uint32{1}},
-			{Name: "epoch seed derivation", TestType: "unit", ModuleName: "epoch", CoverageTarget: "deterministic epoch seed derivation", Assertions: []string{"same inputs produce same seed", "validator set changes alter seed"}, MigrationPhases: []uint32{1}},
-			{Name: "validator score calculation", TestType: "unit", ModuleName: "validator_economy", CoverageTarget: "fixed point validator score calculation", Assertions: []string{"stake performance uptime latency and reliability are applied", "score is deterministic"}, MigrationPhases: []uint32{1}},
-			{Name: "effective stake saturation", TestType: "unit", ModuleName: "validator_economy", CoverageTarget: "stake saturation soft cap", Assertions: []string{"effective stake never exceeds raw stake", "saturation status is queryable"}, MigrationPhases: []uint32{1, 4}},
-			{Name: "reward multiplier calculation", TestType: "unit", ModuleName: "performance", CoverageTarget: "performance reward multiplier", Assertions: []string{"multiplier uses deterministic metrics", "multiplier stays within configured bounds"}, MigrationPhases: []uint32{3}},
-			{Name: "task assignment function", TestType: "unit", ModuleName: "taskgroups", CoverageTarget: "deterministic task assignment", Assertions: []string{"assignment is reproducible from epoch seed", "capacity and minimum group size are enforced"}, MigrationPhases: []uint32{2}},
-			{Name: "proposer priority calculation", TestType: "unit", ModuleName: "taskgroups", CoverageTarget: "proposer priority and fallback order", Assertions: []string{"one canonical proposer per slot", "fallback order is deterministic"}, MigrationPhases: []uint32{2}},
-			{Name: "evidence id derivation", TestType: "unit", ModuleName: "evidence", CoverageTarget: "structured evidence id derivation", Assertions: []string{"same evidence payload derives same id", "duplicate evidence is rejected"}, MigrationPhases: []uint32{4}},
-			{Name: "penalty scaling", TestType: "unit", ModuleName: "slashing", CoverageTarget: "severity based penalty scaling", Assertions: []string{"severity stake exposure and role weight are applied", "repeat offense multiplier is bounded"}, MigrationPhases: []uint32{4}},
-			{Name: "slash routing", TestType: "unit", ModuleName: "slashing", CoverageTarget: "penalty routing accounting", Assertions: []string{"routing sums exactly to penalty amount", "balances never become negative"}, MigrationPhases: []uint32{4}},
-			{Name: "risk window calculation", TestType: "unit", ModuleName: "staking", CoverageTarget: "slashable risk window calculation", Assertions: []string{"unbonding remains slashable for historical faults", "redelegation does not erase exposure"}, MigrationPhases: []uint32{1, 4}},
-		},
-		IntegrationTests: []PosTestCoverageSpec{
-			{Name: "existing staking state migrates into epoch system", TestType: "integration", ModuleName: "epoch", CoverageTarget: "staking to epoch migration", Assertions: []string{"existing validators remain bonded", "epoch records are initialized without staking mutation"}, MigrationPhases: []uint32{1}},
-			{Name: "delegation affects future epoch only after activation delay", TestType: "integration", ModuleName: "staking", CoverageTarget: "delegation activation delay", Assertions: []string{"current epoch election weight is unchanged", "future epoch applies activated delegation"}, MigrationPhases: []uint32{1}},
-			{Name: "validator election ranking is deterministic", TestType: "integration", ModuleName: "validator_economy", CoverageTarget: "deterministic election ranking", Assertions: []string{"ranking is stable across replay", "ties use deterministic ordering"}, MigrationPhases: []uint32{1, 4}},
-			{Name: "task groups are reproducible from epoch seed", TestType: "integration", ModuleName: "taskgroups", CoverageTarget: "task group reproducibility", Assertions: []string{"same epoch seed yields same groups", "assignment root is reproducible"}, MigrationPhases: []uint32{2}},
-			{Name: "proposer fallback works", TestType: "integration", ModuleName: "taskgroups", CoverageTarget: "proposer fallback", Assertions: []string{"missed proposer activates fallback", "fallback eligibility proof is deterministic"}, MigrationPhases: []uint32{2}},
-			{Name: "verification receipts aggregate correctly", TestType: "integration", ModuleName: "taskgroups", CoverageTarget: "verification receipt aggregation", Assertions: []string{"valid receipts are counted once", "invalid and unavailable receipts affect participation"}, MigrationPhases: []uint32{2}},
-			{Name: "valid evidence triggers penalty", TestType: "integration", ModuleName: "evidence", CoverageTarget: "evidence to slashing path", Assertions: []string{"accepted evidence maps to one penalty", "penalty is executed through slashing"}, MigrationPhases: []uint32{4}},
-			{Name: "invalid evidence burns reporter deposit", TestType: "integration", ModuleName: "evidence", CoverageTarget: "invalid evidence deposit handling", Assertions: []string{"invalid evidence is rejected", "reporter deposit burn or redirect is exact"}, MigrationPhases: []uint32{4}},
-			{Name: "unbonding stake is slashed for historical fault", TestType: "integration", ModuleName: "staking", CoverageTarget: "historical fault slash exposure", Assertions: []string{"fault epoch inside window is slashable", "expired exposure is not slashable"}, MigrationPhases: []uint32{4}},
-			{Name: "distribution rewards use performance multiplier", TestType: "integration", ModuleName: "distribution", CoverageTarget: "distribution reward multiplier integration", Assertions: []string{"distribution reads performance multiplier", "reward delta is bounded and deterministic"}, MigrationPhases: []uint32{3}},
-		},
-		InvariantTests: []PosTestCoverageSpec{
-			{Name: "effective stake <= raw stake", TestType: "invariant", ModuleName: "validator_economy", CoverageTarget: "effective stake bounded by raw stake", Assertions: []string{"effective stake never exceeds raw stake", "saturation does not mutate bonded balance"}, MigrationPhases: []uint32{1, 4}},
-			{Name: "total active task group membership references active validators", TestType: "invariant", ModuleName: "taskgroups", CoverageTarget: "task group active validator references", Assertions: []string{"every task group member is active", "inactive validators cannot be assigned"}, MigrationPhases: []uint32{2}},
-			{Name: "penalty routing exactly equals slashed amount", TestType: "invariant", ModuleName: "slashing", CoverageTarget: "slash routing exact accounting", Assertions: []string{"burn reward treasury and compensation sums equal slash", "no routing bucket is negative"}, MigrationPhases: []uint32{4}},
-			{Name: "reporter rewards do not exceed configured cap", TestType: "invariant", ModuleName: "evidence", CoverageTarget: "reporter reward cap", Assertions: []string{"reporter reward is capped by penalty amount", "configured cap basis points are enforced"}, MigrationPhases: []uint32{4}},
-			{Name: "validator cannot escape slash exposure by redelegation", TestType: "invariant", ModuleName: "staking", CoverageTarget: "redelegation slash exposure retention", Assertions: []string{"redelegation keeps historical risk", "fault before exit remains slashable"}, MigrationPhases: []uint32{4}},
-			{Name: "evidence cannot be finalized twice", TestType: "invariant", ModuleName: "evidence", CoverageTarget: "evidence finality idempotence", Assertions: []string{"accepted evidence maps to one penalty", "second finalization is rejected"}, MigrationPhases: []uint32{4}},
-			{Name: "task group root matches assignments", TestType: "invariant", ModuleName: "taskgroups", CoverageTarget: "task group root commitment", Assertions: []string{"root recomputes from assignments", "tampered assignment changes root"}, MigrationPhases: []uint32{2}},
-			{Name: "performance root matches records", TestType: "invariant", ModuleName: "performance", CoverageTarget: "performance root commitment", Assertions: []string{"root recomputes from performance records", "tampered record changes root"}, MigrationPhases: []uint32{3}},
-		},
-		SimulationTests: []PosTestCoverageSpec{
-			{Name: "stake concentration above soft cap", TestType: "simulation", ModuleName: "validator_economy", CoverageTarget: "stake concentration soft cap simulation", Assertions: []string{"concentration warning is emitted", "marginal effective stake is dampened"}, MigrationPhases: []uint32{1, 4}},
-			{Name: "stake splitting across validators", TestType: "simulation", ModuleName: "validator_economy", CoverageTarget: "stake splitting simulation", Assertions: []string{"split validators cannot bypass total concentration controls", "effective stake gain is bounded"}, MigrationPhases: []uint32{1, 4}},
-			{Name: "low participation epoch", TestType: "simulation", ModuleName: "performance", CoverageTarget: "low participation epoch simulation", Assertions: []string{"participation rate reduces rewards", "security metric reflects lower participation"}, MigrationPhases: []uint32{3}},
-			{Name: "repeated downtime", TestType: "simulation", ModuleName: "performance", CoverageTarget: "repeated downtime simulation", Assertions: []string{"future score penalty accumulates", "recovery follows configured decay"}, MigrationPhases: []uint32{3, 4}},
-			{Name: "invalid task execution", TestType: "simulation", ModuleName: "taskgroups", CoverageTarget: "invalid task execution simulation", Assertions: []string{"invalid execution creates evidence path", "assigned verifier participation is recorded"}, MigrationPhases: []uint32{2, 4}},
-			{Name: "collator invalid output", TestType: "simulation", ModuleName: "collators", CoverageTarget: "invalid collator output simulation", Assertions: []string{"invalid collator output is rejected", "bonded collator penalty is bounded"}, MigrationPhases: []uint32{4}},
-			{Name: "fisherman valid and invalid proof submissions", TestType: "simulation", ModuleName: "fishermen", CoverageTarget: "fisherman proof simulation", Assertions: []string{"valid proof earns reward", "invalid proof loses deposit"}, MigrationPhases: []uint32{4}},
-			{Name: "high evidence spam", TestType: "simulation", ModuleName: "evidence", CoverageTarget: "evidence spam resistance simulation", Assertions: []string{"deposit limits spam", "duplicate evidence is rejected"}, MigrationPhases: []uint32{4}},
-			{Name: "validator churn at epoch boundary", TestType: "simulation", ModuleName: "epoch", CoverageTarget: "epoch boundary validator churn simulation", Assertions: []string{"validator set change rate is enforced", "epoch boundary activates changes deterministically"}, MigrationPhases: []uint32{1, 2, 4}},
-			{Name: "delegation market response to commission increase", TestType: "simulation", ModuleName: "delegation_market", CoverageTarget: "commission tolerance market simulation", Assertions: []string{"commission exceeded status is emitted", "delegation risk query reflects change"}, MigrationPhases: []uint32{3}},
-		},
-		PerformanceTests: []PosTestCoverageSpec{
-			{Name: "validator score calculation for 400 validators", TestType: "performance", ModuleName: "validator_economy", CoverageTarget: "validator score batch performance", Assertions: []string{"400 validator scores finish within benchmark budget", "result ordering stays deterministic"}, MigrationPhases: []uint32{1, 4}},
-			{Name: "task group assignment for many workloads", TestType: "performance", ModuleName: "taskgroups", CoverageTarget: "task assignment scalability", Assertions: []string{"many workload assignment finishes within benchmark budget", "assignment root remains reproducible"}, MigrationPhases: []uint32{2}},
-			{Name: "evidence verification group assignment", TestType: "performance", ModuleName: "evidence", CoverageTarget: "evidence verification assignment performance", Assertions: []string{"verification group selection finishes within benchmark budget", "excluded validators are never assigned"}, MigrationPhases: []uint32{4}},
-			{Name: "epoch settlement runtime", TestType: "performance", ModuleName: "epoch", CoverageTarget: "epoch settlement runtime", Assertions: []string{"settlement finishes within benchmark budget", "settlement roots are stable"}, MigrationPhases: []uint32{3, 4}},
-			{Name: "reward distribution with performance multipliers", TestType: "performance", ModuleName: "distribution", CoverageTarget: "performance multiplier distribution runtime", Assertions: []string{"reward distribution finishes within benchmark budget", "bounded multipliers are applied deterministically"}, MigrationPhases: []uint32{3}},
-			{Name: "query latency for validator score and risk data", TestType: "performance", ModuleName: "validator_economy", CoverageTarget: "validator score and risk query latency", Assertions: []string{"validator score query is within latency budget", "risk data query is within latency budget"}, MigrationPhases: []uint32{1, 3}},
-		},
-	}
-	manifest.Root = ComputePosRequiredTestCoverageRoot(manifest)
-	return manifest
-}
-
-func RequiredPosUnitTestCoverageNames() []string {
-	return []string{
-		"epoch phase transition",
-		"epoch seed derivation",
-		"validator score calculation",
-		"effective stake saturation",
-		"reward multiplier calculation",
-		"task assignment function",
-		"proposer priority calculation",
-		"evidence id derivation",
-		"penalty scaling",
-		"slash routing",
-		"risk window calculation",
-	}
-}
-
-func RequiredPosIntegrationTestCoverageNames() []string {
-	return []string{
-		"existing staking state migrates into epoch system",
-		"delegation affects future epoch only after activation delay",
-		"validator election ranking is deterministic",
-		"task groups are reproducible from epoch seed",
-		"proposer fallback works",
-		"verification receipts aggregate correctly",
-		"valid evidence triggers penalty",
-		"invalid evidence burns reporter deposit",
-		"unbonding stake is slashed for historical fault",
-		"distribution rewards use performance multiplier",
-	}
-}
-
-func RequiredPosInvariantTestCoverageNames() []string {
-	return []string{
-		"effective stake <= raw stake",
-		"total active task group membership references active validators",
-		"penalty routing exactly equals slashed amount",
-		"reporter rewards do not exceed configured cap",
-		"validator cannot escape slash exposure by redelegation",
-		"evidence cannot be finalized twice",
-		"task group root matches assignments",
-		"performance root matches records",
-	}
-}
-
-func RequiredPosSimulationTestCoverageNames() []string {
-	return []string{
-		"stake concentration above soft cap",
-		"stake splitting across validators",
-		"low participation epoch",
-		"repeated downtime",
-		"invalid task execution",
-		"collator invalid output",
-		"fisherman valid and invalid proof submissions",
-		"high evidence spam",
-		"validator churn at epoch boundary",
-		"delegation market response to commission increase",
-	}
-}
-
-func RequiredPosPerformanceTestCoverageNames() []string {
-	return []string{
-		"validator score calculation for 400 validators",
-		"task group assignment for many workloads",
-		"evidence verification group assignment",
-		"epoch settlement runtime",
-		"reward distribution with performance multipliers",
-		"query latency for validator score and risk data",
-	}
-}
-
-func (m PosRequiredTestCoverageManifest) Validate(compatibility CosmosSDKCompatibilityManifest, migration PosMigrationStrategyManifest) error {
-	if err := compatibility.Validate(); err != nil {
-		return err
-	}
-	if err := migration.Validate(compatibility); err != nil {
-		return err
-	}
-	knownModules := knownPoSModuleNames(compatibility)
-	knownPhases := make(map[uint32]struct{}, len(migration.Phases))
-	for _, phase := range migration.Phases {
-		knownPhases[phase.PhaseID] = struct{}{}
-	}
-	if err := validatePosCoverageSet("unit", m.UnitTests, RequiredPosUnitTestCoverageNames(), knownModules, knownPhases); err != nil {
-		return err
-	}
-	if err := validatePosCoverageSet("integration", m.IntegrationTests, RequiredPosIntegrationTestCoverageNames(), knownModules, knownPhases); err != nil {
-		return err
-	}
-	if err := validatePosCoverageSet("invariant", m.InvariantTests, RequiredPosInvariantTestCoverageNames(), knownModules, knownPhases); err != nil {
-		return err
-	}
-	if err := validatePosCoverageSet("simulation", m.SimulationTests, RequiredPosSimulationTestCoverageNames(), knownModules, knownPhases); err != nil {
-		return err
-	}
-	if err := validatePosCoverageSet("performance", m.PerformanceTests, RequiredPosPerformanceTestCoverageNames(), knownModules, knownPhases); err != nil {
-		return err
-	}
-	if err := validatePosHash("pos required test coverage root", m.Root); err != nil {
-		return err
-	}
-	if expected := ComputePosRequiredTestCoverageRoot(m); expected != m.Root {
-		return errors.New("pos required test coverage root mismatch")
-	}
-	return nil
-}
-
-func validatePosCoverageSet(testType string, specs []PosTestCoverageSpec, required []string, knownModules map[string]struct{}, knownPhases map[uint32]struct{}) error {
-	if len(specs) == 0 {
-		return fmt.Errorf("pos %s test coverage is required", testType)
-	}
-	seen := make(map[string]struct{}, len(specs))
-	for _, spec := range specs {
-		if err := spec.Validate(testType, knownModules, knownPhases); err != nil {
-			return err
-		}
-		if _, found := seen[spec.Name]; found {
-			return fmt.Errorf("duplicate pos %s test coverage %s", testType, spec.Name)
-		}
-		seen[spec.Name] = struct{}{}
-	}
-	for _, name := range required {
-		if _, found := seen[name]; !found {
-			return fmt.Errorf("required pos %s test coverage %s is missing", testType, name)
-		}
-	}
-	return nil
-}
-
-func (s PosTestCoverageSpec) Validate(expectedType string, knownModules map[string]struct{}, knownPhases map[uint32]struct{}) error {
-	if err := validatePosResponsibility("pos test coverage name", s.Name); err != nil {
-		return err
-	}
-	if s.TestType != expectedType {
-		return fmt.Errorf("pos test coverage %s must be %s", s.Name, expectedType)
-	}
-	if err := validatePosToken("pos test coverage module", s.ModuleName); err != nil {
-		return err
-	}
-	if _, found := knownModules[s.ModuleName]; !found {
-		return fmt.Errorf("pos test coverage %s references unknown module %s", s.Name, s.ModuleName)
-	}
-	if err := validatePosResponsibility("pos test coverage target", s.CoverageTarget); err != nil {
-		return err
-	}
-	if len(s.Assertions) == 0 {
-		return fmt.Errorf("pos test coverage %s must define assertions", s.Name)
-	}
-	for _, assertion := range s.Assertions {
-		if err := validatePosResponsibility("pos test coverage assertion", assertion); err != nil {
-			return err
-		}
-	}
-	if len(s.MigrationPhases) == 0 {
-		return fmt.Errorf("pos test coverage %s must reference migration phases", s.Name)
-	}
-	for _, phaseID := range s.MigrationPhases {
-		if _, found := knownPhases[phaseID]; !found {
-			return fmt.Errorf("pos test coverage %s references unknown migration phase %d", s.Name, phaseID)
-		}
-	}
-	return nil
-}
-
-func ComputePosRequiredTestCoverageRoot(manifest PosRequiredTestCoverageManifest) string {
-	return posHashRoot("aetra-pos-required-test-coverage-v1", func(w posByteWriter) {
-		posWriteCoverageSpecs(w, manifest.UnitTests)
-		posWriteCoverageSpecs(w, manifest.IntegrationTests)
-		posWriteCoverageSpecs(w, manifest.InvariantTests)
-		posWriteCoverageSpecs(w, manifest.SimulationTests)
-		posWriteCoverageSpecs(w, manifest.PerformanceTests)
-	})
-}
-
-func PosUnitTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
-	return posTestCoverageByName(manifest.UnitTests, name)
-}
-
-func PosIntegrationTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
-	return posTestCoverageByName(manifest.IntegrationTests, name)
-}
-
-func PosInvariantTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
-	return posTestCoverageByName(manifest.InvariantTests, name)
-}
-
-func PosSimulationTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
-	return posTestCoverageByName(manifest.SimulationTests, name)
-}
-
-func PosPerformanceTestCoverageByName(manifest PosRequiredTestCoverageManifest, name string) (PosTestCoverageSpec, bool) {
-	return posTestCoverageByName(manifest.PerformanceTests, name)
-}
-
-func posTestCoverageByName(specs []PosTestCoverageSpec, name string) (PosTestCoverageSpec, bool) {
-	for _, spec := range specs {
-		if spec.Name == name {
-			return spec, true
-		}
-	}
-	return PosTestCoverageSpec{}, false
-}
-
-func DefaultPosObservabilityManifest() PosObservabilityManifest {
-	manifest := PosObservabilityManifest{
-		Metrics: []PosMetricSpec{
-			{Name: "current_epoch", ModuleName: "epoch", MetricType: "gauge", Aggregation: "latest", Labels: []string{"chain_id"}},
-			{Name: "current_epoch_phase", ModuleName: "epoch", MetricType: "gauge", Aggregation: "latest", Labels: []string{"chain_id", "phase"}},
-			{Name: "active_validator_count", ModuleName: "staking", MetricType: "gauge", Aggregation: "latest", Labels: []string{"chain_id"}},
-			{Name: "average_validator_score", ModuleName: "validator_economy", MetricType: "gauge", Aggregation: "average", Labels: []string{"chain_id", "epoch_id"}},
-			{Name: "effective_stake_total", ModuleName: "validator_economy", MetricType: "gauge", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id"}},
-			{Name: "raw_stake_total", ModuleName: "staking", MetricType: "gauge", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id"}},
-			{Name: "saturated_stake_amount", ModuleName: "validator_economy", MetricType: "gauge", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id"}},
-			{Name: "top_n_voting_power_concentration", ModuleName: "security_metrics", MetricType: "gauge", Aggregation: "latest", Labels: []string{"chain_id", "top_n"}},
-			{Name: "task_groups_active", ModuleName: "taskgroups", MetricType: "gauge", Aggregation: "latest", Labels: []string{"chain_id", "epoch_id", "workload_type"}},
-			{Name: "average_task_completion_rate", ModuleName: "performance", MetricType: "gauge", Aggregation: "average", Labels: []string{"chain_id", "epoch_id", "role"}},
-			{Name: "evidence_submitted", ModuleName: "evidence", MetricType: "counter", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "evidence_type"}},
-			{Name: "evidence_accepted", ModuleName: "evidence", MetricType: "counter", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "evidence_type"}},
-			{Name: "evidence_rejected", ModuleName: "evidence", MetricType: "counter", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "evidence_type"}},
-			{Name: "slashed_amount_by_severity", ModuleName: "slashing", MetricType: "counter", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "severity"}},
-			{Name: "reporter_rewards_paid", ModuleName: "evidence", MetricType: "counter", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "reporter_type"}},
-			{Name: "performance_reward_multiplier_distribution", ModuleName: "performance", MetricType: "histogram", Aggregation: "distribution", Labels: []string{"chain_id", "epoch_id", "role"}},
-			{Name: "unbonding_slash_exposure", ModuleName: "staking", MetricType: "gauge", Aggregation: "sum", Labels: []string{"chain_id", "epoch_id", "validator"}},
-		},
-		Events: []PosEventSpec{
-			{Name: "epoch_started", ModuleName: "epoch", Attributes: []string{"epoch_id", "start_height", "seed"}},
-			{Name: "epoch_phase_advanced", ModuleName: "epoch", Attributes: []string{"epoch_id", "from_phase", "to_phase"}},
-			{Name: "epoch_settled", ModuleName: "epoch", Attributes: []string{"epoch_id", "reward_root", "slash_root"}},
-			{Name: "validator_score_updated", ModuleName: "validator_economy", Attributes: []string{"epoch_id", "validator", "validator_score"}},
-			{Name: "validator_saturated", ModuleName: "validator_economy", Attributes: []string{"epoch_id", "validator", "saturated_stake_amount"}},
-			{Name: "task_group_assigned", ModuleName: "taskgroups", Attributes: []string{"epoch_id", "task_group_id", "workload_id"}},
-			{Name: "proposer_selected", ModuleName: "taskgroups", Attributes: []string{"epoch_id", "slot", "task_group_id", "validator"}},
-			{Name: "verification_receipt_submitted", ModuleName: "taskgroups", Attributes: []string{"epoch_id", "task_group_id", "validator", "result"}},
-			{Name: "evidence_submitted", ModuleName: "evidence", Attributes: []string{"evidence_id", "evidence_type", "accused_validator", "reporter"}},
-			{Name: "evidence_accepted", ModuleName: "evidence", Attributes: []string{"evidence_id", "penalty_id", "decision_height"}},
-			{Name: "evidence_rejected", ModuleName: "evidence", Attributes: []string{"evidence_id", "decision_height", "deposit_routing"}},
-			{Name: "validator_slashed", ModuleName: "slashing", Attributes: []string{"penalty_id", "validator", "severity", "slash_amount"}},
-			{Name: "reporter_reward_paid", ModuleName: "evidence", Attributes: []string{"evidence_id", "reporter", "reward_amount"}},
-			{Name: "performance_record_finalized", ModuleName: "performance", Attributes: []string{"epoch_id", "operator", "role", "reward_multiplier"}},
-			{Name: "delegation_risk_profile_updated", ModuleName: "delegation_market", Attributes: []string{"delegator", "validator", "activation_epoch"}},
-		},
-		Alerts: []PosAlertSpec{
-			{Name: "validator concentration above threshold", ModuleName: "security_metrics", Severity: "critical", Trigger: "top-n voting power concentration exceeds configured threshold", MetricRefs: []string{"top_n_voting_power_concentration"}, MitigationHint: "apply saturation dampening and emit delegation risk warning"},
-			{Name: "task group below minimum size", ModuleName: "taskgroups", Severity: "critical", Trigger: "active task group member count drops below minimum group size", MetricRefs: []string{"task_groups_active"}, EventRefs: []string{"task_group_assigned"}, MitigationHint: "recompute assignment or suspend workload activation"},
-			{Name: "evidence spam spike", ModuleName: "evidence", Severity: "warning", Trigger: "evidence submitted counter spikes above baseline", MetricRefs: []string{"evidence_submitted", "evidence_rejected"}, EventRefs: []string{"evidence_submitted", "evidence_rejected"}, MitigationHint: "raise deposit requirements and throttle duplicate evidence"},
-			{Name: "performance score collapse", ModuleName: "performance", Severity: "warning", Trigger: "average task completion or reward multiplier collapses", MetricRefs: []string{"average_task_completion_rate", "performance_reward_multiplier_distribution"}, EventRefs: []string{"performance_record_finalized"}, MitigationHint: "inspect workload availability and apply future score penalties"},
-			{Name: "epoch settlement delayed", ModuleName: "epoch", Severity: "critical", Trigger: "epoch remains in settlement beyond configured deadline", MetricRefs: []string{"current_epoch", "current_epoch_phase"}, EventRefs: []string{"epoch_phase_advanced", "epoch_settled"}, MitigationHint: "finalize settlement roots or halt phase advancement"},
-			{Name: "slash routing invariant failure", ModuleName: "slashing", Severity: "critical", Trigger: "slash routing total does not equal slashed amount", MetricRefs: []string{"slashed_amount_by_severity"}, EventRefs: []string{"validator_slashed"}, MitigationHint: "reject penalty finalization and recompute routing"},
-			{Name: "low participation rate", ModuleName: "performance", Severity: "warning", Trigger: "validator participation rate falls below configured threshold", MetricRefs: []string{"average_task_completion_rate"}, EventRefs: []string{"verification_receipt_submitted"}, MitigationHint: "reduce rewards and review liveness conditions"},
-			{Name: "repeated proposer failure", ModuleName: "taskgroups", Severity: "warning", Trigger: "same proposer repeatedly misses canonical slots", MetricRefs: []string{"average_task_completion_rate"}, EventRefs: []string{"proposer_selected"}, MitigationHint: "activate fallback order and reduce proposer priority"},
-			{Name: "unbonding exposure backlog", ModuleName: "staking", Severity: "warning", Trigger: "unbonding slash exposure backlog grows above threshold", MetricRefs: []string{"unbonding_slash_exposure"}, EventRefs: []string{"validator_slashed"}, MitigationHint: "prioritize historical fault evidence settlement"},
-		},
-	}
-	manifest.Root = ComputePosObservabilityRoot(manifest)
-	return manifest
-}
-
-func RequiredPosMetricNames() []string {
-	return []string{
-		"current_epoch",
-		"current_epoch_phase",
-		"active_validator_count",
-		"average_validator_score",
-		"effective_stake_total",
-		"raw_stake_total",
-		"saturated_stake_amount",
-		"top_n_voting_power_concentration",
-		"task_groups_active",
-		"average_task_completion_rate",
-		"evidence_submitted",
-		"evidence_accepted",
-		"evidence_rejected",
-		"slashed_amount_by_severity",
-		"reporter_rewards_paid",
-		"performance_reward_multiplier_distribution",
-		"unbonding_slash_exposure",
-	}
-}
-
-func RequiredPosEventNames() []string {
-	return []string{
-		"epoch_started",
-		"epoch_phase_advanced",
-		"epoch_settled",
-		"validator_score_updated",
-		"validator_saturated",
-		"task_group_assigned",
-		"proposer_selected",
-		"verification_receipt_submitted",
-		"evidence_submitted",
-		"evidence_accepted",
-		"evidence_rejected",
-		"validator_slashed",
-		"reporter_reward_paid",
-		"performance_record_finalized",
-		"delegation_risk_profile_updated",
-	}
-}
-
-func RequiredPosAlertNames() []string {
-	return []string{
-		"validator concentration above threshold",
-		"task group below minimum size",
-		"evidence spam spike",
-		"performance score collapse",
-		"epoch settlement delayed",
-		"slash routing invariant failure",
-		"low participation rate",
-		"repeated proposer failure",
-		"unbonding exposure backlog",
-	}
-}
-
-func (m PosObservabilityManifest) Validate(compatibility CosmosSDKCompatibilityManifest) error {
-	if err := compatibility.Validate(); err != nil {
-		return err
-	}
-	knownModules := knownPoSModuleNames(compatibility)
-	if err := validatePosMetricSpecs(m.Metrics, RequiredPosMetricNames(), knownModules); err != nil {
-		return err
-	}
-	if err := validatePosEventSpecs(m.Events, RequiredPosEventNames(), knownModules); err != nil {
-		return err
-	}
-	if err := validatePosAlertSpecs(m.Alerts, RequiredPosAlertNames(), knownModules, m.Metrics, m.Events); err != nil {
-		return err
-	}
-	if err := validatePosHash("pos observability root", m.Root); err != nil {
-		return err
-	}
-	if expected := ComputePosObservabilityRoot(m); expected != m.Root {
-		return errors.New("pos observability root mismatch")
-	}
-	return nil
-}
-
-func validatePosAlertSpecs(specs []PosAlertSpec, required []string, knownModules map[string]struct{}, metrics []PosMetricSpec, events []PosEventSpec) error {
-	if len(specs) == 0 {
-		return errors.New("pos alerts are required")
-	}
-	knownMetrics := make(map[string]struct{}, len(metrics))
-	for _, metric := range metrics {
-		knownMetrics[metric.Name] = struct{}{}
-	}
-	knownEvents := make(map[string]struct{}, len(events))
-	for _, event := range events {
-		knownEvents[event.Name] = struct{}{}
-	}
-	seen := make(map[string]struct{}, len(specs))
-	for _, spec := range specs {
-		if err := spec.Validate(knownModules, knownMetrics, knownEvents); err != nil {
-			return err
-		}
-		if _, found := seen[spec.Name]; found {
-			return fmt.Errorf("duplicate pos alert %s", spec.Name)
-		}
-		seen[spec.Name] = struct{}{}
-	}
-	for _, name := range required {
-		if _, found := seen[name]; !found {
-			return fmt.Errorf("required pos alert %s is missing", name)
-		}
-	}
-	return nil
-}
-
-func validatePosMetricSpecs(specs []PosMetricSpec, required []string, knownModules map[string]struct{}) error {
-	if len(specs) == 0 {
-		return errors.New("pos metrics are required")
-	}
-	seen := make(map[string]struct{}, len(specs))
-	for _, spec := range specs {
-		if err := spec.Validate(knownModules); err != nil {
-			return err
-		}
-		if _, found := seen[spec.Name]; found {
-			return fmt.Errorf("duplicate pos metric %s", spec.Name)
-		}
-		seen[spec.Name] = struct{}{}
-	}
-	for _, name := range required {
-		if _, found := seen[name]; !found {
-			return fmt.Errorf("required pos metric %s is missing", name)
-		}
-	}
-	return nil
-}
-
-func validatePosEventSpecs(specs []PosEventSpec, required []string, knownModules map[string]struct{}) error {
-	if len(specs) == 0 {
-		return errors.New("pos events are required")
-	}
-	seen := make(map[string]struct{}, len(specs))
-	for _, spec := range specs {
-		if err := spec.Validate(knownModules); err != nil {
-			return err
-		}
-		if _, found := seen[spec.Name]; found {
-			return fmt.Errorf("duplicate pos event %s", spec.Name)
-		}
-		seen[spec.Name] = struct{}{}
-	}
-	for _, name := range required {
-		if _, found := seen[name]; !found {
-			return fmt.Errorf("required pos event %s is missing", name)
-		}
-	}
-	return nil
-}
-
-func (s PosMetricSpec) Validate(knownModules map[string]struct{}) error {
-	if err := validatePosToken("pos metric name", s.Name); err != nil {
-		return err
-	}
-	if err := validatePosToken("pos metric module", s.ModuleName); err != nil {
-		return err
-	}
-	if _, found := knownModules[s.ModuleName]; !found {
-		return fmt.Errorf("pos metric %s references unknown module %s", s.Name, s.ModuleName)
-	}
-	if err := validatePosMetricType(s.MetricType); err != nil {
-		return err
-	}
-	if err := validatePosToken("pos metric aggregation", s.Aggregation); err != nil {
-		return err
-	}
-	if len(s.Labels) == 0 {
-		return fmt.Errorf("pos metric %s must define labels", s.Name)
-	}
-	for _, label := range s.Labels {
-		if err := validatePosToken("pos metric label", label); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s PosEventSpec) Validate(knownModules map[string]struct{}) error {
-	if err := validatePosToken("pos event name", s.Name); err != nil {
-		return err
-	}
-	if err := validatePosToken("pos event module", s.ModuleName); err != nil {
-		return err
-	}
-	if _, found := knownModules[s.ModuleName]; !found {
-		return fmt.Errorf("pos event %s references unknown module %s", s.Name, s.ModuleName)
-	}
-	if len(s.Attributes) == 0 {
-		return fmt.Errorf("pos event %s must define attributes", s.Name)
-	}
-	for _, attr := range s.Attributes {
-		if err := validatePosToken("pos event attribute", attr); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s PosAlertSpec) Validate(knownModules map[string]struct{}, knownMetrics map[string]struct{}, knownEvents map[string]struct{}) error {
-	if err := validatePosResponsibility("pos alert name", s.Name); err != nil {
-		return err
-	}
-	if err := validatePosToken("pos alert module", s.ModuleName); err != nil {
-		return err
-	}
-	if _, found := knownModules[s.ModuleName]; !found {
-		return fmt.Errorf("pos alert %s references unknown module %s", s.Name, s.ModuleName)
-	}
-	if err := validatePosAlertSeverity(s.Severity); err != nil {
-		return err
-	}
-	if err := validatePosResponsibility("pos alert trigger", s.Trigger); err != nil {
-		return err
-	}
-	if len(s.MetricRefs) == 0 {
-		return fmt.Errorf("pos alert %s must reference metrics", s.Name)
-	}
-	for _, metric := range s.MetricRefs {
-		if err := validatePosToken("pos alert metric reference", metric); err != nil {
-			return err
-		}
-		if _, found := knownMetrics[metric]; !found {
-			return fmt.Errorf("pos alert %s references unknown metric %s", s.Name, metric)
-		}
-	}
-	for _, event := range s.EventRefs {
-		if err := validatePosToken("pos alert event reference", event); err != nil {
-			return err
-		}
-		if _, found := knownEvents[event]; !found {
-			return fmt.Errorf("pos alert %s references unknown event %s", s.Name, event)
-		}
-	}
-	return validatePosResponsibility("pos alert mitigation hint", s.MitigationHint)
-}
-
-func validatePosMetricType(metricType string) error {
-	switch metricType {
-	case "counter", "gauge", "histogram":
-		return nil
-	default:
-		return fmt.Errorf("pos metric type %s is invalid", metricType)
-	}
-}
-
-func validatePosAlertSeverity(severity string) error {
-	switch severity {
-	case "info", "warning", "critical":
-		return nil
-	default:
-		return fmt.Errorf("pos alert severity %s is invalid", severity)
-	}
-}
-
-func ComputePosObservabilityRoot(manifest PosObservabilityManifest) string {
-	return posHashRoot("aetra-pos-observability-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(manifest.Metrics)))
-		for _, metric := range manifest.Metrics {
-			posWritePart(w, metric.Name)
-			posWritePart(w, metric.ModuleName)
-			posWritePart(w, metric.MetricType)
-			posWritePart(w, metric.Aggregation)
-			posWriteStringSlice(w, metric.Labels)
-		}
-		posWriteUint64(w, uint64(len(manifest.Events)))
-		for _, event := range manifest.Events {
-			posWritePart(w, event.Name)
-			posWritePart(w, event.ModuleName)
-			posWriteStringSlice(w, event.Attributes)
-		}
-		posWriteUint64(w, uint64(len(manifest.Alerts)))
-		for _, alert := range manifest.Alerts {
-			posWritePart(w, alert.Name)
-			posWritePart(w, alert.ModuleName)
-			posWritePart(w, alert.Severity)
-			posWritePart(w, alert.Trigger)
-			posWriteStringSlice(w, alert.MetricRefs)
-			posWriteStringSlice(w, alert.EventRefs)
-			posWritePart(w, alert.MitigationHint)
-		}
-	})
-}
-
-func PosMetricByName(manifest PosObservabilityManifest, name string) (PosMetricSpec, bool) {
-	for _, metric := range manifest.Metrics {
-		if metric.Name == name {
-			return metric, true
-		}
-	}
-	return PosMetricSpec{}, false
-}
-
-func PosEventByName(manifest PosObservabilityManifest, name string) (PosEventSpec, bool) {
-	for _, event := range manifest.Events {
-		if event.Name == name {
-			return event, true
-		}
-	}
-	return PosEventSpec{}, false
-}
-
-func PosAlertByName(manifest PosObservabilityManifest, name string) (PosAlertSpec, bool) {
-	for _, alert := range manifest.Alerts {
-		if alert.Name == name {
-			return alert, true
-		}
-	}
-	return PosAlertSpec{}, false
-}
-
-func DefaultPosGovernanceParameterManifest() PosGovernanceParameterManifest {
-	manifest := PosGovernanceParameterManifest{Parameters: []PosGovernanceParameterSpec{
-		{Category: "epoch", Name: "epoch_duration", ModuleName: "epoch", ValueKind: "duration_seconds", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "epoch", Name: "phase_durations", ModuleName: "epoch", ValueKind: "duration_set", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "epoch", Name: "epoch_seed_source", ModuleName: "epoch", ValueKind: "enum", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "epoch", Name: "settlement_work_limit", ModuleName: "epoch", ValueKind: "uint64", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "validator_economy", Name: "score_component_weights", ModuleName: "validator_economy", ValueKind: "weight_set_bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "validator_economy", Name: "stake_saturation_cap_factor", ModuleName: "validator_economy", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "validator_economy", Name: "threshold_stake", ModuleName: "validator_economy", ValueKind: "sdk_int", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "validator_economy", Name: "max_voting_power_per_validator", ModuleName: "validator_economy", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "validator_economy", Name: "score_decay_rate", ModuleName: "validator_economy", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "validator_economy", Name: "minimum_score_for_active_set", ModuleName: "validator_economy", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "taskgroups", Name: "minimum_group_size", ModuleName: "taskgroups", ValueKind: "uint32", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "taskgroups", Name: "maximum_task_groups_per_validator", ModuleName: "taskgroups", ValueKind: "uint32", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "taskgroups", Name: "workload_role_requirements", ModuleName: "taskgroups", ValueKind: "role_requirement_set", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "taskgroups", Name: "assignment_seed_domain", ModuleName: "taskgroups", ValueKind: "domain_string", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "evidence", Name: "evidence_deposit", ModuleName: "evidence", ValueKind: "sdk_int", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "evidence", Name: "evidence_submission_window", ModuleName: "evidence", ValueKind: "epoch_count", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "evidence", Name: "verification_group_size", ModuleName: "evidence", ValueKind: "uint32", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "evidence", Name: "decision_threshold", ModuleName: "evidence", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "evidence", Name: "reporter_reward_cap", ModuleName: "evidence", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "slashing", Name: "severity_matrix", ModuleName: "slashing", ValueKind: "severity_matrix", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "slashing", Name: "role_weight_matrix", ModuleName: "slashing", ValueKind: "role_weight_matrix", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "slashing", Name: "repeat_offense_multiplier", ModuleName: "slashing", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "slashing", Name: "burn_allocation", ModuleName: "slashing", ValueKind: "allocation_bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "slashing", Name: "treasury_allocation", ModuleName: "slashing", ValueKind: "allocation_bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "slashing", Name: "reporter_allocation", ModuleName: "slashing", ValueKind: "allocation_bps", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "performance", Name: "reward_multiplier_bounds", ModuleName: "performance", ValueKind: "bps_bounds", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "performance", Name: "uptime_window", ModuleName: "performance", ValueKind: "epoch_count", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "performance", Name: "latency_window", ModuleName: "performance", ValueKind: "epoch_count", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "performance", Name: "task_completion_window", ModuleName: "performance", ValueKind: "epoch_count", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "performance", Name: "performance_decay_rate", ModuleName: "performance", ValueKind: "bps", UpdateAuthority: "governance", SafetyLevel: "high"},
-		{Category: "unbonding", Name: "unbonding_period", ModuleName: "staking", ValueKind: "duration_seconds", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "unbonding", Name: "slashable_window", ModuleName: "staking", ValueKind: "epoch_count", UpdateAuthority: "governance", SafetyLevel: "critical"},
-		{Category: "unbonding", Name: "redelegation_risk_retention", ModuleName: "staking", ValueKind: "retention_policy", UpdateAuthority: "governance", SafetyLevel: "critical"},
-	}}
-	manifest.Root = ComputePosGovernanceParameterRoot(manifest)
-	return manifest
-}
-
-func RequiredPosGovernanceParametersByCategory() map[string][]string {
-	return map[string][]string{
-		"epoch":             {"epoch_duration", "phase_durations", "epoch_seed_source", "settlement_work_limit"},
-		"validator_economy": {"score_component_weights", "stake_saturation_cap_factor", "threshold_stake", "max_voting_power_per_validator", "score_decay_rate", "minimum_score_for_active_set"},
-		"taskgroups":        {"minimum_group_size", "maximum_task_groups_per_validator", "workload_role_requirements", "assignment_seed_domain"},
-		"evidence":          {"evidence_deposit", "evidence_submission_window", "verification_group_size", "decision_threshold", "reporter_reward_cap"},
-		"slashing":          {"severity_matrix", "role_weight_matrix", "repeat_offense_multiplier", "burn_allocation", "treasury_allocation", "reporter_allocation"},
-		"performance":       {"reward_multiplier_bounds", "uptime_window", "latency_window", "task_completion_window", "performance_decay_rate"},
-		"unbonding":         {"unbonding_period", "slashable_window", "redelegation_risk_retention"},
-	}
-}
-
-func (m PosGovernanceParameterManifest) Validate(compatibility CosmosSDKCompatibilityManifest) error {
-	if err := compatibility.Validate(); err != nil {
-		return err
-	}
-	if len(m.Parameters) == 0 {
-		return errors.New("pos governance parameters are required")
-	}
-	knownModules := knownPoSModuleNames(compatibility)
-	seen := make(map[string]struct{}, len(m.Parameters))
-	byCategory := make(map[string]map[string]struct{})
-	for _, parameter := range m.Parameters {
-		if err := parameter.Validate(knownModules); err != nil {
-			return err
-		}
-		key := parameter.Category + "/" + parameter.Name
-		if _, found := seen[key]; found {
-			return fmt.Errorf("duplicate pos governance parameter %s", key)
-		}
-		seen[key] = struct{}{}
-		if byCategory[parameter.Category] == nil {
-			byCategory[parameter.Category] = make(map[string]struct{})
-		}
-		byCategory[parameter.Category][parameter.Name] = struct{}{}
-	}
-	for category, requiredNames := range RequiredPosGovernanceParametersByCategory() {
-		categoryParams := byCategory[category]
-		for _, name := range requiredNames {
-			if _, found := categoryParams[name]; !found {
-				return fmt.Errorf("required pos governance parameter %s/%s is missing", category, name)
-			}
-		}
-	}
-	if err := validatePosHash("pos governance parameter root", m.Root); err != nil {
-		return err
-	}
-	if expected := ComputePosGovernanceParameterRoot(m); expected != m.Root {
-		return errors.New("pos governance parameter root mismatch")
-	}
-	return nil
-}
-
-func (p PosGovernanceParameterSpec) Validate(knownModules map[string]struct{}) error {
-	if err := validatePosToken("pos governance parameter category", p.Category); err != nil {
-		return err
-	}
-	if _, found := RequiredPosGovernanceParametersByCategory()[p.Category]; !found {
-		return fmt.Errorf("pos governance parameter category %s is unknown", p.Category)
-	}
-	if err := validatePosToken("pos governance parameter name", p.Name); err != nil {
-		return err
-	}
-	if err := validatePosToken("pos governance parameter module", p.ModuleName); err != nil {
-		return err
-	}
-	if _, found := knownModules[p.ModuleName]; !found {
-		return fmt.Errorf("pos governance parameter %s/%s references unknown module %s", p.Category, p.Name, p.ModuleName)
-	}
-	if err := validatePosToken("pos governance parameter value kind", p.ValueKind); err != nil {
-		return err
-	}
-	if err := validatePosToken("pos governance parameter update authority", p.UpdateAuthority); err != nil {
-		return err
-	}
-	return validatePosGovernanceSafetyLevel(p.SafetyLevel)
-}
-
-func validatePosGovernanceSafetyLevel(level string) error {
-	switch level {
-	case "low", "medium", "high", "critical":
-		return nil
-	default:
-		return fmt.Errorf("pos governance parameter safety level %s is invalid", level)
-	}
-}
-
-func ComputePosGovernanceParameterRoot(manifest PosGovernanceParameterManifest) string {
-	return posHashRoot("aetra-pos-governance-parameters-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(manifest.Parameters)))
-		for _, parameter := range manifest.Parameters {
-			posWritePart(w, parameter.Category)
-			posWritePart(w, parameter.Name)
-			posWritePart(w, parameter.ModuleName)
-			posWritePart(w, parameter.ValueKind)
-			posWritePart(w, parameter.UpdateAuthority)
-			posWritePart(w, parameter.SafetyLevel)
-		}
-	})
-}
-
-func PosGovernanceParameterByName(manifest PosGovernanceParameterManifest, category string, name string) (PosGovernanceParameterSpec, bool) {
-	for _, parameter := range manifest.Parameters {
-		if parameter.Category == category && parameter.Name == name {
-			return parameter, true
-		}
-	}
-	return PosGovernanceParameterSpec{}, false
-}
-
-func DefaultPosAcceptanceCriteriaManifest() PosAcceptanceCriteriaManifest {
-	manifest := PosAcceptanceCriteriaManifest{Criteria: []PosAcceptanceCriterionSpec{
-		{
-			Name:             "epoch_lifecycle_deterministic_queryable",
-			Requirement:      "epoch lifecycle is deterministic and queryable",
-			ModuleNames:      []string{"epoch", "staking"},
-			EvidenceRefs:     []string{"EpochRecord", "epoch_root", "epoch_seed"},
-			QueryRefs:        []string{"QueryCurrentEpoch", "QueryEpoch"},
-			TestCoverageRefs: []string{"epoch phase transition", "epoch seed derivation", "existing staking state migrates into epoch system"},
-			MigrationPhases:  []uint32{1},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "validator_scoring_fixed_point",
-			Requirement:      "validator scoring is deterministic and fixed point",
-			ModuleNames:      []string{"validator_economy", "performance"},
-			EvidenceRefs:     []string{"ValidatorScoreRecord", "validator_score_root", "fixed_point_math"},
-			QueryRefs:        []string{"QueryValidatorScore", "QueryElectionRanking"},
-			TestCoverageRefs: []string{"validator score calculation", "validator election ranking is deterministic", "validator score calculation for 400 validators"},
-			MigrationPhases:  []uint32{1, 4},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "stake_saturation_centralization_pressure",
-			Requirement:      "effective stake saturation reduces marginal centralization pressure",
-			ModuleNames:      []string{"validator_economy", "security_metrics"},
-			EvidenceRefs:     []string{"effective_stake", "stake_saturation_cap_factor", "max_voting_power_per_validator"},
-			QueryRefs:        []string{"QueryValidatorEffectiveStake", "QueryValidatorSaturation", "QuerySecurityMetrics"},
-			TestCoverageRefs: []string{"effective stake saturation", "effective stake <= raw stake", "stake concentration above soft cap", "stake splitting across validators"},
-			MigrationPhases:  []uint32{1, 4},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "delegation_risk_metadata_queryable",
-			Requirement:      "delegation risk metadata is stored and queryable",
-			ModuleNames:      []string{"delegation_market", "staking", "slashing"},
-			EvidenceRefs:     []string{"DelegationRecord", "RiskWindowRecord", "commission_tolerance"},
-			QueryRefs:        []string{"QueryDelegationRiskExposure", "QueryValidatorRisk", "QueryDelegationActivationEpoch"},
-			TestCoverageRefs: []string{"delegation affects future epoch only after activation delay", "validator cannot escape slash exposure by redelegation", "delegation market response to commission increase"},
-			MigrationPhases:  []uint32{1, 3, 4},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "task_groups_reproducible",
-			Requirement:      "task groups are reproducible from committed validator set and epoch seed",
-			ModuleNames:      []string{"taskgroups", "epoch", "validator_economy"},
-			EvidenceRefs:     []string{"TaskGroup", "task_group_root", "assignment_seed"},
-			QueryRefs:        []string{"QueryTaskGroup", "QueryTaskGroupsByValidator", "QueryAssignmentProof"},
-			TestCoverageRefs: []string{"task assignment function", "task groups are reproducible from epoch seed", "task group root matches assignments", "task group assignment for many workloads"},
-			MigrationPhases:  []uint32{2},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "proposer_rotation_fallback_deterministic",
-			Requirement:      "proposer rotation and fallback are deterministic",
-			ModuleNames:      []string{"taskgroups", "validator_economy"},
-			EvidenceRefs:     []string{"ProposerPriority", "fallback_order", "slot_assignment"},
-			QueryRefs:        []string{"QueryProposerForSlot", "QueryProposerRotation"},
-			TestCoverageRefs: []string{"proposer priority calculation", "proposer fallback works"},
-			MigrationPhases:  []uint32{2},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "verification_receipts_for_assigned_workloads",
-			Requirement:      "validators submit verification receipts for assigned workloads",
-			ModuleNames:      []string{"taskgroups", "performance"},
-			EvidenceRefs:     []string{"VerificationReceipt", "verifier_participation", "receipt_aggregation"},
-			QueryRefs:        []string{"QueryVerificationReceipt", "QueryPerformanceRecord"},
-			TestCoverageRefs: []string{"verification receipts aggregate correctly", "invalid task execution"},
-			MigrationPhases:  []uint32{2, 4},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "structured_evidence_lifecycle",
-			Requirement:      "structured evidence has deposit verification group decision and finalization paths",
-			ModuleNames:      []string{"evidence", "taskgroups", "slashing"},
-			EvidenceRefs:     []string{"EvidenceRecord", "evidence_deposit", "verification_group", "MsgFinalizeEvidence"},
-			QueryRefs:        []string{"QueryEvidence", "QueryEvidenceDeposit", "QueryEvidenceVerificationGroup", "QueryEvidenceDecision"},
-			TestCoverageRefs: []string{"evidence id derivation", "valid evidence triggers penalty", "invalid evidence burns reporter deposit", "evidence cannot be finalized twice", "high evidence spam"},
-			MigrationPhases:  []uint32{4},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "slashing_severity_role_routing",
-			Requirement:      "slashing supports severity role weight confiscation jailing tombstone and routing",
-			ModuleNames:      []string{"slashing", "evidence", "distribution", "validator_economy"},
-			EvidenceRefs:     []string{"SlashingRecord", "severity_matrix", "role_weight_matrix", "penalty_routing"},
-			QueryRefs:        []string{"QueryEvidence", "QuerySecurityMetrics"},
-			TestCoverageRefs: []string{"penalty scaling", "slash routing", "penalty routing exactly equals slashed amount", "valid evidence triggers penalty"},
-			MigrationPhases:  []uint32{4},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "optional_fishermen_collators_bounded_authority",
-			Requirement:      "fishermen and collators are optional roles with bounded authority",
-			ModuleNames:      []string{"fishermen", "collators", "evidence", "taskgroups"},
-			EvidenceRefs:     []string{"CollatorRecord", "Fisherman", "fraud_proof_deposit", "candidate_output"},
-			QueryRefs:        []string{"QueryCollatorRegistry", "QueryCollatorOutput", "QueryFishermanRegistry", "QueryFraudProof"},
-			TestCoverageRefs: []string{"collator invalid output", "fisherman valid and invalid proof submissions"},
-			MigrationPhases:  []uint32{4},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "performance_rewards_bounded_distribution",
-			Requirement:      "performance based rewards integrate with distribution using bounded multipliers",
-			ModuleNames:      []string{"performance", "distribution", "mint"},
-			EvidenceRefs:     []string{"PerformanceRecord", "reward_multiplier_bounds", "RewardMultiplierIntegration"},
-			QueryRefs:        []string{"QueryPerformanceRecord", "QueryRewardMultiplier"},
-			TestCoverageRefs: []string{"reward multiplier calculation", "distribution rewards use performance multiplier", "performance root matches records", "reward distribution with performance multipliers"},
-			MigrationPhases:  []uint32{3},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "unbonding_redelegation_risk_window",
-			Requirement:      "unbonding and redelegation retain slash exposure through configured risk window",
-			ModuleNames:      []string{"staking", "delegation_market", "slashing"},
-			EvidenceRefs:     []string{"RiskWindowRecord", "slashable_window", "redelegation_risk_retention"},
-			QueryRefs:        []string{"QuerySlashableWindow", "QueryDelegationRiskExposure"},
-			TestCoverageRefs: []string{"risk window calculation", "unbonding stake is slashed for historical fault", "validator cannot escape slash exposure by redelegation"},
-			MigrationPhases:  []uint32{1, 4},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "read_only_scoring_migration_preserves_staking",
-			Requirement:      "migration can start with read only scoring while preserving existing staking behavior",
-			ModuleNames:      []string{"staking", "epoch", "validator_economy"},
-			EvidenceRefs:     []string{"scoring_epoch_simulation", "PreservesExistingStaking", "ReadOnlyUntilExit"},
-			QueryRefs:        []string{"QueryValidatorScore", "QueryValidatorSaturation"},
-			TestCoverageRefs: []string{"existing staking state migrates into epoch system", "delegation affects future epoch only after activation delay"},
-			MigrationPhases:  []uint32{1},
-			PlanningGate:     "implementation_planning",
-		},
-		{
-			Name:             "test_coverage_determinism_invariants_simulations_performance",
-			Requirement:      "tests cover determinism invariants simulations and performance",
-			ModuleNames:      []string{"epoch", "validator_economy", "taskgroups", "evidence", "performance"},
-			EvidenceRefs:     []string{"PosRequiredTestCoverageManifest", "invariant_tests", "simulation_tests", "performance_tests"},
-			QueryRefs:        []string{"QuerySecurityMetrics"},
-			TestCoverageRefs: []string{"validator election ranking is deterministic", "task group root matches assignments", "stake concentration above soft cap", "validator score calculation for 400 validators"},
-			MigrationPhases:  []uint32{1, 2, 3, 4},
-			PlanningGate:     "implementation_planning",
-		},
-	}}
-	manifest.Root = ComputePosAcceptanceCriteriaRoot(manifest)
-	return manifest
-}
-
-func RequiredPosAcceptanceCriterionNames() []string {
-	return []string{
-		"epoch_lifecycle_deterministic_queryable",
-		"validator_scoring_fixed_point",
-		"stake_saturation_centralization_pressure",
-		"delegation_risk_metadata_queryable",
-		"task_groups_reproducible",
-		"proposer_rotation_fallback_deterministic",
-		"verification_receipts_for_assigned_workloads",
-		"structured_evidence_lifecycle",
-		"slashing_severity_role_routing",
-		"optional_fishermen_collators_bounded_authority",
-		"performance_rewards_bounded_distribution",
-		"unbonding_redelegation_risk_window",
-		"read_only_scoring_migration_preserves_staking",
-		"test_coverage_determinism_invariants_simulations_performance",
-	}
-}
-
-func (m PosAcceptanceCriteriaManifest) Validate(
-	compatibility CosmosSDKCompatibilityManifest,
-	boundaries PosModuleBoundaryManifest,
-	messages PosMessageQueryManifest,
-	migration PosMigrationStrategyManifest,
-	tests PosRequiredTestCoverageManifest,
-	observability PosObservabilityManifest,
-	governance PosGovernanceParameterManifest,
-	keepers KeeperIntegrationManifest,
-) error {
-	if err := compatibility.Validate(); err != nil {
-		return err
-	}
-	if err := boundaries.Validate(compatibility); err != nil {
-		return err
-	}
-	if err := messages.Validate(compatibility, boundaries); err != nil {
-		return err
-	}
-	if err := migration.Validate(compatibility); err != nil {
-		return err
-	}
-	if err := tests.Validate(compatibility, migration); err != nil {
-		return err
-	}
-	if err := observability.Validate(compatibility); err != nil {
-		return err
-	}
-	if err := governance.Validate(compatibility); err != nil {
-		return err
-	}
-	if err := keepers.Validate(compatibility, boundaries); err != nil {
-		return err
-	}
-	if len(m.Criteria) == 0 {
-		return errors.New("pos acceptance criteria are required")
-	}
-	knownModules := knownKeeperIntegrationModules(compatibility)
-	knownQueries := knownPosQueryNames(messages)
-	knownCoverage := knownPosTestCoverageNames(tests)
-	knownPhases := make(map[uint32]struct{}, len(migration.Phases))
-	for _, phase := range migration.Phases {
-		knownPhases[phase.PhaseID] = struct{}{}
-	}
-	seen := make(map[string]struct{}, len(m.Criteria))
-	for _, criterion := range m.Criteria {
-		if err := criterion.Validate(knownModules, knownQueries, knownCoverage, knownPhases); err != nil {
-			return err
-		}
-		if _, found := seen[criterion.Name]; found {
-			return fmt.Errorf("duplicate pos acceptance criterion %s", criterion.Name)
-		}
-		seen[criterion.Name] = struct{}{}
-	}
-	for _, required := range RequiredPosAcceptanceCriterionNames() {
-		if _, found := seen[required]; !found {
-			return fmt.Errorf("required pos acceptance criterion %s is missing", required)
-		}
-	}
-	if err := validatePosHash("pos acceptance criteria root", m.Root); err != nil {
-		return err
-	}
-	if expected := ComputePosAcceptanceCriteriaRoot(m); expected != m.Root {
-		return errors.New("pos acceptance criteria root mismatch")
-	}
-	return nil
-}
-
-func (c PosAcceptanceCriterionSpec) Validate(
-	knownModules map[string]struct{},
-	knownQueries map[string]struct{},
-	knownCoverage map[string]struct{},
-	knownPhases map[uint32]struct{},
-) error {
-	if err := validatePosToken("pos acceptance criterion name", c.Name); err != nil {
-		return err
-	}
-	if err := validatePosResponsibility("pos acceptance criterion requirement", c.Requirement); err != nil {
-		return err
-	}
-	if len(c.ModuleNames) == 0 {
-		return fmt.Errorf("pos acceptance criterion %s must reference modules", c.Name)
-	}
-	for _, moduleName := range c.ModuleNames {
-		if err := validatePosToken("pos acceptance criterion module", moduleName); err != nil {
-			return err
-		}
-		if _, found := knownModules[moduleName]; !found {
-			return fmt.Errorf("pos acceptance criterion %s references unknown module %s", c.Name, moduleName)
-		}
-	}
-	if len(c.EvidenceRefs) == 0 {
-		return fmt.Errorf("pos acceptance criterion %s must reference evidence artifacts", c.Name)
-	}
-	for _, evidenceRef := range c.EvidenceRefs {
-		if err := validatePosToken("pos acceptance criterion evidence ref", evidenceRef); err != nil {
-			return err
-		}
-	}
-	for _, queryRef := range c.QueryRefs {
-		if err := validatePosToken("pos acceptance criterion query ref", queryRef); err != nil {
-			return err
-		}
-		if _, found := knownQueries[queryRef]; !found {
-			return fmt.Errorf("pos acceptance criterion %s references unknown query %s", c.Name, queryRef)
-		}
-	}
-	if len(c.TestCoverageRefs) == 0 {
-		return fmt.Errorf("pos acceptance criterion %s must reference test coverage", c.Name)
-	}
-	for _, coverageRef := range c.TestCoverageRefs {
-		if err := validatePosResponsibility("pos acceptance criterion test coverage ref", coverageRef); err != nil {
-			return err
-		}
-		if _, found := knownCoverage[coverageRef]; !found {
-			return fmt.Errorf("pos acceptance criterion %s references unknown test coverage %s", c.Name, coverageRef)
-		}
-	}
-	if len(c.MigrationPhases) == 0 {
-		return fmt.Errorf("pos acceptance criterion %s must reference migration phases", c.Name)
-	}
-	for _, phaseID := range c.MigrationPhases {
-		if _, found := knownPhases[phaseID]; !found {
-			return fmt.Errorf("pos acceptance criterion %s references unknown migration phase %d", c.Name, phaseID)
-		}
-	}
-	if c.PlanningGate != "implementation_planning" {
-		return fmt.Errorf("pos acceptance criterion %s must gate implementation planning", c.Name)
-	}
-	return nil
-}
-
-func ComputePosAcceptanceCriteriaRoot(manifest PosAcceptanceCriteriaManifest) string {
-	return posHashRoot("aetra-pos-acceptance-criteria-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(manifest.Criteria)))
-		for _, criterion := range manifest.Criteria {
-			posWritePart(w, criterion.Name)
-			posWritePart(w, criterion.Requirement)
-			posWriteStringSlice(w, criterion.ModuleNames)
-			posWriteStringSlice(w, criterion.EvidenceRefs)
-			posWriteStringSlice(w, criterion.QueryRefs)
-			posWriteStringSlice(w, criterion.TestCoverageRefs)
-			posWriteUint64(w, uint64(len(criterion.MigrationPhases)))
-			for _, phaseID := range criterion.MigrationPhases {
-				posWriteUint64(w, uint64(phaseID))
-			}
-			posWritePart(w, criterion.PlanningGate)
-		}
-	})
-}
-
-func PosAcceptanceCriterionByName(manifest PosAcceptanceCriteriaManifest, name string) (PosAcceptanceCriterionSpec, bool) {
-	for _, criterion := range manifest.Criteria {
-		if criterion.Name == name {
-			return criterion, true
-		}
-	}
-	return PosAcceptanceCriterionSpec{}, false
-}
-
-func knownPosQueryNames(manifest PosMessageQueryManifest) map[string]struct{} {
-	known := make(map[string]struct{}, len(manifest.Queries))
-	for _, query := range manifest.Queries {
-		known[query.QueryName] = struct{}{}
-	}
-	return known
-}
-
-func knownPosTestCoverageNames(manifest PosRequiredTestCoverageManifest) map[string]struct{} {
-	known := make(map[string]struct{})
-	for _, spec := range manifest.UnitTests {
-		known[spec.Name] = struct{}{}
-	}
-	for _, spec := range manifest.IntegrationTests {
-		known[spec.Name] = struct{}{}
-	}
-	for _, spec := range manifest.InvariantTests {
-		known[spec.Name] = struct{}{}
-	}
-	for _, spec := range manifest.SimulationTests {
-		known[spec.Name] = struct{}{}
-	}
-	for _, spec := range manifest.PerformanceTests {
-		known[spec.Name] = struct{}{}
-	}
-	return known
 }
 
 func DefaultKeeperIntegrationManifest() KeeperIntegrationManifest {
@@ -3528,7 +1701,7 @@ func (r RewardMultiplierIntegration) Validate(knownModules map[string]struct{}) 
 }
 
 func ComputeKeeperIntegrationRoot(manifest KeeperIntegrationManifest) string {
-	return posHashRoot("aetra-pos-keeper-integration-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-keeper-integration-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.KeeperInterfaces)))
 		for _, keeper := range manifest.KeeperInterfaces {
 			posWritePart(w, keeper.KeeperName)
@@ -3761,7 +1934,7 @@ func (s StateKeySpec) Validate() error {
 }
 
 func ComputeStateModelRoot(manifest StateModelManifest) string {
-	return posHashRoot("aetra-pos-state-model-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-state-model-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(manifest.Keys)))
 		for _, key := range manifest.Keys {
 			posWritePart(w, key.Domain)
@@ -3843,375 +2016,6 @@ func RiskExposureKey(epochID uint64, validator string, delegator string) (string
 	return stateKeyChecked("risk", "exposure", uint64StateComponent(epochID), validator, delegator)
 }
 
-func DefaultRootCommitmentManifest() RootCommitmentManifest {
-	manifest := RootCommitmentManifest{Roots: []RootCommitmentSpec{
-		{Name: "epoch_root", StateModel: "epoch", Source: "epoch records current phase and seed"},
-		{Name: "validator_score_root", StateModel: "validator_economy", Source: "validator score records"},
-		{Name: "task_group_root", StateModel: "taskgroups", Source: "task group set"},
-		{Name: "evidence_root", StateModel: "evidence", Source: "structured evidence records and verification groups"},
-		{Name: "performance_root", StateModel: "performance", Source: "performance records"},
-		{Name: "slashing_root", StateModel: "slashing", Source: "slashing records and penalty routing"},
-		{Name: "risk_window_root", StateModel: "risk", Source: "unbonding redelegation and exposure windows"},
-	}}
-	manifest.Root = ComputeRootCommitmentManifestRoot(manifest)
-	return manifest
-}
-
-func (m RootCommitmentManifest) Validate() error {
-	if len(m.Roots) == 0 {
-		return errors.New("root commitment specs are required")
-	}
-	seen := make(map[string]struct{}, len(m.Roots))
-	for _, root := range m.Roots {
-		if err := root.Validate(); err != nil {
-			return err
-		}
-		if _, found := seen[root.Name]; found {
-			return fmt.Errorf("duplicate root commitment %s", root.Name)
-		}
-		seen[root.Name] = struct{}{}
-	}
-	for _, required := range []string{"epoch_root", "validator_score_root", "task_group_root", "evidence_root", "performance_root", "slashing_root", "risk_window_root"} {
-		if _, found := seen[required]; !found {
-			return fmt.Errorf("required root commitment %s is missing", required)
-		}
-	}
-	if err := validatePosHash("root commitment manifest root", m.Root); err != nil {
-		return err
-	}
-	if expected := ComputeRootCommitmentManifestRoot(m); expected != m.Root {
-		return errors.New("root commitment manifest root mismatch")
-	}
-	return nil
-}
-
-func (s RootCommitmentSpec) Validate() error {
-	if err := validatePosToken("root commitment name", s.Name); err != nil {
-		return err
-	}
-	if err := validatePosToken("root commitment state model", s.StateModel); err != nil {
-		return err
-	}
-	return validatePosResponsibility("root commitment source", s.Source)
-}
-
-func ComputeRootCommitmentManifestRoot(manifest RootCommitmentManifest) string {
-	return posHashRoot("aetra-pos-root-commitments-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(manifest.Roots)))
-		for _, root := range manifest.Roots {
-			posWritePart(w, root.Name)
-			posWritePart(w, root.StateModel)
-			posWritePart(w, root.Source)
-		}
-	})
-}
-
-func (r StateRootCommitments) Validate() error {
-	for _, item := range []struct {
-		name  string
-		value string
-	}{
-		{name: "epoch root", value: r.EpochRoot},
-		{name: "validator score root", value: r.ValidatorScoreRoot},
-		{name: "task group root", value: r.TaskGroupRoot},
-		{name: "evidence root", value: r.EvidenceRoot},
-		{name: "performance root", value: r.PerformanceRoot},
-		{name: "slashing root", value: r.SlashingRoot},
-		{name: "risk window root", value: r.RiskWindowRoot},
-	} {
-		if err := validatePosHash(item.name, item.value); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func ComputeEpochRoot(records []EpochRecord) (string, error) {
-	ordered := make([]EpochRecord, len(records))
-	copy(ordered, records)
-	sort.SliceStable(ordered, func(i, j int) bool {
-		return ordered[i].EpochID < ordered[j].EpochID
-	})
-	for _, record := range ordered {
-		if err := record.Validate(); err != nil {
-			return "", err
-		}
-	}
-	return posHashRoot("aetra-pos-epoch-root-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(ordered)))
-		for _, record := range ordered {
-			posWriteUint64(w, record.EpochID)
-			posWriteUint64(w, record.StartHeight)
-			posWriteUint64(w, record.EndHeight)
-			posWritePart(w, string(record.Phase))
-			posWritePart(w, record.Seed)
-			posWritePart(w, record.ValidatorSetHash)
-			posWritePart(w, record.TaskGroupRoot)
-			posWritePart(w, record.PerformanceRoot)
-			posWritePart(w, record.RewardRoot)
-			posWritePart(w, record.SlashRoot)
-			posWritePart(w, string(record.SettlementStatus))
-		}
-	}), nil
-}
-
-func ComputeValidatorScoreRoot(records []PosStateValidatorScoreRecord) (string, error) {
-	ordered := make([]PosStateValidatorScoreRecord, len(records))
-	copy(ordered, records)
-	sort.SliceStable(ordered, func(i, j int) bool {
-		if ordered[i].EpochID != ordered[j].EpochID {
-			return ordered[i].EpochID < ordered[j].EpochID
-		}
-		return ordered[i].ValidatorAddress < ordered[j].ValidatorAddress
-	})
-	for _, record := range ordered {
-		if err := record.Validate(); err != nil {
-			return "", err
-		}
-	}
-	return posHashRoot("aetra-pos-validator-score-root-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(ordered)))
-		for _, record := range ordered {
-			posWriteUint64(w, record.EpochID)
-			posWritePart(w, record.ValidatorAddress)
-			posWritePart(w, record.RawStakeNaet.String())
-			posWritePart(w, record.EffectiveStake.String())
-			posWritePart(w, record.Score.String())
-		}
-	}), nil
-}
-
-func (r PosStateValidatorScoreRecord) Validate() error {
-	if r.EpochID == 0 {
-		return errors.New("validator score record epoch id is required")
-	}
-	if err := validatePosToken("validator score record validator", r.ValidatorAddress); err != nil {
-		return err
-	}
-	if r.RawStakeNaet.IsNil() || r.RawStakeNaet.IsNegative() {
-		return errors.New("validator score raw stake cannot be negative")
-	}
-	if r.EffectiveStake.IsNil() || r.EffectiveStake.IsNegative() {
-		return errors.New("validator score effective stake cannot be negative")
-	}
-	if r.Score.IsNil() || r.Score.IsNegative() {
-		return errors.New("validator score cannot be negative")
-	}
-	if r.EffectiveStake.GT(r.RawStakeNaet) {
-		return errors.New("validator score effective stake cannot exceed raw stake")
-	}
-	return nil
-}
-
-func ComputeEvidenceRoot(records []EvidenceRecord, groups []EvidenceVerificationGroup) (string, error) {
-	orderedRecords := make([]EvidenceRecord, len(records))
-	copy(orderedRecords, records)
-	sort.SliceStable(orderedRecords, func(i, j int) bool { return orderedRecords[i].EvidenceID < orderedRecords[j].EvidenceID })
-	orderedGroups := make([]EvidenceVerificationGroup, len(groups))
-	copy(orderedGroups, groups)
-	sort.SliceStable(orderedGroups, func(i, j int) bool {
-		if orderedGroups[i].EvidenceID != orderedGroups[j].EvidenceID {
-			return orderedGroups[i].EvidenceID < orderedGroups[j].EvidenceID
-		}
-		return orderedGroups[i].VerificationGroupID < orderedGroups[j].VerificationGroupID
-	})
-	for _, record := range orderedRecords {
-		if err := record.Validate(); err != nil {
-			return "", err
-		}
-	}
-	for _, group := range orderedGroups {
-		if err := group.Validate(); err != nil {
-			return "", err
-		}
-	}
-	return posHashRoot("aetra-pos-evidence-root-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(orderedRecords)))
-		for _, record := range orderedRecords {
-			posWritePart(w, computeEvidenceRecordHash(record))
-		}
-		posWriteUint64(w, uint64(len(orderedGroups)))
-		for _, group := range orderedGroups {
-			posWritePart(w, group.GroupHash)
-		}
-	}), nil
-}
-
-func ComputePerformanceRoot(records []PerformanceRecord) (string, error) {
-	ordered := make([]PerformanceRecord, len(records))
-	copy(ordered, records)
-	sort.SliceStable(ordered, func(i, j int) bool {
-		if ordered[i].EpochID != ordered[j].EpochID {
-			return ordered[i].EpochID < ordered[j].EpochID
-		}
-		if ordered[i].OperatorAddress != ordered[j].OperatorAddress {
-			return ordered[i].OperatorAddress < ordered[j].OperatorAddress
-		}
-		return ordered[i].Role < ordered[j].Role
-	})
-	for _, record := range ordered {
-		if err := record.Validate(); err != nil {
-			return "", err
-		}
-	}
-	return posHashRoot("aetra-pos-performance-root-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(ordered)))
-		for _, record := range ordered {
-			posWriteUint64(w, record.EpochID)
-			posWritePart(w, record.OperatorAddress)
-			posWritePart(w, string(record.Role))
-			posWriteUint64(w, record.AssignedTasks)
-			posWriteUint64(w, record.CompletedTasks)
-			posWriteUint64(w, record.MissedTasks)
-			posWriteUint64(w, record.InvalidTasks)
-			posWriteUint64(w, uint64(record.RewardMultiplierBps))
-		}
-	}), nil
-}
-
-func ComputeSlashingRoot(records []SlashingRecord) (string, error) {
-	ordered := make([]SlashingRecord, len(records))
-	copy(ordered, records)
-	sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].PenaltyID < ordered[j].PenaltyID })
-	for _, record := range ordered {
-		if err := record.Validate(); err != nil {
-			return "", err
-		}
-	}
-	return posHashRoot("aetra-pos-slashing-root-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(ordered)))
-		for _, record := range ordered {
-			posWritePart(w, record.RecordHash)
-		}
-	}), nil
-}
-
-func ComputeRiskWindowSetRoot(records []RiskWindowRecord) (string, error) {
-	ordered := make([]RiskWindowRecord, len(records))
-	copy(ordered, records)
-	sort.SliceStable(ordered, func(i, j int) bool {
-		if ordered[i].StartEpoch != ordered[j].StartEpoch {
-			return ordered[i].StartEpoch < ordered[j].StartEpoch
-		}
-		if ordered[i].ValidatorAddress != ordered[j].ValidatorAddress {
-			return ordered[i].ValidatorAddress < ordered[j].ValidatorAddress
-		}
-		return ordered[i].StakeOwner < ordered[j].StakeOwner
-	})
-	for _, record := range ordered {
-		if err := record.Validate(); err != nil {
-			return "", err
-		}
-	}
-	return posHashRoot("aetra-pos-risk-window-root-v1", func(w posByteWriter) {
-		posWriteUint64(w, uint64(len(ordered)))
-		for _, record := range ordered {
-			posWritePart(w, record.RiskHistoryRoot)
-		}
-	}), nil
-}
-
-func ValidateStateInvariants(input StateInvariantInput) (StateInvariantReport, error) {
-	if input.ActiveEpochID == 0 {
-		return StateInvariantReport{}, errors.New("state invariant active epoch id is required")
-	}
-	failed := make([]string, 0)
-	active := make(map[string]ScoredValidator, len(input.ActiveValidators))
-	for _, validator := range input.ActiveValidators {
-		if err := validateScoredValidatorForSecurity(validator); err != nil {
-			return StateInvariantReport{}, err
-		}
-		active[validator.ValidatorID] = validator
-	}
-	scoreByValidator := make(map[string]PosStateValidatorScoreRecord, len(input.ScoreRecords))
-	for _, record := range input.ScoreRecords {
-		if err := record.Validate(); err != nil {
-			if strings.Contains(err.Error(), "effective stake cannot exceed raw stake") {
-				failed = appendUnique(failed, "effective_stake_not_greater_than_raw_stake")
-				continue
-			}
-			return StateInvariantReport{}, err
-		}
-		if record.EpochID == input.ActiveEpochID {
-			scoreByValidator[record.ValidatorAddress] = record
-		}
-	}
-	for validatorID := range active {
-		if _, found := scoreByValidator[validatorID]; !found {
-			failed = appendUnique(failed, "active_validator_has_score_record")
-		}
-	}
-	for _, group := range input.TaskGroups {
-		if err := group.Validate(); err != nil {
-			if strings.Contains(err.Error(), "minimum group size") {
-				failed = appendUnique(failed, "task_group_size_meets_minimum")
-				continue
-			}
-			return StateInvariantReport{}, err
-		}
-		if len(group.ValidatorMembers) < int(group.MinimumGroupSize) {
-			failed = appendUnique(failed, "task_group_size_meets_minimum")
-		}
-		for _, member := range group.ValidatorMembers {
-			if _, found := active[member]; !found {
-				failed = appendUnique(failed, "task_group_members_are_active_validators")
-			}
-		}
-	}
-	groupByEvidence := make(map[string]EvidenceVerificationGroup, len(input.EvidenceVerificationGroups))
-	for _, group := range input.EvidenceVerificationGroups {
-		if err := group.Validate(); err != nil {
-			if strings.Contains(err.Error(), "excluded") {
-				failed = appendUnique(failed, "accused_validator_excluded_from_evidence_verification_group")
-				continue
-			}
-			return StateInvariantReport{}, err
-		}
-		groupByEvidence[group.EvidenceID] = group
-	}
-	slashingByEvidence := make(map[string][]SlashingRecord)
-	for _, record := range input.SlashingRecords {
-		if err := record.Validate(); err != nil {
-			if strings.Contains(err.Error(), "routing") || strings.Contains(err.Error(), "sum") {
-				failed = appendUnique(failed, "slash_routing_sums_to_penalty_amount")
-				continue
-			}
-			return StateInvariantReport{}, err
-		}
-		slashingByEvidence[record.EvidenceID] = append(slashingByEvidence[record.EvidenceID], record)
-	}
-	for _, evidence := range input.EvidenceRecords {
-		if err := evidence.Validate(); err != nil {
-			return StateInvariantReport{}, err
-		}
-		if group, found := groupByEvidence[evidence.EvidenceID]; found {
-			if isExcludedValidator(evidence.AccusedValidator, group.Members) || !isExcludedValidator(evidence.AccusedValidator, group.ExcludedValidators) {
-				failed = appendUnique(failed, "accused_validator_excluded_from_evidence_verification_group")
-			}
-		}
-		if evidence.Status == EvidenceStatusAccepted || evidence.Status == EvidenceStatusSlashed {
-			if len(slashingByEvidence[evidence.EvidenceID]) != 1 {
-				failed = appendUnique(failed, "accepted_evidence_maps_to_exactly_one_penalty_decision")
-			}
-		}
-	}
-	for _, check := range input.RiskWindowFaultChecks {
-		result, err := QuerySlashExposure(input.RiskWindows, SlashExposureQuery{
-			StakeOwner:       check.StakeOwner,
-			ValidatorAddress: check.ValidatorAddress,
-			FaultEpoch:       check.FaultEpoch,
-			EvidenceEpoch:    check.EvidenceEpoch,
-		})
-		if err != nil {
-			return StateInvariantReport{}, err
-		}
-		if !result.ExposureNaet.IsPositive() {
-			failed = appendUnique(failed, "unbonding_stake_remains_slashable_within_risk_window")
-		}
-	}
-	return StateInvariantReport{Passed: len(failed) == 0, FailedInvariants: failed}, nil
-}
-
 func (a LayeredPosArchitecture) Validate() error {
 	if len(a.Layers) != len(DefaultPosLayerOrder()) {
 		return errors.New("layered pos architecture must define all layers")
@@ -4290,7 +2094,7 @@ func DefaultPosLayerOrder() []PosLayer {
 }
 
 func ComputeLayeredPosArchitectureRoot(layers []PosLayerSpec) string {
-	return posHashRoot("aetra-pos-layered-architecture-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-layered-architecture-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(layers)))
 		for _, layer := range layers {
 			posWritePart(w, string(layer.Layer))
@@ -4610,7 +2414,7 @@ func (r PerformanceRewardRecord) Validate() error {
 }
 
 func ComputePerformanceRewardHash(record PerformanceRewardRecord) string {
-	return posHashRoot("aetra-pos-performance-reward-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-performance-reward-v1", func(w posByteWriter) {
 		posWriteUint64(w, record.EpochID)
 		posWritePart(w, record.ValidatorID)
 		posWritePart(w, record.BaseEmissionNaet.String())
@@ -5719,7 +3523,7 @@ func QuerySlashExposure(windows []RiskWindowRecord, query SlashExposureQuery) (S
 }
 
 func ComputeRiskWindowRoot(record RiskWindowRecord) string {
-	return posHashRoot("aetra-pos-risk-window-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-risk-window-v1", func(w posByteWriter) {
 		posWritePart(w, record.StakeOwner)
 		posWritePart(w, record.ValidatorAddress)
 		posWritePart(w, record.AmountNaet.String())
@@ -5731,7 +3535,7 @@ func ComputeRiskWindowRoot(record RiskWindowRecord) string {
 }
 
 func ComputeUnbondingRiskHistoryKey(record UnbondingRiskRecord) string {
-	return posHashRoot("aetra-pos-unbonding-risk-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-unbonding-risk-v1", func(w posByteWriter) {
 		posWritePart(w, record.DelegatorID)
 		posWritePart(w, record.ValidatorID)
 		posWritePart(w, record.AmountNaet.String())
@@ -5742,7 +3546,7 @@ func ComputeUnbondingRiskHistoryKey(record UnbondingRiskRecord) string {
 }
 
 func ComputeRedelegationRiskHistoryKey(record RedelegationRiskRecord) string {
-	return posHashRoot("aetra-pos-redelegation-risk-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-redelegation-risk-v1", func(w posByteWriter) {
 		posWritePart(w, record.DelegatorID)
 		posWritePart(w, record.SourceValidatorID)
 		posWritePart(w, record.DestinationValidatorID)
@@ -5969,7 +3773,7 @@ func ComputeValidatorSetHash(validators []ScoredValidator) (string, error) {
 			return "", err
 		}
 	}
-	return posHashRoot("aetra-pos-validator-set-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-validator-set-v1", func(w posByteWriter) {
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, validator := range ordered {
 			posWritePart(w, validator.ValidatorID)
@@ -6002,7 +3806,7 @@ func DeriveEpochSeedWithSource(source EpochSeedSource, epochID uint64, startHeig
 	if err := validatePosHash("validator set hash", validatorSetHash); err != nil {
 		return "", err
 	}
-	return posHashRoot("aetra-pos-epoch-seed-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-epoch-seed-v1", func(w posByteWriter) {
 		posWritePart(w, string(source))
 		posWriteUint64(w, epochID)
 		posWriteUint64(w, startHeight)
@@ -6972,7 +4776,7 @@ func (s TaskGroupSet) Validate() error {
 }
 
 func ComputeTaskAssignmentHash(epochID uint64, seed string, assignment TaskAssignment) string {
-	return posHashRoot("aetra-pos-task-assignment-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-task-assignment-v1", func(w posByteWriter) {
 		posWriteUint64(w, epochID)
 		posWritePart(w, seed)
 		posWritePart(w, assignment.TaskID)
@@ -6990,7 +4794,7 @@ func ComputeTaskAssignmentHash(epochID uint64, seed string, assignment TaskAssig
 }
 
 func ComputeTaskAssignmentRoot(epochID uint64, seed string, assignments []TaskAssignment) string {
-	return posHashRoot("aetra-pos-task-assignment-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-task-assignment-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, epochID)
 		posWritePart(w, seed)
 		posWriteUint64(w, uint64(len(assignments)))
@@ -7001,7 +4805,7 @@ func ComputeTaskAssignmentRoot(epochID uint64, seed string, assignments []TaskAs
 }
 
 func ComputeTaskGroupID(group TaskGroup) string {
-	return posHashRoot("aetra-pos-task-group-id-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-task-group-id-v1", func(w posByteWriter) {
 		posWriteUint64(w, group.EpochID)
 		posWritePart(w, group.WorkloadID)
 		posWritePart(w, string(group.WorkloadType))
@@ -7012,7 +4816,7 @@ func ComputeTaskGroupID(group TaskGroup) string {
 }
 
 func ComputeTaskGroupStakeWeightRoot(epochID uint64, task WorkloadTask, members []string, validators map[string]ScoredValidator) string {
-	return posHashRoot("aetra-pos-task-group-stake-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-task-group-stake-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, epochID)
 		posWritePart(w, task.TaskID)
 		posWritePart(w, task.WorkloadID)
@@ -7028,7 +4832,7 @@ func ComputeTaskGroupStakeWeightRoot(epochID uint64, task WorkloadTask, members 
 }
 
 func ComputeTaskGroupRoot(epochID uint64, seed string, groups []TaskGroup) string {
-	return posHashRoot("aetra-pos-task-group-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-task-group-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, epochID)
 		posWritePart(w, seed)
 		posWriteUint64(w, uint64(len(groups)))
@@ -7584,7 +5388,7 @@ func (o CollatorCandidateOutput) Validate() error {
 }
 
 func ComputeCollatorCandidateOutputHash(output CollatorCandidateOutput) string {
-	return posHashRoot("aetra-pos-collator-output-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-collator-output-v1", func(w posByteWriter) {
 		posWriteUint64(w, output.EpochID)
 		posWritePart(w, output.CollatorID)
 		posWritePart(w, output.OperatorAddress)
@@ -7679,7 +5483,7 @@ func (r CollatorRegistry) ActiveCollatorsForWorkload(workloadType WorkloadType) 
 }
 
 func ComputeCollatorRegistryRoot(registry CollatorRegistry) string {
-	return posHashRoot("aetra-pos-collator-registry-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-collator-registry-v1", func(w posByteWriter) {
 		posWriteUint64(w, registry.EpochID)
 		posWriteUint64(w, uint64(len(registry.Collators)))
 		for _, collator := range registry.Collators {
@@ -7839,7 +5643,7 @@ func (r CollatorOutputVerificationResult) Validate() error {
 }
 
 func ComputeCollatorOutputVerificationRoot(result CollatorOutputVerificationResult) string {
-	return posHashRoot("aetra-pos-collator-verification-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-collator-verification-v1", func(w posByteWriter) {
 		posWritePart(w, result.OutputHash)
 		posWriteUint64(w, uint64(result.ValidVotes))
 		posWriteUint64(w, uint64(result.InvalidVotes))
@@ -7890,7 +5694,7 @@ func BuildInvalidCollatorOutputEvidence(evidenceID string, reporterID string, co
 }
 
 func ComputeInvalidCollatorOutputEvidenceHash(collator CollatorRecord, output CollatorCandidateOutput, verification CollatorOutputVerificationResult) string {
-	return posHashRoot("aetra-pos-invalid-collator-output-evidence-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-invalid-collator-output-evidence-v1", func(w posByteWriter) {
 		posWritePart(w, collator.CollatorID)
 		posWritePart(w, output.CandidateOutputHash)
 		posWritePart(w, verification.VerificationRoot)
@@ -8425,7 +6229,7 @@ func selectTaskValidatorIDs(seed string, task WorkloadTask, role ValidatorRole, 
 		ranked[i] = rankedValidator{
 			validatorID: validator.ValidatorID,
 			score:       validator.Score,
-			rankHash: posHashRoot("aetra-pos-task-rank-v1", func(w posByteWriter) {
+			rankHash: posHashRoot("aetheris-pos-task-rank-v1", func(w posByteWriter) {
 				posWritePart(w, seed)
 				posWritePart(w, task.TaskID)
 				posWritePart(w, task.WorkloadID)
@@ -8515,7 +6319,7 @@ func taskGroupProposerOrder(seed string, task WorkloadTask, members []string) []
 	for i, validatorID := range members {
 		ranks[i] = proposerRank{
 			validatorID: validatorID,
-			hash: posHashRoot("aetra-pos-task-group-proposer-v1", func(w posByteWriter) {
+			hash: posHashRoot("aetheris-pos-task-group-proposer-v1", func(w posByteWriter) {
 				posWritePart(w, seed)
 				posWritePart(w, task.TaskID)
 				posWritePart(w, task.WorkloadID)
@@ -8696,7 +6500,7 @@ func compareDelegationIntents(left, right DelegationIntent) int {
 }
 
 func computeDelegationActivationKey(epoch uint64, validatorID string, nominations []Nomination) string {
-	return posHashRoot("aetra-pos-delegation-activation-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-delegation-activation-v1", func(w posByteWriter) {
 		posWriteUint64(w, epoch)
 		posWritePart(w, validatorID)
 		posWriteUint64(w, uint64(len(nominations)))
@@ -8708,7 +6512,7 @@ func computeDelegationActivationKey(epoch uint64, validatorID string, nomination
 }
 
 func computeEvidenceSettlementHash(settlement EvidenceSettlement) string {
-	return posHashRoot("aetra-pos-evidence-settlement-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-evidence-settlement-v1", func(w posByteWriter) {
 		posWritePart(w, settlement.EvidenceID)
 		posWritePart(w, settlement.ReporterID)
 		posWritePart(w, settlement.Slash.ValidatorID)
@@ -8721,7 +6525,7 @@ func computeEvidenceSettlementHash(settlement EvidenceSettlement) string {
 }
 
 func computeStructuredEvidenceHash(evidence StructuredEvidenceRecord) string {
-	return posHashRoot("aetra-pos-structured-evidence-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-structured-evidence-v1", func(w posByteWriter) {
 		posWritePart(w, evidence.EvidenceID)
 		posWritePart(w, evidence.EvidenceType)
 		posWritePart(w, evidence.ReporterID)
@@ -8737,7 +6541,7 @@ func computeStructuredEvidenceHash(evidence StructuredEvidenceRecord) string {
 }
 
 func computeEvidenceRecordHash(record EvidenceRecord) string {
-	return posHashRoot("aetra-pos-evidence-record-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-evidence-record-v1", func(w posByteWriter) {
 		posWritePart(w, record.EvidenceID)
 		posWritePart(w, record.EvidenceType)
 		posWritePart(w, record.AccusedValidator)
@@ -8755,14 +6559,14 @@ func computeEvidenceRecordHash(record EvidenceRecord) string {
 }
 
 func computeEvidenceVerificationAssignmentSeed(epochSeed string, evidenceID string) string {
-	return posHashRoot("aetra-pos-evidence-verification-seed-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-evidence-verification-seed-v1", func(w posByteWriter) {
 		posWritePart(w, epochSeed)
 		posWritePart(w, evidenceID)
 	})
 }
 
 func computeEvidenceVerifierSelectionHash(epochSeed string, evidenceID string, validatorID string) string {
-	return posHashRoot("aetra-pos-evidence-verifier-rank-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-evidence-verifier-rank-v1", func(w posByteWriter) {
 		posWritePart(w, epochSeed)
 		posWritePart(w, evidenceID)
 		posWritePart(w, validatorID)
@@ -8770,7 +6574,7 @@ func computeEvidenceVerifierSelectionHash(epochSeed string, evidenceID string, v
 }
 
 func computeEvidenceVerificationGroupID(group EvidenceVerificationGroup) string {
-	return posHashRoot("aetra-pos-evidence-verification-group-id-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-evidence-verification-group-id-v1", func(w posByteWriter) {
 		posWritePart(w, group.EvidenceID)
 		posWriteUint64(w, group.EpochID)
 		posWritePart(w, group.AssignmentSeed)
@@ -8780,7 +6584,7 @@ func computeEvidenceVerificationGroupID(group EvidenceVerificationGroup) string 
 }
 
 func computeEvidenceVerificationGroupHash(group EvidenceVerificationGroup) string {
-	return posHashRoot("aetra-pos-evidence-verification-group-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-evidence-verification-group-v1", func(w posByteWriter) {
 		posWritePart(w, group.EvidenceID)
 		posWriteUint64(w, group.EpochID)
 		posWritePart(w, group.VerificationGroupID)
@@ -8807,7 +6611,7 @@ func computeEvidenceVerificationRoot(evidenceID string, votes []EvidenceVerifica
 		}
 		return ordered[i].VoteHeight < ordered[j].VoteHeight
 	})
-	return posHashRoot("aetra-pos-evidence-verification-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-evidence-verification-root-v1", func(w posByteWriter) {
 		posWritePart(w, evidenceID)
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, vote := range ordered {
@@ -8828,7 +6632,7 @@ func computeEvidenceFinalityVoteRoot(evidenceID string, votes []EvidenceFinality
 		}
 		return ordered[i].FinalityHeight < ordered[j].FinalityHeight
 	})
-	return posHashRoot("aetra-pos-evidence-finality-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-evidence-finality-root-v1", func(w posByteWriter) {
 		posWritePart(w, evidenceID)
 		posWriteUint64(w, uint64(len(ordered)))
 		for _, vote := range ordered {
@@ -8842,7 +6646,7 @@ func computeEvidenceFinalityVoteRoot(evidenceID string, votes []EvidenceFinality
 }
 
 func computeWorkloadRewardRoot(settlement WorkloadRewardSettlement) string {
-	return posHashRoot("aetra-pos-workload-reward-root-v1", func(w posByteWriter) {
+	return posHashRoot("aetheris-pos-workload-reward-root-v1", func(w posByteWriter) {
 		posWriteUint64(w, settlement.EpochID)
 		posWriteUint64(w, uint64(len(settlement.Rewards)))
 		for _, reward := range settlement.Rewards {
@@ -9117,15 +6921,6 @@ func validateStateKeyComponent(fieldName string, value string) error {
 	return nil
 }
 
-func appendUnique(values []string, value string) []string {
-	for _, existing := range values {
-		if existing == value {
-			return values
-		}
-	}
-	return append(values, value)
-}
-
 func validatePosToken(fieldName string, value string) error {
 	if strings.TrimSpace(value) != value || value == "" {
 		return fmt.Errorf("%s is required and must not have surrounding whitespace", fieldName)
@@ -9150,24 +6945,12 @@ func validatePosResponsibility(fieldName string, value string) error {
 		return fmt.Errorf("%s must be <= %d bytes", fieldName, maxPosTokenLength)
 	}
 	for _, r := range value {
-		if r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '_' || r == '-' || r == '.' || r == ':' || r == '/' || r == ' ' || r == '+' || r == ',' || r == '<' || r == '=' {
+		if r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '_' || r == '-' || r == '.' || r == ':' || r == '/' || r == ' ' || r == '+' || r == ',' {
 			continue
 		}
 		return fmt.Errorf("%s contains invalid character", fieldName)
 	}
 	return nil
-}
-
-func validatePosPhaseSelector(fieldName string, value string) error {
-	if value == "any" {
-		return nil
-	}
-	switch EpochPhase(value) {
-	case EpochPhaseDelegation, EpochPhaseElection, EpochPhaseAssignment, EpochPhaseActive, EpochPhaseSettlement, EpochPhaseClosed:
-		return nil
-	default:
-		return fmt.Errorf("%s must be any or a valid epoch phase", fieldName)
-	}
 }
 
 func validatePosHash(fieldName string, value string) error {
@@ -9205,21 +6988,6 @@ func posWriteStringSlice(w posByteWriter, values []string) {
 	posWriteUint64(w, uint64(len(values)))
 	for _, value := range values {
 		posWritePart(w, value)
-	}
-}
-
-func posWriteCoverageSpecs(w posByteWriter, specs []PosTestCoverageSpec) {
-	posWriteUint64(w, uint64(len(specs)))
-	for _, spec := range specs {
-		posWritePart(w, spec.Name)
-		posWritePart(w, spec.TestType)
-		posWritePart(w, spec.ModuleName)
-		posWritePart(w, spec.CoverageTarget)
-		posWriteStringSlice(w, spec.Assertions)
-		posWriteUint64(w, uint64(len(spec.MigrationPhases)))
-		for _, phaseID := range spec.MigrationPhases {
-			posWriteUint64(w, uint64(phaseID))
-		}
 	}
 }
 
