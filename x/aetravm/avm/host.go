@@ -22,6 +22,62 @@ const (
 	ExitCodeForbiddenHostCall = async.ResultForbiddenHostCall
 )
 
+// HostGasCost specifies the gas cost model for a host function.
+// Each function has a base cost plus per-byte and per-ref (Chunk reference) costs.
+type HostGasCost struct {
+	BaseCost   uint64
+	PerByte    uint64
+	PerRef     uint64
+	MinCost    uint64
+}
+
+// HostGasCostFor returns the gas cost for calling a host function with given inputs.
+func HostGasCostFor(host HostFunction, argBytes int, refCount int) uint64 {
+	costs := DefaultHostFunctionCosts()
+	perByteCost := hostPerByteCosts()
+	perRefCost := hostPerRefCosts()
+
+	cost := costs[host]
+	cost += uint64(argBytes) * perByteCost[host]
+	cost += uint64(refCount) * perRefCost[host]
+
+	minCost := hostMinCosts()
+	if min, ok := minCost[host]; ok && cost < min {
+		return min
+	}
+	return cost
+}
+
+func hostPerByteCosts() map[HostFunction]uint64 {
+	return map[HostFunction]uint64{
+		HostSendInternal: 2,
+		HostEmitEvent:    1,
+		HostWriteStorage: 1,
+		HostReadStorage:  1,
+	}
+}
+
+func hostPerRefCosts() map[HostFunction]uint64 {
+	return map[HostFunction]uint64{
+		HostReadStorage:  10,
+		HostWriteStorage: 25,
+	}
+}
+
+func hostMinCosts() map[HostFunction]uint64 {
+	return map[HostFunction]uint64{
+		HostHashSHA256:         70,
+		HostHashBLAKE3:         80,
+		HostVerifyEd25519:      3_000,
+		HostSendInternal:       200,
+		HostWriteStorage:       50,
+		HostReadStorage:        20,
+		HostDeleteStorage:      150,
+		HostParseAetraAddress:  30,
+		HostFormatAetraAddress: 30,
+	}
+}
+
 type HostFunctionSpec struct {
 	ID          HostFunction
 	Name        string
@@ -287,4 +343,19 @@ func hostParseAetraAddress(text []byte) ([]byte, error) {
 
 func hostFormatAetraAddress(raw []byte) (string, error) {
 	return addressing.FormatUserFriendly(raw)
+}
+
+// RandomBeacon produces deterministic entropy for contract-level randomness.
+// Uses only consensus inputs — NO process randomness, wall-clock, or external entropy.
+//
+//	random = SHA256(previous_state_root || block_entropy || message_hash || domain)
+//
+// The result is deterministic per block: all validators produce identical values.
+func RandomBeacon(previousStateRoot, blockEntropy, messageHash, domain []byte) []byte {
+	h := sha256.New()
+	h.Write(previousStateRoot)
+	h.Write(blockEntropy)
+	h.Write(messageHash)
+	h.Write(domain)
+	return h.Sum(nil)
 }

@@ -6,6 +6,21 @@ import (
 )
 
 // Phase represents the current execution phase of the AVM.
+// Execution is a pure state transition defined as:
+//
+//	(StateRoot, Message, BlockContext) → (NewStateRoot, Actions, Receipt, ExitCode)
+//
+// Phases execute in strict order with explicit READ/WRITE separation:
+//   - Storage Phase (READ ONLY): loads immutable state snapshot
+//   - Credit Phase: applies attached value to contract balance
+//   - Compute Phase: executes VM instructions (mainly PURE operations)
+//   - Action Phase (COLLECTION ONLY): stages outgoing messages/events
+//   - Finalization Phase (WRITE ONLY): commits new Chunk roots
+//
+// No phase may mutate input state directly. All EFFECTFUL operations
+// are staged during execution and atomically committed in Finalization.
+// On failure, all WRITE operations are discarded, READ snapshot remains intact,
+// receipt is persisted, and only system-bounce actions survive.
 type Phase uint8
 
 const (
@@ -140,6 +155,8 @@ type ExecutionFrame struct {
 
 	ActionBudget uint32
 	ActionsUsed  uint32
+
+	HostCallTrace []HostCallRecord
 }
 
 func NewExecutionFrame(state *chunk.Chunk, msg Message, maxActions uint32) *ExecutionFrame {
@@ -204,3 +221,27 @@ type QueryReceipt struct {
 	Response  []byte
 	TraceHash string
 }
+
+// FailureKind classifies execution failures for error handling.
+type FailureKind uint8
+
+const (
+	FailureNone          FailureKind = iota // success
+	FailureRecoverable                      // retryable (e.g. queue congestion)
+	FailureNonRecoverable                   // contract abort, no retry
+	FailureSystemFatal                      // node-level error, halt processing
+)
+
+// HostCallRecord captures an auditable host function invocation.
+type HostCallRecord struct {
+	FunctionID uint32
+	InputHash  string
+	OutputHash string
+	GasUsed    uint64
+	Phase      Phase
+}
+
+// TraceStep records a single step of VM execution.
+// The execution trace is deterministic: same inputs produce identical traces.
+// Each step records the instruction, stack delta, gas consumed, and phase.
+// Host calls add HostCallRecord entries for auditability.
