@@ -59,15 +59,13 @@ func TestChunkMapPersistence(t *testing.T) {
 	m1, _ := m.Put(key, val)
 	root1 := m1.Root().Hash()
 
-	// Update with same value should result in same root (because Chunk hashes are deterministic)
 	m2, _ := m1.Put(key, val)
 	root2 := m2.Root().Hash()
-	require.Equal(t, root1, root2)
+	require.Equal(t, root1, root2, "same key+value must produce identical root hash")
 
-	// Different key should result in different root
 	m3, _ := m1.Put([]byte("other"), val)
 	root3 := m3.Root().Hash()
-	require.NotEqual(t, root1, root3)
+	require.NotEqual(t, root1, root3, "different key must produce different root hash")
 }
 
 func TestChunkMapProof(t *testing.T) {
@@ -84,15 +82,311 @@ func TestChunkMapProof(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, m.Root().Hash(), proof.Hash(), "proof root hash must match actual root hash")
 
-	// Verify proof: we should be able to Get(key1) from proof tree
 	pm := NewMap(proof)
 	res1, _ := pm.Get(key1)
 	require.NotNil(t, res1)
 	require.Equal(t, val1.Hash(), res1.Hash())
 
-	// Get(key2) from proof tree should return a pruned chunk or nil if pruned deeply
 	res2, _ := pm.Get(key2)
 	if res2 != nil {
 		require.Equal(t, TypePruned, res2.TypeTag(), "key2 should be pruned in key1's proof")
 	}
+}
+
+// --- New tests for all 12 improvements ---
+
+func TestChunkMapValidate(t *testing.T) {
+	m := NewEmptyMap()
+
+	// Empty map is valid
+	require.NoError(t, m.Validate())
+
+	// Populated map is valid
+	key1 := []byte("k1")
+	val, _ := NewBuilder().SetData([]byte{1}, 8).Build()
+	m, _ = m.Put(key1, val)
+	require.NoError(t, m.Validate())
+
+	// Multiple keys still valid
+	key2 := []byte("k2")
+	m, _ = m.Put(key2, val)
+	require.NoError(t, m.Validate())
+}
+
+func TestChunkMapValidateEmptyBranch(t *testing.T) {
+	m := NewEmptyMap()
+	m, _ = m.Put([]byte("a"), mustBuild(t, []byte{1}))
+	m, _ = m.Put([]byte("b"), mustBuild(t, []byte{2}))
+	m, _ = m.Put([]byte("c"), mustBuild(t, []byte{3}))
+
+	// All populated branches should validate fine
+	require.NoError(t, m.Validate())
+
+	// Deleting all keys should return to valid state
+	m, _ = m.Delete([]byte("a"))
+	m, _ = m.Delete([]byte("b"))
+	m, _ = m.Delete([]byte("c"))
+	require.NoError(t, m.Validate())
+}
+
+func TestChunkMapMaxDepth(t *testing.T) {
+	m := NewEmptyMap()
+	val, _ := NewBuilder().SetData([]byte{1}, 8).Build()
+
+	// Many puts with different keys should not exceed depth
+	for i := 0; i < 50; i++ {
+		key := []byte{byte(i)}
+		var err error
+		m, err = m.Put(key, val)
+		require.NoError(t, err, "put at key %d failed", i)
+	}
+
+	// Validate respects max depth
+	require.NoError(t, m.Validate())
+}
+
+func TestChunkMapCompress(t *testing.T) {
+	m := NewEmptyMap()
+	val, _ := NewBuilder().SetData([]byte{0x42}, 8).Build()
+
+	m, _ = m.Put([]byte{0x01}, val)
+
+	beforeDepth := getDepth(m.Root())
+	require.Greater(t, beforeDepth, 0)
+
+	compressed := m.Compress()
+
+	require.NoError(t, compressed.Validate())
+
+	afterDepth := getDepth(compressed.Root())
+	require.LessOrEqual(t, afterDepth, beforeDepth)
+
+	res, err := compressed.Get([]byte{0x01})
+	require.NoError(t, err)
+	require.NotNil(t, res, "key must be retrievable after compress")
+	require.Equal(t, val.Hash(), res.Hash())
+}
+
+func TestChunkMapCompressPreservesLookup(t *testing.T) {
+	m := NewEmptyMap()
+	keys := [][]byte{[]byte("alpha"), []byte("beta"), []byte("gamma")}
+	vals := make([]*Chunk, 3)
+
+	for i, k := range keys {
+		v, _ := NewBuilder().SetData([]byte{byte(i + 1)}, 8).Build()
+		vals[i] = v
+		m, _ = m.Put(k, v)
+	}
+
+	compressed := m.Compress()
+
+	for i, k := range keys {
+		res, err := compressed.Get(k)
+		require.NoError(t, err)
+		require.NotNil(t, res)
+		require.Equal(t, vals[i].Hash(), res.Hash(), "key %s mismatch after compress", k)
+	}
+}
+
+func TestChunkMapProveAbsence(t *testing.T) {
+	m := NewEmptyMap()
+	val, _ := NewBuilder().SetData([]byte{1}, 8).Build()
+
+	m, _ = m.Put([]byte("present"), val)
+
+	proof, err := m.ProveAbsence([]byte("absent"))
+	require.NoError(t, err)
+	require.NotNil(t, proof, "absence proof should exist even for empty target")
+
+	// Verify the proof root hash matches
+	require.Equal(t, m.Root().Hash(), proof.Hash())
+}
+
+func TestChunkMapProveAbsenceEmpty(t *testing.T) {
+	m := NewEmptyMap()
+
+	proof, err := m.ProveAbsence([]byte("any"))
+	require.NoError(t, err)
+	require.NotNil(t, proof)
+}
+
+func TestChunkMapVersioning(t *testing.T) {
+	m := NewEmptyMap()
+	require.Equal(t, uint64(0), m.Version())
+
+	val, _ := NewBuilder().SetData([]byte{1}, 8).Build()
+
+	m, _ = m.Put([]byte("k1"), val)
+	require.Equal(t, uint64(1), m.Version())
+
+	m, _ = m.Put([]byte("k2"), val)
+	require.Equal(t, uint64(2), m.Version())
+
+	m, _ = m.Delete([]byte("k1"))
+	require.Equal(t, uint64(3), m.Version())
+
+	// Compress also bumps version
+	m = m.Compress()
+	require.Equal(t, uint64(4), m.Version())
+}
+
+func TestChunkMapRootHash(t *testing.T) {
+	m := NewEmptyMap()
+
+	// Empty map RootHash
+	emptyHash := m.RootHash()
+	require.NotEqual(t, [HashSize]byte{}, emptyHash)
+
+	val, _ := NewBuilder().SetData([]byte{0x01}, 8).Build()
+	m, _ = m.Put([]byte("key"), val)
+
+	// Non-empty has different hash
+	nonEmptyHash := m.RootHash()
+	require.NotEqual(t, emptyHash, nonEmptyHash)
+
+	// Same content → same RootHash
+	m2 := NewEmptyMap()
+	m2, _ = m2.Put([]byte("key"), val)
+	require.Equal(t, nonEmptyHash, m2.RootHash())
+}
+
+func TestChunkMapGasModel(t *testing.T) {
+	// GasCost should increase with depth
+	gcShallow := GasCostFor(1)
+	gcDeep := GasCostFor(50)
+
+	require.Greater(t, gcDeep.Lookup, gcShallow.Lookup)
+	require.Greater(t, gcDeep.Insert, gcShallow.Insert)
+	require.Greater(t, gcDeep.Delete, gcShallow.Delete)
+	require.Greater(t, gcDeep.Proof, gcShallow.Proof)
+
+	// All costs should be positive at depth 0
+	gc0 := GasCostFor(0)
+	require.Greater(t, gc0.Lookup, uint64(0))
+	require.Greater(t, gc0.Insert, uint64(0))
+	require.Greater(t, gc0.Delete, uint64(0))
+	require.Greater(t, gc0.Proof, uint64(0))
+}
+
+func TestChunkMapIterate(t *testing.T) {
+	m := NewEmptyMap()
+	v1, _ := NewBuilder().SetData([]byte{1}, 8).Build()
+	v2, _ := NewBuilder().SetData([]byte{2}, 8).Build()
+	v3, _ := NewBuilder().SetData([]byte{3}, 8).Build()
+
+	m, _ = m.Put([]byte("ccc"), v3)
+	m, _ = m.Put([]byte("aaa"), v1)
+	m, _ = m.Put([]byte("bbb"), v2)
+
+	entries := m.Iterate()
+	require.Equal(t, 3, len(entries))
+
+	// All values should be present (keys are not recoverable from trie)
+	vals := make(map[[HashSize]byte]bool)
+	for _, e := range entries {
+		var h [HashSize]byte
+		copy(h[:], e.Value.Hash())
+		vals[h] = true
+	}
+	var h1, h2, h3 [HashSize]byte
+	copy(h1[:], v1.Hash())
+	copy(h2[:], v2.Hash())
+	copy(h3[:], v3.Hash())
+	require.True(t, vals[h1], "v1 missing")
+	require.True(t, vals[h2], "v2 missing")
+	require.True(t, vals[h3], "v3 missing")
+}
+
+func TestChunkMapIterateEmpty(t *testing.T) {
+	m := NewEmptyMap()
+	entries := m.Iterate()
+	require.Nil(t, entries)
+}
+
+func TestChunkMapEmptyCanonical(t *testing.T) {
+	m := NewEmptyMap()
+	require.True(t, m.IsEmpty())
+	require.Nil(t, m.Root())
+	require.NoError(t, m.Validate())
+}
+
+func TestChunkMapCollisionBucket(t *testing.T) {
+	// Two keys that resolve to the same 3-bit prefix path
+	// We rely on the collision bucket mechanism to handle this
+	m := NewEmptyMap()
+	v1, _ := NewBuilder().SetData([]byte{0x0A}, 8).Build()
+	v2, _ := NewBuilder().SetData([]byte{0x0B}, 8).Build()
+
+	// Insert many keys to increase probability of shared prefix
+	keys := make([][]byte, 20)
+	for i := 0; i < 20; i++ {
+		keys[i] = []byte{byte(i), 0x00, 0x00, 0x00}
+	}
+	m, _ = m.Put(keys[0], v1)
+	m, _ = m.Put(keys[1], v2)
+
+	// Both retrievable
+	r1, err := m.Get(keys[0])
+	require.NoError(t, err)
+	require.NotNil(t, r1)
+	require.Equal(t, v1.Hash(), r1.Hash())
+
+	r2, err := m.Get(keys[1])
+	require.NoError(t, err)
+	require.NotNil(t, r2)
+	require.Equal(t, v2.Hash(), r2.Hash())
+}
+
+func TestChunkMapManyKeysDeterministic(t *testing.T) {
+	m := NewEmptyMap()
+	val, _ := NewBuilder().SetData([]byte{0xFF}, 8).Build()
+
+	for i := 0; i < 100; i++ {
+		key := []byte{byte(i), byte(i >> 8)}
+		var err error
+		m, err = m.Put(key, val)
+		require.NoError(t, err)
+	}
+
+	// Same inputs → same root (deterministic)
+	m2 := NewEmptyMap()
+	for i := 0; i < 100; i++ {
+		key := []byte{byte(i), byte(i >> 8)}
+		m2, _ = m2.Put(key, val)
+	}
+
+	require.Equal(t, m.RootHash(), m2.RootHash())
+
+	// Validate the tree
+	require.NoError(t, m.Validate())
+}
+
+func TestChunkMapIsEmpty(t *testing.T) {
+	require.True(t, NewEmptyMap().IsEmpty())
+	require.False(t, NewMap(mustBuild(t, []byte{1})).IsEmpty())
+}
+
+func TestChunkMapParallelBucketsIndependent(t *testing.T) {
+	m := NewEmptyMap()
+	val, _ := NewBuilder().SetData([]byte{0x01}, 8).Build()
+
+	// Keys with different first 3 bits → different top-level buckets
+	// These should update independently without conflicts
+	m, _ = m.Put([]byte{0x00}, val)
+
+	// Different bucket should have different hash path
+	m2 := NewEmptyMap()
+	m2, _ = m2.Put([]byte{0x20}, val)
+
+	// Both should be valid independently
+	require.NoError(t, m.Validate())
+	require.NoError(t, m2.Validate())
+	require.NotEqual(t, m.RootHash(), m2.RootHash())
+}
+
+func mustBuild(t *testing.T, data []byte) *Chunk {
+	t.Helper()
+	c, err := NewBuilder().SetData(data, uint16(len(data)*8)).Build()
+	require.NoError(t, err)
+	return c
 }
