@@ -556,7 +556,6 @@ func AVM2ContractStorageShardKey(contractAddr, storageKey string) string {
 
 func ComputeAVM2ContractStateEntryHash(entry AVM2ContractStateEntry) string {
 	entry = canonicalAVM2ContractStateEntry(entry)
-	entry.EntryHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-contract-state-entry-v1")
 	writeEnginePart(h, entry.Key)
@@ -579,7 +578,6 @@ func ComputeAVM2ContractStateLayoutRoot(layout AVM2ContractStateLayout) string {
 
 func ComputeAVM2CodeRecordHash(record AVM2CodeRecord) string {
 	record = canonicalAVM2CodeRecord(record)
-	record.RecordHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-code-record-v1")
 	writeEngineUint64(h, record.CodeID)
@@ -597,7 +595,6 @@ func ComputeAVM2CodeRecordHash(record AVM2CodeRecord) string {
 
 func ComputeAVM2ContractRecordHash(record AVM2ContractRecord) string {
 	record = canonicalAVM2ContractRecord(record)
-	record.RecordHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-contract-record-v1")
 	writeEnginePart(h, record.ContractAddr)
@@ -615,7 +612,6 @@ func ComputeAVM2ContractRecordHash(record AVM2ContractRecord) string {
 
 func ComputeAVM2ContractStorageValueHash(value AVM2ContractStorageValue) string {
 	value = canonicalAVM2ContractStorageValue(value)
-	value.RecordHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-contract-storage-value-v1")
 	writeEnginePart(h, value.ContractAddr)
@@ -628,7 +624,6 @@ func ComputeAVM2ContractStorageValueHash(value AVM2ContractStorageValue) string 
 
 func ComputeAVM2ContractABIDescriptorRecordHash(record AVM2ContractABIDescriptorRecord) string {
 	record = canonicalAVM2ContractABIDescriptorRecord(record)
-	record.RecordHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-contract-abi-record-v1")
 	writeEngineUint64(h, record.CodeID)
@@ -640,7 +635,6 @@ func ComputeAVM2ContractABIDescriptorRecordHash(record AVM2ContractABIDescriptor
 
 func ComputeAVM2ContractEventRecordHash(record AVM2ContractEventRecord) string {
 	record = canonicalAVM2ContractEventRecord(record)
-	record.RecordHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-contract-event-record-v1")
 	writeEnginePart(h, record.Event.EventHash)
@@ -651,7 +645,6 @@ func ComputeAVM2ContractEventRecordHash(record AVM2ContractEventRecord) string {
 
 func ComputeAVM2ContractMessageNonceRecordHash(record AVM2ContractMessageNonceRecord) string {
 	record = canonicalAVM2ContractMessageNonceRecord(record)
-	record.RecordHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-contract-message-nonce-v1")
 	writeEnginePart(h, record.ContractAddr)

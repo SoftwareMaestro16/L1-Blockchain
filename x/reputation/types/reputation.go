@@ -1414,8 +1414,6 @@ func addressKey(address sdk.AccAddress) string {
 }
 
 func ComputeReputationEventID(event ReputationEvent) string {
-	event.EventID = ""
-	event.EventHash = ""
 	return hashParts(
 		"reputation-event-id-v1",
 		event.SubjectType,

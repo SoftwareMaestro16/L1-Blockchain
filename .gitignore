@@ -77,6 +77,10 @@ vendor/
 Thumbs.db
 .vscode/
 .idea/
+.ide/
+.history/
+*.swp
+*.swo
 
 # Private research and planning docs
 AUDIT_RESULTS_V2.md

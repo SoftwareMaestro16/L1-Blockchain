@@ -1275,7 +1275,6 @@ func ComputeAVM2BytesHash(data []byte) string {
 
 func ComputeAVM2InstructionSetHash(set AVM2InstructionSet) string {
 	set = canonicalAVM2InstructionSet(set)
-	set.SetHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-instruction-set-v1")
 	writeEngineUint64(h, set.Version)
@@ -1291,7 +1290,6 @@ func ComputeAVM2InstructionSetHash(set AVM2InstructionSet) string {
 
 func ComputeAVM2GasTableHash(table AVM2GasTable) string {
 	table = canonicalAVM2GasTable(table)
-	table.TableHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-gas-table-v1")
 	writeEngineUint64(h, table.BaseInstructionGas)
@@ -1318,7 +1316,6 @@ func ComputeAVM2GasTableHash(table AVM2GasTable) string {
 }
 
 func ComputeAVM2ContextHash(ctx AVM2ExecutionContext) string {
-	ctx.ContextHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-context-v1")
 	writeEnginePart(h, ctx.ChainID)
@@ -1365,7 +1362,6 @@ func ComputeAVM2ProofHash(proof AVM2ProofInput) string {
 
 func ComputeAVM2PromiseHash(promise AVM2PromiseState) string {
 	promise = canonicalAVM2PromiseState(promise)
-	promise.PromiseHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-promise-v1")
 	writeEnginePart(h, promise.PromiseID)
@@ -1381,7 +1377,6 @@ func ComputeAVM2PromiseHash(promise AVM2PromiseState) string {
 
 func ComputeAVM2ABIInterfaceHash(abi AVM2ABIDescriptor) string {
 	abi = canonicalAVM2ABIDescriptor(abi)
-	abi.InterfaceHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-abi-v1")
 	writeEngineUint64(h, abi.ABIVersion)
@@ -1396,7 +1391,6 @@ func ComputeAVM2ABIInterfaceHash(abi AVM2ABIDescriptor) string {
 
 func ComputeAVM2EventHash(event AVM2Event) string {
 	event = canonicalAVM2Event(event)
-	event.EventHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-event-v1")
 	writeEngineUint64(h, event.Height)
@@ -1472,7 +1466,6 @@ func ComputeAVM2EventRoot(events []AVM2Event) string {
 
 func ComputeAVM2ExecutionHash(result AVM2ExecutionResult) string {
 	result = canonicalAVM2ExecutionResult(result)
-	result.ExecutionHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-execution-v1")
 	writeEngineUint64(h, result.GasUsed)

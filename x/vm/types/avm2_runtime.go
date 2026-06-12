@@ -502,7 +502,6 @@ func ComputeAVM2BytecodeHash(module AVM2BytecodeModule) string {
 
 func ComputeAVM2StoreV2EntryHash(entry AVM2StoreV2Entry) string {
 	entry = canonicalAVM2StoreV2Entry(entry)
-	entry.EntryHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-storev2-entry-v1")
 	writeEnginePart(h, entry.Key)
@@ -525,7 +524,6 @@ func ComputeAVM2StoreV2AdapterRoot(adapter AVM2StoreV2Adapter) string {
 
 func ComputeAVM2MessageDrivenInputHash(input AVM2MessageDrivenInput) string {
 	input = canonicalAVM2MessageDrivenInput(input)
-	input.InputHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-message-driven-input-v1")
 	writeEnginePart(h, input.Message.ID)
@@ -537,7 +535,6 @@ func ComputeAVM2MessageDrivenInputHash(input AVM2MessageDrivenInput) string {
 
 func ComputeAVM2StateTransitionHash(transition AVM2StateTransition) string {
 	transition = canonicalAVM2StateTransition(transition)
-	transition.StateTransitionHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-state-transition-v1")
 	writeEnginePart(h, transition.Input.InputHash)
@@ -568,7 +565,6 @@ func ComputeAVM2ReceiptRoot(receipts []AVMExecutionReceipt) string {
 
 func ComputeAVM2ContractShardRouteSetHash(set AVM2ContractShardRouteSet) string {
 	set = canonicalAVM2ContractShardRouteSet(set)
-	set.RouteSetHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-contract-shard-routes-v1")
 	writeEngineUint64(h, set.LayoutEpoch)

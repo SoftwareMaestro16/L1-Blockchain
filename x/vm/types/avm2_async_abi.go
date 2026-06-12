@@ -601,7 +601,6 @@ func (d AVM2ABIIntrospectionDescriptor) RequiredFundsForSelector(selector string
 
 func ComputeAVM2AsyncCallPlanHash(plan AVM2AsyncCallPlan) string {
 	plan = canonicalAVM2AsyncCallPlan(plan)
-	plan.PlanHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-async-call-plan-v1")
 	writeEngineUint64(h, plan.Height)
@@ -617,7 +616,6 @@ func ComputeAVM2AsyncCallPlanHash(plan AVM2AsyncCallPlan) string {
 
 func ComputeAVM2PromiseResolutionHash(resolution AVM2PromiseResolution) string {
 	resolution = canonicalAVM2PromiseResolution(resolution)
-	resolution.ResolutionHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-promise-resolution-v1")
 	writeEnginePart(h, resolution.PromiseID)
@@ -632,7 +630,6 @@ func ComputeAVM2PromiseResolutionHash(resolution AVM2PromiseResolution) string {
 
 func ComputeAVM2PromiseTimeoutTaskHash(task AVM2PromiseTimeoutTask) string {
 	task = canonicalAVM2PromiseTimeoutTask(task)
-	task.TaskHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-promise-timeout-task-v1")
 	writeEnginePart(h, task.PromiseID)
@@ -645,7 +642,6 @@ func ComputeAVM2PromiseTimeoutTaskHash(task AVM2PromiseTimeoutTask) string {
 
 func ComputeAVM2MethodDescriptorHash(method AVM2MethodDescriptor) string {
 	method = canonicalAVM2MethodDescriptor(method)
-	method.MethodHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-method-descriptor-v1")
 	writeEnginePart(h, method.Selector)
@@ -659,7 +655,6 @@ func ComputeAVM2MethodDescriptorHash(method AVM2MethodDescriptor) string {
 
 func ComputeAVM2EventDescriptorHash(event AVM2EventDescriptor) string {
 	event = canonicalAVM2EventDescriptor(event)
-	event.EventHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-abi-event-descriptor-v1")
 	writeEnginePart(h, event.Name)
@@ -669,7 +664,6 @@ func ComputeAVM2EventDescriptorHash(event AVM2EventDescriptor) string {
 
 func ComputeAVM2ErrorDescriptorHash(errDesc AVM2ErrorDescriptor) string {
 	errDesc = canonicalAVM2ErrorDescriptor(errDesc)
-	errDesc.ErrorHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-error-descriptor-v1")
 	writeEnginePart(h, errDesc.Code)
@@ -679,7 +673,6 @@ func ComputeAVM2ErrorDescriptorHash(errDesc AVM2ErrorDescriptor) string {
 
 func ComputeAVM2FundRequirementHash(requirement AVM2FundRequirement) string {
 	requirement = canonicalAVM2FundRequirement(requirement)
-	requirement.RequirementHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-fund-requirement-v1")
 	writeEnginePart(h, requirement.Selector)
@@ -690,7 +683,6 @@ func ComputeAVM2FundRequirementHash(requirement AVM2FundRequirement) string {
 
 func ComputeAVM2GasHintHash(hint AVM2GasHint) string {
 	hint = canonicalAVM2GasHint(hint)
-	hint.HintHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-gas-hint-v1")
 	writeEnginePart(h, hint.Selector)
@@ -700,7 +692,6 @@ func ComputeAVM2GasHintHash(hint AVM2GasHint) string {
 
 func ComputeAVM2ABIIntrospectionHash(descriptor AVM2ABIIntrospectionDescriptor) string {
 	descriptor = canonicalAVM2ABIIntrospectionDescriptor(descriptor)
-	descriptor.InterfaceHash = ""
 	h := sha256.New()
 	writeEnginePart(h, "aetra-avm2-abi-introspection-v1")
 	writeEngineUint64(h, descriptor.ABIVersion)
